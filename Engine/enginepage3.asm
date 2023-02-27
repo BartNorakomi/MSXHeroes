@@ -1,15 +1,33 @@
 phase	$c000
 
-
-
-
-loadGraphics:
-;  call  SetInterruptHandler           ;set Lineint and Vblank  
+StartGame:
+  call  LoadWorldGraphics
+  call  SetInterruptHandler             ;set Vblank
   jp    LevelEngine
 
+LoadWorldGraphics:
+  ld    d,World1TilesBlock
+  ld    a,1
+  ld    hl,$8000                        ;write to page 3
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
 
+  ld    hl,World1Palette
+  call  SetPalette
+  ret
 
-setpage:              ;in a->x*32+31 (x=page)
+SetInterruptHandler:
+  di
+  ld    hl,InterruptHandler 
+  ld    ($38+1),hl                      ;set new normal interrupt
+  ld    a,$c3                           ;jump command
+  ei
+  ld    ($38),a
+  ret
+
+World1Palette:
+  incbin"..\grapx\tilesheets\world1tiles.pl"
+
+SetPage:                                ;in a->x*32+31 (x=page)
   di
   out   ($99),a
   ld    a,2+128
@@ -40,7 +58,6 @@ block1234:
 	ld		($7000),a
 	ei
 	ret
-
 
 DoCopy:
   ld    a,32
@@ -75,70 +92,47 @@ DoCopy:
 	dw    $a3ed,$a3ed,$a3ed
   ret
 
-lineintheight: equ 212-43
-SetInterruptHandler:
-  di
-  ld    hl,InterruptHandler 
-  ld    ($38+1),hl          ;set new normal interrupt
-  ld    a,$c3               ;jump command
-  ld    ($38),a
- 
-  ld    a,(VDP_0)           ;set ei1
-  or    16                  ;ei1 checks for lineint and vblankint
-  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
-  out   ($99),a
-  ld    a,128
-  out   ($99),a
+copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+	call	SetVdp_Write                    ;start writing to address bhl
 
-  ld    a,lineintheight
-  out   ($99),a
-  ld    a,19+128            ;set lineinterrupt height
-  ei
-  out   ($99),a 
-  ret
+  ld    a,d
+  call  block1234
 
-
-
-copyGraphicsToScreen:
-  ld    a,d                 ;Graphicsblock
-  call  block12
-  
-	ld		a,b
-	call	SetVdp_Write	
 	ld		hl,$4000
   ld    c,$98
-  ld    a,64                ;first 128 line, copy 64*256 = $4000 bytes to Vram
-  ld    b,0
-      
-  call  .loop1    
+  ld    a,128                           ;256 lines, copy 128*256 = $4000 bytes to Vram      
 
-  ld    a,d                 ;Graphicsblock
-;  add   a,2
-  inc   a
-  call  block12
-  
-	ld		hl,$4000
-  ld    c,$98
-  ld    a,42                ;second 84 line, copy 64*256 = $4000 bytes to Vram
-  ld    b,0
-      
-  call  .loop1   
-
-  ;this last part is to fill the screen with a repetition
-;	ld		hl,$4000
-;  ld    c,$98
-;  ld    a,22                ;second 84 line, copy 64*256 = $4000 bytes to Vram
-;  ld    b,0
-      
-;  call  .loop1   
-  ret
-
-.loop1:
-  otir
+  .loop1:
+  call  outix256
   dec   a
   jp    nz,.loop1
   ret
 
+copyGraphicsToScreen212:                ;in d=block, ahl=address to write to. This routine writes a set amount of bytes to vram. In this case 212 lines (212 lines * 128 bytes = $6a00 bytes)
+	call	SetVdp_Write                    ;start writing to address bhl
+
+  ld    a,d
+  call  block12
+
+	ld		hl,$4000
+  ld    c,$98
+  ld    a,64                            ;first 128 line, copy 64*256 = $4000 bytes to Vram      
+  call  .loop1    
+
+  ld    a,d                             ;Graphicsblock
+  inc   a
+  call  block12
+  
+	ld		hl,$4000
+  ld    a,42                            ;second 84 line, copy 64*256 = $4000 bytes to Vram      
+;  call  .loop1   
+;  ret
+
+  .loop1:
+  call  outix256
+  dec   a
+  jp    nz,.loop1
+  ret
 
 currentpage:                ds  1
 sprcoltableaddress:         ds  2
@@ -147,8 +141,6 @@ sprchatableaddress:         ds  2
 invissprcoltableaddress:    ds  2
 invisspratttableaddress:    ds  2
 invissprchatableaddress:    ds  2
-
-
 
 SetPalette:
 	xor		a
@@ -171,14 +163,14 @@ SetVdp_Read:  rlc     h
               srl     h
               srl     h
               di
-              out     ($99),a         ;set bits 15-17
+              out     ($99),a           ;set bits 15-17
               ld      a,14+128
               out     ($99),a
-              ld      a,l             ;set bits 0-7
+              ld      a,l               ;set bits 0-7
 ;              nop
               out     ($99),a
-              ld      a,h             ;set bits 8-14
-              ei                      ; + read access
+              ld      a,h               ;set bits 8-14
+              ei                        ; + read access
               out     ($99),a
               ret
               
@@ -194,26 +186,23 @@ SetVdp_Write:
 	srl     h
 	srl     h
 	di
-	out     ($99),a       ;set bits 15-17
+	out     ($99),a                       ;set bits 15-17
 	ld      a,14+128
 	out     ($99),a
 ;/first set register 14 (actually this only needs to be done once
 
-	ld      a,l           ;set bits 0-7
+	ld      a,l                           ;set bits 0-7
 ;	nop
 	out     ($99),a
-	ld      a,h           ;set bits 8-14
-	or      64            ; + write access
+	ld      a,h                           ;set bits 8-14
+	or      64                            ; + write access
 	ei
 	out     ($99),a       
 	ret
 
-
-
-
-Depack:     ;In: HL: source, DE: destination
-	inc	hl		;skip original file length
-	inc	hl		;which is stored in 4 bytes
+Depack:                                 ;In: HL: source, DE: destination
+	inc	hl		                            ;skip original file length
+	inc	hl		                            ;which is stored in 4 bytes
 	inc	hl
 	inc	hl
 
@@ -225,78 +214,78 @@ Depack:     ;In: HL: source, DE: destination
 	
 .depack_loop:
 	call .getbits
-	jr	c,.output_compressed	;if set, we got lz77 compression
-	ldi				;copy byte from compressed data to destination (literal byte)
+	jr	c,.output_compressed	            ;if set, we got lz77 compression
+	ldi				                            ;copy byte from compressed data to destination (literal byte)
 
 	jr	.depack_loop
 	
 ;handle compressed data
 .output_compressed:
-	ld	c,(hl)		;get lowest 7 bits of offset, plus offset extension bit
-	inc	hl		;to next byte in compressed data
+	ld	c,(hl)		                        ;get lowest 7 bits of offset, plus offset extension bit
+	inc	hl		                            ;to next byte in compressed data
 
 .output_match:
 	ld	b,0
 	bit	7,c
-	jr	z,.output_match1	;no need to get extra bits if carry not set
+	jr	z,.output_match1	                ;no need to get extra bits if carry not set
 
 	call .getbits
 	call .rlbgetbits
 	call .rlbgetbits
 	call .rlbgetbits
 
-	jr	c,.output_match1	;since extension mark already makes bit 7 set 
-	res	7,c		;only clear it if the bit should be cleared
+	jr	c,.output_match1	                ;since extension mark already makes bit 7 set 
+	res	7,c		                            ;only clear it if the bit should be cleared
 .output_match1:
 	inc	bc
 	
 ;return a gamma-encoded value
 ;length returned in HL
-	exx			;to second register set!
+	exx			                              ;to second register set!
 	ld	h,d
-	ld	l,e             ;initial length to 1
-	ld	b,e		;bitcount to 1
+	ld	l,e                               ;initial length to 1
+	ld	b,e		                            ;bitcount to 1
 
 ;determine number of bits used to encode value
 .get_gamma_value_size:
 	exx
 	call .getbits
 	exx
-	jr	nc,.get_gamma_value_size_end	;if bit not set, bitlength of remaining is known
-	inc	b				;increase bitcount
-	jr	.get_gamma_value_size		;repeat...
+	jr	nc,.get_gamma_value_size_end	    ;if bit not set, bitlength of remaining is known
+	inc	b				                          ;increase bitcount
+	jr	.get_gamma_value_size		          ;repeat...
 
 .get_gamma_value_bits:
 	exx
 	call .getbits
 	exx
 	
-	adc	hl,hl				;insert new bit in HL
+	adc	hl,hl				                      ;insert new bit in HL
 .get_gamma_value_size_end:
-	djnz	.get_gamma_value_bits		;repeat if more bits to go
+	djnz	.get_gamma_value_bits		        ;repeat if more bits to go
 
 .get_gamma_value_end:
-	inc	hl		;length was stored as length-2 so correct this
-	exx			;back to normal register set
+	inc	hl		                            ;length was stored as length-2 so correct this
+	exx			                              ;back to normal register set
 	
 	ret	c
 ;HL' = length
 
-	push	hl		;address compressed data on stack
+	push	hl		                          ;address compressed data on stack
 
 	exx
-	push	hl		;match length on stack
+	push	hl		                          ;match length on stack
 	exx
 
 	ld	h,d
-	ld	l,e		;destination address in HL...
-	sbc	hl,bc		;calculate source address
+	ld	l,e		                            ;destination address in HL...
+	sbc	hl,bc		                          ;calculate source address
 
-	pop	bc		;match length from stack
+	pop	bc		                            ;match length from stack
 
-	ldir			;transfer data
+	ldir			                            ;transfer data
 
-	pop	hl		;address compressed data back from stack
+	pop	hl		                            ;address compressed data back from stack
 
 	jr	.depack_loop
 
@@ -325,17 +314,17 @@ PopulateControls:
 ;	ld		a,(NewPrContr)
 ;	ld		(NewPrContrOld),a
 	
-	ld		a,15		; select joystick port 1
+	ld		a,15		                        ; select joystick port 1
 	di
 	out		($a0),a
 	ld		a,$8f
 	out		($a1),a
-	ld		a,14		; read joystick data
+	ld		a,14		                        ; read joystick data
 	out		($a0),a
 	ei
 	in		a,($a2)
 	cpl
-	and		$3f			; 00BARLDU
+	and		$3f			                        ; 00BARLDU
 	ld		c,a
 
 	ld		de,$04F0
@@ -346,38 +335,38 @@ PopulateControls:
 	out		($aa),a
 	in		a,($a9)
 	cpl
-	and		$20			; 'F1' key
-	rlca				  ; 01000000
+	and		$20			                        ; 'F1' key
+	rlca				                          ; 01000000
 	or		c
-	ld		c,a			; 01BARLDU
+	ld		c,a			                        ; 01BARLDU
 	
-	in		a,($aa)	; M = B-trigger
+	in		a,($aa)	                        ; M = B-trigger
 	and		e
 	or		d
 	out		($aa),a
 	in		a,($a9)
 	cpl
-	and		d			; xxxxxBxx
+	and		d			                          ; xxxxxBxx
 	ld		b,a
 	in		a,($aa)
 	and		e
 	or		8
 	out		($aa),a
 	in		a,($a9)
-	cpl					; RDULxxxA
-	and		$F1		; RDUL000A
-	rlca				; DUL000AR
-	or		b			; DUL00BAR
-	rla					; UL00BAR0
-	rla					; L00BAR0D
-	rla					; 00BAR0DU
+	cpl					                          ; RDULxxxA
+	and		$F1		                          ; RDUL000A
+	rlca				                          ; DUL000AR
+	or		b			                          ; DUL00BAR
+	rla					                          ; UL00BAR0
+	rla					                          ; L00BAR0D
+	rla					                          ; 00BAR0DU
 	ld		b,a
-	rla					; 0BAR0DUL
-	rla					; BAR0DUL0
-	rla					; AR0DUL00
-	and		d			; 00000L00
-	or		b			; 00BARLDU
-	or		c			; 51BARLDU
+	rla					                          ; 0BAR0DUL
+	rla					                          ; BAR0DUL0
+	rla					                          ; AR0DUL00
+	and		d			                          ; 00000L00
+	or		b			                          ; 00BARLDU
+	or		c			                          ; 51BARLDU
 	
 	ld		b,a
 	ld		hl,Controls
@@ -398,6 +387,54 @@ PopulateControls:
 	ld		(Controls),a
 	ld		(NewPrContr),a
   ret
+
+outix384:
+  call  outix256
+  jp    outix128
+outix352:
+  call  outix256
+  jp    outix96
+outix320:
+  call  outix256
+  jp    outix64
+outix288:
+  call  outix256
+  jp    outix32
+outix256:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix250:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix224:
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix208:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix192:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi
+outix176:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix160:
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix144:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix128:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix112:
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix96:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix80:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi
+outix64:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix48:
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix32:	
+	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	outi	
+outix16:	
+	outi	outi	outi	outi	outi	outi	outi	outi
+outix8:	
+	outi	outi	outi	outi	outi	outi	outi	outi	
+	ret	
 
 endenginepage3:
 dephase
@@ -420,6 +457,16 @@ engaddr:	                  equ	  $03e
 loader.address:             equ   $8000
 enginepage3addr:            equ   $c000
 
+sx:                         equ   0
+sy:                         equ   2
+spage:                      equ   3
+dx:                         equ   4
+dy:                         equ   6
+dpage:                      equ   7 
+nx:                         equ   8
+ny:                         equ   10
+copydirection:              equ   13
+copytype:                   equ   14
 
 framecounter:               rb    1
 
@@ -427,6 +474,11 @@ framecounter:               rb    1
 Controls:	                  rb		1
 NewPrContr:	                rb		1
 oldControls: 				        rb    1
+
+ycoorspritebottom:	        equ	193
+xcoorspriteright:	          equ	240 ;-11
+mousey:	                    rb    1
+mousex:	                    rb    1
 
 
 
