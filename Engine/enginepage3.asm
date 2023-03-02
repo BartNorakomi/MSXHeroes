@@ -1,11 +1,45 @@
 phase	$c000
 
 StartGame:
-  call  LoadWorldGraphics
+  call  LoadWorldTiles                  ;set all world map tiles in page 3
+  call  LoadHeroesSprites               ;set all heroes sprites in page 2
+  call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
+  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
+  call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
   jp    LevelEngine
 
-LoadWorldGraphics:
+copyfont:
+	db		0,0,155,0
+	db		0,0,212,0
+	db		0,1,5,0
+	db		0,0,$90	
+CopyPage0To1:
+	db		0,0,0,0
+	db		0,0,0,1
+	db		0,1,0,1
+	db		0,0,$d0	
+
+LoadHud:
+  ld    d,HudBlock
+  ld    a,0
+  ld    hl,$0000                        ;write to page 0
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+
+	ld		hl,copyfont	                    ;put font at (0,212)
+	call	docopy
+  ld    hl,CopyPage0To1
+	call	docopy
+  ret
+
+LoadHeroesSprites:
+  ld    d,HeroesSpritesBlock
+  ld    a,1
+  ld    hl,$0000                        ;write to page 2
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+  ret
+
+LoadWorldTiles:
   ld    d,World1TilesBlock
   ld    a,1
   ld    hl,$8000                        ;write to page 3
@@ -14,6 +48,22 @@ LoadWorldGraphics:
   ld    hl,World1Palette
   call  SetPalette
   ret
+
+LoadWorldMap:
+;unpack map data
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+
+  ld    a,World1MapBlock              ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    hl,$4000
+  ld    de,$8000
+  call  Depack
+  ret
+  
+World1Palette:
+  incbin"..\grapx\tilesheets\world1tiles.pl"
 
 SetInterruptHandler:
   di
@@ -24,8 +74,41 @@ SetInterruptHandler:
   ld    ($38),a
   ret
 
-World1Palette:
-  incbin"..\grapx\tilesheets\world1tiles.pl"
+sprcoladdr:		equ	$7400
+sprattaddr:		equ	$7600
+sprcharaddr:	equ	$7800
+SpriteInitialize:
+	ld		a,(vdp_0+1)
+	or		2			;sprites 16*16
+	di
+	out		($99),a
+	ld		a,1+128
+	ei
+	out		($99),a
+
+	ld		a,%1110 1111
+	ld		(vdp_0+5),a
+	di
+;	out		($99),a		                      ;spr att table to $17600
+	out		($99),a		                      ;spr att table to $7600
+	ld		a,5+128
+	out		($99),a
+;	ld		a,%0000 0010                    ;spr att table to $17600
+	ld		a,%0000 0000                    ;spr att table to $7600
+	ld		(vdp_8+3),a
+	out		($99),a
+	ld		a,11+128
+	out		($99),a
+	
+;	ld		a,%0010 1111
+	ld		a,%0000 1111
+	ld		(vdp_0+6),a
+;	out		($99),a		                      ;spr chr table to $17800
+	out		($99),a		                      ;spr chr table to $7800
+	ld		a,6+128
+	ei
+	out		($99),a
+	ret
 
 SetPage:                                ;in a->x*32+31 (x=page)
   di
@@ -465,23 +548,15 @@ dy:                         equ   6
 dpage:                      equ   7 
 nx:                         equ   8
 ny:                         equ   10
+clr:                        equ   12
 copydirection:              equ   13
 copytype:                   equ   14
 
 framecounter:               rb    1
 
-
 Controls:	                  rb		1
 NewPrContr:	                rb		1
 oldControls: 				        rb    1
-
-ycoorspritebottom:	        equ	193
-xcoorspriteright:	          equ	240 ;-11
-mousey:	                    rb    1
-mousex:	                    rb    1
-
-
-
 
 endenginepage3variables:  equ $+enginepage3length
 org variables

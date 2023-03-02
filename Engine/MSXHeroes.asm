@@ -387,6 +387,34 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $05
+;
+World1MapBlock:  equ   $05
+phase	$4000
+  incbin "..\maps\world1.map.pck"
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $06 - 07
+;
+HeroesSpritesBlock:  equ   $06
+phase	$4000
+  incbin "..\grapx\HeroesSprites\HeroesSprites.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\HeroesSprites\HeroesSpritesBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $08 - 09
+;
+HudBlock:  equ   $08
+phase	$4000
+  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
