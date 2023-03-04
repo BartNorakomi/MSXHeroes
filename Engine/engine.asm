@@ -1,8 +1,46 @@
 LevelEngine:
+
+;	call	checkbuttonnolongerover
+;	call	checkbuttonover
+
   call  PopulateControls                ;read out keys
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 	call	buildupscreen                   ;build up the visible map in page 0/1
+
+
+;	call	movehero
+	call	checktriggermapscreen
+
 	call	setherosinwindows               ;erase hero and life status windows, then put the heroes in the windows and set the life and movement status of the heroes
+	call	putbottomcastles
+	call	putbottomheroes	
+;	call	putbottomcreatures
+;	call	putitems
+	call	puttopheroes	
+;	call	puttopcreatures
+	call	puttopcastles
+	call	putmovementstars
+
+;	call	checkwindowsclick
+;	call	checkmovementlifeheroline
+;	call	setherosinwindows
+;	call	docomputerplayerturn
+;	call	textwindow
+;	call	checktriggerBmap
+;	call	textwindowhero
+;	call	checktriggeronhero
+
+
+
+
+
+
+
+
+
+
+
+
 
   ld    a,(framecounter)
   inc   a
@@ -63,6 +101,826 @@ InterruptHandler:
   pop   af 
   ei
   ret
+
+
+
+
+
+
+
+
+
+putmovementstars:
+	ld		a,(putmovementstars?)
+	or		a
+	ret		z
+
+	ld		a,(movementpath+0)	;y hero
+	inc		a
+	ld		(ystar),a
+	ld		a,(movementpath+1)	;x hero
+	ld		(xstar),a
+
+	ld		hl,movementpath+2
+.loop:
+	ld		b,(hl)				;dy
+	ld		a,(ystar)
+	add		a,b
+	ld		(ystar),a
+	inc		hl
+	ld		c,(hl)				;dy
+	ld		a,(xstar)
+	add		a,c
+	ld		(xstar),a
+
+	ld		a,c
+	or		b
+	ret		z
+	push	hl
+	call	doputstar
+	pop		hl
+	inc		hl
+	jp		.loop
+	
+doputstar:
+	ld		a,(activepage)	;check mirror page to mark background star position as 'dirty'
+	or		a
+	ld		hl,mappage1
+	jp		z,.mirrorpageset
+	ld		hl,mappage0
+.mirrorpageset:
+
+	ld		a,(mappointerx)
+	ld		b,a
+	ld		a,(xstar)		;xstar
+	sub		a,b
+	ret		c				;dont put star if x is out of screen
+	cp		TilesPerRow
+	ret		nc				;dont put star if x is out of screen
+
+	ld		d,0
+	ld		e,a				;store relative x star
+	
+	add		a,a				;*2
+	add		a,a				;*4
+	add		a,a				;*8
+	add		a,a				;*16
+	add		a,3				;centre star
+	ld		(putstar+dx),a
+
+	ld		a,(mappointery)
+	ld		b,a
+	ld		a,(ystar)		;y star
+	sub		a,b
+	ret		c				;dont put star if y is out of screen
+	cp		TilesPerColumn
+	ret		nc				;dont put star if y is out of screen
+	ld		b,a				;store relative y star
+	add		a,a				;*2
+	add		a,a				;*4
+	add		a,a				;*8
+	add		a,a				;*16
+	add		a,4				;centre star
+	ld		(putstar+dy),a
+
+;mark background star position as 'dirty'
+	;setmappointer
+		;setxpointer
+	add		hl,de
+		;/setxpointer
+	
+		;setypointer	
+	ld		de,TilesPerRow
+
+	ld		a,b
+	or		a
+	jp		z,.endsetmappointer
+
+.setypointerloop:	
+	add		hl,de
+	djnz	.setypointerloop
+		;/setypointer
+.endsetmappointer:
+	;/setmappointer
+	ld		a,(hl)
+	ld		(hl),255
+;/mark background star position as 'dirty'
+
+;check if star is behind a tree	
+	cp		amountoftransparantpieces
+	jp		c,.behindtree
+	cp		255
+	jp		z,.behindheroorcastle
+
+	ld		hl,putstar
+	jp		docopy
+.behindtree:
+.behindheroorcastle:	
+	ld		a,(putstar+dx)
+	ld		(putstarbehindobject+dx),a
+	ld		a,(putstar+dy)
+	ld		(putstarbehindobject+dy),a
+	ld		hl,putstarbehindobject
+	jp		docopy	
+;	ret
+;/check if star is behind a tree	
+
+
+
+
+
+
+;mouseposy:		ds	1
+;mouseposx:		ds	1
+;mouseclicky:	ds	1
+;mouseclickx:	ds	1
+;addxtomouse:	equ	8
+;subyfrommouse:	equ	4
+checktriggermapscreen:
+	ld		a,(spat)				;y cursor
+	cp		TilesPerColumn*16-12
+	ret		nc						                  ;dont check trigger if cursor is in bottom half of screen
+		
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+	bit		4,a						                  ;space pressed ?
+	ret		z
+
+;dont react to space / mouse click if current player is a computer
+	ld		a,(whichplayernowplaying?)
+	ld		hl,player1human?
+	ld		b,4
+  .loop:
+	dec		a
+	jp		z,.playerfound
+	inc		hl
+	djnz	.loop
+.playerfound:
+	or		(hl)			                      ;is this a human player ?
+	ret		z				                        ;no
+;player1human?:			db	1
+;player2human?:			db	1
+;player3human?:			db	0
+;player4human?:			db	0
+;whichplayernowplaying?:	db	1
+;/dont react to space / mouse click if current player is a computer
+
+	ld		a,(movehero?)
+	or		a
+	jp		nz,.stopheromovement	          ;hero was moving, mouse clicked-> stop hero
+
+	ld		a,(putmovementstars?)
+	or		a
+	jp		z,.initputstars			            ;mouse clicked. put stars in screen
+
+;mouse clicked, stars are already in screen
+	ld		a,(movehero?)
+	or		a
+	jp		z,.movehero
+
+;mouse clicked, hero is already moving, stop hero
+.stopheromovement:
+	xor		a
+	ld		(movehero?),a
+	ret
+			
+.movehero:
+;mouse clicked, should hero move over path ?
+	ld		a,(spat+1)		                  ;x	(mouse)pointer
+	add		a,addxtomouse	                  ;centre mouse in grid
+	and		%1111 0000
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		c,a
+	ld		a,(mappointerx)
+	add		a,c
+	ld		c,a
+	ld		a,(mouseclickx)
+	cp		c
+	jp		nz,.cancel
+
+	ld		a,(spat)		                    ;y	(mouse)pointer
+	sub		a,subyfrommouse	                ;centre mouse in grid
+	jp		nc,.notcarry
+	xor		a
+.notcarry:
+	and		%1111 0000
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		d,a
+	ld		a,(mappointery)
+	add		a,d
+	ld		d,a
+	ld		a,(mouseclicky)
+	cp		d
+	jp		nz,.cancel
+
+	xor		a
+	ld		(putmovementstars?),a
+	ld		(movementpathpointer),a
+	ld		a,1
+	ld		(movehero?),a
+	ret
+
+.cancel:					                      ;dont move hero, mouse click was not accurately on path
+;mouse clicked, set star path
+.initputstars:
+	ld		a,1
+	ld		(putmovementstars?),a
+
+	ld		a,(plxcurrenthero)
+;amountofheroes:	equ	10
+;plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
+;lenghtherotable:	equ	10
+;pl1hero1y:		db	4
+;pl1hero1x:		db	2
+;pl1hero1type:	db	0		;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+;pl1hero1life:	db	10,20
+;pl1hero1move:	db	12,20
+;pl1hero1mana:	db	10,20
+;pl1hero1manarec:db	5		;recover x mana every turn
+
+;turnbased?:				db	1
+;amountofplayers:		db	2
+;player1human?:			db	1
+;player2human?:			db	1
+;player3human?:			db	0
+;player4human?:			db	0
+;whichplayernowplaying?:	db	1
+	ld		e,a
+	ld		d,0
+
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero1y
+	jr		z,.playerset
+	ld		hl,pl4hero1y
+.playerset:
+;	ld		hl,pl1hero1y
+	add		hl,de			                      ;pl1hero?y
+
+	ld		a,(hl)			                    ;pl1hero?y
+	ld		(.setpl1hero?y),a
+	ld		(heroymirror),a
+	inc		hl				                      ;pl1hero?x
+	ld		a,(hl)
+	ld		(.setpl1hero?x),a
+	ld		(heroxmirror),a
+	ld		hl,movementpath+2
+
+;movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero	
+
+.initloop:
+	call	.init			                      ;out c=dx, d=dy
+	ld		a,c
+	or		d
+	ret		z
+
+	ld		a,(heroxmirror)
+	add		a,c
+	ld		(heroxmirror),a
+	ld		a,(heroymirror)
+	add		a,d
+	ld		(heroymirror),a
+	jp		.initloop
+	ret
+
+.init:
+	ld		a,(spat+1)		                  ;x (mouse)pointer
+	add		a,addxtomouse	                  ;centre mouse in grid
+	and		%1111 0000
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		c,a
+	ld		a,(mappointerx)
+	add		a,c
+	ld		c,a
+	ld		(mouseclickx),a
+
+	ld		a,(spat)		                    ;y (mouse)pointer
+	sub		a,subyfrommouse	                ;centre mouse in grid
+	jp		nc,.notcarry2
+	xor		a
+.notcarry2:
+	and		%1111 0000
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		d,a
+	ld		a,(mappointery)
+	add		a,d
+	ld		d,a
+	ld		(mouseclicky),a
+
+;check if there is an obstacle. Can star be put here ?
+	push	hl
+	push	de
+
+	;setmappointer
+		;setxpointer
+	ld		hl,mapdata
+	ld		a,(heroxmirror)
+	ld		e,a
+	ld		d,0
+	add		hl,de
+		;/setxpointer
+	
+		;setypointer	
+	ld		a,(heroymirror)
+	inc		a
+	or		a
+	jp		z,.endsetmappointer
+	ld		b,a
+
+	ld		de,(maplenght)
+.setypointerloop:	
+	add		hl,de
+	djnz	.setypointerloop
+		;/setypointer
+.endsetmappointer:
+	;/setmappointer
+	ld		a,(hl)
+
+	pop		de
+	pop		hl
+
+	cp		16
+	jr		c,.noobstacle
+	cp		24
+	jr		c,.obstacle
+	cp		149
+	jr		c,.noobstacle
+.obstacle:
+	dec		hl
+	dec		hl
+	ld		c,0
+	ld		d,0
+	jp		.dosetstarpath
+
+.noobstacle:
+;/check if there is an obstacle. Can star be put here ?
+	
+	ld		a,(heroxmirror)
+	cp		c
+	ld		c,0				                      ;dont move horizontally
+	jp		z,.checkvertical
+	ld		c,1
+	jp		c,.checkvertical
+	ld		c,-1	
+.checkvertical:
+
+	ld		a,(heroymirror)
+	cp		d
+	ld		d,0				                      ;dont move horizontally
+	jp		z,.dosetstarpath
+	ld		d,1
+	jp		c,.dosetstarpath
+	ld		d,-1	
+.dosetstarpath:
+
+.setpl1hero?y:	equ	$+1
+	ld		a,255
+	ld		(movementpath+0),a
+.setpl1hero?x:	equ	$+1
+	ld		a,255
+	ld		(movementpath+1),a
+
+	ld		a,d				;dy
+	ld		(hl),a
+	inc		hl
+	ld		a,c				;dx
+	ld		(hl),a
+	inc		hl
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;castlepl1y:	db	04 | castlepl1x:	db	01
+;castlepl2y:	db	14 | castlepl2x:	db	19
+;castlepl3y:	db	06 | castlepl3x:	db	18
+;castlepl4y:	db	15 | castlepl4x:	db	03
+;castley:	ds	1
+;castlex:	ds	1
+
+puttopcastles:
+	ld		hl,castlepl1y
+	call	.doputcastletop
+	ld		hl,castlepl2y
+	call	.doputcastletop
+	ld		hl,castlepl3y
+	call	.doputcastletop
+	ld		hl,castlepl4y
+;	call	.doputcastletop
+
+.doputcastletop:
+	xor   a
+	ld		(putcastle+sx),a
+	ld		a,(hl)			                    ;castle y
+	or    a
+	ret   z                               ;if y=0 there is no castle
+	sub		a,3
+	ld		(castley),a
+	inc		hl
+	ld		a,(hl)			                    ;castle x
+	inc		a
+	ld		(castlex),a
+	call	putbottomcastles.puttwopieces
+	ld		a,(putcastle+sx)
+	add		a,16
+	ld		(putcastle+sx),a
+	ld		a,(castley)
+	inc		a
+	ld		(castley),a
+	ld		a,(castlex)
+	sub		a,2
+	ld		(castlex),a
+	call	putbottomcastles.putthreepieces
+	ld		a,(putcastle+sx)
+	add		a,16
+	ld		(putcastle+sx),a
+	ld		a,(castley)
+	inc		a
+	ld		(castley),a
+	ld		a,(castlex)
+	sub		a,2
+	ld		(castlex),a
+	call	putbottomcastles.doputthispiece
+	ld		a,(putcastle+sx)
+	add		a,16
+	ld		(putcastle+sx),a
+	ld		a,(castlex)
+	add		a,2
+	ld		(castlex),a
+	call	putbottomcastles.doputthispiece
+	ret
+
+putbottomcastles:
+	ld		hl,castlepl1y
+	call	.doputcastle
+	ld		hl,castlepl2y
+	call	.doputcastle
+	ld		hl,castlepl3y
+	call	.doputcastle
+	ld		hl,castlepl4y
+;	call	.doputcastle
+
+.doputcastle:
+	ld		a,112
+	ld		(putcastle+sx),a
+	ld		a,(hl)			                    ;castle y
+	or    a
+	ret   z                               ;if y=0 there is no castle
+	ld		(castley),a
+	inc		hl
+	ld		a,(hl)			                    ;castle x
+	ld		(castlex),a
+
+.putthreepieces:
+	call	.doputthispiece
+	ld		a,(putcastle+sx)
+	add		a,16
+	ld		(putcastle+sx),a
+	ld		a,(castlex)
+	inc		a
+	ld		(castlex),a
+.puttwopieces:
+	call	.doputthispiece
+	ld		a,(putcastle+sx)
+	add		a,16
+	ld		(putcastle+sx),a
+	ld		a,(castlex)
+	inc		a
+	ld		(castlex),a
+	jp		.doputthispiece
+;	ret
+
+.doputthispiece:
+	ld		a,(activepage)	                ;check mirror page to mark background hero position as 'dirty'
+	or		a
+	ld		hl,mappage1
+	jp		z,.mirrorpageset
+	ld		hl,mappage0
+.mirrorpageset:
+
+	ld		a,(mappointerx)
+	ld		b,a
+	ld		a,(castlex)
+	sub		a,b
+	ret		c
+	cp		TilesPerRow
+	ret		nc
+
+	ld		d,0
+	ld		e,a				                      ;store relative x castle
+	
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(putcastle+dx),a
+
+	ld		a,(mappointery)
+	ld		b,a
+	ld		a,(castley)		                  ;y star
+	sub		a,b
+	ret		c				                        ;dont put castle if y is out of screen
+	cp		TilesPerColumn
+	ret		nc				                      ;dont put castle if y is out of screen
+
+	ld		b,a				                      ;store relative y castle
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(putcastle+dy),a
+
+;mark background castle position as 'dirty'
+	;setmappointer
+		;setxpointer
+	add		hl,de
+		;/setxpointer
+	
+		;setypointer	
+	ld		de,TilesPerRow
+	ld		a,b
+	or		a
+	jp		z,.endsetmappointer2
+
+  .setypointerloop2:	
+	add		hl,de
+	djnz	.setypointerloop2
+		;/setypointer
+  .endsetmappointer2:
+	;/setmappointer
+	ld		(hl),255
+;/mark background hero position as 'dirty'
+
+	ld		hl,putcastle
+  jp    docopy
+
+
+
+
+
+
+
+
+
+
+
+putbottomheroes:
+	ld		a,(activepage)	                ;check mirror page to mark background hero position as 'dirty'
+	or		a
+	ld		hl,mappage1
+	jr		z,.mirrorpageset
+	ld		hl,mappage0
+.mirrorpageset:
+	ld		(doputheros.SelfModifyingCodeSetPointerInMapToHero),hl
+
+	ld		a,16
+	ld		(doputheros.SelfModifyingCodeAddYToSYHero),a
+	ld		a,1
+	ld		(doputheros.SelfModifyingCodeAddYToHero),a
+	jp		doputheros
+
+puttopheroes:
+	xor		a
+	ld		(doputheros.SelfModifyingCodeAddYToSYHero),a
+	ld		(doputheros.SelfModifyingCodeAddYToHero),a
+
+doputheros:
+  ld    hl,pl1hero1y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl1hero2y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl1hero3y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl1hero4y | ld a,(hl) | inc a | call nz,.doputhero
+
+  ld    hl,pl2hero1y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl2hero2y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl2hero3y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl2hero4y | ld a,(hl) | inc a | call nz,.doputhero
+
+  ld    hl,pl3hero1y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl3hero2y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl3hero3y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl3hero4y | ld a,(hl) | inc a | call nz,.doputhero
+
+  ld    hl,pl4hero1y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl4hero2y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl4hero3y | ld a,(hl) | inc a | call nz,.doputhero
+  ld    hl,pl4hero4y | ld a,(hl) | inc a | call nz,.doputhero
+  ret
+
+;pl1hero1y:		db	4
+;pl1hero1x:		db	2
+;pl1hero1type:	db	0		;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+;pl1hero1life:	db	10,20
+;pl1hero1move:	db	12,20
+;pl1hero1mana:	db	10,20
+;pl1hero1manarec:db	5		;recover x mana every turn
+;pl1hero1items:	db	255,255,255,255,255
+
+
+.doputhero:
+	ld		a,(mappointery)                 ;check if hero y is within screen range
+	ld		b,a
+	ld		a,(hl)			                    ;y hero
+  .SelfModifyingCodeAddYToHero:	equ	$+1
+	add		a,000
+	sub		a,b
+	ret		c                               ;check hero within screen y range top
+	cp		TilesPerColumn
+	ret		nc                              ;check hero within screen y range bottom
+	ld		c,a				                      ;store relative y hero in c
+
+	inc		hl
+	ld		a,(mappointerx)                 ;check if hero x is within screen range
+	ld		b,a
+	ld		a,(hl)			                    ;x hero
+	sub		a,b
+	ret		c                               ;check hero within screen x range left
+	cp		TilesPerRow
+	ret		nc                              ;check hero within screen x range right
+
+	ld		d,0
+	ld		e,a                             ;store relative x hero (in tiles)
+	
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(putherotopbottom+dx),a         ;set hero dx
+
+	ld		a,c				                      ;relative y hero (in tiles)
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(putherotopbottom+dy),a         ;set hero dy
+
+	inc		hl                              ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+
+	ld		a,(hl)			                    ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+
+	ld		(putherotopbottom+sx),a	        ;hero sx
+
+	ld		a,(hl)			                    ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+	and		%1111 0000
+  .SelfModifyingCodeAddYToSYHero:	equ	$+1
+	add		a,000
+	ld		(putherotopbottom+sy),a         ;hero sy
+	
+  .SelfModifyingCodeSetPointerInMapToHero:	equ	$+1
+	ld		hl,0000
+	add		hl,de                           ;this points to x of tile in map where we put our hero piece. Let's mark this tile as 'dirty' so it will be overwritten when hero moves
+	
+	ld		de,TilesPerRow
+	ld		a,c				                      ;relative y hero (in tiles)
+	or		a
+	jr		z,.endsetmappointer1
+	ld		b,a
+  .setypointerloop1:	
+	add		hl,de
+	djnz	.setypointerloop1
+  .endsetmappointer1:                   ;hl now points to the tile in the map where this hero piece will be put
+
+	ld    a,(hl)                          ;tile at mappointer at position of hero
+	cp		254				                      ;is there a hero already here, AND is this hero behind an object ??
+	call	z,.behindheroandtree	
+	ld		(hl),255                        ;this tile is now 'dirty'
+
+	cp    amountoftransparantpieces       ;(64 tiles hero can stand behind) check if hero is behind a tree	
+	jp		nc,.notbehindtree		
+	ld		(hl),254                        ;254 when hero is behind an object (mark background position)
+	cp		non_see_throughpieces           ;(16) bakground pieces a hero can stand behind, but they are not see through
+	ret		c				                        ;hero is completely invisible behind the tree
+  ;at this point hero is standing behind an object. So first put the hero, and then put the object on top of the hero.
+	ld		d,a				                      ;tile where hero is standing on
+	ld		hl,putherotopbottom
+	call	docopy			                    ;first put hero
+
+;mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
+;  ds	16*2 	
+;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 000,224, 000,240, 000,000, 000,000
+;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 016,224, 016,240, 048,224, 048,240
+;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
+
+	ld		a,d				                      ;mappointer at position of hero	
+	add   a,a                             ;*2
+	ld    e,a
+	ld    d,0
+	ld    hl,mirrortransparentpieces
+	add   hl,de                           ;sy mirror piece
+	ld    a,(hl)
+	ld    (putbackgroundoverhero+sy),a
+	inc   hl                              ;sx mirror piece
+	ld    a,(hl)
+	ld    (putbackgroundoverhero+sx),a
+	
+	ld    a,(putherotopbottom+dy)
+	ld    (putbackgroundoverhero+dy),a
+	ld    a,(putherotopbottom+dx)
+	ld    (putbackgroundoverhero+dx),a
+	ld    hl,putbackgroundoverhero
+	jp		docopy			                    ;put background (tree) over hero
+
+  .notbehindtree:
+	ld		hl,putherotopbottom
+	jp		docopy			                    ;hero is not behind a tree
+
+  .behindheroandtree:			              ;at this point the hero is in front of/behind another hero and behind a tree
+;retrace the partnumber
+	push	hl
+	ld		a,(putherotopbottom+dx)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		b,a				                      ;relative x hero
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+
+	ld		a,(putherotopbottom+dy)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+	ld		c,a				                      ;relative y hero
+
+;setmappointer
+	;setxpointer
+	ld		hl,mapdata
+	ld		de,(mappointerx)
+	ld		a,e
+	add		a,b
+	ld		e,a
+	add		hl,de
+	;/setxpointer
+	
+	;setypointer	
+	ld		a,(mappointery)
+	add		a,c
+	jp		z,.endsetmappointer2
+	ld		b,a
+
+	ld		de,(maplenght)
+.setypointerloop2:	
+	add		hl,de
+	djnz	.setypointerloop2
+	;/setypointer
+.endsetmappointer2:
+;/setmappointer
+	ld    	a,(hl)			                  ;partnumber 'mappointer at position of hero'
+;/retrace the partnumber
+	pop		hl
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -982,51 +1840,65 @@ spat:						;sprite attribute table
 
 
 scrollscreen:
-	ld		bc,0
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  ld    d,a                             ;controls in d
+	ld		bc,0                            ;b=scroll map left(-1)/right(+1),  c=scroll map up(-1)/down(+1)
 
-.left:
+  .left:                                ;check if cursor is at the left side of the screen and left is pressed
 	ld		a,(spat+1)			                ;x cursor
 	or		a
-	jp		nz,.right
+	jr		nz,.right
+  bit   2,d                             ;check ontrols to see if left is pressed
+  jr    z,.right
 	dec		b
-.right:
+
+  .right:                               ;check if cursor is at the right side of the screen and right is pressed
 	cp		xcoorspriteright
-	jp		nz,.up
+	jr		nz,.up
+  bit   3,d                             ;check ontrols to see if right is pressed
+  jr    z,.up
 	inc		b
-.up:
+
+  .up:                                  ;check if cursor is at the top side of the screen and up is pressed
 	ld		a,(spat)			                  ;x cursor
 	or		a
-	jp		nz,.down
+	jr		nz,.down
+  bit   0,d                             ;check ontrols to see if up is pressed
+  jr    z,.down
 	dec		c
-.down:
+
+  .down:        
 	cp		ycoorspritebottom
-	jp		nz,.endcheck
+	jr		nz,.endcheck
+  bit   1,d                             ;check ontrols to see if down is pressed
+  jr    z,.endcheck
 	inc		c
-.endcheck:
+  .endcheck:
 
-	ld		a,b
-	or		c
-	ret		z
-
-	ld		a,(maplenght)
-	sub		a,TilesPerRow-1
+	ld		a,(maplenght)                   ;total lenght of map
+	sub		a,TilesPerRow-1                 ;total lenght of map - total lenght of visible map in screen
 	ld		d,a
 	ld		a,(mapheight)
 	sub		a,TilesPerColumn-1
 	ld		e,a
 
 	ld		a,(mappointerx)
-	add		a,b
-	cp		d
+	add		a,b                             ;set new map pointer x
+	cp		d                               ;check if camera is still within the total map
 	jp		nc,.endmovex
 	ld		(mappointerx),a
-.endmovex:
+  .endmovex:
+
 	ld		a,(mappointery)
-	add		a,c
-	cp		e
-	jp		nc,.endmovey
+	add		a,c                             ;set new map pointer y
+	cp		e                               ;check if camera is still within the total map
+  ret   nc
 	ld		(mappointery),a	
-.endmovey:
 	ret	
 
 SetPageSpecial:                         
@@ -1437,7 +2309,6 @@ mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
   db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 016,224, 016,240, 048,224, 048,240
   db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
   
-
 unpassablepieces:
 	db	0,1,2,3,4,5,48,49,50,51,52,53,54,55,56,57,58,59,60,61,64,65,66,67,68,69,107,108,109
 
@@ -1615,3 +2486,12 @@ creature4c_type:	db	177			;other creatures in this pack
 creature4c_amount:	db	10
 creature4d_type:	db	177			;other creatures in this pack
 creature4d_amount:	db	10
+
+movementpathpointer:	ds	1	
+movehero?:				ds	1
+movementspeed:			ds	1
+
+putmovementstars?:	db	0
+movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero
+ystar:				ds	1
+xstar:				ds	1
