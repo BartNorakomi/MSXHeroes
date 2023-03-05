@@ -4,6 +4,7 @@ LevelEngine:
 ;	call	checkbuttonover
 
   call  PopulateControls                ;read out keys
+	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 	call	buildupscreen                   ;build up the visible map in page 0/1
 
@@ -1343,7 +1344,7 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
 	call	movecursorx
 	jp		.setmousespat
 
-.mouseactive:
+  .mouseactive:
 	call	movecursorx
 
 	ld    	a,14                          ;read mouse Y offset
@@ -1352,7 +1353,7 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
 	call 	$1c
 
 	call	movecursory
-.setmousespat:
+  .setmousespat:
 	ld		a,(spat+0)
 	ld		(spat+4),a
 	ld		a,(spat+1)
@@ -1420,25 +1421,30 @@ PopulateKeyMatrix:
 ;row 8 		R		D		U		L		DEL		INS		HOME	SPACE 
 keys:	equ	$fbe5
 ReadOutKeyboardAndMovePointer:
-	call	PopulateKeyMatrix
-	ld		bc,0
-	
-	ld		a,(keys+8)
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+	ld		bc,0                            ;b=scroll map left(-1)/right(+1),  c=scroll map up(-1)/down(+1)
+
+;	ld		a,(keys+8)
 .right:
-	bit		7,a			                        ;arrow right
-	jp		nz,.down
+	bit		3,a			                        ;arrow right
+	jp		z,.down
 	inc		b
 .down:
-	bit		6,a			                        ;arrow down
-	jp		nz,.up
+	bit		1,a			                        ;arrow down
+	jp		z,.up
 	inc		c
 .up:
-	bit		5,a			                        ;arrow up
-	jp		nz,.left
+	bit		0,a			                        ;arrow up
+	jp		z,.left
 	dec		c
 .left:
-	bit		4,a			                        ;arrow left
-	jp		nz,.end
+	bit		2,a			                        ;arrow left
+	jp		z,.end
 	dec		b
 .end:
 
@@ -1839,7 +1845,7 @@ spat:						;sprite attribute table
 
 
 
-scrollscreen:
+scrollscreen:                           ;you can either scroll the scroll by moving with the mouse pointer to the edges of the screen, or by holding CTRL and let/right/up/down
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -1848,6 +1854,39 @@ scrollscreen:
   ld    a,(Controls)
   ld    d,a                             ;controls in d
 	ld		bc,0                            ;b=scroll map left(-1)/right(+1),  c=scroll map up(-1)/down(+1)
+
+;
+;row 6		F3		F2		F1		CODE	CAPS	GRAPH	CTRL 	SHIFT 
+;row 8 		R		D		U		L		DEL		INS		HOME	SPACE 	
+;
+	ld		a,(keys+6)
+	bit		1,a			                        ;check ontrols to see if CTRL is pressed
+	jp		nz,.EndCheckCTRL
+
+  ld    a,(Controls)
+  and   %1111 0000
+  ld    (Controls),a
+
+  bit   2,d                             ;check ontrols to see if left is pressed
+  jr    z,.EndCheckCTRLAndLeft
+	dec		b
+  .EndCheckCTRLAndLeft:
+
+  bit   3,d                             ;check ontrols to see if right is pressed
+  jr    z,.EndCheckCTRLAndRight
+	inc		b
+  .EndCheckCTRLAndRight:
+
+  bit   0,d                             ;check ontrols to see if up is pressed
+  jr    z,.EndCheckCTRLAndUp
+	dec		c
+  .EndCheckCTRLAndUp:
+
+  bit   1,d                             ;check ontrols to see if down is pressed
+  jr    z,.endcheck
+	inc		c
+  jp    .endcheck
+  .EndCheckCTRL:
 
   .left:                                ;check if cursor is at the left side of the screen and left is pressed
 	ld		a,(spat+1)			                ;x cursor
