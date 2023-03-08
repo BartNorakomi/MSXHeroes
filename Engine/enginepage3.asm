@@ -7,6 +7,7 @@ StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
+  call  firstherowindow
   jp    LevelEngine
 
 copyfont:

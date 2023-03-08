@@ -1,15 +1,11 @@
 LevelEngine:
-
-;	call	checkbuttonnolongerover
-;	call	checkbuttonover
-
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 	call	buildupscreen                   ;build up the visible map in page 0/1
 
 
-;	call	movehero
+	call	movehero
 	call	checktriggermapscreen
 
 	call	setherosinwindows               ;erase hero and life status windows, then put the heroes in the windows and set the life and movement status of the heroes
@@ -22,26 +18,15 @@ LevelEngine:
 	call	puttopcastles
 	call	putmovementstars
 
-;	call	checkwindowsclick
-;	call	checkmovementlifeheroline
-;	call	setherosinwindows
+	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
+	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
+	call	checkwindowsclick               ;check if any of the buttons in the hud are pressed
+	call	checkmovementlifeheroline
 ;	call	docomputerplayerturn
 ;	call	textwindow
 ;	call	checktriggerBmap
 ;	call	textwindowhero
 ;	call	checktriggeronhero
-
-
-
-
-
-
-
-
-
-
-
-
 
   ld    a,(framecounter)
   inc   a
@@ -102,6 +87,949 @@ InterruptHandler:
   pop   af 
   ei
   ret
+
+
+
+
+
+
+
+
+
+
+
+colorlightgrey: equ 8
+colormiddlebrown: equ 13
+
+checkbuttonnolongerover:	;check if mousepointer is no longer on a button
+	ld		hl,buttons+0*lenghtbuttontable+4
+	call	.check
+	ld		hl,buttons+1*lenghtbuttontable+4
+	ld		b,1
+	call	.checkherobutton
+	ld		hl,buttons+2*lenghtbuttontable+4
+	ld		b,2
+	call	.checkherobutton
+	ld		hl,buttons+3*lenghtbuttontable+4
+	ld		b,3
+	call	.checkherobutton	
+	ld		hl,buttons+4*lenghtbuttontable+4
+	call	.check
+	ld		hl,buttons+5*lenghtbuttontable+4
+	call	.check
+	ld		hl,buttons+6*lenghtbuttontable+4
+	call	.check
+	ld		hl,buttons+7*lenghtbuttontable+4
+	call	.check	
+	ld		hl,buttons+8*lenghtbuttontable+4
+	call	.check
+	ret
+;check if mouse move away from a hero button that is supposed to stay lit
+.checkherobutton:
+	ld		a,(currentherowindowclicked)
+	cp		b
+	jp		nz,.check
+
+.check2:
+	ld		a,(hl)			;lit ?
+	or		a
+	ret		z
+;.thisoneislit:
+	dec		(hl)			;leave this one lit
+	ld		a,colorwhite+16*colorwhite
+	jp		lightupbutton	
+;/check if mouse move away from a hero button that is supposed to stay lit
+
+.check:
+	ld		a,(hl)
+	or		a
+	ret		z
+	
+.thisoneislit:
+	dec		(hl)
+
+	ld		a,colormiddlebrown+16*colormiddlebrown
+	jp		lightupbutton
+;	ret
+
+checkbuttonover:	;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
+	ld		a,(spritecharacter) ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=fight,11=hand,12=piece of window
+	cp		11
+	ret		nz
+
+	ld		a,(spat)		;y mouse pointer
+	ld		b,a
+	ld		a,(spat+1)		;x mouse pointer
+	ld		c,a
+
+	ld		hl,buttons+0*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+1*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+2*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+3*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+4*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+5*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+6*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+7*lenghtbuttontable
+	call	.check
+	ld		hl,buttons+8*lenghtbuttontable
+	call	.check
+	ret
+
+.check:
+	ld		a,(hl)			;sy button window
+	cp		b				;y mouse pointer
+	ret		nc
+	
+	inc		hl				;ny button window
+	add		a,(hl)
+	cp		b
+	ret		c
+
+	inc		hl				;sx button window
+	ld		a,(hl)
+	cp		c				;x mouse pointer
+	ret		nc
+
+	inc		hl				;nx button window
+	add		a,(hl)
+	cp		c
+	ret		c
+
+;mouse is over a button, light up this button
+	inc		hl				;lit ?
+	ld		(hl),2				;keep button lit for 2 screenbuilduptimes
+
+	ld		a,colorwhite+16*colorwhite
+	call	lightupbutton
+	pop		af				;dont check any other buttons
+	ret
+
+lightupbutton:
+	ld		(putline+clr),a
+
+	dec		hl				;nx-2
+
+;top line
+	push	hl
+	ld		a,(hl)			;nx-2
+	add		a,2
+	ld		(putline+nx),a
+	dec		hl				;sx-7
+	ld		a,(hl)
+	add		a,7
+	ld		(putline+dx),a
+	dec		hl				;ny-2
+;	ld		a,(hl)
+;	add		a,2
+	ld		a,1
+	ld		(putline+ny),a
+	dec		hl				;sy-2
+	ld		a,(hl)
+	add		a,2
+	ld		(putline+dy),a
+	ld		hl,putline
+	call	docopy
+	pop		hl
+;/top line
+
+;bottom line
+	push	hl
+	dec		hl				;sx-7
+	dec		hl				;ny-2
+	ld		b,(hl)
+	dec		hl				;sy-2
+	ld		a,(hl)
+	add		a,2 + 1
+	add		a,b
+	ld		(putline+dy),a
+	ld		hl,putline
+	call	docopy
+	pop		hl
+;/bottom line
+
+;left line
+	push	hl
+	ld		a,1
+	ld		(putline+nx),a
+	dec		hl				;sx-7
+	dec		hl				;ny-2
+	ld		a,(hl)
+	add		a,2
+	ld		(putline+ny),a
+	dec		hl				;sy-2
+	ld		a,(hl)
+	add		a,2
+	ld		(putline+dy),a
+	ld		hl,putline
+	call	docopy
+	pop		hl
+;/left line
+
+;right line
+	ld		b,(hl)
+	dec		hl				;sx-7
+	ld		a,(hl)
+	add		a,7 + 1
+	add		a,b	
+	ld		(putline+dx),a
+	ld		hl,putline
+	jp		docopy
+;/right line
+;	ret
+;/mouse is over a button, light up this button
+
+
+
+
+
+
+
+
+
+
+
+
+
+checkwindowsclick:
+	ld		a,(spritecharacter) ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=fight,11=hand,12=piece of window
+	cp		11
+	ret		nz
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+	bit		4,a						                  ;space pressed ?
+	ret		z
+
+
+;arrow left		1st hero window	 2nd hero window  3rd hero wind		arrow right		map					castle			system			end turn
+;sywindow1: equ 176 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 168 | sywindow5: equ 176 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 172
+;sxwindow1: equ 009 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 217
+
+			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
+;buttons:	
+;      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
+;			db	sywindow2-2,	32-2,	sxwindow2-7,	17-2,	0	;1st hero window
+;			db	sywindow3-2,	32-2,	sxwindow3-7,	17-2,	0	;2nd hero window
+;			db	sywindow4-2,	32-2,	sxwindow4-7,	17-2,	0	;3rd hero window	
+;			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;arrow right
+
+;			db	sywindow6-2,	28-2,	sxwindow6-7,	28-2,	0	;map
+;			db	sywindow7-2,	28-2,	sxwindow7-7,	28-2,	0	;castle
+;			db	sywindow8-2,	28-2,	sxwindow8-7,	28-2,	0	;system
+;			db	sywindow9-2,	28-2,	sxwindow9-7,	28-2,	0	;end turn
+
+	ld		a,(buttons+0*lenghtbuttontable+4)		;arrow left clicked
+	or		a
+	jp		nz,checkarrowleft
+	ld		a,(buttons+1*lenghtbuttontable+4)		;1st hero window clicked
+	or		a
+	jp		nz,firstherowindow
+	ld		a,(buttons+2*lenghtbuttontable+4)		;2nd hero window clicked
+	or		a
+	jp		nz,secondherowindow
+	ld		a,(buttons+3*lenghtbuttontable+4)		;3rd hero window clicked
+	or		a
+	jp		nz,thirdherowindow
+	ld		a,(buttons+4*lenghtbuttontable+4)		;arrow right clicked
+	or		a
+	jp		nz,checkarrowright
+	ld		a,(buttons+8*lenghtbuttontable+4)		;end turn clicked
+	or		a
+	jp		nz,endturn
+	ret
+
+endturn:
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero1manarec
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero1manarec
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero1manarec
+	jr		z,.playerset
+	ld		hl,pl4hero1manarec
+.playerset:
+
+	ld		a,1
+	ld		(changemovementlife?),a
+;reset all heroes mana/ life and movement
+;	ld		hl,pl1hero1manarec	;at end turn hero get an amount of mana back
+	ld		b,amountofheroesperplayer
+	ld		de,lenghtherotable+6
+
+.loop:
+	ld		a,(hl)				;mana recovery
+	dec		hl					;total mana
+	ld		c,(hl)				
+	dec		hl					;current player1hero?mana
+	add		a,(hl)
+	cp		c
+	jp		nc,.nooverflowmana
+	ld		a,c
+.nooverflowmana:
+	ld		(hl),a
+	
+	dec		hl					;total move
+	ld		a,(hl)
+	dec		hl					;current move
+	ld		(hl),a
+	
+	dec		hl					;total life
+	ld		a,(hl)
+	dec		hl					;current life
+	ld		(hl),a
+	add		hl,de				;next hero mana recovery
+	djnz	.loop
+
+	ld		a,(amountofplayers)
+	ld		b,a
+	ld		a,(whichplayernowplaying?)
+	cp		b
+	jp		nz,.endchecklastplayer
+	xor		a
+.endchecklastplayer:	
+	inc		a
+	ld		(whichplayernowplaying?),a
+
+	ld		a,3					;put new heros in windows (page 0 and page 1) 
+	ld		(setherosinwindows?),a	
+
+	xor		a
+	ld		(herowindowpointer),a
+
+	call	firstherowindow
+	ret
+;/reset all heroes mana/ life and movement
+
+thirdherowindow:
+	ld		a,(whichplayernowplaying?)
+	dec		a
+;	ld		hl,pl1hero1type
+	ld		hl,pl1amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl2hero1type
+	ld		hl,pl2amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl3hero1type
+	ld		hl,pl3amountherosonmap
+	jr		z,.playertypeset
+;	ld		hl,pl4hero1type
+	ld		hl,pl4amountherosonmap
+.playertypeset:
+
+	ld		c,(hl)			;plxamountherosonmap
+	inc		hl
+	inc		hl
+	inc		hl				;plxheroxtype	
+
+	ld		a,(herowindowpointer)
+	or		a
+;	ld		hl,pl1hero1type
+	jr		z,.herotypefound2
+
+	ld		de,lenghtherotable
+	ld		b,a
+.loop1:
+	add		hl,de
+	djnz	.loop1
+.herotypefound2:
+
+	ld		b,a				;herowindowpointer
+	ld		a,c				;plxamountherosonmap
+	sub		a,b		
+	ret		c
+	cp		3
+	ret		c
+
+	ld		a,(hl)
+	cp		255
+	ret		z						;there is no hero in this window
+
+	ld		a,3
+	ld		(currentherowindowclicked),a;hero window 3 should be lit constantly
+	ld		a,2							;reset all lit hero windows
+	ld		(buttons+1*lenghtbuttontable+4),a
+	ld		(buttons+2*lenghtbuttontable+4),a
+	ld		(buttons+3*lenghtbuttontable+4),a
+
+	ld		de,lenghtherotable
+
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero3y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero3y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero3y
+	jr		z,.playerset
+	ld		hl,pl4hero3y
+.playerset:
+
+	ld		a,(herowindowpointer)
+;	ld		hl,pl1hero3y
+	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	or		a
+	jp		z,centrescreenforthishero
+	ret
+
+secondherowindow:
+	ld		a,(whichplayernowplaying?)
+	dec		a
+;	ld		hl,pl1hero1type
+	ld		hl,pl1amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl2hero1type
+	ld		hl,pl2amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl3hero1type
+	ld		hl,pl3amountherosonmap
+	jr		z,.playertypeset
+;	ld		hl,pl4hero1type
+	ld		hl,pl4amountherosonmap
+.playertypeset:
+
+	ld		c,(hl)			;plxamountherosonmap
+	inc		hl
+	inc		hl
+	inc		hl				;plxheroxtype	
+
+	ld		a,(herowindowpointer)
+	or		a
+;	ld		hl,pl1hero1type
+	jr		z,.herotypefound2
+
+	ld		de,lenghtherotable
+	ld		b,a
+.loop1:
+	add		hl,de
+	djnz	.loop1
+.herotypefound2:
+
+	ld		b,a				;herowindowpointer
+	ld		a,c				;plxamountherosonmap
+	sub		a,b		
+	ret		c
+	cp		2
+	ret		c
+
+	ld		a,(hl)
+	cp		255
+	ret		z						;there is no hero in this window
+
+	ld		a,2
+	ld		(currentherowindowclicked),a;hero window 2 should be lit constantly
+	ld		a,2							;reset all lit hero windows
+	ld		(buttons+1*lenghtbuttontable+4),a
+	ld		(buttons+2*lenghtbuttontable+4),a
+	ld		(buttons+3*lenghtbuttontable+4),a
+
+	ld		de,lenghtherotable
+
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero2y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero2y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero2y
+	jr		z,.playerset
+	ld		hl,pl4hero2y
+.playerset:
+
+	ld		a,(herowindowpointer)
+;	ld		hl,pl1hero2y
+	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	or		a
+	jp		z,centrescreenforthishero
+	add		hl,de					;	ld		hl,pl1hero3y
+	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	dec		a
+	jp		z,centrescreenforthishero
+	ret
+
+firstherowindow:
+	ld		a,(whichplayernowplaying?)
+	dec		a
+;	ld		hl,pl1hero1type
+	ld		hl,pl1amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl2hero1type
+	ld		hl,pl2amountherosonmap
+	jr		z,.playertypeset
+	dec		a
+;	ld		hl,pl3hero1type
+	ld		hl,pl3amountherosonmap
+	jr		z,.playertypeset
+;	ld		hl,pl4hero1type
+	ld		hl,pl4amountherosonmap
+.playertypeset:
+
+	ld		c,(hl)			;plxamountherosonmap
+	inc		hl
+	inc		hl
+	inc		hl				;plxheroxtype	
+
+	ld		a,(herowindowpointer)
+	or		a
+;	ld		hl,pl1hero1type
+	jr		z,.herotypefound2
+
+	ld		de,lenghtherotable
+	ld		b,a
+.loop1:
+	add		hl,de
+	djnz	.loop1
+.herotypefound2:
+
+	ld		b,a				;herowindowpointer
+	ld		a,c				;plxamountherosonmap
+	sub		a,b		
+	ret		c
+	cp		1
+	ret		c
+
+	ld		a,(hl)
+	cp		255
+	ret		z						;there is no hero in this window
+
+	ld		a,1
+	ld		(currentherowindowclicked),a;hero window 1 should be lit constantly
+	ld		a,2							;reset all lit hero windows
+	ld		(buttons+1*lenghtbuttontable+4),a
+	ld		(buttons+2*lenghtbuttontable+4),a
+	ld		(buttons+3*lenghtbuttontable+4),a
+
+	ld		de,lenghtherotable
+
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero1y
+	jr		z,.playerset
+	ld		hl,pl4hero1y
+.playerset:
+
+	ld		a,(herowindowpointer)
+;	ld		hl,pl1hero1y
+	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	or		a
+	jp		z,centrescreenforthishero
+	add		hl,de					;	ld		hl,pl1hero2y
+	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	dec		a
+	jp		z,centrescreenforthishero
+	add		hl,de					;	ld		hl,pl1hero3y
+	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+	dec		a
+	jp		z,centrescreenforthishero
+	ret
+	
+centrescreenforthishero:
+;a new player is clicked, set new player as current player, and reset movement stars
+	ld		a,b
+	ld		(plxcurrenthero),a
+	
+	xor		a
+	ld		(putmovementstars?),a
+	ld		(movementpathpointer),a
+	ld		(movehero?),a
+;/a new player is clicked, set new player as current player, and reset movement stars	
+	ld		a,TilesPerColumn
+	ld		b,a
+	ld		a,(mapheight)
+	sub		a,b
+	ld		b,a
+
+	ld		a,TilesPerRow
+	ld		c,a
+	ld		a,(maplenght)
+	sub		a,c
+	ld		c,a
+	
+	ld		a,(hl)			;pl1hero1y
+	sub		a,TilesPerColumn/2
+	jp		nc,.notoutofscreentop
+	xor		a
+.notoutofscreentop:	
+	ld		(mappointery),a
+
+	cp		b
+	jp		c,.notoutofscreenbottom
+	ld		a,b
+	ld		(mappointery),a
+.notoutofscreenbottom:	
+	
+	inc		hl				;pl1hero1x
+	ld		a,(hl)
+	sub		a,TilesPerRow/2
+	jp		nc,.notoutofscreenleft
+	xor		a
+.notoutofscreenleft:	
+	ld		(mappointerx),a
+
+	cp		c
+	jp		c,.notoutofscreenright
+	ld		a,c
+	ld		(mappointerx),a
+.notoutofscreenright:	
+	ret
+
+checkarrowleft:
+	ld		a,(herowindowpointer)
+	sub		a,1
+	ret		c
+	ld		(herowindowpointer),a
+
+	ld		a,3
+	ld		(setherosinwindows?),a	
+
+	ld		a,2							;reset all lit hero windows
+	ld		(buttons+1*lenghtbuttontable+4),a
+	ld		(buttons+2*lenghtbuttontable+4),a
+	ld		(buttons+3*lenghtbuttontable+4),a
+
+	ld		a,(currentherowindowclicked)
+	inc		a
+	ld		(currentherowindowclicked),a
+	ret
+
+checkarrowright:
+	ld		a,(herowindowpointer)
+	add		a,1
+	cp		8
+	ret		nc
+	ld		(herowindowpointer),a
+
+	ld		a,3
+	ld		(setherosinwindows?),a	
+
+	ld		a,2							;reset all lit hero windows
+	ld		(buttons+1*lenghtbuttontable+4),a
+	ld		(buttons+2*lenghtbuttontable+4),a
+	ld		(buttons+3*lenghtbuttontable+4),a
+
+	ld		a,(currentherowindowclicked)
+	dec		a
+	ld		(currentherowindowclicked),a
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+movehero:
+	ld		a,(movehero?)
+	or		a
+	ret		z
+
+	ld		a,(framecounter)
+  rrca
+	ret		c                               ;move every other frame
+	
+	ld		a,(movementpathpointer)
+	add		a,2
+	ld		(movementpathpointer),a
+	
+	ld		e,a
+	ld		d,0
+	ld		hl,movementpath
+	add		hl,de
+	
+	ld		b,(hl)		                      ;dy
+	inc		hl
+	ld		c,(hl)		                      ;dx
+	ld		a,b
+	or		c
+	jp		nz,.domovehero
+	
+.endmovement:	
+	xor		a
+	ld		(movehero?),a
+	ret
+	
+.domovehero:	
+	ld		a,(plxcurrenthero)
+	ld		e,a
+	ld		d,0
+
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl2hero1y
+	jr		z,.playerset
+	dec		a
+	ld		hl,pl3hero1y
+	jr		z,.playerset
+	ld		hl,pl4hero1y
+.playerset:
+
+	add		hl,de			;pl?hero?y
+;amountofheroes:	equ	10
+;plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
+;lenghtherotable:	equ	9
+;pl1hero1y:		db	4
+;pl1hero1x:		db	2
+;pl1hero1type:	db	0		;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+;pl1hero1life:	db	10,20
+;pl1hero1move:	db	12,20
+;pl1hero1mana:	db	10,20
+
+	call	checkheronearobject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
+
+	inc		hl
+	inc		hl
+	inc		hl
+	inc		hl
+	inc		hl				                      ;pl1hero?move
+	ld		a,(hl)
+	sub		a,1                             ;we reduce the total amount of movement steps hero has this turn, when it reaches 0, end movement
+	jr		c,.endmovement
+	ld		(hl),a
+	ld		a,1
+	ld		(changemovementlife?),a
+	dec		hl
+	dec		hl
+	dec		hl
+	dec		hl
+	dec		hl
+
+	ld		a,(hl)			                    ;pl1hero?y
+	add		a,b
+	ld		(hl),a		
+	inc		hl				                      ;pl1hero?x
+	ld		a,(hl)		
+	add		a,c
+	ld		(hl),a		
+	inc		hl				                      ;pl1hero?type
+
+;set new character hero. does hero move left, right, up, down ?
+	ld		a,(hl)			                    ;0=adol, 8=goemon, 16=pixie
+	and		%0000 0111		                  ;0,1=right, 2,3=left, 4,5=down, 6,7=up
+	ld		d,a
+	cp		2
+	jr		c,.herowasmovingright
+	cp		4
+	jr		c,.herowasmovingleft
+	cp		6
+	jr		c,.herowasmovingdown
+
+.herowasmovingup:
+	ld		a,b
+	cp		-1
+	jp		.cont
+.herowasmovingdown:
+	ld		a,b
+	cp		1
+	jp		.cont
+.herowasmovingleft:
+	ld		a,c
+	cp		-1
+	jp		.cont
+.herowasmovingright:
+	ld		a,c
+	cp		1
+;	jp		.cont
+
+.cont:
+	jr		nz,.newdirection
+
+	ld		a,d
+	and		1
+	ld		e,1
+	jp		z,.setherotype
+	ld		e,-1
+.setherotype:
+	ld		a,d
+	add		a,e
+	ld		d,a
+
+	ld		a,(hl)			                    ;pl1hero?type
+	and		%1111 1000
+	or		d
+	ld		(hl),a			                    ;pl1hero?type
+	ret
+
+.newdirection:
+	ld		a,c
+	cp		1
+	ld		d,0
+	jr		z,.setdirection
+	cp		-1
+	ld		d,2
+	jr		z,.setdirection
+	ld		a,b
+	cp		1
+	ld		d,4
+	jr		z,.setdirection
+	cp		-1
+	ld		d,6
+	jr		z,.setdirection
+
+.setdirection:
+	ld		a,(hl)
+	and		%1111 1000
+	or		d
+	ld		(hl),a
+	ret
+;set new character hero. does hero move left, right, up, down ?
+
+checkheronearobject:	                  ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
+	push	hl			                        ;in hl-> pl?hero?y
+	push	bc
+	call	.docheck
+	pop		bc
+	pop		hl
+	ret
+
+.docheck:
+;set relative hero  position
+	ld		a,(hl)			                    ;hero y
+	add		a,b
+	ld		d,a
+
+	inc		hl				                      ;hero x
+	ld		a,(hl)
+	add		a,c
+	ld		e,a
+;/set relative hero position
+
+;check take item
+.checkherotakesitem:
+	ld		hl,item1y
+	ld		bc,lenghtitemtable-1
+
+.docheckherotakesitem:
+	exx
+	ld		b,amountofitems
+.loopitemcheck:
+	exx
+	;pointer on enemy hero?
+	ld		a,d
+	cp		(hl)			                      ;cp y
+	inc		hl
+	jp		nz,.endcheckthisitem
+	ld		a,e
+	cp		(hl)			                      ;cp	x
+	jp		z,.herotakesitem
+	;pointer on enemy hero?
+.endcheckthisitem:
+	add		hl,bc
+	exx
+	djnz	.loopitemcheck
+	exx
+	ret
+
+.herotakesitem:
+	inc		hl				                      ;item type
+	ld		a,(hl)
+
+	exx
+	
+	ld		c,a
+	pop		af
+	pop		af
+	pop		hl				                      ;hl -> pl?hero?y
+	pop		af
+
+	ld		de,10
+	add		hl,de			                      ;pl?hero?items
+	ld		a,255
+
+amountofitemsperhero:	equ	5
+	
+	ld		b,amountofitemsperhero
+.loop:
+	cp		(hl)
+	jr		z,.emptyspace
+	inc		hl
+	djnz	.loop
+	ret
+	
+.emptyspace:
+	ld		(hl),c
+
+	exx
+
+	dec		hl
+	ld		(hl),255		                    ;item x
+	dec		hl			
+	ld		(hl),255		                    ;item y
+	xor		a
+	ld		(movehero?),a
+	ret
+
+changemovementlife?:	db		0
+checkmovementlifeheroline:
+	ld		a,(changemovementlife?)
+	or		a
+	ret		z
+	call	eraselifemovewindows
+	call	setlife_moveinwindows
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -383,7 +1311,7 @@ checktriggermapscreen:
 	ld		(heroxmirror),a
 	ld		hl,movementpath+2
 
-;movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero	
+;movementpath:		ds	64	;1stbyte:y star,	2ndbyte:x star (the movement path consists of stars, they have each their y and x coordinates. The hero will move to these coordinates when moving)
 
 .initloop:
 	call	.init			                      ;out c=dx, d=dy
@@ -503,10 +1431,10 @@ checktriggermapscreen:
 	ld		a,255
 	ld		(movementpath+1),a
 
-	ld		a,d				;dy
+	ld		a,d				                      ;dy
 	ld		(hl),a
 	inc		hl
-	ld		a,c				;dx
+	ld		a,c				                      ;dx
 	ld		(hl),a
 	inc		hl
 	ret
@@ -825,7 +1753,7 @@ doputheros:
 	cp    amountoftransparantpieces       ;(64 tiles hero can stand behind) check if hero is behind a tree	
 	jp		nc,.notbehindtree		
 	ld		(hl),254                        ;254 when hero is behind an object (mark background position)
-	cp		non_see_throughpieces           ;(16) bakground pieces a hero can stand behind, but they are not see through
+	cp		non_see_throughpieces           ;(16) background pieces a hero can stand behind, but they are not see through
 	ret		c				                        ;hero is completely invisible behind the tree
   ;at this point hero is standing behind an object. So first put the hero, and then put the object on top of the hero.
 	ld		d,a				                      ;tile where hero is standing on
@@ -833,11 +1761,11 @@ doputheros:
 	call	docopy			                    ;first put hero
 
 ;mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
-;  ds	16*2 	
-;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 000,224, 000,240, 000,000, 000,000
-;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 016,224, 016,240, 048,224, 048,240
+;  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
+;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
+;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
 ;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
-
+  
 	ld		a,d				                      ;mappointer at position of hero	
 	add   a,a                             ;*2
 	ld    e,a
@@ -2257,8 +3185,8 @@ pl1hero10y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 ;					y,	x,	type,life,lifemax,move,movemax,mana,manamax,manarec
 
 pl2amountherosonmap:	db	2
-pl2hero1y:		db	14
-pl2hero1x:		db	20
+pl2hero1y:		db	4
+pl2hero1x:		db	100
 pl2hero1type:	db	40		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
 pl2hero1life:	db	10,20
 pl2hero1move:	db	10,20
@@ -2268,7 +3196,7 @@ pl2hero1items:	db	255,255,255,255,255
 pl2hero1status:	db	1		                ;255=inactive, 1=hero is active on map, 11=in castle, 12=in fight, 2=part of hero 2's team
 
 ;pl2hero1y:		db	014,020,032, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255
-pl2hero2y:		db	014,019,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
 pl2hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl2hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl2hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -2279,8 +3207,8 @@ pl2hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,2
 pl2hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 
 pl3amountherosonmap:	db	2
-pl3hero1y:		db	06
-pl3hero1x:		db	18
+pl3hero1y:		db	100
+pl3hero1x:		db	02
 pl3hero1type:	db	96		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
 pl3hero1life:	db	10,20
 pl3hero1move:	db	10,20
@@ -2289,7 +3217,7 @@ pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1items:	db	255,255,255,255,255
 pl3hero1status:	db	1		                ;255=inactive, 1=hero is active on map, 11=in castle, 12=in fight, 2=part of hero 2's team
 
-pl3hero2y:		db	006,019,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
 pl3hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl3hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl3hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -2300,8 +3228,8 @@ pl3hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,2
 pl3hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 
 pl4amountherosonmap:	db	2
-pl4hero1y:		db	15
-pl4hero1x:		db	03
+pl4hero1y:		db	100
+pl4hero1x:		db	100
 pl4hero1type:	db	136		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
 pl4hero1life:	db	10,20
 pl4hero1move:	db	10,20
@@ -2310,7 +3238,7 @@ pl4hero1manarec:db	2		                ;recover x mana every turn
 pl4hero1items:	db	255,255,255,255,255
 pl4hero1status:	db	1		                ;255=inactive, 1=hero is active on map, 11=in castle, 12=in fight, 2=part of hero 2's team
 
-pl4hero2y:		db	015,004,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
 pl4hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl4hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl4hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -2343,9 +3271,9 @@ amountoftransparantpieces:  equ 64
 ;/check if hero is behind a tree
 
 mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
-  ds	16*2 	
-  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 000,224, 000,240, 000,000, 000,000
-  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 016,224, 016,240, 048,224, 048,240
+  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
+  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
+  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
   db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
   
 unpassablepieces:
@@ -2371,10 +3299,10 @@ puthero:
 	db		0,%0000 0000,$98	
 ;	db		0,%0000 1000,$98	
 
-castlepl1y:	db	04 | castlepl1x:	db	01
-castlepl2y:	db	14 | castlepl2x:	db	19
-castlepl3y:	db	06 | castlepl3x:	db	18
-castlepl4y:	db	15 | castlepl4x:	db	03
+castlepl1y:	db	004 | castlepl1x:	db	001
+castlepl2y:	db	004 | castlepl2x:	db	100
+castlepl3y:	db	100 | castlepl3x:	db	001
+castlepl4y:	db	100 | castlepl4x:	db	100
 castley:	ds	1
 castlex:	ds	1
 
@@ -2428,7 +3356,8 @@ sywindow1: equ 176 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 16
 sxwindow1: equ 009 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 217
 
 			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
-buttons:	db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
+buttons:	
+      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
 			db	sywindow2-2,	32-2,	sxwindow2-7,	17-2,	0	;1st hero window
 			db	sywindow3-2,	32-2,	sxwindow3-7,	17-2,	0	;2nd hero window
 			db	sywindow4-2,	32-2,	sxwindow4-7,	17-2,	0	;3rd hero window	
@@ -2472,11 +3401,11 @@ addxtomouse:	equ	8
 subyfrommouse:	equ	4
 
 turnbased?:				db	1
-amountofplayers:		db	2
+amountofplayers:		db	4
 player1human?:			db	1
 player2human?:			db	1
-player3human?:			db	0
-player4human?:			db	0
+player3human?:			db	1
+player4human?:			db	1
 whichplayernowplaying?:	db	1
 
 
@@ -2534,3 +3463,5 @@ putmovementstars?:	db	0
 movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero
 ystar:				ds	1
 xstar:				ds	1
+
+currentherowindowclicked:	db	0
