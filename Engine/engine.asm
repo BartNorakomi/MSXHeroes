@@ -8,7 +8,7 @@ LevelEngine:
 	call	movehero
 	call	checktriggermapscreen
 
-	call	setherosinwindows               ;erase hero and life status windows, then put the heroes in the windows and set the life and movement status of the heroes
+;	call	setherosinwindows               ;erase hero and life status windows, then put the heroes in the windows and set the life and movement status of the heroes
 	call	putbottomcastles
 	call	putbottomheroes	
 ;	call	putbottomcreatures
@@ -18,10 +18,10 @@ LevelEngine:
 	call	puttopcastles
 	call	putmovementstars
 
-	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
-	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
-	call	checkwindowsclick               ;check if any of the buttons in the hud are pressed
-	call	checkmovementlifeheroline
+;	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
+;	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
+;	call	checkwindowsclick               ;check if any of the buttons in the hud are pressed
+;	call	checkmovementlifeheroline
 ;	call	docomputerplayerturn
 ;	call	textwindow
 ;	call	checktriggerBmap
@@ -2880,10 +2880,11 @@ SetPageSpecial:
   out   ($99),a
   ret
 
-;buildupscreenYoffset:	equ	0
-TilesPerColumn:				equ	10
+buildupscreenYoffset:	equ	5
+buildupscreenXoffset:	equ	6
+TilesPerColumn:				equ	12
 ;halfnumberrows:			  equ	TilesPerColumn/2
-TilesPerRow:				  equ	16
+TilesPerRow:				  equ	12
 ;halflenghtrow:			  equ	TilesPerRow/2
 mapdata:  equ $8000
 
@@ -2928,14 +2929,14 @@ buildupscreen:
 
   ex    de,hl                           ;hl->points to tile in inactive page, de->pointer to tile in total map 
 
-;  ld		a,buildupscreenYoffset          ;Y start of visible map (Is probably always gonna be 0)
-  xor   a
+  ld		a,buildupscreenYoffset          ;Y start of visible map (Is probably always gonna be 0)
+;  xor   a
 	ld		(Copy16x16Tile+dy),a
 
 	ld		bc,TilesPerColumn*256 + 16      ;b=TilesPerColumn, c=16
   .loop:
 	push	bc
-	xor		a
+  ld		a,buildupscreenXoffset          ;X start of visible map (Is probably always gonna be 0)
 	ld		(Copy16x16Tile+dx),a            ;first tile on each row starts at x=0
 	call	putrow				                  ;put all the pieces (defined in 'TilesPerRow') in this row
 
@@ -2944,7 +2945,7 @@ buildupscreen:
 	ld		(Copy16x16Tile+dy),a	
 
 ;  .SelfmodifyingMaplenghtMinusTilesPerRow:  Equ $+1
-  ld    bc,128 - 16                      ;maplenght - tiles per row
+  ld    bc,128 - 12                      ;maplenght - tiles per row
   ex    de,hl
 	add		hl,bc                           ;jump to first tile of next row in screen display
   ex    de,hl

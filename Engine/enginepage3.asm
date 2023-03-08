@@ -22,7 +22,8 @@ CopyPage0To1:
 	db		0,0,$d0	
 
 LoadHud:
-  ld    d,HudBlock
+;  ld    d,HudBlock
+  ld    d,HudNewBlock
   ld    a,0
   ld    hl,$0000                        ;write to page 0
   call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
