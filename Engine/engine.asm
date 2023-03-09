@@ -1094,7 +1094,10 @@ doputstar:
 	add		a,a				;*4
 	add		a,a				;*8
 	add		a,a				;*16
-	add		a,3				;centre star
+;	add		a,3				;centre star
+
+  add   a,buildupscreenXoffset+3        ;map in screen starts at (6,5) due to the frame around the map  
+		
 	ld		(putstar+dx),a
 
 	ld		a,(mappointery)
@@ -1109,7 +1112,10 @@ doputstar:
 	add		a,a				;*4
 	add		a,a				;*8
 	add		a,a				;*16
-	add		a,4				;centre star
+;	add		a,4				;centre star
+
+  add   a,buildupscreenYoffset+4        ;map in screen starts at (6,5) due to the frame around the map  
+
 	ld		(putstar+dy),a
 
 ;mark background star position as 'dirty'
@@ -1221,6 +1227,9 @@ checktriggermapscreen:
 ;mouse clicked, should hero move over path ?
 	ld		a,(spat+1)		                  ;x	(mouse)pointer
 	add		a,addxtomouse	                  ;centre mouse in grid
+
+  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+	
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -1236,6 +1245,9 @@ checktriggermapscreen:
 
 	ld		a,(spat)		                    ;y	(mouse)pointer
 	sub		a,subyfrommouse	                ;centre mouse in grid
+
+  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+
 	jp		nc,.notcarry
 	xor		a
 .notcarry:
@@ -1331,6 +1343,9 @@ checktriggermapscreen:
 .init:
 	ld		a,(spat+1)		                  ;x (mouse)pointer
 	add		a,addxtomouse	                  ;centre mouse in grid
+
+  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+	
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -1344,6 +1359,9 @@ checktriggermapscreen:
 
 	ld		a,(spat)		                    ;y (mouse)pointer
 	sub		a,subyfrommouse	                ;centre mouse in grid
+
+  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+
 	jp		nc,.notcarry2
 	xor		a
 .notcarry2:
@@ -1575,6 +1593,9 @@ putbottomcastles:
 	add		a,a				                      ;*4
 	add		a,a				                      ;*8
 	add		a,a				                      ;*16
+
+  add   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  
+
 	ld		(putcastle+dx),a
 
 	ld		a,(mappointery)
@@ -1590,6 +1611,9 @@ putbottomcastles:
 	add		a,a				                      ;*4
 	add		a,a				                      ;*8
 	add		a,a				                      ;*16
+
+  add   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  
+
 	ld		(putcastle+dy),a
 
 ;mark background castle position as 'dirty'
@@ -1706,6 +1730,7 @@ doputheros:
 	add		a,a				                      ;*4
 	add		a,a				                      ;*8
 	add		a,a				                      ;*16
+  add   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  
 	ld		(putherotopbottom+dx),a         ;set hero dx
 
 	ld		a,c				                      ;relative y hero (in tiles)
@@ -1713,6 +1738,7 @@ doputheros:
 	add		a,a				                      ;*4
 	add		a,a				                      ;*8
 	add		a,a				                      ;*16
+  add   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  
 	ld		(putherotopbottom+dy),a         ;set hero dy
 
 	inc		hl                              ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
@@ -1793,17 +1819,23 @@ doputheros:
 ;retrace the partnumber
 	push	hl
 	ld		a,(putherotopbottom+dx)
+
+  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  
+
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
 	srl		a				                        ;/16
 	ld		b,a				                      ;relative x hero
-	add		a,a				                      ;*2
-	add		a,a				                      ;*4
-	add		a,a				                      ;*8
-	add		a,a				                      ;*16
+;	add		a,a				                      ;*2
+;	add		a,a				                      ;*4
+;	add		a,a				                      ;*8
+;	add		a,a				                      ;*16
 
 	ld		a,(putherotopbottom+dy)
+
+  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  
+
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
