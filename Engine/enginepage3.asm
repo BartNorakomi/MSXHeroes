@@ -1,6 +1,7 @@
 phase	$c000
 
 StartGame:
+jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadHeroesSprites               ;set all heroes sprites in page 2
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
@@ -20,6 +21,24 @@ CopyPage0To1:
 	db		0,0,0,1
 	db		0,1,0,1
 	db		0,0,$d0	
+
+LoadCastleOverview:
+  ld    a,0*32+31
+  call  SetPage
+
+  ld    d,CastleOverviewBlock
+  ld    a,0
+  ld    hl,$0000                        ;write to page 0
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+
+  ld    hl,CastleOverviewPalette
+  call  SetPalette
+    
+kut: jp kut
+  ret
+
+CastleOverviewPalette:
+  incbin"..\grapx\CastleOverview\CastleOverview.pl"
 
 LoadHud:
 ;  ld    d,HudBlock
@@ -177,8 +196,11 @@ DoCopy:
 	dw    $a3ed,$a3ed,$a3ed
   ret
 
-copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram  
 	call	SetVdp_Write                    ;start writing to address bhl
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1
+  out   ($a8),a   
 
   ld    a,d
   call  block1234
@@ -191,6 +213,9 @@ copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. Th
   call  outix256
   dec   a
   jp    nz,.loop1
+
+  ld    a,(slot.page1rom)               ;all RAM except page 1
+  out   ($a8),a
   ret
 
 copyGraphicsToScreen212:                ;in d=block, ahl=address to write to. This routine writes a set amount of bytes to vram. In this case 212 lines (212 lines * 128 bytes = $6a00 bytes)

@@ -421,10 +421,18 @@ dephase
 ;
 HudNewBlock:  equ   $0a
 phase	$4000
-  incbin "..\grapx\hud\HudNew.SC5",7,212 * 128      ;208 lines
+  incbin "..\grapx\hud\HudNew.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $0c - 0d
+;
+CastleOverviewBlock:  equ   $0c
+phase	$4000
+  incbin "..\grapx\CastleOverview\5.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

@@ -17,6 +17,7 @@ LevelEngine:
 ;	call	puttopcreatures
 	call	puttopcastles
 	call	putmovementstars
+  call  CheckEnterCastle                ;press F1 to enter castle
 
 ;	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
 ;	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
@@ -90,7 +91,34 @@ InterruptHandler:
 
 
 
+CheckEnterCastle:
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   6,a
+  ret   z
+    
+  ; set temp ISR
+  di
+	ld		hl,.tempisr
+	ld		de,$38
+	ld		bc,6
+	ldir
+  ei
 
+  pop   af                              ;pop the call to this routine         
+  jp    LoadCastleOverview
+
+		; set temp ISR
+  .tempisr:	
+	push	af
+	in		a,($99)                         ;check and acknowledge vblank int (ei0 is set)
+	pop		af
+	ei	
+	ret
 
 
 
