@@ -38,7 +38,9 @@ kut: jp kut
   ret
 
 CastleOverviewPalette:
+;  incbin"..\grapx\CastleOverview\tavern.pl"
   incbin"..\grapx\CastleOverview\CastleOverview.pl"
+;  incbin"..\grapx\CastleOverview\image7.pl"
 
 LoadHud:
 ;  ld    d,HudBlock

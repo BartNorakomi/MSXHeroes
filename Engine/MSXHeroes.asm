@@ -430,7 +430,10 @@ dephase
 ;
 CastleOverviewBlock:  equ   $0c
 phase	$4000
-  incbin "..\grapx\CastleOverview\total_msx.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\tavernoriginal.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\magicguild.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\chamberofcommerce.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
