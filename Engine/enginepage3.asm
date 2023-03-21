@@ -1,7 +1,7 @@
 phase	$c000
 
 StartGame:
-jp LoadCastleOverview
+;jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadHeroesSprites               ;set all heroes sprites in page 2
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
