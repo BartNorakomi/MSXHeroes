@@ -54,8 +54,8 @@ vblank:
   push  hl
 
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
-	call	setspritecharacter
-	call	putsprite
+	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+	call	putsprite                       ;out spat data
 
   ld    a,1                             ;vblank flag gets set
   ld    (vblankintflag),a  
@@ -2295,10 +2295,11 @@ checkcurrentplayerhuman:	              ;out zero flag, current player is compute
 	ret
 ;/dont react to space / mouse click if current player is a computer
 
-ycoorspritebottom:	equ	193
+ycoorspritebottom:	equ	184
 xcoorspriteright:	equ	240 ;-11
 mousey:	ds	1
 mousex:	ds	1
+;ycoordinateStartPlayfield:  equ 16
 MovePointer:					                  ;move mouse pointer (set mouse coordinates in spat)
 	call	checkcurrentplayerhuman	        ;out zero flag, current player is computer
 	ret		z
@@ -2344,11 +2345,13 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
   .setmousespat:
 	ld		a,(spat+0)
 	ld		(spat+4),a
+	ld		(spat+8),a
 	ld		a,(spat+1)
 	ld		(spat+5),a
+	ld		(spat+9),a
 	ret
 
-movecursory:
+movecursory:                            ;move cursor up(a=-1)/down(a=+1)
 	ld    hl,spat+0 	                    ;cursory
 	or		a			                          ;check if cursor/mouse moves left or right
 	jp		m,.up
@@ -2362,8 +2365,12 @@ movecursory:
 	jp		.sety
   .up:
 	add		a,(hl)
-	jp		c,.sety
-	xor		a
+
+
+  cp    ycoordinateStartPlayfield       ;check top border for mouse pointer
+
+	jp		nc,.sety
+  ld    a,ycoordinateStartPlayfield
   .sety:
 	ld    (hl),a
 	ret
@@ -2415,7 +2422,7 @@ ReadOutKeyboardAndMovePointer:
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
   ld    a,(Controls)
-	ld		bc,0                            ;b=scroll map left(-1)/right(+1),  c=scroll map up(-1)/down(+1)
+	ld		bc,0                            ;b=move cursor left(-1)/right(+1),  c=move cursor up(-1)/down(+1)
 
 ;	ld		a,(keys+8)
 .right:
@@ -2449,19 +2456,18 @@ ReadOutKeyboardAndMovePointer:
 
 	ld		a,b
 	add		a,a
-	call	movecursorx
+	call	movecursorx                     ;move cursor left(a=-1)/right(a=+1)
 	ld		a,c
 	add		a,a
-	call	movecursory
+	call	movecursory                     ;move cursor up(a=-1)/down(a=+1)
 
 	ld		a,(spat+0)
 	ld		(spat+4),a
+	ld		(spat+8),a
 	ld		a,(spat+1)
 	ld		(spat+5),a
+	ld		(spat+9),a
 	ret
-
-
-
 
 
 
@@ -2478,25 +2484,85 @@ spritechar:
 spritecolor:
 	include "../sprites/sprites.tcs.gen"
 
-
+ycoordinateStartPlayfield:  equ 04
+SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
 spritecharacter:	db	255	              ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=swords,11=hand,12=change arrows
-setspritecharacter:
+setspritecharacter:                     ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   2,a                             ;check if left is pressed
+  jr    z,.EndCheckShowScrollArrowLeft
 	ld		a,(spat+1)			                ;x cursor
 	or		a
-	jp		z,.leftofscreen
+	jp		z,.ShowScrollArrowLeft          ;if mousepointer is at x=0 show scrollarrow to the left
+  .EndCheckShowScrollArrowLeft:
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   3,a                             ;check if right is pressed
+  jr    z,.EndCheckShowScrollArrowRight
+	ld		a,(spat+1)			                ;x cursor
 	cp		xcoorspriteright
-	jp		z,.rightofscreen
+	jp		z,.ShowScrollArrowRight         ;if mousepointer is at furthest right in screen, show scrollarrow to the right
+  .EndCheckShowScrollArrowRight:
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   0,a                             ;check if up is pressed
+  jr    z,.EndCheckShowScrollArrowTop
 	ld		a,(spat)			                  ;y cursor
-	or		a
-	jp		z,.topofscreen
+  cp    ycoordinateStartPlayfield
+
+;	or		a                               ;check if y=0
+	jp		z,.ShowScrollArrowTop           ;if mousepointer is at y=0 show scrollarrow to the top
+  .EndCheckShowScrollArrowTop:
+
+
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   1,a                             ;check if down is pressed
+  jr    z,.EndCheckShowScrollArrowBottom
+	ld		a,(spat)			                  ;y cursor
 	cp		ycoorspritebottom	
-	jp		z,.bottomofscreen
-	cp		TilesPerColumn*16-12
-	jp		nc,.bottomhalfofscreen
+	jp		z,.ShowScrollArrowBottom        ;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
+  .EndCheckShowScrollArrowBottom:
+
+
+
+
+;	ld		a,(spat)			                  ;y cursor
+;	cp		ycoorspritebottom	
+;	jp		z,.ShowScrollArrowBottom        ;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
+
+	ld		a,(spat+1)			                ;x cursor
+	cp		SX_Hud                          ;check if mousepointer is in the hud (x>196)
+	jp		nc,.MousepointInHud             ;if mousepointer is in hud, show hud sprites
+
+
+;	cp		TilesPerColumn*16-12
+;	jp		nc,.MousepointInHud          ;if mousepointer is in hud, show hud sprites
 
 ;set relative mouse position
 	ld		a,(spat+1)		                  ;x	(mouse)pointer
-	add		a,addxtomouse	                  ;centre mouse in grid
+;	add		a,addxtomouse	                  ;centre mouse in grid
+;	add		a,addxtomouse	                  ;centre mouse in grid
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -2533,8 +2599,8 @@ setspritecharacter:
 	ld		a,(whichplayernowplaying?) | cp 4 | ld hl,pl4hero1y | call .checkpointeronhero
 ;/check pointer on hero
 
-	call	.checkpointeroncreature
-	call	.checkpointeritem
+	call	.checkpointeroncreature         ;check if pointer is on creature or enemy hero
+	call	.checkpointeritem               ;check if pointer is on an item
 	jp		.shoe					                  ;pointer on no hero at all
 ;	ret
 
@@ -2702,46 +2768,118 @@ setspritecharacter:
 	jp		.setcharacter
 ;/check if pointer is on friendly hero
 
-.bottomhalfofscreen:			;mouse pointer is in the bottom half of screen
+.MousepointInHud:			;mouse pointer is in the hud
 	ld		a,11				
 	jp		.setcharacter
 .shoe:
 	ld		a,8
 	jp		.setcharacter
-.bottomofscreen:
+.ShowScrollArrowBottom:
 	ld		a,0
 	jp		.setcharacter
-.topofscreen:
+.ShowScrollArrowTop:
 	ld		a,1
 	jp		.setcharacter
-.rightofscreen:
-	ld		a,(spat)			;y cursor
-	or		a
-	jr		z,.righttop
-	cp		ycoorspritebottom	
-	jr		z,.rightbottom
+.ShowScrollArrowRight:
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   0,a                             ;check if up is pressed
+  jr    z,.EndCheckShowScrollArrowTopAndRight
+	ld		a,(spat)			                  ;y cursor
+  cp    ycoordinateStartPlayfield
+	jp		z,.ShowScrollArrowTopAndRight   ;if mousepointer is at y=0 show and x=0 show scrollarrow to the top and left
+  .EndCheckShowScrollArrowTopAndRight:
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   1,a                             ;check if down is pressed
+  jr    z,.EndCheckShowScrollArrowBottomAndRight
+	ld		a,(spat)			                  ;y cursor
+	cp		ycoorspritebottom
+	jp		z,.ShowScrollArrowBottomAndRight;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
+  .EndCheckShowScrollArrowBottomAndRight:
+
+
+
+
+
+
+
+
+
+;	ld		a,(spat)			;y cursor
+;	or		a
+;	jr		z,.righttop
+;	cp		ycoorspritebottom	
+;	jr		z,.rightbottom
 .right:
 	ld		a,4
 	jp		.setcharacter
-.righttop:
+.ShowScrollArrowTopAndRight:
 	ld		a,2
 	jp		.setcharacter
-.rightbottom:
+.ShowScrollArrowBottomAndRight:
 	ld		a,6
 	jp		.setcharacter
-.leftofscreen:
-	ld		a,(spat)			;y cursor
-	or		a
-	jr		z,.lefttop
+.ShowScrollArrowLeft:
+
+
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   0,a                             ;check if up is pressed
+  jr    z,.EndCheckShowScrollArrowTopAndLeft
+	ld		a,(spat)			                  ;y cursor
+  cp    ycoordinateStartPlayfield
+	jp		z,.ShowScrollArrowTopAndLeft    ;if mousepointer is at y=0 show and x=0 show scrollarrow to the top and left
+  .EndCheckShowScrollArrowTopAndLeft:
+
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   1,a                             ;check if down is pressed
+  jr    z,.EndCheckShowScrollArrowBottomAndLeft
+	ld		a,(spat)			                  ;y cursor
 	cp		ycoorspritebottom	
-	jr		z,.leftbottom
+	jp		z,.ShowScrollArrowBottomAndLeft ;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
+  .EndCheckShowScrollArrowBottomAndLeft:
+
+
+
+
+
+
+
+
+;	ld		a,(spat)			;y cursor
+;	or		a
+;	jr		z,.ShowScrollArrowLeftTop
+;	cp		ycoorspritebottom	
+;	jr		z,.leftbottom
 .left:
 	ld		a,5
 	jp		.setcharacter
-.lefttop:
+.ShowScrollArrowTopAndLeft:
 	ld		a,3
 	jp		.setcharacter
-.leftbottom:
+.ShowScrollArrowBottomAndLeft:
 	ld		a,7
 	jp		.setcharacter
 .setcharacter:
@@ -2768,8 +2906,12 @@ setspritecharacter:
 	ld		hl,sprcharaddr	;sprite 0 character table in VRAM
 	call	SetVdp_Write
 	exx
+
+
+  ld    hl,SpriteCharCursorSwords
 	ld		c,$98
-	call	outix64			;write sprite character of pointer and hand to vram
+	call	outix96			;write sprite character of pointer and hand to vram
+;	call	outix64			;write sprite character of pointer and hand to vram
 
 ;color
 ;	ld		a,1				;page 2/3
@@ -2778,18 +2920,36 @@ setspritecharacter:
 	call	SetVdp_Write
 	ld		c,$98
 
-	ld		hl,spritecolor
-	call	outix32			;write sprite color of pointer and hand to vram
+;	ld		hl,spritecolor
+	ld		hl,SpriteColCursorSwords
+;	call	outix32			;write sprite color of pointer and hand to vram
+	call	outix48			;write sprite color of pointer and hand to vram
 	ret
 
+SpriteCharCursorShoe:
+	include "../sprites/MouseCursorShoe.tgs.gen"
+SpriteColCursorShoe:
+	include "../sprites/MouseCursorShoe.tcs.gen"
+	
+SpriteCharCursorHand:
+	include "../sprites/MouseCursorHand.tgs.gen"
+SpriteColCursorHand:
+	include "../sprites/MouseCursorHand.tcs.gen"
 
+SpriteCharCursorSwitchingArrows:
+	include "../sprites/MouseCursorSwitchingArrows.tgs.gen"
+SpriteColCursorSwitchingArrows:
+	include "../sprites/MouseCursorSwitchingArrows.tcs.gen"
 
+SpriteCharCursorSwords:
+	include "../sprites/MouseCursorSwords.tgs.gen"
+SpriteColCursorSwords:
+	include "../sprites/MouseCursorSwords.tcs.gen"
 
-
-
-
-
-
+SpriteCharCursorShoeAndStar:
+	include "../sprites/MouseCursorShoeAndStar.tgs.gen"
+SpriteColCursorShoeAndStar:
+	include "../sprites/MouseCursorShoeAndStar.tcs.gen"
 
 
 
@@ -2807,7 +2967,7 @@ putsprite:
 	ret
 
 spat:						;sprite attribute table
-	db		100,100,00,0	,100,100,04,0	,230,230,00,0	,230,230,00,0
+	db		100,100,00,0	,100,100,04,0	,100,100,08,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
@@ -2891,9 +3051,11 @@ scrollscreen:                           ;you can either scroll the scroll by mov
   jr    z,.up
 	inc		b
 
+
   .up:                                  ;check if cursor is at the top side of the screen and up is pressed
 	ld		a,(spat)			                  ;x cursor
-	or		a
+  cp    ycoordinateStartPlayfield
+;	or		a
 	jr		nz,.down
   bit   0,d                             ;check ontrols to see if up is pressed
   jr    z,.down
@@ -2927,6 +3089,8 @@ scrollscreen:                           ;you can either scroll the scroll by mov
   ret   nc
 	ld		(mappointery),a	
 	ret	
+
+
 
 SetPageSpecial:                         
   ld    a,0*32+31
