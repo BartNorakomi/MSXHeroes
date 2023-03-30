@@ -246,12 +246,12 @@ initMem.length:	equ	$-initMem
 
 ;
 init:		
-  ld    a,15        ;is zwart in onze huidige pallet
+  ld    a,13        ;is zwart in onze huidige pallet
 	ld		($f3e9),a	  ;foreground color 
 	ld		($f3ea),a	  ;background color 
 	ld		($f3eb),a	  ;border color
 
-  ld    a,15        ;start write to this palette color (15)
+  ld    a,13        ;start write to this palette color (15)
   di
 	out		($99),a
 	ld		a,16+128

@@ -2,11 +2,9 @@ LevelEngine:
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
+	call	movehero                        ;moves hero if needed. Also centers screen around hero
 	call	buildupscreen                   ;build up the visible map in page 0/1
 
-
-	call	movehero
-	call	checktriggermapscreen
 
 ;	call	setherosinwindows               ;erase hero and life status windows, then put the heroes in the windows and set the life and movement status of the heroes
 	call	putbottomcastles
@@ -19,9 +17,12 @@ LevelEngine:
 	call	putmovementstars
   call  CheckEnterCastle                ;press F1 to enter castle
 
-;	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
-;	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
-;	call	checkwindowsclick               ;check if any of the buttons in the hud are pressed
+	call	checkbuttonnolongerover         ;check if mousepointer is no longer on a button
+	call	checkbuttonover                 ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
+	call	checkwindowsclick               ;check if any of the buttons in the hud are pressed
+
+	call	checktriggermapscreen
+
 ;	call	checkmovementlifeheroline
 ;	call	docomputerplayerturn
 ;	call	textwindow
@@ -33,12 +34,12 @@ LevelEngine:
   inc   a
   ld    (framecounter),a
 
-;  xor   a
-;  ld    hl,vblankintflag
-;  .checkflag:
-;  cp    (hl)
-;  jr    z,.checkflag
-;  ld    (hl),a  
+  ld    a,04
+  ld    hl,vblankintflag
+  .checkflag:
+  cp    (hl)
+  jr    nc,.checkflag
+  ld    (hl),0
 
   halt
   jp    LevelEngine
@@ -57,7 +58,8 @@ vblank:
 	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
 	call	putsprite                       ;out spat data
 
-  ld    a,1                             ;vblank flag gets set
+  ld    a,(vblankintflag)
+  inc   a                               ;vblank flag gets incremented
   ld    (vblankintflag),a  
 
   pop   hl 
@@ -127,28 +129,28 @@ CheckEnterCastle:
 
 
 colorlightgrey: equ 8
-colormiddlebrown: equ 13
+colormiddlebrown: equ 6
 
 checkbuttonnolongerover:	;check if mousepointer is no longer on a button
 	ld		hl,buttons+0*lenghtbuttontable+4
-	call	.check
+;	call	.check
 	ld		hl,buttons+1*lenghtbuttontable+4
 	ld		b,1
-	call	.checkherobutton
+;	call	.checkherobutton
 	ld		hl,buttons+2*lenghtbuttontable+4
 	ld		b,2
-	call	.checkherobutton
+;	call	.checkherobutton
 	ld		hl,buttons+3*lenghtbuttontable+4
 	ld		b,3
-	call	.checkherobutton	
+;	call	.checkherobutton	
 	ld		hl,buttons+4*lenghtbuttontable+4
-	call	.check
+;	call	.check
 	ld		hl,buttons+5*lenghtbuttontable+4
-	call	.check
+;	call	.check
 	ld		hl,buttons+6*lenghtbuttontable+4
-	call	.check
+;	call	.check
 	ld		hl,buttons+7*lenghtbuttontable+4
-	call	.check	
+;	call	.check	
 	ld		hl,buttons+8*lenghtbuttontable+4
 	call	.check
 	ret
@@ -180,9 +182,48 @@ checkbuttonnolongerover:	;check if mousepointer is no longer on a button
 	jp		lightupbutton
 ;	ret
 
+CompareHLwithDE:
+  xor   a
+  sbc   hl,de
+  ret
+
+eraseherowindow:
+	DB    0,0,0,0
+	DB    0,0,0,0
+	DB    herowindownx,0,herowindowny,0
+	DB    colordarkbrown+16*colordarkbrown,1,$80
+
+lenghtbuttontable:	equ	5
+amountofbuttons:	equ	5
+
+;arrow left		1st hero window	 2nd hero window  3rd hero wind		arrow right		map					castle			system			end turn
+sywindow1: equ 176 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 168 | sywindow5: equ 176 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 109
+sxwindow1: equ 009 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 232
+
+			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
+buttons:	
+      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
+			db	sywindow2-2,	32-2,	sxwindow2-7,	17-2,	0	;1st hero window
+			db	sywindow3-2,	32-2,	sxwindow3-7,	17-2,	0	;2nd hero window
+			db	sywindow4-2,	32-2,	sxwindow4-7,	17-2,	0	;3rd hero window	
+			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;arrow right
+
+			db	sywindow6-2,	28-2,	sxwindow6-7,	28-2,	0	;map
+			db	sywindow7-2,	28-2,	sxwindow7-7,	28-2,	0	;castle
+			db	sywindow8-2,	28-2,	sxwindow8-7,	28-2,	0	;system
+			db	sywindow9-2,	16-2,	sxwindow9-7,	16-2,	0	;end turn
+
+herowindow1y:	equ	sywindow2+2
+herowindow1x:	equ	sxwindow2+2
+herowindow2x:	equ	sxwindow3+2
+herowindow3x:	equ	sxwindow4+2
+herowindownx:	equ	14
+herowindowny:	equ	29
+
 checkbuttonover:	;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
-	ld		a,(spritecharacter) ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=fight,11=hand,12=piece of window
-	cp		11
+  ld    hl,(CurrentCursorSpriteCharacter)
+  ld    de,CursorHand
+  call  CompareHLwithDE                     ;out z=the same sprite, nz=different sprites
 	ret		nz
 
 	ld		a,(spat)		;y mouse pointer
@@ -191,22 +232,22 @@ checkbuttonover:	;check if mousepointer moves over a button (a button can be, th
 	ld		c,a
 
 	ld		hl,buttons+0*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+1*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+2*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+3*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+4*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+5*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+6*lenghtbuttontable
-	call	.check
+;	call	.check
 	ld		hl,buttons+7*lenghtbuttontable
-	call	.check
-	ld		hl,buttons+8*lenghtbuttontable
+;	call	.check
+	ld		hl,buttons+8*lenghtbuttontable      ;end turn button
 	call	.check
 	ret
 
@@ -234,7 +275,7 @@ checkbuttonover:	;check if mousepointer moves over a button (a button can be, th
 	inc		hl				;lit ?
 	ld		(hl),2				;keep button lit for 2 screenbuilduptimes
 
-	ld		a,colorwhite+16*colorwhite
+	ld		a,colorwhite+16*colorblack
 	call	lightupbutton
 	pop		af				;dont check any other buttons
 	ret
@@ -326,10 +367,10 @@ lightupbutton:
 
 
 checkwindowsclick:
-	ld		a,(spritecharacter) ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=fight,11=hand,12=piece of window
-	cp		11
+  ld    hl,(CurrentCursorSpriteCharacter)   ;only continue if cursor sprite is a hand
+  ld    de,CursorHand
+  call  CompareHLwithDE                     ;out z=the same sprite, nz=different sprites
 	ret		nz
-
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -359,19 +400,19 @@ checkwindowsclick:
 
 	ld		a,(buttons+0*lenghtbuttontable+4)		;arrow left clicked
 	or		a
-	jp		nz,checkarrowleft
+;	jp		nz,checkarrowleft
 	ld		a,(buttons+1*lenghtbuttontable+4)		;1st hero window clicked
 	or		a
-	jp		nz,firstherowindow
+;	jp		nz,firstherowindow
 	ld		a,(buttons+2*lenghtbuttontable+4)		;2nd hero window clicked
 	or		a
-	jp		nz,secondherowindow
+;	jp		nz,secondherowindow
 	ld		a,(buttons+3*lenghtbuttontable+4)		;3rd hero window clicked
 	or		a
-	jp		nz,thirdherowindow
+;	jp		nz,thirdherowindow
 	ld		a,(buttons+4*lenghtbuttontable+4)		;arrow right clicked
 	or		a
-	jp		nz,checkarrowright
+;	jp		nz,checkarrowright
 	ld		a,(buttons+8*lenghtbuttontable+4)		;end turn clicked
 	or		a
 	jp		nz,endturn
@@ -689,6 +730,7 @@ centrescreenforthishero:
 	ld		(movementpathpointer),a
 	ld		(movehero?),a
 ;/a new player is clicked, set new player as current player, and reset movement stars	
+.GoCenter:
 	ld		a,TilesPerColumn
 	ld		b,a
 	ld		a,(mapheight)
@@ -702,7 +744,7 @@ centrescreenforthishero:
 	ld		c,a
 	
 	ld		a,(hl)			;pl1hero1y
-	sub		a,TilesPerColumn/2
+	sub		a,TilesPerColumn/2 - 1
 	jp		nc,.notoutofscreentop
 	xor		a
 .notoutofscreentop:	
@@ -779,7 +821,26 @@ checkarrowright:
 
 
 
+CenterScreenForCurrentHero:
+	ld		a,(plxcurrenthero)
+	ld		e,a
+	ld		d,0
 
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero1y
+	jr		z,.playerset_
+	dec		a
+	ld		hl,pl2hero1y
+	jr		z,.playerset_
+	dec		a
+	ld		hl,pl3hero1y
+	jr		z,.playerset_
+	ld		hl,pl4hero1y
+  .playerset_:
+
+	add		hl,de			;pl?hero?y
+  jp    centrescreenforthishero.GoCenter
 
 
 
@@ -790,10 +851,14 @@ movehero:
 	or		a
 	ret		z
 
+  call  .GoMove
+  jp    CenterScreenForCurrentHero
+
+  .GoMove:
 	ld		a,(framecounter)
   rrca
-	ret		c                               ;move every other frame
-	
+;	ret		c                               ;move every other frame
+
 	ld		a,(movementpathpointer)
 	add		a,2
 	ld		(movementpathpointer),a
@@ -1200,10 +1265,10 @@ doputstar:
 ;addxtomouse:	equ	8
 ;subyfrommouse:	equ	4
 checktriggermapscreen:
-	ld		a,(spat)				;y cursor
-	cp		TilesPerColumn*16-12
-	ret		nc						                  ;dont check trigger if cursor is in bottom half of screen
-		
+	ld		a,(spat+1)			                ;x cursor
+	cp		SX_Hud                          ;check if mousepointer is in the hud (x>196)
+	ret   nc                              ;if mousepointer is in hud, skip this routine
+
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -1917,7 +1982,7 @@ doputheros:
 
 
 
-colorlightgreen: equ 12
+;colorlightgreen: equ 12
 colorpink:  equ 11
 colorlightbrown: equ 6
 herowindowpointer:	db	0
@@ -2295,8 +2360,6 @@ checkcurrentplayerhuman:	              ;out zero flag, current player is compute
 	ret
 ;/dont react to space / mouse click if current player is a computer
 
-ycoorspritebottom:	equ	184
-xcoorspriteright:	equ	240 ;-11
 mousey:	ds	1
 mousex:	ds	1
 ;ycoordinateStartPlayfield:  equ 16
@@ -2389,8 +2452,11 @@ movecursorx:
 	jp		.setx
   .left:
 	add		a,(hl)
-	jp		c,.setx
-	xor		a
+
+  cp    xcoordinateStartPlayfield       ;check top border for mouse pointer
+
+	jp		nc,.setx
+  ld    a,xcoordinateStartPlayfield
   .setx:
 	ld		(hl),a
 	ret
@@ -2485,6 +2551,11 @@ spritecolor:
 	include "../sprites/sprites.tcs.gen"
 
 ycoordinateStartPlayfield:  equ 04
+xcoordinateStartPlayfield:  equ 06
+ycoorspritebottom:	equ	180
+xcoorspriteright:	equ	235 ;-11
+
+
 SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
 spritecharacter:	db	255	              ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=swords,11=hand,12=change arrows
 setspritecharacter:                     ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
@@ -2497,7 +2568,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   bit   2,a                             ;check if left is pressed
   jr    z,.EndCheckShowScrollArrowLeft
 	ld		a,(spat+1)			                ;x cursor
-	or		a
+	cp    xcoordinateStartPlayfield
 	jp		z,.ShowScrollArrowLeft          ;if mousepointer is at x=0 show scrollarrow to the left
   .EndCheckShowScrollArrowLeft:
 
@@ -2653,7 +2724,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
 .pointeronitem:
 	pop		af				;pop call
-	ld		a,09			;shoe action
+  ld    hl,CursorWalkingBoots
 	jp		.setcharacter
 
 ;/check pointer on item
@@ -2715,7 +2786,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 .pointeroncreature:
 .pointeronenemyhero:
 	pop		af				;pop call
-	ld		a,10			;swords
+  ld    hl,CursorSwords
 	jp		.setcharacter
 ;/check if pointer is on enemy hero
 
@@ -2758,27 +2829,29 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 .hand:
 	pop		af				;pop call
 	pop		af				;pop call
-	ld		a,11
+  ld    hl,CursorHand
 	jp		.setcharacter
 
 .changearrows:
 	pop		af				;pop call
 	pop		af				;pop call
-	ld		a,12
+  ld    hl,CursorSwitchingArrows
 	jp		.setcharacter
 ;/check if pointer is on friendly hero
 
 .MousepointInHud:			;mouse pointer is in the hud
-	ld		a,11				
+  ld    hl,CursorHand
 	jp		.setcharacter
 .shoe:
-	ld		a,8
+
+;  ld    hl,SpriteCharCursorShoe
+  ld    hl,CursorBoots
 	jp		.setcharacter
 .ShowScrollArrowBottom:
-	ld		a,0
+  ld    hl,CursorArrowDown
 	jp		.setcharacter
 .ShowScrollArrowTop:
-	ld		a,1
+  ld    hl,CursorArrowUp
 	jp		.setcharacter
 .ShowScrollArrowRight:
 
@@ -2813,22 +2886,14 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
 
 
-
-
-
-;	ld		a,(spat)			;y cursor
-;	or		a
-;	jr		z,.righttop
-;	cp		ycoorspritebottom	
-;	jr		z,.rightbottom
 .right:
-	ld		a,4
+  ld    hl,CursorArrowRight
 	jp		.setcharacter
 .ShowScrollArrowTopAndRight:
-	ld		a,2
+  ld    hl,CursorArrowRightUp
 	jp		.setcharacter
 .ShowScrollArrowBottomAndRight:
-	ld		a,6
+  ld    hl,CursorArrowRightDown
 	jp		.setcharacter
 .ShowScrollArrowLeft:
 
@@ -2862,79 +2927,67 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   .EndCheckShowScrollArrowBottomAndLeft:
 
 
-
-
-
-
-
-
-;	ld		a,(spat)			;y cursor
-;	or		a
-;	jr		z,.ShowScrollArrowLeftTop
-;	cp		ycoorspritebottom	
-;	jr		z,.leftbottom
 .left:
-	ld		a,5
+  ld    hl,CursorArrowLeft
 	jp		.setcharacter
 .ShowScrollArrowTopAndLeft:
-	ld		a,3
+  ld    hl,CursorArrowLeftUp	
 	jp		.setcharacter
 .ShowScrollArrowBottomAndLeft:
-	ld		a,7
+  ld    hl,CursorArrowDownLeft
 	jp		.setcharacter
-.setcharacter:
-	ld		hl,spritecharacter
-	cp		(hl)
-	ret		z
-	ld		(hl),a
+.setcharacter:                    ;in HL-> SpriteCharCursor
 
-	ld		h,0
-	ld		l,a
-	add		hl,hl			;*2
-	add		hl,hl			;*4
-	add		hl,hl			;*8
-	add		hl,hl			;*16
-	add		hl,hl			;*32
-	add		hl,hl			;*32
-	ld		de,spritechar
-	add		hl,de
-	exx
+  ld    (CurrentCursorSpriteCharacter),hl
 
 ;character
-;	ld		a,1				;page 2/3
 	xor		a				;page 0/1
 	ld		hl,sprcharaddr	;sprite 0 character table in VRAM
 	call	SetVdp_Write
-	exx
 
 
-  ld    hl,SpriteCharCursorSwords
+  ld    hl,(CurrentCursorSpriteCharacter)
 	ld		c,$98
 	call	outix96			;write sprite character of pointer and hand to vram
-;	call	outix64			;write sprite character of pointer and hand to vram
 
+;THIS NEEDS TO BE DONE ONLY ONCE, SINCE ALL CURSOR SPRITES HAVE THE SAME COLORS
 ;color
-;	ld		a,1				;page 2/3
 	xor		a				;page 0/1
 	ld		hl,sprcoladdr	;sprite 0 color table in VRAM
 	call	SetVdp_Write
 	ld		c,$98
 
-;	ld		hl,spritecolor
-	ld		hl,SpriteColCursorSwords
-;	call	outix32			;write sprite color of pointer and hand to vram
+	ld		hl,SpriteColCursorSprites
 	call	outix48			;write sprite color of pointer and hand to vram
 	ret
 
-SpriteCharCursorShoe:
-	include "../sprites/MouseCursorShoe.tgs.gen"
-SpriteColCursorShoe:
-	include "../sprites/MouseCursorShoe.tcs.gen"
-	
-SpriteCharCursorHand:
-	include "../sprites/MouseCursorHand.tgs.gen"
-SpriteColCursorHand:
-	include "../sprites/MouseCursorHand.tcs.gen"
+
+CurrentCursorSpriteCharacter:  dw CursorHand
+
+CursorArrowUp:          equ SpriteCharCursorSprites + (00 * 32*3)
+CursorArrowRightUp:     equ SpriteCharCursorSprites + (01 * 32*3)
+CursorArrowRight:       equ SpriteCharCursorSprites + (02 * 32*3)
+CursorArrowRightDown:   equ SpriteCharCursorSprites + (03 * 32*3)
+CursorArrowDown:        equ SpriteCharCursorSprites + (04 * 32*3)
+CursorArrowDownLeft:    equ SpriteCharCursorSprites + (05 * 32*3)
+CursorArrowLeft:        equ SpriteCharCursorSprites + (06 * 32*3)
+CursorArrowLeftUp:      equ SpriteCharCursorSprites + (07 * 32*3)
+CursorSwitchingArrows:  equ SpriteCharCursorSprites + (08 * 32*3)
+CursorBoots:            equ SpriteCharCursorSprites + (09 * 32*3)
+CursorWalkingBoots:     equ SpriteCharCursorSprites + (10 * 32*3)
+CursorHand:             equ SpriteCharCursorSprites + (11 * 32*3)
+CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
+
+colorlightgreen:  equ 01
+colormidgreen:    equ 02
+colorwhite:       equ 12
+
+SpriteCharCursorSprites:
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 13
+SpriteColCursorSprites:
+  ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
+
+
 
 SpriteCharCursorSwitchingArrows:
 	include "../sprites/MouseCursorSwitchingArrows.tgs.gen"
@@ -3038,7 +3091,7 @@ scrollscreen:                           ;you can either scroll the scroll by mov
 
   .left:                                ;check if cursor is at the left side of the screen and left is pressed
 	ld		a,(spat+1)			                ;x cursor
-	or		a
+	cp    xcoordinateStartPlayfield
 	jr		nz,.right
   bit   2,d                             ;check ontrols to see if left is pressed
   jr    z,.right
@@ -3550,7 +3603,7 @@ putstarbehindobject:
 	db		10,0,8,0
 	db		0,%0000 0000,$98	
 
-colorwhite: equ 1
+;colorwhite: equ 1
   putline:
 	DB    0,0,0,0
 	DB    0,0,0,0
@@ -3567,38 +3620,7 @@ lifemovewindow_line:
 ;herowindownx:	equ	14
 ;herowindowny:	equ	29
 
-eraseherowindow:
-	DB    0,0,0,0
-	DB    0,0,0,0
-	DB    herowindownx,0,herowindowny,0
-	DB    colordarkbrown+16*colordarkbrown,1,$80
 
-lenghtbuttontable:	equ	5
-amountofbuttons:	equ	5
-
-;arrow left		1st hero window	 2nd hero window  3rd hero wind		arrow right		map					castle			system			end turn
-sywindow1: equ 176 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 168 | sywindow5: equ 176 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 172
-sxwindow1: equ 009 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 217
-
-			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
-buttons:	
-      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
-			db	sywindow2-2,	32-2,	sxwindow2-7,	17-2,	0	;1st hero window
-			db	sywindow3-2,	32-2,	sxwindow3-7,	17-2,	0	;2nd hero window
-			db	sywindow4-2,	32-2,	sxwindow4-7,	17-2,	0	;3rd hero window	
-			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;arrow right
-
-			db	sywindow6-2,	28-2,	sxwindow6-7,	28-2,	0	;map
-			db	sywindow7-2,	28-2,	sxwindow7-7,	28-2,	0	;castle
-			db	sywindow8-2,	28-2,	sxwindow8-7,	28-2,	0	;system
-			db	sywindow9-2,	28-2,	sxwindow9-7,	28-2,	0	;end turn
-
-herowindow1y:	equ	sywindow2+2
-herowindow1x:	equ	sxwindow2+2
-herowindow2x:	equ	sxwindow3+2
-herowindow3x:	equ	sxwindow4+2
-herowindownx:	equ	14
-herowindowny:	equ	29
 
 				;	a,b,c, d, e, f, g, h, i, j, k, l, m, n, o, p, q,  r,  s,  t,  u,  v,  w,  x,  y,  z
 lettreoffset:	db	0,7,14,21,28,33,38,45,52,54,60,67,73,79,86,93,100,107,114,121,126,134,141,148,155,162
@@ -3611,7 +3633,7 @@ putlettre:
 	db		16,0,5,0
 	db		0,%0000 0000,$98	
 
-colorblack: equ 0
+colorblack: equ 13
 blackrectangle:
 	db	0,0,0,0
 	db	255,0,255,0
