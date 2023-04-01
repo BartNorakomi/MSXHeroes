@@ -430,12 +430,22 @@ dephase
 ;
 CastleOverviewBlock:  equ   $0c
 phase	$4000
-  incbin "..\grapx\CastleOverview\build2.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\CastleOverview.SC5",7,212 * 128      ;212 lines
 ;  incbin "..\grapx\CastleOverview\chamberofcommerce4.SC5",7,212 * 128      ;212 lines
 ;  incbin "..\grapx\CastleOverview\tavernoriginal.SC5",7,212 * 128      ;212 lines
 ;  incbin "..\grapx\CastleOverview\magicguild.SC5",7,212 * 128      ;212 lines
 ;  incbin "..\grapx\CastleOverview\chamberofcommerce.SC5",7,212 * 128      ;212 lines
 ;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+
+;
+; block $0e - 0f
+;
+BattleFieldSnowBlock:  equ   $0e
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldSnow.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

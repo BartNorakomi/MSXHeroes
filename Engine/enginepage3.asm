@@ -33,8 +33,56 @@ LoadCastleOverview:
 
   ld    hl,CastleOverviewPalette
   call  SetPalette
-    
-kut: jp kut
+  ret
+
+EnterCastle:
+  call  SetTempisr                      ;end the current interrupt handler used in the engine
+
+	ld		a,(activepage)
+  or    a
+  ld    hl,$8000
+  jr    z,.ActivePageFound
+  ld    hl,$0000
+  .ActivePageFound:
+
+  ;load castle graphics to inactive page
+  ld    d,CastleOverviewBlock
+  ld    a,0
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+
+	ld		a,(activepage)                  ;switch page so that battle field graphics will become visible
+	xor		1                               ;now we switch and set our page
+	ld		(activepage),a			
+	call	SetPageSpecial					        ;set page
+
+  ld    hl,CastleOverviewPalette
+  call  SetPalette
+;.kut: jp .kut
+  jp    StartGame                       ;back to game
+  ret
+
+EnterCombat:
+  call  SetTempisr                      ;end the current interrupt handler used in the engine
+
+	ld		a,(activepage)
+  or    a
+  ld    hl,$8000
+  jr    z,.ActivePageFound
+  ld    hl,$0000
+  .ActivePageFound:
+
+  ;load battle field graphics to inactive page
+  ld    d,BattleFieldSnowBlock
+  ld    a,0
+  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+
+	ld		a,(activepage)                  ;switch page so that battle field graphics will become visible
+	xor		1                               ;now we switch and set our page
+	ld		(activepage),a			
+	call	SetPageSpecial					        ;set page
+  
+;.kut: jp .kut
+  jp    StartGame                       ;back to game
   ret
 
 CastleOverviewPalette:
@@ -96,6 +144,24 @@ SetInterruptHandler:
   ei
   ld    ($38),a
   ret
+
+		; set temp ISR
+SetTempisr:	
+; load BIOS / engine , load startup
+  di
+	ld		hl,.tempisr
+	ld		de,$38
+	ld		bc,6
+	ldir
+  ei
+  ret
+
+.tempisr:
+	push	af
+	in		a,($99)             ;check and acknowledge vblank int (ei0 is set)
+	pop		af
+	ei	
+	ret
 
 sprcoladdr:		equ	$7400
 sprattaddr:		equ	$7600
