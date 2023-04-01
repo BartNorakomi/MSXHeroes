@@ -488,7 +488,7 @@ CheckhudButtonsClicked:                     ;check if any of the buttons in the 
 ;	jp		nz,checkarrowleft
 	ld		a,(buttons+1*lenghtbuttontable+4)		;1st hero window clicked
 	or		a
-;	jp		nz,firstherowindow
+	jp		nz,firstherowindow
 	ld		a,(buttons+2*lenghtbuttontable+4)		;2nd hero window clicked
 	or		a
 ;	jp		nz,secondherowindow
@@ -504,61 +504,38 @@ CheckhudButtonsClicked:                     ;check if any of the buttons in the 
 	ret
 
 endturn:
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero1manarec
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl2hero1manarec
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl3hero1manarec
-	jr		z,.playerset
-	ld		hl,pl4hero1manarec
-.playerset:
+  call  SetHero1ForCurrentPlayerInIX
 
 	ld		a,3
 	ld		(ChangeManaAndMovement?),a
-;reset all heroes mana/ life and movement
-;	ld		hl,pl1hero1manarec	;at end turn hero get an amount of mana back
+;reset all heroes mana and movement
 	ld		b,amountofheroesperplayer
-	ld		de,lenghtherotable+6
+	ld		de,lenghtherotable
 
 .loop:
-	ld		a,(hl)				;mana recovery
-	dec		hl					;total mana
-	ld		c,(hl)				
-	dec		hl					;current player1hero?mana
-	add		a,(hl)
-	cp		c
+	ld		a,(ix+HeroManarec)				;mana recovery
+	add		a,(ix+HeroMana)           ;add current hero mana
+	cp		(ix+HeroTotalMana)				;cp with total mana 
 	jp		nc,.nooverflowmana
-	ld		a,c
-.nooverflowmana:
-	ld		(hl),a
-	
-	dec		hl					;total move
-	ld		a,(hl)
-	dec		hl					;current move
-	ld		(hl),a
-	
-	dec		hl					;total life
-	ld		a,(hl)
-	dec		hl					;current life
-	ld		(hl),a
-	add		hl,de				;next hero mana recovery
+	ld		a,(ix+HeroTotalMana)
+	.nooverflowmana:
+	ld		(ix+HeroMana),a           ;set mana for next turn
+	ld		a,(ix+HeroTotalMove)		  ;total movement
+	ld		(ix+HeroMove),a		        ;reset total movement
+	add		ix,de				              ;next hero
 	djnz	.loop
 
-	ld		a,(amountofplayers)
+	ld		a,(amountofplayers)       ;set next player to have their turn
 	ld		b,a
 	ld		a,(whichplayernowplaying?)
 	cp		b
 	jp		nz,.endchecklastplayer
 	xor		a
-.endchecklastplayer:	
+  .endchecklastplayer:	
 	inc		a
 	ld		(whichplayernowplaying?),a
 
-	ld		a,3					;put new heros in windows (page 0 and page 1) 
+	ld		a,3					              ;put new heros in windows (page 0 and page 1) 
 	ld		(setherosinwindows?),a	
 
 	xor		a
@@ -723,87 +700,41 @@ secondherowindow:
 	ret
 
 firstherowindow:
-	ld		a,(whichplayernowplaying?)
-	dec		a
-;	ld		hl,pl1hero1type
-	ld		hl,pl1amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl2hero1type
-	ld		hl,pl2amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl3hero1type
-	ld		hl,pl3amountherosonmap
-	jr		z,.playertypeset
-;	ld		hl,pl4hero1type
-	ld		hl,pl4amountherosonmap
-.playertypeset:
+  call  SetHero1ForCurrentPlayerInIX
 
-	ld		c,(hl)			;plxamountherosonmap
-	inc		hl
-	inc		hl
-	inc		hl				;plxheroxtype	
-
-	ld		a,(herowindowpointer)
-	or		a
-;	ld		hl,pl1hero1type
-	jr		z,.herotypefound2
-
-	ld		de,lenghtherotable
-	ld		b,a
-.loop1:
-	add		hl,de
-	djnz	.loop1
-.herotypefound2:
-
-	ld		b,a				;herowindowpointer
-	ld		a,c				;plxamountherosonmap
-	sub		a,b		
-	ret		c
-	cp		1
-	ret		c
-
-	ld		a,(hl)
-	cp		255
-	ret		z						;there is no hero in this window
+	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	cp		255                             ;255=inactive
+	ret		z						                    ;there is no hero in this window
 
 	ld		a,1
-	ld		(currentherowindowclicked),a;hero window 1 should be lit constantly
-	ld		a,2							;reset all lit hero windows
-	ld		(buttons+1*lenghtbuttontable+4),a
-	ld		(buttons+2*lenghtbuttontable+4),a
-	ld		(buttons+3*lenghtbuttontable+4),a
+	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
+	ld		a,2							                ;reset all lit hero windows
+	ld		(ButtonHeroWindow1+ButtonLit?),a
+	ld		(ButtonHeroWindow2+ButtonLit?),a
+	ld		(ButtonHeroWindow3+ButtonLit?),a
 
 	ld		de,lenghtherotable
 
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero1y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl2hero1y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl3hero1y
-	jr		z,.playerset
-	ld		hl,pl4hero1y
-.playerset:
 
 	ld		a,(herowindowpointer)
-;	ld		hl,pl1hero1y
 	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	or		a
 	jp		z,centrescreenforthishero
-	add		hl,de					;	ld		hl,pl1hero2y
+
+	add		ix,de					;	ld		hl,pl1hero2y
 	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	dec		a
 	jp		z,centrescreenforthishero
-	add		hl,de					;	ld		hl,pl1hero3y
+
+	add		ix,de					;	ld		hl,pl1hero3y
 	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	dec		a
 	jp		z,centrescreenforthishero
 	ret
+
+CenterScreenForCurrentHero:
+  call  SetHero1ForCurrentPlayerInIX
+  jp    centrescreenforthishero.GoCenter
 	
 centrescreenforthishero:
 ;a new player is clicked, set new player as current player, and reset movement stars
@@ -816,6 +747,7 @@ centrescreenforthishero:
 	ld		(movehero?),a
 ;/a new player is clicked, set new player as current player, and reset movement stars	
 .GoCenter:
+
 	ld		a,TilesPerColumn
 	ld		b,a
 	ld		a,(mapheight)
@@ -828,7 +760,7 @@ centrescreenforthishero:
 	sub		a,c
 	ld		c,a
 	
-	ld		a,(hl)			;pl1hero1y
+	ld		a,(ix+HeroY)			;Hero Y
 	sub		a,TilesPerColumn/2 - 1
 	jp		nc,.notoutofscreentop
 	xor		a
@@ -841,8 +773,7 @@ centrescreenforthishero:
 	ld		(mappointery),a
 .notoutofscreenbottom:	
 	
-	inc		hl				;pl1hero1x
-	ld		a,(hl)
+	ld		a,(ix+HeroX)			;Hero X
 	sub		a,TilesPerRow/2
 	jp		nc,.notoutofscreenleft
 	xor		a
@@ -906,26 +837,7 @@ checkarrowright:
 
 
 
-CenterScreenForCurrentHero:
-	ld		a,(plxcurrenthero)
-	ld		e,a
-	ld		d,0
 
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero1y
-	jr		z,.playerset_
-	dec		a
-	ld		hl,pl2hero1y
-	jr		z,.playerset_
-	dec		a
-	ld		hl,pl3hero1y
-	jr		z,.playerset_
-	ld		hl,pl4hero1y
-  .playerset_:
-
-	add		hl,de			;pl?hero?y
-  jp    centrescreenforthishero.GoCenter
 
 
 
@@ -3369,10 +3281,12 @@ HeroX:          equ 1
 HeroType:       equ 2                   ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
 HeroLeft:       equ 3
 HeroMove:       equ 5
+HeroTotalMove:  equ 6
 HeroMana:       equ 7
+HeroTotalMana:  equ 8
 HeroManarec:    equ 9
 HeroItems:      equ 10
-HeroStatus:     equ 15
+HeroStatus:     equ 15                  ;1=active on map, 254=in castle, 255=inactive
 
 pl1hero1y:		db	4
 pl1hero1x:		db	2
