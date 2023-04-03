@@ -1,5 +1,14 @@
 phase	$c000
 
+InitiateGame:
+;	ld		a,1
+;	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
+;	ld		a,3
+;	ld		(ChangeManaAndMovement?),a
+
+	ld		a,1
+	ld		(whichplayernowplaying?),a       ;which hero has it's first turn
+
 StartGame:
 ;jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
@@ -8,8 +17,19 @@ StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
-  call  firstherowindow
+  call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
+  call  ClearMapPage0AndMapPage1
   jp    LevelEngine
+
+
+
+ClearMapPage0AndMapPage1:
+  ld    hl,mappage0
+  ld    (hl),10
+  ld    de,mappage0+1
+  ld    bc,TilesPerColumn*TilesPerRow * 2 - 1
+  ldir
+  ret
 
 copyfont:
 	db		0,0,155,0
@@ -484,10 +504,10 @@ freezecontrols?:          db  0
 ;		  0	  0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  F5	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-PopulateControls:	
-  ld    a,(freezecontrols?)
-  or    a
-  jp    nz,.freezecontrols
+PopulateControls:
+;  ld    a,(freezecontrols?)
+;  or    a
+;  jp    nz,.freezecontrols
 
 ;	ld		a,(NewPrContr)
 ;	ld		(NewPrContrOld),a
@@ -560,11 +580,87 @@ PopulateControls:
 ;  ld    (DoubleTapCounter),a
 	ret
 
-.freezecontrols:
-  xor   a
-	ld		(Controls),a
-	ld		(NewPrContr),a
-  ret
+;.freezecontrols:
+;  xor   a
+;	ld		(Controls),a
+;	ld		(NewPrContr),a
+;  ret
+
+
+PopulateControlsOnInterrupt:	
+	ld		a,15		                        ; select joystick port 1
+	di
+	out		($a0),a
+	ld		a,$8f
+	out		($a1),a
+	ld		a,14		                        ; read joystick data
+	out		($a0),a
+	ei
+	in		a,($a2)
+	cpl
+	and		$3f			                        ; 00BARLDU
+	ld		c,a
+
+	ld		de,$04F0
+	
+	in		a,($aa)
+	and		e
+	or		6
+	out		($aa),a
+	in		a,($a9)
+	cpl
+	and		$20			                        ; 'F1' key
+	rlca				                          ; 01000000
+	or		c
+	ld		c,a			                        ; 01BARLDU
+	
+	in		a,($aa)	                        ; M = B-trigger
+	and		e
+	or		d
+	out		($aa),a
+	in		a,($a9)
+	cpl
+	and		d			                          ; xxxxxBxx
+	ld		b,a
+	in		a,($aa)
+	and		e
+	or		8
+	out		($aa),a
+	in		a,($a9)
+	cpl					                          ; RDULxxxA
+	and		$F1		                          ; RDUL000A
+	rlca				                          ; DUL000AR
+	or		b			                          ; DUL00BAR
+	rla					                          ; UL00BAR0
+	rla					                          ; L00BAR0D
+	rla					                          ; 00BAR0DU
+	ld		b,a
+	rla					                          ; 0BAR0DUL
+	rla					                          ; BAR0DUL0
+	rla					                          ; AR0DUL00
+	and		d			                          ; 00000L00
+	or		b			                          ; 00BARLDU
+	or		c			                          ; 51BARLDU
+	
+	ld		b,a
+	ld		hl,ControlsOnInterrupt
+	ld		a,(hl)
+	xor		b
+	and		b
+	ld		(NewPrContrControlsOnInterrupt),a
+	ld		(hl),b
+
+	ld		a,(keys+6)
+	bit		1,a			                        ;check ontrols to see if CTRL is pressed
+  ret   nz
+
+  ld    a,(ControlsOnInterrupt)
+  and   %1111 0000
+  ld    (ControlsOnInterrupt),a
+
+	
+	ret
+
 
 outix384:
   call  outix256
@@ -652,6 +748,9 @@ framecounter:               rb    1
 Controls:	                  rb		1
 NewPrContr:	                rb		1
 oldControls: 				        rb    1
+
+ControlsOnInterrupt:	                  rb		1
+NewPrContrControlsOnInterrupt:	        rb		1
 
 endenginepage3variables:  equ $+enginepage3length
 org variables

@@ -58,6 +58,7 @@ vblank:
   push  de
   push  hl
 
+  call  PopulateControlsOnInterrupt     ;read out keys
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
 	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
 	call	putsprite                       ;out spat data
@@ -116,23 +117,19 @@ GetActivehero:                          ;out: hl->plxheroxy
   ret
 
 CheckHeroEntersCastle:
-  call  GetActivehero                   ;out: hl->plxheroxy
-  ld    d,(hl)                          ;d= y hero
-  inc   d
-  
-  inc   hl
-  ld    e,(hl)                          ;e= x hero
-  dec   e
+;  call  GetActivehero                   ;out: hl->plxheroxy
+  ld    ix,(plxcurrentheroAddress)
 
   ld    a,(castlepl1y)
-  cp    d
+  dec   a
+  cp    (ix+Heroy)
   ret   nz
   ld    a,(castlepl1x)
-  cp    e
+  inc   a
+  cp    (ix+Herox)
   ret   nz
 
-  dec   hl                              ;y hero
-  inc   (hl)                            ;move hero out of castle 
+  inc   (ix+Heroy)                            ;move hero out of castle 
   
   pop   af                              ;pop the call from the engine to this routine
   jp    EnterCastle
@@ -234,8 +231,8 @@ CheckEnterCastle:
 
 
 CheckHudButtonsNoLongerOver:	;check if mousepointer is no longer on a button
-	ld		hl,buttons+0*lenghtbuttontable+4
-;	call	.check
+  ld    ix,ButtonHeroArrowUp                ;hero arrow up button
+	call	.check
   ld    ix,ButtonHeroWindow1                ;1st hero window
 	ld		b,1
 	call	.checkherobutton
@@ -245,8 +242,9 @@ CheckHudButtonsNoLongerOver:	;check if mousepointer is no longer on a button
   ld    ix,ButtonHeroWindow3                ;3d hero window
 	ld		b,3
 	call	.checkherobutton	
-	ld		hl,buttons+4*lenghtbuttontable+4
-;	call	.check
+  ld    ix,ButtonHeroArrowDown              ;hero arrow down button
+	call	.check
+
 	ld		hl,buttons+5*lenghtbuttontable+4
 ;	call	.check
 	ld		hl,buttons+6*lenghtbuttontable+4
@@ -289,18 +287,13 @@ CompareHLwithDE:
   sbc   hl,de
   ret
 
-eraseherowindow:
-	DB    0,0,0,0
-	DB    0,0,0,0
-	DB    herowindownx,0,herowindowny,0
-	DB    colordarkbrown+16*colordarkbrown,1,$80
 
 lenghtbuttontable:	equ	5
 amountofbuttons:	equ	5
 
-;arrow left		     | 1st hero window	  | 2nd hero window    | 3rd hero wind		  | arrow right		     | map					      | castle			       | system			        | end turn
-sywindow1: equ 176 | sywindow2: equ 066 | sywindow3: equ 077 | sywindow4: equ 088 | sywindow5: equ 176 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 109
-sxwindow1: equ 009 | sxwindow2: equ 208 | sxwindow3: equ 208 | sxwindow4: equ 208 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 232
+;hero arrow up     | 1st hero window	  | 2nd hero window    | 3rd hero wind		  | hero arrow down    | map					      | castle			       | system			        | end turn
+sywindow1: equ 059 | sywindow2: equ 066 | sywindow3: equ 077 | sywindow4: equ 088 | sywindow5: equ 099 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 109
+sxwindow1: equ 205 | sxwindow2: equ 208 | sxwindow3: equ 208 | sxwindow4: equ 208 | sxwindow5: equ 205 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 232
 
 ButtonSY:   equ 0
 ButtonNY:   equ 1
@@ -308,13 +301,13 @@ ButtonSX:   equ 2
 ButtonNX:   equ 3
 ButtonLit?: equ 4
 
-			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
+                            ;	sy(-2),			ny(-2),	       sx-7, nx-2,	lit?
 buttons:	
-      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
+ButtonHeroArrowUp:        db	sywindow1-2,	06-2,	sxwindow1-7,	20-2,	0	;hero arrow up
 ButtonHeroWindow1:			  db	sywindow2-2,	10-2,	sxwindow2-7,	14-2,	0	;1st hero window
 ButtonHeroWindow2:			  db	sywindow3-2,	10-2,	sxwindow3-7,	14-2,	0	;2nd hero window
 ButtonHeroWindow3:			  db	sywindow4-2,	10-2,	sxwindow4-7,	14-2,	0	;3rd hero window	
-			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;arrow right
+ButtonHeroArrowDown:			db	sywindow5-2,	06-2,	sxwindow5-7,	20-2,	0 ;hero arrow down
 
 			db	sywindow6-2,	28-2,	sxwindow6-7,	28-2,	0	;map
 			db	sywindow7-2,	28-2,	sxwindow7-7,	28-2,	0	;castle
@@ -341,16 +334,17 @@ CheckHudButtonsOver:	;check if mousepointer moves over a button (a button can be
 	ld		a,(spat+1)		;x mouse pointer
 	ld		c,a
 
-;  ld    ix,ButtonHeroArrowUp
-;	call	.check
+  ld    ix,ButtonHeroArrowUp                ;hero arrow up
+	call	.check
   ld    ix,ButtonHeroWindow1                ;1st hero window
 	call	.check
   ld    ix,ButtonHeroWindow2                ;2nd hero window
 	call	.check
   ld    ix,ButtonHeroWindow3                ;3d hero window
 	call	.check
-	ld		hl,buttons+4*lenghtbuttontable
-;	call	.check
+  ld    ix,ButtonHeroArrowDown              ;hero arrow down
+	call	.check
+
 	ld		hl,buttons+5*lenghtbuttontable
 ;	call	.check
 	ld		hl,buttons+6*lenghtbuttontable
@@ -466,38 +460,38 @@ CheckhudButtonsClicked:                     ;check if any of the buttons in the 
 	ret		z
 
 
-;arrow left		1st hero window	 2nd hero window  3rd hero wind		arrow right		map					castle			system			end turn
-;sywindow1: equ 176 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 168 | sywindow5: equ 176 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 172
-;sxwindow1: equ 009 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 072 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 217
+;hero arrow up      | 1st hero window	   | 2nd hero window    | 3rd hero wind		   | hero arrow down		|  map					     |  castle			      | system			       | end turn
+;sywindow1: equ 059 | sywindow2: equ 168 | sywindow3: equ 168 | sywindow4: equ 168 | sywindow5: equ 099 | sywindow6: equ 172 | sywindow7: equ 172 | sywindow8: equ 172 | sywindow9: equ 172
+;sxwindow1: equ 205 | sxwindow2: equ 018 | sxwindow3: equ 036 | sxwindow4: equ 054 | sxwindow5: equ 205 | sxwindow6: equ 130 | sxwindow7: equ 159 | sxwindow8: equ 188 | sxwindow9: equ 217
 
 			;	sy(-2),			ny(-2),	sx-7,			nx-2,	lit?
 ;buttons:	
-;      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;arrow left
+;      db	sywindow1-2,	15-2,	sxwindow1-7,	8-2,	0	;hero arrow up
 ;			db	sywindow2-2,	32-2,	sxwindow2-7,	17-2,	0	;1st hero window
 ;			db	sywindow3-2,	32-2,	sxwindow3-7,	17-2,	0	;2nd hero window
 ;			db	sywindow4-2,	32-2,	sxwindow4-7,	17-2,	0	;3rd hero window	
-;			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;arrow right
+;			db	sywindow5-2,	15-2,	sxwindow5-7,	8-2,	0	;hero arrow down
 
 ;			db	sywindow6-2,	28-2,	sxwindow6-7,	28-2,	0	;map
 ;			db	sywindow7-2,	28-2,	sxwindow7-7,	28-2,	0	;castle
 ;			db	sywindow8-2,	28-2,	sxwindow8-7,	28-2,	0	;system
 ;			db	sywindow9-2,	28-2,	sxwindow9-7,	28-2,	0	;end turn
 
-	ld		a,(buttons+0*lenghtbuttontable+4)		;arrow left clicked
+	ld		a,(buttons+0*lenghtbuttontable+4)		;hero arrow up clicked
 	or		a
-;	jp		nz,checkarrowleft
+	jp		nz,CheckHeroArrowUp
 	ld		a,(buttons+1*lenghtbuttontable+4)		;1st hero window clicked
 	or		a
-	jp		nz,firstherowindow
+	jp		nz,FirstHeroWindowClicked
 	ld		a,(buttons+2*lenghtbuttontable+4)		;2nd hero window clicked
 	or		a
-;	jp		nz,secondherowindow
+	jp		nz,SecondHeroWindowClicked
 	ld		a,(buttons+3*lenghtbuttontable+4)		;3rd hero window clicked
 	or		a
-;	jp		nz,thirdherowindow
-	ld		a,(buttons+4*lenghtbuttontable+4)		;arrow right clicked
+	jp		nz,ThirdHeroWindowClicked
+	ld		a,(buttons+4*lenghtbuttontable+4)		;hero arrow down clicked
 	or		a
-;	jp		nz,checkarrowright
+	jp		nz,CheckHeroArrowDown
 	ld		a,(buttons+8*lenghtbuttontable+4)		;end turn clicked
 	or		a
 	jp		nz,endturn
@@ -506,13 +500,9 @@ CheckhudButtonsClicked:                     ;check if any of the buttons in the 
 endturn:
   call  SetHero1ForCurrentPlayerInIX
 
-	ld		a,3
-	ld		(ChangeManaAndMovement?),a
-;reset all heroes mana and movement
-	ld		b,amountofheroesperplayer
+	ld		b,amountofheroesperplayer ;reset all heroes mana and movement
 	ld		de,lenghtherotable
-
-.loop:
+  .loop:
 	ld		a,(ix+HeroManarec)				;mana recovery
 	add		a,(ix+HeroMana)           ;add current hero mana
 	cp		(ix+HeroTotalMana)				;cp with total mana 
@@ -534,174 +524,82 @@ endturn:
   .endchecklastplayer:	
 	inc		a
 	ld		(whichplayernowplaying?),a
+;  call  InitiatePlayerTurn
+;  ret
 
-	ld		a,3					              ;put new heros in windows (page 0 and page 1) 
+  xor   a
+	ld		(herowindowpointer),a           ;each player has 10 heroes. The herowindowpointer tells us which hero is in window 1
+	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
+
+  call  SetHero1ForCurrentPlayerInIX
+  call  FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime
+  ld    (plxcurrentheroAddress),ix  
+	call	FirstHeroWindowClicked          ;if possible click first window to center screen for this hero. hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.                                      
+
+
+  InitiatePlayerTurn:
+;  call  SetHero1ForCurrentPlayerInIX
+;  call  FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime
+;  ld    (plxcurrentheroAddress),ix  
+;	call	FirstHeroWindowClicked          ;if possible click first window to center screen for this hero. hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.                                      
+	ld		a,2							                ;reset all lit hero windows
+	ld		(ButtonHeroWindow1+ButtonLit?),a
+	ld		(ButtonHeroWindow2+ButtonLit?),a
+	ld		(ButtonHeroWindow3+ButtonLit?),a
+  ld    ix,(plxcurrentheroAddress)
+  call  centrescreenforthishero.GoCenter
+  
+  ;if this player is in castle, center screen around castle instead
+  
+	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
 	ld		(setherosinwindows?),a	
-
-	xor		a
-	ld		(herowindowpointer),a
-
-	call	firstherowindow
+	ld		(ChangeManaAndMovement?),a	
 	ret
-;/reset all heroes mana/ life and movement
 
-thirdherowindow:
-	ld		a,(whichplayernowplaying?)
-	dec		a
-;	ld		hl,pl1hero1type
-	ld		hl,pl1amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl2hero1type
-	ld		hl,pl2amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl3hero1type
-	ld		hl,pl3amountherosonmap
-	jr		z,.playertypeset
-;	ld		hl,pl4hero1type
-	ld		hl,pl4amountherosonmap
-.playertypeset:
-
-	ld		c,(hl)			;plxamountherosonmap
-	inc		hl
-	inc		hl
-	inc		hl				;plxheroxtype	
-
-	ld		a,(herowindowpointer)
-	or		a
-;	ld		hl,pl1hero1type
-	jr		z,.herotypefound2
-
-	ld		de,lenghtherotable
-	ld		b,a
-.loop1:
-	add		hl,de
-	djnz	.loop1
-.herotypefound2:
-
-	ld		b,a				;herowindowpointer
-	ld		a,c				;plxamountherosonmap
-	sub		a,b		
-	ret		c
-	cp		3
-	ret		c
-
-	ld		a,(hl)
-	cp		255
-	ret		z						;there is no hero in this window
+ThirdHeroWindowClicked:
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroForWindow3DeterminedByHeroWindowPointerInIX
+  
+	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	cp		255                             ;255=inactive
+	ret		z						                    ;there is no hero in this window
 
 	ld		a,3
-	ld		(currentherowindowclicked),a;hero window 3 should be lit constantly
-	ld		a,2							;reset all lit hero windows
-	ld		(buttons+1*lenghtbuttontable+4),a
-	ld		(buttons+2*lenghtbuttontable+4),a
-	ld		(buttons+3*lenghtbuttontable+4),a
+	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
+	ld		a,2							                ;reset all lit hero windows
+	ld		(ButtonHeroWindow1+ButtonLit?),a
+	ld		(ButtonHeroWindow2+ButtonLit?),a
+	ld		(ButtonHeroWindow3+ButtonLit?),a
 
-	ld		de,lenghtherotable
+  ld    (plxcurrentheroAddress),ix
 
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero3y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl2hero3y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl3hero3y
-	jr		z,.playerset
-	ld		hl,pl4hero3y
-.playerset:
-
-	ld		a,(herowindowpointer)
-;	ld		hl,pl1hero3y
 	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	or		a
-	jp		z,centrescreenforthishero
-	ret
+	jp		centrescreenforthishero
 
-secondherowindow:
-	ld		a,(whichplayernowplaying?)
-	dec		a
-;	ld		hl,pl1hero1type
-	ld		hl,pl1amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl2hero1type
-	ld		hl,pl2amountherosonmap
-	jr		z,.playertypeset
-	dec		a
-;	ld		hl,pl3hero1type
-	ld		hl,pl3amountherosonmap
-	jr		z,.playertypeset
-;	ld		hl,pl4hero1type
-	ld		hl,pl4amountherosonmap
-.playertypeset:
-
-	ld		c,(hl)			;plxamountherosonmap
-	inc		hl
-	inc		hl
-	inc		hl				;plxheroxtype	
-
-	ld		a,(herowindowpointer)
-	or		a
-;	ld		hl,pl1hero1type
-	jr		z,.herotypefound2
-
-	ld		de,lenghtherotable
-	ld		b,a
-.loop1:
-	add		hl,de
-	djnz	.loop1
-.herotypefound2:
-
-	ld		b,a				;herowindowpointer
-	ld		a,c				;plxamountherosonmap
-	sub		a,b		
-	ret		c
-	cp		2
-	ret		c
-
-	ld		a,(hl)
-	cp		255
-	ret		z						;there is no hero in this window
+SecondHeroWindowClicked:
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroForWindow2DeterminedByHeroWindowPointerInIX
+  
+	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	cp		255                             ;255=inactive
+	ret		z						                    ;there is no hero in this window
 
 	ld		a,2
-	ld		(currentherowindowclicked),a;hero window 2 should be lit constantly
-	ld		a,2							;reset all lit hero windows
-	ld		(buttons+1*lenghtbuttontable+4),a
-	ld		(buttons+2*lenghtbuttontable+4),a
-	ld		(buttons+3*lenghtbuttontable+4),a
+	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
+	ld		a,2							                ;reset all lit hero windows
+	ld		(ButtonHeroWindow1+ButtonLit?),a
+	ld		(ButtonHeroWindow2+ButtonLit?),a
+	ld		(ButtonHeroWindow3+ButtonLit?),a
 
-	ld		de,lenghtherotable
+  ld    (plxcurrentheroAddress),ix
 
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero2y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl2hero2y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl3hero2y
-	jr		z,.playerset
-	ld		hl,pl4hero2y
-.playerset:
-
-	ld		a,(herowindowpointer)
-;	ld		hl,pl1hero2y
 	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	or		a
-	jp		z,centrescreenforthishero
-	add		hl,de					;	ld		hl,pl1hero3y
-	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	dec		a
-	jp		z,centrescreenforthishero
-	ret
+	jp		centrescreenforthishero
 
-firstherowindow:
+FirstHeroWindowClicked:                        ;hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.
   call  SetHero1ForCurrentPlayerInIX
-
+  call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
+  
 	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
 	cp		255                             ;255=inactive
 	ret		z						                    ;there is no hero in this window
@@ -713,34 +611,20 @@ firstherowindow:
 	ld		(ButtonHeroWindow2+ButtonLit?),a
 	ld		(ButtonHeroWindow3+ButtonLit?),a
 
-	ld		de,lenghtherotable
+  ld    (plxcurrentheroAddress),ix
 
-
-	ld		a,(herowindowpointer)
 	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	or		a
-	jp		z,centrescreenforthishero
-
-	add		ix,de					;	ld		hl,pl1hero2y
-	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	dec		a
-	jp		z,centrescreenforthishero
-
-	add		ix,de					;	ld		hl,pl1hero3y
-	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
-	dec		a
-	jp		z,centrescreenforthishero
-	ret
+	jp		centrescreenforthishero;
 
 CenterScreenForCurrentHero:
-  call  SetHero1ForCurrentPlayerInIX
+  ld    ix,(plxcurrentheroAddress)
   jp    centrescreenforthishero.GoCenter
 	
 centrescreenforthishero:
 ;a new player is clicked, set new player as current player, and reset movement stars
 	ld		a,b
 	ld		(plxcurrenthero),a
-	
+
 	xor		a
 	ld		(putmovementstars?),a
 	ld		(movementpathpointer),a
@@ -787,14 +671,19 @@ centrescreenforthishero:
 .notoutofscreenright:	
 	ret
 
-checkarrowleft:
+CheckHeroArrowUp:
 	ld		a,(herowindowpointer)
 	sub		a,1
 	ret		c
 	ld		(herowindowpointer),a
 
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroUsingHeroWindowPointer
+  call  FindHeroThatIsNotInCastleAndDecreaseHeroWindowPointerEachTime
+
 	ld		a,3
 	ld		(setherosinwindows?),a	
+	ld		(ChangeManaAndMovement?),a
 
 	ld		a,2							;reset all lit hero windows
 	ld		(buttons+1*lenghtbuttontable+4),a
@@ -806,15 +695,20 @@ checkarrowleft:
 	ld		(currentherowindowclicked),a
 	ret
 
-checkarrowright:
+CheckHeroArrowDown:
 	ld		a,(herowindowpointer)
 	add		a,1
 	cp		8
 	ret		nc
 	ld		(herowindowpointer),a
 
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroUsingHeroWindowPointer
+  call  FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime
+
 	ld		a,3
 	ld		(setherosinwindows?),a	
+	ld		(ChangeManaAndMovement?),a
 
 	ld		a,2							;reset all lit hero windows
 	ld		(buttons+1*lenghtbuttontable+4),a
@@ -873,8 +767,10 @@ movehero:
 	ld		(movehero?),a                   ;end movement
 	ret
 	
-  .domovehero:	
-  call  SetHero1ForCurrentPlayerInIX
+  .domovehero:
+  ld    ix,(plxcurrentheroAddress)
+  
+;  call  SetHero1ForCurrentPlayerInIX
 	call	CheckHeroNearObject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
 
 	ld		a,(ix+HeroMove)
@@ -1313,51 +1209,18 @@ checktriggermapscreen:
 .cancel:					                      ;dont move hero, mouse click was not accurately on path
 ;mouse clicked, set star path
 .initputstars:
+  ld    ix,(plxcurrentheroAddress)
+	ld		a,(ix+HeroStatus)			                    ;pl1hero?status
+	cp    254                                   ;current hero could be in castle, in which case we won't move
+	ret   z
+
 	ld		a,1
 	ld		(putmovementstars?),a
 
-	ld		a,(plxcurrenthero)
-;amountofheroes:	equ	10
-;plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
-;lenghtherotable:	equ	10
-;pl1hero1y:		db	4
-;pl1hero1x:		db	2
-;pl1hero1type:	db	0		;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-;pl1hero1life:	db	10,20
-;pl1hero1move:	db	12,20
-;pl1hero1mana:	db	10,20
-;pl1hero1manarec:db	5		;recover x mana every turn
-
-;turnbased?:				db	1
-;amountofplayers:		db	2
-;player1human?:			db	1
-;player2human?:			db	1
-;player3human?:			db	0
-;player4human?:			db	0
-;whichplayernowplaying?:	db	1
-	ld		e,a
-	ld		d,0
-
-	ld		a,(whichplayernowplaying?)
-	dec		a
-	ld		hl,pl1hero1y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl2hero1y
-	jr		z,.playerset
-	dec		a
-	ld		hl,pl3hero1y
-	jr		z,.playerset
-	ld		hl,pl4hero1y
-.playerset:
-;	ld		hl,pl1hero1y
-	add		hl,de			                      ;pl1hero?y
-
-	ld		a,(hl)			                    ;pl1hero?y
+	ld		a,(ix+HeroY)			                    ;pl1hero?y
 	ld		(.setpl1hero?y),a
 	ld		(heroymirror),a
-	inc		hl				                      ;pl1hero?x
-	ld		a,(hl)
+	ld		a,(ix+HeroX)			                    ;pl1hero?y
 	ld		(.setpl1hero?x),a
 	ld		(heroxmirror),a
 	ld		hl,movementpath+2
@@ -1935,25 +1798,68 @@ SetHero1ForCurrentPlayerInIX:           ;sets hero 1 of current player in IX
 	ld		ix,pl4hero1y
   ret
 
-SetHeroForWindow1DeterminedByHeroWindowPointerInIX:
-  ;set hero for window 1, determined by the hero window pointer
+SetHeroUsingHeroWindowPointer:      ;set hero hero window points to in IX
+	ld		de,lenghtherotable
+
 	ld		a,(herowindowpointer)
 	or		a
   ret   z
-	ld		de,lenghtherotable
 	ld		b,a
   .loop:
 	add		ix,de
 	djnz	.loop
   ret
 
+FindHeroThatIsNotInCastleAndDecreaseHeroWindowPointerEachTime:
+	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+  cp    254
+  ret   nz
+  ld    de,-lenghtherotable
+	add		ix,de
+	ld		a,(herowindowpointer)
+	sub		a,1
+	jp    c,CheckHeroArrowDown
+	ld		(herowindowpointer),a
+  jp    FindHeroThatIsNotInCastle 
 
+FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime:
+	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+  cp    254
+  ret   nz
+	add		ix,de
+	ld		a,(herowindowpointer)
+	add		a,1
+	cp		8
+	ret		nc
+	ld		(herowindowpointer),a
+  jp    FindHeroThatIsNotInCastle 
+  
+FindHeroThatIsNotInCastle:
+	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+  cp    254
+  ret   nz
+	add		ix,de
+  jp    FindHeroThatIsNotInCastle 
 
+SetHeroForWindow1DeterminedByHeroWindowPointerInIX:
+  call  SetHeroUsingHeroWindowPointer ;set hero hero window points to in IX
+  jp    FindHeroThatIsNotInCastle
+	
+SetHeroForWindow2DeterminedByHeroWindowPointerInIX:
+  call  SetHeroUsingHeroWindowPointer ;set hero hero window points to in IX
+  call  FindHeroThatIsNotInCastle
+	add		ix,de
+  jp    FindHeroThatIsNotInCastle
 
+SetHeroForWindow3DeterminedByHeroWindowPointerInIX:
+  call  SetHeroUsingHeroWindowPointer ;set hero hero window points to in IX
+  call  FindHeroThatIsNotInCastle
+	add		ix,de
+  call  FindHeroThatIsNotInCastle
+	add		ix,de
+  jp    FindHeroThatIsNotInCastle
 
-
-
-ChangeManaAndMovement?:	db		1
+ChangeManaAndMovement?:	db		3
 SetManaAndMovementBars:
 	ld		a,(ChangeManaAndMovement?)
 	dec		a
@@ -1965,7 +1871,7 @@ SetManaAndMovementBars:
 	ret
 
 
-herowindowpointer:	db	0               ;which hero window are we looking at now
+herowindowpointer:	db	0               ;each player has 10 heroes. The herowindowpointer tells us which hero is in window 1
 setherosinwindows?:	db	3               ;this means for 2 frames the heroes are set in the windows (in page 0 and page 1)
 setherosinwindows:
 	ld		a,(setherosinwindows?)
@@ -2111,6 +2017,14 @@ dosetherosinwindows:
 	add		ix,de                           ;next hero
 	ret
 
+eraseherowindow:
+	DB    0,0,0,0
+	DB    0,0,0,0
+	DB    014,0,010,0
+;	DB    colordarkbrown+16*colordarkbrown,1,$c0
+	DB    0,1,$c0       ;fill
+
+
 eraseherowindows:
 	ld		a,herowindow1y
 	ld		(eraseherowindow+dy),a
@@ -2118,12 +2032,14 @@ eraseherowindows:
 	ld		(eraseherowindow+dx),a
 	ld		hl,eraseherowindow
 	call	docopy
-	ld		a,herowindow2x
-	ld		(eraseherowindow+dx),a
+
+	ld		a,herowindow2y
+	ld		(eraseherowindow+dy),a
 	ld		hl,eraseherowindow
 	call	docopy
-	ld		a,herowindow3x
-	ld		(eraseherowindow+dx),a
+
+	ld		a,herowindow3y
+	ld		(eraseherowindow+dy),a
 	ld		hl,eraseherowindow
 	call	docopy
 	ret
@@ -2325,7 +2241,7 @@ ReadOutKeyboardAndMovePointer:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
 	ld		bc,0                            ;b=move cursor left(-1)/right(+1),  c=move cursor up(-1)/down(+1)
 
 ;	ld		a,(keys+8)
@@ -3021,6 +2937,11 @@ mapdata:  equ $8000
 maplenght:			dw	128
 mapheight:			db	128
 
+mappage0:
+	ds		TilesPerColumn*TilesPerRow,255
+mappage1:
+	ds		TilesPerColumn*TilesPerRow,255
+	
 buildupscreen:
 	ld		hl,mapdata                      ;set map pointer x
 	ld		de,(mappointerx)
@@ -3048,7 +2969,7 @@ buildupscreen:
 	ld		(MovementAndMana_line+dpage),a
 	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
-
+;
 	xor		1                               ;now we switch and set our page
 	ld		(activepage),a			
 	ld		de,mappage1                     ;start writing to mappage1 if our current active page = 0
@@ -3142,10 +3063,7 @@ Copy16x16Tile:
 	db		016,000,016,000
 	db		000,000,$d0	
 
-mappage0:
-	ds		TilesPerColumn*TilesPerRow,255
-mappage1:
-	ds		TilesPerColumn*TilesPerRow,255
+
 
 
 
@@ -3272,6 +3190,7 @@ heroxmirror:	ds	1
 
 amountofheroesperplayer:	equ	10
 plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
+plxcurrentheroAddress:	dw  pl1hero1y
 lenghtherotable:	equ	16
 
 pl1amountherosonmap:	db	2
@@ -3288,7 +3207,7 @@ HeroManarec:    equ 9
 HeroItems:      equ 10
 HeroStatus:     equ 15                  ;1=active on map, 254=in castle, 255=inactive
 
-pl1hero1y:		db	4
+pl1hero1y:		db	14
 pl1hero1x:		db	2
 pl1hero1type:	db	0		                  ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
 pl1hero1life:	db	10,20
@@ -3308,15 +3227,15 @@ pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2items:	db	255,255,255,255,255
 pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 
-pl1hero3y:		db	255		                ;
-pl1hero3x:		db	255		
-pl1hero3type:	db	32		                ;0=adol, 8=goemon, 32=pixie
+pl1hero3y:		db	14		                ;
+pl1hero3x:		db	14		
+pl1hero3type:	db	96		                ;0=adol, 8=goemon, 32=pixie
 pl1hero3life:	db	03,20
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	10,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3items:	db	255,255,255,255,255
-pl1hero3status:	db	255		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 
 pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
@@ -3340,7 +3259,7 @@ pl2hero1items:	db	255,255,255,255,255
 pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 
 ;pl2hero1y:		db	014,020,032, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255
-pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,1
 pl2hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl2hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl2hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -3361,7 +3280,7 @@ pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1items:	db	255,255,255,255,255
 pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 
-pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,1
 pl3hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl3hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl3hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -3382,7 +3301,7 @@ pl4hero1manarec:db	2		                ;recover x mana every turn
 pl4hero1items:	db	255,255,255,255,255
 pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 
-pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,2
+pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,1
 pl4hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl4hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
 pl4hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
@@ -3583,4 +3502,4 @@ movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero
 ystar:				ds	1
 xstar:				ds	1
 
-currentherowindowclicked:	db	0
+currentherowindowclicked:	db	1

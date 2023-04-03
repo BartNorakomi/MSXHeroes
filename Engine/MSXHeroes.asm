@@ -335,7 +335,7 @@ init:
 	ld		bc,enginepage3length	    ;load enginepage3
 	ldir
 
-  jp    StartGame
+  jp    InitiateGame
 
 		; set temp ISR
 tempisr:	
