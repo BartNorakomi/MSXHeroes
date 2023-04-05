@@ -101,8 +101,26 @@ EnterCombat:
 	ld		(activepage),a			
 	call	SetPageSpecial					        ;set page
   
-;.kut: jp .kut
+  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
+  ld    ix,(HeroThatGetsAttacked)       ;y hero that gets attacked
+  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
   jp    StartGame                       ;back to game
+  ret
+
+DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
+  ld    (ix+HeroStatus),255             ;255 = inactive
+
+  push  ix
+  pop   hl
+	ld		de,lenghtherotable
+  add   hl,de                           ;set hero below Deactivated in hl
+
+  push  ix
+  pop   de                              ;set deactivated hero in de
+  
+  ld    bc,(AmountHeroesTimesLenghtHerotableBelowHero) ;amount of heroes we need to move * lenghtherotable
+
+  ldir
   ret
 
 CastleOverviewPalette:
