@@ -23,6 +23,7 @@ StartGame:
 
 
 
+
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0
   ld    (hl),10
@@ -413,6 +414,30 @@ SetVdp_Write:
 	ld      a,h                           ;set bits 8-14
 	or      64                            ; + write access
 	ei
+	out     ($99),a       
+	ret
+
+;
+;Set VDP port #98 to start writing at address AHL (17-bit)
+;
+SetVdp_WriteWithoutDisablingOrEnablingInt: 
+;first set register 14 (actually this only needs to be done once
+	rlc     h
+	rla
+	rlc     h
+	rla
+	srl     h
+	srl     h
+	out     ($99),a                       ;set bits 15-17
+	ld      a,14+128
+	out     ($99),a
+;/first set register 14 (actually this only needs to be done once
+
+	ld      a,l                           ;set bits 0-7
+;	nop
+	out     ($99),a
+	ld      a,h                           ;set bits 8-14
+	or      64                            ; + write access
 	out     ($99),a       
 	ret
 

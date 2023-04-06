@@ -7,10 +7,10 @@ LevelEngine:
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroEntersCastle           ;check if a hero walked into a castle
   
-
 	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
 	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
 	call	SetCastlesInWindows             ;erase castle windows, then put the castles in the windows
+  call  SetHeroArmyAndStatusInHud
 
 	call	putbottomcastles
 	call	putbottomheroes	
@@ -114,6 +114,139 @@ InterruptHandler:
   ei
   ret
 
+AddressToWriteTo:           ds  2
+AddressToWriteFrom:         ds  2
+NXAndNY:                    ds  2
+
+NXAndNY14x14CharaterPortraits:      equ 014*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
+DYDXUnit1WindowInHud:               equ 153*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit2WindowInHud:               equ 153*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit3WindowInHud:               equ 153*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit4WindowInHud:               equ 176*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit5WindowInHud:               equ 176*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit6WindowInHud:               equ 176*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
+
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+UnitSYSXTable:  dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
+                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
+                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
+                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
+                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
+                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
+                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
+                dw $4000+(98*128)+(00/2)-128, $4000+(98*128)+(14/2)-128, $4000+(98*128)+(28/2)-128, $4000+(98*128)+(42/2)-128, $4000+(98*128)+(56/2)-128, $4000+(98*128)+(70/2)-128, $4000+(98*128)+(84/2)-128, $4000+(98*128)+(98/2)-128, $4000+(98*128)+(112/2)-128, $4000+(98*128)+(126/2)-128, $4000+(98*128)+(140/2)-128, $4000+(98*128)+(154/2)-128, $4000+(98*128)+(168/2)-128, $4000+(98*128)+(182/2)-128, $4000+(98*128)+(196/2)-128, $4000+(98*128)+(210/2)-128, $4000+(98*128)+(224/2)-128, $4000+(98*128)+(238/2)-128
+                dw $4000+(112*128)+(00/2)-128, $4000+(112*128)+(14/2)-128, $4000+(112*128)+(28/2)-128, $4000+(112*128)+(42/2)-128, $4000+(112*128)+(56/2)-128, $4000+(112*128)+(70/2)-128, $4000+(112*128)+(84/2)-128, $4000+(112*128)+(98/2)-128, $4000+(112*128)+(112/2)-128, $4000+(112*128)+(126/2)-128, $4000+(112*128)+(140/2)-128, $4000+(112*128)+(154/2)-128, $4000+(112*128)+(168/2)-128, $4000+(112*128)+(182/2)-128, $4000+(112*128)+(196/2)-128, $4000+(112*128)+(210/2)-128, $4000+(112*128)+(224/2)-128, $4000+(112*128)+(238/2)-128
+                dw $4000+(126*128)+(00/2)-128, $4000+(126*128)+(14/2)-128, $4000+(126*128)+(28/2)-128, $4000+(126*128)+(42/2)-128, $4000+(126*128)+(56/2)-128, $4000+(126*128)+(70/2)-128, $4000+(126*128)+(84/2)-128, $4000+(126*128)+(98/2)-128, $4000+(126*128)+(112/2)-128, $4000+(126*128)+(126/2)-128, $4000+(126*128)+(140/2)-128, $4000+(126*128)+(154/2)-128, $4000+(126*128)+(168/2)-128, $4000+(126*128)+(182/2)-128, $4000+(126*128)+(196/2)-128, $4000+(126*128)+(210/2)-128, $4000+(126*128)+(224/2)-128, $4000+(126*128)+(238/2)-128
+                dw $4000+(140*128)+(00/2)-128, $4000+(140*128)+(14/2)-128, $4000+(140*128)+(28/2)-128, $4000+(140*128)+(42/2)-128, $4000+(140*128)+(56/2)-128, $4000+(140*128)+(70/2)-128, $4000+(140*128)+(84/2)-128, $4000+(140*128)+(98/2)-128, $4000+(140*128)+(112/2)-128, $4000+(140*128)+(126/2)-128, $4000+(140*128)+(140/2)-128, $4000+(140*128)+(154/2)-128, $4000+(140*128)+(168/2)-128, $4000+(140*128)+(182/2)-128, $4000+(140*128)+(196/2)-128, $4000+(140*128)+(210/2)-128, $4000+(140*128)+(224/2)-128, $4000+(140*128)+(238/2)-128
+                dw $4000+(154*128)+(00/2)-128, $4000+(154*128)+(14/2)-128, $4000+(154*128)+(28/2)-128, $4000+(154*128)+(42/2)-128, $4000+(154*128)+(56/2)-128, $4000+(154*128)+(70/2)-128, $4000+(154*128)+(84/2)-128, $4000+(154*128)+(98/2)-128, $4000+(154*128)+(112/2)-128, $4000+(154*128)+(126/2)-128, $4000+(154*128)+(140/2)-128, $4000+(154*128)+(154/2)-128, $4000+(154*128)+(168/2)-128, $4000+(154*128)+(182/2)-128, $4000+(154*128)+(196/2)-128, $4000+(154*128)+(210/2)-128, $4000+(154*128)+(224/2)-128, $4000+(154*128)+(238/2)-128
+                dw $4000+(168*128)+(00/2)-128, $4000+(168*128)+(14/2)-128, $4000+(168*128)+(28/2)-128, $4000+(168*128)+(42/2)-128, $4000+(168*128)+(56/2)-128, $4000+(168*128)+(70/2)-128, $4000+(168*128)+(84/2)-128, $4000+(168*128)+(98/2)-128, $4000+(168*128)+(112/2)-128, $4000+(168*128)+(126/2)-128, $4000+(168*128)+(140/2)-128, $4000+(168*128)+(154/2)-128, $4000+(168*128)+(168/2)-128, $4000+(168*128)+(182/2)-128, $4000+(168*128)+(196/2)-128, $4000+(168*128)+(210/2)-128, $4000+(168*128)+(224/2)-128, $4000+(168*128)+(238/2)-128
+                dw $4000+(182*128)+(00/2)-128, $4000+(182*128)+(14/2)-128, $4000+(182*128)+(28/2)-128, $4000+(182*128)+(42/2)-128, $4000+(182*128)+(56/2)-128, $4000+(182*128)+(70/2)-128, $4000+(182*128)+(84/2)-128, $4000+(182*128)+(98/2)-128, $4000+(182*128)+(112/2)-128, $4000+(182*128)+(126/2)-128, $4000+(182*128)+(140/2)-128, $4000+(182*128)+(154/2)-128, $4000+(182*128)+(168/2)-128, $4000+(182*128)+(182/2)-128, $4000+(182*128)+(196/2)-128, $4000+(182*128)+(210/2)-128, $4000+(182*128)+(224/2)-128, $4000+(182*128)+(238/2)-128
+
+SetHeroArmyAndStatusInHud?: db  3
+SetHeroArmyAndStatusInHud:
+	ld		a,(SetHeroArmyAndStatusInHud?)
+	dec		a
+	ret		z
+	ld		(SetHeroArmyAndStatusInHud?),a
+
+  call  SetArmyUnits
+
+SetArmyUnits:
+  ld    a,(slot.page1rom)               ;all RAM except page 1
+  out   ($a8),a      
+
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    ix,(plxcurrentheroAddress)
+
+  ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit1WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit2WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit3WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit4WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit5WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit6WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,UnitSYSXTable
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
+
+CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    (AddressToWriteFrom),bc
+  ld    (NXAndNY),de
+
+	ld		a,(activepage)                  ;alternate between page 0 and 1
+  or    a
+  jr    nz,.SetAddress                  ;page 0
+  ld    de,$8000
+  add   hl,de                           ;page 1
+  .SetAddress:
+  ld    (AddressToWriteTo),hl
+
+  ld    c,$98                           ;out port
+  ld    de,128                          ;increase 128 bytes to go to the next line
+  di
+
+  .loop:
+  call  .WriteOneLine
+  ld    a,(NXAndNY+1)
+  dec   a
+  ld    (NXAndNY+1),a
+  jp    nz,.loop
+  ei
+  ret
+
+  .WriteOneLine:
+  xor   a                               ;we want to write to (204,151)
+  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteTo),hl
+	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
+
+  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteFrom),hl
+  ld    a,(NXAndNY)
+  ld    b,a
+  otir
+  ret
 
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available
@@ -673,6 +806,7 @@ endturn:
 	ld		(SetHeroesInWindows?),a	
 	ld		(SetCastlesInWindows?),a	
 	ld		(ChangeManaAndMovement?),a	
+	ld		(SetHeroArmyAndStatusInHud?),a
 	ret
 
 
@@ -707,6 +841,8 @@ ThirdHeroWindowClicked:
 	ld		(ButtonHeroWindow3+ButtonLit?),a
 
   ld    (plxcurrentheroAddress),ix
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
 
 	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
@@ -727,6 +863,8 @@ SecondHeroWindowClicked:
 	ld		(ButtonHeroWindow3+ButtonLit?),a
 
   ld    (plxcurrentheroAddress),ix
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
 
 	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
@@ -747,6 +885,8 @@ FirstHeroWindowClicked:                        ;hero window 1 is clicked. check 
 	ld		(ButtonHeroWindow3+ButtonLit?),a
 
   ld    (plxcurrentheroAddress),ix
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
 
 	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero;
@@ -3475,7 +3615,7 @@ heroxmirror:	ds	1
 amountofheroesperplayer:	equ	10
 plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
 plxcurrentheroAddress:	dw  pl1hero1y
-lenghtherotable:	equ	16
+lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
 ;pl1amountherosonmap:	db	2
 
@@ -3490,6 +3630,8 @@ HeroTotalMana:  equ 8
 HeroManarec:    equ 9
 HeroItems:      equ 10
 HeroStatus:     equ 15                  ;1=active on map, 254=in castle, 255=inactive
+HeroUnits:      equ 16                  ;unit,amount (6 in total)
+HeroEquipment:  equ 28                  ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
 pl1hero1y:		db	14
 pl1hero1x:		db	2
@@ -3500,6 +3642,8 @@ pl1hero1mana:	db	10,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1items:	db	255,255,255,255,255
 pl1hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero1Units:  db 003 | dw 001 |      db 002 | dw 001 |      db 001 | dw 001 |      db 100 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
 pl1hero2y:		db	4
 pl1hero2x:		db	3
@@ -3510,6 +3654,8 @@ pl1hero2mana:	db	10,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2items:	db	255,255,255,255,255
 pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero2Units:  db 023 | dw 001 |      db 022 | dw 001 |      db 021 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero2Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
 pl1hero3y:		db	08		                ;
 pl1hero3x:		db	08		
@@ -3520,14 +3666,16 @@ pl1hero3mana:	db	10,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3items:	db	255,255,255,255,255
 pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero3Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
-pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero6y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero7y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero8y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero9y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-pl1hero10y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
+pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero6y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero7y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero8y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero9y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
+pl1hero10y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0
 
 ;					y,	x,	type,life,lifemax,move,movemax,mana,manamax,manarec
 
@@ -3541,17 +3689,18 @@ pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1items:	db	255,255,255,255,255
 pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl2Hero1Units:  db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
-;pl2hero1y:		db	014,020,032, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255
-pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,255
-pl2hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl2hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
+pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,255 | ds 27,0
+pl2hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl2hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
 
 ;pl3amountherosonmap:	db	2
 pl3hero1y:		db	100
@@ -3563,16 +3712,18 @@ pl3hero1mana:	db	10,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1items:	db	255,255,255,255,255
 pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl3Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
-pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,1
-pl3hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl3hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
+pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,001 | ds 27,0
+pl3hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl3hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
 
 ;pl4amountherosonmap:	db	2
 pl4hero1y:		db	100
@@ -3584,16 +3735,18 @@ pl4hero1mana:	db	10,20
 pl4hero1manarec:db	2		                ;recover x mana every turn
 pl4hero1items:	db	255,255,255,255,255
 pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl4Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 
-pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,1
-pl4hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
-pl4hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255
+pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,001 | ds 27,0
+pl4hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero9y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
+pl4hero10y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0
 
 amountofitems:		equ	4
 lenghtitemtable:	equ	3
