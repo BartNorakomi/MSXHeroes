@@ -118,6 +118,9 @@ AddressToWriteTo:           ds  2
 AddressToWriteFrom:         ds  2
 NXAndNY:                    ds  2
 
+NXAndNY10x18HeroPortraits:          equ 018*256 + (010/2)            ;(ny*256 + nx/2) = (10x18)
+DYDXHeroWindowInHud:                equ 132*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,132)
+
 NXAndNY14x14CharaterPortraits:      equ 014*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
 DYDXUnit1WindowInHud:               equ 153*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit2WindowInHud:               equ 153*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -150,6 +153,37 @@ SetHeroArmyAndStatusInHud:
 	ld		(SetHeroArmyAndStatusInHud?),a
 
   call  SetArmyUnits
+  call  SetHeroPortrait
+
+SetHeroPortrait:
+  ld    a,(slot.page1rom)               ;all RAM except page 1
+  out   ($a8),a      
+
+  ld    a,Hero10x18PortraitsBlock       ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    ix,(plxcurrentheroAddress)
+
+  ld    a,(ix+HeroType)                 ;check which hero
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+
+  ld    bc,$4000 +(0*128)+(0/2)-128     ;(sy*128 + sx/2)  
+
+  ld    de,NXAndNY10x18HeroPortraits    ;(ny*256 + nx/2) = (10x18)
+  ld    hl,DYDXHeroWindowInHud          ;(dy*128 + dx/2) = (204,132)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,UnitSYSXTable
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
 
 SetArmyUnits:
   ld    a,(slot.page1rom)               ;all RAM except page 1
@@ -1955,7 +1989,7 @@ doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
 
 	ld		(putherotopbottom+sx),a	        ;hero sx
 
-	ld		a,(ix+HeroType)                  ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+	ld		a,(ix+HeroType)                 ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
 	and		%1111 0000
   .SelfModifyingCodeAddYToSYHero:	equ	$+1
 	add		a,000
