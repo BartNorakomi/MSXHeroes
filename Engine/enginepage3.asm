@@ -12,12 +12,13 @@ InitiateGame:
 StartGame:
 ;jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
-  call  LoadHeroesSprites               ;set all heroes sprites in page 2
+;  call  LoadHeroesSprites               ;set all heroes sprites in page 2
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
+  call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
   call  ClearMapPage0AndMapPage1
   jp    LevelEngine
 
@@ -142,12 +143,14 @@ LoadHud:
 	call	docopy
   ret
 
-LoadHeroesSprites:
-  ld    d,HeroesSpritesBlock
-  ld    a,1
-  ld    hl,$0000                        ;write to page 2
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-  ret
+;LoadHeroesSprites:
+;  ld    d,HeroesSpritesBlock
+;  ld    d,_32HeroesSpritesAndCurrentHeroBlock
+  
+;  ld    a,1
+;  ld    hl,$0000                        ;write to page 2
+;  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+;  ret
 
 LoadWorldTiles:
   ld    d,World1TilesBlock

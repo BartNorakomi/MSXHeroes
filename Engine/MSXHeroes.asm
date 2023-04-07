@@ -467,5 +467,14 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $14 - 15
+;
+Hero14x9PortraitsBlock:  equ   $14
+phase	$4000
+  incbin "..\grapx\HeroesSprites\14x9Portraits.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
