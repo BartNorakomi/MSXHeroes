@@ -17,13 +17,17 @@ StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
-  call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
+  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
+  call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
+
+
+
+;Pl1Hero1DYDX:  dw (0*128)+(0/2) - 128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+
   call  ClearMapPage0AndMapPage1
   jp    LevelEngine
-
-
-
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0
@@ -106,6 +110,7 @@ EnterCombat:
   ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
   ld    ix,(HeroThatGetsAttacked)       ;y hero that gets attacked
   call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
+;  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   jp    StartGame                       ;back to game
   ret
 
@@ -122,8 +127,98 @@ DeactivateHero:                         ;sets Status to 255 and moves all heros 
   
   ld    bc,(AmountHeroesTimesLenghtHerotableBelowHero) ;amount of heroes we need to move * lenghtherotable
 
+  ld    a,b
+  or    c
+  ret   z                               ;no heroes below this hero (so this hero is hero 8)
+
   ldir
+
+  ld    iy,(LastHeroForThisPlayer)
+  ld    (iy+HeroStatus),255             ;255 = inactive
   ret
+
+SetAllSpriteCoordinatesInPage2:
+  ld    hl,0*128+(000/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero1y+HeroDYDX),hl
+  ld    hl,0*128+(016/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero2y+HeroDYDX),hl
+  ld    hl,0*128+(032/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero3y+HeroDYDX),hl
+  ld    hl,0*128+(048/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero4y+HeroDYDX),hl
+  ld    hl,0*128+(064/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero5y+HeroDYDX),hl
+  ld    hl,0*128+(080/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero6y+HeroDYDX),hl
+  ld    hl,0*128+(096/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero7y+HeroDYDX),hl
+  ld    hl,0*128+(112/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl1hero8y+HeroDYDX),hl
+  
+  ld    hl,0*128+(128/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero1y+HeroDYDX),hl
+  ld    hl,0*128+(144/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero2y+HeroDYDX),hl
+  ld    hl,0*128+(160/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero3y+HeroDYDX),hl
+  ld    hl,0*128+(176/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero4y+HeroDYDX),hl
+  ld    hl,0*128+(192/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero5y+HeroDYDX),hl
+  ld    hl,0*128+(208/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero6y+HeroDYDX),hl
+  ld    hl,0*128+(224/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero7y+HeroDYDX),hl
+  ld    hl,0*128+(240/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl2hero8y+HeroDYDX),hl
+  
+  ld    hl,32*128+(000/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero1y+HeroDYDX),hl
+  ld    hl,32*128+(016/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero2y+HeroDYDX),hl
+  ld    hl,32*128+(032/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero3y+HeroDYDX),hl
+  ld    hl,32*128+(048/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero4y+HeroDYDX),hl
+  ld    hl,32*128+(064/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero5y+HeroDYDX),hl
+  ld    hl,32*128+(080/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero6y+HeroDYDX),hl
+  ld    hl,32*128+(096/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero7y+HeroDYDX),hl
+  ld    hl,32*128+(112/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl3hero8y+HeroDYDX),hl
+  
+  ld    hl,32*128+(128/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero1y+HeroDYDX),hl
+  ld    hl,32*128+(144/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero2y+HeroDYDX),hl
+  ld    hl,32*128+(160/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero3y+HeroDYDX),hl
+  ld    hl,32*128+(176/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero4y+HeroDYDX),hl
+  ld    hl,32*128+(192/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero5y+HeroDYDX),hl
+  ld    hl,32*128+(208/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero6y+HeroDYDX),hl
+  ld    hl,32*128+(224/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero7y+HeroDYDX),hl
+  ld    hl,32*128+(240/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    (pl4hero8y+HeroDYDX),hl
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\tavern.pl"

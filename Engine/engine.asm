@@ -167,7 +167,7 @@ SetHeroArmyAndStatusInHud:
 ;
 
 HeroPortrait10x18SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGoemon:       equ $4000+(000*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGoemon1:      equ $4000+(000*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXPixy:         equ $4000+(000*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXDrasle1:      equ $4000+(000*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXLatok:        equ $4000+(000*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -178,6 +178,36 @@ HeroPortrait10x18SYSXSnake2:       equ $4000+(000*128)+(080/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXDrasle4:      equ $4000+(000*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXAshguine:     equ $4000+(000*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXUndeadline1:  equ $4000+(000*128)+(110/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPsychoWorld:  equ $4000+(000*128)+(120/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXUndeadline2:  equ $4000+(000*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGoemon2:      equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXUndeadline3:  equ $4000+(000*128)+(150/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXFray:         equ $4000+(000*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXBlackColor:   equ $4000+(000*128)+(170/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXWit:          equ $4000+(000*128)+(180/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXMitchell:     equ $4000+(000*128)+(190/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXJanJackGibson:equ $4000+(000*128)+(200/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGillianSeed:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXSnatcher:     equ $4000+(000*128)+(220/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGolvellius:   equ $4000+(000*128)+(230/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXBillRizer:    equ $4000+(000*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait10x18SYSXPochi:        equ $4000+(018*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGreyFox:      equ $4000+(018*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXTrevorBelmont:equ $4000+(018*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXBigBoss:      equ $4000+(018*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXSimonBelmont: equ $4000+(018*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXDrPettrovich: equ $4000+(018*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXRichterBelmont:equ $4000+(018*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+
+
+
+
+
+
 
 SetHeroPortrait10x18:
   ld    a,(slot.page1rom)               ;all RAM except page 1
@@ -351,14 +381,15 @@ CheckHeroCollidesWithEnemyHero:
   
 ;check if this hero touches an enemy hero
 	ld		de,lenghtherotable
-	ld		hl,9*lenghtherotable
-	ld		a,(whichplayernowplaying?) | cp 1 | ld iy,pl1hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 2 | ld iy,pl2hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 3 | ld iy,pl3hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 4 | ld iy,pl4hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		hl,lenghtherotable*(amountofheroesperplayer-1)
+	ld		a,(whichplayernowplaying?) | cp 1 | ld bc,pl1hero8y | ld iy,pl1hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 2 | ld bc,pl2hero8y | ld iy,pl2hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 3 | ld bc,pl3hero8y | ld iy,pl3hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 4 | ld bc,pl4hero8y | ld iy,pl4hero1y | call nz,.CheckHeroTouchesEnemyHero
   ret
 
   .CheckHeroTouchesEnemyHero:           ;in: ix->active hero, iy->hero we check collision with
+  ld    (LastHeroForThisPlayer),bc
 	ld		b,amountofheroesperplayer
   .checkpointerenemyloop:
 	ld		a,(iy+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
@@ -389,6 +420,7 @@ CheckHeroCollidesWithEnemyHero:
 
 	jp		EnterCombat
 
+LastHeroForThisPlayer: ds  2
 HeroThatGetsAttacked: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
@@ -1047,7 +1079,7 @@ CheckCastleArrowUp:
 CheckHeroArrowDown:
 	ld		a,(herowindowpointer)
 	add		a,1
-	cp		8
+	cp		6
 	ret		nc
 	ld		(herowindowpointer),a
 
@@ -1199,9 +1231,6 @@ SetAllHeroPosesInVram:                  ;Set all hero poses in page 2 in Vram
   ld    a,(slot.page1rom)               ;all RAM except page 1
   out   ($a8),a      
 
-  ld    a,HeroesSpritesBlock            ;all hero sprites in all 8 directions
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    ix,pl1hero1y | call SetHeroPoseInVram.go
   ld    ix,pl1hero2y | call SetHeroPoseInVram.go
   ld    ix,pl1hero3y | call SetHeroPoseInVram.go
@@ -1232,9 +1261,9 @@ SetAllHeroPosesInVram:                  ;Set all hero poses in page 2 in Vram
   ld    ix,pl4hero1y | call SetHeroPoseInVram.go
   ld    ix,pl4hero2y | call SetHeroPoseInVram.go
   ld    ix,pl4hero3y | call SetHeroPoseInVram.go
-  ld    ix,pl4hero4y | call SetHeroPoseInVram.go
-  ld    ix,pl4hero5y | call SetHeroPoseInVram.go
-  ld    ix,pl4hero6y | call SetHeroPoseInVram.go
+  ld    ix,pl4hero4y | call SetHeroPoseInVram.go  
+  ld    ix,pl4hero5y | call SetHeroPoseInVram.go 
+  ld    ix,pl4hero6y | call SetHeroPoseInVram.go  
   ld    ix,pl4hero7y | call SetHeroPoseInVram.go
   ld    ix,pl4hero8y | call SetHeroPoseInVram.go
   ret
@@ -1243,9 +1272,6 @@ NXAndNY16x32HeroSprites:  equ 032*256 + (016/2)   ;(ny*256 + nx/2) = (16x32)
 SetHeroPoseInVram:
   ld    a,(slot.page1rom)               ;all RAM except page 1
   out   ($a8),a      
-
-  ld    a,HeroesSpritesBlock            ;all hero sprites in all 8 directions
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    ix,(plxcurrentheroAddress)
   .go:
@@ -1262,6 +1288,9 @@ SetHeroPoseInVram:
   ld    (AddressToWriteFrom),bc
   ld    (NXAndNY),de
   ld    (AddressToWriteTo),hl
+
+  ld    a,(ix+HeroSpriteBlock)
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
@@ -2007,41 +2036,41 @@ puttopheroes:
 	ld		(doputheros.SelfModifyingCodeAddYToHero),a
 
 doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
-  ld    hl,256*00 + 000 |   ld    ix,pl1hero1y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 016 |   ld    ix,pl1hero2y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 032 |   ld    ix,pl1hero3y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 048 |   ld    ix,pl1hero4y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 064 |   ld    ix,pl1hero5y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 080 |   ld    ix,pl1hero6y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 096 |   ld    ix,pl1hero7y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 112 |   ld    ix,pl1hero8y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
+  ld    hl,256*00 + 000 |   ld    ix,pl1hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 016 |   ld    ix,pl1hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 032 |   ld    ix,pl1hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 048 |   ld    ix,pl1hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 064 |   ld    ix,pl1hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 080 |   ld    ix,pl1hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 096 |   ld    ix,pl1hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 112 |   ld    ix,pl1hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
 
-  ld    hl,256*00 + 128 |   ld    ix,pl2hero1y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 144 |   ld    ix,pl2hero2y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 160 |   ld    ix,pl2hero3y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 176 |   ld    ix,pl2hero4y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 192 |   ld    ix,pl2hero5y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 208 |   ld    ix,pl2hero6y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 224 |   ld    ix,pl2hero7y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*00 + 240 |   ld    ix,pl2hero8y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
+  ld    hl,256*00 + 128 |   ld    ix,pl2hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 144 |   ld    ix,pl2hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 160 |   ld    ix,pl2hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 176 |   ld    ix,pl2hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 192 |   ld    ix,pl2hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 208 |   ld    ix,pl2hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 224 |   ld    ix,pl2hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 240 |   ld    ix,pl2hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
 
-  ld    hl,256*32 + 000 |   ld    ix,pl3hero1y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 016 |   ld    ix,pl3hero2y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 032 |   ld    ix,pl3hero3y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 048 |   ld    ix,pl3hero4y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 064 |   ld    ix,pl3hero5y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 080 |   ld    ix,pl3hero6y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 096 |   ld    ix,pl3hero7y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 112 |   ld    ix,pl3hero8y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
+  ld    hl,256*32 + 000 |   ld    ix,pl3hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 016 |   ld    ix,pl3hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 032 |   ld    ix,pl3hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 048 |   ld    ix,pl3hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 064 |   ld    ix,pl3hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 080 |   ld    ix,pl3hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 096 |   ld    ix,pl3hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 112 |   ld    ix,pl3hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
 
-  ld    hl,256*32 + 128 |   ld    ix,pl4hero1y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 144 |   ld    ix,pl4hero2y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 160 |   ld    ix,pl4hero3y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 176 |   ld    ix,pl4hero4y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 192 |   ld    ix,pl4hero5y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 208 |   ld    ix,pl4hero6y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 224 |   ld    ix,pl4hero7y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
-  ld    hl,256*32 + 240 |   ld    ix,pl4hero8y | ld a,(ix+HeroStatus) | inc a | call nz,.doputhero
+  ld    hl,256*32 + 128 |   ld    ix,pl4hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 144 |   ld    ix,pl4hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 160 |   ld    ix,pl4hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 176 |   ld    ix,pl4hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 192 |   ld    ix,pl4hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 208 |   ld    ix,pl4hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 224 |   ld    ix,pl4hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 240 |   ld    ix,pl4hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
   ret
 ;pl1hero1y:		db	4
 ;pl1hero1x:		db	2
@@ -2558,7 +2587,7 @@ doSetHeroesInWindows:
   ld    a,Hero14x9PortraitsBlock        ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
-  ld    c,(ix+HeroPortrait14x9SYSX+0)
+  ld    c,(ix+HeroPortrait14x9SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
   ld    b,(ix+HeroPortrait14x9SYSX+1)
 
   ld    de,NXAndNY14x9HeroPortraits     ;(ny*256 + nx/2) = (10x18)
@@ -3501,7 +3530,7 @@ buildupscreen:
 
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
 	ld		(Copy16x16Tile+dpage),a		      ;copy new blocks to inactive page
-	ld		(puthero+dpage),a
+;	ld		(puthero+dpage),a
 	ld		(putherotopbottom+dpage),a
 	ld		(putcastle+dpage),a
 	ld		(putCastleInWindow+dpage),a
@@ -3740,64 +3769,97 @@ lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
 ;pl1amountherosonmap:	db	2
 
-HeroY:          equ 0
-HeroX:          equ 1
-HeroType:       equ 2                   ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
-HeroLeft:       equ 3
-HeroMove:       equ 5
-HeroTotalMove:  equ 6
-HeroMana:       equ 7
-HeroTotalMana:  equ 8
-HeroManarec:    equ 9
-HeroItems:      equ 10
-HeroStatus:     equ 15                  ;1=active on map, 254=in castle, 255=inactive
-HeroUnits:      equ 16                  ;unit,amount (6 in total)
-HeroEquipment:  equ 34                  ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-HeroSYSX:       equ 43
-HeroDYDX:       equ 45
+HeroY:                  equ 0
+HeroX:                  equ 1
+HeroType:               equ 2           ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+HeroLeft:               equ 3
+HeroMove:               equ 5
+HeroTotalMove:          equ 6
+HeroMana:               equ 7
+HeroTotalMana:          equ 8
+HeroManarec:            equ 9
+HeroItems:              equ 10
+HeroStatus:             equ 15          ;1=active on map, 254=in castle, 255=inactive
+HeroUnits:              equ 16          ;unit,amount (6 in total)
+HeroEquipment:          equ 34          ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+HeroSYSX:               equ 43
+HeroDYDX:               equ 45
 HeroPortrait10x18SYSX:  equ 47
-HeroPortrait14x9SYSX: equ 49
+HeroPortrait14x9SYSX:   equ 49
+HeroSpriteBlock:        equ 51
 
-AddToHeroTable: equ 8
+AddToHeroTable: equ 9
 
 HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGoemon:       equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXPixy:         equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXDrasle1:      equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXLatok:        equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXDrasle2:      equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXSnake1:       equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXDrasle3:      equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXSnake2:       equ $4000+(128*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrasle4:      equ $4000+(128*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXAshguine:     equ $4000+(160*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXUndeadline1:  equ $4000+(160*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
-;HeroPortrait10x18SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXGoemon:       equ $4000+(000*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXPixy:         equ $4000+(000*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXDrasle1:      equ $4000+(000*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXLatok:        equ $4000+(000*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXDrasle2:      equ $4000+(000*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXSnake1:       equ $4000+(000*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXDrasle3:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXSnake2:       equ $4000+(000*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXDrasle4:      equ $4000+(000*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXAshguine:     equ $4000+(000*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;HeroPortrait10x18SYSXUndeadline1:  equ $4000+(000*128)+(110/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXSnake2:       equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXDrasle4:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXAshguine:     equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXUndeadline1:  equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXPsychoWorld:  equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXUndeadline2:  equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXGoemon2:      equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXUndeadline3:  equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+HeroSYSXFray:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXBlackColor:   equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXWit:          equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXMitchell:     equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXJanJackGibson:equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXGillianSeed:  equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXSnatcher:     equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXGolvellius:   equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroSYSXBillRizer:    equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXPochi:        equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXGreyFox:      equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXTrevorBelmont:equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXBigBoss:      equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXSimonBelmont: equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXDrPettrovich: equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXRichterBelmont:equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;------------------------------------------------------------------------------------------------------------
 HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGoemon:       equ $4000+(000*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXGoemon1:      equ $4000+(000*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXPixy:         equ $4000+(000*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXDrasle1:      equ $4000+(000*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXLatok:        equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle2:      equ $4000+(000*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSnake1:       equ $4000+(000*128)+(074/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle3:      equ $4000+(000*128)+(088/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSnake2:       equ $4000+(000*128)+(102/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle4:      equ $4000+(000*128)+(116/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXAshguine:     equ $4000+(000*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXUndeadline1:  equ $4000+(000*128)+(144/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXDrasle2:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXSnake1:       equ $4000+(000*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXDrasle3:      equ $4000+(000*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXSnake2:       equ $4000+(000*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXDrasle4:      equ $4000+(000*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXAshguine:     equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXUndeadline1:  equ $4000+(000*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXPsychoWorld:  equ $4000+(000*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXUndeadline2:  equ $4000+(000*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXGoemon2:      equ $4000+(000*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXUndeadline3:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXFray:         equ $4000+(000*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXBlackColor:   equ $4000+(000*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait14x9SYSXWit:          equ $4000+(009*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXMitchell:     equ $4000+(009*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXJanJackGibson:equ $4000+(009*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXGillianSeed:  equ $4000+(009*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXSnatcher:     equ $4000+(009*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXGolvellius:   equ $4000+(009*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXBillRizer:    equ $4000+(009*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXPochi:        equ $4000+(009*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXGreyFox:      equ $4000+(009*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXTrevorBelmont:equ $4000+(009*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXBigBoss:      equ $4000+(009*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXSimonBelmont: equ $4000+(009*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXDrPettrovich: equ $4000+(009*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
 
 
 pl1hero1y:		db	07
@@ -3811,10 +3873,11 @@ pl1hero1items:	db	255,255,255,255,255
 pl1hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 001 |      db 002 | dw 001 |      db 001 | dw 001 |      db 100 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero1SYSX:  dw HeroSYSXAdol ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero1DYDX:  dw (0*128)+(0/2) ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXAdol
-Pl1Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXAdol
+Pl1Hero1SYSX:  dw HeroSYSXUndeadline3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXUndeadline3
+Pl1Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXUndeadline3
+Pl1Hero1Block:  db Undeadline3SpriteBlock
 
 
 pl1hero2y:		db	7
@@ -3828,10 +3891,11 @@ pl1hero2items:	db	255,255,255,255,255
 pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 001 |      db 022 | dw 001 |      db 021 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero2Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero2SYSX:  dw HeroSYSXGoemon ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero2DYDX:  dw (0*128)+(16/2) ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXGoemon
-Pl1Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXGoemon
+Pl1Hero2SYSX:  dw HeroSYSXGoemon1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero2DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXGoemon1
+Pl1Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXGoemon1
+Pl1Hero2Block:  db Goemon1SpriteBlock
 
 
 pl1hero3y:		db	07		                ;
@@ -3846,22 +3910,135 @@ pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inact
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero3Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero3SYSX:  dw HeroSYSXPixy ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero3DYDX:  dw (0*128)+(32/2) ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero3DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero3Portrait10x18SYSX: dw HeroPortrait10x18SYSXPixy
 Pl1Hero3Portrait14x9SYSX:  dw HeroPortrait14x9SYSXPixy
+Pl1Hero3Block:  db PixySpriteBlock
 
-ds AddToHeroTable-2,0
 
-pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero4DYDX:  dw (0*128)+(48/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero5DYDX:  dw (0*128)+(64/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl1hero6y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero6DYDX:  dw (0*128)+(80/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl1hero7y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero7DYDX:  dw (0*128)+(96/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl1hero8y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero8DYDX:  dw (0*128)+(112/2) ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+
+
+
+
+
+
+
+pl1hero4y:		db	07		                ;
+pl1hero4x:		db	05		
+pl1hero4type:	db	24		                ;0=adol, 8=goemon, 32=pixie
+pl1hero4life:	db	03,20
+pl1hero4move:	db	30,20
+pl1hero4mana:	db	10,20
+pl1hero4manarec:db	5		                ;recover x mana every turn
+pl1hero4items:	db	255,255,255,255,255
+pl1hero4status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero4Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero4SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero4DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero4Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
+Pl1Hero4Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl1Hero4Block:  db Drasle1SpriteBlock
+
+
+pl1hero5y:		db	07		                ;
+pl1hero5x:		db	06		
+pl1hero5type:	db	32		                ;0=adol, 8=goemon, 32=pixie
+pl1hero5life:	db	03,20
+pl1hero5move:	db	30,20
+pl1hero5mana:	db	10,20
+pl1hero5manarec:db	5		                ;recover x mana every turn
+pl1hero5items:	db	255,255,255,255,255
+pl1hero5status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero5Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero5SYSX:  dw HeroSYSXLatok ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero5DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero5Portrait10x18SYSX: dw HeroPortrait10x18SYSXLatok
+Pl1Hero5Portrait14x9SYSX:  dw HeroPortrait14x9SYSXLatok
+Pl1Hero5Block:  db LatokSpriteBlock
+
+
+pl1hero6y:		db	07		                ;
+pl1hero6x:		db	07		
+pl1hero6type:	db	40		                ;0=adol, 8=goemon, 32=pixie
+pl1hero6life:	db	03,20
+pl1hero6move:	db	30,20
+pl1hero6mana:	db	10,20
+pl1hero6manarec:db	5		                ;recover x mana every turn
+pl1hero6items:	db	255,255,255,255,255
+pl1hero6status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero6Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero6SYSX:  dw HeroSYSXDrasle2 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero6DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero6Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle2
+Pl1Hero6Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle2
+Pl1Hero6Block:  db Drasle2SpriteBlock
+
+
+pl1hero7y:		db	07		                ;
+pl1hero7x:		db	08		
+pl1hero7type:	db	48		                ;0=adol, 8=goemon, 32=pixie
+pl1hero7life:	db	03,20
+pl1hero7move:	db	30,20
+pl1hero7mana:	db	10,20
+pl1hero7manarec:db	5		                ;recover x mana every turn
+pl1hero7items:	db	255,255,255,255,255
+pl1hero7status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero7Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero7SYSX:  dw HeroSYSXSnake1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero7DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero7Portrait10x18SYSX: dw HeroPortrait10x18SYSXSnake1
+Pl1Hero7Portrait14x9SYSX:  dw HeroPortrait14x9SYSXSnake1
+Pl1Hero7Block:  db Snake1SpriteBlock
+
+
+pl1hero8y:		db	07		                ;
+pl1hero8x:		db	09		
+pl1hero8type:	db	56		                ;0=adol, 8=goemon, 32=pixie
+pl1hero8life:	db	03,20
+pl1hero8move:	db	30,20
+pl1hero8mana:	db	10,20
+pl1hero8manarec:db	5		                ;recover x mana every turn
+pl1hero8items:	db	255,255,255,255,255
+pl1hero8status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero8Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero8SYSX:  dw HeroSYSXDrasle3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero8DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero8Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle3
+Pl1Hero8Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle3
+Pl1Hero8Block:  db Drasle3SpriteBlock
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero4DYDX:  dw (0*128)+(48/2) ;(dy*128 + dx/2) Destination in Vram page 2
+;pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero5DYDX:  dw (0*128)+(64/2) ;(dy*128 + dx/2) Destination in Vram page 2
+;pl1hero6y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero6DYDX:  dw (0*128)+(80/2) ;(dy*128 + dx/2) Destination in Vram page 2
+;pl1hero7y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero7DYDX:  dw (0*128)+(96/2) ;(dy*128 + dx/2) Destination in Vram page 2
+;pl1hero8y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero8DYDX:  dw (0*128)+(112/2) ;(dy*128 + dx/2) Destination in Vram page 2
 
 ;					y,	x,	type,life,lifemax,move,movemax,mana,manamax,manarec
 
 ;pl2amountherosonmap:	db	2
-pl2hero1y:		db	7
+pl2hero1y:		db	9
 pl2hero1x:		db	6 ;100
 pl2hero1type:	db	24		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
 pl2hero1life:	db	10,20
@@ -3870,21 +4047,22 @@ pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1items:	db	255,255,255,255,255
 pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl2Hero1Units:  db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl2Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl2Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl2Hero1DYDX:  dw (0*128)+(128/2) ;(dy*128 + dx/2) Destination in Vram page 2
+Pl2Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl2Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl2Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl2Hero1Block:  db Drasle1SpriteBlock
 
+pl2hero2y:		ds  lenghtherotable,255
+pl2hero3y:		ds  lenghtherotable,255
+pl2hero4y:		ds  lenghtherotable,255
+pl2hero5y:		ds  lenghtherotable,255
+pl2hero6y:		ds  lenghtherotable,255
+pl2hero7y:		ds  lenghtherotable,255
+pl2hero8y:		ds  lenghtherotable,255
 
-pl2hero2y:		db	004,101,064, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero2DYDX:  dw (0*128)+(144/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero3DYDX:  dw (0*128)+(160/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero4DYDX:  dw (0*128)+(176/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero5DYDX:  dw (0*128)+(192/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero6DYDX:  dw (0*128)+(208/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero7DYDX:  dw (0*128)+(224/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl2hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl2Hero8DYDX:  dw (0*128)+(240/2) ;(dy*128 + dx/2) Destination in Vram page 2
 
 ;pl3amountherosonmap:	db	2
 pl3hero1y:		db	100
@@ -3899,24 +4077,18 @@ pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inact
 Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl3Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl3Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl3Hero1DYDX:  dw (32*128)+(000/2) ;(dy*128 + dx/2) Destination in Vram page 2
+Pl3Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl3Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl3Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl3Hero1Block:  db HeroesSpritesBlock1
 
-
-pl3hero2y:		db	100,003,104, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,001 | ds 27,0
-Pl3Hero2SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl3Hero2DYDX:  dw (32*128)+(016/2) ;(dy*128 + dx/2) Destination in Vram page 2
-Pl3Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl3Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-
-
-pl3hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero3DYDX:  dw (32*128)+(32/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl3hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero4DYDX:  dw (32*128)+(48/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl3hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero5DYDX:  dw (32*128)+(64/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl3hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero6DYDX:  dw (32*128)+(80/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl3hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero7DYDX:  dw (32*128)+(96/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl3hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl3Hero8DYDX:  dw (32*128)+(112/2) ;(dy*128 + dx/2) Destination in Vram page 2
+pl3hero2y:		ds  lenghtherotable,255
+pl3hero3y:		ds  lenghtherotable,255
+pl3hero4y:		ds  lenghtherotable,255
+pl3hero5y:		ds  lenghtherotable,255
+pl3hero6y:		ds  lenghtherotable,255
+pl3hero7y:		ds  lenghtherotable,255
+pl3hero8y:		ds  lenghtherotable,255
 
 ;pl4amountherosonmap:	db	2
 pl4hero1y:		db	100
@@ -3931,25 +4103,18 @@ pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inact
 Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl4Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl4Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl4Hero1DYDX:  dw (32*128)+(128/2) ;(dy*128 + dx/2) Destination in Vram page 2
+Pl4Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl4Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl4Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl4Hero1Block:  db Drasle1SpriteBlock
 
-
-pl4hero2y:		db	100,101,160, 010, 020,	  010, 020,	   010, 020,    002 ,255,255,255,255,255,001 | ds 27,0
-Pl4Hero2SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl4Hero2DYDX:  dw (32*128)+(144/2) ;(dy*128 + dx/2) Destination in Vram page 2
-Pl4Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl4Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-
-
-pl4hero3y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero3DYDX:  dw (32*128)+(160/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl4hero4y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero4DYDX:  dw (32*128)+(176/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl4hero5y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero5DYDX:  dw (32*128)+(192/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl4hero6y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero6DYDX:  dw (32*128)+(208/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl4hero7y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero7DYDX:  dw (32*128)+(224/2) ;(dy*128 + dx/2) Destination in Vram page 2
-pl4hero8y:		db	255,255,255, 255, 255,	  255, 255,	   255, 255,    255 ,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl4Hero8DYDX:  dw (32*128)+(240/2) ;(dy*128 + dx/2) Destination in Vram page 2
-
+pl4hero2y:		ds  lenghtherotable,255
+pl4hero3y:		ds  lenghtherotable,255
+pl4hero4y:		ds  lenghtherotable,255
+pl4hero5y:		ds  lenghtherotable,255
+pl4hero6y:		ds  lenghtherotable,255
+pl4hero7y:		ds  lenghtherotable,255
+pl4hero8y:		ds  lenghtherotable,255
 
 amountofitems:		equ	4
 lenghtitemtable:	equ	3
@@ -3995,11 +4160,11 @@ putherotopbottom:
 	db		16,0,16,0
 	db		0,%0000 0000,$98	
 
-puthero:
-	db		224,0,0,2
-	db		96,0,96,0
-	db		16,0,32,0
-	db		0,%0000 0000,$d0
+;puthero:
+;	db		224,0,0,2
+;	db		96,0,96,0
+;	db		16,0,32,0
+;	db		0,%0000 0000,$d0
 ;	db		0,%0000 1000,$98	
 
 CastleY:                equ 0

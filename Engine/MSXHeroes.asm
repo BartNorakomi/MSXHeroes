@@ -396,23 +396,69 @@ phase	$4000
 	ds		$8000-$,$ff
 dephase
 
+
+
+
+
+
+
+
+
+AdolSpriteBlock:              equ HeroesSpritesBlock1
+Goemon1SpriteBlock:           equ HeroesSpritesBlock1
+PixySpriteBlock:              equ HeroesSpritesBlock1
+Drasle1SpriteBlock:           equ HeroesSpritesBlock1
+LatokSpriteBlock:             equ HeroesSpritesBlock1
+Drasle2SpriteBlock:           equ HeroesSpritesBlock1
+Snake1SpriteBlock:            equ HeroesSpritesBlock1
+Drasle3SpriteBlock:           equ HeroesSpritesBlock1
+
+Snake2SpriteBlock:            equ HeroesSpritesBlock2
+Drasle4SpriteBlock:           equ HeroesSpritesBlock2
+AshguineSpriteBlock:          equ HeroesSpritesBlock2
+Undeadline1SpriteBlock:       equ HeroesSpritesBlock2
+PsychoWorldSpriteBlock:       equ HeroesSpritesBlock2
+Undeadline2SpriteBlock:       equ HeroesSpritesBlock2
+Goemon2SpriteBlock:           equ HeroesSpritesBlock2
+Undeadline3SpriteBlock:       equ HeroesSpritesBlock2
+
+FraySpriteBlock:              equ HeroesSpritesBlock3
+BlackColorSpriteBlock:        equ HeroesSpritesBlock3
+WitSpriteBlock:               equ HeroesSpritesBlock3
+MitchellSpriteBlock:          equ HeroesSpritesBlock3
+JanJackGibsonSpriteBlock:     equ HeroesSpritesBlock3
+GillianSeedSpriteBlock:       equ HeroesSpritesBlock3
+SnatcherSpriteBlock:          equ HeroesSpritesBlock3
+GolvelliusSpriteBlock:        equ HeroesSpritesBlock3
+
+BillRizerSpriteBlock:         equ HeroesSpritesBlock4
+PochiSpriteBlock:             equ HeroesSpritesBlock4
+GreyFoxSpriteBlock:           equ HeroesSpritesBlock4
+TrevorBelmontSpriteBlock:     equ HeroesSpritesBlock4
+BigBossSpriteBlock:           equ HeroesSpritesBlock4
+SimonBelmontSpriteBlock:      equ HeroesSpritesBlock4
+DrPettrovichSpriteBlock:      equ HeroesSpritesBlock4
+RichterBelmontSpriteBlock:    equ HeroesSpritesBlock4
+
 ;
 ; block $06 - 07
 ;
-HeroesSpritesBlock:  equ   $06
+HeroesSpritesBlock1:  equ   $06
+HeroesSpritesBlock2:  equ   HeroesSpritesBlock1 + 1
 phase	$4000
-  incbin "..\grapx\HeroesSprites\HeroesSprites.SC5",7,208 * 128      ;208 lines
-;  incbin "..\grapx\HeroesSprites\HeroesSpritesBottom48Lines.SC5",7,48 * 128 ;48 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet1.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet1Bottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
 ; block $08 - 09
 ;
-HudBlock:  equ   $08
+HeroesSpritesBlock3:  equ   HeroesSpritesBlock1 + 2
+HeroesSpritesBlock4:  equ   HeroesSpritesBlock1 + 3
 phase	$4000
-  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
-;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet2.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet2Bottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -473,6 +519,16 @@ dephase
 Hero14x9PortraitsBlock:  equ   $14
 phase	$4000
   incbin "..\grapx\HeroesSprites\14x9Portraits.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $16 - 17
+;
+HudBlock:  equ   $16
+phase	$4000
+  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
