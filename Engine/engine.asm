@@ -1196,35 +1196,35 @@ movehero:
   ret   nz
   
   .HeroMovesDown:
-  ld    a,(ix+HeroSYSX+0)               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    a,(ix+HeroSYSX+0)               	
   and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
   or    a,128 + (064 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
   xor   8
-  ld    (ix+HeroSYSX+0),a               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    (ix+HeroSYSX+0),a               	
   ret
   
   .HeroMovesUp:
-  ld    a,(ix+HeroSYSX+0)               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    a,(ix+HeroSYSX+0)               	
   and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
   or    a,128 + (096 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
   xor   8
-  ld    (ix+HeroSYSX+0),a               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    (ix+HeroSYSX+0),a               	
   ret
 
   .HereMovesRight:
-  ld    a,(ix+HeroSYSX+0)               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    a,(ix+HeroSYSX+0)               	
   and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
   or    a,128 + (000 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
   xor   8
-  ld    (ix+HeroSYSX+0),a               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    (ix+HeroSYSX+0),a               	
   ret
   
   .HeroMovesLeft:
-  ld    a,(ix+HeroSYSX+0)               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    a,(ix+HeroSYSX+0)               	
   and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
   or    a,128 + (032 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
   xor   8
-  ld    (ix+HeroSYSX+0),a               ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+  ld    (ix+HeroSYSX+0),a               	
   ret
 
 SetAllHeroPosesInVram:                  ;Set all hero poses in page 2 in Vram
@@ -2074,8 +2074,8 @@ doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
   ret
 ;pl1hero1y:		db	4
 ;pl1hero1x:		db	2
-;pl1hero1type:	db	0		;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
-;pl1hero1life:	db	10,20
+;pl1hero1type:	db	0			
+;pl1hero1xp: dw 0000
 ;pl1hero1move:	db	12,20
 ;pl1hero1mana:	db	10,20
 ;pl1hero1manarec:db	5		;recover x mana every turn
@@ -2120,7 +2120,7 @@ doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
   add   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  
 	ld		(putherotopbottom+dy),a         ;set hero dy
 
-;	ld		a,(ix+HeroType)                  ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+;	ld		a,(ix+HeroType)                   (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
 ;	add		a,a				                      ;*2
 ;	add		a,a				                      ;*4
 ;	add		a,a				                      ;*8
@@ -2129,7 +2129,7 @@ doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
   ld    a,l                             ;sx
 	ld		(putherotopbottom+sx),a	        ;hero sx
 
-;	ld		a,(ix+HeroType)                 ;hero type (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
+;	ld		a,(ix+HeroType)                  (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
 ;	and		%1111 0000
 
 
@@ -3771,7 +3771,7 @@ lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
 HeroY:                  equ 0
 HeroX:                  equ 1
-HeroType:               equ 2           ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
+;HeroType:               equ 2           	
 HeroLeft:               equ 3
 HeroMove:               equ 5
 HeroTotalMove:          equ 6
@@ -3864,8 +3864,8 @@ HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx
 
 pl1hero1y:		db	07
 pl1hero1x:		db	2
-pl1hero1type:	db	0		                  ;hero type	;0=adol, 8=goemon, 32=pixie...... 255=no more hero
-pl1hero1life:	db	10,20
+pl1hero1type:	db	0		                  	
+pl1hero1xp: dw 0000
 pl1hero1move:	db	12,20
 pl1hero1mana:	db	10,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
@@ -3878,11 +3878,15 @@ Pl1Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXUndeadline3
 Pl1Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXUndeadline3
 Pl1Hero1Block:  db Undeadline3SpriteBlock
+Pl1Hero1StatAttack:  db 1
+Pl1Hero1StatDefense:  db 1
+Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 
 
 pl1hero2y:		db	7
 pl1hero2x:		db	3
-pl1hero2type:	db	8		                  ;0=adol, 8=goemon, 32=pixie
+pl1hero2type:	db	8		                  
 pl1hero2life:	db	05,20
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	10,20
@@ -3896,11 +3900,16 @@ Pl1Hero2DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXGoemon1
 Pl1Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXGoemon1
 Pl1Hero2Block:  db Goemon1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+
 
 
 pl1hero3y:		db	07		                ;
 pl1hero3x:		db	04		
-pl1hero3type:	db	16		                ;0=adol, 8=goemon, 32=pixie
+pl1hero3type:	db	16		                
 pl1hero3life:	db	03,20
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	10,20
@@ -3914,6 +3923,10 @@ Pl1Hero3DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero3Portrait10x18SYSX: dw HeroPortrait10x18SYSXPixy
 Pl1Hero3Portrait14x9SYSX:  dw HeroPortrait14x9SYSXPixy
 Pl1Hero3Block:  db PixySpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 
@@ -3928,7 +3941,7 @@ Pl1Hero3Block:  db PixySpriteBlock
 
 pl1hero4y:		db	07		                ;
 pl1hero4x:		db	05		
-pl1hero4type:	db	24		                ;0=adol, 8=goemon, 32=pixie
+pl1hero4type:	db	24		                
 pl1hero4life:	db	03,20
 pl1hero4move:	db	30,20
 pl1hero4mana:	db	10,20
@@ -3942,11 +3955,15 @@ Pl1Hero4DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero4Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl1Hero4Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
 Pl1Hero4Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 pl1hero5y:		db	07		                ;
 pl1hero5x:		db	06		
-pl1hero5type:	db	32		                ;0=adol, 8=goemon, 32=pixie
+pl1hero5type:	db	32		                
 pl1hero5life:	db	03,20
 pl1hero5move:	db	30,20
 pl1hero5mana:	db	10,20
@@ -3960,11 +3977,15 @@ Pl1Hero5DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero5Portrait10x18SYSX: dw HeroPortrait10x18SYSXLatok
 Pl1Hero5Portrait14x9SYSX:  dw HeroPortrait14x9SYSXLatok
 Pl1Hero5Block:  db LatokSpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 pl1hero6y:		db	07		                ;
 pl1hero6x:		db	07		
-pl1hero6type:	db	40		                ;0=adol, 8=goemon, 32=pixie
+pl1hero6type:	db	40		                
 pl1hero6life:	db	03,20
 pl1hero6move:	db	30,20
 pl1hero6mana:	db	10,20
@@ -3978,11 +3999,15 @@ Pl1Hero6DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero6Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle2
 Pl1Hero6Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle2
 Pl1Hero6Block:  db Drasle2SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 pl1hero7y:		db	07		                ;
 pl1hero7x:		db	08		
-pl1hero7type:	db	48		                ;0=adol, 8=goemon, 32=pixie
+pl1hero7type:	db	48		                
 pl1hero7life:	db	03,20
 pl1hero7move:	db	30,20
 pl1hero7mana:	db	10,20
@@ -3996,11 +4021,15 @@ Pl1Hero7DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero7Portrait10x18SYSX: dw HeroPortrait10x18SYSXSnake1
 Pl1Hero7Portrait14x9SYSX:  dw HeroPortrait14x9SYSXSnake1
 Pl1Hero7Block:  db Snake1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 pl1hero8y:		db	07		                ;
 pl1hero8x:		db	09		
-pl1hero8type:	db	56		                ;0=adol, 8=goemon, 32=pixie
+pl1hero8type:	db	56		                
 pl1hero8life:	db	03,20
 pl1hero8move:	db	30,20
 pl1hero8mana:	db	10,20
@@ -4014,6 +4043,10 @@ Pl1Hero8DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl1Hero8Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle3
 Pl1Hero8Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle3
 Pl1Hero8Block:  db Drasle3SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 
 
@@ -4021,27 +4054,10 @@ Pl1Hero8Block:  db Drasle3SpriteBlock
 
 
 
-
-
-
-
-
-
-
-
-;pl1hero4y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero4DYDX:  dw (0*128)+(48/2) ;(dy*128 + dx/2) Destination in Vram page 2
-;pl1hero5y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero5DYDX:  dw (0*128)+(64/2) ;(dy*128 + dx/2) Destination in Vram page 2
-;pl1hero6y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero6DYDX:  dw (0*128)+(80/2) ;(dy*128 + dx/2) Destination in Vram page 2
-;pl1hero7y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero7DYDX:  dw (0*128)+(96/2) ;(dy*128 + dx/2) Destination in Vram page 2
-;pl1hero8y:		db	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 | ds 27,0 | ds AddToHeroTable-2,0 | Pl1Hero8DYDX:  dw (0*128)+(112/2) ;(dy*128 + dx/2) Destination in Vram page 2
-
-;					y,	x,	type,life,lifemax,move,movemax,mana,manamax,manarec
-
-;pl2amountherosonmap:	db	2
 pl2hero1y:		db	9
 pl2hero1x:		db	6 ;100
-pl2hero1type:	db	24		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl2hero1life:	db	10,20
+pl2hero1type:	db	24		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
@@ -4054,6 +4070,10 @@ Pl2Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl2Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl2Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
 Pl2Hero1Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 pl2hero2y:		ds  lenghtherotable,255
 pl2hero3y:		ds  lenghtherotable,255
@@ -4067,8 +4087,8 @@ pl2hero8y:		ds  lenghtherotable,255
 ;pl3amountherosonmap:	db	2
 pl3hero1y:		db	100
 pl3hero1x:		db	02
-pl3hero1type:	db	96		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl3hero1life:	db	10,20
+pl3hero1type:	db	96		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl3hero1xp: dw 0000
 pl3hero1move:	db	10,20
 pl3hero1mana:	db	10,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
@@ -4081,6 +4101,10 @@ Pl3Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl3Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl3Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
 Pl3Hero1Block:  db HeroesSpritesBlock1
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 pl3hero2y:		ds  lenghtherotable,255
 pl3hero3y:		ds  lenghtherotable,255
@@ -4093,8 +4117,8 @@ pl3hero8y:		ds  lenghtherotable,255
 ;pl4amountherosonmap:	db	2
 pl4hero1y:		db	100
 pl4hero1x:		db	100
-pl4hero1type:	db	136		                ;hero type	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl4hero1life:	db	10,20
+pl4hero1type:	db	136		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl4hero1xp: dw 0000
 pl4hero1move:	db	10,20
 pl4hero1mana:	db	10,20
 pl4hero1manarec:db	2		                ;recover x mana every turn
@@ -4107,6 +4131,10 @@ Pl4Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 Pl4Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
 Pl4Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
 Pl4Hero1Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 
 pl4hero2y:		ds  lenghtherotable,255
 pl4hero3y:		ds  lenghtherotable,255
