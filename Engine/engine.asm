@@ -9,6 +9,8 @@ LevelEngine:
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroEntersCastle           ;check if a hero walked into a castle
+
+  call  CheckHeroPicksUpItem
   
 	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
 	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
@@ -80,12 +82,14 @@ vblank:
   call  PopulateControlsOnInterrupt     ;read out keys
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
 
+;when we set sprite character we also need to look at the worldmap object layer.
+;for instance, we need to check if the mouse pointer is over an object
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
 
-  ld    a,(page1bank)
+  ld    a,(page1bank)                   ;put the bank back in page 1 which was there before we ran setspritecharacter
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 	call	putsprite                       ;out spat data
@@ -125,6 +129,47 @@ InterruptHandler:
  
   pop   af 
   ei
+  ret
+
+SetMappositionHero:                     ;adds mappointer x and y to the mapdata, gives our current camera location in hl
+  ld    ix,(plxcurrentheroAddress)
+
+	ld		hl,mapdata                      ;set map pointer x
+  ld    e,(ix+HeroX)
+  ld    d,0
+	add		hl,de	
+  
+  ld    a,(ix+HeroY)
+  inc   a                               ;items are picked up with the bottom part of hero's body
+;	or		a
+;  ret   z
+	ld		b,a
+	ld		de,(maplenght)
+  .setypointerloop:	
+	add		hl,de
+	djnz	.setypointerloop
+  ret
+
+
+CheckHeroPicksUpItem:
+  Call  SetMappositionHero              ;sets heroes position in mapdata in hl
+
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,(hl)
+  or    a
+  ret   z
+  cp    128
+  ret   nc                              ;tilenr. 128 and up are creatures
+
+  call  AddItemToHero
+
+  ld    (hl),0                          ;remove item from object layer map
+  ret
+
+AddItemToHero:
   ret
 
 AddressToWriteTo:           ds  2
@@ -1637,9 +1682,11 @@ checktriggermapscreen:
 .movehero:
 ;mouse clicked, should hero move over path ?
 	ld		a,(spat+1)		                  ;x	(mouse)pointer
-	add		a,addxtomouse	                  ;centre mouse in grid
+;	add		a,addxtomouse	                  ;centre mouse in grid
 
-  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+;  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+
+  add   a,1
 	
 	and		%1111 0000
 	srl		a				                        ;/2
@@ -1655,9 +1702,12 @@ checktriggermapscreen:
 	jp		nz,.cancel
 
 	ld		a,(spat)		                    ;y	(mouse)pointer
-	sub		a,subyfrommouse	                ;centre mouse in grid
+;	sub		a,subyfrommouse	                ;centre mouse in grid
+;  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
 
-  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+;  add   a,AddYToMouse                   ;centre mouse in grid
+
+  sub   a,12
 
 	jp		nc,.notcarry
 	xor		a
@@ -1720,9 +1770,11 @@ checktriggermapscreen:
 
 .init:
 	ld		a,(spat+1)		                  ;x (mouse)pointer
-	add		a,addxtomouse	                  ;centre mouse in grid
+;	add		a,addxtomouse	                  ;centre mouse in grid
 
-  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+;  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+
+  add   a,1
 	
 	and		%1111 0000
 	srl		a				                        ;/2
@@ -1736,9 +1788,12 @@ checktriggermapscreen:
 	ld		(mouseclickx),a
 
 	ld		a,(spat)		                    ;y (mouse)pointer
-	sub		a,subyfrommouse	                ;centre mouse in grid
+;	sub		a,subyfrommouse	                ;centre mouse in grid
+;  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
 
-  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
+;  add   a,AddYToMouse                   ;centre mouse in grid
+
+  sub   a,12
 
 	jp		nc,.notcarry2
 	xor		a
@@ -2988,7 +3043,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		(mouseposx),a
 
 	ld		a,(spat)		                    ;y	(mouse)pointer
-	sub		a,subyfrommouse	                ;centre mouse in grid
+;	sub		a,subyfrommouse	                ;centre mouse in grid
+
+  add a,addytomouse                     ;centery y mouse in grid
+
 	jp		nc,.notcarry2
 	xor		a
 .notcarry2:
@@ -3071,6 +3129,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   .checkpointerenemyloop:
   ;pointer on enemy hero?
 	ld		a,h                           ;mouseposy (/16)
+
+  dec   a
+
 	cp		(ix+HeroY)                    ;cp hero y
 	jp		nz,.endcheck1
 	ld		a,l                           ;mouseposx (/16)
@@ -3095,6 +3156,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		b,amountofheroesperplayer
   .CheckPointerFriendlyHeroLoop:
 	ld		a,h                           ;mouseposy (/16)
+
+  dec   a
+
 	cp		(ix+HeroY)                    ;cp hero y
 	jp		nz,.endcheck2
 	ld		a,l                           ;mouseposx (/16)
@@ -4418,6 +4482,7 @@ mouseclicky:	ds	1
 mouseclickx:	ds	1
 addxtomouse:	equ	8
 subyfrommouse:	equ	4
+addytomouse:	equ	4
 
 turnbased?:				db	1
 amountofplayers:		db	4
