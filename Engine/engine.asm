@@ -15,14 +15,14 @@ LevelEngine:
 	call	SetCastlesInWindows             ;erase castle windows, then put the castles in the windows
   call  SetHeroArmyAndStatusInHud
 
-
+  call  putbottomobjects
 	call	putbottomcastles
 	call	putbottomheroes	
-;	call	putbottomcreatures
-;	call	putitems
-	call	puttopheroes	
-;	call	puttopcreatures
+
+  call  puttopobjects
 	call	puttopcastles
+	call	puttopheroes	
+
 	call	putmovementstars
   call  CheckEnterCastle                ;press F1 to enter castle
 
@@ -61,6 +61,7 @@ LevelEngine:
   jp    LevelEngine
 
 PreviousVblankIntFlag:  db  1
+page1bank:  ds  1
 
 vblank:
   push  bc
@@ -78,7 +79,15 @@ vblank:
 
   call  PopulateControlsOnInterrupt     ;read out keys
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
+
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
 	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+
+  ld    a,(page1bank)
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
 	call	putsprite                       ;out spat data
 
   ld    a,(vblankintflag)
@@ -1570,6 +1579,10 @@ doputstar:
 ;addxtomouse:	equ	8
 ;subyfrommouse:	equ	4
 checktriggermapscreen:
+  ld		a,1                             ;set worldmap in bank 1 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
 	ld		a,(spat+1)			                ;x cursor
 	cp		SX_Hud                          ;check if mousepointer is in the hud (x>196)
 	ret   nc                              ;if mousepointer is in hud, skip this routine
@@ -2934,8 +2947,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	jp		z,.ShowScrollArrowTop           ;if mousepointer is at y=0 show scrollarrow to the top
   .EndCheckShowScrollArrowTop:
 
-
-
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -2948,9 +2959,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	cp		ycoorspritebottom	
 	jp		z,.ShowScrollArrowBottom        ;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
   .EndCheckShowScrollArrowBottom:
-
-
-
 
 ;	ld		a,(spat)			                  ;y cursor
 ;	cp		ycoorspritebottom	
@@ -3001,101 +3009,55 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		a,(whichplayernowplaying?) | cp 2 | ld ix,pl2hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 3 | ld ix,pl3hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 4 | ld ix,pl4hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
-;	call	.checkpointeroncreature         ;check if pointer is on creature
-;	call	.checkpointeritem               ;check if pointer is on an item
+	call	.checkpointeroncreature         ;check if pointer is on creature
+	call	.checkpointeritem               ;check if pointer is on an item
 	jp		.shoe					                  ;pointer on no hero at all, show shoe
 ;	ret
 
+  .checkpointeritem:
+  call  .SetMappositionMousePointsTo
 
+  ld    a,(hl)
+  or    a
+  ret   z
 
-;amountofitems:		equ	4
-;lenghtitemtable:	equ	10
-;item1y:				db	6
-;item1x:				db	7
-;item1type:			db	240 - 16
-
-;item2y:				db	6
-;item2x:				db	8
-;item2type:			db	255 - 16 
-
-;item3y:				db	6
-;item3x:				db	9
-;item3type:			db	241 - 16
-
-;item4y:				db	6
-;item4x:				db	10
-;item5type:			db	247 - 16
-
-
-;check pointer on item
-.checkpointeritem:
-ret
-	ld		hl,item1y
-	ld		bc,lenghtitemtable-1
-
-.checkpointeronitem:
-	exx
-	ld		b,amountofitems
-.loopitemcheck:
-	exx
-	;pointer on enemy hero?
-	ld		a,d
-	cp		(hl)			;cp y
-	inc		hl
-	jp		nz,.endcheckthisitem
-	ld		a,e
-	cp		(hl)			;cp	x
-	jp		z,.pointeronitem
-	;pointer on enemy hero?
-.endcheckthisitem:
-	add		hl,bc
-	exx
-	djnz	.loopitemcheck
-	exx
-	ret
-
-  .pointeronitem:
-	pop		af				;pop call
+	pop		af				                      ;pop call
   ld    hl,CursorWalkingBoots
 	jp		.setcharacter
 
-;/check pointer on item
+  .checkpointeroncreature:
+  call  .SetMappositionMousePointsTo
 
+  ld    a,(hl)
+  cp    224
+  ret   nc                              ;tilenr. 224 and up are top parts of objects
+  cp    128
+  ret   c                               ;tilenr. 128 - 224 are creatures
 
-;check pointer on creature
-.checkpointeroncreature:
-ret
-	ld		hl,creature1y
-	ld		bc,lenghtcreaturetable-1
-
-.checkpointercreature:
-	exx
-	ld		b,amountofcreatures
-.loopcreaturecheck:
-	exx
-	;pointer on creature?
-	ld		a,d
-	cp		(hl)			;cp y
-	inc		hl
-	jp		nz,.endcheckthiscreature
-	ld		a,e
-	cp		(hl)			;cp	x
-	jp		z,.pointeroncreature
-	;pointer on creature?
-.endcheckthiscreature:
-	add		hl,bc
-	exx
-	djnz	.loopcreaturecheck
-	exx
-	ret
-;/check pointer on creature
+	pop		af				                      ;pop call
+  ld    hl,CursorSwords
+	jp		.setcharacter
 
 
 
+  .SetMappositionMousePointsTo:         ;(mouseposy)=mappointery + mouseposy(/16), (mouseposx)=mappointerx + mouseposx(/16)
+	ld		hl,mapdata                      ;set map pointer x
+	ld		a,(mouseposy)                   ;set map pointer y
+	or		a
+  jr    z,.SetX
+	ld		b,a
+	ld		de,(maplenght)
 
+  .setypointerloop:	
+	add		hl,de
+	djnz	.setypointerloop
 
-
-
+  .SetX:
+  ld    a,(mouseposx)
+  ld    e,a
+  ld    d,0
+	add		hl,de  
+  ret
 
 
 
@@ -3103,16 +3065,11 @@ ret
 	jp		z,.checkpointerfriend
 	jp		.checkpointerenemy
 
-
-
-
-
-
-;check if pointer is on enemy hero
-.checkpointerenemy:
+  ;check if pointer is on enemy hero
+  .checkpointerenemy:
 	ld		b,amountofheroesperplayer
-.checkpointerenemyloop:
-;pointer on enemy hero?
+  .checkpointerenemyloop:
+  ;pointer on enemy hero?
 	ld		a,h                           ;mouseposy (/16)
 	cp		(ix+HeroY)                    ;cp hero y
 	jp		nz,.endcheck1
@@ -3122,25 +3079,19 @@ ret
   ld    a,(ix+HeroStatus)             ;1=active on map, 254=in castle, 255=inactive
   or    a
 	jp		p,.pointeronenemyhero
-;pointer on enemy hero?
-.endcheck1:
+  ;pointer on enemy hero?
+  .endcheck1:
 	add		ix,de                         ;de=lenghtherotable
 	djnz	.checkpointerenemyloop
 	ret
 
-.pointeroncreature:
-.pointeronenemyhero:
+  .pointeronenemyhero:
 	pop		af				;pop call
   ld    hl,CursorSwords
 	jp		.setcharacter
-;/check if pointer is on enemy hero
+  ;/check if pointer is on enemy hero
 
-
-
-
-
-
-.checkpointerfriend:                ;in: de=lenghtherotable, h=mouseposy (/16), l=mouseposx (/16), ix->plxhero1y
+  .checkpointerfriend:                ;in: de=lenghtherotable, h=mouseposy (/16), l=mouseposx (/16), ix->plxhero1y
 	ld		b,amountofheroesperplayer
   .CheckPointerFriendlyHeroLoop:
 	ld		a,h                           ;mouseposy (/16)
@@ -3173,20 +3124,20 @@ ret
 .MousepointInHud:			;mouse pointer is in the hud
   ld    hl,CursorHand
 	jp		.setcharacter
-.shoe:
 
-;  ld    hl,SpriteCharCursorShoe
+.shoe:
   ld    hl,CursorBoots
 	jp		.setcharacter
 	
 .ShowScrollArrowBottom:
   ld    hl,CursorArrowDown
 	jp		.setcharacter
+
 .ShowScrollArrowTop:
   ld    hl,CursorArrowUp
 	jp		.setcharacter
-.ShowScrollArrowRight:
 
+.ShowScrollArrowRight:
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -3213,24 +3164,19 @@ ret
 	jp		z,.ShowScrollArrowBottomAndRight;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
   .EndCheckShowScrollArrowBottomAndRight:
 
-
-
-
-
-
 .right:
   ld    hl,CursorArrowRight
 	jp		.setcharacter
+
 .ShowScrollArrowTopAndRight:
   ld    hl,CursorArrowRightUp
 	jp		.setcharacter
+
 .ShowScrollArrowBottomAndRight:
   ld    hl,CursorArrowRightDown
 	jp		.setcharacter
+
 .ShowScrollArrowLeft:
-
-
-
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -3258,18 +3204,19 @@ ret
 	jp		z,.ShowScrollArrowBottomAndLeft ;if mousepointer is at complete bottom of screen show scrollarrow to the bottom
   .EndCheckShowScrollArrowBottomAndLeft:
 
-
 .left:
   ld    hl,CursorArrowLeft
 	jp		.setcharacter
+
 .ShowScrollArrowTopAndLeft:
   ld    hl,CursorArrowLeftUp	
 	jp		.setcharacter
+
 .ShowScrollArrowBottomAndLeft:
   ld    hl,CursorArrowDownLeft
 	jp		.setcharacter
-.setcharacter:                    ;in HL-> SpriteCharCursor
 
+.setcharacter:                    ;in HL-> SpriteCharCursor
   ld    (CurrentCursorSpriteCharacter),hl
 
 ;character
@@ -3513,24 +3460,179 @@ mappage0:
 	ds		TilesPerColumn*TilesPerRow,255
 mappage1:
 	ds		TilesPerColumn*TilesPerRow,255
-	
-buildupscreen:
+
+putbottomobjects:
+  Call  SetMapposition                  ;adds mappointer x and y to the mapdata, gives our current camera location in hl
+
+	ld		a,(activepage)
+  or    a
+	ld		de,mappage1                     ;start writing to mappage1 if our current active page = 0
+	jr		z,.mirrorpageset
+	ld		de,mappage0                     ;start writing to mappage0 if our current active page = 1
+  .mirrorpageset:
+
+  ld		a,buildupscreenYoffset          ;Y start of visible map (Is probably always gonna be 0)
+	ld		(Copy16x16Tile+dy),a
+
+	ld		bc,TilesPerColumn*256 + 16      ;b=TilesPerColumn, c=16
+  .loop:
+	push	bc
+  ld		a,buildupscreenXoffset          ;X start of visible map (Is probably always gonna be 0)
+	ld		(Copy16x16Tile+dx),a            ;first tile on each row starts at x=0
+	call	PutRowBottomObjects             ;put all the pieces (defined in 'TilesPerRow') in this row
+
+	ld		a,(Copy16x16Tile+dy)            ;next row will be 16 pixels lower. the value 16 is still in c at this point
+	add		a,c
+	ld		(Copy16x16Tile+dy),a	
+
+  ld    bc,128 - 12                     ;maplenght - tiles per row
+	add		hl,bc                           ;jump to first tile of next row in mapdata
+
+	pop		bc
+	djnz	.loop
+	ret
+  ret
+
+PutRowBottomObjects:
+	ld		b,TilesPerRow                   ;number of tiles per row
+  .loop:
+  call  PutBottomObjectFromObjectLayer  ;check the object layer for any objects that need to be placed here
+	inc		hl                              ;hl->pointer to tile in total map
+	inc		de                              ;de->points to tile in inactive page
+
+	ld		a,(Copy16x16Tile+dx)
+	add		a,c
+	ld		(Copy16x16Tile+dx),a
+
+	djnz	.loop
+	ret
+
+PutBottomObjectFromObjectLayer:         ;hl->points to tile in inactive page, de->pointer to tile in total map 
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,2                             ;objects are in page 2
+  ld    (Copy16x16Tile+sPage),a
+  ld    a,$98                           ;objects use transparant copy
+  ld    (Copy16x16Tile+copytype),a
+
+  ld    a,(hl)
+  or    a
+  ret   z
+  cp    192
+  ret   nc                              ;tilenr. 192 and up are the top parts of objets
+
+  ld    a,255
+	ld		(de),a                          ;this tile is dirty, put background tile again next frame
+  ld    a,(hl)
+  jp    PutTile.go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PutTopObjects:
+  Call  SetMapposition                  ;adds mappointer x and y to the mapdata, gives our current camera location in hl
+
+	ld		a,(activepage)
+  or    a
+	ld		de,mappage1                     ;start writing to mappage1 if our current active page = 0
+	jr		z,.mirrorpageset
+	ld		de,mappage0                     ;start writing to mappage0 if our current active page = 1
+  .mirrorpageset:
+
+  ld		a,buildupscreenYoffset          ;Y start of visible map (Is probably always gonna be 0)
+	ld		(Copy16x16Tile+dy),a
+
+	ld		bc,TilesPerColumn*256 + 16      ;b=TilesPerColumn, c=16
+  .loop:
+	push	bc
+  ld		a,buildupscreenXoffset          ;X start of visible map (Is probably always gonna be 0)
+	ld		(Copy16x16Tile+dx),a            ;first tile on each row starts at x=0
+	call	PutRowTopObjects                ;put all the pieces (defined in 'TilesPerRow') in this row
+
+	ld		a,(Copy16x16Tile+dy)            ;next row will be 16 pixels lower. the value 16 is still in c at this point
+	add		a,c
+	ld		(Copy16x16Tile+dy),a	
+
+  ld    bc,128 - 12                     ;maplenght - tiles per row
+	add		hl,bc                           ;jump to first tile of next row in mapdata
+
+	pop		bc
+	djnz	.loop
+	ret
+
+PutRowTopObjects:
+	ld		b,TilesPerRow                   ;number of tiles per row
+  .loop:
+  call  PutTopObjectFromObjectLayer     ;check the object layer for any objects that need to be placed here
+	inc		hl                              ;hl->pointer to tile in total map
+	inc		de                              ;de->points to tile in inactive page
+
+	ld		a,(Copy16x16Tile+dx)
+	add		a,c
+	ld		(Copy16x16Tile+dx),a
+
+	djnz	.loop
+	ret
+
+PutTopObjectFromObjectLayer:            ;hl->points to tile in inactive page, de->pointer to tile in total map 
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,2                             ;objects are in page 2
+  ld    (Copy16x16Tile+sPage),a
+  ld    a,$98                           ;objects use transparant copy
+  ld    (Copy16x16Tile+copytype),a
+
+  ld    a,(hl)
+  cp    192
+  ret   c                               ;tilenr. 192 and up are the top parts of objets
+
+  ld    a,255
+	ld		(de),a                        ;this tile is dirty, put background tile again next frame
+  ld    a,(hl)
+  jp    PutTile.go
+
+SetMapposition:                         ;adds mappointer x and y to the mapdata, gives our current camera location in hl
 	ld		hl,mapdata                      ;set map pointer x
 	ld		de,(mappointerx)
 	add		hl,de	
 	ld		a,(mappointery)                 ;set map pointer y
 	or		a
-	jp		z,.endsetmappointer
+  ret   z
 	ld		b,a
 	ld		de,(maplenght)
   .setypointerloop:	
 	add		hl,de
 	djnz	.setypointerloop
-  .endsetmappointer:                    ;hl points to mapdata (x,y)
+  ret
+
+
+
+
+
+
+
+
+
+buildupscreen:
+  Call  SetMapposition                  ;adds mappointer x and y to the mapdata, gives our current camera location in hl
 
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
 	ld		(Copy16x16Tile+dpage),a		      ;copy new blocks to inactive page
-;	ld		(puthero+dpage),a
 	ld		(putherotopbottom+dpage),a
 	ld		(putcastle+dpage),a
 	ld		(putCastleInWindow+dpage),a
@@ -3543,7 +3645,6 @@ buildupscreen:
 	ld		(MovementAndMana_line+dpage),a
 	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
-;
 	xor		1                               ;now we switch and set our page
 	ld		(activepage),a			
 	ld		de,mappage1                     ;start writing to mappage1 if our current active page = 0
@@ -3553,9 +3654,7 @@ buildupscreen:
 	call	SetPageSpecial					        ;set page
 
   ex    de,hl                           ;hl->points to tile in inactive page, de->pointer to tile in total map 
-
   ld		a,buildupscreenYoffset          ;Y start of visible map (Is probably always gonna be 0)
-;  xor   a
 	ld		(Copy16x16Tile+dy),a
 
 	ld		bc,TilesPerColumn*256 + 16      ;b=TilesPerColumn, c=16
@@ -3569,10 +3668,9 @@ buildupscreen:
 	add		a,c
 	ld		(Copy16x16Tile+dy),a	
 
-;  .SelfmodifyingMaplenghtMinusTilesPerRow:  Equ $+1
-  ld    bc,128 - 12                      ;maplenght - tiles per row
+  ld    bc,128 - 12                     ;maplenght - tiles per row
   ex    de,hl
-	add		hl,bc                           ;jump to first tile of next row in screen display
+	add		hl,bc                           ;jump to first tile of next row in mapdata
   ex    de,hl
 
 	pop		bc
@@ -3583,6 +3681,7 @@ putrow:                                 ;hl->points to tile in inactive page, de
 	ld		b,TilesPerRow                   ;number of tiles per row
 .loop:
 	call	PutTile                         ;copy 16x16 tile into the inactive page
+;  call  PutObjectFromObjectLayer        ;check the object layer for any objects that need to be placed here
 	inc		hl
 	inc		de
 
@@ -3593,12 +3692,22 @@ putrow:                                 ;hl->points to tile in inactive page, de
 	djnz	.loop
 	ret
 
-PutTile:                                ;copy 16x16 tile into the inactive page
+PutTile:                                ;copy 16x16 tile into the inactive page  
+  ld		a,1                             ;set worldmap in bank 1 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,3                             ;tiles are in page 3
+  ld    (Copy16x16Tile+sPage),a
+  ld    a,$d0                           ;tiles use fast copy
+  ld    (Copy16x16Tile+copytype),a
+
 	ld		a,(de)                          ;hl->points to tile in inactive page, de->pointer to tile in total map 
 	cp		(hl)	
   ret   z                               ;don't put tile if this tile is already present
 	ld		(hl),a
 
+  .go:
 	exx                                   ;set sx of tile. in: a=tilenr
 	ld		e,a                             ;store tilenr
 	add		a,a				                      ;*2
@@ -3627,6 +3736,8 @@ PutTile:                                ;copy 16x16 tile into the inactive page
 	call	docopy
 	exx
 	ret
+
+
 
 ymapstart:	equ	0
 ;put items / artifacts / heroes on map

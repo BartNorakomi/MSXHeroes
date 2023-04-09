@@ -12,20 +12,16 @@ InitiateGame:
 StartGame:
 ;jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
+  call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
 ;  call  LoadHeroesSprites               ;set all heroes sprites in page 2
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
-  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram
+  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
+  call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
-
-
-
-;Pl1Hero1DYDX:  dw (0*128)+(0/2) - 128 ;(dy*128 + dx/2) Destination in Vram page 2
-
-
   call  ClearMapPage0AndMapPage1
   jp    LevelEngine
 
@@ -208,7 +204,12 @@ SetAllSpriteCoordinatesInPage2:
   ret
 
 
-
+LoadAllObjectsInVram:                   ;Load all objects in page 2 starting at (0,64)
+  ld    d,World1ObjectsBlock
+  ld    a,1
+  ld    hl,064*128                      ;write to page 2 at (0,64)
+  call  copyGraphicsToScreen192         ;in d=block, ahl=address to write to.  
+  ret
 
 
 
@@ -257,6 +258,22 @@ LoadWorldTiles:
   call  SetPalette
   ret
 
+LoadWorldObjectLayerMap:
+;unpack map data
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+
+  ld    a,World1ObjectLayerMapBlock   ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    hl,World1ObjectLayerMap
+  ld    de,$8000
+  call  Depack
+  ret
+
 LoadWorldMap:
 ;unpack map data
   ld    a,(slot.page1rom)             ;all RAM except page 1
@@ -265,7 +282,10 @@ LoadWorldMap:
   ld    a,World1MapBlock              ;Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
-  ld    hl,$4000
+  ld		a,1                             ;set worldmap in bank 1 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+  
+  ld    hl,World1Map
   ld    de,$8000
   call  Depack
   ret
@@ -399,6 +419,28 @@ DoCopy:
 	dw    $a3ed,$a3ed,$a3ed,$a3ed
 	dw    $a3ed,$a3ed,$a3ed,$a3ed
 	dw    $a3ed,$a3ed,$a3ed
+  ret
+
+copyGraphicsToScreen192:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram  
+	call	SetVdp_Write                    ;start writing to address bhl
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1
+  out   ($a8),a   
+
+  ld    a,d
+  call  block1234
+
+	ld		hl,$4000
+  ld    c,$98
+  ld    a,128                           ;1 lines
+
+  .loop1:
+  call  outix192
+  dec   a
+  jp    nz,.loop1
+
+  ld    a,(slot.page1rom)               ;all RAM except page 1
+  out   ($a8),a
   ret
 
 copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram  

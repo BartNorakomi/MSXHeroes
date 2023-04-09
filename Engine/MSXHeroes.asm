@@ -391,8 +391,12 @@ dephase
 ; block $05
 ;
 World1MapBlock:  equ   $05
+World1ObjectLayerMapBlock:  equ   $05
 phase	$4000
+World1Map:
   incbin "..\maps\world1.map.pck"
+World1ObjectLayerMap:
+  incbin "..\maps\world1ObjectLayer.map.pck"
 	ds		$8000-$,$ff
 dephase
 
@@ -531,6 +535,17 @@ phase	$4000
 ;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $18 - 19
+;
+World1ObjectsBlock:  equ   $18
+phase	$4000
+  incbin "..\grapx\tilesheets\world1Objects.SC5",7+(64*128),144 * 128      ;144 lines
+  incbin "..\grapx\tilesheets\world1ObjectsBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
