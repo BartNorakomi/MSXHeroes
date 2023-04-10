@@ -546,6 +546,27 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $1a - 1b
+;
+HeroOverviewGraphicsBlock:  equ   $1a
+phase	$4000
+  incbin "..\grapx\HeroOverview\HeroOverviewGraphics.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\HeroOverview\HeroOverviewGraphicsBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $1c
+;
+HeroOverviewCodeBlock:  equ   $1c
+phase	$4000
+  include "HeroOverviewCode.asm"
+HeroOverviewFont:
+  incbin "..\grapx\HeroOverview\font.SC5",7,5 * 128      ;5 lines
+  
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

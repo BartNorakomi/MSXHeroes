@@ -23,7 +23,80 @@ StartGame:
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
   call  ClearMapPage0AndMapPage1
+
+
+jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+
+
+
+
+
+
+
+CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+;we set 32kb HeroOverviewGraphics in page 1 and 2
+  ld    a,HeroOverviewGraphicsBlock     ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  call  .go                             ;go copy
+
+;now set engine back in page 1
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+.go:
+  ld    (AddressToWriteFrom),hl
+  ld    (NXAndNY),bc
+
+	ld		a,(activepage)                  ;alternate between page 0 and 1
+  or    a
+  ld    hl,$0000
+  jr    nz,.SetAddress                  ;page 0
+  ld    hl,$8000
+  .SetAddress:
+  add   hl,de
+  ld    (AddressToWriteTo),hl
+
+  ld    c,$98                           ;out port
+  ld    de,128                          ;increase 128 bytes to go to the next line
+  di
+
+  .loop:
+  call  .WriteOneLine
+  ld    a,(NXAndNY+1)
+  dec   a
+  ld    (NXAndNY+1),a
+  jp    nz,.loop
+  ei
+  ret
+
+  .WriteOneLine:
+  xor   a                               ;we want to write to (204,151)
+  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteTo),hl
+	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
+
+  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteFrom),hl
+  ld    a,(NXAndNY)
+  ld    b,a
+  otir
+  ret
+
+
+
+
+
+
+
+
+
+
+
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0
@@ -55,6 +128,51 @@ LoadCastleOverview:
 
   ld    hl,CastleOverviewPalette
   call  SetPalette
+  ret
+
+HeroOverViewFirstWindowButtonOffSX:           equ 008
+HeroOverViewFirstWindowButtonOffSY:           equ 122
+HeroOverViewFirstWindowButtonMouseOverSX:     equ 008
+HeroOverViewFirstWindowButtonMouseOverSY:     equ 133
+HeroOverViewFirstWindowButtonMouseClickedSX:  equ 008
+HeroOverViewFirstWindowButtonMouseClickedSY:  equ 144
+
+HeroOverViewFirstWindowButton1DX:   equ HeroOverViewFirstWindowchoicesDX + 008
+HeroOverViewFirstWindowButton1DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (0 * 14)
+HeroOverViewFirstWindowButton2DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (1 * 14)
+HeroOverViewFirstWindowButton3DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (2 * 14)
+HeroOverViewFirstWindowButton4DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (3 * 14)
+HeroOverViewFirstWindowButton5DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (4 * 14)
+
+ButtonTableLenght:                equ 3
+HeroOverviewWindowButton_de:      equ 0
+HeroOverviewWindowButtonStatus:   equ 2
+HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  dw  $0000 + (HeroOverViewFirstWindowButton1DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011
+  dw  $0000 + (HeroOverViewFirstWindowButton2DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0100 0011
+  dw  $0000 + (HeroOverViewFirstWindowButton3DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0010 0011
+  dw  $0000 + (HeroOverViewFirstWindowButton4DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0100 0011
+  dw  $0000 + (HeroOverViewFirstWindowButton5DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011
+
+ButtonOff:  equ 0
+ButtonMouseOver:  equ 2
+ButtonOMouseClicked:  equ 4
+ButtonTableSYSX:
+  dw  $4000 + (HeroOverViewFirstWindowButtonOffSY*128) + (HeroOverViewFirstWindowButtonOffSX/2) - 128
+  dw  $4000 + (HeroOverViewFirstWindowButtonMouseOverSY*128) + (HeroOverViewFirstWindowButtonMouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewFirstWindowButtonMouseClickedSY*128) + (HeroOverViewFirstWindowButtonMouseClickedSX/2) - 128
+
+
+SetHeroOverviewMenuInPage1ROM:
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a      
+
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  HeroOverviewCode
+
+  ld    a,(slot.page1rom)               ;all RAM except page 1
+  out   ($a8),a      
   ret
 
 EnterCastle:

@@ -7,10 +7,12 @@ LevelEngine:
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
+
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroEntersCastle           ;check if a hero walked into a castle
 
   call  CheckHeroPicksUpItem
+  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster
   
 	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
 	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
@@ -150,6 +152,32 @@ SetMappositionHero:                     ;adds mappointer x and y to the mapdata,
 	djnz	.setypointerloop
   ret
 
+CheckHeroCollidesWithMonster:
+  Call  SetMappositionHero              ;sets heroes position in mapdata in hl
+
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,(hl)
+  cp    192
+  ret   nc                              ;tilenr. 192 and up are top parts of objects
+  cp    128
+  ret   c                               ;tilenr. 128 - 224 are creatures
+
+  call  AddXPToHero
+
+  ld    (hl),0                          ;remove monster from object layer map
+  or    a
+  sbc   hl,de                           ;check if monster has a top part
+  ld    a,(hl)
+  cp    192
+  ret   c
+  ld    (hl),0                          ;remove top part monster from object layer map  
+  ret
+
+AddXPToHero:
+  ret
 
 CheckHeroPicksUpItem:
   Call  SetMappositionHero              ;sets heroes position in mapdata in hl
@@ -1613,9 +1641,12 @@ doputstar:
 ;/check if star is behind a tree	
 
 
-
-
-
+CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon) and mousebutton is pressed
+  ld    hl,(CurrentCursorSpriteCharacter)
+  ld    de,CursorHand
+  call  CompareHLwithDE
+  ret   nz  
+  jp    SetHeroOverviewMenuInPage1ROM   ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
 
 ;mouseposy:		ds	1
 ;mouseposx:		ds	1
@@ -1663,6 +1694,8 @@ checktriggermapscreen:
 	ld		a,(movehero?)
 	or		a
 	jp		nz,.stopheromovement	          ;hero was moving, mouse clicked-> stop hero
+
+  call  CheckEnterHeroOverviewMenu      ;check if pointer is on hero (hand icon) and mousebutton is pressed
 
 	ld		a,(putmovementstars?)
 	or		a
@@ -3087,8 +3120,8 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   call  .SetMappositionMousePointsTo
 
   ld    a,(hl)
-  cp    224
-  ret   nc                              ;tilenr. 224 and up are top parts of objects
+  cp    192
+  ret   nc                              ;tilenr. 192 and up are top parts of objects
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
 
