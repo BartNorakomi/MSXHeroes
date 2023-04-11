@@ -18,11 +18,15 @@ HeroOverviewCode:
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
 
   .engine:
+  call  PopulateControls                ;read out keys
   call  SwapAndSetPage                  ;swap and set page  
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
-  call  CheckStatusButtons_FirstWindow
+  call  CheckButtonMouseInteraction
 
+  ld    ix,HeroOverviewFirstWindowButtonTable
+  call  SetButtonStatus                 ;copies button state from rom -> vram
+ 
   halt
   jp  .engine
 
@@ -36,7 +40,52 @@ HeroOverviewCode:
 ;  db  HeroOverViewFirstWindowchoicesDY + 089, HeroOverViewFirstWindowchoicesDX + 008, %0100 0011
 ;  db  HeroOverViewFirstWindowchoicesDY + 103, HeroOverViewFirstWindowchoicesDX + 008, %1000 0011
 
-CheckStatusButtons_FirstWindow:
+
+CheckButtonMouseInteraction:
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
+  ld    de,ButtonTableLenght
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+HeroOverviewWindowButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+HeroOverviewWindowButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+  cp    (ix+HeroOverviewWindowButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+HeroOverviewWindowButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+  ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+  ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+  ret
+
+  .NotOverButton:
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   6,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  ret
+
+SetButtonStatus:                        ;copies button state from rom -> vram
   ld    b,5                             ;amount of buttons
 
   .loop:

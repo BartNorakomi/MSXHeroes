@@ -143,16 +143,23 @@ HeroOverViewFirstWindowButton2DY:   equ HeroOverViewFirstWindowchoicesDY + 047 +
 HeroOverViewFirstWindowButton3DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (2 * 14)
 HeroOverViewFirstWindowButton4DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (3 * 14)
 HeroOverViewFirstWindowButton5DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (4 * 14)
+HeroOverViewFirstWindowButton6DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (5 * 14) ;non existing, but in use
 
-ButtonTableLenght:                equ 3
+ButtonTableLenght:                equ 7
 HeroOverviewWindowButton_de:      equ 0
 HeroOverviewWindowButtonStatus:   equ 2
-HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
-  dw  $0000 + (HeroOverViewFirstWindowButton1DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011
-  dw  $0000 + (HeroOverViewFirstWindowButton2DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0100 0011
-  dw  $0000 + (HeroOverViewFirstWindowButton3DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0010 0011
-  dw  $0000 + (HeroOverViewFirstWindowButton4DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %0100 0011
-  dw  $0000 + (HeroOverViewFirstWindowButton5DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011
+HeroOverviewWindowButtonYtop:     equ 3
+HeroOverviewWindowButtonYbottom:  equ 4
+HeroOverviewWindowButtonXleft:    equ 5
+HeroOverviewWindowButtonXright:   equ 6
+HeroOverviewWindowAmountOfButtons:equ -1
+HeroOverviewFirstWindowButtonTableAmountOfButtons:  db  5
+HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright
+  dw  $0000 + (HeroOverViewFirstWindowButton1DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton1DY,HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
+  dw  $0000 + (HeroOverViewFirstWindowButton2DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
+  dw  $0000 + (HeroOverViewFirstWindowButton3DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
+  dw  $0000 + (HeroOverViewFirstWindowButton4DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
+  dw  $0000 + (HeroOverViewFirstWindowButton5DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton6DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
 
 ButtonOff:  equ 0
 ButtonMouseOver:  equ 2
@@ -161,7 +168,6 @@ ButtonTableSYSX:
   dw  $4000 + (HeroOverViewFirstWindowButtonOffSY*128) + (HeroOverViewFirstWindowButtonOffSX/2) - 128
   dw  $4000 + (HeroOverViewFirstWindowButtonMouseOverSY*128) + (HeroOverViewFirstWindowButtonMouseOverSX/2) - 128
   dw  $4000 + (HeroOverViewFirstWindowButtonMouseClickedSY*128) + (HeroOverViewFirstWindowButtonMouseClickedSX/2) - 128
-
 
 SetHeroOverviewMenuInPage1ROM:
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
