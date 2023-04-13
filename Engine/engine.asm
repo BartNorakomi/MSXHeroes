@@ -1,10 +1,13 @@
 LevelEngine:
+
+;For now PopulateControls and PopulateKeyMatrix are ONLY used in the routine scrollscreen
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
+  call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mousebutton is pressed
 
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
 
@@ -28,14 +31,13 @@ LevelEngine:
 	call	puttopheroes	
 
 	call	putmovementstars
-  call  CheckEnterCastle                ;press F1 to enter castle
+;  call  CheckEnterCastle                ;press F1 to enter castle
 
   ;HUD
 	call	CheckHudButtonsNoLongerOver     ;check if mousepointer is no longer on a button
 	call	CheckHudButtonsOver             ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
 	call	CheckhudButtonsClicked          ;check if any of the buttons in the hud are pressed
 
-	call	checktriggermapscreen
 
 ;	call	docomputerplayerturn
 ;	call	textwindow
@@ -86,6 +88,12 @@ vblank:
 
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
+
+  ld		a,1                             ;set worldmap in bank 1 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+	call	checktriggermapscreen           ;this needs to be on the interrupt for accurate readout of keypresses per frame
+
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
@@ -516,28 +524,28 @@ CheckEnterCastle:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
-  bit   6,a
-  ret   z
+;  ld    a,(Controls)
+;  bit   6,a
+;  ret   z
     
   ; set temp ISR
-  di
-	ld		hl,.tempisr
-	ld		de,$38
-	ld		bc,6
-	ldir
-  ei
+;  di
+;	ld		hl,.tempisr
+;	ld		de,$38
+;	ld		bc,6
+;	ldir
+;  ei
 
-  pop   af                              ;pop the call to this routine         
-  jp    LoadCastleOverview
+;  pop   af                              ;pop the call to this routine         
+;  jp    LoadCastleOverview
 
 		; set temp ISR
-  .tempisr:	
-	push	af
-	in		a,($99)                         ;check and acknowledge vblank int (ei0 is set)
-	pop		af
-	ei	
-	ret
+;  .tempisr:	
+;	push	af
+;	in		a,($99)                         ;check and acknowledge vblank int (ei0 is set)
+;	pop		af
+;	ei	
+;	ret
 
 
 
@@ -1641,12 +1649,30 @@ doputstar:
 ;/check if star is behind a tree	
 
 
+
+
+SetHeroOverViewMenu?: db  0
 CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon) and mousebutton is pressed
   ld    hl,(CurrentCursorSpriteCharacter)
   ld    de,CursorHand
   call  CompareHLwithDE
   ret   nz  
-  jp    SetHeroOverviewMenuInPage1ROM   ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+
+  ld    a,1
+  ld    (SetHeroOverViewMenu?),a
+  ret
+
+GoCheckEnterHeroOverviewMenu:
+  ld    a,(SetHeroOverViewMenu?)
+  or    a
+  ld    a,0
+  ld    (SetHeroOverViewMenu?),a
+  jp    nz,SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+
+
+
+
+
 
 ;mouseposy:		ds	1
 ;mouseposx:		ds	1
@@ -1655,9 +1681,13 @@ CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon)
 ;addxtomouse:	equ	8
 ;subyfrommouse:	equ	4
 checktriggermapscreen:
-  ld		a,1                             ;set worldmap in bank 1 at $8000
-  ld    (page1bank),a
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  or    a
+  ret   nz
+
+;  ld		a,1                             ;set worldmap in bank 1 at $8000
+;  ld    (page1bank),a
+;  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 	ld		a,(spat+1)			                ;x cursor
 	cp		SX_Hud                          ;check if mousepointer is in the hud (x>196)
@@ -1668,7 +1698,7 @@ checktriggermapscreen:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-	ld		a,(NewPrContr)
+	ld		a,(NewPrContrControlsOnInterrupt)
 	bit		4,a						                  ;space pressed ?
 	ret		z
 
@@ -1695,7 +1725,7 @@ checktriggermapscreen:
 	or		a
 	jp		nz,.stopheromovement	          ;hero was moving, mouse clicked-> stop hero
 
-  call  CheckEnterHeroOverviewMenu      ;check if pointer is on hero (hand icon) and mousebutton is pressed
+  call  CheckEnterHeroOverviewMenu
 
 	ld		a,(putmovementstars?)
 	or		a
@@ -2990,16 +3020,28 @@ xcoordinateStartPlayfield:  equ 06
 ycoorspritebottom:	equ	180
 xcoorspriteright:	equ	235 ;-11
 
-
+GameStatus: db  0                       ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
 spritecharacter:	db	255	              ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=swords,11=hand,12=change arrows
 setspritecharacter:                     ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  or    a
+  jr    z,.Ingame
+  dec   a
+  jr    z,.HeroOverview
+
+  .HeroOverview:
+  ld    hl,CursorHand
+	jp		.setcharacter
+  ret
+
+  .Ingame:
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   2,a                             ;check if left is pressed
   jr    z,.EndCheckShowScrollArrowLeft
 	ld		a,(spat+1)			                ;x cursor
@@ -3012,7 +3054,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   3,a                             ;check if right is pressed
   jr    z,.EndCheckShowScrollArrowRight
 	ld		a,(spat+1)			                ;x cursor
@@ -3025,7 +3067,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   0,a                             ;check if up is pressed
   jr    z,.EndCheckShowScrollArrowTop
 	ld		a,(spat)			                  ;y cursor
@@ -3040,7 +3082,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   1,a                             ;check if down is pressed
   jr    z,.EndCheckShowScrollArrowBottom
 	ld		a,(spat)			                  ;y cursor
@@ -3240,7 +3282,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   0,a                             ;check if up is pressed
   jr    z,.EndCheckShowScrollArrowTopAndRight
 	ld		a,(spat)			                  ;y cursor
@@ -3253,7 +3295,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   1,a                             ;check if down is pressed
   jr    z,.EndCheckShowScrollArrowBottomAndRight
 	ld		a,(spat)			                  ;y cursor
@@ -3279,7 +3321,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   0,a                             ;check if up is pressed
   jr    z,.EndCheckShowScrollArrowTopAndLeft
 	ld		a,(spat)			                  ;y cursor
@@ -3293,7 +3335,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
+  ld    a,(ControlsOnInterrupt)
   bit   1,a                             ;check if down is pressed
   jr    z,.EndCheckShowScrollArrowBottomAndLeft
 	ld		a,(spat)			                  ;y cursor
@@ -3449,7 +3491,7 @@ scrollscreen:                           ;you can either scroll the scroll by mov
 	bit		1,a			                        ;check ontrols to see if CTRL is pressed
 	jp		nz,.EndCheckCTRL
 
-  ld    a,(Controls)
+  ld    a,(Controls)                    ;freeze directional control when CTRL pressed
   and   %1111 0000
   ld    (Controls),a
 

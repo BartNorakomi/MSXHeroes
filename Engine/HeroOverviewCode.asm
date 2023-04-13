@@ -5,12 +5,40 @@ HeroOverViewFirstWindowchoicesDY:   equ 037
 HeroOverViewFirstWindowchoicesNX:   equ 088
 HeroOverViewFirstWindowchoicesNY:   equ 122
 
-HeroOverViewFirstWindowHightlightOption1SX:   equ 008
-HeroOverViewFirstWindowHightlightOption1SY:   equ 133
-HeroOverViewFirstWindowHightlightOption1DX:   equ HeroOverViewFirstWindowchoicesDX + 008
-HeroOverViewFirstWindowHightlightOption1DY:   equ HeroOverViewFirstWindowchoicesDY + 047
-HeroOverViewFirstWindowHightlightOption1NX:   equ 072
-HeroOverViewFirstWindowHightlightOption1NY:   equ 011
+HeroOverViewFirstWindowButtonNY:  equ 011
+HeroOverViewFirstWindowButtonNX:  equ 072
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewSkillsWindowSX:   equ 088
+HeroOverViewSkillsWindowSY:   equ 000
+HeroOverViewSkillsWindowDX:   equ 030
+HeroOverViewSkillsWindowDY:   equ 025
+HeroOverViewSkillsWindowNX:   equ 150
+HeroOverViewSkillsWindowNY:   equ 139
+
+HeroOverViewSkillsWindowButtonNY:  equ 011
+HeroOverViewSkillsWindowButtonNX:  equ 134
+
+HeroOverviewSkillsWindowCode:
+  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
+
+  .engine:
+  call  PopulateControls                ;read out keys
+  call  SwapAndSetPage                  ;swap and set page  
+  ld    ix,HeroOverviewSkillsButtonTable
+  ld    iy,ButtonTableSkillsSYSX
+  call  CheckButtonMouseInteraction
+  call  CheckEndHeroOverviewSkills      ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewSkillsButtonTable
+  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
+  call  SetButtonStatus                 ;copies button state from rom -> vram
+ 
+  halt
+  jp  .engine
 
 HeroOverviewCode:
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
@@ -23,23 +51,56 @@ HeroOverviewCode:
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
   call  CheckButtonMouseInteraction
+  call  CheckEndHeroOverviewFirstWindow ;check if mouse is clicked outside of window. If so, return to game
 
   ld    ix,HeroOverviewFirstWindowButtonTable
+  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
   call  SetButtonStatus                 ;copies button state from rom -> vram
  
   halt
   jp  .engine
 
-;HeroOverviewWindowButtonY:      equ 0
-;HeroOverviewWindowButtonX:      equ 1
-;HeroOverviewWindowButtonStatus: equ 2
-;HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
-;  db  HeroOverViewFirstWindowchoicesDY + 047, HeroOverViewFirstWindowchoicesDX + 008, %1000 0000
-;  db  HeroOverViewFirstWindowchoicesDY + 061, HeroOverViewFirstWindowchoicesDX + 008, %0100 0011
-;  db  HeroOverViewFirstWindowchoicesDY + 075, HeroOverViewFirstWindowchoicesDX + 008, %0010 0011
-;  db  HeroOverViewFirstWindowchoicesDY + 089, HeroOverViewFirstWindowchoicesDX + 008, %0100 0011
-;  db  HeroOverViewFirstWindowchoicesDY + 103, HeroOverViewFirstWindowchoicesDX + 008, %1000 0011
+CheckEndHeroOverviewSkills:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
 
+  ld    a,(spat+0)                      ;y mouse
+  cp    HeroOverViewSkillsWindowDY
+  jr    c,.NotOverHeroOverViewSkillsWindow
+  cp    HeroOverViewSkillsWindowDY+HeroOverViewSkillsWindowNY
+  jr    nc,.NotOverHeroOverViewSkillsWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    HeroOverViewSkillsWindowDX
+  jr    c,.NotOverHeroOverViewSkillsWindow
+  cp    HeroOverViewSkillsWindowDX+HeroOverViewSkillsWindowNX
+  ret   c
+
+  .NotOverHeroOverViewSkillsWindow:
+  pop   af
+  ret                                   ;return to game
+
+CheckEndHeroOverviewFirstWindow:        ;if mouse is NOT over the overview window AND you press trig a, then return back to game
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    HeroOverViewFirstWindowchoicesDY
+  jr    c,.NotOverHeroOverViewFirstWindowChoices
+  cp    HeroOverViewFirstWindowchoicesDY+HeroOverViewFirstWindowchoicesNY
+  jr    nc,.NotOverHeroOverViewFirstWindowChoices
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    HeroOverViewFirstWindowchoicesDX
+  jr    c,.NotOverHeroOverViewFirstWindowChoices
+  cp    HeroOverViewFirstWindowchoicesDX+HeroOverViewFirstWindowchoicesNX
+  ret   c
+
+  .NotOverHeroOverViewFirstWindowChoices:
+  pop   af
+  ret                                   ;return to game
 
 CheckButtonMouseInteraction:
   ld    b,(ix+HeroOverviewWindowAmountOfButtons)
@@ -63,16 +124,28 @@ CheckButtonMouseInteraction:
   cp    (ix+HeroOverviewWindowButtonXright)
   jr    nc,.NotOverButton
   ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
-  ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
-
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
+
   ld    a,(Controls)
   bit   4,a                             ;check trigger a / space
-  ret   z
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,MenuOptionSelected           ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
   ret
 
@@ -85,9 +158,18 @@ CheckButtonMouseInteraction:
   ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
   ret
 
-SetButtonStatus:                        ;copies button state from rom -> vram
-  ld    b,5                             ;amount of buttons
+MenuOptionSelected:
+  pop   af
+  pop   af                              ;pop the 2 calls to this routine
+  jp    HeroOverviewSkillsWindowCode
 
+SetButtonStatus:                        ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+;  ld    ix,HeroOverviewSkillsButtonTable
+;  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+
+  ld    (BCStored),bc
+
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
   .loop:
   push  bc
   call  .Setbutton
@@ -126,7 +208,11 @@ SetButtonStatus:                        ;copies button state from rom -> vram
   xor   a
   ld    e,(ix+HeroOverviewWindowButton_de)
   ld    d,(ix+HeroOverviewWindowButton_de+1)
-  ld    bc,$0000 + (HeroOverViewFirstWindowHightlightOption1NY*256) + (HeroOverViewFirstWindowHightlightOption1NX/2)
+;  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+;  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
+
+  ld    bc,(BCStored)
+
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret  
 
@@ -145,3 +231,10 @@ SetHeroOverViewFirstWindow:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
+SetHeroOverViewSkillsWindow:
+  ld    hl,$4000 + (HeroOverViewSkillsWindowSY*128) + (HeroOverViewSkillsWindowSX/2) -128
+  xor   a
+  ld    de,$0000 + (HeroOverViewSkillsWindowDY*128) + (HeroOverViewSkillsWindowDX/2)
+  ld    bc,$0000 + (HeroOverViewSkillsWindowNY*256) + (HeroOverViewSkillsWindowNX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
