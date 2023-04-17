@@ -560,11 +560,19 @@ dephase
 ; block $1c
 ;
 HeroOverviewCodeBlock:  equ   $1c
+HeroOverviewFontBlock:  equ   $1c
 phase	$4000
-  include "HeroOverviewCode.asm"
-HeroOverviewFont:
   incbin "..\grapx\HeroOverview\font.SC5",7,5 * 128      ;5 lines
-  
+  include "HeroOverviewCode.asm"
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $1d - 1e
+;
+HeroOverviewStatusGraphicsBlock:  equ   $1d
+phase	$4000
+  incbin "..\grapx\HeroOverview\StatusWindow.SC5",7,116 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

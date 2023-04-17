@@ -1660,14 +1660,14 @@ CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon)
 
   ld    a,1
   ld    (SetHeroOverViewMenu?),a
+  pop   af                              ;pop the call checktriggermapscreen
   ret
 
 GoCheckEnterHeroOverviewMenu:
   ld    a,(SetHeroOverViewMenu?)
   or    a
-  ld    a,0
-  ld    (SetHeroOverViewMenu?),a
-  jp    nz,SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+  ret   z
+  jp    SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
 
 
 
@@ -4022,7 +4022,7 @@ lenghtherotable:	equ	pl1hero2y-pl1hero1y
 HeroY:                  equ 0
 HeroX:                  equ 1
 ;HeroType:               equ 2           	
-HeroLeft:               equ 3
+HeroXp:                 equ 3
 HeroMove:               equ 5
 HeroTotalMove:          equ 6
 HeroMana:               equ 7
@@ -4037,8 +4037,326 @@ HeroDYDX:               equ 45
 HeroPortrait10x18SYSX:  equ 47
 HeroPortrait14x9SYSX:   equ 49
 HeroSpriteBlock:        equ 51
+HeroStatAttack:         equ 52
+HeroStatDefense:        equ 53
+HeroStatKnowledge:      equ 54
+HeroStatSpelldamage:    equ 55
+HeroSkills:             equ 56
+HeroLevel:              equ 62
 
 AddToHeroTable: equ 9
+
+
+
+
+pl1hero1y:		db	07
+pl1hero1x:		db	2
+pl1hero1type:	db	0		                  	
+pl1hero1xp: dw 0940
+pl1hero1move:	db	12,20
+pl1hero1mana:	db	10,20
+pl1hero1manarec:db	5		                ;recover x mana every turn
+pl1hero1items:	db	255,255,255,255,255
+pl1hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero1Units:  db 003 | dw 001 |      db 002 | dw 001 |      db 001 | dw 001 |      db 100 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero1SYSX:  dw HeroSYSXUndeadline3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXUndeadline3
+Pl1Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXUndeadline3
+Pl1Hero1Block:  db Undeadline3SpriteBlock
+Pl1Hero1StatAttack:  db 8
+Pl1Hero1StatDefense:  db 2
+Pl1Hero1StatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
+Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
+.HeroSkills:  db  1,0,0,0,0,0
+.HeroLevel: db  67
+
+
+pl1hero2y:		db	7
+pl1hero2x:		db	3
+pl1hero2type:	db	8		                  
+pl1hero2life:	db	05,20
+pl1hero2move:	db	10,20
+pl1hero2mana:	db	10,20
+pl1hero2manarec:db	5		                ;recover x mana every turn
+pl1hero2items:	db	255,255,255,255,255
+pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero2Units:  db 023 | dw 001 |      db 022 | dw 001 |      db 021 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero2Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero2SYSX:  dw HeroSYSXGoemon1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero2DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXGoemon1
+Pl1Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXGoemon1
+Pl1Hero2Block:  db Goemon1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  4,7,10,0,0,0
+.HeroLevel: db  1
+
+
+
+pl1hero3y:		db	07		                ;
+pl1hero3x:		db	04		
+pl1hero3type:	db	16		                
+pl1hero3life:	db	03,20
+pl1hero3move:	db	30,20
+pl1hero3mana:	db	10,20
+pl1hero3manarec:db	5		                ;recover x mana every turn
+pl1hero3items:	db	255,255,255,255,255
+pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero3Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero3SYSX:  dw HeroSYSXPixy ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero3DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero3Portrait10x18SYSX: dw HeroPortrait10x18SYSXPixy
+Pl1Hero3Portrait14x9SYSX:  dw HeroPortrait14x9SYSXPixy
+Pl1Hero3Block:  db PixySpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  8,17,24,0,0,0
+.HeroLevel: db  1
+
+
+
+
+
+
+
+
+
+
+
+
+pl1hero4y:		db	07		                ;
+pl1hero4x:		db	05		
+pl1hero4type:	db	24		                
+pl1hero4life:	db	03,20
+pl1hero4move:	db	30,20
+pl1hero4mana:	db	10,20
+pl1hero4manarec:db	5		                ;recover x mana every turn
+pl1hero4items:	db	255,255,255,255,255
+pl1hero4status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero4Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero4SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero4DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero4Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
+Pl1Hero4Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl1Hero4Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+
+pl1hero5y:		db	07		                ;
+pl1hero5x:		db	06		
+pl1hero5type:	db	32		                
+pl1hero5life:	db	03,20
+pl1hero5move:	db	30,20
+pl1hero5mana:	db	10,20
+pl1hero5manarec:db	5		                ;recover x mana every turn
+pl1hero5items:	db	255,255,255,255,255
+pl1hero5status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero5Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero5SYSX:  dw HeroSYSXLatok ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero5DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero5Portrait10x18SYSX: dw HeroPortrait10x18SYSXLatok
+Pl1Hero5Portrait14x9SYSX:  dw HeroPortrait14x9SYSXLatok
+Pl1Hero5Block:  db LatokSpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+
+pl1hero6y:		db	07		                ;
+pl1hero6x:		db	07		
+pl1hero6type:	db	40		                
+pl1hero6life:	db	03,20
+pl1hero6move:	db	30,20
+pl1hero6mana:	db	10,20
+pl1hero6manarec:db	5		                ;recover x mana every turn
+pl1hero6items:	db	255,255,255,255,255
+pl1hero6status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero6Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero6SYSX:  dw HeroSYSXDrasle2 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero6DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero6Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle2
+Pl1Hero6Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle2
+Pl1Hero6Block:  db Drasle2SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+
+pl1hero7y:		db	07		                ;
+pl1hero7x:		db	08		
+pl1hero7type:	db	48		                
+pl1hero7life:	db	03,20
+pl1hero7move:	db	30,20
+pl1hero7mana:	db	10,20
+pl1hero7manarec:db	5		                ;recover x mana every turn
+pl1hero7items:	db	255,255,255,255,255
+pl1hero7status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero7Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero7SYSX:  dw HeroSYSXSnake1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero7DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero7Portrait10x18SYSX: dw HeroPortrait10x18SYSXSnake1
+Pl1Hero7Portrait14x9SYSX:  dw HeroPortrait14x9SYSXSnake1
+Pl1Hero7Block:  db Snake1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+
+pl1hero8y:		db	07		                ;
+pl1hero8x:		db	09		
+pl1hero8type:	db	56		                
+pl1hero8life:	db	03,20
+pl1hero8move:	db	30,20
+pl1hero8mana:	db	10,20
+pl1hero8manarec:db	5		                ;recover x mana every turn
+pl1hero8items:	db	255,255,255,255,255
+pl1hero8status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero8Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl1Hero8SYSX:  dw HeroSYSXDrasle3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl1Hero8DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl1Hero8Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle3
+Pl1Hero8Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle3
+Pl1Hero8Block:  db Drasle3SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+
+
+
+
+
+
+pl2hero1y:		db	9
+pl2hero1x:		db	6 ;100
+pl2hero1type:	db	24		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl2hero1xp: dw 0000
+pl2hero1move:	db	10,20
+pl2hero1mana:	db	10,20
+pl2hero1manarec:db	2		                ;recover x mana every turn
+pl2hero1items:	db	255,255,255,255,255
+pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl2Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl2Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl2Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
+Pl2Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl2Hero1Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+pl2hero2y:		ds  lenghtherotable,255
+pl2hero3y:		ds  lenghtherotable,255
+pl2hero4y:		ds  lenghtherotable,255
+pl2hero5y:		ds  lenghtherotable,255
+pl2hero6y:		ds  lenghtherotable,255
+pl2hero7y:		ds  lenghtherotable,255
+pl2hero8y:		ds  lenghtherotable,255
+
+
+;pl3amountherosonmap:	db	2
+pl3hero1y:		db	100
+pl3hero1x:		db	02
+pl3hero1type:	db	96		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl3hero1xp: dw 0000
+pl3hero1move:	db	10,20
+pl3hero1mana:	db	10,20
+pl3hero1manarec:db	2		                ;recover x mana every turn
+pl3hero1items:	db	255,255,255,255,255
+pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl3Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl3Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl3Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl3Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
+Pl3Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl3Hero1Block:  db HeroesSpritesBlock1
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+pl3hero2y:		ds  lenghtherotable,255
+pl3hero3y:		ds  lenghtherotable,255
+pl3hero4y:		ds  lenghtherotable,255
+pl3hero5y:		ds  lenghtherotable,255
+pl3hero6y:		ds  lenghtherotable,255
+pl3hero7y:		ds  lenghtherotable,255
+pl3hero8y:		ds  lenghtherotable,255
+
+;pl4amountherosonmap:	db	2
+pl4hero1y:		db	100
+pl4hero1x:		db	100
+pl4hero1type:	db	136		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
+pl4hero1xp: dw 0000
+pl4hero1move:	db	10,20
+pl4hero1mana:	db	10,20
+pl4hero1manarec:db	2		                ;recover x mana every turn
+pl4hero1items:	db	255,255,255,255,255
+pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl4Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
+Pl4Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
+Pl4Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+Pl4Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
+Pl4Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
+Pl4Hero1Block:  db Drasle1SpriteBlock
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+
+pl4hero2y:		ds  lenghtherotable,255
+pl4hero3y:		ds  lenghtherotable,255
+pl4hero4y:		ds  lenghtherotable,255
+pl4hero5y:		ds  lenghtherotable,255
+pl4hero6y:		ds  lenghtherotable,255
+pl4hero7y:		ds  lenghtherotable,255
+pl4hero8y:		ds  lenghtherotable,255
+
+
+
+
+
 
 HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -4112,287 +4430,6 @@ HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx
 
 
 
-pl1hero1y:		db	07
-pl1hero1x:		db	2
-pl1hero1type:	db	0		                  	
-pl1hero1xp: dw 0000
-pl1hero1move:	db	12,20
-pl1hero1mana:	db	10,20
-pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1items:	db	255,255,255,255,255
-pl1hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero1Units:  db 003 | dw 001 |      db 002 | dw 001 |      db 001 | dw 001 |      db 100 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero1SYSX:  dw HeroSYSXUndeadline3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXUndeadline3
-Pl1Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXUndeadline3
-Pl1Hero1Block:  db Undeadline3SpriteBlock
-Pl1Hero1StatAttack:  db 1
-Pl1Hero1StatDefense:  db 1
-Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-
-
-pl1hero2y:		db	7
-pl1hero2x:		db	3
-pl1hero2type:	db	8		                  
-pl1hero2life:	db	05,20
-pl1hero2move:	db	10,20
-pl1hero2mana:	db	10,20
-pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2items:	db	255,255,255,255,255
-pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero2Units:  db 023 | dw 001 |      db 022 | dw 001 |      db 021 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero2Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero2SYSX:  dw HeroSYSXGoemon1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero2DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero2Portrait10x18SYSX: dw HeroPortrait10x18SYSXGoemon1
-Pl1Hero2Portrait14x9SYSX:  dw HeroPortrait14x9SYSXGoemon1
-Pl1Hero2Block:  db Goemon1SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-
-pl1hero3y:		db	07		                ;
-pl1hero3x:		db	04		
-pl1hero3type:	db	16		                
-pl1hero3life:	db	03,20
-pl1hero3move:	db	30,20
-pl1hero3mana:	db	10,20
-pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3items:	db	255,255,255,255,255
-pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero3Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero3SYSX:  dw HeroSYSXPixy ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero3DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero3Portrait10x18SYSX: dw HeroPortrait10x18SYSXPixy
-Pl1Hero3Portrait14x9SYSX:  dw HeroPortrait14x9SYSXPixy
-Pl1Hero3Block:  db PixySpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-
-
-
-
-
-
-
-
-
-
-pl1hero4y:		db	07		                ;
-pl1hero4x:		db	05		
-pl1hero4type:	db	24		                
-pl1hero4life:	db	03,20
-pl1hero4move:	db	30,20
-pl1hero4mana:	db	10,20
-pl1hero4manarec:db	5		                ;recover x mana every turn
-pl1hero4items:	db	255,255,255,255,255
-pl1hero4status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero4Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero4SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero4DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero4Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl1Hero4Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-Pl1Hero4Block:  db Drasle1SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-pl1hero5y:		db	07		                ;
-pl1hero5x:		db	06		
-pl1hero5type:	db	32		                
-pl1hero5life:	db	03,20
-pl1hero5move:	db	30,20
-pl1hero5mana:	db	10,20
-pl1hero5manarec:db	5		                ;recover x mana every turn
-pl1hero5items:	db	255,255,255,255,255
-pl1hero5status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero5Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero5SYSX:  dw HeroSYSXLatok ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero5DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero5Portrait10x18SYSX: dw HeroPortrait10x18SYSXLatok
-Pl1Hero5Portrait14x9SYSX:  dw HeroPortrait14x9SYSXLatok
-Pl1Hero5Block:  db LatokSpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-pl1hero6y:		db	07		                ;
-pl1hero6x:		db	07		
-pl1hero6type:	db	40		                
-pl1hero6life:	db	03,20
-pl1hero6move:	db	30,20
-pl1hero6mana:	db	10,20
-pl1hero6manarec:db	5		                ;recover x mana every turn
-pl1hero6items:	db	255,255,255,255,255
-pl1hero6status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero6Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero6SYSX:  dw HeroSYSXDrasle2 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero6DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero6Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle2
-Pl1Hero6Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle2
-Pl1Hero6Block:  db Drasle2SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-pl1hero7y:		db	07		                ;
-pl1hero7x:		db	08		
-pl1hero7type:	db	48		                
-pl1hero7life:	db	03,20
-pl1hero7move:	db	30,20
-pl1hero7mana:	db	10,20
-pl1hero7manarec:db	5		                ;recover x mana every turn
-pl1hero7items:	db	255,255,255,255,255
-pl1hero7status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero7Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero7SYSX:  dw HeroSYSXSnake1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero7DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero7Portrait10x18SYSX: dw HeroPortrait10x18SYSXSnake1
-Pl1Hero7Portrait14x9SYSX:  dw HeroPortrait14x9SYSXSnake1
-Pl1Hero7Block:  db Snake1SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-pl1hero8y:		db	07		                ;
-pl1hero8x:		db	09		
-pl1hero8type:	db	56		                
-pl1hero8life:	db	03,20
-pl1hero8move:	db	30,20
-pl1hero8mana:	db	10,20
-pl1hero8manarec:db	5		                ;recover x mana every turn
-pl1hero8items:	db	255,255,255,255,255
-pl1hero8status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl1Hero8Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl1Hero8SYSX:  dw HeroSYSXDrasle3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl1Hero8DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl1Hero8Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle3
-Pl1Hero8Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle3
-Pl1Hero8Block:  db Drasle3SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-
-
-
-
-
-
-pl2hero1y:		db	9
-pl2hero1x:		db	6 ;100
-pl2hero1type:	db	24		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl2hero1xp: dw 0000
-pl2hero1move:	db	10,20
-pl2hero1mana:	db	10,20
-pl2hero1manarec:db	2		                ;recover x mana every turn
-pl2hero1items:	db	255,255,255,255,255
-pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl2Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl2Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl2Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl2Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl2Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-Pl2Hero1Block:  db Drasle1SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-pl2hero2y:		ds  lenghtherotable,255
-pl2hero3y:		ds  lenghtherotable,255
-pl2hero4y:		ds  lenghtherotable,255
-pl2hero5y:		ds  lenghtherotable,255
-pl2hero6y:		ds  lenghtherotable,255
-pl2hero7y:		ds  lenghtherotable,255
-pl2hero8y:		ds  lenghtherotable,255
-
-
-;pl3amountherosonmap:	db	2
-pl3hero1y:		db	100
-pl3hero1x:		db	02
-pl3hero1type:	db	96		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl3hero1xp: dw 0000
-pl3hero1move:	db	10,20
-pl3hero1mana:	db	10,20
-pl3hero1manarec:db	2		                ;recover x mana every turn
-pl3hero1items:	db	255,255,255,255,255
-pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl3Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl3Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl3Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl3Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl3Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-Pl3Hero1Block:  db HeroesSpritesBlock1
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-pl3hero2y:		ds  lenghtherotable,255
-pl3hero3y:		ds  lenghtherotable,255
-pl3hero4y:		ds  lenghtherotable,255
-pl3hero5y:		ds  lenghtherotable,255
-pl3hero6y:		ds  lenghtherotable,255
-pl3hero7y:		ds  lenghtherotable,255
-pl3hero8y:		ds  lenghtherotable,255
-
-;pl4amountherosonmap:	db	2
-pl4hero1y:		db	100
-pl4hero1x:		db	100
-pl4hero1type:	db	136		                	;0=adol, 8=goemon, 16=pixie...... 255=no more hero
-pl4hero1xp: dw 0000
-pl4hero1move:	db	10,20
-pl4hero1mana:	db	10,20
-pl4hero1manarec:db	2		                ;recover x mana every turn
-pl4hero1items:	db	255,255,255,255,255
-pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
-Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-Pl4Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
-Pl4Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
-Pl4Hero1DYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-Pl4Hero1Portrait10x18SYSX: dw HeroPortrait10x18SYSXDrasle1
-Pl4Hero1Portrait14x9SYSX:  dw HeroPortrait14x9SYSXDrasle1
-Pl4Hero1Block:  db Drasle1SpriteBlock
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-
-pl4hero2y:		ds  lenghtherotable,255
-pl4hero3y:		ds  lenghtherotable,255
-pl4hero4y:		ds  lenghtherotable,255
-pl4hero5y:		ds  lenghtherotable,255
-pl4hero6y:		ds  lenghtherotable,255
-pl4hero7y:		ds  lenghtherotable,255
-pl4hero8y:		ds  lenghtherotable,255
 
 amountofitems:		equ	4
 lenghtitemtable:	equ	3

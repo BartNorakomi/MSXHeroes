@@ -35,9 +35,24 @@ StartGame:
 
 
 
+CopyRamToVramCorrectedWithoutActivePageSetting:
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  call  .go                             ;go copy
+
+;now set engine back in page 1
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+.go:
+  ld    (AddressToWriteFrom),hl
+  ld    (NXAndNY),bc
+  ld    (AddressToWriteTo),de
+  jr    CopyRamToVramCorrected.AddressesSet
+
+
 CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 ;we set 32kb HeroOverviewGraphics in page 1 and 2
-  ld    a,HeroOverviewGraphicsBlock     ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   call  .go                             ;go copy
@@ -58,7 +73,7 @@ CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   .SetAddress:
   add   hl,de
   ld    (AddressToWriteTo),hl
-
+  .AddressesSet:
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
   di
@@ -130,6 +145,24 @@ LoadCastleOverview:
   call  SetPalette
   ret
 
+;Text8bitNumberStored: ds  1
+TextNumber: ;ds  10
+db  "31456",255
+
+StatusText:
+.attack:        db "3",255
+.defense:       db "1",255
+.knowledge:     db "7",255
+.spellpower:    db "8",255
+.level:         db "03",255
+.xp:            db "0100",255
+.xpnext:        db "1000",255
+.spellpoints:   db "115",255
+.spellpointstot:db "120",255
+.spellrecovery: db "16",255
+.movementpoints:db "19",255
+.movementpointstot:db "24",255
+
 HeroOverViewFirstWindowButtonOffSX:           equ 008
 HeroOverViewFirstWindowButtonOffSY:           equ 122
 HeroOverViewFirstWindowButtonMouseOverSX:     equ 008
@@ -145,33 +178,30 @@ HeroOverViewFirstWindowButton4DY:   equ HeroOverViewFirstWindowchoicesDY + 047 +
 HeroOverViewFirstWindowButton5DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (4 * 14)
 HeroOverViewFirstWindowButton6DY:   equ HeroOverViewFirstWindowchoicesDY + 047 + (5 * 14) ;non existing, but in use
 
-ButtonTableLenght:                equ 7
+ButtonTableLenght:                equ 9
 HeroOverviewWindowButton_de:      equ 0
 HeroOverviewWindowButtonStatus:   equ 2
 HeroOverviewWindowButtonYtop:     equ 3
 HeroOverviewWindowButtonYbottom:  equ 4
 HeroOverviewWindowButtonXleft:    equ 5
 HeroOverviewWindowButtonXright:   equ 6
+TextAddress:                      equ 7
 HeroOverviewWindowAmountOfButtons:equ -1
 
 HeroOverviewFirstWindowButtonTableAmountOfButtons:  db  5
-HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright
-  dw  $0000 + (HeroOverViewFirstWindowButton1DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton1DY,HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
-  dw  $0000 + (HeroOverViewFirstWindowButton2DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
-  dw  $0000 + (HeroOverViewFirstWindowButton3DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
-  dw  $0000 + (HeroOverViewFirstWindowButton4DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
-  dw  $0000 + (HeroOverViewFirstWindowButton5DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton6DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX
-
-
-
-
+HeroOverviewFirstWindowButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                        button text address
+  dw  $0000 + (HeroOverViewFirstWindowButton1DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton1DY,HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX | dw TextFirstWindowChoicesButton1
+  dw  $0000 + (HeroOverViewFirstWindowButton2DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton2DY,HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX | dw TextFirstWindowChoicesButton2
+  dw  $0000 + (HeroOverViewFirstWindowButton3DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton3DY,HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX | dw TextFirstWindowChoicesButton3
+  dw  $0000 + (HeroOverViewFirstWindowButton4DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton4DY,HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX | dw TextFirstWindowChoicesButton4
+  dw  $0000 + (HeroOverViewFirstWindowButton5DY*128) + (HeroOverViewFirstWindowButton1DX/2) | db %1000 0011, HeroOverViewFirstWindowButton5DY,HeroOverViewFirstWindowButton6DY,HeroOverViewFirstWindowButton1DX,HeroOverViewFirstWindowButton1DX+HeroOverViewFirstWindowchoicesNX | dw TextFirstWindowChoicesButton5
 
 HeroOverViewSkillsButtonOffSX:           equ 096
-HeroOverViewSkillsButtonOffSY:           equ 139
+HeroOverViewSkillsButtonOffSY:           equ 139-1
 HeroOverViewSkillsButtonMouseOverSX:     equ 096
-HeroOverViewSkillsButtonMouseOverSY:     equ 150
+HeroOverViewSkillsButtonMouseOverSY:     equ 150-1
 HeroOverViewSkillsButtonMouseClickedSX:  equ 096
-HeroOverViewSkillsButtonMouseClickedSY:  equ 161
+HeroOverViewSkillsButtonMouseClickedSY:  equ 161-1
 
 HeroOverViewSkillsButton1DX:   equ HeroOverViewSkillsWindowDX + 008
 HeroOverViewSkillsButton1DY:   equ HeroOverViewSkillsWindowDY + 025 + (0 * 14)
@@ -183,19 +213,45 @@ HeroOverViewSkillsButton6DY:   equ HeroOverViewSkillsWindowDY + 025 + (5 * 14)
 HeroOverViewSkillsButton7DY:   equ HeroOverViewSkillsWindowDY + 025 + (6 * 14) 
 HeroOverViewSkillsButton8DY:   equ HeroOverViewSkillsWindowDY + 025 + (7 * 14) ;non existing, but in use
 
-
-
-
-
 HeroOverviewSkillsButtonTableAmountOfButtons:  db  6
-HeroOverviewSkillsButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright
-  dw  $0000 + (HeroOverViewSkillsButton1DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton1DY,HeroOverViewSkillsButton2DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
-  dw  $0000 + (HeroOverViewSkillsButton2DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton2DY,HeroOverViewSkillsButton3DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
-  dw  $0000 + (HeroOverViewSkillsButton3DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton3DY,HeroOverViewSkillsButton4DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
-  dw  $0000 + (HeroOverViewSkillsButton4DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton4DY,HeroOverViewSkillsButton5DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
-  dw  $0000 + (HeroOverViewSkillsButton5DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton5DY,HeroOverViewSkillsButton6DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
-  dw  $0000 + (HeroOverViewSkillsButton6DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton6DY,HeroOverViewSkillsButton7DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX
+HeroOverviewSkillsButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                         button text address
+  dw  $0000 + (HeroOverViewSkillsButton1DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton1DY,HeroOverViewSkillsButton2DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton1
+  dw  $0000 + (HeroOverViewSkillsButton2DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton2DY,HeroOverViewSkillsButton3DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton2
+  dw  $0000 + (HeroOverViewSkillsButton3DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton3DY,HeroOverViewSkillsButton4DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton3
+  dw  $0000 + (HeroOverViewSkillsButton4DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton4DY,HeroOverViewSkillsButton5DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton4
+  dw  $0000 + (HeroOverViewSkillsButton5DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton5DY,HeroOverViewSkillsButton6DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton5
+  dw  $0000 + (HeroOverViewSkillsButton6DY*128) + (HeroOverViewSkillsButton1DX/2) | db %1000 0011, HeroOverViewSkillsButton6DY,HeroOverViewSkillsButton7DY,HeroOverViewSkillsButton1DX,HeroOverViewSkillsButton1DX+HeroOverViewSkillsWindowNX | dw TextSkillsWindowButton6
 
+ActivatedSkillsButton:  ds  2
+PreviousActivatedSkillsButton:  ds  2
+SetSkillsDescription?:  db  1
+MenuOptionSelected?:  db  0
+
+LenghtTextSkillsDescription:  equ 24
+TextSkillsWindowButton1:  db  "basic archery          ",255
+                          db  "basic archery          ",254
+                          db  "ranged attack damage   ",254
+                          db  "is increased by 10%    ",255
+TextSkillsWindowButton2:  db  "advanced resistance    ",255
+                          db  "advanced resistance    ",254
+                          db  "10% chance to block    ",254
+                          db  "spells                 ",255
+TextSkillsWindowButton3:  db  "basic estates          ",255
+                          db  "basic estates          ",254
+                          db  "125 gold per day       ",254
+                          db  "                       ",255
+TextSkillsWindowButton4:  db  "expert logistics       ",255
+                          db  "expert logistics       ",254
+                          db  "increases land movement",254
+                          db  "range of hero by 30%   ",255
+TextSkillsWindowButton5:  db  "                       ",255
+                          db  "                       ",254
+                          db  "                       ",254
+                          db  "                       ",255
+TextSkillsWindowButton6:  db  "                       ",255
+                          db  "                       ",254
+                          db  "                       ",254
+                          db  "                       ",255
 
 ButtonOff:  equ 0
 ButtonMouseOver:  equ 2
@@ -211,6 +267,15 @@ ButtonTableSkillsSYSX:
   dw  $4000 + (HeroOverViewSkillsButtonMouseClickedSY*128) + (HeroOverViewSkillsButtonMouseClickedSX/2) - 128
 
 BCStored: ds 2
+TextAddresspointer: ds 2
+TextPointer:  db  0
+TextDX:  ds 1
+
+PutLetter:
+  db    000,000,212,000                 ;sx,--,sy,spage
+  db    010,000,010,001                 ;dx,--,dy,dpage
+  db    005,000,005,000                 ;nx,--,ny,--
+  db    000,000,$98              ;fast copy -> Copy from right to left     
 
 ResetAllControls:
   xor   a
@@ -233,6 +298,7 @@ SetHeroOverviewMenuInPage1ROM:
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (SetHeroOverViewMenu?),a
 
   call  ClearMapPage0AndMapPage1
   call  ResetAllControls
