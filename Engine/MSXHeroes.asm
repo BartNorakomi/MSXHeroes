@@ -572,7 +572,16 @@ dephase
 ;
 HeroOverviewStatusGraphicsBlock:  equ   $1d
 phase	$4000
-  incbin "..\grapx\HeroOverview\StatusWindow.SC5",7,116 * 128      ;212 lines
+  incbin "..\grapx\HeroOverview\StatusWindow.SC5",7,116 * 128      ;116 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $1f - 20
+;
+SpellBookGraphicsBlock:  equ   $1f
+phase	$4000
+  incbin "..\grapx\HeroOverview\SpellBook.SC5",7,200 * 128      ;184 lines
 	ds		$c000-$,$ff
 dephase
 

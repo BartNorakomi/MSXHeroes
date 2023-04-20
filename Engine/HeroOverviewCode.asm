@@ -27,20 +27,769 @@ HeroOverViewStatusWindowSY:   equ 000
 HeroOverViewStatusWindowDX:   equ 028
 HeroOverViewStatusWindowDY:   equ 040
 HeroOverViewStatusWindowNX:   equ 150
-HeroOverViewStatusWindowNY:   equ 116 ;-1
+HeroOverViewStatusWindowNY:   equ 116
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewSpellBookWindowSX:   equ 000
+HeroOverViewSpellBookWindowSY:   equ 000
+HeroOverViewSpellBookWindowDX:   equ 006
+HeroOverViewSpellBookWindowDY:   equ 009
+HeroOverViewSpellBookWindowNX:   equ 192
+HeroOverViewSpellBookWindowNY:   equ 184
+
+HeroOverViewSpellBookWindowButton1NY:  equ 035 - 1
+HeroOverViewSpellBookWindowButton1NX:  equ 010
+
+HeroOverViewSpellBookWindowButton2NY:  equ 029 - 1
+HeroOverViewSpellBookWindowButton2NX:  equ 010
+
+HeroOverViewSpellBookWindowButton3NY:  equ 023 - 1
+HeroOverViewSpellBookWindowButton3NX:  equ 010
+
+HeroOverViewSpellBookWindowButton4NY:  equ 035
+HeroOverViewSpellBookWindowButton4NX:  equ 010
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewSpellBackdropSX:   equ 192
+HeroOverViewSpellBackdropSY:   equ 122
+HeroOverViewSpell1backdropDY:  equ HeroOverViewSpellBookWindowDY + 044
+HeroOverViewSpell1backdropDX:  equ HeroOverViewSpellBookWindowDX + 034
+HeroOverViewSpellbackdropNX:   equ 028
+HeroOverViewSpellbackdropNY:   equ 028
+
+HeroOverViewSpell2backdropDY:  equ HeroOverViewSpellBookWindowDY + 048
+HeroOverViewSpell2backdropDX:  equ HeroOverViewSpellBookWindowDX + 064
+HeroOverViewSpell3backdropDY:  equ HeroOverViewSpellBookWindowDY + 089
+HeroOverViewSpell3backdropDX:  equ HeroOverViewSpellBookWindowDX + 032
+HeroOverViewSpell4backdropDY:  equ HeroOverViewSpellBookWindowDY + 093
+HeroOverViewSpell4backdropDX:  equ HeroOverViewSpellBookWindowDX + 062
+HeroOverViewSpell5backdropDY:  equ HeroOverViewSpellBookWindowDY + 048
+HeroOverViewSpell5backdropDX:  equ HeroOverViewSpellBookWindowDX + 102
+HeroOverViewSpell6backdropDY:  equ HeroOverViewSpellBookWindowDY + 044
+HeroOverViewSpell6backdropDX:  equ HeroOverViewSpellBookWindowDX + 132
+HeroOverViewSpell7backdropDY:  equ HeroOverViewSpellBookWindowDY + 093
+HeroOverViewSpell7backdropDX:  equ HeroOverViewSpellBookWindowDX + 104
+HeroOverViewSpell8backdropDY:  equ HeroOverViewSpellBookWindowDY + 089
+HeroOverViewSpell8backdropDX:  equ HeroOverViewSpellBookWindowDX + 134
+
+;earth
+Spell01IconSX:   equ 224
+Spell01IconSY:   equ 000
+Spell02IconSX:   equ 224
+Spell02IconSY:   equ 016
+Spell03IconSX:   equ 224
+Spell03IconSY:   equ 032
+Spell04IconSX:   equ 224
+Spell04IconSY:   equ 048
+;fire
+Spell05IconSX:   equ 224
+Spell05IconSY:   equ 064
+Spell06IconSX:   equ 224
+Spell06IconSY:   equ 080
+Spell07IconSX:   equ 224
+Spell07IconSY:   equ 096
+Spell08IconSX:   equ 224
+Spell08IconSY:   equ 112
+;air
+Spell09IconSX:   equ 224
+Spell09IconSY:   equ 128
+Spell10IconSX:   equ 224
+Spell10IconSY:   equ 144
+Spell11IconSX:   equ 224
+Spell11IconSY:   equ 160
+Spell12IconSX:   equ 224
+Spell12IconSY:   equ 176
+;water
+Spell13IconSX:   equ 000
+Spell13IconSY:   equ 184
+Spell14IconSX:   equ 032
+Spell14IconSY:   equ 184
+Spell15IconSX:   equ 064
+Spell15IconSY:   equ 184
+Spell16IconSX:   equ 096
+Spell16IconSY:   equ 184
+;all spellschools
+Spell17IconSX:   equ 128
+Spell17IconSY:   equ 184
+Spell18IconSX:   equ 160
+Spell18IconSY:   equ 184
+Spell19IconSX:   equ 192
+Spell19IconSY:   equ 184
+Spell20IconSX:   equ 192
+Spell20IconSY:   equ 168
+
+
+Spell1DY:  equ HeroOverViewSpellBookWindowDY + 050
+Spell1DX:  equ HeroOverViewSpellBookWindowDX + 040
+Spell2DY:  equ HeroOverViewSpellBookWindowDY + 054
+Spell2DX:  equ HeroOverViewSpellBookWindowDX + 070
+Spell3DY:  equ HeroOverViewSpellBookWindowDY + 095
+Spell3DX:  equ HeroOverViewSpellBookWindowDX + 038
+Spell4DY:  equ HeroOverViewSpellBookWindowDY + 099
+Spell4DX:  equ HeroOverViewSpellBookWindowDX + 068
+Spell5DY:  equ HeroOverViewSpellBookWindowDY + 054
+Spell5DX:  equ HeroOverViewSpellBookWindowDX + 108
+Spell6DY:  equ HeroOverViewSpellBookWindowDY + 050
+Spell6DX:  equ HeroOverViewSpellBookWindowDX + 138
+Spell7DY:  equ HeroOverViewSpellBookWindowDY + 099
+Spell7DX:  equ HeroOverViewSpellBookWindowDX + 110
+Spell8DY:  equ HeroOverViewSpellBookWindowDY + 095
+Spell8DX:  equ HeroOverViewSpellBookWindowDX + 140
+
+SpellIconNX:   equ 016
+SpellIconNY:   equ 016
+
+PlaceWaterSpellsInSpellBook:
+  ld    ix,(plxcurrentheroAddress)
+
+  ;earth spells
+  bit   0,(ix+HeroWaterSpells)
+  jr    z,.EndPlaceWaterSpell1
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  ld    hl,$4000 + (Spell13IconSY*128) + (Spell13IconSX/2) -128
+  ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceWaterSpell1:
+
+  bit   1,(ix+HeroWaterSpells)
+  jr    z,.EndPlaceWaterSpell2
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell14IconSY*128) + (Spell14IconSX/2) -128
+  ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceWaterSpell2:
+
+  bit   2,(ix+HeroWaterSpells)
+  jr    z,.EndPlaceWaterSpell3
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell15IconSY*128) + (Spell15IconSX/2) -128
+  ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceWaterSpell3:
+
+  bit   3,(ix+HeroWaterSpells)
+  jr    z,.EndPlaceWaterSpell4
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell16IconSY*128) + (Spell16IconSX/2) -128
+  ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceWaterSpell4:
+  jp    PlaceAllSpellSchoolSpellsInSpellBook
+
+PlaceAirSpellsInSpellBook:
+  ld    ix,(plxcurrentheroAddress)
+
+  ;earth spells
+  bit   0,(ix+HeroAirSpells)
+  jr    z,.EndPlaceAirSpell1
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  ld    hl,$4000 + (Spell09IconSY*128) + (Spell09IconSX/2) -128
+  ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAirSpell1:
+
+  bit   1,(ix+HeroAirSpells)
+  jr    z,.EndPlaceAirSpell2
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell10IconSY*128) + (Spell10IconSX/2) -128
+  ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAirSpell2:
+
+  bit   2,(ix+HeroAirSpells)
+  jr    z,.EndPlaceAirSpell3
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell11IconSY*128) + (Spell11IconSX/2) -128
+  ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAirSpell3:
+
+  bit   3,(ix+HeroAirSpells)
+  jr    z,.EndPlaceAirSpell4
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell12IconSY*128) + (Spell12IconSX/2) -128
+  ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAirSpell4:
+  jp    PlaceAllSpellSchoolSpellsInSpellBook
+  
+PlaceFireSpellsInSpellBook:
+  ld    ix,(plxcurrentheroAddress)
+
+  ;earth spells
+  bit   0,(ix+HeroFireSpells)
+  jr    z,.EndPlaceFireSpell1
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  ld    hl,$4000 + (Spell05IconSY*128) + (Spell05IconSX/2) -128
+  ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceFireSpell1:
+
+  bit   1,(ix+HeroFireSpells)
+  jr    z,.EndPlaceFireSpell2
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell06IconSY*128) + (Spell06IconSX/2) -128
+  ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceFireSpell2:
+
+  bit   2,(ix+HeroFireSpells)
+  jr    z,.EndPlaceFireSpell3
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell07IconSY*128) + (Spell07IconSX/2) -128
+  ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceFireSpell3:
+
+  bit   3,(ix+HeroFireSpells)
+  jr    z,.EndPlaceFireSpell4
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell08IconSY*128) + (Spell08IconSX/2) -128
+  ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceFireSpell4:
+  jp    PlaceAllSpellSchoolSpellsInSpellBook
+
+
+PlaceEarthSpellsInSpellBook:
+  ld    ix,(plxcurrentheroAddress)
+
+  ;earth spells
+  bit   0,(ix+HeroEarthSpells)
+  jr    z,.EndPlaceEarthSpell1
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  ld    hl,$4000 + (Spell01IconSY*128) + (Spell01IconSX/2) -128
+  ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceEarthSpell1:
+
+  bit   1,(ix+HeroEarthSpells)
+  jr    z,.EndPlaceEarthSpell2
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell02IconSY*128) + (Spell02IconSX/2) -128
+  ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceEarthSpell2:
+
+  bit   2,(ix+HeroEarthSpells)
+  jr    z,.EndPlaceEarthSpell3
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell03IconSY*128) + (Spell03IconSX/2) -128
+  ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceEarthSpell3:
+
+  bit   3,(ix+HeroEarthSpells)
+  jr    z,.EndPlaceEarthSpell4
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell04IconSY*128) + (Spell04IconSX/2) -128
+  ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceEarthSpell4:
+  jp    PlaceAllSpellSchoolSpellsInSpellBook
+
+PlaceAllSpellSchoolSpellsInSpellBook:
+  ld    ix,(plxcurrentheroAddress)
+  ;all spellschools
+  bit   0,(ix+HeroAllSchoolsSpells)
+  jr    z,.EndPlaceAllSchoolsSpell1  
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell5backdropDY*128) + (HeroOverViewSpell5backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
+  ld    de,$0000 + (Spell5DY*128) + (Spell5DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAllSchoolsSpell1:
+
+  bit   1,(ix+HeroAllSchoolsSpells)
+  jr    z,.EndPlaceAllSchoolsSpell2  
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell6backdropDY*128) + (HeroOverViewSpell6backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
+  ld    de,$0000 + (Spell6DY*128) + (Spell6DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAllSchoolsSpell2:
+
+  bit   2,(ix+HeroAllSchoolsSpells)
+  jr    z,.EndPlaceAllSchoolsSpell3  
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell7backdropDY*128) + (HeroOverViewSpell7backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
+  ld    de,$0000 + (Spell7DY*128) + (Spell7DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAllSchoolsSpell3:
+
+  bit   3,(ix+HeroAllSchoolsSpells)
+  jr    z,.EndPlaceAllSchoolsSpell4
+  ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpell8backdropDY*128) + (HeroOverViewSpell8backdropDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
+  ld    de,$0000 + (Spell8DY*128) + (Spell8DX/2)
+  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  .EndPlaceAllSchoolsSpell4:
+  ret
+
+
+HeroOverviewSpellBookWindowCode_Water:
+  call  ResetStatusSpellBookButtons
+  call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ActivateButton_Water
+  call  PlaceWaterSpellsInSpellBook
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ActivateButton_Water
+  call  PlaceWaterSpellsInSpellBook
+
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Water
+  ld    iy,ButtonTableSpellBookSYSX_Water
+  call  CheckButtonMouseInteraction
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.MenuOptionSelected
+
+  call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Water
+  call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,AirSelected
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,FireSelected
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,EarthSelected
+  ret
+
+HeroOverviewSpellBookWindowCode_Air:
+  call  ResetStatusSpellBookButtons
+  call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ActivateButton_Air
+  call  PlaceAirSpellsInSpellBook
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ActivateButton_Air
+  call  PlaceAirSpellsInSpellBook
+
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Air
+  ld    iy,ButtonTableSpellBookSYSX_Air
+  call  CheckButtonMouseInteraction
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.MenuOptionSelected
+
+  call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Air
+  call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,WaterSelected
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,FireSelected
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,EarthSelected
+  ret
+  
+HeroOverviewSpellBookWindowCode_Fire:
+  call  ResetStatusSpellBookButtons
+  call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ActivateButton_Fire
+  call  PlaceFireSpellsInSpellBook
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ActivateButton_Fire
+  call  PlaceFireSpellsInSpellBook
+
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Fire
+  ld    iy,ButtonTableSpellBookSYSX_Fire
+  call  CheckButtonMouseInteraction
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.MenuOptionSelected
+
+  call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Fire
+  call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,WaterSelected
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,AirSelected
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,EarthSelected
+  ret
+
+
+HeroOverviewSpellBookWindowCode_Earth:
+  call  ResetStatusSpellBookButtons
+  call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ActivateButton_Earth
+  call  PlaceEarthSpellsInSpellBook
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ActivateButton_Earth
+  call  PlaceEarthSpellsInSpellBook
+
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Earth
+  ld    iy,ButtonTableSpellBookSYSX_Earth
+  call  CheckButtonMouseInteraction
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.MenuOptionSelected
+
+  call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewSpellBookButtonTable_Earth
+  call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,WaterSelected
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,AirSelected
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jp    z,FireSelected
+  ret
+
+EarthSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSpellBookWindowCode_Earth
+
+FireSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSpellBookWindowCode_Fire
+
+AirSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSpellBookWindowCode_Air
+  
+WaterSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSpellBookWindowCode_Water
+
+
+
+ResetStatusSpellBookButtons:  
+  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ld    (HeroOverviewSkillsButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ret
+
+ActivateButton_Earth:
+  ld    ix,HeroOverviewSpellBookButtonTable_Earth_Activated
+  ld    iy,ButtonTableSpellBookSYSX_Earth_Activated
+  jr    SetElementalButton
+
+ActivateButton_Fire:
+  ld    ix,HeroOverviewSpellBookButtonTable_Fire_Activated
+  ld    iy,ButtonTableSpellBookSYSX_Fire_Activated
+  jr    SetElementalButton
+
+ActivateButton_Air:
+  ld    ix,HeroOverviewSpellBookButtonTable_Air_Activated
+  ld    iy,ButtonTableSpellBookSYSX_Air_Activated
+  jr    SetElementalButton
+
+ActivateButton_Water:
+  ld    ix,HeroOverviewSpellBookButtonTable_Water_Activated
+  ld    iy,ButtonTableSpellBookSYSX_Water_Activated
+  jr    SetElementalButton
+
+SetElementalButton:
+  ld    l,(iy+ButtonOMouseClicked)
+  ld    h,(iy+ButtonOMouseClicked+1)
+  
+  ld    e,(ix+HeroOverviewWindowButton_de)
+  ld    d,(ix+HeroOverviewWindowButton_de+1)
+
+  ld    c,(ix+Buttonnynx)
+  ld    b,(ix+Buttonnynx+1)
+
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
 
 HeroOverviewStatusWindowCode:
   call  SetHeroOverViewStatusWindow     ;set skills Window in inactive page
   call  SetStatusTextAttack
   call  SwapAndSetPage                  ;swap and set page
-;  call  SetHeroOverViewStatusWindow     ;set skills Window in inactive page
-;  call  SetStatusTextAttack
 
   .engine:
   call  PopulateControls                ;read out keys
-  call  CheckEndHeroOverviewStatus       ;check if mouse is clicked outside of window. If so, return to game
+  call  CheckEndHeroOverviewStatus      ;check if mouse is clicked outside of window. If so, return to game
   halt
   jp  .engine
+
+HeroOverviewSkillsWindowCode:
+  call  SetHeroSkillsInTable
+
+  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ld    (HeroOverviewSkillsButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewSkillsButtonTable + 5*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+
+  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
+
+  ld    ix,HeroOverviewSkillsButtonTable
+  ld    iy,ButtonTableSkillsSYSX
+  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
+  call  SetButtonStatusAndText          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
+
+  .engine:
+  call  PopulateControls                ;read out keys
+  ld    ix,HeroOverviewSkillsButtonTable
+  ld    iy,ButtonTableSkillsSYSX
+
+  call  CheckButtonMouseInteraction
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.MenuOptionSelected
+
+  call  SetSkillExplanation             ;when clicking on a skill, the explanation will appear
+  call  CheckEndHeroOverviewSkills      ;check if mouse is clicked outside of window. If so, return to game
+  ld    ix,HeroOverviewSkillsButtonTable
+  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
+  call  SetButtonStatusAndText          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+ 
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a
+  ld    (ActivatedSkillsButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  jp    HeroOverviewSkillsWindowCode
+  
+HeroOverviewCode:
+  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ld    (HeroOverviewFirstWindowButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewFirstWindowButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewFirstWindowButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewFirstWindowButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    (HeroOverviewFirstWindowButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+
+  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+  call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
+
+  ld    ix,HeroOverviewFirstWindowButtonTable
+  ld    iy,ButtonTableSYSX
+  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+  call  SetButtonStatusAndText          ;copies button state from rom -> vram
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
+
+  .engine:
+  call  PopulateControls                ;read out keys
+  ld    ix,HeroOverviewFirstWindowButtonTable
+  ld    iy,ButtonTableSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jr    nz,.MenuOptionSelected
+
+  call  CheckEndHeroOverviewFirstWindow ;check if mouse is clicked outside of window. If so, return to game
+
+  ld    ix,HeroOverviewFirstWindowButtonTable
+  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+  call  SetButtonStatusAndText          ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+
+  halt
+  jp  .engine
+
+  .MenuOptionSelected:
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jr    z,.StatusSelected
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jr    z,.SpellBookSelected
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jr    z,.SkillsSelected
+
+  xor   a
+  ld    (MenuOptionSelected?),a
+  ret
+
+  .StatusSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewStatusWindowCode
+
+  .SpellBookSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSpellBookWindowCode_Earth
+  
+  .SkillsSelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewSkillsWindowCode
+
 
 SetStatusTextAttack:
   ld    ix,(plxcurrentheroAddress)
@@ -300,168 +1049,26 @@ ConvertToDecimal:
 
 
 
+CheckEndHeroOverviewSpellBook:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
 
-
-  ld    a,HeroOverViewStatusWindowDX + 090
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 59
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.xpnext
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go  
-
-  ld    a,HeroOverViewStatusWindowDX + 092
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 73
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.spellpoints
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go  
-
-  ld    a,HeroOverViewStatusWindowDX + 116
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 73
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.spellpointstot
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go  
-
-  ld    a,HeroOverViewStatusWindowDX + 097
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 87
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.spellrecovery
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go  
-
-  ld    a,HeroOverViewStatusWindowDX + 105
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 101
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.movementpoints
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go  
-
-  ld    a,HeroOverViewStatusWindowDX + 124
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewStatusWindowDY + 101
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    hl,StatusText.movementpointstot
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go  
-
-HeroOverviewSkillsWindowCode:
-  call  SetHeroSkillsInTable
-
-  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
-  ld    (HeroOverviewSkillsButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 5*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-
-  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
-
-  ld    ix,HeroOverviewSkillsButtonTable
-  ld    iy,ButtonTableSkillsSYSX
-  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
-  call  SetButtonStatusAndText          ;copies button state from rom -> vram
-  call  SwapAndSetPage                  ;swap and set page
-  call  SetHeroOverViewSkillsWindow     ;set skills Window in inactive page
-
-  .engine:
-  call  PopulateControls                ;read out keys
-  ld    ix,HeroOverviewSkillsButtonTable
-  ld    iy,ButtonTableSkillsSYSX
-
-  call  CheckButtonMouseInteraction
-  ld    a,(MenuOptionSelected?)
-  or    a
-  jp    nz,.MenuOptionSelected
-
-  call  SetSkillExplanation             ;when clicking on a skill, the explanation will appear
-  call  CheckEndHeroOverviewSkills      ;check if mouse is clicked outside of window. If so, return to game
-  ld    ix,HeroOverviewSkillsButtonTable
-  ld    bc,$0000 + (HeroOverViewSkillsWindowButtonNY*256) + (HeroOverViewSkillsWindowButtonNX/2)
-  call  SetButtonStatusAndText          ;copies button state from rom -> vram
-  call  SwapAndSetPage                  ;swap and set page  
- 
-  halt
-  jp  .engine
-
-  .MenuOptionSelected:
-  xor   a
-  ld    (MenuOptionSelected?),a
-  ld    (ActivatedSkillsButton),ix
-  ld    a,3
-  ld    (SetSkillsDescription?),a  
-  jp    HeroOverviewSkillsWindowCode
+  ld    a,(spat+0)                      ;y mouse
+  cp    HeroOverViewSpellBookWindowDY
+  jr    c,.NotOverHeroOverViewSpellBookWindow
+  cp    HeroOverViewSpellBookWindowDY+HeroOverViewSpellBookWindowNY
+  jr    nc,.NotOverHeroOverViewSpellBookWindow
   
-HeroOverviewCode:
-  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
-  ld    (HeroOverviewFirstWindowButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewFirstWindowButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewFirstWindowButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewFirstWindowButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewFirstWindowButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+  ld    a,(spat+1)                      ;x mouse
+  cp    HeroOverViewSpellBookWindowDX
+  jr    c,.NotOverHeroOverViewSpellBookWindow
+  cp    HeroOverViewSpellBookWindowDX+HeroOverViewSpellBookWindowNX
+  ret   c
 
-  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
-  call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
-
-  ld    ix,HeroOverviewFirstWindowButtonTable
-  ld    iy,ButtonTableSYSX
-  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
-  call  SetButtonStatusAndText          ;copies button state from rom -> vram
-
-  call  SwapAndSetPage                  ;swap and set page
-  call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
-
-  .engine:
-  call  PopulateControls                ;read out keys
-  ld    ix,HeroOverviewFirstWindowButtonTable
-  ld    iy,ButtonTableSYSX
-  call  CheckButtonMouseInteraction
-
-  ld    a,(MenuOptionSelected?)
-  or    a
-  jr    nz,.MenuOptionSelected
-
-  call  CheckEndHeroOverviewFirstWindow ;check if mouse is clicked outside of window. If so, return to game
-
-  ld    ix,HeroOverviewFirstWindowButtonTable
-  ld    bc,$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
-  call  SetButtonStatusAndText          ;copies button state from rom -> vram
-  call  SwapAndSetPage                  ;swap and set page  
-
-  halt
-  jp  .engine
-
-  .MenuOptionSelected:
-  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  jr    z,.StatusSelected
-  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  jr    z,.SkillsSelected
-
-  xor   a
-  ld    (MenuOptionSelected?),a
-  ret
-
-  .StatusSelected:
-  xor   a
-  ld    (MenuOptionSelected?),a  
-  jp    HeroOverviewStatusWindowCode
-  
-  .SkillsSelected:
-  xor   a
-  ld    (MenuOptionSelected?),a  
-  jp    HeroOverviewSkillsWindowCode
+  .NotOverHeroOverViewSpellBookWindow:
+  pop   af
+  ret   
 
 CheckEndHeroOverviewStatus:
 	ld		a,(NewPrContr)
@@ -637,6 +1244,66 @@ MenuOptionSelected:
   ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
   ld    (MenuOptionSelected?),a
   pop   af                                    ;pop the call in the button check loop 
+  ret
+
+SetButtonStatusAndText2:                       ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
+;  ld    ix,HeroOverviewSpellBookButtonTable
+;  ld    iy,ButtonTableSpellBookSYSX
+;  ld    bc,$0000 + (HeroOverViewSpellBookWindowButtonNY*256) + (HeroOverViewSpellBookWindowButtonNX/2)
+
+  ld    (BCStored),bc
+
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,ButtonTableLenght
+  add   ix,de
+
+
+  ld    de,6                            ;lenght of button data
+  add   iy,de
+
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   0,(ix+HeroOverviewWindowButtonStatus)
+  jr    nz,.bit0isSet
+  bit   1,(ix+HeroOverviewWindowButtonStatus)
+  ret   z
+  
+  .bit1isSet:
+  res   1,(ix+HeroOverviewWindowButtonStatus)
+  jr    .goCopyButton
+  .bit0isSet:
+  res   0,(ix+HeroOverviewWindowButtonStatus)  
+  .goCopyButton:
+
+  bit   7,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOff)
+  ld    h,(iy+ButtonOff+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   6,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonMouseOver)
+  ld    h,(iy+ButtonMouseOver+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+;  bit   5,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOMouseClicked)
+  ld    h,(iy+ButtonOMouseClicked+1)
+  .go:
+  
+  ld    e,(ix+HeroOverviewWindowButton_de)
+  ld    d,(ix+HeroOverviewWindowButton_de+1)
+  ld    bc,(BCStored)
+
+  ld    c,(ix+Buttonnynx)
+  ld    b,(ix+Buttonnynx+1)
+
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText:                        ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
@@ -1028,11 +1695,16 @@ SetHeroOverViewSkillsWindow:
   ld    a,HeroOverviewGraphicsBlock     ;Map block
   jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
-
 SetHeroOverViewStatusWindow:
   ld    hl,$4000 + (HeroOverViewStatusWindowSY*128) + (HeroOverViewStatusWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewStatusWindowDY*128) + (HeroOverViewStatusWindowDX/2)
   ld    bc,$0000 + (HeroOverViewStatusWindowNY*256) + (HeroOverViewStatusWindowNX/2)
   ld    a,HeroOverviewStatusGraphicsBlock;Map block
+  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetHeroOverViewSpellBookWindow:
+  ld    hl,$4000 + (HeroOverViewSpellBookWindowSY*128) + (HeroOverViewSpellBookWindowSX/2) -128
+  ld    de,$0000 + (HeroOverViewSpellBookWindowDY*128) + (HeroOverViewSpellBookWindowDX/2)
+  ld    bc,$0000 + (HeroOverViewSpellBookWindowNY*256) + (HeroOverViewSpellBookWindowNX/2)
+  ld    a,SpellBookGraphicsBlock;Map block
   jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

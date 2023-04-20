@@ -4043,8 +4043,13 @@ HeroStatKnowledge:      equ 54
 HeroStatSpelldamage:    equ 55
 HeroSkills:             equ 56
 HeroLevel:              equ 62
+HeroEarthSpells:        equ 63
+HeroFireSpells:         equ 64
+HeroAirSpells:          equ 65
+HeroWaterSpells:        equ 66
+HeroAllSchoolsSpells:   equ 67
 
-AddToHeroTable: equ 9
+;AddToHeroTable: equ 9
 
 
 
@@ -4071,7 +4076,11 @@ Pl1Hero1StatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  67
-
+.EarthSpells:       db  %0000 0111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1011
+.AirSpells:         db  %0000 1101
+.WaterSpells:       db  %0000 1110
+.AllSchoolsSpells:  db  %0000 1111
 
 pl1hero2y:		db	7
 pl1hero2x:		db	3
@@ -4095,6 +4104,11 @@ Pl1Hero2Block:  db Goemon1SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  4,7,10,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 
@@ -4120,6 +4134,11 @@ Pl1Hero3Block:  db PixySpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  8,17,24,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 
@@ -4154,6 +4173,11 @@ Pl1Hero4Block:  db Drasle1SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 pl1hero5y:		db	07		                ;
@@ -4178,6 +4202,11 @@ Pl1Hero5Block:  db LatokSpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 pl1hero6y:		db	07		                ;
@@ -4202,6 +4231,11 @@ Pl1Hero6Block:  db Drasle2SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 pl1hero7y:		db	07		                ;
@@ -4226,6 +4260,11 @@ Pl1Hero7Block:  db Snake1SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 pl1hero8y:		db	07		                ;
@@ -4250,6 +4289,11 @@ Pl1Hero8Block:  db Drasle3SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 
 
@@ -4279,6 +4323,11 @@ Pl2Hero1Block:  db Drasle1SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 pl2hero2y:		ds  lenghtherotable,255
 pl2hero3y:		ds  lenghtherotable,255
@@ -4312,6 +4361,11 @@ Pl3Hero1Block:  db HeroesSpritesBlock1
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 pl3hero2y:		ds  lenghtherotable,255
 pl3hero3y:		ds  lenghtherotable,255
@@ -4344,6 +4398,11 @@ Pl4Hero1Block:  db Drasle1SpriteBlock
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,0
 .HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 
 pl4hero2y:		ds  lenghtherotable,255
 pl4hero3y:		ds  lenghtherotable,255
