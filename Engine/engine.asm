@@ -4076,10 +4076,10 @@ Pl1Hero1StatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  67
-.EarthSpells:       db  %0000 0111  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 1011
-.AirSpells:         db  %0000 1101
-.WaterSpells:       db  %0000 1110
+.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1111
+.AirSpells:         db  %0000 1111
+.WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
 
 pl1hero2y:		db	7

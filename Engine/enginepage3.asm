@@ -25,7 +25,7 @@ StartGame:
   call  ClearMapPage0AndMapPage1
 
 
-jp SetHeroOverviewMenuInPage1ROM
+;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
 
@@ -256,16 +256,12 @@ HeroOverViewSpellBookButton4MouseClickedSY:  equ 087
 
 HeroOverViewSpellBookButton1DX:   equ HeroOverViewSpellBookWindowDX + 016
 HeroOverViewSpellBookButton1DY:   equ HeroOverViewSpellBookWindowDY + 024
-
 HeroOverViewSpellBookButton2DX:   equ HeroOverViewSpellBookWindowDX + 014
 HeroOverViewSpellBookButton2DY:   equ HeroOverViewSpellBookWindowDY + 058
-
 HeroOverViewSpellBookButton3DX:   equ HeroOverViewSpellBookWindowDX + 012
 HeroOverViewSpellBookButton3DY:   equ HeroOverViewSpellBookWindowDY + 086
-
 HeroOverViewSpellBookButton4DX:   equ HeroOverViewSpellBookWindowDX + 010
 HeroOverViewSpellBookButton4DY:   equ HeroOverViewSpellBookWindowDY + 108
-
 HeroOverViewSpellBookButton5DX:   equ HeroOverViewSpellBookWindowDX + 008
 HeroOverViewSpellBookButton5DY:   equ HeroOverViewSpellBookWindowDY + 130 ;non existing, but in use
 
@@ -328,10 +324,322 @@ ButtonTableSpellBookSYSX_Water_Activated:
   dw  $4000 + (HeroOverViewSpellBookButton4MouseClickedSY*128) + (HeroOverViewSpellBookButton4MouseClickedSX/2) - 128
 
 
-;TextSpellBookWindowButton1:  db  " ",255
-;TextSpellBookWindowButton2:  db  " ",255
-;TextSpellBookWindowButton3:  db  " ",255
-;TextSpellBookWindowButton4:  db  " ",255
+
+
+
+HeroOverViewSpellIconButton1DX:   equ HeroOverViewSpellBookWindowDX + 040
+HeroOverViewSpellIconButton1DY:   equ HeroOverViewSpellBookWindowDY + 050
+
+HeroOverViewSpellIconButton2DX:   equ HeroOverViewSpellBookWindowDX + 070
+HeroOverViewSpellIconButton2DY:   equ HeroOverViewSpellBookWindowDY + 054
+
+HeroOverViewSpellIconButton3DX:   equ HeroOverViewSpellBookWindowDX + 038
+HeroOverViewSpellIconButton3DY:   equ HeroOverViewSpellBookWindowDY + 095
+
+HeroOverViewSpellIconButton4DX:   equ HeroOverViewSpellBookWindowDX + 068
+HeroOverViewSpellIconButton4DY:   equ HeroOverViewSpellBookWindowDY + 099
+
+HeroOverViewSpellIconButton5DX:   equ HeroOverViewSpellBookWindowDX + 108
+HeroOverViewSpellIconButton5DY:   equ HeroOverViewSpellBookWindowDY + 054
+
+HeroOverViewSpellIconButton6DX:   equ HeroOverViewSpellBookWindowDX + 138
+HeroOverViewSpellIconButton6DY:   equ HeroOverViewSpellBookWindowDY + 050
+
+HeroOverViewSpellIconButton7DX:   equ HeroOverViewSpellBookWindowDX + 110
+HeroOverViewSpellIconButton7DY:   equ HeroOverViewSpellBookWindowDY + 099
+
+HeroOverViewSpellIconButton8DX:   equ HeroOverViewSpellBookWindowDX + 140
+HeroOverViewSpellIconButton8DY:   equ HeroOverViewSpellBookWindowDY + 095
+
+
+HeroOverviewSpellIconButtonTableAmountOfButtons:  db  8
+HeroOverviewSpellIconButtonTable_Earth: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (HeroOverViewSpellIconButton1DY*128) + (HeroOverViewSpellIconButton1DX/2) | db %1000 0011, HeroOverViewSpellIconButton1DY,HeroOverViewSpellIconButton1DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton1DX,HeroOverViewSpellIconButton1DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton2DY*128) + (HeroOverViewSpellIconButton2DX/2) | db %1000 0011, HeroOverViewSpellIconButton2DY,HeroOverViewSpellIconButton2DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton2DX,HeroOverViewSpellIconButton2DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton3DY*128) + (HeroOverViewSpellIconButton3DX/2) | db %1000 0011, HeroOverViewSpellIconButton3DY,HeroOverViewSpellIconButton3DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton3DX,HeroOverViewSpellIconButton3DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton4DY*128) + (HeroOverViewSpellIconButton4DX/2) | db %1000 0011, HeroOverViewSpellIconButton4DY,HeroOverViewSpellIconButton4DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton4DX,HeroOverViewSpellIconButton4DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+  dw  $0000 + (HeroOverViewSpellIconButton5DY*128) + (HeroOverViewSpellIconButton5DX/2) | db %1000 0011, HeroOverViewSpellIconButton5DY,HeroOverViewSpellIconButton5DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton5DX,HeroOverViewSpellIconButton5DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton6DY*128) + (HeroOverViewSpellIconButton6DX/2) | db %1000 0011, HeroOverViewSpellIconButton6DY,HeroOverViewSpellIconButton6DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton6DX,HeroOverViewSpellIconButton6DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton7DY*128) + (HeroOverViewSpellIconButton7DX/2) | db %1000 0011, HeroOverViewSpellIconButton7DY,HeroOverViewSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton7DX,HeroOverViewSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton8DY*128) + (HeroOverViewSpellIconButton8DX/2) | db %1000 0011, HeroOverViewSpellIconButton8DY,HeroOverViewSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton8DX,HeroOverViewSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+db  8 ;amount of buttons
+HeroOverviewSpellIconButtonTable_Fire: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (HeroOverViewSpellIconButton1DY*128) + (HeroOverViewSpellIconButton1DX/2) | db %1000 0011, HeroOverViewSpellIconButton1DY,HeroOverViewSpellIconButton1DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton1DX,HeroOverViewSpellIconButton1DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton2DY*128) + (HeroOverViewSpellIconButton2DX/2) | db %1000 0011, HeroOverViewSpellIconButton2DY,HeroOverViewSpellIconButton2DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton2DX,HeroOverViewSpellIconButton2DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton3DY*128) + (HeroOverViewSpellIconButton3DX/2) | db %1000 0011, HeroOverViewSpellIconButton3DY,HeroOverViewSpellIconButton3DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton3DX,HeroOverViewSpellIconButton3DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton4DY*128) + (HeroOverViewSpellIconButton4DX/2) | db %1000 0011, HeroOverViewSpellIconButton4DY,HeroOverViewSpellIconButton4DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton4DX,HeroOverViewSpellIconButton4DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+  dw  $0000 + (HeroOverViewSpellIconButton5DY*128) + (HeroOverViewSpellIconButton5DX/2) | db %1000 0011, HeroOverViewSpellIconButton5DY,HeroOverViewSpellIconButton5DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton5DX,HeroOverViewSpellIconButton5DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton6DY*128) + (HeroOverViewSpellIconButton6DX/2) | db %1000 0011, HeroOverViewSpellIconButton6DY,HeroOverViewSpellIconButton6DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton6DX,HeroOverViewSpellIconButton6DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton7DY*128) + (HeroOverViewSpellIconButton7DX/2) | db %1000 0011, HeroOverViewSpellIconButton7DY,HeroOverViewSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton7DX,HeroOverViewSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton8DY*128) + (HeroOverViewSpellIconButton8DX/2) | db %1000 0011, HeroOverViewSpellIconButton8DY,HeroOverViewSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton8DX,HeroOverViewSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+
+db  8 ;amount of buttons
+HeroOverviewSpellIconButtonTable_Air: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (HeroOverViewSpellIconButton1DY*128) + (HeroOverViewSpellIconButton1DX/2) | db %1000 0011, HeroOverViewSpellIconButton1DY,HeroOverViewSpellIconButton1DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton1DX,HeroOverViewSpellIconButton1DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton2DY*128) + (HeroOverViewSpellIconButton2DX/2) | db %1000 0011, HeroOverViewSpellIconButton2DY,HeroOverViewSpellIconButton2DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton2DX,HeroOverViewSpellIconButton2DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton3DY*128) + (HeroOverViewSpellIconButton3DX/2) | db %1000 0011, HeroOverViewSpellIconButton3DY,HeroOverViewSpellIconButton3DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton3DX,HeroOverViewSpellIconButton3DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton4DY*128) + (HeroOverViewSpellIconButton4DX/2) | db %1000 0011, HeroOverViewSpellIconButton4DY,HeroOverViewSpellIconButton4DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton4DX,HeroOverViewSpellIconButton4DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+  dw  $0000 + (HeroOverViewSpellIconButton5DY*128) + (HeroOverViewSpellIconButton5DX/2) | db %1000 0011, HeroOverViewSpellIconButton5DY,HeroOverViewSpellIconButton5DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton5DX,HeroOverViewSpellIconButton5DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton6DY*128) + (HeroOverViewSpellIconButton6DX/2) | db %1000 0011, HeroOverViewSpellIconButton6DY,HeroOverViewSpellIconButton6DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton6DX,HeroOverViewSpellIconButton6DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton7DY*128) + (HeroOverViewSpellIconButton7DX/2) | db %1000 0011, HeroOverViewSpellIconButton7DY,HeroOverViewSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton7DX,HeroOverViewSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton8DY*128) + (HeroOverViewSpellIconButton8DX/2) | db %1000 0011, HeroOverViewSpellIconButton8DY,HeroOverViewSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton8DX,HeroOverViewSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+db  8 ;amount of buttons
+HeroOverviewSpellIconButtonTable_Water: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (HeroOverViewSpellIconButton1DY*128) + (HeroOverViewSpellIconButton1DX/2) | db %1000 0011, HeroOverViewSpellIconButton1DY,HeroOverViewSpellIconButton1DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton1DX,HeroOverViewSpellIconButton1DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton2DY*128) + (HeroOverViewSpellIconButton2DX/2) | db %1000 0011, HeroOverViewSpellIconButton2DY,HeroOverViewSpellIconButton2DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton2DX,HeroOverViewSpellIconButton2DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton3DY*128) + (HeroOverViewSpellIconButton3DX/2) | db %1000 0011, HeroOverViewSpellIconButton3DY,HeroOverViewSpellIconButton3DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton3DX,HeroOverViewSpellIconButton3DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton4DY*128) + (HeroOverViewSpellIconButton4DX/2) | db %1000 0011, HeroOverViewSpellIconButton4DY,HeroOverViewSpellIconButton4DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton4DX,HeroOverViewSpellIconButton4DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+  dw  $0000 + (HeroOverViewSpellIconButton5DY*128) + (HeroOverViewSpellIconButton5DX/2) | db %1000 0011, HeroOverViewSpellIconButton5DY,HeroOverViewSpellIconButton5DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton5DX,HeroOverViewSpellIconButton5DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton6DY*128) + (HeroOverViewSpellIconButton6DX/2) | db %1000 0011, HeroOverViewSpellIconButton6DY,HeroOverViewSpellIconButton6DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton6DX,HeroOverViewSpellIconButton6DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton7DY*128) + (HeroOverViewSpellIconButton7DX/2) | db %1000 0011, HeroOverViewSpellIconButton7DY,HeroOverViewSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton7DX,HeroOverViewSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewSpellIconButton8DY*128) + (HeroOverViewSpellIconButton8DX/2) | db %1000 0011, HeroOverViewSpellIconButton8DY,HeroOverViewSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton8DX,HeroOverViewSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+ButtonTableSpellIconsEarthSYSX:
+  dw  $4000 + (HeroOverViewSpellIconButton1OffSY*128) + (HeroOverViewSpellIconButton1OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton1MouseOverSY*128) + (HeroOverViewSpellIconButton1MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton2OffSY*128) + (HeroOverViewSpellIconButton2OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton2MouseOverSY*128) + (HeroOverViewSpellIconButton2MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton3OffSY*128) + (HeroOverViewSpellIconButton3OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton3MouseOverSY*128) + (HeroOverViewSpellIconButton3MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton4OffSY*128) + (HeroOverViewSpellIconButton4OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton4MouseOverSY*128) + (HeroOverViewSpellIconButton4MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton17OffSY*128) + (HeroOverViewSpellIconButton17OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton17MouseOverSY*128) + (HeroOverViewSpellIconButton17MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton18OffSY*128) + (HeroOverViewSpellIconButton18OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton18MouseOverSY*128) + (HeroOverViewSpellIconButton18MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton19OffSY*128) + (HeroOverViewSpellIconButton19OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton19MouseOverSY*128) + (HeroOverViewSpellIconButton19MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton20OffSY*128) + (HeroOverViewSpellIconButton20OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton20MouseOverSY*128) + (HeroOverViewSpellIconButton20MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+ButtonTableSpellIconsFireSYSX:
+  dw  $4000 + (HeroOverViewSpellIconButton5OffSY*128) + (HeroOverViewSpellIconButton5OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton5MouseOverSY*128) + (HeroOverViewSpellIconButton5MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton6OffSY*128) + (HeroOverViewSpellIconButton6OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton6MouseOverSY*128) + (HeroOverViewSpellIconButton6MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton7OffSY*128) + (HeroOverViewSpellIconButton7OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton7MouseOverSY*128) + (HeroOverViewSpellIconButton7MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton8OffSY*128) + (HeroOverViewSpellIconButton8OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton8MouseOverSY*128) + (HeroOverViewSpellIconButton8MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton17OffSY*128) + (HeroOverViewSpellIconButton17OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton17MouseOverSY*128) + (HeroOverViewSpellIconButton17MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton18OffSY*128) + (HeroOverViewSpellIconButton18OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton18MouseOverSY*128) + (HeroOverViewSpellIconButton18MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton19OffSY*128) + (HeroOverViewSpellIconButton19OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton19MouseOverSY*128) + (HeroOverViewSpellIconButton19MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton20OffSY*128) + (HeroOverViewSpellIconButton20OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton20MouseOverSY*128) + (HeroOverViewSpellIconButton20MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+ButtonTableSpellIconsAirSYSX:
+  dw  $4000 + (HeroOverViewSpellIconButton9OffSY*128) + (HeroOverViewSpellIconButton9OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton9MouseOverSY*128) + (HeroOverViewSpellIconButton9MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton10OffSY*128) + (HeroOverViewSpellIconButton10OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton10MouseOverSY*128) + (HeroOverViewSpellIconButton10MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton11OffSY*128) + (HeroOverViewSpellIconButton11OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton11MouseOverSY*128) + (HeroOverViewSpellIconButton11MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton12OffSY*128) + (HeroOverViewSpellIconButton12OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton12MouseOverSY*128) + (HeroOverViewSpellIconButton12MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton17OffSY*128) + (HeroOverViewSpellIconButton17OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton17MouseOverSY*128) + (HeroOverViewSpellIconButton17MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton18OffSY*128) + (HeroOverViewSpellIconButton18OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton18MouseOverSY*128) + (HeroOverViewSpellIconButton18MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton19OffSY*128) + (HeroOverViewSpellIconButton19OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton19MouseOverSY*128) + (HeroOverViewSpellIconButton19MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton20OffSY*128) + (HeroOverViewSpellIconButton20OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton20MouseOverSY*128) + (HeroOverViewSpellIconButton20MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+ButtonTableSpellIconsWaterSYSX:
+  dw  $4000 + (HeroOverViewSpellIconButton13OffSY*128) + (HeroOverViewSpellIconButton13OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton13MouseOverSY*128) + (HeroOverViewSpellIconButton13MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton14OffSY*128) + (HeroOverViewSpellIconButton14OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton14MouseOverSY*128) + (HeroOverViewSpellIconButton14MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton15OffSY*128) + (HeroOverViewSpellIconButton15OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton15MouseOverSY*128) + (HeroOverViewSpellIconButton15MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton16OffSY*128) + (HeroOverViewSpellIconButton16OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton16MouseOverSY*128) + (HeroOverViewSpellIconButton16MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton17OffSY*128) + (HeroOverViewSpellIconButton17OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton17MouseOverSY*128) + (HeroOverViewSpellIconButton17MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton18OffSY*128) + (HeroOverViewSpellIconButton18OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton18MouseOverSY*128) + (HeroOverViewSpellIconButton18MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton19OffSY*128) + (HeroOverViewSpellIconButton19OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton19MouseOverSY*128) + (HeroOverViewSpellIconButton19MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewSpellIconButton20OffSY*128) + (HeroOverViewSpellIconButton20OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButton20MouseOverSY*128) + (HeroOverViewSpellIconButton20MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellIconButtonMouseClickedSY*128) + (HeroOverViewSpellIconButtonMouseClickedSX/2) - 128
+
+
+HeroOverViewSpellIconButton1OffSX:           equ 224
+HeroOverViewSpellIconButton1OffSY:           equ 000
+HeroOverViewSpellIconButton1MouseOverSX:     equ 240
+HeroOverViewSpellIconButton1MouseOverSY:     equ 000
+HeroOverViewSpellIconButtonMouseClickedSX:  equ 192
+HeroOverViewSpellIconButtonMouseClickedSY:  equ 150
+
+HeroOverViewSpellIconButton2OffSX:           equ 224
+HeroOverViewSpellIconButton2OffSY:           equ 016
+HeroOverViewSpellIconButton2MouseOverSX:     equ 240
+HeroOverViewSpellIconButton2MouseOverSY:     equ 016
+
+HeroOverViewSpellIconButton3OffSX:           equ 224
+HeroOverViewSpellIconButton3OffSY:           equ 032
+HeroOverViewSpellIconButton3MouseOverSX:     equ 240
+HeroOverViewSpellIconButton3MouseOverSY:     equ 032
+
+HeroOverViewSpellIconButton4OffSX:           equ 224
+HeroOverViewSpellIconButton4OffSY:           equ 048
+HeroOverViewSpellIconButton4MouseOverSX:     equ 240
+HeroOverViewSpellIconButton4MouseOverSY:     equ 048
+
+HeroOverViewSpellIconButton5OffSX:           equ 224
+HeroOverViewSpellIconButton5OffSY:           equ 064
+HeroOverViewSpellIconButton5MouseOverSX:     equ 240
+HeroOverViewSpellIconButton5MouseOverSY:     equ 064
+
+HeroOverViewSpellIconButton6OffSX:           equ 224
+HeroOverViewSpellIconButton6OffSY:           equ 080
+HeroOverViewSpellIconButton6MouseOverSX:     equ 240
+HeroOverViewSpellIconButton6MouseOverSY:     equ 080
+
+HeroOverViewSpellIconButton7OffSX:           equ 224
+HeroOverViewSpellIconButton7OffSY:           equ 096
+HeroOverViewSpellIconButton7MouseOverSX:     equ 240
+HeroOverViewSpellIconButton7MouseOverSY:     equ 096
+
+HeroOverViewSpellIconButton8OffSX:           equ 224
+HeroOverViewSpellIconButton8OffSY:           equ 112
+HeroOverViewSpellIconButton8MouseOverSX:     equ 240
+HeroOverViewSpellIconButton8MouseOverSY:     equ 112
+
+HeroOverViewSpellIconButton9OffSX:           equ 224
+HeroOverViewSpellIconButton9OffSY:           equ 128
+HeroOverViewSpellIconButton9MouseOverSX:     equ 240
+HeroOverViewSpellIconButton9MouseOverSY:     equ 128
+
+HeroOverViewSpellIconButton10OffSX:           equ 224
+HeroOverViewSpellIconButton10OffSY:           equ 144
+HeroOverViewSpellIconButton10MouseOverSX:     equ 240
+HeroOverViewSpellIconButton10MouseOverSY:     equ 144
+
+HeroOverViewSpellIconButton11OffSX:           equ 224
+HeroOverViewSpellIconButton11OffSY:           equ 160
+HeroOverViewSpellIconButton11MouseOverSX:     equ 240
+HeroOverViewSpellIconButton11MouseOverSY:     equ 160
+
+HeroOverViewSpellIconButton12OffSX:           equ 224
+HeroOverViewSpellIconButton12OffSY:           equ 176
+HeroOverViewSpellIconButton12MouseOverSX:     equ 240
+HeroOverViewSpellIconButton12MouseOverSY:     equ 176
+
+
+
+HeroOverViewSpellIconButton13OffSX:           equ 000
+HeroOverViewSpellIconButton13OffSY:           equ 184
+HeroOverViewSpellIconButton13MouseOverSX:     equ 016
+HeroOverViewSpellIconButton13MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton14OffSX:           equ 032
+HeroOverViewSpellIconButton14OffSY:           equ 184
+HeroOverViewSpellIconButton14MouseOverSX:     equ 048
+HeroOverViewSpellIconButton14MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton15OffSX:           equ 064
+HeroOverViewSpellIconButton15OffSY:           equ 184
+HeroOverViewSpellIconButton15MouseOverSX:     equ 080
+HeroOverViewSpellIconButton15MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton16OffSX:           equ 096
+HeroOverViewSpellIconButton16OffSY:           equ 184
+HeroOverViewSpellIconButton16MouseOverSX:     equ 112
+HeroOverViewSpellIconButton16MouseOverSY:     equ 184
+
+
+
+HeroOverViewSpellIconButton17OffSX:           equ 128
+HeroOverViewSpellIconButton17OffSY:           equ 184
+HeroOverViewSpellIconButton17MouseOverSX:     equ 144
+HeroOverViewSpellIconButton17MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton18OffSX:           equ 160
+HeroOverViewSpellIconButton18OffSY:           equ 184
+HeroOverViewSpellIconButton18MouseOverSX:     equ 176
+HeroOverViewSpellIconButton18MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton19OffSX:           equ 192
+HeroOverViewSpellIconButton19OffSY:           equ 184
+HeroOverViewSpellIconButton19MouseOverSX:     equ 208
+HeroOverViewSpellIconButton19MouseOverSY:     equ 184
+
+HeroOverViewSpellIconButton20OffSX:           equ 192
+HeroOverViewSpellIconButton20OffSY:           equ 168
+HeroOverViewSpellIconButton20MouseOverSX:     equ 208
+HeroOverViewSpellIconButton20MouseOverSY:     equ 168
+
 
 ButtonTableSpellBookSYSX_Earth:
 ;  dw  $4000 + (HeroOverViewSpellBookButton1OffSY*128) + (HeroOverViewSpellBookButton1OffSX/2) - 128
@@ -402,9 +710,11 @@ ButtonTableSpellBookSYSX_Water:
 ;  dw  $4000 + (HeroOverViewSpellBookButton4MouseClickedSY*128) + (HeroOverViewSpellBookButton4MouseClickedSX/2) - 128
 
 ActivatedSkillsButton:  ds  2
+;ActivatedSpellIconButton:  ds  2
 PreviousActivatedSkillsButton:  ds  2
 SetSkillsDescription?:  db  1
 MenuOptionSelected?:  db  0
+MenuOptionSelected?Backup:  ds  1
 
 LenghtTextSkillsDescription:  equ 24
 TextSkillsWindowButton1:  db  "basic archery          ",255
@@ -472,9 +782,10 @@ SetHeroOverviewMenuInPage1ROM:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
-;  call  HeroOverviewCode
+  call  HeroOverviewCode
 ;  call  HeroOverviewSkillsWindowCode
-  call  HeroOverviewSpellBookWindowCode_Earth
+;  call  HeroOverviewSpellBookWindowCode_Earth
+;  call  HeroOverviewSpellBookWindowCode_Fire
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle

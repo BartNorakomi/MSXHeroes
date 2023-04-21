@@ -563,7 +563,10 @@ HeroOverviewCodeBlock:  equ   $1c
 HeroOverviewFontBlock:  equ   $1c
 phase	$4000
   incbin "..\grapx\HeroOverview\font.SC5",7,5 * 128      ;5 lines
+kut:
   include "HeroOverviewCode.asm"
+kutje:
+kutjes: equ kutje-kut
 	ds		$8000-$,$ff
 dephase
 

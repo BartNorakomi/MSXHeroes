@@ -40,15 +40,15 @@ HeroOverViewSpellBookWindowNY:   equ 184
 
 HeroOverViewSpellBookWindowButton1NY:  equ 035 - 1
 HeroOverViewSpellBookWindowButton1NX:  equ 010
-
 HeroOverViewSpellBookWindowButton2NY:  equ 029 - 1
 HeroOverViewSpellBookWindowButton2NX:  equ 010
-
 HeroOverViewSpellBookWindowButton3NY:  equ 023 - 1
 HeroOverViewSpellBookWindowButton3NX:  equ 010
-
 HeroOverViewSpellBookWindowButton4NY:  equ 035
 HeroOverViewSpellBookWindowButton4NX:  equ 010
+
+HeroOverViewSpellIconWindowButtonNY:  equ 016
+HeroOverViewSpellIconWindowButtonNX:  equ 016
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -144,9 +144,14 @@ SpellIconNY:   equ 016
 PlaceWaterSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
-  ;earth spells
+  ;water spells
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Water + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
   bit   0,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell1
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Water + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -159,8 +164,13 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell1:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Water + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
   bit   1,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell2
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Water + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -173,8 +183,13 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell2:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Water + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
   bit   2,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell3
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Water + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -187,8 +202,14 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell3:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Water + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
+
   bit   3,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell4
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Water + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -205,9 +226,14 @@ PlaceWaterSpellsInSpellBook:
 PlaceAirSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
-  ;earth spells
+  ;air spells
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Air + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
   bit   0,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell1
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Air + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -220,8 +246,13 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell1:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Air + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
   bit   1,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell2
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Air + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -234,8 +265,13 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell2:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Air + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
   bit   2,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell3
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Air + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -248,8 +284,13 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell3:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Air + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
   bit   3,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell4
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Air + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -266,9 +307,14 @@ PlaceAirSpellsInSpellBook:
 PlaceFireSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
-  ;earth spells
+  ;fire spells
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   0,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell1
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -281,8 +327,13 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell1:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   1,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell2
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+    
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -295,8 +346,13 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell2:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   2,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell3
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -309,8 +365,13 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell3:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   3,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell4
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Fire + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -329,8 +390,12 @@ PlaceEarthSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
   ;earth spells
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   0,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell1
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -343,8 +408,12 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell1:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   1,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell2
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -357,8 +426,12 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell2:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   2,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell3
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -371,8 +444,12 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell3:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   bit   3,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell4
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -389,8 +466,20 @@ PlaceEarthSpellsInSpellBook:
 PlaceAllSpellSchoolSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
   ;all spellschools
+  
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   bit   0,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell1  
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+ 
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell5backdropDY*128) + (HeroOverViewSpell5backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -403,8 +492,19 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell1:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   bit   1,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell2  
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell6backdropDY*128) + (HeroOverViewSpell6backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -417,8 +517,19 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell2:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   bit   2,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell3  
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell7backdropDY*128) + (HeroOverViewSpell7backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -431,8 +542,19 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell3:
 
+  ld    a,%0000 0000
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   bit   3,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell4
+  ld    a,%1000 0011
+  ld    (HeroOverviewSpellIconButtonTable_Earth + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Fire+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Air + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    (HeroOverviewSpellIconButtonTable_Water+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
   ld    de,$0000 + (HeroOverViewSpell8backdropDY*128) + (HeroOverViewSpell8backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
@@ -448,12 +570,14 @@ PlaceAllSpellSchoolSpellsInSpellBook:
 
 
 HeroOverviewSpellBookWindowCode_Water:
-  call  ResetStatusSpellBookButtons
+;  call  ResetStatusSpellBookButtons
   call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Water
   call  PlaceWaterSpellsInSpellBook
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Water
   call  PlaceWaterSpellsInSpellBook
 
@@ -465,18 +589,44 @@ HeroOverviewSpellBookWindowCode_Water:
   call  CheckButtonMouseInteraction
   ld    a,(MenuOptionSelected?)
   or    a
-  jp    nz,.MenuOptionSelected
+  jp    nz,.ElementalButtonPressed
 
   call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
 
   ld    ix,HeroOverviewSpellBookButtonTable_Water
   call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Water
+  ld    iy,ButtonTableSpellIconsWaterSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.SpellIconPressed
+
+call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetSpellExplanation_Water        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Water
+  call  SetButtonStatusAndText2         ;copies button state from rom -> vram
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  
   call  SwapAndSetPage                  ;swap and set page  
 
   halt
   jp  .engine
 
-  .MenuOptionSelected:
+  .ElementalButtonPressed:
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jp    z,AirSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -485,13 +635,47 @@ HeroOverviewSpellBookWindowCode_Water:
   jp    z,EarthSelected
   ret
 
+
+
+  .SpellIconPressed:
+  ld    (MenuOptionSelected?Backup),a
+  xor   a
+  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewSpellBookWindowCode_Water
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 HeroOverviewSpellBookWindowCode_Air:
-  call  ResetStatusSpellBookButtons
+;  call  ResetStatusSpellBookButtons
   call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Air
   call  PlaceAirSpellsInSpellBook
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Air
   call  PlaceAirSpellsInSpellBook
 
@@ -503,18 +687,42 @@ HeroOverviewSpellBookWindowCode_Air:
   call  CheckButtonMouseInteraction
   ld    a,(MenuOptionSelected?)
   or    a
-  jp    nz,.MenuOptionSelected
+  jp    nz,.ElementalButtonPressed
 
   call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
 
   ld    ix,HeroOverviewSpellBookButtonTable_Air
   call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Air
+  ld    iy,ButtonTableSpellIconsAirSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.SpellIconPressed
+
+call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetSpellExplanation_Air        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Air
+  call  SetButtonStatusAndText2         ;copies button state from rom -> vram
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
   call  SwapAndSetPage                  ;swap and set page  
 
   halt
   jp  .engine
 
-  .MenuOptionSelected:
+  .ElementalButtonPressed:
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jp    z,WaterSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -523,13 +731,36 @@ HeroOverviewSpellBookWindowCode_Air:
   jp    z,EarthSelected
   ret
   
+
+
+
+  .SpellIconPressed:
+  ld    (MenuOptionSelected?Backup),a
+  xor   a
+  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewSpellBookWindowCode_Air
+
+
+    
+  
+  
+  
+  
+  
+  
 HeroOverviewSpellBookWindowCode_Fire:
-  call  ResetStatusSpellBookButtons
+;  call  ResetStatusSpellBookButtons
   call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Fire
   call  PlaceFireSpellsInSpellBook
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Fire
   call  PlaceFireSpellsInSpellBook
 
@@ -541,18 +772,46 @@ HeroOverviewSpellBookWindowCode_Fire:
   call  CheckButtonMouseInteraction
   ld    a,(MenuOptionSelected?)
   or    a
-  jp    nz,.MenuOptionSelected
+  jp    nz,.ElementalButtonPressed
 
   call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
 
   ld    ix,HeroOverviewSpellBookButtonTable_Fire
   call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Fire
+  ld    iy,ButtonTableSpellIconsFireSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.SpellIconPressed
+
+call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetSpellExplanation_Fire        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Fire
+  call  SetButtonStatusAndText2         ;copies button state from rom -> vram
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
   call  SwapAndSetPage                  ;swap and set page  
 
   halt
   jp  .engine
 
-  .MenuOptionSelected:
+  .ElementalButtonPressed:
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jp    z,WaterSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -562,15 +821,48 @@ HeroOverviewSpellBookWindowCode_Fire:
   ret
 
 
+
+
+
+
+
+
+  .SpellIconPressed:
+  ld    (MenuOptionSelected?Backup),a
+  xor   a
+  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewSpellBookWindowCode_Fire
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 HeroOverviewSpellBookWindowCode_Earth:
-  call  ResetStatusSpellBookButtons
+;  call  ResetStatusSpellBookButtons
   call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
-  call  ActivateButton_Earth
-  call  PlaceEarthSpellsInSpellBook
+  call  ClearWhiteWindow
+  call  ActivateButton_Earth            ;activate the elemental button on the left side
+  call  PlaceEarthSpellsInSpellBook     ;check which earth spells player has available, and set those in the spell book
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewSpellBookWindow  ;set SpellBook Window in inactive page
+  call  ClearWhiteWindow
   call  ActivateButton_Earth
-  call  PlaceEarthSpellsInSpellBook
+  call  PlaceEarthSpellsInSpellBook     ;check which earth spells player has available, and set those in the spell book
 
   .engine:
   call  PopulateControls                ;read out keys
@@ -580,18 +872,78 @@ HeroOverviewSpellBookWindowCode_Earth:
   call  CheckButtonMouseInteraction
   ld    a,(MenuOptionSelected?)
   or    a
-  jp    nz,.MenuOptionSelected
+  jp    nz,.ElementalButtonPressed
 
   call  CheckEndHeroOverviewSpellBook   ;check if mouse is clicked outside of window. If so, return to game
 
   ld    ix,HeroOverviewSpellBookButtonTable_Earth
   call  SetButtonStatusAndText2          ;copies button state from rom -> vram
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Earth
+  ld    iy,ButtonTableSpellIconsEarthSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.SpellIconPressed
+
+call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetSpellExplanation_Earth             ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+  ld    ix,HeroOverviewSpellIconButtonTable_Earth
+  call  SetButtonStatusAndText2         ;copies button state from rom -> vram
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;  ld    ix,HeroOverviewSpellIconButtonTable_AllSpellSchools
+;  ld    iy,ButtonTableSpellIconsSYSX
+;  call  CheckButtonMouseInteraction
+
+;  ld    a,(MenuOptionSelected?)
+;  or    a
+;  jp    nz,.SpellIconPressed
+
+;  call  SetSpellExplanation_Earth             ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+;  ld    ix,HeroOverviewSpellIconButtonTable_AllSpellSchools
+;  call  SetButtonStatusAndText2         ;copies button state from rom -> vram
+
+
+
+
+
+
+
+
+
+
+
   call  SwapAndSetPage                  ;swap and set page  
 
   halt
   jp  .engine
 
-  .MenuOptionSelected:
+
+
+
+
+  .SpellIconPressed:
+  ld    (MenuOptionSelected?Backup),a
+  xor   a
+  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewSpellBookWindowCode_Earth
+
+  .ElementalButtonPressed:
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jp    z,WaterSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -599,6 +951,786 @@ HeroOverviewSpellBookWindowCode_Earth:
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jp    z,FireSelected
   ret
+
+ClearWhiteWindow:
+  ld    hl,$4000 + ((HeroOverViewSpellBookWindowSY+159)*128) + ((HeroOverViewSpellBookWindowSX+28)/2) -128
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY+159)*128) + ((HeroOverViewSpellBookWindowDX+008)/2)
+  ld    bc,$0000 + (18*256) + (20/2)
+  ld    a,SpellBookGraphicsBlock;Map block
+  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
+
+SetWhiteWindow:
+  ld    hl,$4000 + ((HeroOverViewSpellBookWindowSY+159)*128) + ((HeroOverViewSpellBookWindowSX+008)/2) -128
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY+159)*128) + ((HeroOverViewSpellBookWindowDX+008)/2)
+  ld    bc,$0000 + (18*256) + (20/2)
+  ld    a,SpellBookGraphicsBlock;Map block
+  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
+
+
+DescriptionEarth1:        db  "earth meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionEarth2:        db  "earth",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionEarth3:        db  "earthstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionEarth4:        db  "earthbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+DescriptionFire1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionFire2:        db  "fire",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionFire3:        db  "firestorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+DescriptionFire4:        db  "firebullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+Descriptionair1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionair2:        db  "air",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionair3:        db  "airstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionair4:        db  "airbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+Descriptionwater1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionwater2:        db  "water",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionwater3:        db  "waterstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+Descriptionwater4:        db  "waterbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+DescriptionAllSpellSchools1: db  "bla 1",255
+DescriptionAllSpellSchools2: db  "bla 2",255
+DescriptionAllSpellSchools3: db  "bla 3",255
+DescriptionAllSpellSchools4: db  "bla 4",255
+
+SetSpellExplanation_Water:
+  ld    a,(SetSkillsDescription?)
+  dec   a
+  ret   z
+  ld    (SetSkillsDescription?),a 
+
+  call  .GoSetText
+  call  .SetSpellIcon
+  call  .SetCost
+  call  .SetDamage
+  ret
+
+  .SetDamage:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,10
+  jp    z,.DamageAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,210
+  jp    z,.DamageAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,0
+  jp    z,.DamageAmountFound
+  ld    b,140
+  .DamageAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 170
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 130
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextDamage
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextDamage: db  "damage",255
+
+  .SetCost:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,66
+  jp    z,.CostAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,9
+  jp    z,.CostAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,12
+  jp    z,.CostAmountFound
+  ld    b,25
+  .CostAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 175
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 146
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 173
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextCost
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextCost: db  "cost",255
+
+  .SetSpellIcon:
+  call  SetWhiteWindow
+
+  ld    a,(MenuOptionSelected?Backup)
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
+  jp    z,.SetIcon
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
+  jp    z,.SetIcon
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
+  jp    z,.SetIcon
+  cp    4
+  ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
+  jp    z,.SetIcon  
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell16IconSY*128) + (Spell16IconSX/2) -128
+  jp    z,.SetIcon
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell15IconSY*128) + (Spell15IconSX/2) -128
+  jp    z,.SetIcon
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell14IconSY*128) + (Spell14IconSX/2) -128
+  jp    z,.SetIcon
+  ld    hl,$4000 + (Spell13IconSY*128) + (Spell13IconSX/2) -128
+  .SetIcon:
+  
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
+  ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+
+  .GoSetText:
+  ld    a,(MenuOptionSelected?Backup)
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools1
+  jp    z,.SetText
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools2
+  jp    z,.SetText
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools3
+  jp    z,.SetText
+  cp    4
+  ld    hl,DescriptionAllSpellSchools4
+  jp    z,.SetText
+
+
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,Descriptionwater1
+  jp    z,.SetText
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,Descriptionwater2
+  jp    z,.SetText
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,Descriptionwater3
+  jp    z,.SetText
+  ld    hl,Descriptionwater4
+  .SetText:
+
+
+  ld    a,HeroOverViewSpellBookWindowDX + 030
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+
+;  ld    l,(ix+TextAddress)
+;  ld    h,(ix+TextAddress+1)            ;address of text to put
+;  ld    de,LenghtTextSkillsDescription
+;  add   hl,de
+
+
+  ld    (TextAddresspointer),hl  
+  jp    SetTextInButton.go
+
+
+
+
+
+
+
+
+SetSpellExplanation_Air:
+  ld    a,(SetSkillsDescription?)
+  dec   a
+  ret   z
+  ld    (SetSkillsDescription?),a 
+
+  call  .GoSetText
+  call  .SetSpellIcon
+  call  .SetCost
+  call  .SetDamage
+  ret
+
+  .SetDamage:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,10
+  jp    z,.DamageAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,210
+  jp    z,.DamageAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,0
+  jp    z,.DamageAmountFound
+  ld    b,140
+  .DamageAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 170
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 130
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextDamage
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextDamage: db  "damage",255
+
+  .SetCost:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,66
+  jp    z,.CostAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,9
+  jp    z,.CostAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,12
+  jp    z,.CostAmountFound
+  ld    b,25
+  .CostAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 175
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 146
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 173
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextCost
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextCost: db  "cost",255
+
+  .SetSpellIcon:
+  call  SetWhiteWindow
+
+  ld    a,(MenuOptionSelected?Backup)
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
+  jp    z,.SetIcon
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
+  jp    z,.SetIcon
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
+  jp    z,.SetIcon
+  cp    4
+  ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
+  jp    z,.SetIcon
+  
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell12IconSY*128) + (Spell12IconSX/2) -128
+  jp    z,.SetIcon
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell11IconSY*128) + (Spell11IconSX/2) -128
+  jp    z,.SetIcon
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell10IconSY*128) + (Spell10IconSX/2) -128
+  jp    z,.SetIcon
+  ld    hl,$4000 + (Spell09IconSY*128) + (Spell09IconSX/2) -128
+  .SetIcon:
+  
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
+  ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+
+  .GoSetText:
+  ld    a,(MenuOptionSelected?Backup)
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools1
+  jp    z,.SetText
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools2
+  jp    z,.SetText
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools3
+  jp    z,.SetText
+  cp    4
+  ld    hl,DescriptionAllSpellSchools4
+  jp    z,.SetText
+
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAir1
+  jp    z,.SetText
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAir2
+  jp    z,.SetText
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAir3
+  jp    z,.SetText
+  ld    hl,DescriptionAir4
+  .SetText:
+
+
+  ld    a,HeroOverViewSpellBookWindowDX + 030
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+
+;  ld    l,(ix+TextAddress)
+;  ld    h,(ix+TextAddress+1)            ;address of text to put
+;  ld    de,LenghtTextSkillsDescription
+;  add   hl,de
+
+
+  ld    (TextAddresspointer),hl  
+  jp    SetTextInButton.go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SetSpellExplanation_Fire:
+  ld    a,(SetSkillsDescription?)
+  dec   a
+  ret   z
+  ld    (SetSkillsDescription?),a 
+
+  call  .GoSetText
+  call  .SetSpellIcon
+  call  .SetCost
+  call  .SetDamage
+  ret
+
+  .SetDamage:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,10
+  jp    z,.DamageAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,210
+  jp    z,.DamageAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,0
+  jp    z,.DamageAmountFound
+  ld    b,140
+  .DamageAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 170
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 130
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextDamage
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextDamage: db  "damage",255
+
+  .SetCost:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,66
+  jp    z,.CostAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,9
+  jp    z,.CostAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,12
+  jp    z,.CostAmountFound
+  ld    b,25
+  .CostAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 175
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 146
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 173
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextCost
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextCost: db  "cost",255
+
+  .SetSpellIcon:
+  call  SetWhiteWindow
+
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
+  jp    z,.SetIcon
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
+  jp    z,.SetIcon
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
+  jp    z,.SetIcon
+  cp    4
+  ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
+  jp    z,.SetIcon
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell08IconSY*128) + (Spell08IconSX/2) -128
+  jp    z,.SetIcon
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell07IconSY*128) + (Spell07IconSX/2) -128
+  jp    z,.SetIcon
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell06IconSY*128) + (Spell06IconSX/2) -128
+  jp    z,.SetIcon
+  ld    hl,$4000 + (Spell05IconSY*128) + (Spell05IconSX/2) -128
+  .SetIcon:
+  
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
+  ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+
+  .GoSetText:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools1
+  jp    z,.SetText
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools2
+  jp    z,.SetText
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools3
+  jp    z,.SetText
+  cp    4
+  ld    hl,DescriptionAllSpellSchools4
+  jp    z,.SetText
+
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionFire1
+  jp    z,.SetText
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionFire2
+  jp    z,.SetText
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionFire3
+  jp    z,.SetText
+  cp    8
+  ld    hl,DescriptionFire4
+  jp    z,.SetText
+  .SetText:
+
+
+  ld    a,HeroOverViewSpellBookWindowDX + 030
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+
+;  ld    l,(ix+TextAddress)
+;  ld    h,(ix+TextAddress+1)            ;address of text to put
+;  ld    de,LenghtTextSkillsDescription
+;  add   hl,de
+
+
+  ld    (TextAddresspointer),hl  
+  jp    SetTextInButton.go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SetSpellExplanation_Earth:              ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+  ld    a,(SetSkillsDescription?)
+  dec   a
+  ret   z
+  ld    (SetSkillsDescription?),a 
+
+  call  .GoSetText
+  call  .SetSpellIcon
+  call  .SetCost
+  call  .SetDamage
+  ret
+
+  .SetDamage:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,10
+  jp    z,.DamageAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,210
+  jp    z,.DamageAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,0
+  jp    z,.DamageAmountFound
+  ld    b,140
+  .DamageAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 170
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 130
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextDamage
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextDamage: db  "damage",255
+
+  .SetCost:
+  ld    a,(MenuOptionSelected?Backup)
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,66
+  jp    z,.CostAmountFound
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,9
+  jp    z,.CostAmountFound
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,12
+  jp    z,.CostAmountFound
+  ld    b,25
+  .CostAmountFound:
+
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 175
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  push  iy
+  call  SetNumber8Bit
+  pop   iy
+
+  ld    a,HeroOverViewSpellBookWindowDX + 146
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 173
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    hl,.TextCost
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
+  .TextCost: db  "cost",255
+
+  .SetSpellIcon:
+  call  SetWhiteWindow
+
+  ld    a,(MenuOptionSelected?Backup)
+
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
+  jp    z,.SetIcon
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
+  jp    z,.SetIcon
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
+  jp    z,.SetIcon
+  cp    4
+  ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
+  jp    z,.SetIcon
+  
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell04IconSY*128) + (Spell04IconSX/2) -128
+  jp    z,.SetIcon
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell03IconSY*128) + (Spell03IconSX/2) -128
+  jp    z,.SetIcon
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,$4000 + (Spell02IconSY*128) + (Spell02IconSX/2) -128
+  jp    z,.SetIcon
+  ld    hl,$4000 + (Spell01IconSY*128) + (Spell01IconSX/2) -128
+  .SetIcon:
+  
+  ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
+  ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  ld    a,SpellBookGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+
+  .GoSetText:
+  ld    a,(MenuOptionSelected?Backup)
+
+  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools1
+  jp    z,.SetText
+  cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools2
+  jp    z,.SetText
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionAllSpellSchools3
+  jp    z,.SetText
+  cp    4
+  ld    hl,DescriptionAllSpellSchools4
+  jp    z,.SetText
+
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionEarth1
+  jp    z,.SetText
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionEarth2
+  jp    z,.SetText
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    hl,DescriptionEarth3
+  jp    z,.SetText
+  ld    hl,DescriptionEarth4
+  .SetText:
+
+
+  ld    a,HeroOverViewSpellBookWindowDX + 030
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 159
+  ld    (PutLetter+dy),a                ;set dy of text
+
+;  ld    l,(ix+TextAddress)
+;  ld    h,(ix+TextAddress+1)            ;address of text to put
+;  ld    de,LenghtTextSkillsDescription
+;  add   hl,de
+
+
+  ld    (TextAddresspointer),hl  
+  jp    SetTextInButton.go
+
 
 EarthSelected:
   xor   a
@@ -623,11 +1755,13 @@ WaterSelected:
 
 
 ResetStatusSpellBookButtons:  
-  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
-  ld    (HeroOverviewSkillsButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
-  ld    (HeroOverviewSkillsButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+;  ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+;  ld    (HeroOverviewSkillsButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+;  ld    (HeroOverviewSkillsButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+;  ld    (HeroOverviewSkillsButtonTable + 2*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+;  ld    (HeroOverviewSkillsButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
+
+
   ret
 
 ActivateButton_Earth:
@@ -1190,6 +2324,10 @@ CheckButtonMouseInteraction:
   ret
   
   .check:
+  ld    a,(ix+HeroOverviewWindowButtonStatus)
+  or    a
+  ret   z
+  
   ld    a,(spat+0)                      ;y mouse
   cp    (ix+HeroOverviewWindowButtonYtop)
   jr    c,.NotOverButton
