@@ -1,0 +1,92 @@
+inventory:
+
+Dagger time			attack + 4
+sword of bahrain		attack + 5
+hell slayer			attack + 7, defense - 2
+the butterfly			all primary attributes + 1
+swiftblade			attack + 3, units movement speed + 1
+
+regalia di pleb			defense + 3, movement speed + 1
+young blood's armor		defense + 4
+the juggernaut			defense + 7, movement speed - 1
+yojimbo the ronin		defense + 3, 50% less damage from fire
+caesar's chestplate/aegis	defense + 3, max hp units +2
+
+greenleaf shield		defense + 3, 10% less damage from ranged units
+wooden shield			defense + 4
+bram stoker			defense + 3, 50% less damage from earth
+impenetrable shield		defense + 3, +5% chance to block spells
+training shield			defense + 3
+
+yatta shi-ne			spell power + 2, intelligence + 1, defense + 1
+fire hood			spell power + 4, 10% more fire damage
+cerebro				intelligence + 6
+viridescent			defense + 3, max hp unit +3
+pikemen's helmet		defense + 2, 10% less damage from ranged units
+
+shadow tramper			combat speed all units + 2
+dusk rover			no terrain penalty for hero on worldmap
+planeswalkers			+3 movement points per day for your hero
+knight's night slippers		50% less damage from water
+sturdy boots			combat speed all units + 3
+
+gripfast			+2 movement points per day for your hero
+iron hand			50 less damage from air, combat speed all units - 1
+elk skin gloves			damage + 2, max hp units + 2
+venomous gauntlet		melee attacks inflict poison
+emerald gloves			intelligence + 3
+
+small ring			spell power + 3
+the cyclops			intelligence + 4
+scarlet ring			all four primary skills + 2
+bronze ring			15% more earth damage
+hypnotising ring		15% more water damage
+
+the blue topaz			50% less damage from water
+good luck charm			+10% chance to block spells
+negligee of teeth		intelligence + 3, spell power + 3
+skull of the unborn		increases necromancy by 5%
+the choker			spell power + 6
+
+the kings garment		all primary skills + 1, +125 gold / day
+priest's cope			10% more air damage, intelligence + 1
+enchanted robe			spell power + 4
+rural vest			max hp units + 3
+labcoat				spell power +7, max hp units - 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

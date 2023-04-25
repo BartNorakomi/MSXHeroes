@@ -141,6 +141,318 @@ Spell8DX:  equ HeroOverViewSpellBookWindowDX + 140
 SpellIconNX:   equ 016
 SpellIconNY:   equ 016
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewInventoryWindowSX:   equ 000
+HeroOverViewInventoryWindowSY:   equ 000
+HeroOverViewInventoryWindowDX:   equ 030
+HeroOverViewInventoryWindowDY:   equ 024
+HeroOverViewInventoryWindowNX:   equ 146
+HeroOverViewInventoryWindowNY:   equ 156
+
+InventoryItemNY:        equ 020
+InventoryItemNx:        equ 020
+;9 inventory slots
+InventoryItem01DY:      equ HeroOverViewInventoryWindowDY + 028
+InventoryItem01Dx:      equ HeroOverViewInventoryWindowDX + 020
+InventoryItem02DY:      equ HeroOverViewInventoryWindowDY + 028
+InventoryItem02Dx:      equ HeroOverViewInventoryWindowDX + 064
+InventoryItem03DY:      equ HeroOverViewInventoryWindowDY + 028
+InventoryItem03Dx:      equ HeroOverViewInventoryWindowDX + 108
+
+InventoryItem04DY:      equ HeroOverViewInventoryWindowDY + 053
+InventoryItem04Dx:      equ HeroOverViewInventoryWindowDX + 020
+InventoryItem05DY:      equ HeroOverViewInventoryWindowDY + 053
+InventoryItem05Dx:      equ HeroOverViewInventoryWindowDX + 064
+InventoryItem06DY:      equ HeroOverViewInventoryWindowDY + 053
+InventoryItem06Dx:      equ HeroOverViewInventoryWindowDX + 108
+
+InventoryItem07DY:      equ HeroOverViewInventoryWindowDY + 078
+InventoryItem07Dx:      equ HeroOverViewInventoryWindowDX + 020
+InventoryItem08DY:      equ HeroOverViewInventoryWindowDY + 078
+InventoryItem08Dx:      equ HeroOverViewInventoryWindowDX + 064
+InventoryItem09DY:      equ HeroOverViewInventoryWindowDY + 078
+InventoryItem09Dx:      equ HeroOverViewInventoryWindowDX + 108
+;6 open slots
+InventoryItem10DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem10Dx:      equ HeroOverViewInventoryWindowDX + 008
+InventoryItem11DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem11Dx:      equ HeroOverViewInventoryWindowDX + 030
+InventoryItem12DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem12Dx:      equ HeroOverViewInventoryWindowDX + 052
+InventoryItem13DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem13Dx:      equ HeroOverViewInventoryWindowDX + 074
+InventoryItem14DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem14Dx:      equ HeroOverViewInventoryWindowDX + 096
+InventoryItem15DY:      equ HeroOverViewInventoryWindowDY + 101
+InventoryItem15Dx:      equ HeroOverViewInventoryWindowDX + 118
+
+
+;inventory has:
+;sword - attack
+;armor - units hp
+;shield - defense
+;helmet - protection
+;boots - movement
+;gloves - archery +x%
+;ring - spell power
+;necklace - spell point recovery / income + 500 when equiped / 
+;robe - intelligence (total mana)
+HeroOverviewInventoryWindowCode:
+  call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
+  call  SetInventoryIcons               ;sets all available items in inactive page
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
+  call  SetInventoryIcons               ;sets all available items in inactive page
+
+  .engine:
+  call  PopulateControls                ;read out keys
+  call  SwapAndSetPage                  ;swap and set page  
+ 
+  halt
+  jp  .engine
+  ret
+
+;sword
+InventoryItem00SY:      equ 000
+InventoryItem00Sx:      equ 146
+InventoryItem01SY:      equ 000
+InventoryItem01Sx:      equ 166
+InventoryItem02SY:      equ 000
+InventoryItem02Sx:      equ 186
+InventoryItem03SY:      equ 000
+InventoryItem03Sx:      equ 206
+InventoryItem04SY:      equ 000
+InventoryItem04Sx:      equ 226
+
+;armor
+InventoryItem05SY:      equ 040
+InventoryItem05Sx:      equ 146
+InventoryItem06SY:      equ 040
+InventoryItem06Sx:      equ 166
+InventoryItem07SY:      equ 040
+InventoryItem07Sx:      equ 186
+InventoryItem08SY:      equ 040
+InventoryItem08Sx:      equ 206
+InventoryItem09SY:      equ 040
+InventoryItem09Sx:      equ 226
+
+;shield
+InventoryItem10SY:      equ 080
+InventoryItem10Sx:      equ 146
+InventoryItem11SY:      equ 080
+InventoryItem11Sx:      equ 166
+InventoryItem12SY:      equ 080
+InventoryItem12Sx:      equ 186
+InventoryItem13SY:      equ 080
+InventoryItem13Sx:      equ 206
+InventoryItem14SY:      equ 080
+InventoryItem14Sx:      equ 226
+
+;helmet
+InventoryItem15SY:      equ 156
+InventoryItem15Sx:      equ 000
+InventoryItem16SY:      equ 156
+InventoryItem16Sx:      equ 020
+InventoryItem17SY:      equ 156
+InventoryItem17Sx:      equ 040
+InventoryItem18SY:      equ 156
+InventoryItem18Sx:      equ 060
+InventoryItem19SY:      equ 156
+InventoryItem19Sx:      equ 080
+
+;boots
+InventoryItem20SY:      equ 156
+InventoryItem20Sx:      equ 100
+InventoryItem21SY:      equ 156
+InventoryItem21Sx:      equ 120
+InventoryItem22SY:      equ 156
+InventoryItem22Sx:      equ 140
+InventoryItem23SY:      equ 156
+InventoryItem23Sx:      equ 160
+InventoryItem24SY:      equ 156
+InventoryItem24Sx:      equ 180
+
+;gloves
+InventoryItem25SY:      equ 156
+InventoryItem25Sx:      equ 200
+InventoryItem26SY:      equ 156
+InventoryItem26Sx:      equ 220
+InventoryItem27SY:      equ 156
+InventoryItem27Sx:      equ 000
+InventoryItem28SY:      equ 196
+InventoryItem28Sx:      equ 020
+InventoryItem29SY:      equ 196
+InventoryItem29Sx:      equ 040
+
+;ring
+InventoryItem30SY:      equ 196
+InventoryItem30Sx:      equ 060
+InventoryItem31SY:      equ 196
+InventoryItem31Sx:      equ 080
+InventoryItem32SY:      equ 196
+InventoryItem32Sx:      equ 100
+InventoryItem33SY:      equ 196
+InventoryItem33Sx:      equ 120
+InventoryItem34SY:      equ 196
+InventoryItem34Sx:      equ 140
+
+;neclace
+InventoryItem35SY:      equ 196
+InventoryItem35Sx:      equ 160
+InventoryItem36SY:      equ 196
+InventoryItem36Sx:      equ 180
+InventoryItem37SY:      equ 196
+InventoryItem37Sx:      equ 200
+InventoryItem38SY:      equ 196
+InventoryItem38Sx:      equ 220
+InventoryItem39SY:      equ 236
+InventoryItem39Sx:      equ 000
+
+;robe
+InventoryItem40SY:      equ 120
+InventoryItem40Sx:      equ 146
+InventoryItem41SY:      equ 120
+InventoryItem41Sx:      equ 166
+InventoryItem42SY:      equ 120
+InventoryItem42Sx:      equ 186
+InventoryItem43SY:      equ 120
+InventoryItem43Sx:      equ 206
+InventoryItem44SY:      equ 120
+InventoryItem44Sx:      equ 226
+
+;empty slot
+InventoryItem45SY:      equ 236
+InventoryItem45Sx:      equ 200
+
+InventoryIconTable: dw $4000 + (InventoryItem00SY*128) + (InventoryItem00SX/2) -128
+                    dw $4000 + (InventoryItem01SY*128) + (InventoryItem01SX/2) -128
+                    dw $4000 + (InventoryItem02SY*128) + (InventoryItem02SX/2) -128
+                    dw $4000 + (InventoryItem03SY*128) + (InventoryItem03SX/2) -128
+                    dw $4000 + (InventoryItem04SY*128) + (InventoryItem04SX/2) -128
+                    dw $4000 + (InventoryItem05SY*128) + (InventoryItem05SX/2) -128
+                    dw $4000 + (InventoryItem06SY*128) + (InventoryItem06SX/2) -128
+                    dw $4000 + (InventoryItem07SY*128) + (InventoryItem07SX/2) -128
+                    dw $4000 + (InventoryItem08SY*128) + (InventoryItem08SX/2) -128
+                    dw $4000 + (InventoryItem09SY*128) + (InventoryItem09SX/2) -128
+                    dw $4000 + (InventoryItem10SY*128) + (InventoryItem10SX/2) -128
+                    dw $4000 + (InventoryItem11SY*128) + (InventoryItem11SX/2) -128
+                    dw $4000 + (InventoryItem12SY*128) + (InventoryItem12SX/2) -128
+                    dw $4000 + (InventoryItem13SY*128) + (InventoryItem13SX/2) -128
+                    dw $4000 + (InventoryItem14SY*128) + (InventoryItem14SX/2) -128
+                    dw $4000 + (InventoryItem15SY*128) + (InventoryItem15SX/2) -128
+                    dw $4000 + (InventoryItem16SY*128) + (InventoryItem16SX/2) -128
+                    dw $4000 + (InventoryItem17SY*128) + (InventoryItem17SX/2) -128
+                    dw $4000 + (InventoryItem18SY*128) + (InventoryItem18SX/2) -128
+                    dw $4000 + (InventoryItem19SY*128) + (InventoryItem19SX/2) -128
+                    dw $4000 + (InventoryItem20SY*128) + (InventoryItem20SX/2) -128
+                    dw $4000 + (InventoryItem21SY*128) + (InventoryItem21SX/2) -128
+                    dw $4000 + (InventoryItem22SY*128) + (InventoryItem22SX/2) -128
+                    dw $4000 + (InventoryItem23SY*128) + (InventoryItem23SX/2) -128
+                    dw $4000 + (InventoryItem24SY*128) + (InventoryItem24SX/2) -128
+                    dw $4000 + (InventoryItem25SY*128) + (InventoryItem25SX/2) -128
+                    dw $4000 + (InventoryItem26SY*128) + (InventoryItem26SX/2) -128
+                    dw $4000 + (InventoryItem27SY*128) + (InventoryItem27SX/2) -128
+                    dw $4000 + (InventoryItem28SY*128) + (InventoryItem28SX/2) -128
+                    dw $4000 + (InventoryItem29SY*128) + (InventoryItem29SX/2) -128
+                    dw $4000 + (InventoryItem30SY*128) + (InventoryItem30SX/2) -128
+                    dw $4000 + (InventoryItem31SY*128) + (InventoryItem31SX/2) -128
+                    dw $4000 + (InventoryItem32SY*128) + (InventoryItem32SX/2) -128
+                    dw $4000 + (InventoryItem33SY*128) + (InventoryItem33SX/2) -128
+                    dw $4000 + (InventoryItem34SY*128) + (InventoryItem34SX/2) -128
+                    dw $4000 + (InventoryItem35SY*128) + (InventoryItem35SX/2) -128
+                    dw $4000 + (InventoryItem36SY*128) + (InventoryItem36SX/2) -128
+                    dw $4000 + (InventoryItem37SY*128) + (InventoryItem37SX/2) -128
+                    dw $4000 + (InventoryItem38SY*128) + (InventoryItem38SX/2) -128
+                    dw $4000 + (InventoryItem39SY*128) + (InventoryItem39SX/2) -128
+                    dw $4000 + (InventoryItem40SY*128) + (InventoryItem40SX/2) -128
+                    dw $4000 + (InventoryItem41SY*128) + (InventoryItem41SX/2) -128
+                    dw $4000 + (InventoryItem42SY*128) + (InventoryItem42SX/2) -128
+                    dw $4000 + (InventoryItem43SY*128) + (InventoryItem43SX/2) -128
+                    dw $4000 + (InventoryItem44SY*128) + (InventoryItem44SX/2) -128
+
+                    dw $4000 + (InventoryItem45SY*128) + (InventoryItem45SX/2) -128
+                    
+SetInventoryIcons:
+  ld    ix,(plxcurrentheroAddress)
+
+  call  .SetIconHLBCandA
+  ld    de,$0000 + (InventoryItem01DY*128) + (InventoryItem01DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem02DY*128) + (InventoryItem02DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem03DY*128) + (InventoryItem03DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem04DY*128) + (InventoryItem04DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem05DY*128) + (InventoryItem05DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem06DY*128) + (InventoryItem06DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem07DY*128) + (InventoryItem07DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem08DY*128) + (InventoryItem08DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem09DY*128) + (InventoryItem09DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;6 open slots
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem10DY*128) + (InventoryItem10DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem11DY*128) + (InventoryItem11DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem12DY*128) + (InventoryItem12DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem13DY*128) + (InventoryItem13DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem14DY*128) + (InventoryItem14DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (InventoryItem15DY*128) + (InventoryItem15DX/2)
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+  .SetIconHLBCandA:
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  add   a,a                             ;*2
+  ld    iy,InventoryIconTable
+  ld    d,0
+  ld    e,a
+  add   iy,de
+  ld    l,(iy)
+  ld    h,(iy+1)
+  inc   ix
+  ld    bc,$0000 + (InventoryItemNY*256) + (InventoryItemNX/2)
+  ld    a,InventoryGraphicsBlock;Map block  
+  ret
+
+
 PlaceWaterSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
@@ -836,6 +1148,7 @@ call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
   ld    (SetSkillsDescription?),a  
   ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
   jp    HeroOverviewSpellBookWindowCode_Fire
+
 
 
 
@@ -1902,12 +2215,19 @@ HeroOverviewCode:
   jr    z,.StatusSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jr    z,.SpellBookSelected
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jr    z,.InventorySelected
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jr    z,.SkillsSelected
 
   xor   a
   ld    (MenuOptionSelected?),a
   ret
+
+  .InventorySelected:
+  xor   a
+  ld    (MenuOptionSelected?),a  
+  jp    HeroOverviewInventoryWindowCode
 
   .StatusSelected:
   xor   a
@@ -2846,3 +3166,11 @@ SetHeroOverViewSpellBookWindow:
   ld    bc,$0000 + (HeroOverViewSpellBookWindowNY*256) + (HeroOverViewSpellBookWindowNX/2)
   ld    a,SpellBookGraphicsBlock;Map block
   jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetHeroOverViewInventoryWindow:
+  ld    hl,$4000 + (HeroOverViewInventoryWindowSY*128) + (HeroOverViewInventoryWindowSX/2) -128
+  ld    de,$0000 + (HeroOverViewInventoryWindowDY*128) + (HeroOverViewInventoryWindowDX/2)
+  ld    bc,$0000 + (HeroOverViewInventoryWindowNY*256) + (HeroOverViewInventoryWindowNX/2)
+  ld    a,InventoryGraphicsBlock;Map block
+  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+

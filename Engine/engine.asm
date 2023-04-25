@@ -4048,11 +4048,11 @@ HeroFireSpells:         equ 64
 HeroAirSpells:          equ 65
 HeroWaterSpells:        equ 66
 HeroAllSchoolsSpells:   equ 67
-
+HeroInventory:          equ 68
 ;AddToHeroTable: equ 9
 
 
-
+lenghtinventorytable:   equ 9 + 6
 
 pl1hero1y:		db	07
 pl1hero1x:		db	2
@@ -4081,6 +4081,7 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .AirSpells:         db  %0000 1111
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
+.Inventory: db  001,045,011,015,020,025,030,045,040,  002,003,045,045,045,004 ;9 body slots and 6 open slots (045 = empty slot)
 
 pl1hero2y:		db	7
 pl1hero2x:		db	3
@@ -4109,6 +4110,7 @@ Pl1Hero2Block:  db Goemon1SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
 
 
 
@@ -4139,16 +4141,7 @@ Pl1Hero3Block:  db PixySpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
-
-
-
-
-
-
-
-
-
-
+.Inventory: ds  lenghtinventorytable,255
 
 
 pl1hero4y:		db	07		                ;
@@ -4178,6 +4171,7 @@ Pl1Hero4Block:  db Drasle1SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 
 pl1hero5y:		db	07		                ;
@@ -4207,6 +4201,7 @@ Pl1Hero5Block:  db LatokSpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 
 pl1hero6y:		db	07		                ;
@@ -4236,6 +4231,7 @@ Pl1Hero6Block:  db Drasle2SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 
 pl1hero7y:		db	07		                ;
@@ -4265,6 +4261,7 @@ Pl1Hero7Block:  db Snake1SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 
 pl1hero8y:		db	07		                ;
@@ -4294,6 +4291,7 @@ Pl1Hero8Block:  db Drasle3SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 
 
@@ -4328,6 +4326,7 @@ Pl2Hero1Block:  db Drasle1SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 pl2hero2y:		ds  lenghtherotable,255
 pl2hero3y:		ds  lenghtherotable,255
@@ -4366,6 +4365,7 @@ Pl3Hero1Block:  db HeroesSpritesBlock1
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 pl3hero2y:		ds  lenghtherotable,255
 pl3hero3y:		ds  lenghtherotable,255
@@ -4403,6 +4403,7 @@ Pl4Hero1Block:  db Drasle1SpriteBlock
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,255
 
 pl4hero2y:		ds  lenghtherotable,255
 pl4hero3y:		ds  lenghtherotable,255

@@ -782,10 +782,11 @@ SetHeroOverviewMenuInPage1ROM:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
-  call  HeroOverviewCode
+;  call  HeroOverviewCode
 ;  call  HeroOverviewSkillsWindowCode
 ;  call  HeroOverviewSpellBookWindowCode_Earth
 ;  call  HeroOverviewSpellBookWindowCode_Fire
+  call  HeroOverviewInventoryWindowCode
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
