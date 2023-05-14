@@ -50,6 +50,10 @@ HeroOverViewSpellBookWindowButton4NX:  equ 010
 HeroOverViewSpellIconWindowButtonNY:  equ 016
 HeroOverViewSpellIconWindowButtonNX:  equ 016
 
+HeroOverViewInventoryIconWindowButtonNY:  equ 020
+HeroOverViewInventoryIconWindowButtonNX:  equ 020
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 HeroOverViewSpellBackdropSX:   equ 192
@@ -198,20 +202,68 @@ InventoryItem15Dx:      equ HeroOverViewInventoryWindowDX + 118
 ;ring - spell power
 ;necklace - spell point recovery / income + 500 when equiped / 
 ;robe - intelligence (total mana)
-HeroOverviewInventoryWindowCode:
+HeroOverviewInventoryWindowCode:  
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
 
+
+  ld    ix,ButtonTableInventoryIconsSYSX
+  ld    hl,$4000 + (HeroOverViewInventoryIconButton1OffSY*128) + (HeroOverViewInventoryIconButton1OffSX/2) - 128
+  ld    (ix+0),l
+  ld    (ix+1),h
+
+  ld    hl,$4000 + (HeroOverViewInventoryIconButton1MouseOverSY*128) + (HeroOverViewInventoryIconButton1MouseOverSX/2) - 128
+  ld    (ix+2),l
+  ld    (ix+3),h
+
+  ld    hl,$4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+  ld    (ix+4),l
+  ld    (ix+5),h
+
   .engine:
   call  PopulateControls                ;read out keys
+
+
+
+
+  ld    ix,HeroOverviewInventoryIconButtonTable
+  ld    iy,ButtonTableInventoryIconsSYSX
+  call  CheckButtonMouseInteraction
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.SpellIconPressed
+
+  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetSpellExplanation_Earth             ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+
+  ld    ix,HeroOverviewInventoryIconButtonTable
+  call  SetButtonStatusAndText3         ;copies button state from rom -> vram
+
+
+
+
   call  SwapAndSetPage                  ;swap and set page  
  
   halt
   jp  .engine
-  ret
+
+
+
+  .SpellIconPressed:
+  ld    (MenuOptionSelected?Backup),a
+  xor   a
+  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+  ld    a,3
+  ld    (SetSkillsDescription?),a  
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewInventoryWindowCode
+
 
 ;sword
 InventoryItem00SY:      equ 000
@@ -2702,6 +2754,66 @@ MenuOptionSelected:
   ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
   ld    (MenuOptionSelected?),a
   pop   af                                    ;pop the call in the button check loop 
+  ret
+
+SetButtonStatusAndText3:
+;  ld    ix,HeroOverviewSpellBookButtonTable
+;  ld    iy,ButtonTableSpellBookSYSX
+;  ld    bc,$0000 + (HeroOverViewSpellBookWindowButtonNY*256) + (HeroOverViewSpellBookWindowButtonNX/2)
+
+  ld    (BCStored),bc
+
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,ButtonTableLenght
+  add   ix,de
+
+
+  ld    de,6                            ;lenght of button data
+  add   iy,de
+
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   0,(ix+HeroOverviewWindowButtonStatus)
+  jr    nz,.bit0isSet
+  bit   1,(ix+HeroOverviewWindowButtonStatus)
+  ret   z
+  
+  .bit1isSet:
+  res   1,(ix+HeroOverviewWindowButtonStatus)
+  jr    .goCopyButton
+  .bit0isSet:
+  res   0,(ix+HeroOverviewWindowButtonStatus)  
+  .goCopyButton:
+
+  bit   7,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOff)
+  ld    h,(iy+ButtonOff+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   6,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonMouseOver)
+  ld    h,(iy+ButtonMouseOver+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+;  bit   5,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOMouseClicked)
+  ld    h,(iy+ButtonOMouseClicked+1)
+  .go:
+  
+  ld    e,(ix+HeroOverviewWindowButton_de)
+  ld    d,(ix+HeroOverviewWindowButton_de+1)
+  ld    bc,(BCStored)
+
+  ld    c,(ix+Buttonnynx)
+  ld    b,(ix+Buttonnynx+1)
+
+  ld    a,InventoryGraphicsBlock        ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText2:                       ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
