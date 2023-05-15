@@ -381,8 +381,6 @@ HeroOverViewInventoryIconButton4OffSY:           equ 156
 HeroOverViewInventoryIconButton4MouseOverSX:     equ 000
 HeroOverViewInventoryIconButton4MouseOverSY:     equ 176
 
-
-
 HeroOverViewInventoryIconButton5OffSX:           equ 146
 HeroOverViewInventoryIconButton5OffSY:           equ 000
 HeroOverViewInventoryIconButton5MouseOverSX:     equ 146
@@ -407,7 +405,36 @@ HeroOverViewInventoryIconButton9OffSX:           equ 020
 HeroOverViewInventoryIconButton9OffSY:           equ 028
 HeroOverViewInventoryIconButton9MouseOverSX:     equ 020
 HeroOverViewInventoryIconButton9MouseOverSY:     equ 028
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+HeroOverViewInventoryIconButton10OffSX:           equ 000
+HeroOverViewInventoryIconButton10OffSY:           equ 156
+HeroOverViewInventoryIconButton10MouseOverSX:     equ 000
+HeroOverViewInventoryIconButton10MouseOverSY:     equ 176
 
+HeroOverViewInventoryIconButton11OffSX:           equ 146
+HeroOverViewInventoryIconButton11OffSY:           equ 000
+HeroOverViewInventoryIconButton11MouseOverSX:     equ 146
+HeroOverViewInventoryIconButton11MouseOverSY:     equ 020
+
+HeroOverViewInventoryIconButton12OffSX:           equ 146
+HeroOverViewInventoryIconButton12OffSY:           equ 000
+HeroOverViewInventoryIconButton12MouseOverSX:     equ 146
+HeroOverViewInventoryIconButton12MouseOverSY:     equ 020
+
+HeroOverViewInventoryIconButton13OffSX:           equ 146
+HeroOverViewInventoryIconButton13OffSY:           equ 000
+HeroOverViewInventoryIconButton13MouseOverSX:     equ 146
+HeroOverViewInventoryIconButton13MouseOverSY:     equ 020
+
+HeroOverViewInventoryIconButton14OffSX:           equ 146
+HeroOverViewInventoryIconButton14OffSY:           equ 000
+HeroOverViewInventoryIconButton14MouseOverSX:     equ 146
+HeroOverViewInventoryIconButton14MouseOverSY:     equ 020
+
+HeroOverViewInventoryIconButton15OffSX:           equ 020
+HeroOverViewInventoryIconButton15OffSY:           equ 028
+HeroOverViewInventoryIconButton15MouseOverSX:     equ 020
+HeroOverViewInventoryIconButton15MouseOverSY:     equ 028
 
 
 
@@ -447,6 +474,31 @@ ButtonTableInventoryIconsSYSX:
   dw  $4000 + (HeroOverViewInventoryIconButton9OffSY*128) + (HeroOverViewInventoryIconButton9OffSX/2) - 128
   dw  $4000 + (HeroOverViewInventoryIconButton9MouseOverSY*128) + (HeroOverViewInventoryIconButton9MouseOverSX/2) - 128
   dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  dw  $4000 + (HeroOverViewInventoryIconButton10OffSY*128) + (HeroOverViewInventoryIconButton10OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton10MouseOverSY*128) + (HeroOverViewInventoryIconButton10MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewInventoryIconButton11OffSY*128) + (HeroOverViewInventoryIconButton11OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton11MouseOverSY*128) + (HeroOverViewInventoryIconButton11MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewInventoryIconButton12OffSY*128) + (HeroOverViewInventoryIconButton12OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton12MouseOverSY*128) + (HeroOverViewInventoryIconButton12MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewInventoryIconButton13OffSY*128) + (HeroOverViewInventoryIconButton13OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton13MouseOverSY*128) + (HeroOverViewInventoryIconButton13MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewInventoryIconButton14OffSY*128) + (HeroOverViewInventoryIconButton14OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton14MouseOverSY*128) + (HeroOverViewInventoryIconButton14MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewInventoryIconButton15OffSY*128) + (HeroOverViewInventoryIconButton15OffSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButton15MouseOverSY*128) + (HeroOverViewInventoryIconButton15MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
+
 
 HeroOverViewInventoryIconButton1DX:   equ HeroOverViewInventoryWindowDX + 020
 HeroOverViewInventoryIconButton1DY:   equ HeroOverViewInventoryWindowDY + 028
@@ -474,8 +526,26 @@ HeroOverViewInventoryIconButton8DY:   equ HeroOverViewInventoryWindowDY + 078
 
 HeroOverViewInventoryIconButton9DX:   equ HeroOverViewInventoryWindowDX + 108
 HeroOverViewInventoryIconButton9DY:   equ HeroOverViewInventoryWindowDY + 078
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+HeroOverViewInventoryIconButton10DX:   equ HeroOverViewInventoryWindowDX + 008
+HeroOverViewInventoryIconButton10DY:   equ HeroOverViewInventoryWindowDY + 101
 
-HeroOverviewInventoryIconButtonTableAmountOfButtons:  db  9
+HeroOverViewInventoryIconButton11DX:   equ HeroOverViewInventoryWindowDX + 030
+HeroOverViewInventoryIconButton11DY:   equ HeroOverViewInventoryWindowDY + 101
+
+HeroOverViewInventoryIconButton12DX:   equ HeroOverViewInventoryWindowDX + 052
+HeroOverViewInventoryIconButton12DY:   equ HeroOverViewInventoryWindowDY + 101
+
+HeroOverViewInventoryIconButton13DX:   equ HeroOverViewInventoryWindowDX + 074
+HeroOverViewInventoryIconButton13DY:   equ HeroOverViewInventoryWindowDY + 101
+
+HeroOverViewInventoryIconButton14DX:   equ HeroOverViewInventoryWindowDX + 096
+HeroOverViewInventoryIconButton14DY:   equ HeroOverViewInventoryWindowDY + 101
+
+HeroOverViewInventoryIconButton15DX:   equ HeroOverViewInventoryWindowDX + 118
+HeroOverViewInventoryIconButton15DY:   equ HeroOverViewInventoryWindowDY + 101
+
+HeroOverviewInventoryIconButtonTableAmountOfButtons:  db  9 + 6
 HeroOverviewInventoryIconButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
   dw  $0000 + (HeroOverViewInventoryIconButton1DY*128) + (HeroOverViewInventoryIconButton1DX/2) | db %1000 0011, HeroOverViewInventoryIconButton1DY,HeroOverViewInventoryIconButton1DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton1DX,HeroOverViewInventoryIconButton1DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton2DY*128) + (HeroOverViewInventoryIconButton2DX/2) | db %1000 0011, HeroOverViewInventoryIconButton2DY,HeroOverViewInventoryIconButton2DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton2DX,HeroOverViewInventoryIconButton2DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
@@ -487,6 +557,12 @@ HeroOverviewInventoryIconButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover
   dw  $0000 + (HeroOverViewInventoryIconButton8DY*128) + (HeroOverViewInventoryIconButton8DX/2) | db %1000 0011, HeroOverViewInventoryIconButton8DY,HeroOverViewInventoryIconButton8DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton8DX,HeroOverViewInventoryIconButton8DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton9DY*128) + (HeroOverViewInventoryIconButton9DX/2) | db %1000 0011, HeroOverViewInventoryIconButton9DY,HeroOverViewInventoryIconButton9DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton9DX,HeroOverViewInventoryIconButton9DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
 
+  dw  $0000 + (HeroOverViewInventoryIconButton10DY*128) + (HeroOverViewInventoryIconButton10DX/2) | db %1000 0011, HeroOverViewInventoryIconButton10DY,HeroOverViewInventoryIconButton10DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton10DX,HeroOverViewInventoryIconButton10DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewInventoryIconButton11DY*128) + (HeroOverViewInventoryIconButton11DX/2) | db %1000 0011, HeroOverViewInventoryIconButton11DY,HeroOverViewInventoryIconButton11DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton11DX,HeroOverViewInventoryIconButton11DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewInventoryIconButton12DY*128) + (HeroOverViewInventoryIconButton12DX/2) | db %1000 0011, HeroOverViewInventoryIconButton12DY,HeroOverViewInventoryIconButton12DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton12DX,HeroOverViewInventoryIconButton12DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewInventoryIconButton13DY*128) + (HeroOverViewInventoryIconButton13DX/2) | db %1000 0011, HeroOverViewInventoryIconButton13DY,HeroOverViewInventoryIconButton13DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton13DX,HeroOverViewInventoryIconButton13DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewInventoryIconButton14DY*128) + (HeroOverViewInventoryIconButton14DX/2) | db %1000 0011, HeroOverViewInventoryIconButton14DY,HeroOverViewInventoryIconButton14DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton14DX,HeroOverViewInventoryIconButton14DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewInventoryIconButton15DY*128) + (HeroOverViewInventoryIconButton15DX/2) | db %1000 0011, HeroOverViewInventoryIconButton15DY,HeroOverViewInventoryIconButton15DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton15DX,HeroOverViewInventoryIconButton15DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
 
 
 

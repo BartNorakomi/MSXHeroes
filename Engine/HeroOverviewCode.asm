@@ -192,6 +192,310 @@ InventoryItem15DY:      equ HeroOverViewInventoryWindowDY + 101
 InventoryItem15Dx:      equ HeroOverViewInventoryWindowDX + 118
 
 
+
+
+
+
+
+InventoryIconTableSYSX: 
+                    dw $4000 + (InventoryItem00ButtonOffSY*128) + (InventoryItem00ButtonOffSX/2) - 128  ;sword 1
+                    dw $4000 + (InventoryItem00MouseOverSY*128) + (InventoryItem00MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem01ButtonOffSY*128) + (InventoryItem01ButtonOffSX/2) - 128  ;sword 2
+                    dw $4000 + (InventoryItem01MouseOverSY*128) + (InventoryItem01MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem02ButtonOffSY*128) + (InventoryItem02ButtonOffSX/2) - 128  ;sword 3
+                    dw $4000 + (InventoryItem02MouseOverSY*128) + (InventoryItem02MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem03ButtonOffSY*128) + (InventoryItem03ButtonOffSX/2) - 128  ;sword 4
+                    dw $4000 + (InventoryItem03MouseOverSY*128) + (InventoryItem03MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem04ButtonOffSY*128) + (InventoryItem04ButtonOffSX/2) - 128  ;sword 5
+                    dw $4000 + (InventoryItem04MouseOverSY*128) + (InventoryItem04MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem05ButtonOffSY*128) + (InventoryItem05ButtonOffSX/2) - 128  ;armor 1
+                    dw $4000 + (InventoryItem05MouseOverSY*128) + (InventoryItem05MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem06ButtonOffSY*128) + (InventoryItem06ButtonOffSX/2) - 128  ;armor 2
+                    dw $4000 + (InventoryItem06MouseOverSY*128) + (InventoryItem06MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem07ButtonOffSY*128) + (InventoryItem07ButtonOffSX/2) - 128  ;armor 3
+                    dw $4000 + (InventoryItem07MouseOverSY*128) + (InventoryItem07MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem08ButtonOffSY*128) + (InventoryItem08ButtonOffSX/2) - 128  ;armor 4
+                    dw $4000 + (InventoryItem08MouseOverSY*128) + (InventoryItem08MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem09ButtonOffSY*128) + (InventoryItem09ButtonOffSX/2) - 128  ;armor 5
+                    dw $4000 + (InventoryItem09MouseOverSY*128) + (InventoryItem09MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem10ButtonOffSY*128) + (InventoryItem10ButtonOffSX/2) - 128  ;shield 1
+                    dw $4000 + (InventoryItem10MouseOverSY*128) + (InventoryItem10MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem11ButtonOffSY*128) + (InventoryItem11ButtonOffSX/2) - 128  ;shield 2
+                    dw $4000 + (InventoryItem11MouseOverSY*128) + (InventoryItem11MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem12ButtonOffSY*128) + (InventoryItem12ButtonOffSX/2) - 128  ;shield 3
+                    dw $4000 + (InventoryItem12MouseOverSY*128) + (InventoryItem12MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem13ButtonOffSY*128) + (InventoryItem13ButtonOffSX/2) - 128  ;shield 4
+                    dw $4000 + (InventoryItem13MouseOverSY*128) + (InventoryItem13MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem14ButtonOffSY*128) + (InventoryItem14ButtonOffSX/2) - 128  ;shield 5
+                    dw $4000 + (InventoryItem14MouseOverSY*128) + (InventoryItem14MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem15ButtonOffSY*128) + (InventoryItem15ButtonOffSX/2) - 128  ;helmet 1
+                    dw $4000 + (InventoryItem15MouseOverSY*128) + (InventoryItem15MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem16ButtonOffSY*128) + (InventoryItem16ButtonOffSX/2) - 128  ;helmet 2
+                    dw $4000 + (InventoryItem16MouseOverSY*128) + (InventoryItem16MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem17ButtonOffSY*128) + (InventoryItem17ButtonOffSX/2) - 128  ;helmet 3
+                    dw $4000 + (InventoryItem17MouseOverSY*128) + (InventoryItem17MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem18ButtonOffSY*128) + (InventoryItem18ButtonOffSX/2) - 128  ;helmet 4
+                    dw $4000 + (InventoryItem18MouseOverSY*128) + (InventoryItem18MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem19ButtonOffSY*128) + (InventoryItem19ButtonOffSX/2) - 128  ;helmet 5
+                    dw $4000 + (InventoryItem19MouseOverSY*128) + (InventoryItem19MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem20ButtonOffSY*128) + (InventoryItem20ButtonOffSX/2) - 128  ;boots 1
+                    dw $4000 + (InventoryItem20MouseOverSY*128) + (InventoryItem20MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem21ButtonOffSY*128) + (InventoryItem21ButtonOffSX/2) - 128  ;boots 2
+                    dw $4000 + (InventoryItem21MouseOverSY*128) + (InventoryItem21MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem22ButtonOffSY*128) + (InventoryItem22ButtonOffSX/2) - 128  ;boots 3
+                    dw $4000 + (InventoryItem22MouseOverSY*128) + (InventoryItem22MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem23ButtonOffSY*128) + (InventoryItem23ButtonOffSX/2) - 128  ;boots 4
+                    dw $4000 + (InventoryItem23MouseOverSY*128) + (InventoryItem23MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem24ButtonOffSY*128) + (InventoryItem24ButtonOffSX/2) - 128  ;boots 5
+                    dw $4000 + (InventoryItem24MouseOverSY*128) + (InventoryItem24MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem25ButtonOffSY*128) + (InventoryItem25ButtonOffSX/2) - 128  ;gloves 1
+                    dw $4000 + (InventoryItem25MouseOverSY*128) + (InventoryItem25MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem26ButtonOffSY*128) + (InventoryItem26ButtonOffSX/2) - 128  ;gloves 2
+                    dw $4000 + (InventoryItem26MouseOverSY*128) + (InventoryItem26MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem27ButtonOffSY*128) + (InventoryItem27ButtonOffSX/2) - 128  ;gloves 3
+                    dw $4000 + (InventoryItem27MouseOverSY*128) + (InventoryItem27MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem28ButtonOffSY*128) + (InventoryItem28ButtonOffSX/2) - 128  ;gloves 4
+                    dw $4000 + (InventoryItem28MouseOverSY*128) + (InventoryItem28MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem29ButtonOffSY*128) + (InventoryItem29ButtonOffSX/2) - 128  ;gloves 5
+                    dw $4000 + (InventoryItem29MouseOverSY*128) + (InventoryItem29MouseOverSX/2) - 128
+
+
+
+                    dw $4000 + (InventoryItem30ButtonOffSY*128) + (InventoryItem30ButtonOffSX/2) - 128  ;ring 1
+                    dw $4000 + (InventoryItem30MouseOverSY*128) + (InventoryItem30MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem31ButtonOffSY*128) + (InventoryItem31ButtonOffSX/2) - 128  ;ring 2
+                    dw $4000 + (InventoryItem31MouseOverSY*128) + (InventoryItem31MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem32ButtonOffSY*128) + (InventoryItem32ButtonOffSX/2) - 128  ;ring 3
+                    dw $4000 + (InventoryItem32MouseOverSY*128) + (InventoryItem32MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem33ButtonOffSY*128) + (InventoryItem33ButtonOffSX/2) - 128  ;ring 4
+                    dw $4000 + (InventoryItem33MouseOverSY*128) + (InventoryItem33MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem34ButtonOffSY*128) + (InventoryItem34ButtonOffSX/2) - 128  ;ring 5
+                    dw $4000 + (InventoryItem34MouseOverSY*128) + (InventoryItem34MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem35ButtonOffSY*128) + (InventoryItem35ButtonOffSX/2) - 128  ;neclace 1
+                    dw $4000 + (InventoryItem35MouseOverSY*128) + (InventoryItem35MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem36ButtonOffSY*128) + (InventoryItem36ButtonOffSX/2) - 128  ;neclace 2
+                    dw $4000 + (InventoryItem36MouseOverSY*128) + (InventoryItem36MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem37ButtonOffSY*128) + (InventoryItem37ButtonOffSX/2) - 128  ;neclace 3
+                    dw $4000 + (InventoryItem37MouseOverSY*128) + (InventoryItem37MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem38ButtonOffSY*128) + (InventoryItem38ButtonOffSX/2) - 128  ;neclace 4
+                    dw $4000 + (InventoryItem38MouseOverSY*128) + (InventoryItem38MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem39ButtonOffSY*128) + (InventoryItem39ButtonOffSX/2) - 128  ;neclace 5
+                    dw $4000 + (InventoryItem39MouseOverSY*128) + (InventoryItem39MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem40ButtonOffSY*128) + (InventoryItem40ButtonOffSX/2) - 128  ;robe 1
+                    dw $4000 + (InventoryItem40MouseOverSY*128) + (InventoryItem40MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem41ButtonOffSY*128) + (InventoryItem41ButtonOffSX/2) - 128  ;robe 2
+                    dw $4000 + (InventoryItem41MouseOverSY*128) + (InventoryItem41MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem42ButtonOffSY*128) + (InventoryItem42ButtonOffSX/2) - 128  ;robe 3
+                    dw $4000 + (InventoryItem42MouseOverSY*128) + (InventoryItem42MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem43ButtonOffSY*128) + (InventoryItem43ButtonOffSX/2) - 128  ;robe 4
+                    dw $4000 + (InventoryItem43MouseOverSY*128) + (InventoryItem43MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem44ButtonOffSY*128) + (InventoryItem44ButtonOffSX/2) - 128  ;robe 5
+                    dw $4000 + (InventoryItem44MouseOverSY*128) + (InventoryItem44MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
+                    dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
+
+InventoryItem00ButtonOffSY:   equ 000 ;sword 1
+InventoryItem00ButtonOffSX:   equ 146
+InventoryItem00MouseOverSY:   equ 020
+InventoryItem00MouseOverSX:   equ 146
+InventoryItem01ButtonOffSY:   equ 000 ;sword 2
+InventoryItem01ButtonOffSX:   equ 166
+InventoryItem01MouseOverSY:   equ 020
+InventoryItem01MouseOverSX:   equ 166
+InventoryItem02ButtonOffSY:   equ 000 ;sword 3
+InventoryItem02ButtonOffSX:   equ 186
+InventoryItem02MouseOverSY:   equ 020
+InventoryItem02MouseOverSX:   equ 186
+InventoryItem03ButtonOffSY:   equ 000 ;sword 4
+InventoryItem03ButtonOffSX:   equ 206
+InventoryItem03MouseOverSY:   equ 020
+InventoryItem03MouseOverSX:   equ 206
+InventoryItem04ButtonOffSY:   equ 000 ;sword 5
+InventoryItem04ButtonOffSX:   equ 226
+InventoryItem04MouseOverSY:   equ 020
+InventoryItem04MouseOverSX:   equ 226
+
+InventoryItem05ButtonOffSY:   equ 040 ;armor 1
+InventoryItem05ButtonOffSX:   equ 146
+InventoryItem05MouseOverSY:   equ 060
+InventoryItem05MouseOverSX:   equ 146
+InventoryItem06ButtonOffSY:   equ 040 ;armor 2
+InventoryItem06ButtonOffSX:   equ 166
+InventoryItem06MouseOverSY:   equ 060
+InventoryItem06MouseOverSX:   equ 166
+InventoryItem07ButtonOffSY:   equ 040 ;armor 3
+InventoryItem07ButtonOffSX:   equ 186
+InventoryItem07MouseOverSY:   equ 060
+InventoryItem07MouseOverSX:   equ 186
+InventoryItem08ButtonOffSY:   equ 040 ;armor 4
+InventoryItem08ButtonOffSX:   equ 206
+InventoryItem08MouseOverSY:   equ 060
+InventoryItem08MouseOverSX:   equ 206
+InventoryItem09ButtonOffSY:   equ 040 ;armor 5
+InventoryItem09ButtonOffSX:   equ 226
+InventoryItem09MouseOverSY:   equ 060
+InventoryItem09MouseOverSX:   equ 226
+
+InventoryItem10ButtonOffSY:   equ 080 ;shield 1
+InventoryItem10ButtonOffSX:   equ 146
+InventoryItem10MouseOverSY:   equ 100
+InventoryItem10MouseOverSX:   equ 146
+InventoryItem11ButtonOffSY:   equ 080 ;shield 2
+InventoryItem11ButtonOffSX:   equ 166
+InventoryItem11MouseOverSY:   equ 100
+InventoryItem11MouseOverSX:   equ 166
+InventoryItem12ButtonOffSY:   equ 080 ;shield 3
+InventoryItem12ButtonOffSX:   equ 186
+InventoryItem12MouseOverSY:   equ 100
+InventoryItem12MouseOverSX:   equ 186
+InventoryItem13ButtonOffSY:   equ 080 ;shield 4
+InventoryItem13ButtonOffSX:   equ 206
+InventoryItem13MouseOverSY:   equ 100
+InventoryItem13MouseOverSX:   equ 206
+InventoryItem14ButtonOffSY:   equ 080 ;shield 5
+InventoryItem14ButtonOffSX:   equ 226
+InventoryItem14MouseOverSY:   equ 100
+InventoryItem14MouseOverSX:   equ 226
+
+InventoryItem15ButtonOffSY:   equ 156 ;helmet 1
+InventoryItem15ButtonOffSX:   equ 000
+InventoryItem15MouseOverSY:   equ 176
+InventoryItem15MouseOverSX:   equ 000
+InventoryItem16ButtonOffSY:   equ 156 ;helmet 2
+InventoryItem16ButtonOffSX:   equ 020
+InventoryItem16MouseOverSY:   equ 176
+InventoryItem16MouseOverSX:   equ 020
+InventoryItem17ButtonOffSY:   equ 156 ;helmet 3
+InventoryItem17ButtonOffSX:   equ 040
+InventoryItem17MouseOverSY:   equ 176
+InventoryItem17MouseOverSX:   equ 040
+InventoryItem18ButtonOffSY:   equ 156 ;helmet 4
+InventoryItem18ButtonOffSX:   equ 060
+InventoryItem18MouseOverSY:   equ 176
+InventoryItem18MouseOverSX:   equ 060
+InventoryItem19ButtonOffSY:   equ 156 ;helmet 5
+InventoryItem19ButtonOffSX:   equ 080
+InventoryItem19MouseOverSY:   equ 176
+InventoryItem19MouseOverSX:   equ 080
+
+InventoryItem20ButtonOffSY:   equ 156 ;boots 1
+InventoryItem20ButtonOffSX:   equ 100
+InventoryItem20MouseOverSY:   equ 176
+InventoryItem20MouseOverSX:   equ 100
+InventoryItem21ButtonOffSY:   equ 156 ;boots 2
+InventoryItem21ButtonOffSX:   equ 120
+InventoryItem21MouseOverSY:   equ 176
+InventoryItem21MouseOverSX:   equ 120
+InventoryItem22ButtonOffSY:   equ 156 ;boots 3
+InventoryItem22ButtonOffSX:   equ 140
+InventoryItem22MouseOverSY:   equ 176
+InventoryItem22MouseOverSX:   equ 140
+InventoryItem23ButtonOffSY:   equ 156 ;boots 4
+InventoryItem23ButtonOffSX:   equ 160
+InventoryItem23MouseOverSY:   equ 176
+InventoryItem23MouseOverSX:   equ 160
+InventoryItem24ButtonOffSY:   equ 156 ;boots 5
+InventoryItem24ButtonOffSX:   equ 180
+InventoryItem24MouseOverSY:   equ 176
+InventoryItem24MouseOverSX:   equ 180
+
+InventoryItem25ButtonOffSY:   equ 156 ;gloves 1
+InventoryItem25ButtonOffSX:   equ 200
+InventoryItem25MouseOverSY:   equ 176
+InventoryItem25MouseOverSX:   equ 200
+InventoryItem26ButtonOffSY:   equ 156 ;gloves 2
+InventoryItem26ButtonOffSX:   equ 220
+InventoryItem26MouseOverSY:   equ 176
+InventoryItem26MouseOverSX:   equ 220
+InventoryItem27ButtonOffSY:   equ 196 ;gloves 3
+InventoryItem27ButtonOffSX:   equ 000
+InventoryItem27MouseOverSY:   equ 216
+InventoryItem27MouseOverSX:   equ 000
+InventoryItem28ButtonOffSY:   equ 196 ;gloves 4
+InventoryItem28ButtonOffSX:   equ 020
+InventoryItem28MouseOverSY:   equ 216
+InventoryItem28MouseOverSX:   equ 020
+InventoryItem29ButtonOffSY:   equ 196 ;gloves 5
+InventoryItem29ButtonOffSX:   equ 040
+InventoryItem29MouseOverSY:   equ 216
+InventoryItem29MouseOverSX:   equ 040
+
+InventoryItem30ButtonOffSY:   equ 196 ;ring 1
+InventoryItem30ButtonOffSX:   equ 060
+InventoryItem30MouseOverSY:   equ 216
+InventoryItem30MouseOverSX:   equ 060
+InventoryItem31ButtonOffSY:   equ 196 ;ring 2
+InventoryItem31ButtonOffSX:   equ 080
+InventoryItem31MouseOverSY:   equ 216
+InventoryItem31MouseOverSX:   equ 080
+InventoryItem32ButtonOffSY:   equ 196 ;ring 3
+InventoryItem32ButtonOffSX:   equ 100
+InventoryItem32MouseOverSY:   equ 216
+InventoryItem32MouseOverSX:   equ 100
+InventoryItem33ButtonOffSY:   equ 196 ;ring 4
+InventoryItem33ButtonOffSX:   equ 120
+InventoryItem33MouseOverSY:   equ 216
+InventoryItem33MouseOverSX:   equ 120
+InventoryItem34ButtonOffSY:   equ 196 ;ring 5
+InventoryItem34ButtonOffSX:   equ 140
+InventoryItem34MouseOverSY:   equ 216
+InventoryItem34MouseOverSX:   equ 140
+
+InventoryItem35ButtonOffSY:   equ 196 ;neclace 1
+InventoryItem35ButtonOffSX:   equ 160
+InventoryItem35MouseOverSY:   equ 216
+InventoryItem35MouseOverSX:   equ 160
+InventoryItem36ButtonOffSY:   equ 196 ;neclace 2
+InventoryItem36ButtonOffSX:   equ 180
+InventoryItem36MouseOverSY:   equ 216
+InventoryItem36MouseOverSX:   equ 180
+InventoryItem37ButtonOffSY:   equ 196 ;neclace 3
+InventoryItem37ButtonOffSX:   equ 200
+InventoryItem37MouseOverSY:   equ 216
+InventoryItem37MouseOverSX:   equ 200
+InventoryItem38ButtonOffSY:   equ 196 ;neclace 4
+InventoryItem38ButtonOffSX:   equ 220
+InventoryItem38MouseOverSY:   equ 216
+InventoryItem38MouseOverSX:   equ 220
+InventoryItem39ButtonOffSY:   equ 236 ;neclace 5
+InventoryItem39ButtonOffSX:   equ 000
+InventoryItem39MouseOverSY:   equ 236
+InventoryItem39MouseOverSX:   equ 020
+
+InventoryItem40ButtonOffSY:   equ 236 ;robe 1
+InventoryItem40ButtonOffSX:   equ 040
+InventoryItem40MouseOverSY:   equ 120
+InventoryItem40MouseOverSX:   equ 146
+InventoryItem41ButtonOffSY:   equ 236 ;robe 2
+InventoryItem41ButtonOffSX:   equ 060
+InventoryItem41MouseOverSY:   equ 120
+InventoryItem41MouseOverSX:   equ 166
+InventoryItem42ButtonOffSY:   equ 236 ;robe 3
+InventoryItem42ButtonOffSX:   equ 080
+InventoryItem42MouseOverSY:   equ 120
+InventoryItem42MouseOverSX:   equ 186
+InventoryItem43ButtonOffSY:   equ 236 ;robe 4
+InventoryItem43ButtonOffSX:   equ 100
+InventoryItem43MouseOverSY:   equ 120
+InventoryItem43MouseOverSX:   equ 206
+InventoryItem44ButtonOffSY:   equ 236 ;robe 5
+InventoryItem44ButtonOffSX:   equ 120
+InventoryItem44MouseOverSY:   equ 120
+InventoryItem44MouseOverSX:   equ 226
+
+InventoryItem45ButtonOffSY:   equ 236 ;empty slot
+InventoryItem45ButtonOffSX:   equ 200
+InventoryItem45MouseOverSY:   equ 236
+InventoryItem45MouseOverSX:   equ 200
+
 ;inventory has:
 ;sword - attack
 ;armor - units hp
@@ -208,20 +512,7 @@ HeroOverviewInventoryWindowCode:
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
-
-
-  ld    ix,ButtonTableInventoryIconsSYSX
-  ld    hl,$4000 + (HeroOverViewInventoryIconButton1OffSY*128) + (HeroOverViewInventoryIconButton1OffSX/2) - 128
-  ld    (ix+0),l
-  ld    (ix+1),h
-
-  ld    hl,$4000 + (HeroOverViewInventoryIconButton1MouseOverSY*128) + (HeroOverViewInventoryIconButton1MouseOverSX/2) - 128
-  ld    (ix+2),l
-  ld    (ix+3),h
-
-  ld    hl,$4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128
-  ld    (ix+4),l
-  ld    (ix+5),h
+  call  CreateInventoryListForCurrHero  ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
 
   .engine:
   call  PopulateControls                ;read out keys
@@ -265,165 +556,37 @@ HeroOverviewInventoryWindowCode:
   jp    HeroOverviewInventoryWindowCode
 
 
-;sword
-InventoryItem00SY:      equ 000
-InventoryItem00Sx:      equ 146
-InventoryItem01SY:      equ 000
-InventoryItem01Sx:      equ 166
-InventoryItem02SY:      equ 000
-InventoryItem02Sx:      equ 186
-InventoryItem03SY:      equ 000
-InventoryItem03Sx:      equ 206
-InventoryItem04SY:      equ 000
-InventoryItem04Sx:      equ 226
+CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
+  ld    ix,(plxcurrentheroAddress)
+  ld    iy,ButtonTableInventoryIconsSYSX
 
-;armor
-InventoryItem05SY:      equ 040
-InventoryItem05Sx:      equ 146
-InventoryItem06SY:      equ 040
-InventoryItem06Sx:      equ 166
-InventoryItem07SY:      equ 040
-InventoryItem07Sx:      equ 186
-InventoryItem08SY:      equ 040
-InventoryItem08Sx:      equ 206
-InventoryItem09SY:      equ 040
-InventoryItem09Sx:      equ 226
+  ld    b,9+6                           ;9 inventory slots
 
-;shield
-InventoryItem10SY:      equ 080
-InventoryItem10Sx:      equ 146
-InventoryItem11SY:      equ 080
-InventoryItem11Sx:      equ 166
-InventoryItem12SY:      equ 080
-InventoryItem12Sx:      equ 186
-InventoryItem13SY:      equ 080
-InventoryItem13Sx:      equ 206
-InventoryItem14SY:      equ 080
-InventoryItem14Sx:      equ 226
+  .loop:
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  add   a,a                             ;*2
+  add   a,a                             ;*4
+  ld    d,0
+  ld    e,a
+  ld    hl,InventoryIconTableSYSX
+  add   hl,de
+  ld    a,(hl)
+  ld    (iy+0),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+1),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+2),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+3),a
+  ld    de,6
+  add   iy,de                           ;next button in ButtonTableInventoryIconsSYSX
+  inc   ix                              ;next hero-inventory item
+  djnz  .loop
+  ret
 
-;helmet
-InventoryItem15SY:      equ 156
-InventoryItem15Sx:      equ 000
-InventoryItem16SY:      equ 156
-InventoryItem16Sx:      equ 020
-InventoryItem17SY:      equ 156
-InventoryItem17Sx:      equ 040
-InventoryItem18SY:      equ 156
-InventoryItem18Sx:      equ 060
-InventoryItem19SY:      equ 156
-InventoryItem19Sx:      equ 080
-
-;boots
-InventoryItem20SY:      equ 156
-InventoryItem20Sx:      equ 100
-InventoryItem21SY:      equ 156
-InventoryItem21Sx:      equ 120
-InventoryItem22SY:      equ 156
-InventoryItem22Sx:      equ 140
-InventoryItem23SY:      equ 156
-InventoryItem23Sx:      equ 160
-InventoryItem24SY:      equ 156
-InventoryItem24Sx:      equ 180
-
-;gloves
-InventoryItem25SY:      equ 156
-InventoryItem25Sx:      equ 200
-InventoryItem26SY:      equ 156
-InventoryItem26Sx:      equ 220
-InventoryItem27SY:      equ 156
-InventoryItem27Sx:      equ 000
-InventoryItem28SY:      equ 196
-InventoryItem28Sx:      equ 020
-InventoryItem29SY:      equ 196
-InventoryItem29Sx:      equ 040
-
-;ring
-InventoryItem30SY:      equ 196
-InventoryItem30Sx:      equ 060
-InventoryItem31SY:      equ 196
-InventoryItem31Sx:      equ 080
-InventoryItem32SY:      equ 196
-InventoryItem32Sx:      equ 100
-InventoryItem33SY:      equ 196
-InventoryItem33Sx:      equ 120
-InventoryItem34SY:      equ 196
-InventoryItem34Sx:      equ 140
-
-;neclace
-InventoryItem35SY:      equ 196
-InventoryItem35Sx:      equ 160
-InventoryItem36SY:      equ 196
-InventoryItem36Sx:      equ 180
-InventoryItem37SY:      equ 196
-InventoryItem37Sx:      equ 200
-InventoryItem38SY:      equ 196
-InventoryItem38Sx:      equ 220
-InventoryItem39SY:      equ 236
-InventoryItem39Sx:      equ 000
-
-;robe
-InventoryItem40SY:      equ 120
-InventoryItem40Sx:      equ 146
-InventoryItem41SY:      equ 120
-InventoryItem41Sx:      equ 166
-InventoryItem42SY:      equ 120
-InventoryItem42Sx:      equ 186
-InventoryItem43SY:      equ 120
-InventoryItem43Sx:      equ 206
-InventoryItem44SY:      equ 120
-InventoryItem44Sx:      equ 226
-
-;empty slot
-InventoryItem45SY:      equ 236
-InventoryItem45Sx:      equ 200
-
-InventoryIconTable: dw $4000 + (InventoryItem00SY*128) + (InventoryItem00SX/2) -128
-                    dw $4000 + (InventoryItem01SY*128) + (InventoryItem01SX/2) -128
-                    dw $4000 + (InventoryItem02SY*128) + (InventoryItem02SX/2) -128
-                    dw $4000 + (InventoryItem03SY*128) + (InventoryItem03SX/2) -128
-                    dw $4000 + (InventoryItem04SY*128) + (InventoryItem04SX/2) -128
-                    dw $4000 + (InventoryItem05SY*128) + (InventoryItem05SX/2) -128
-                    dw $4000 + (InventoryItem06SY*128) + (InventoryItem06SX/2) -128
-                    dw $4000 + (InventoryItem07SY*128) + (InventoryItem07SX/2) -128
-                    dw $4000 + (InventoryItem08SY*128) + (InventoryItem08SX/2) -128
-                    dw $4000 + (InventoryItem09SY*128) + (InventoryItem09SX/2) -128
-                    dw $4000 + (InventoryItem10SY*128) + (InventoryItem10SX/2) -128
-                    dw $4000 + (InventoryItem11SY*128) + (InventoryItem11SX/2) -128
-                    dw $4000 + (InventoryItem12SY*128) + (InventoryItem12SX/2) -128
-                    dw $4000 + (InventoryItem13SY*128) + (InventoryItem13SX/2) -128
-                    dw $4000 + (InventoryItem14SY*128) + (InventoryItem14SX/2) -128
-                    dw $4000 + (InventoryItem15SY*128) + (InventoryItem15SX/2) -128
-                    dw $4000 + (InventoryItem16SY*128) + (InventoryItem16SX/2) -128
-                    dw $4000 + (InventoryItem17SY*128) + (InventoryItem17SX/2) -128
-                    dw $4000 + (InventoryItem18SY*128) + (InventoryItem18SX/2) -128
-                    dw $4000 + (InventoryItem19SY*128) + (InventoryItem19SX/2) -128
-                    dw $4000 + (InventoryItem20SY*128) + (InventoryItem20SX/2) -128
-                    dw $4000 + (InventoryItem21SY*128) + (InventoryItem21SX/2) -128
-                    dw $4000 + (InventoryItem22SY*128) + (InventoryItem22SX/2) -128
-                    dw $4000 + (InventoryItem23SY*128) + (InventoryItem23SX/2) -128
-                    dw $4000 + (InventoryItem24SY*128) + (InventoryItem24SX/2) -128
-                    dw $4000 + (InventoryItem25SY*128) + (InventoryItem25SX/2) -128
-                    dw $4000 + (InventoryItem26SY*128) + (InventoryItem26SX/2) -128
-                    dw $4000 + (InventoryItem27SY*128) + (InventoryItem27SX/2) -128
-                    dw $4000 + (InventoryItem28SY*128) + (InventoryItem28SX/2) -128
-                    dw $4000 + (InventoryItem29SY*128) + (InventoryItem29SX/2) -128
-                    dw $4000 + (InventoryItem30SY*128) + (InventoryItem30SX/2) -128
-                    dw $4000 + (InventoryItem31SY*128) + (InventoryItem31SX/2) -128
-                    dw $4000 + (InventoryItem32SY*128) + (InventoryItem32SX/2) -128
-                    dw $4000 + (InventoryItem33SY*128) + (InventoryItem33SX/2) -128
-                    dw $4000 + (InventoryItem34SY*128) + (InventoryItem34SX/2) -128
-                    dw $4000 + (InventoryItem35SY*128) + (InventoryItem35SX/2) -128
-                    dw $4000 + (InventoryItem36SY*128) + (InventoryItem36SX/2) -128
-                    dw $4000 + (InventoryItem37SY*128) + (InventoryItem37SX/2) -128
-                    dw $4000 + (InventoryItem38SY*128) + (InventoryItem38SX/2) -128
-                    dw $4000 + (InventoryItem39SY*128) + (InventoryItem39SX/2) -128
-                    dw $4000 + (InventoryItem40SY*128) + (InventoryItem40SX/2) -128
-                    dw $4000 + (InventoryItem41SY*128) + (InventoryItem41SX/2) -128
-                    dw $4000 + (InventoryItem42SY*128) + (InventoryItem42SX/2) -128
-                    dw $4000 + (InventoryItem43SY*128) + (InventoryItem43SX/2) -128
-                    dw $4000 + (InventoryItem44SY*128) + (InventoryItem44SX/2) -128
-
-                    dw $4000 + (InventoryItem45SY*128) + (InventoryItem45SX/2) -128
                     
 SetInventoryIcons:
   ld    ix,(plxcurrentheroAddress)
@@ -493,7 +656,8 @@ SetInventoryIcons:
   .SetIconHLBCandA:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
   add   a,a                             ;*2
-  ld    iy,InventoryIconTable
+  add   a,a                             ;*2
+  ld    iy,InventoryIconTableSYSX
   ld    d,0
   ld    e,a
   add   iy,de

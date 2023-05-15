@@ -4081,7 +4081,7 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .AirSpells:         db  %0000 1111
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
-.Inventory: db  001,045,011,015,020,025,030,045,040,  002,003,045,045,045,004 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  002,045,011,015,020,025,030,045,040,  002,003,045,045,045,004 ;9 body slots and 6 open slots (045 = empty slot)
 
 pl1hero2y:		db	7
 pl1hero2x:		db	3
