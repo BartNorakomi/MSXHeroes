@@ -363,8 +363,8 @@ HeroOverViewInventoryIconButton1OffSX:           equ 146
 HeroOverViewInventoryIconButton1OffSY:           equ 000
 HeroOverViewInventoryIconButton1MouseOverSX:     equ 146
 HeroOverViewInventoryIconButton1MouseOverSY:     equ 020
-HeroOverViewInventoryIconButtonMouseClickedSX:   equ 008
-HeroOverViewInventoryIconButtonMouseClickedSY:   equ 101
+HeroOverViewInventoryIconButtonMouseClickedSX:   equ 220
+HeroOverViewInventoryIconButtonMouseClickedSY:   equ 236
 
 HeroOverViewInventoryIconButton2OffSX:           equ 146
 HeroOverViewInventoryIconButton2OffSY:           equ 040

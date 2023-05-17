@@ -277,15 +277,15 @@ InventoryIconTableSYSX:
                     dw $4000 + (InventoryItem34ButtonOffSY*128) + (InventoryItem34ButtonOffSX/2) - 128  ;ring 5
                     dw $4000 + (InventoryItem34MouseOverSY*128) + (InventoryItem34MouseOverSX/2) - 128
 
-                    dw $4000 + (InventoryItem35ButtonOffSY*128) + (InventoryItem35ButtonOffSX/2) - 128  ;neclace 1
+                    dw $4000 + (InventoryItem35ButtonOffSY*128) + (InventoryItem35ButtonOffSX/2) - 128  ;Necklace 1
                     dw $4000 + (InventoryItem35MouseOverSY*128) + (InventoryItem35MouseOverSX/2) - 128
-                    dw $4000 + (InventoryItem36ButtonOffSY*128) + (InventoryItem36ButtonOffSX/2) - 128  ;neclace 2
+                    dw $4000 + (InventoryItem36ButtonOffSY*128) + (InventoryItem36ButtonOffSX/2) - 128  ;Necklace 2
                     dw $4000 + (InventoryItem36MouseOverSY*128) + (InventoryItem36MouseOverSX/2) - 128
-                    dw $4000 + (InventoryItem37ButtonOffSY*128) + (InventoryItem37ButtonOffSX/2) - 128  ;neclace 3
+                    dw $4000 + (InventoryItem37ButtonOffSY*128) + (InventoryItem37ButtonOffSX/2) - 128  ;Necklace 3
                     dw $4000 + (InventoryItem37MouseOverSY*128) + (InventoryItem37MouseOverSX/2) - 128
-                    dw $4000 + (InventoryItem38ButtonOffSY*128) + (InventoryItem38ButtonOffSX/2) - 128  ;neclace 4
+                    dw $4000 + (InventoryItem38ButtonOffSY*128) + (InventoryItem38ButtonOffSX/2) - 128  ;Necklace 4
                     dw $4000 + (InventoryItem38MouseOverSY*128) + (InventoryItem38MouseOverSX/2) - 128
-                    dw $4000 + (InventoryItem39ButtonOffSY*128) + (InventoryItem39ButtonOffSX/2) - 128  ;neclace 5
+                    dw $4000 + (InventoryItem39ButtonOffSY*128) + (InventoryItem39ButtonOffSX/2) - 128  ;Necklace 5
                     dw $4000 + (InventoryItem39MouseOverSY*128) + (InventoryItem39MouseOverSX/2) - 128
 
                     dw $4000 + (InventoryItem40ButtonOffSY*128) + (InventoryItem40ButtonOffSX/2) - 128  ;robe 1
@@ -449,23 +449,23 @@ InventoryItem34ButtonOffSX:   equ 140
 InventoryItem34MouseOverSY:   equ 216
 InventoryItem34MouseOverSX:   equ 140
 
-InventoryItem35ButtonOffSY:   equ 196 ;neclace 1
+InventoryItem35ButtonOffSY:   equ 196 ;Necklace 1
 InventoryItem35ButtonOffSX:   equ 160
 InventoryItem35MouseOverSY:   equ 216
 InventoryItem35MouseOverSX:   equ 160
-InventoryItem36ButtonOffSY:   equ 196 ;neclace 2
+InventoryItem36ButtonOffSY:   equ 196 ;Necklace 2
 InventoryItem36ButtonOffSX:   equ 180
 InventoryItem36MouseOverSY:   equ 216
 InventoryItem36MouseOverSX:   equ 180
-InventoryItem37ButtonOffSY:   equ 196 ;neclace 3
+InventoryItem37ButtonOffSY:   equ 196 ;Necklace 3
 InventoryItem37ButtonOffSX:   equ 200
 InventoryItem37MouseOverSY:   equ 216
 InventoryItem37MouseOverSX:   equ 200
-InventoryItem38ButtonOffSY:   equ 196 ;neclace 4
+InventoryItem38ButtonOffSY:   equ 196 ;Necklace 4
 InventoryItem38ButtonOffSX:   equ 220
 InventoryItem38MouseOverSY:   equ 216
 InventoryItem38MouseOverSX:   equ 220
-InventoryItem39ButtonOffSY:   equ 236 ;neclace 5
+InventoryItem39ButtonOffSY:   equ 236 ;Necklace 5
 InventoryItem39ButtonOffSX:   equ 000
 InventoryItem39MouseOverSY:   equ 236
 InventoryItem39MouseOverSX:   equ 020
@@ -494,7 +494,7 @@ InventoryItem44MouseOverSX:   equ 226
 InventoryItem45ButtonOffSY:   equ 236 ;empty slot
 InventoryItem45ButtonOffSX:   equ 200
 InventoryItem45MouseOverSY:   equ 236
-InventoryItem45MouseOverSX:   equ 200
+InventoryItem45MouseOverSX:   equ 180
 
 ;inventory has:
 ;sword - attack
@@ -530,7 +530,7 @@ HeroOverviewInventoryWindowCode:
 
   call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
-  call  SetSpellExplanation_Earth             ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
+  call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
 
   ld    ix,HeroOverviewInventoryIconButtonTable
   call  SetButtonStatusAndText3         ;copies button state from rom -> vram
@@ -555,6 +555,242 @@ HeroOverviewInventoryWindowCode:
   ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
   jp    HeroOverviewInventoryWindowCode
 
+
+
+
+
+
+
+
+
+
+
+
+
+SetTextInventoryItem:                   ;when clicking on an item, the explanation will appear
+  ld    a,(SetSkillsDescription?)
+  dec   a
+  ret   z
+  ld    (SetSkillsDescription?),a 
+
+;  call  .GoSetText
+;  ret
+
+  .GoSetText:
+;jp .GoSetText
+
+;db "'" ;$27
+
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,15
+  sub   a,b
+  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  
+  ld    ix,InventoryDescriptionList
+  add   a,a                             ;*2
+  ld    e,a
+  add   ix,de
+  ld    l,(ix)
+  ld    h,(ix+1)
+  .SetText:
+
+
+  ld    a,HeroOverViewSpellBookWindowDX + 032
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewSpellBookWindowDY + 141
+  ld    (PutLetter+dy),a                ;set dy of text
+
+;  ld    l,(ix+TextAddress)
+;  ld    h,(ix+TextAddress+1)            ;address of text to put
+;  ld    de,LenghtTextSkillsDescription
+;  add   hl,de
+
+
+  ld    (TextAddresspointer),hl  
+  jp    SetTextInButton.go
+
+InventoryDescriptionList:
+  dw    DescriptionSword1, DescriptionSword2, DescriptionSword3, DescriptionSword4, DescriptionSword5
+  dw    DescriptionArmor1, DescriptionArmor2, DescriptionArmor3, DescriptionArmor4, DescriptionArmor5
+  dw    DescriptionShield1, DescriptionShield2, DescriptionShield3, DescriptionShield4, DescriptionShield5
+  dw    DescriptionHelmet1, DescriptionHelmet2, DescriptionHelmet3, DescriptionHelmet4, DescriptionHelmet5
+  dw    DescriptionBoots1, DescriptionBoots2, DescriptionBoots3, DescriptionBoots4, DescriptionBoots5
+  dw    DescriptionGloves1, DescriptionGloves2, DescriptionGloves3, DescriptionGloves4, DescriptionGloves5
+  dw    DescriptionRing1, DescriptionRing2, DescriptionRing3, DescriptionRing4, DescriptionRing5
+  dw    DescriptionNecklace1, DescriptionNecklace2, DescriptionNecklace3, DescriptionNecklace4, DescriptionNecklace5
+  dw    DescriptionRobe1, DescriptionRobe2, DescriptionRobe3, DescriptionRobe4, DescriptionRobe5
+  dw    DescriptionEmpty
+  
+DescriptionSword1:        db  "dagger time",254
+                          db  "attack + 4",255
+
+DescriptionSword2:        db  "sword of bahrain",254
+                          db  "attack + 5",255
+
+DescriptionSword3:        db  "hell slayer",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionSword4:        db  "the butterfly",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionSword5:        db  "swiftblade",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionArmor1:        db  "regalia di pleb",254
+                          db  "attack + 4",255
+
+DescriptionArmor2:        db  "young blood's armor",254
+                          db  "attack + 5",255
+
+DescriptionArmor3:        db  "the juggernaut",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionArmor4:        db  "yojimbo the ronin",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionArmor5:        db  "caesar's chestplate",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionShield1:        db  "greenleaf shield",254
+                          db  "attack + 4",255
+
+DescriptionShield2:        db  "wooden shield",254
+                          db  "attack + 5",255
+
+DescriptionShield3:        db  "the bram stoker",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionShield4:        db  "impenetrable shield",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionShield5:        db  "training shield",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionHelmet1:        db  "yatta shi-ne",254
+                          db  "attack + 4",255
+
+DescriptionHelmet2:        db  "fire hood",254
+                          db  "attack + 5",255
+
+DescriptionHelmet3:        db  "cerebro",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionHelmet4:        db  "the viridescent",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionHelmet5:        db  "pikemen's helmet",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionBoots1:        db  "shadow tramper",254
+                          db  "attack + 4",255
+
+DescriptionBoots2:        db  "dusk rover",254
+                          db  "attack + 5",255
+
+DescriptionBoots3:        db  "planeswalkers",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionBoots4:        db  "knight's night slippers",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionBoots5:        db  "sturdy boots",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionGloves1:        db  "gripfast",254
+                          db  "attack + 4",255
+
+DescriptionGloves2:        db  "iron hand",254
+                          db  "attack + 5",255
+
+DescriptionGloves3:        db  "elk skin gloves",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionGloves4:        db  "venomous gauntlet",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionGloves5:        db  "emerald gloves",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionRing1:        db  "small ring",254
+                          db  "attack + 4",255
+
+DescriptionRing2:        db  "cyclops",254
+                          db  "attack + 5",255
+
+DescriptionRing3:        db  "scarlet ring",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionRing4:        db  "bronze ring",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionRing5:        db  "hypnotising ring",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionNecklace1:        db  "the blue topaz",254
+                          db  "attack + 4",255
+
+DescriptionNecklace2:        db  "good luck charm",254
+                          db  "attack + 5",255
+
+DescriptionNecklace3:        db  "negligee of teeth",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionNecklace4:        db  "skull of the unborn",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionNecklace5:        db  "the choker",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionRobe1:        db  "the kings garment",254
+                          db  "attack + 4",255
+
+DescriptionRobe2:        db  "priest's cope",254
+                          db  "attack + 5",255
+
+DescriptionRobe3:        db  "enchanted robe",254
+                          db  "attack + 7",254
+                          db  "defense - 2",255
+
+DescriptionRobe4:        db  "rural vest",254
+                          db  "all primary attributes",254
+                          db  "+ 1",255
+
+DescriptionRobe5:        db  "labcoat",254
+                          db  "attack + 3",254
+                          db  "unit movement speed + 1",255
+
+DescriptionEmpty:        db  "empty",255
 
 CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
   ld    ix,(plxcurrentheroAddress)
@@ -3134,6 +3370,15 @@ SetTextInButton:
   jr    z,.Space
   cp    TextPercentageSymbol            ;%
   jr    z,.TextPercentageSymbol
+  cp    TextPlusSymbol                  ;+
+  jr    z,.TextPlusSymbol
+  cp    TextMinusSymbol                 ;-
+  jr    z,.TextMinusSymbol
+
+  cp    TextApostrofeSymbol             ;'
+  jr    z,.TextApostrofeSymbol
+
+
   cp    TextNumber0+10
   jr    c,.Number
 
@@ -3176,7 +3421,19 @@ SetTextInButton:
 .TextPercentageSymbol:
   ld    hl,TextPercentageSymbolSXNX  
   jr    .GoPutLetter
-  
+
+.TextPlusSymbol:
+  ld    hl,TextPlusSymbolSXNX  
+  jr    .GoPutLetter
+
+.TextMinusSymbol:
+  ld    hl,TextMinusSymbolSXNX  
+  jr    .GoPutLetter
+
+.TextApostrofeSymbol:
+  ld    hl,TextApostrofeSymbolSXNX  
+  jr    .GoPutLetter
+
 .Space:
   ld    a,(PutLetter+dx)                ;set dx of next letter
   add   a,5
@@ -3211,13 +3468,19 @@ SetSkillExplanation:
   ld    (TextAddresspointer),hl  
   jp    SetTextInButton.go
 
+TextPlusSymbol:           equ $2b
+TextMinusSymbol:          equ $2d
 TextPercentageSymbol:     equ $25
 TextSpace:                equ $20
 TextNumber0:              equ $30
+TextApostrofeSymbol:      equ $27
 
 TextNumberSymbolsSXNX: db 121,5,  126,2,  128,4,  132,3,  135,3,  138,4,  142,4,  146,4,  150,4,  154,4,  158,4  
 TextPercentageSymbolSXNX: db  162,4 ;"%"
+TextPlusSymbolSXNX: db  166,5 ;"+"
+TextMinusSymbolSXNX: db  169,5 ;"-"
 TextSlashSymbolSXNX: db  158,4  ;"/"
+TextApostrofeSymbolSXNX: db  114,2  ;"'"
 
 ;                         a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
 TextCoordinateTable:  db  000,5, 004,5, 009,5, 014,5, 019,5, 024,5, 029,5, 034,5, 039,5, 042,5, 047,4, 051,4, 055,5, 059,5, 063,5, 067,5, 072,5, 076,5, 081,5, 086,5, 091,5, 096,5, 101,5, 106,5, 111,5, 116,5
