@@ -524,6 +524,7 @@ HeroOverviewInventoryWindowCode:
   ld    iy,ButtonTableInventoryIconsSYSX
   call  CheckButtonMouseInteraction
 
+
   ld    a,(MenuOptionSelected?)
   or    a
   jp    nz,.SpellIconPressed
@@ -531,6 +532,17 @@ HeroOverviewInventoryWindowCode:
   call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
+
+
+  call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
+
+
+
+
+
+
+
+
 
   ld    ix,HeroOverviewInventoryIconButtonTable
   call  SetButtonStatusAndText3         ;copies button state from rom -> vram
@@ -547,6 +559,7 @@ HeroOverviewInventoryWindowCode:
 
   .SpellIconPressed:
   ld    (MenuOptionSelected?Backup),a
+
   xor   a
   ld    (MenuOptionSelected?),a
 ;  ld    (ActivatedSpellIconButton),ix
@@ -559,6 +572,62 @@ HeroOverviewInventoryWindowCode:
 
 
 
+MarkLastPressedButton:                  ;mark the button that was pressed as 'mouse hover over'
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    255                             ;no button pressed (yet)
+  ret   z
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  cp    255
+  jr    z,.Set
+
+  ld    b,a
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    b
+  jr    nz,.DifferentButtonPressed
+
+  ld    b,a
+  ld    a,15
+  sub   a,b
+  
+;  ld    ix,(plxcurrentheroAddress)
+;  ld    d,0
+;  ld    e,a
+;  add   ix,de  
+;  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+
+  ld    ix,HeroOverviewInventoryIconButtonTable
+  ld    de,HeroOverviewInventoryIconButtonTableLenghtPerIcon
+  .loop:
+  jr    z,.Found
+  add   ix,de
+  dec   a
+  jr    .loop
+
+  .Found:                               ;the button that was pressed will now be marked as 'mouse hover over'
+  ld    (ix+2),%0100 0011               ; (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+
+  .Set:
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    (MenuOptionSelected?BackupLastFrame),a
+  ret
+
+  .DifferentButtonPressed:
+;1. both items are in slot 1-9 and therefor can never be swapped
+;2. the item that goes to slot 1-9 is not a match, therefor don't swap
+;3. the 2 items can be swapped  
+
+;check 1. both items are in slot 1-9 and therefor can never be swapped
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    15 - 9
+  jr    c,.EndCheck1
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  cp    15 - 9
+  jr    nc,.UnableToSwapItems
+  .EndCheck1:
+  jp    SwapInventoryItems              ;swaps the last 2 inventory items that have been selected
+
+;check 2. the item that goes to slot 1-9 is not a match, therefor don't swap
+  
 
 
 
@@ -566,6 +635,73 @@ HeroOverviewInventoryWindowCode:
 
 
 
+
+
+
+  .UnableToSwapItems:
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,15
+  sub   a,b
+  
+;  ld    ix,(plxcurrentheroAddress)
+;  ld    d,0
+;  ld    e,a
+;  add   ix,de  
+;  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+
+  ld    ix,HeroOverviewInventoryIconButtonTable
+  ld    de,HeroOverviewInventoryIconButtonTableLenghtPerIcon
+  .loop2:
+  jr    z,.Found2
+  add   ix,de
+  dec   a
+  jr    .loop2
+
+  .Found2:                               ;the button that was pressed will now be marked as 'mouse hover over'
+  ld    (ix+2),%1000 0011               ; (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    (MenuOptionSelected?BackupLastFrame),a
+  ret
+
+SwapInventoryItems:                     ;swaps the last 2 inventory items that have been selected
+  push  iy
+
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,15
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  ld    b,a
+  ld    a,15
+  sub   a,b
+  ld    iy,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   iy,de  
+
+  ld    b,(iy+HeroInventory)            ;body slot 1-9 and open slots 10-15 - previous frame
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15 - this frame
+  ld    (iy+HeroInventory),a            ;body slot 1-9 and open slots 10-15 - previous frame
+  ld    (ix+HeroInventory),b            ;body slot 1-9 and open slots 10-15 - this frame
+
+  pop   iy
+
+  xor   a
+  ld    (MenuOptionSelected?),a
+  ld    a,255
+  ld    (MenuOptionSelected?Backup),a  
+  ld    (MenuOptionSelected?BackupLastFrame),a
+
+  pop   af                              ;pop the call to this routine
+  ld    a,1
+  ld    (SetSkillsDescription?),a       ;clear description window
+  jp    HeroOverviewInventoryWindowCode ;restart code, item has been swapped
 
 SetTextInventoryItem:                   ;when clicking on an item, the explanation will appear
   ld    a,(SetSkillsDescription?)
@@ -601,10 +737,10 @@ SetTextInventoryItem:                   ;when clicking on an item, the explanati
   .SetText:
 
 
-  ld    a,HeroOverViewSpellBookWindowDX + 032
+  ld    a,HeroOverViewSpellBookWindowDX + 031
   ld    (PutLetter+dx),a                ;set dx of text
   ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 141
+  ld    a,HeroOverViewSpellBookWindowDY + 143
   ld    (PutLetter+dy),a                ;set dy of text
 
 ;  ld    l,(ix+TextAddress)
@@ -629,174 +765,183 @@ InventoryDescriptionList:
   dw    DescriptionEmpty
   
 DescriptionSword1:        db  "dagger time",254
-                          db  "attack + 4",255
+                          db  "attack +4",255
 
 DescriptionSword2:        db  "sword of bahrain",254
-                          db  "attack + 5",255
+                          db  "attack +5",255
 
 DescriptionSword3:        db  "hell slayer",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "attack +7",254
+                          db  "defense -2",255
 
 DescriptionSword4:        db  "the butterfly",254
                           db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "+1",255
 
 DescriptionSword5:        db  "swiftblade",254
                           db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "unit movement speed +1",255
 
 DescriptionArmor1:        db  "regalia di pleb",254
-                          db  "attack + 4",255
+                          db  "defense +3",254
+                          db  "unit movement speed +1",255
 
 DescriptionArmor2:        db  "young blood's armor",254
-                          db  "attack + 5",255
+                          db  "defense +4",255
 
 DescriptionArmor3:        db  "the juggernaut",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "defense +7",254
+                          db  "unit movement speed - 1",255
 
 DescriptionArmor4:        db  "yojimbo the ronin",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "defense +3",254
+                          db  "-25% damage from fire",255
 
 DescriptionArmor5:        db  "caesar's chestplate",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "defense +3",254
+                          db  "max hp units +2",255
 
 DescriptionShield1:        db  "greenleaf shield",254
-                          db  "attack + 4",255
+                          db  "50% less damage from",254
+                          db  "ranged units",255
 
 DescriptionShield2:        db  "wooden shield",254
-                          db  "attack + 5",255
+                          db  "defense +4",255
 
 DescriptionShield3:        db  "the bram stoker",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "defense +3",254
+                          db  "-25% damage from earth",255
 
 DescriptionShield4:        db  "impenetrable shield",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "+5% chance to block any",254
+                          db  "enemy spell cast",255
 
 DescriptionShield5:        db  "training shield",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "defense +3",255
+
+
+
+
+
+
+
+
 
 DescriptionHelmet1:        db  "yatta shi-ne",254
-                          db  "attack + 4",255
+                          db  "spell power +2",254
+                          db  "defense +2",255
 
 DescriptionHelmet2:        db  "fire hood",254
-                          db  "attack + 5",255
+                          db  "spell power +4",254
+                          db  "+10% fire spell damage",255
 
 DescriptionHelmet3:        db  "cerebro",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "intelligence +6",255
 
 DescriptionHelmet4:        db  "the viridescent",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "defense +3",254
+                          db  "max hp units +3",255
 
 DescriptionHelmet5:        db  "pikemen's helmet",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "defense +2",254
+                          db  "unit movement speed +1",255
+
 
 DescriptionBoots1:        db  "shadow tramper",254
-                          db  "attack + 4",255
+                          db  "unit movement speed +2",255
 
 DescriptionBoots2:        db  "dusk rover",254
-                          db  "attack + 5",255
+                          db  "no terrain penalty",254
+                          db  "for hero on worldmap",255
 
 DescriptionBoots3:        db  "planeswalkers",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "+3 max movement points",254
+                          db  "for hero on worldmap",255
 
 DescriptionBoots4:        db  "knight's night slippers",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "-25% damage from water",255
 
 DescriptionBoots5:        db  "sturdy boots",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "unit movement speed +3",255
 
 DescriptionGloves1:        db  "gripfast",254
-                          db  "attack + 4",255
+                          db  "+2 max movement points",254
+                          db  "for hero on worldmap",255
 
 DescriptionGloves2:        db  "iron hand",254
-                          db  "attack + 5",255
+                          db  "-30% damage from air",254
+                          db  "unit movement speed -1",255
 
 DescriptionGloves3:        db  "elk skin gloves",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "attack +2",254
+                          db  "max hp units +2",255
 
 DescriptionGloves4:        db  "venomous gauntlet",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "melee attacks deal",254
+                          db  "poison damage '20 dpt'",255
 
 DescriptionGloves5:        db  "emerald gloves",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "intelligence +3",255
 
 DescriptionRing1:        db  "small ring",254
-                          db  "attack + 4",255
+                          db  "spell power +3",255
 
 DescriptionRing2:        db  "cyclops",254
-                          db  "attack + 5",255
+                          db  "intelligence +4",255
 
 DescriptionRing3:        db  "scarlet ring",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "all primary attributes",254
+                          db  "+2",255
 
 DescriptionRing4:        db  "bronze ring",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "+10% earth spell damage",255
 
 DescriptionRing5:        db  "hypnotising ring",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "+10% water spell damage",255
 
 DescriptionNecklace1:        db  "the blue topaz",254
-                          db  "attack + 4",255
+                          db  "-25% damage from water",255
 
 DescriptionNecklace2:        db  "good luck charm",254
-                          db  "attack + 5",255
+                          db  "+10% chance to block any",254
+                          db  "enemy spell cast",255
 
 DescriptionNecklace3:        db  "negligee of teeth",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "intelligence +3",254
+                          db  "spell power +3",255
 
 DescriptionNecklace4:        db  "skull of the unborn",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "increases necromancy",254
+                          db  "skill by 5%",255
 
 DescriptionNecklace5:        db  "the choker",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "spell power +6",255
 
 DescriptionRobe1:        db  "the kings garment",254
-                          db  "attack + 4",255
+                          db  "increases wealth by",254
+                          db  "125 gold per day",255
 
 DescriptionRobe2:        db  "priest's cope",254
-                          db  "attack + 5",255
+                          db  "+10% air spell damage",254
+                          db  "intelligence +1",255
 
 DescriptionRobe3:        db  "enchanted robe",254
-                          db  "attack + 7",254
-                          db  "defense - 2",255
+                          db  "spell power +4",255
 
 DescriptionRobe4:        db  "rural vest",254
-                          db  "all primary attributes",254
-                          db  "+ 1",255
+                          db  "max hp units +3",255
 
 DescriptionRobe5:        db  "labcoat",254
-                          db  "attack + 3",254
-                          db  "unit movement speed + 1",255
+                          db  "spell power +7",254
+                          db  "max hp units -3",255
 
-DescriptionEmpty:        db  "empty",255
+DescriptionEmpty:        db  255
 
 CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
   ld    ix,(plxcurrentheroAddress)
   ld    iy,ButtonTableInventoryIconsSYSX
 
-  ld    b,9+6                           ;9 inventory slots
+  ld    b,9+6                           ;9+6 inventory slots
 
   .loop:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15

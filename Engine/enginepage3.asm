@@ -545,9 +545,11 @@ HeroOverViewInventoryIconButton14DY:   equ HeroOverViewInventoryWindowDY + 101
 HeroOverViewInventoryIconButton15DX:   equ HeroOverViewInventoryWindowDX + 118
 HeroOverViewInventoryIconButton15DY:   equ HeroOverViewInventoryWindowDY + 101
 
+HeroOverviewInventoryIconButtonTableLenghtPerIcon:  equ HeroOverviewInventoryIconButtonTable.endlenght-HeroOverviewInventoryIconButtonTable
 HeroOverviewInventoryIconButtonTableAmountOfButtons:  db  9 + 6
 HeroOverviewInventoryIconButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
   dw  $0000 + (HeroOverViewInventoryIconButton1DY*128) + (HeroOverViewInventoryIconButton1DX/2) | db %1000 0011, HeroOverViewInventoryIconButton1DY,HeroOverViewInventoryIconButton1DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton1DX,HeroOverViewInventoryIconButton1DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+  .endlenght:
   dw  $0000 + (HeroOverViewInventoryIconButton2DY*128) + (HeroOverViewInventoryIconButton2DX/2) | db %1000 0011, HeroOverViewInventoryIconButton2DY,HeroOverViewInventoryIconButton2DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton2DX,HeroOverViewInventoryIconButton2DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton3DY*128) + (HeroOverViewInventoryIconButton3DX/2) | db %1000 0011, HeroOverViewInventoryIconButton3DY,HeroOverViewInventoryIconButton3DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton3DX,HeroOverViewInventoryIconButton3DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton4DY*128) + (HeroOverViewInventoryIconButton4DX/2) | db %1000 0011, HeroOverViewInventoryIconButton4DY,HeroOverViewInventoryIconButton4DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton4DX,HeroOverViewInventoryIconButton4DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
@@ -929,7 +931,8 @@ ActivatedSkillsButton:  ds  2
 PreviousActivatedSkillsButton:  ds  2
 SetSkillsDescription?:  db  1
 MenuOptionSelected?:  db  0
-MenuOptionSelected?Backup:  ds  1
+MenuOptionSelected?Backup:  db 255
+MenuOptionSelected?BackupLastFrame:  db 255
 
 LenghtTextSkillsDescription:  equ 24
 TextSkillsWindowButton1:  db  "basic archery          ",255
