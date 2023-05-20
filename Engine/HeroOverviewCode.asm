@@ -506,7 +506,7 @@ InventoryItem45MouseOverSX:   equ 180
 ;ring - spell power
 ;necklace - spell point recovery / income + 500 when equiped / 
 ;robe - intelligence (total mana)
-HeroOverviewInventoryWindowCode:  
+HeroOverviewInventoryWindowCode:
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
   call  SwapAndSetPage                  ;swap and set page
@@ -516,48 +516,23 @@ HeroOverviewInventoryWindowCode:
 
   .engine:
   call  PopulateControls                ;read out keys
-
-
-
-
   ld    ix,HeroOverviewInventoryIconButtonTable
   ld    iy,ButtonTableInventoryIconsSYSX
   call  CheckButtonMouseInteraction
-
-
   ld    a,(MenuOptionSelected?)
   or    a
-  jp    nz,.SpellIconPressed
-
+  jp    nz,.InventoryIconPressed
   call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
-
   call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
-
-
   call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
-
-
-
-
-
-
-
-
-
   ld    ix,HeroOverviewInventoryIconButtonTable
   call  SetButtonStatusAndText3         ;copies button state from rom -> vram
-
-
-
-
   call  SwapAndSetPage                  ;swap and set page  
- 
+  call  CheckEndHeroOverviewInventory   ;check if mouse is clicked outside of window. If so, return to game
   halt
   jp  .engine
 
-
-
-  .SpellIconPressed:
+  .InventoryIconPressed:
   ld    (MenuOptionSelected?Backup),a
 
   xor   a
@@ -589,11 +564,25 @@ MarkLastPressedButton:                  ;mark the button that was pressed as 'mo
   ld    a,15
   sub   a,b
   
-;  ld    ix,(plxcurrentheroAddress)
-;  ld    d,0
-;  ld    e,a
-;  add   ix,de  
-;  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+;check empty slot 'inventory item nr#45'
+  push  af
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+
+  cp    045
+  jr    nz,.NotEmpty
+  ld    a,255
+  ld    (MenuOptionSelected?Backup),a   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    (MenuOptionSelected?BackupLastFrame),a
+  pop   af
+  ret
+  .NotEmpty:
+  pop   af
+
+
 
   ld    ix,HeroOverviewInventoryIconButtonTable
   ld    de,HeroOverviewInventoryIconButtonTableLenghtPerIcon
@@ -613,30 +602,85 @@ MarkLastPressedButton:                  ;mark the button that was pressed as 'mo
 
   .DifferentButtonPressed:
 ;1. both items are in slot 1-9 and therefor can never be swapped
-;2. the item that goes to slot 1-9 is not a match, therefor don't swap
-;3. the 2 items can be swapped  
+;2. both items are in slot 10-15 and therefor can be swapped
+;3. the item that goes to slot 1-9 is not a match, therefor don't swap
+;4. the 2 items can be swapped  
 
 ;check 1. both items are in slot 1-9 and therefor can never be swapped
   ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
-  cp    15 - 9
+  cp    7
   jr    c,.EndCheck1
   ld    a,(MenuOptionSelected?BackupLastFrame)
-  cp    15 - 9
+  cp    7
   jr    nc,.UnableToSwapItems
   .EndCheck1:
+
+;2. both items are in slot 10-15 and therefor must be swapped
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    7
+  jr    nc,.MenuOptionSelected?BackupLastFrame_GoesToSlot1to9
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  cp    15 - 9
+  jp    c,SwapInventoryItems            ;swaps the last 2 inventory items that have been selected
+
+;check 3. the item that goes to slot 1-9 is not a match, therefor don't swap
+  .MenuOptionSelected?Backup_GoesToSlot1to9:
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  ld    c,a
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  jr    .go
+
+  .MenuOptionSelected?BackupLastFrame_GoesToSlot1to9:
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    c,a
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+;  jr    .go
+
+  .go:
+  ld    b,a
+  ld    a,15
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  ld    a,(ix+HeroInventory)            ;this is the unequipped item we are going to move to slot 1-9
+  sub   5
+  ld    b,15
+  jr    c,.InventorySlotFound           ;Sword
+  sub   5
+  ld    b,14
+  jr    c,.InventorySlotFound           ;Armor
+  sub   5
+  ld    b,13
+  jr    c,.InventorySlotFound           ;Shield
+  sub   5
+  ld    b,12
+  jr    c,.InventorySlotFound           ;Helmet
+  sub   5
+  ld    b,11
+  jr    c,.InventorySlotFound           ;Boots
+  sub   5
+  ld    b,10
+  jr    c,.InventorySlotFound           ;Gloves
+  sub   5
+  ld    b,09
+  jr    c,.InventorySlotFound           ;Ring
+  sub   5
+  ld    b,08
+  jr    c,.InventorySlotFound           ;Neclace
+  sub   5
+  ld    b,07
+  jr    c,.InventorySlotFound           ;Robe
+;4. the 2 items can be swapped  
+  jp    SwapInventoryItems              ;if no item is found, the slot is empty, swap is possible
+
+  .InventorySlotFound:  
+  ld    a,c
+  cp    b
+  jp    nz,.UnableToSwapItems
+;4. the 2 items can be swapped  
   jp    SwapInventoryItems              ;swaps the last 2 inventory items that have been selected
-
-;check 2. the item that goes to slot 1-9 is not a match, therefor don't swap
-  
-
-
-
-
-
-
-
-
-
 
   .UnableToSwapItems:
   ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
@@ -3096,9 +3140,27 @@ ConvertToDecimal:
   ld    (iy),a                          ;set 1 fold
   ld    (iy+1),255                      ;end text
   ret
+    
+CheckEndHeroOverviewInventory:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    HeroOverViewInventoryWindowDY
+  jr    c,.NotOverHeroOverViewInventoryWindow
+  cp    HeroOverViewInventoryWindowDY+HeroOverViewInventoryWindowNY
+  jr    nc,.NotOverHeroOverViewInventoryWindow
   
+  ld    a,(spat+1)                      ;x mouse
+  cp    HeroOverViewInventoryWindowDX
+  jr    c,.NotOverHeroOverViewInventoryWindow
+  cp    HeroOverViewInventoryWindowDX+HeroOverViewInventoryWindowNX
+  ret   c
 
-
+  .NotOverHeroOverViewInventoryWindow:
+  pop   af
+  ret   
 
 CheckEndHeroOverviewSpellBook:
 	ld		a,(NewPrContr)
