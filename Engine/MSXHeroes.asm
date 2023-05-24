@@ -562,7 +562,7 @@ dephase
 HeroOverviewCodeBlock:  equ   $1c
 HeroOverviewFontBlock:  equ   $1c
 phase	$4000
-  incbin "..\grapx\HeroOverview\font.SC5",7,5 * 128      ;5 lines
+  incbin "..\grapx\HeroOverview\font.SC5",7,7 * 128      ;5 lines
 kut:
   include "HeroOverviewCode.asm"
 kutje:
@@ -595,6 +595,42 @@ InventoryGraphicsBlock:  equ   $21
 phase	$4000
   incbin "..\grapx\HeroOverview\Inventory.SC5",7,208 * 128      ;208 lines
   incbin "..\grapx\HeroOverview\InventoryBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $23 - 24
+;
+ArmyGraphicsBlock:  equ   $23
+phase	$4000
+  incbin "..\grapx\HeroOverview\Army.SC5",7,130 * 128      ;130 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $25 - 26
+;
+HeroArmyTransferGraphicsBlock:  equ   $25
+phase	$4000
+  incbin "..\grapx\HeroOverview\HeroArmyTransfer.SC5",7,137 * 128      ;137 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $27
+;
+Hero16x30PortraitsBlock:  equ   $27
+phase	$4000
+  incbin "..\grapx\HeroesSprites\16x30Portraits.SC5",7,212 * 128      ;212 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $28 - 29
+;
+Enemy14x24PortraitsBlock:  equ   $28
+phase	$4000
+  incbin "..\grapx\MonsterSprites\14x24Portraits.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

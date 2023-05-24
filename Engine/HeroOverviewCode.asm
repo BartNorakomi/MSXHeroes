@@ -191,12 +191,6 @@ InventoryItem14Dx:      equ HeroOverViewInventoryWindowDX + 096
 InventoryItem15DY:      equ HeroOverViewInventoryWindowDY + 101
 InventoryItem15Dx:      equ HeroOverViewInventoryWindowDX + 118
 
-
-
-
-
-
-
 InventoryIconTableSYSX: 
                     dw $4000 + (InventoryItem00ButtonOffSY*128) + (InventoryItem00ButtonOffSX/2) - 128  ;sword 1
                     dw $4000 + (InventoryItem00MouseOverSY*128) + (InventoryItem00MouseOverSX/2) - 128
@@ -495,6 +489,125 @@ InventoryItem45ButtonOffSY:   equ 236 ;empty slot
 InventoryItem45ButtonOffSX:   equ 200
 InventoryItem45MouseOverSY:   equ 236
 InventoryItem45MouseOverSX:   equ 180
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewArmyWindowSX:   equ 000
+HeroOverViewArmyWindowSY:   equ 000
+HeroOverViewArmyWindowDX:   equ 024
+HeroOverViewArmyWindowDY:   equ 029
+HeroOverViewArmyWindowNX:   equ 156
+HeroOverViewArmyWindowNY:   equ 130
+
+HeroOverviewArmyWindowCode:
+  call  SetHeroOverViewArmyWindow       ;set overview of hero army
+  call  Set16x30HeroIcon                ;sets hero icon in the Army Window
+  call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewArmyWindow       ;set overview of hero army
+  call  Set16x30HeroIcon                ;sets hero icon in the Army Window
+  call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
+
+  .engine:
+  call  PopulateControls                ;read out keys
+;  ld    ix,HeroOverviewInventoryIconButtonTable
+;  ld    iy,ButtonTableInventoryIconsSYSX
+;  call  CheckButtonMouseInteraction
+;  ld    a,(MenuOptionSelected?)
+;  or    a
+;  jp    nz,.InventoryIconPressed
+;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;  call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
+;  call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
+;  ld    ix,HeroOverviewInventoryIconButtonTable
+;  call  SetButtonStatusAndText3         ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page  
+  call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
+  halt
+  jp  .engine
+
+;  .InventoryIconPressed:
+;  ld    (MenuOptionSelected?Backup),a
+
+;  xor   a
+;  ld    (MenuOptionSelected?),a
+;  ld    (ActivatedSpellIconButton),ix
+;  ld    a,3
+;  ld    (SetSkillsDescription?),a  
+;  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+;  jp    HeroOverviewInventoryWindowCode
+
+
+
+NXAndNY16x30HeroIcon:   equ 030*256 + (016/2)            ;(ny*256 + nx/2) = (14x09)
+DYDX16x30HeroIconArmyWindow:       equ (HeroOverViewArmyWindowDY+27)*128 + ((HeroOverViewArmyWindowDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
+
+Set16x30HeroIcon:
+  ;SetHeroPortrait16x30:
+  ld    a,Hero16x30PortraitsBlock       ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    b,(ix+HeroPortrait16x30SYSX+1)
+  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
+  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+	ret
+
+SetArmyIconsAndAmount:
+  ld    a,Enemy14x24PortraitsBlock      ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit1WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit2WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit3WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit4WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit5WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit6WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,UnitSYSXTable
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
+
+
+
 
 ;inventory has:
 ;sword - attack
@@ -2811,7 +2924,44 @@ HeroOverviewSkillsWindowCode:
   ld    a,3
   ld    (SetSkillsDescription?),a  
   jp    HeroOverviewSkillsWindowCode
-  
+
+SetTextNameHeroAndLevel:
+  ld    a,HeroOverViewFirstWindowchoicesDx + 26
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,HeroOverViewFirstWindowchoicesDY + 10
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    l,(ix+HeroSpecificInfo+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    h,(ix+HeroSpecificInfo+1)
+
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+
+
+
+  ld    a,(ix+HeroStatAttack)
+  ld    b,HeroOverViewStatusWindowDX + 056
+  ld    c,HeroOverViewStatusWindowDY + 034
+  call  SetNumber8Bit
+  ret
+
+
+DYDX16x30HeroIconAtHeroOverview:       equ (HeroOverViewFirstWindowchoicesDY+10)*128 + ((HeroOverViewFirstWindowchoicesDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
+Set16x30HeroIconAtHeroOverviewCode:
+  ;SetHeroPortrait16x30:
+  ld    a,Hero16x30PortraitsBlock       ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    b,(ix+HeroPortrait16x30SYSX+1)
+  ld    hl,DYDX16x30HeroIconAtHeroOverview  ;(dy*128 + dx/2) = (208,089)
+  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+	ret
+
 HeroOverviewCode:
   ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   ld    (HeroOverviewFirstWindowButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
@@ -2822,6 +2972,8 @@ HeroOverviewCode:
 
   call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
+  call  Set16x30HeroIconAtHeroOverviewCode
+  call  SetTextNameHeroAndLevel         ;sets hero name in hero window
 
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
@@ -2830,8 +2982,10 @@ HeroOverviewCode:
 
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
+  call  Set16x30HeroIconAtHeroOverviewCode
+  call  SetTextNameHeroAndLevel         ;sets hero name in hero window
 
-  .engine:
+  .engine:  
   call  PopulateControls                ;read out keys
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
@@ -2856,6 +3010,8 @@ HeroOverviewCode:
   jr    z,.StatusSelected
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jr    z,.SpellBookSelected
+  cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  jr    z,.ArmySelected
   cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   jr    z,.InventorySelected
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -2874,6 +3030,11 @@ HeroOverviewCode:
   xor   a
   ld    (MenuOptionSelected?),a  
   jp    HeroOverviewStatusWindowCode
+
+  .ArmySelected:
+  xor   a
+  ld    (MenuOptionSelected?),a
+  jp    HeroOverviewArmyWindowCode
 
   .SpellBookSelected:
   xor   a
@@ -3140,7 +3301,28 @@ ConvertToDecimal:
   ld    (iy),a                          ;set 1 fold
   ld    (iy+1),255                      ;end text
   ret
-    
+
+CheckEndHeroOverviewArmy:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    HeroOverViewArmyWindowDY
+  jr    c,.NotOverHeroOverViewArmyWindow
+  cp    HeroOverViewArmyWindowDY+HeroOverViewArmyWindowNY
+  jr    nc,.NotOverHeroOverViewArmyWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    HeroOverViewArmyWindowDX
+  jr    c,.NotOverHeroOverViewArmyWindow
+  cp    HeroOverViewArmyWindowDX+HeroOverViewArmyWindowNX
+  ret   c
+
+  .NotOverHeroOverViewArmyWindow:
+  pop   af
+  ret   
+
 CheckEndHeroOverviewInventory:
 	ld		a,(NewPrContr)
   bit   4,a                             ;check trigger a / space
@@ -3920,3 +4102,9 @@ SetHeroOverViewInventoryWindow:
   ld    a,InventoryGraphicsBlock;Map block
   jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+SetHeroOverViewArmyWindow:
+  ld    hl,$4000 + (HeroOverViewArmyWindowSY*128) + (HeroOverViewArmyWindowSX/2) -128
+  ld    de,$0000 + (HeroOverViewArmyWindowDY*128) + (HeroOverViewArmyWindowDX/2)
+  ld    bc,$0000 + (HeroOverViewArmyWindowNY*256) + (HeroOverViewArmyWindowNX/2)
+  ld    a,ArmyGraphicsBlock;Map block
+  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

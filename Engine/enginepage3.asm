@@ -1006,11 +1006,19 @@ SetHeroOverviewMenuInPage1ROM:
   ld    (MenuOptionSelected?Backup),a   ;which inventory slot has been clicked (count from rightbottom to lefttop)
   ld    (MenuOptionSelected?BackupLastFrame),a
 
-  call  HeroOverviewCode
+
+
 ;  call  HeroOverviewSkillsWindowCode
 ;  call  HeroOverviewSpellBookWindowCode_Earth
 ;  call  HeroOverviewSpellBookWindowCode_Fire
 ;  call  HeroOverviewInventoryWindowCode
+;  call  HeroOverviewArmyWindowCode
+
+
+
+
+
+  call  HeroOverviewCode
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle

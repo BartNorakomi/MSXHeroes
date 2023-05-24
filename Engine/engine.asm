@@ -1257,7 +1257,7 @@ movehero:
   ld    ix,(plxcurrentheroAddress)
   
 ;  call  SetHero1ForCurrentPlayerInIX
-	call	CheckHeroNearObject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
+;	call	CheckHeroNearObject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
 
 	ld		a,(ix+HeroMove)
 	sub		a,1                             ;we reduce the amount of movement steps hero has this turn, when it reaches 0, end movement
@@ -1410,90 +1410,6 @@ SetHeroPoseInVram:
   ld    b,a
   otir
   ret
-
-CheckHeroNearObject:	                  ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
-	push	hl			                        ;in hl-> pl?hero?y
-	push	bc
-	call	.docheck
-	pop		bc
-	pop		hl
-	ret
-
-.docheck:
-;set relative hero  position
-	ld		a,(ix+HeroY)
-	add		a,b
-	ld		d,a
-
-	ld		a,(ix+HeroX)
-	add		a,c
-	ld		e,a
-;/set relative hero position
-
-;check take item
-.checkherotakesitem:
-	ld		hl,item1y
-	ld		bc,lenghtitemtable-1
-
-.docheckherotakesitem:
-	exx
-	ld		b,amountofitems
-.loopitemcheck:
-	exx
-	;pointer on enemy hero?
-	ld		a,d
-	cp		(hl)			                      ;cp y
-	inc		hl
-	jp		nz,.endcheckthisitem
-	ld		a,e
-	cp		(hl)			                      ;cp	x
-	jp		z,.herotakesitem
-	;pointer on enemy hero?
-.endcheckthisitem:
-	add		hl,bc
-	exx
-	djnz	.loopitemcheck
-	exx
-	ret
-
-.herotakesitem:
-	inc		hl				                      ;item type
-	ld		a,(hl)
-
-	exx
-	
-	ld		c,a
-	pop		af
-	pop		af
-	pop		hl				                      ;hl -> pl?hero?y
-	pop		af
-
-	ld		de,10
-	add		hl,de			                      ;pl?hero?items
-	ld		a,255
-
-amountofitemsperhero:	equ	5
-	
-	ld		b,amountofitemsperhero
-.loop:
-	cp		(hl)
-	jr		z,.emptyspace
-	inc		hl
-	djnz	.loop
-	ret
-	
-.emptyspace:
-	ld		(hl),c
-
-	exx
-
-	dec		hl
-	ld		(hl),255		                    ;item x
-	dec		hl			
-	ld		(hl),255		                    ;item y
-	xor		a
-	ld		(movehero?),a
-	ret
 
 
 
@@ -4049,10 +3965,45 @@ HeroAirSpells:          equ 65
 HeroWaterSpells:        equ 66
 HeroAllSchoolsSpells:   equ 67
 HeroInventory:          equ 68
-;AddToHeroTable: equ 9
-
+HeroPortrait16x30SYSX:  equ HeroInventory + 15
+HeroSpecificInfo:       equ HeroPortrait16x30SYSX + 2
 
 lenghtinventorytable:   equ 9 + 6
+
+
+
+HeroAddressesAdol:            db "   adol   ",254,"          ",254,"  knight  ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroPortrait14x9SYSXAdol,HeroPortrait16x30SYSXAdol
+HeroAddressesGoemon1:         db " goemon1  ",254,"          ",254,"  ranger  ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroPortrait14x9SYSXGoemon1,HeroPortrait16x30SYSXGoemon1
+HeroAddressesPixy:            db "  pixy    ",254,"          ",254," alchemist",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroPortrait14x9SYSXPixy,HeroPortrait16x30SYSXPixy
+HeroAddressesDrasle1:         db " drasle1  ",254,"          ",254," demoniac ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroPortrait14x9SYSXDrasle1,HeroPortrait16x30SYSXDrasle1
+HeroAddressesLatok:           db "  latok   ",254,"          ",254," overlord ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroPortrait14x9SYSXLatok,HeroPortrait16x30SYSXLatok
+HeroAddressesDrasle2:         db " drasle2  ",254,"          ",254," barbarian",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroPortrait14x9SYSXDrasle2,HeroPortrait16x30SYSXDrasle2
+HeroAddressesSnake1:          db " snake1   ",254,"          ",254,"          ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroPortrait14x9SYSXSnake1,HeroPortrait16x30SYSXSnake1
+HeroAddressesDrasle3:         db " drasle3  ",254,"          ",254,"          ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroPortrait14x9SYSXDrasle3,HeroPortrait16x30SYSXDrasle3
+HeroAddressesSnake2:          db " snake2   ",254,"          ",254,"          ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroPortrait14x9SYSXSnake2,HeroPortrait16x30SYSXSnake2
+HeroAddressesDrasle4:         db " drasle4  ",254,"          ",254,"          ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroPortrait14x9SYSXDrasle4,HeroPortrait16x30SYSXDrasle4
+HeroAddressesAshguine:        db " ashguine ",254,"          ",254,"          ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroPortrait14x9SYSXAshguine,HeroPortrait16x30SYSXAshguine
+HeroAddressesUndeadline1:     db " warrior  ",254,"          ",254,"          ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroPortrait14x9SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1
+HeroAddressesPsychoWorld:     db " psycho   ",254,"          ",254,"          ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroPortrait14x9SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld
+HeroAddressesUndeadline2:     db "  ninja   ",254,"          ",254,"          ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroPortrait14x9SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2
+HeroAddressesGoemon2:         db " goemon   ",254,"          ",254,"          ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroPortrait14x9SYSXGoemon2,HeroPortrait16x30SYSXGoemon2
+HeroAddressesUndeadline3:     db "  marco   ",254,"          ",254,"   mage   ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroPortrait14x9SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3
+HeroAddressesFray:            db "   fray   ",254,"          ",254,"          ",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroPortrait14x9SYSXFray,HeroPortrait16x30SYSXFray
+HeroAddressesBlackColor:      db "   black  ",254,"  color   ",254,"          ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroPortrait14x9SYSXBlackColor,HeroPortrait16x30SYSXBlackColor
+HeroAddressesWit:             db "   wit    ",254,"          ",254,"          ",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroPortrait14x9SYSXWit,HeroPortrait16x30SYSXWit
+HeroAddressesMitchell:        db " mitchell ",254,"          ",254,"          ",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroPortrait14x9SYSXMitchell,HeroPortrait16x30SYSXMitchell
+HeroAddressesJanJackGibson:   db " jan jack ",254,"  gibson  ",254,"          ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroPortrait14x9SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson
+HeroAddressesGillianSeed:     db " gillian  ",254,"   seed   ",254,"          ",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroPortrait14x9SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed
+HeroAddressesSnatcher:        db " snatcher ",254,"          ",254,"          ",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroPortrait14x9SYSXSnatcher,HeroPortrait16x30SYSXSnatcher
+HeroAddressesGolvellius:      db "golvellius",254,"          ",254,"          ",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroPortrait14x9SYSXGolvellius,HeroPortrait16x30SYSXGolvellius
+HeroAddressesBillRizer:       db "bill rizer",254,"          ",254,"          ",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroPortrait14x9SYSXBillRizer,HeroPortrait16x30SYSXBillRizer
+HeroAddressesPochi:           db "  pochi   ",254,"          ",254,"          ",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroPortrait14x9SYSXPochi,HeroPortrait16x30SYSXPochi
+HeroAddressesGreyFox:         db " grey fox ",254,"          ",254,"          ",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroPortrait14x9SYSXGreyFox,HeroPortrait16x30SYSXGreyFox
+HeroAddressesTrevorBelmont:   db "  trevor  ",254,"  belmont ",254,"          ",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroPortrait14x9SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont
+HeroAddressesBigBoss:         db " big boss ",254,"          ",254,"          ",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroPortrait14x9SYSXBigBoss,HeroPortrait16x30SYSXBigBoss
+HeroAddressesSimonBelmont:    db "   simon  ",254,"  belmont ",254,"          ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroPortrait14x9SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont
+HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254,"          ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroPortrait14x9SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich
+HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroPortrait14x9SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont
 
 pl1hero1y:		db	07
 pl1hero1x:		db	2
@@ -4082,6 +4033,8 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
 .Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,018,023,028,033 ;9 body slots and 6 open slots (045 = empty slot)
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXUndeadline3
+.HeroSpecificInfo: dw HeroAddressesUndeadline3
 
 pl1hero2y:		db	7
 pl1hero2x:		db	3
@@ -4111,6 +4064,8 @@ Pl1Hero2Block:  db Goemon1SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXGoemon1
+.HeroSpecificInfo: dw HeroAddressesGoemon1
 
 
 
@@ -4142,6 +4097,8 @@ Pl1Hero3Block:  db PixySpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXPixy
+.HeroSpecificInfo: dw HeroAddressesPixy
 
 
 pl1hero4y:		db	07		                ;
@@ -4172,6 +4129,8 @@ Pl1Hero4Block:  db Drasle1SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle1
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 
 
 pl1hero5y:		db	07		                ;
@@ -4202,6 +4161,8 @@ Pl1Hero5Block:  db LatokSpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXLatok
+.HeroSpecificInfo: dw HeroAddressesLatok
 
 
 pl1hero6y:		db	07		                ;
@@ -4232,6 +4193,8 @@ Pl1Hero6Block:  db Drasle2SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle2
+.HeroSpecificInfo: dw HeroAddressesDrasle2
 
 
 pl1hero7y:		db	07		                ;
@@ -4262,6 +4225,8 @@ Pl1Hero7Block:  db Snake1SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXSnake1
+.HeroSpecificInfo: dw HeroAddressesSnake1
 
 
 pl1hero8y:		db	07		                ;
@@ -4292,7 +4257,8 @@ Pl1Hero8Block:  db Drasle3SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
-
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle3
+.HeroSpecificInfo: dw HeroAddressesDrasle3
 
 
 
@@ -4327,6 +4293,8 @@ Pl2Hero1Block:  db Drasle1SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle1
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 
 pl2hero2y:		ds  lenghtherotable,255
 pl2hero3y:		ds  lenghtherotable,255
@@ -4366,6 +4334,8 @@ Pl3Hero1Block:  db HeroesSpritesBlock1
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle1
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 
 pl3hero2y:		ds  lenghtherotable,255
 pl3hero3y:		ds  lenghtherotable,255
@@ -4404,6 +4374,8 @@ Pl4Hero1Block:  db Drasle1SpriteBlock
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,255
+.Portrait16x30SYSX:  dw HeroPortrait16x30SYSXDrasle1
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 
 pl4hero2y:		ds  lenghtherotable,255
 pl4hero3y:		ds  lenghtherotable,255
@@ -4487,27 +4459,44 @@ HeroPortrait14x9SYSXBigBoss:      equ $4000+(009*128)+(140/2)-128 ;(dy*128 + dx/
 HeroPortrait14x9SYSXSimonBelmont: equ $4000+(009*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXDrPettrovich: equ $4000+(009*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;------------------------------------------------------------------------------------------------------------
+HeroPortrait16x30SYSXAdol:         equ $8000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXGoemon1:      equ $8000+(000*128)+(016/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXPixy:         equ $8000+(000*128)+(032/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXDrasle1:      equ $8000+(000*128)+(048/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXLatok:        equ $8000+(000*128)+(064/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXDrasle2:      equ $8000+(000*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSnake1:       equ $8000+(000*128)+(096/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXDrasle3:      equ $8000+(000*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSnake2:       equ $8000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXDrasle4:      equ $8000+(000*128)+(144/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXAshguine:     equ $8000+(000*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXUndeadline1:  equ $8000+(000*128)+(176/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXPsychoWorld:  equ $8000+(000*128)+(192/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXUndeadline2:  equ $8000+(000*128)+(208/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXGoemon2:      equ $8000+(000*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXUndeadline3:  equ $8000+(000*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait16x30SYSXFray:         equ $8000+(030*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXBlackColor:   equ $8000+(030*128)+(016/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXWit:          equ $8000+(030*128)+(032/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXMitchell:     equ $8000+(030*128)+(048/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXJanJackGibson:equ $8000+(030*128)+(064/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXGillianSeed:  equ $8000+(030*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSnatcher:     equ $8000+(030*128)+(096/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXGolvellius:   equ $8000+(030*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXBillRizer:    equ $8000+(030*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXPochi:        equ $8000+(030*128)+(144/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXGreyFox:      equ $8000+(030*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXTrevorBelmont:equ $8000+(030*128)+(176/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXBigBoss:      equ $8000+(030*128)+(192/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSimonBelmont: equ $8000+(030*128)+(208/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXDrPettrovich: equ $8000+(030*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXRichterBelmont:equ $8000+(030*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 
 
 
-amountofitems:		equ	4
-lenghtitemtable:	equ	3
-item1y:				db	6
-item1x:				db	7
-item1type:			db	240 - 16
-
-item2y:				db	6
-item2x:				db	8
-item2type:			db	255 - 16 
-
-item3y:				db	6
-item3x:				db	9
-item3type:			db	241 - 16
-
-item4y:				db	6
-item4x:				db	10
-item5type:			db	247 - 16
 
 non_see_throughpieces:  equ 16
 amountoftransparantpieces:  equ 64
@@ -4665,51 +4654,7 @@ player4human?:			db	1
 whichplayernowplaying?:	db	1
 
 
-amountofcreatures:	equ	4
-lenghtcreaturetable:equ	10
-creature1y:			db	8
-creature1x:			db	10
-creature1type:		db	224 		;201=last small creature | 202=1st big creature | 224=left bottom | 228=1st huge creature
-creature1a_amount:	db	10
-creature1b_type:	db	177			;other creatures in this pack
-creature1b_amount:	db	10
-creature1c_type:	db	177			;other creatures in this pack
-creature1c_amount:	db	10
-creature1d_type:	db	177			;other creatures in this pack
-creature1d_amount:	db	10
 
-creature2y:			db	8
-creature2x:			db	11
-creature2type:		db	202 		;202= first big creature
-creature2a_amount:	db	10
-creature2b_type:	db	177			;other creatures in this pack
-creature2b_amount:	db	10
-creature2c_type:	db	177			;other creatures in this pack
-creature2c_amount:	db	10
-creature2d_type:	db	177			;other creatures in this pack
-creature2d_amount:	db	10
-
-creature3y:			db	8
-creature3x:			db	12
-creature3type:		db	182 		;202= first big creature
-creature3a_amount:	db	10
-creature3b_type:	db	177			;other creatures in this pack
-creature3b_amount:	db	10
-creature3c_type:	db	177			;other creatures in this pack
-creature3c_amount:	db	10
-creature3d_type:	db	177			;other creatures in this pack
-creature3d_amount:	db	10
-
-creature4y:			db	08
-creature4x:			db	13
-creature4type:		db	193  		;202= first big creature
-creature4a_amount:	db	10
-creature4b_type:	db	177			;other creatures in this pack
-creature4b_amount:	db	10
-creature4c_type:	db	177			;other creatures in this pack
-creature4c_amount:	db	10
-creature4d_type:	db	177			;other creatures in this pack
-creature4d_amount:	db	10
 
 movementpathpointer:	ds	1	
 movehero?:				ds	1
