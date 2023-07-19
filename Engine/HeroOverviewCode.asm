@@ -499,7 +499,24 @@ HeroOverViewArmyWindowDY:   equ 029
 HeroOverViewArmyWindowNX:   equ 156
 HeroOverViewArmyWindowNY:   equ 130
 
+HeroOverViewArmyIconWindowButtonNY:  equ 030
+HeroOverViewArmyIconWindowButtonNX:  equ 018
+
+
+
+
+
+
+
+
 HeroOverviewArmyWindowCode:
+	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
+	ld		(SetHeroArmyAndStatusInHud?),a
+
+;################################ CAN REMOVE LATER ################################
+  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;################################ CAN REMOVE LATER ################################
+
   call  SetHeroOverViewArmyWindow       ;set overview of hero army
   call  Set16x30HeroIcon                ;sets hero icon in the Army Window
   call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
@@ -510,43 +527,301 @@ HeroOverviewArmyWindowCode:
 
   .engine:
   call  PopulateControls                ;read out keys
-;  ld    ix,HeroOverviewInventoryIconButtonTable
-;  ld    iy,ButtonTableInventoryIconsSYSX
-;  call  CheckButtonMouseInteraction
-;  ld    a,(MenuOptionSelected?)
-;  or    a
-;  jp    nz,.InventoryIconPressed
+
+  ld    ix,HeroOverviewArmyIconButtonTable
+  ld    iy,ButtonTableArmyIconsSYSX
+  call  CheckButtonMouseInteraction
+
+
+  ld    a,(MenuOptionSelected?)
+  or    a
+  jp    nz,.ButtonPressed
 ;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 ;  call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
-;  call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
-;  ld    ix,HeroOverviewInventoryIconButtonTable
-;  call  SetButtonStatusAndText3         ;copies button state from rom -> vram
+  call  MarkLastPressedButtonArmy        ;mark the button that was pressed as 'mouse hover over'
+
+
+  ld    ix,HeroOverviewArmyIconButtonTable
+  call  SetButtonStatusAndText4         ;copies button state from rom -> vram
+  call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
+
+
   call  SwapAndSetPage                  ;swap and set page  
   call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
   halt
   jp  .engine
 
-;  .InventoryIconPressed:
-;  ld    (MenuOptionSelected?Backup),a
+  .ButtonPressed:
+  ld    (MenuOptionSelected?Backup),a
 
-;  xor   a
-;  ld    (MenuOptionSelected?),a
-;  ld    (ActivatedSpellIconButton),ix
+  xor   a
+  ld    (MenuOptionSelected?),a
 ;  ld    a,3
 ;  ld    (SetSkillsDescription?),a  
-;  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
-;  jp    HeroOverviewInventoryWindowCode
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  jp    HeroOverviewArmyWindowCode
+
+
+
+
+
+
+MarkLastPressedButtonArmy:                  ;mark the button that was pressed as 'mouse hover over'
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    255                             ;no button pressed (yet)
+  ret   z
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  cp    255
+  jr    z,.Set
+
+  ld    b,a
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  cp    b
+  jr    nz,.DifferentButtonPressed
+
+  ld    b,a
+  ld    a,6
+  sub   a,b
+
+  ld    ix,HeroOverviewArmyIconButtonTable
+  ld    de,HeroOverviewArmyIconButtonTableLenghtPerIcon
+  .loop:
+  jr    z,.Found
+  add   ix,de
+  dec   a
+  jr    .loop
+  .Found:                               ;the button that was pressed will now be marked as 'mouse hover over'
+
+;check empty slot
+  push  ix
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  cp    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  jp    z,.end
+;/check empty slot
+
+  ld    (ix+2),%0100 0011               ; (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  .Set:
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    (MenuOptionSelected?BackupLastFrame),a
+  ret
+
+  .DifferentButtonPressed:
+;1. second slot clicked is empty, move (and split if possible) 1 unit
+;2. second slot clicked  has the same unit type, combine them 
+;3. both slots have different units, swap them
+
+;check 1. second slot clicked is empty, move (and split if possible) 1 unit
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  jp    nz,.EndCheck1
+  ;second slot is empty, move (and split if possible) 1 unit
+
+  ;reduce amount of unit we want to split
+  ld    a,(MenuOptionSelected?BackupLastFrame)   
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+  dec   hl
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+  ld    c,(ix+HeroUnits+0)              ;unit type
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  jr    nz,.EndCheckZero
+  ld    (ix+HeroUnits+0),0              ;unit type (remove when amount is zero)
+  .EndCheckZero:
+  ;/reduce amount of unit we want to split
+
+  ;put one unit in the second slot/botton pressed
+  ld    a,(MenuOptionSelected?Backup)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a 
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    (ix+HeroUnits+0),c              ;unit type
+  ld    (ix+HeroUnits+1),1              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+  jp    .end
+  ;/put one unit in the second slot/botton pressed
+  .EndCheck1:
+
+;check 2. second slot clicked  has the same unit type, combine them 
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    c,(ix+HeroUnits+0)              ;unit type first button pressed
+
+  ld    a,(MenuOptionSelected?BackupLastFrame)   
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+0)              ;unit type second button pressed
+
+  cp    c
+  jp    nz,.EndCheck2
+
+  ;combine units into one slot
+  ld    (ix+HeroUnits+0),0              ;unit type second button pressed
+  ld    l,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit type second button pressed
+
+  ld    (ix+HeroUnits+1),0              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit type second button pressed
+
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de
+  ld    e,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    d,(ix+HeroUnits+2)              ;unit type second button pressed
+  add   hl,de
+
+  ld    (ix+HeroUnits+1),l              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit type second button pressed
+  jp    .end
+  .EndCheck2:
+
+
+;check 3. both slots have different units, swap them
+
+;SwapInventoryItemsArmy:                     ;swaps the last 2 inventory items that have been selected
+  push  iy
+
+  ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
+  ld    b,a
+  ld    a,6
+  sub   a,b  
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(MenuOptionSelected?BackupLastFrame)
+  ld    b,a
+  ld    a,6
+  sub   a,b
+  ld    iy,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,a
+  add   iy,de
+  add   iy,de
+  add   iy,de
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  ld    b,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  ld    c,(ix+HeroUnits+2)              ;unit amount (16 bit)
+
+  ld    d,(iy+HeroUnits+0)              ;unit type
+  ld    e,(iy+HeroUnits+1)              ;unit amount (16 bit)
+  ld    h,(iy+HeroUnits+2)              ;unit amount (16 bit)
+
+  ld    (ix+HeroUnits+0),d              ;unit type
+  ld    (ix+HeroUnits+1),e              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+2),h              ;unit amount (16 bit)
+
+  ld    (iy+HeroUnits+0),a              ;unit type
+  ld    (iy+HeroUnits+1),b              ;unit amount (16 bit)
+  ld    (iy+HeroUnits+2),c              ;unit amount (16 bit)
+
+  pop   iy
+
+  .end:
+  xor   a
+  ld    (MenuOptionSelected?),a
+  ld    a,255
+  ld    (MenuOptionSelected?Backup),a  
+  ld    (MenuOptionSelected?BackupLastFrame),a
+  pop   af                              ;pop the call to this routine
+  jp    HeroOverviewArmyWindowCode      ;restart code, item has been swapped
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 NXAndNY16x30HeroIcon:   equ 030*256 + (016/2)            ;(ny*256 + nx/2) = (14x09)
-DYDX16x30HeroIconArmyWindow:       equ (HeroOverViewArmyWindowDY+27)*128 + ((HeroOverViewArmyWindowDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
+DYDX16x30HeroIconArmyWindow:       equ (HeroOverViewArmyWindowDY+28)*128 + ((HeroOverViewArmyWindowDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
 
 Set16x30HeroIcon:
   ;SetHeroPortrait16x30:
   ld    a,Hero16x30PortraitsBlock       ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
+  ld    ix,(plxcurrentheroAddress)
   ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
   ld    b,(ix+HeroPortrait16x30SYSX+1)
   ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
@@ -554,44 +829,98 @@ Set16x30HeroIcon:
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 	ret
 
+NXAndNY14x24CharaterPortraits:      equ 024*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
+DYDXUnit1WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+32)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit2WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+52)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit3WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+72)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit4WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+92)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit5WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+112)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit6WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+132)/2 - 128      ;(dy*128 + dx/2) = (204,153)
+
 SetArmyIconsAndAmount:
+  ld    ix,(plxcurrentheroAddress)
+
+  call  .army
+;  call  .amount
+;  ret
+
+  .amount:
+  ld    l,(ix+HeroUnits+01)
+  ld    h,(ix+HeroUnits+02)
+  ld    b,HeroOverViewArmyWindowDX + 031
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+
+  ld    l,(ix+HeroUnits+04)
+  ld    h,(ix+HeroUnits+05)
+  ld    b,HeroOverViewArmyWindowDX + 051
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+
+  ld    l,(ix+HeroUnits+07)
+  ld    h,(ix+HeroUnits+08)
+  ld    b,HeroOverViewArmyWindowDX + 071
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+
+  ld    l,(ix+HeroUnits+10)
+  ld    h,(ix+HeroUnits+11)
+  ld    b,HeroOverViewArmyWindowDX + 091
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+
+  ld    l,(ix+HeroUnits+13)
+  ld    h,(ix+HeroUnits+14)
+  ld    b,HeroOverViewArmyWindowDX + 111
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+
+  ld    l,(ix+HeroUnits+16)
+  ld    h,(ix+HeroUnits+17)
+  ld    b,HeroOverViewArmyWindowDX + 131
+  ld    c,HeroOverViewArmyWindowDY + 056
+  call  SetNumber16Bit
+  ret
+
+
+  .army:
   ld    a,Enemy14x24PortraitsBlock      ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit1WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit1WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit2WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit2WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit3WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit3WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit4WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit4WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit5WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit5WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit6WindowInHud         ;(dy*128 + dx/2) = (204,153)
+  ld    de,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit6WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
@@ -599,14 +928,22 @@ SetArmyIconsAndAmount:
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,UnitSYSXTable
+  ld    de,UnitSYSXTable14x24Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ret
 
-
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+UnitSYSXTable14x24Portraits:  
+                dw $8000+(00*128)+(00/2)-128, $8000+(00*128)+(14/2)-128, $8000+(00*128)+(28/2)-128, $8000+(00*128)+(42/2)-128, $8000+(00*128)+(56/2)-128, $8000+(00*128)+(70/2)-128, $8000+(00*128)+(84/2)-128, $8000+(00*128)+(98/2)-128, $8000+(00*128)+(112/2)-128, $8000+(00*128)+(126/2)-128, $8000+(00*128)+(140/2)-128, $8000+(00*128)+(154/2)-128, $8000+(00*128)+(168/2)-128, $8000+(00*128)+(182/2)-128, $8000+(00*128)+(196/2)-128, $8000+(00*128)+(210/2)-128, $8000+(00*128)+(224/2)-128, $8000+(00*128)+(238/2)-128
+                dw $8000+(24*128)+(00/2)-128, $8000+(24*128)+(14/2)-128, $8000+(24*128)+(28/2)-128, $8000+(24*128)+(42/2)-128, $8000+(24*128)+(56/2)-128, $8000+(24*128)+(70/2)-128, $8000+(24*128)+(84/2)-128, $8000+(24*128)+(98/2)-128, $8000+(24*128)+(112/2)-128, $8000+(24*128)+(126/2)-128, $8000+(24*128)+(140/2)-128, $8000+(24*128)+(154/2)-128, $8000+(24*128)+(168/2)-128, $8000+(24*128)+(182/2)-128, $8000+(24*128)+(196/2)-128, $8000+(24*128)+(210/2)-128, $8000+(24*128)+(224/2)-128, $8000+(24*128)+(238/2)-128
+                dw $8000+(48*128)+(00/2)-128, $8000+(48*128)+(14/2)-128, $8000+(48*128)+(28/2)-128, $8000+(48*128)+(42/2)-128, $8000+(48*128)+(56/2)-128, $8000+(48*128)+(70/2)-128, $8000+(48*128)+(84/2)-128, $8000+(48*128)+(98/2)-128, $8000+(48*128)+(112/2)-128, $8000+(48*128)+(126/2)-128, $8000+(48*128)+(140/2)-128, $8000+(48*128)+(154/2)-128, $8000+(48*128)+(168/2)-128, $8000+(48*128)+(182/2)-128, $8000+(48*128)+(196/2)-128, $8000+(48*128)+(210/2)-128, $8000+(48*128)+(224/2)-128, $8000+(48*128)+(238/2)-128
+                dw $8000+(72*128)+(00/2)-128, $8000+(72*128)+(14/2)-128, $8000+(72*128)+(28/2)-128, $8000+(72*128)+(42/2)-128, $8000+(72*128)+(56/2)-128, $8000+(72*128)+(70/2)-128, $8000+(72*128)+(84/2)-128, $8000+(72*128)+(98/2)-128, $8000+(72*128)+(112/2)-128, $8000+(72*128)+(126/2)-128, $8000+(72*128)+(140/2)-128, $8000+(72*128)+(154/2)-128, $8000+(72*128)+(168/2)-128, $8000+(72*128)+(182/2)-128, $8000+(72*128)+(196/2)-128, $8000+(72*128)+(210/2)-128, $8000+(72*128)+(224/2)-128, $8000+(72*128)+(238/2)-128
+                dw $8000+(96*128)+(00/2)-128, $8000+(96*128)+(14/2)-128, $8000+(96*128)+(28/2)-128, $8000+(96*128)+(42/2)-128, $8000+(96*128)+(56/2)-128, $8000+(96*128)+(70/2)-128, $8000+(96*128)+(84/2)-128, $8000+(96*128)+(98/2)-128, $8000+(96*128)+(112/2)-128, $8000+(96*128)+(126/2)-128, $8000+(96*128)+(140/2)-128, $8000+(96*128)+(154/2)-128, $8000+(96*128)+(168/2)-128, $8000+(96*128)+(182/2)-128, $8000+(96*128)+(196/2)-128, $8000+(96*128)+(210/2)-128, $8000+(96*128)+(224/2)-128, $8000+(96*128)+(238/2)-128
+                dw $8000+(120*128)+(00/2)-128, $8000+(120*128)+(14/2)-128, $8000+(120*128)+(28/2)-128, $8000+(120*128)+(42/2)-128, $8000+(120*128)+(56/2)-128, $8000+(120*128)+(70/2)-128, $8000+(120*128)+(84/2)-128, $8000+(120*128)+(98/2)-128, $8000+(120*128)+(112/2)-128, $8000+(120*128)+(126/2)-128, $8000+(120*128)+(140/2)-128, $8000+(120*128)+(154/2)-128, $8000+(120*128)+(168/2)-128, $8000+(120*128)+(182/2)-128, $8000+(120*128)+(196/2)-128, $8000+(120*128)+(210/2)-128, $8000+(120*128)+(224/2)-128, $8000+(120*128)+(238/2)-128
+                dw $8000+(144*128)+(00/2)-128, $8000+(144*128)+(14/2)-128, $8000+(144*128)+(28/2)-128, $8000+(144*128)+(42/2)-128, $8000+(144*128)+(56/2)-128, $8000+(144*128)+(70/2)-128, $8000+(144*128)+(84/2)-128, $8000+(144*128)+(98/2)-128, $8000+(144*128)+(112/2)-128, $8000+(144*128)+(126/2)-128, $8000+(144*128)+(140/2)-128, $8000+(144*128)+(154/2)-128, $8000+(144*128)+(168/2)-128, $8000+(144*128)+(182/2)-128, $8000+(144*128)+(196/2)-128, $8000+(144*128)+(210/2)-128, $8000+(144*128)+(224/2)-128, $8000+(144*128)+(238/2)-128
 
 
 ;inventory has:
@@ -2939,11 +3276,9 @@ SetTextNameHeroAndLevel:
   ld    (TextAddresspointer),hl  
   call  SetTextInButton.go
 
-
-
   ld    a,(ix+HeroStatAttack)
-  ld    b,HeroOverViewStatusWindowDX + 056
-  ld    c,HeroOverViewStatusWindowDY + 034
+  ld    b,HeroOverViewFirstWindowchoicesDx + 069
+  ld    c,HeroOverViewFirstWindowchoicesDY + 034
   call  SetNumber8Bit
   ret
 
@@ -3119,6 +3454,10 @@ SetNumber16Bit:                         ;in hl=number (16bit)
   ld    a,c                             ;dy
   ld    (PutLetter+dy),a                ;set dy of text
 
+  ld    a,h
+  cp    l
+  ret   z
+
   call  ConvertToDecimal16bit
 
   ld    hl,TextNumber
@@ -3143,7 +3482,7 @@ SetNumber8Bit:                          ;in a=number (8bit)
 
 ConvertToDecimal16bit:
   ld    iy,TextNumber
-
+  ld    e,0                             ;e=has an xfold already been set prior ?
 
 
 
@@ -3162,6 +3501,7 @@ ConvertToDecimal16bit:
   ld    a,d
   cp    $30
   jr    z,.EndSet10000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
   ld    (iy),d                          ;set 1000fold
   inc   iy
   .EndSet10000Fold:
@@ -3183,9 +3523,13 @@ ConvertToDecimal16bit:
   jr  .Loop1000Fold
 
   .Set1000Fold:
+  bit   0,e
+  jr    nz,.DoSet1000Fold    
   ld    a,d
   cp    $30
   jr    z,.EndSet1000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  .DoSet1000Fold:
   ld    (iy),d                          ;set 100fold
   inc   iy
   .EndSet1000Fold:
@@ -3218,14 +3562,31 @@ ConvertToDecimal16bit:
   jr  .Loop100Fold
 
   .Set100Fold:
+  bit   0,e
+  jr    nz,.DoSet100Fold  
   ld    a,d
   cp    $30
-  jr    z,.EndSet100Fold  
+  jr    nz,.DoSet100Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,4
+  ld    (PutLetter+dx),a                ;set dx of text
+
+
+  jr    .EndSet100Fold  
+
+  .DoSet100Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
   ld    (iy),d                          ;set 100fold
   inc   iy
   .EndSet100Fold:
 
   add   hl,bc
+
+
+
+
+  
   .Check10Folds:
   ld    d,$30                           ;10folds in d ($30 = 0)
 
@@ -3238,12 +3599,30 @@ ConvertToDecimal16bit:
   jr  .Loop10Fold
 
   .Set10Fold:
+  bit   0,e
+  jr    nz,.DoSet10Fold
   ld    a,d
   cp    $30
-  jr    z,.EndSet10Fold  
+  jr    nz,.DoSet10Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,3
+  ld    (PutLetter+dx),a                ;set dx of text
+
+  jr    .EndSet10Fold  
+
+
+
+  .DoSet10Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
   ld    (iy),d                          ;set 10fold
   inc   iy
   .EndSet10Fold:
+
+
+
+
+
 
   .Check1Fold:
   ld    bc,10 + $30
@@ -3543,6 +3922,66 @@ MenuOptionSelected:
   ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
   ld    (MenuOptionSelected?),a
   pop   af                                    ;pop the call in the button check loop 
+  ret
+
+SetButtonStatusAndText4:
+;  ld    ix,HeroOverviewSpellBookButtonTable
+;  ld    iy,ButtonTableSpellBookSYSX
+;  ld    bc,$0000 + (HeroOverViewSpellBookWindowButtonNY*256) + (HeroOverViewSpellBookWindowButtonNX/2)
+
+  ld    (BCStored),bc
+
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,ButtonTableLenght
+  add   ix,de
+
+
+  ld    de,6                            ;lenght of button data
+  add   iy,de
+
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   0,(ix+HeroOverviewWindowButtonStatus)
+  jr    nz,.bit0isSet
+  bit   1,(ix+HeroOverviewWindowButtonStatus)
+  ret   z
+  
+  .bit1isSet:
+  res   1,(ix+HeroOverviewWindowButtonStatus)
+  jr    .goCopyButton
+  .bit0isSet:
+  res   0,(ix+HeroOverviewWindowButtonStatus)  
+  .goCopyButton:
+
+  bit   7,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOff)
+  ld    h,(iy+ButtonOff+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   6,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonMouseOver)
+  ld    h,(iy+ButtonMouseOver+1)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+;  bit   5,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(iy+ButtonOMouseClicked)
+  ld    h,(iy+ButtonOMouseClicked+1)
+  .go:
+  
+  ld    e,(ix+HeroOverviewWindowButton_de)
+  ld    d,(ix+HeroOverviewWindowButton_de+1)
+  ld    bc,(BCStored)
+
+  ld    c,(ix+Buttonnynx)
+  ld    b,(ix+Buttonnynx+1)
+
+  ld    a,ArmyGraphicsBlock             ;Map block
+  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText3:

@@ -149,20 +149,6 @@ LoadCastleOverview:
 TextNumber: ;ds  10
 db  "31456",255
 
-StatusText:
-.attack:        db "3",255
-.defense:       db "1",255
-.knowledge:     db "7",255
-.spellpower:    db "8",255
-.level:         db "03",255
-.xp:            db "0100",255
-.xpnext:        db "1000",255
-.spellpoints:   db "115",255
-.spellpointstot:db "120",255
-.spellrecovery: db "16",255
-.movementpoints:db "19",255
-.movementpointstot:db "24",255
-
 HeroOverViewFirstWindowButtonOffSX:           equ 008
 HeroOverViewFirstWindowButtonOffSY:           equ 122
 HeroOverViewFirstWindowButtonMouseOverSX:     equ 008
@@ -352,8 +338,97 @@ HeroOverViewSpellIconButton8DX:   equ HeroOverViewSpellBookWindowDX + 140
 HeroOverViewSpellIconButton8DY:   equ HeroOverViewSpellBookWindowDY + 095
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+HeroOverViewArmyIconButton1OffSX:           equ 156
+HeroOverViewArmyIconButton1OffSY:           equ 021
+HeroOverViewArmyIconButton1MouseOverSX:     equ 174
+HeroOverViewArmyIconButton1MouseOverSY:     equ 021
+HeroOverViewArmyIconButtonMouseClickedSX:   equ 192
+HeroOverViewArmyIconButtonMouseClickedSY:   equ 021
+
+HeroOverViewArmyIconButton2OffSX:           equ 156
+HeroOverViewArmyIconButton2OffSY:           equ 021
+HeroOverViewArmyIconButton2MouseOverSX:     equ 174
+HeroOverViewArmyIconButton2MouseOverSY:     equ 021
+
+HeroOverViewArmyIconButton3OffSX:           equ 156
+HeroOverViewArmyIconButton3OffSY:           equ 021
+HeroOverViewArmyIconButton3MouseOverSX:     equ 174
+HeroOverViewArmyIconButton3MouseOverSY:     equ 021
+
+HeroOverViewArmyIconButton4OffSX:           equ 156
+HeroOverViewArmyIconButton4OffSY:           equ 021
+HeroOverViewArmyIconButton4MouseOverSX:     equ 174
+HeroOverViewArmyIconButton4MouseOverSY:     equ 021
+
+HeroOverViewArmyIconButton5OffSX:           equ 156
+HeroOverViewArmyIconButton5OffSY:           equ 021
+HeroOverViewArmyIconButton5MouseOverSX:     equ 174
+HeroOverViewArmyIconButton5MouseOverSY:     equ 021
+
+HeroOverViewArmyIconButton6OffSX:           equ 156
+HeroOverViewArmyIconButton6OffSY:           equ 021
+HeroOverViewArmyIconButton6MouseOverSX:     equ 174
+HeroOverViewArmyIconButton6MouseOverSY:     equ 021
+
+HeroOverViewArmyIconButton1DX:   equ HeroOverViewArmyWindowDX + 030
+HeroOverViewArmyIconButton1DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverViewArmyIconButton2DX:   equ HeroOverViewArmyWindowDX + 050
+HeroOverViewArmyIconButton2DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverViewArmyIconButton3DX:   equ HeroOverViewArmyWindowDX + 070
+HeroOverViewArmyIconButton3DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverViewArmyIconButton4DX:   equ HeroOverViewArmyWindowDX + 090
+HeroOverViewArmyIconButton4DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverViewArmyIconButton5DX:   equ HeroOverViewArmyWindowDX + 110
+HeroOverViewArmyIconButton5DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverViewArmyIconButton6DX:   equ HeroOverViewArmyWindowDX + 130
+HeroOverViewArmyIconButton6DY:   equ HeroOverViewArmyWindowDY + 026
+
+HeroOverviewArmyIconButtonTableLenghtPerIcon:  equ HeroOverviewArmyIconButtonTable.endlenght-HeroOverviewArmyIconButtonTable
+HeroOverviewArmyIconButtonTableAmountOfButtons:  db  6
+HeroOverviewArmyIconButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (HeroOverViewArmyIconButton1DY*128) + (HeroOverViewArmyIconButton1DX/2) | db %1000 0011, HeroOverViewArmyIconButton1DY,HeroOverViewArmyIconButton1DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton1DX,HeroOverViewArmyIconButton1DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+  .endlenght:
+  dw  $0000 + (HeroOverViewArmyIconButton2DY*128) + (HeroOverViewArmyIconButton2DX/2) | db %1000 0011, HeroOverViewArmyIconButton2DY,HeroOverViewArmyIconButton2DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton2DX,HeroOverViewArmyIconButton2DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewArmyIconButton3DY*128) + (HeroOverViewArmyIconButton3DX/2) | db %1000 0011, HeroOverViewArmyIconButton3DY,HeroOverViewArmyIconButton3DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton3DX,HeroOverViewArmyIconButton3DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewArmyIconButton4DY*128) + (HeroOverViewArmyIconButton4DX/2) | db %1000 0011, HeroOverViewArmyIconButton4DY,HeroOverViewArmyIconButton4DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton4DX,HeroOverViewArmyIconButton4DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewArmyIconButton5DY*128) + (HeroOverViewArmyIconButton5DX/2) | db %1000 0011, HeroOverViewArmyIconButton5DY,HeroOverViewArmyIconButton5DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton5DX,HeroOverViewArmyIconButton5DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+  dw  $0000 + (HeroOverViewArmyIconButton6DY*128) + (HeroOverViewArmyIconButton6DX/2) | db %1000 0011, HeroOverViewArmyIconButton6DY,HeroOverViewArmyIconButton6DY+HeroOverViewArmyIconWindowButtonNY,HeroOverViewArmyIconButton6DX,HeroOverViewArmyIconButton6DX+HeroOverViewArmyIconWindowButtonNX | dw $0000 + (HeroOverViewArmyIconWindowButtonNY*256) + (HeroOverViewArmyIconWindowButtonNX/2)
+
+ButtonTableArmyIconsSYSX:
+  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewArmyIconButton3OffSY*128) + (HeroOverViewArmyIconButton3OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton3MouseOverSY*128) + (HeroOverViewArmyIconButton3MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewArmyIconButton4OffSY*128) + (HeroOverViewArmyIconButton4OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton4MouseOverSY*128) + (HeroOverViewArmyIconButton4MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewArmyIconButton5OffSY*128) + (HeroOverViewArmyIconButton5OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton5MouseOverSY*128) + (HeroOverViewArmyIconButton5MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+  dw  $4000 + (HeroOverViewArmyIconButton6OffSY*128) + (HeroOverViewArmyIconButton6OffSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButton6MouseOverSY*128) + (HeroOverViewArmyIconButton6MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -565,6 +640,10 @@ HeroOverviewInventoryIconButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover
   dw  $0000 + (HeroOverViewInventoryIconButton13DY*128) + (HeroOverViewInventoryIconButton13DX/2) | db %1000 0011, HeroOverViewInventoryIconButton13DY,HeroOverViewInventoryIconButton13DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton13DX,HeroOverViewInventoryIconButton13DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton14DY*128) + (HeroOverViewInventoryIconButton14DX/2) | db %1000 0011, HeroOverViewInventoryIconButton14DY,HeroOverViewInventoryIconButton14DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton14DX,HeroOverViewInventoryIconButton14DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewInventoryIconButton15DY*128) + (HeroOverViewInventoryIconButton15DX/2) | db %1000 0011, HeroOverViewInventoryIconButton15DY,HeroOverViewInventoryIconButton15DY+HeroOverViewInventoryIconWindowButtonNY,HeroOverViewInventoryIconButton15DX,HeroOverViewInventoryIconButton15DX+HeroOverViewInventoryIconWindowButtonNX | dw $0000 + (HeroOverViewInventoryIconWindowButtonNY*256) + (HeroOverViewInventoryIconWindowButtonNX/2)
+
+
+
+
 
 
 

@@ -617,18 +617,18 @@ phase	$4000
 dephase
 
 ;
-; block $27
+; block $27 - 28
 ;
 Hero16x30PortraitsBlock:  equ   $27
 phase	$4000
   incbin "..\grapx\HeroesSprites\16x30Portraits.SC5",7,212 * 128      ;212 lines
-	ds		$8000-$,$ff
+	ds		$c000-$,$ff
 dephase
 
 ;
-; block $28 - 29
+; block $29 - 30
 ;
-Enemy14x24PortraitsBlock:  equ   $28
+Enemy14x24PortraitsBlock:  equ   $29
 phase	$4000
   incbin "..\grapx\MonsterSprites\14x24Portraits.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
