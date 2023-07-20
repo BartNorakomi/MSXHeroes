@@ -7,12 +7,13 @@ LevelEngine:
 
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
-  call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mousebutton is pressed
+  call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
 
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
 
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroEntersCastle           ;check if a hero walked into a castle
+  call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
 
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster
@@ -82,6 +83,10 @@ vblank:
   push  hl
   push  ix
   push  iy
+
+;  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+;  cp    2
+;  jr    z,.CastleOverView
 
   call  PopulateControlsOnInterrupt     ;read out keys
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
@@ -436,6 +441,17 @@ CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressTo
 ;Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
 ;Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
 
+
+
+CheckEnterCastle:
+  ld    a,(EnterCastle?)
+  or    a
+  ret   z
+  xor   a
+  ld    (EnterCastle?),a
+  pop   af                              ;pop the call from the engine to this routine
+  jp    EnterCastle
+
 CheckHeroEntersCastle:
   ld    ix,(plxcurrentheroAddress)
   ld    iy,Castle1
@@ -520,7 +536,6 @@ AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
 
 
-CheckEnterCastle:
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -1567,7 +1582,17 @@ doputstar:
 ;/check if star is behind a tree	
 
 
+EnterCastle?: db  0
+CheckEnterHeroCastle:
+  ld    hl,(CurrentCursorSpriteCharacter)
+  ld    de,CursorEnterCastle
+  call  CompareHLwithDE
+  ret   nz  
 
+  ld    a,1
+  ld    (EnterCastle?),a
+  pop   af                              ;pop the call checktriggermapscreen
+  ret
 
 SetHeroOverViewMenu?: db  0
 CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon) and mousebutton is pressed
@@ -1644,6 +1669,7 @@ checktriggermapscreen:
 	jp		nz,.stopheromovement	          ;hero was moving, mouse clicked-> stop hero
 
   call  CheckEnterHeroOverviewMenu
+  call  CheckEnterHeroCastle
 
 	ld		a,(putmovementstars?)
 	or		a
@@ -2947,6 +2973,13 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   jr    z,.Ingame
   dec   a
   jr    z,.HeroOverview
+  dec   a
+  jr    z,.CastleOverview
+
+  .CastleOverview:
+  ld    hl,CursorHand
+	jp		.setcharacter
+  ret
 
   .HeroOverview:
   ld    hl,CursorHand
@@ -3067,20 +3100,49 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 ;	ret
 
   .CheckPointerOnCastle:
-
-
-  
-
-
-
   call  .SetMappositionMousePointsTo    ;check object layer for item
 
   ld    a,(hl)
   cp    254
   ret   nz
+  ;pointer is on castle. Check if it's a friendly castle
+  call  .SetCastleMousePointsToInIX
+  call  .CheckFriendlyCastle
+  jr    z,.FriendlyCastle
+
+  .EnemyCastle:
 	pop		af				                      ;pop call
   ld    hl,CursorSwords
 	jp		.setcharacter
+
+  .FriendlyCastle:
+  ld    (WhichCastleIsPointerPointingAt?),ix
+	pop		af				                      ;pop call
+  ld    hl,CursorEnterCastle
+
+
+	jp		.setcharacter
+
+  .CheckFriendlyCastle:
+  ld		a,(whichplayernowplaying?)
+  cp    (ix+CastlePlayer)
+  ret
+
+  .SetCastleMousePointsToInIX:
+  ld    ix,Castle1 | call .check | ret z
+  ld    ix,Castle2 | call .check | ret z
+  ld    ix,Castle3 | call .check | ret z
+  ld    ix,Castle4;| call .check | ret z
+  ret
+  .check:
+  ld    a,(mouseposx) ;2
+  dec   a
+  cp    (ix+CastleX)
+  ret   nz
+  ld    a,(mouseposy) ;3
+  inc   a
+  cp    (ix+CastleY)
+  ret
 
   .checkpointeritem:
   call  .SetMappositionMousePointsTo    ;check object layer for item
@@ -3106,8 +3168,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    hl,CursorSwords
 	jp		.setcharacter
 
-
-
   .SetMappositionMousePointsTo:         ;(mouseposy)=mappointery + mouseposy(/16), (mouseposx)=mappointerx + mouseposx(/16)
 	ld		hl,mapdata                      ;set map pointer x
 	ld		a,(mouseposy)                   ;set map pointer y
@@ -3126,8 +3186,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    d,0
 	add		hl,de  
   ret
-
-
 
 .checkpointeronhero:                  ;in: de=lenghtherotable, h=mouseposy (/16), l=mouseposx (/16), ix->plxhero1y
 	jp		z,.checkpointerfriend
@@ -3330,6 +3388,7 @@ CursorBoots:            equ SpriteCharCursorSprites + (09 * 32*3)
 CursorWalkingBoots:     equ SpriteCharCursorSprites + (10 * 32*3)
 CursorHand:             equ SpriteCharCursorSprites + (11 * 32*3)
 CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
+CursorEnterCastle:      equ SpriteCharCursorSprites + (13 * 32*3)
 
 colorlightgreen:    equ 01
 colormidgreen:      equ 02
@@ -3345,26 +3404,26 @@ colorblack:         equ 13
 
 
 SpriteCharCursorSprites:
-	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 13
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
 SpriteColCursorSprites:
   ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
 
 
 
-SpriteCharCursorSwitchingArrows:
-	include "../sprites/MouseCursorSwitchingArrows.tgs.gen"
-SpriteColCursorSwitchingArrows:
-	include "../sprites/MouseCursorSwitchingArrows.tcs.gen"
-
-SpriteCharCursorSwords:
-	include "../sprites/MouseCursorSwords.tgs.gen"
-SpriteColCursorSwords:
-	include "../sprites/MouseCursorSwords.tcs.gen"
-
-SpriteCharCursorShoeAndStar:
-	include "../sprites/MouseCursorShoeAndStar.tgs.gen"
-SpriteColCursorShoeAndStar:
-	include "../sprites/MouseCursorShoeAndStar.tcs.gen"
+;SpriteCharCursorSwitchingArrows:
+;	include "../sprites/MouseCursorSwitchingArrows.tgs.gen"
+;SpriteColCursorSwitchingArrows:
+;	include "../sprites/MouseCursorSwitchingArrows.tcs.gen"
+;
+;SpriteCharCursorSwords:
+;	include "../sprites/MouseCursorSwords.tgs.gen"
+;SpriteColCursorSwords:
+;	include "../sprites/MouseCursorSwords.tcs.gen"
+;
+;SpriteCharCursorShoeAndStar:
+;	include "../sprites/MouseCursorShoeAndStar.tgs.gen"
+;SpriteColCursorShoeAndStar:
+;	include "../sprites/MouseCursorShoeAndStar.tcs.gen"
 
 
 
@@ -4550,6 +4609,7 @@ putherotopbottom:
 ;	db		0,%0000 0000,$d0
 ;	db		0,%0000 1000,$98	
 
+WhichCastleIsPointerPointingAt?:  ds  2
 CastleY:                equ 0
 CastleX:                equ 1
 CastlePlayer:           equ 2

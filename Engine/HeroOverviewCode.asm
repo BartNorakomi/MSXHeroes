@@ -4491,12 +4491,6 @@ SkillwisdomExpert:
                           db  "spells                 ",255
 
 
-SwapAndSetPage:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-	ld		(activepage),a			
-	call	SetPageSpecial					        ;set page
-  ret
 
 SetHeroOverViewFontPage0Y212:           ;set font at (0,212) page 0
   ld    hl,$4000 + (000*128) + (000/2) - 128

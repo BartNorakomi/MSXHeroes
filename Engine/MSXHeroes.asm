@@ -563,10 +563,7 @@ HeroOverviewCodeBlock:  equ   $1c
 HeroOverviewFontBlock:  equ   $1c
 phase	$4000
   incbin "..\grapx\HeroOverview\font.SC5",7,7 * 128      ;5 lines
-kut:
   include "HeroOverviewCode.asm"
-kutje:
-kutjes: equ kutje-kut
 	ds		$8000-$,$ff
 dephase
 
@@ -626,13 +623,35 @@ phase	$4000
 dephase
 
 ;
-; block $29 - 30
+; block $29 - 2a
 ;
 Enemy14x24PortraitsBlock:  equ   $29
 phase	$4000
   incbin "..\grapx\MonsterSprites\14x24Portraits.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $2b
+;
+CastleOverviewCodeBlock:  equ   $2b
+CastleOverviewFontBlock:  equ   $2b
+phase	$4000
+  incbin "..\grapx\HeroOverview\font.SC5",7,7 * 128      ;5 lines
+  include "CastleOverviewCode.asm"
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $2c - 2d
+;
+IndividualBuildingsBlock:  equ   $2c
+phase	$4000
+  incbin "..\grapx\CastleOverview\IndividualBuildings.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

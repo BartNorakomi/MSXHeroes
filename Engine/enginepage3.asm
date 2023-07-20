@@ -25,6 +25,9 @@ StartGame:
   call  ClearMapPage0AndMapPage1
 
 
+  ld    a,1
+  ld    (EnterCastle?),a
+
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
@@ -49,6 +52,17 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   ld    (NXAndNY),bc
   ld    (AddressToWriteTo),de
   jr    CopyRamToVramCorrected.AddressesSet
+
+CopyRamToVramCorrectedCastleOverview:
+;we set 32kb HeroOverviewGraphics in page 1 and 2
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  call  CopyRamToVramCorrected.go                             ;go copy
+
+;now set engine back in page 1
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
 
 
 CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -129,6 +143,11 @@ copyfont:
 CopyPage0To1:
 	db		0,0,0,0
 	db		0,0,0,1
+	db		0,1,0,1
+	db		0,0,$d0	
+CopyPage1To0:
+	db		0,0,0,1
+	db		0,0,0,0
 	db		0,1,0,1
 	db		0,0,$d0	
 
@@ -1070,14 +1089,14 @@ ResetAllControls:
   ret
 
 SetHeroOverviewMenuInPage1ROM:
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
   out   ($a8),a      
 
   ld    a,HeroOverviewCodeBlock         ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
   xor   a
   ld    (MenuOptionSelected?),a
@@ -1092,10 +1111,6 @@ SetHeroOverviewMenuInPage1ROM:
 ;  call  HeroOverviewSpellBookWindowCode_Fire
 ;  call  HeroOverviewInventoryWindowCode
 ;  call  HeroOverviewArmyWindowCode
-
-
-
-
 
   call  HeroOverviewCode
 
@@ -1114,30 +1129,41 @@ SetHeroOverviewMenuInPage1ROM:
   ret
 
 EnterCastle:
+  ld    a,2
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+	ld		a,(memblocks.1)
+	push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a      
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  call  CastleOverviewCode
+
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+
+  xor   a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
   call  SetTempisr                      ;end the current interrupt handler used in the engine
+  jp    StartGame                       ;back to game
 
-	ld		a,(activepage)
-  or    a
-  ld    hl,$8000
-  jr    z,.ActivePageFound
-  ld    hl,$0000
-  .ActivePageFound:
-
-  ;load castle graphics to inactive page
-  ld    d,CastleOverviewBlock
-  ld    a,0
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-
-	ld		a,(activepage)                  ;switch page so that battle field graphics will become visible
+SwapAndSetPage:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
 	xor		1                               ;now we switch and set our page
 	ld		(activepage),a			
-	call	SetPageSpecial					        ;set page
+	jp    SetPageSpecial					        ;set page
 
-  ld    hl,CastleOverviewPalette
-  call  SetPalette
-;.kut: jp .kut
-  jp    StartGame                       ;back to game
-  ret
+
+
 
 EnterCombat:
   call  SetTempisr                      ;end the current interrupt handler used in the engine
@@ -1164,7 +1190,6 @@ EnterCombat:
   call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
 ;  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   jp    StartGame                       ;back to game
-  ret
 
 DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
   ld    (ix+HeroStatus),255             ;255 = inactive
@@ -1505,6 +1530,9 @@ copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. Th
   ld    a,(slot.page12rom)              ;all RAM except page 1
   out   ($a8),a   
 
+  ld    a,(memblocks.1)
+  push  af                              ;save block page settings
+
   ld    a,d
   call  block1234
 
@@ -1516,6 +1544,9 @@ copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. Th
   call  outix256
   dec   a
   jp    nz,.loop1
+
+  pop   af
+  call  block1234                       ;restore block page settings
 
   ld    a,(slot.page1rom)               ;all RAM except page 1
   out   ($a8),a
