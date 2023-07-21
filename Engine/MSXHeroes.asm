@@ -651,7 +651,23 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $2e - 2f
+;
+IndividualBuildingsPage2Block:  equ   $2e
+phase	$4000
+  incbin "..\grapx\CastleOverview\IndividualBuildingsPage2.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
+;
+; block $30 - 31
+;
+ButtonsBlock:  equ   $30
+phase	$4000
+  incbin "..\grapx\CastleOverview\Buttons.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

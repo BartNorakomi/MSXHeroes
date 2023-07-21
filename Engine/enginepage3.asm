@@ -10,10 +10,8 @@ InitiateGame:
 	ld		(whichplayernowplaying?),a       ;which hero has it's first turn
 
 StartGame:
-;jp LoadCastleOverview
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
-;  call  LoadHeroesSprites               ;set all heroes sprites in page 2
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
   call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
@@ -23,7 +21,6 @@ StartGame:
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
   call  ClearMapPage0AndMapPage1
-
 
   ld    a,1
   ld    (EnterCastle?),a
@@ -115,6 +112,65 @@ CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    b,a
   otir
   ret
+
+
+
+
+
+
+
+CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1:
+;we set 32kb HeroOverviewGraphics in page 1 and 2
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  call  .go                             ;go copy
+
+;now set engine back in page 1
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  .go:
+  ld    (AddressToWriteFrom),hl
+  ld    (NXAndNY),bc
+
+;	ld		a,(activepage)                  ;alternate between page 0 and 1
+;  or    a
+;  ld    hl,$0000
+;  jr    nz,.SetAddress                  ;page 0
+  ld    hl,$8000
+;  .SetAddress:
+  add   hl,de
+  ld    (AddressToWriteTo),hl
+  .AddressesSet:
+  ld    c,$98                           ;out port
+  ld    de,128                          ;increase 128 bytes to go to the next line
+  di
+
+  .loop:
+  call  .WriteOneLine
+  ld    a,(NXAndNY+1)
+  dec   a
+  ld    (NXAndNY+1),a
+  jp    nz,.loop
+  ei
+  ret
+
+  .WriteOneLine:
+  xor   a                               ;we want to write to (204,151)
+  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteTo),hl
+	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
+
+  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteFrom),hl
+  ld    a,(NXAndNY)
+  ld    b,a
+  otir
+  ret
+
+
 
 
 
@@ -448,6 +504,65 @@ ButtonTableArmyIconsSYSX:
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CopyCastleButton:
+	db		012,0,212,1
+	db		012,0,181,255
+	db		040,0,031,0
+	db		0,%0000 0000,$98
+	
+CastleOverviewButton1DX:   equ HeroOverViewArmyWindowDX + 014
+CastleOverviewButton1DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewButton2DX:   equ HeroOverViewArmyWindowDX + 053
+CastleOverviewButton2DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewButton3DX:   equ HeroOverViewArmyWindowDX + 094
+CastleOverviewButton3DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewButton4DX:   equ HeroOverViewArmyWindowDX + 134
+CastleOverviewButton4DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewButton5DX:   equ HeroOverViewArmyWindowDX + 174
+CastleOverviewButton5DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewButton6DX:   equ HeroOverViewArmyWindowDX + 214
+CastleOverviewButton6DY:   equ HeroOverViewArmyWindowDY + 180
+
+CastleOverviewButtonTableLenghtPerButton:  equ CastleOverviewButtonTable.endlenght-CastleOverviewButtonTable
+CastleOverviewButtonTableAmountOfButtons:  db  6
+CastleOverviewButtonTable: ;y,x, status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (CastleOverviewButton1DY*128) + (CastleOverviewButton1DX/2) | db %1100 0011
+  .endlenght:
+  dw  $0000 + (CastleOverviewButton2DY*128) + (CastleOverviewButton2DX/2) | db %0100 0011
+  dw  $0000 + (CastleOverviewButton3DY*128) + (CastleOverviewButton3DX/2) | db %0100 0011
+  dw  $0000 + (CastleOverviewButton4DY*128) + (CastleOverviewButton4DX/2) | db %0100 0011
+  dw  $0000 + (CastleOverviewButton5DY*128) + (CastleOverviewButton5DX/2) | db %0100 0011
+  dw  $0000 + (CastleOverviewButton6DY*128) + (CastleOverviewButton6DX/2) | db %0100 0011
+  
+;deze shit mag erin verwerkt zijn
+;ButtonTableArmyIconsSYSX:
+;  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+;  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+;  dw  $4000 + (HeroOverViewArmyIconButton3OffSY*128) + (HeroOverViewArmyIconButton3OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton3MouseOverSY*128) + (HeroOverViewArmyIconButton3MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+;  dw  $4000 + (HeroOverViewArmyIconButton4OffSY*128) + (HeroOverViewArmyIconButton4OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton4MouseOverSY*128) + (HeroOverViewArmyIconButton4MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+;  dw  $4000 + (HeroOverViewArmyIconButton5OffSY*128) + (HeroOverViewArmyIconButton5OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton5MouseOverSY*128) + (HeroOverViewArmyIconButton5MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+;  dw  $4000 + (HeroOverViewArmyIconButton6OffSY*128) + (HeroOverViewArmyIconButton6OffSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButton6MouseOverSY*128) + (HeroOverViewArmyIconButton6MouseOverSX/2) - 128
+;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
+
+
+
 
 
 
