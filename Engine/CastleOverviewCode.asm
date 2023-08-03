@@ -7,7 +7,7 @@ CastleOverviewCode:
 
   call  SetCastleOverviewGraphics       ;put gfx in page 1
   call  SwapAndSetPage                  ;swap to and set page 1
-  call  SetIndividualBuildings          ;put gfx in page 0, then docopy them from page 0 to page 1 transparantly
+  call  SetIndividualBuildings          ;put buildings in page 0, then docopy them from page 0 to page 1 transparantly
   ld    hl,CopyPage1To0
   call  docopy
 
@@ -81,48 +81,51 @@ SetCastleButtons:                       ;put button in mirror page below screen,
   ret
 
   .Setbutton:
-  bit   7,(ix+HeroOverviewWindowButtonStatus)
+  bit   7,(ix+CastleOverviewWindowButtonStatus)
   ret   z                               ;check on/off bit
 
-  bit   0,(ix+HeroOverviewWindowButtonStatus)
+  bit   0,(ix+CastleOverviewWindowButtonStatus)
   jr    nz,.bit0isSet
-  bit   1,(ix+HeroOverviewWindowButtonStatus)
+  bit   1,(ix+CastleOverviewWindowButtonStatus)
   ret   z
   
   .bit1isSet:
-  res   1,(ix+HeroOverviewWindowButtonStatus)
+  res   1,(ix+CastleOverviewWindowButtonStatus)
   jr    .goCopyButton
   .bit0isSet:
-  res   0,(ix+HeroOverviewWindowButtonStatus)  
+  res   0,(ix+CastleOverviewWindowButtonStatus)  
   .goCopyButton:
 
-  ld    l,(iy+ButtonOff)
-  ld    h,(iy+ButtonOff+1)
-  bit   6,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(ix+CastleOverviewWindowButton_SYSX_Ontouched)
+  ld    h,(ix+CastleOverviewWindowButton_SYSX_Ontouched+1)
+  bit   6,(ix+CastleOverviewWindowButtonStatus)
   jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
 
-  ld    l,(iy+ButtonMouseOver)
-  ld    h,(iy+ButtonMouseOver+1)
-  bit   5,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(ix+CastleOverviewWindowButton_SYSX_MovedOver)
+  ld    h,(ix+CastleOverviewWindowButton_SYSX_MovedOver+1)
+  bit   5,(ix+CastleOverviewWindowButtonStatus)
   jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
 
-  ld    l,(iy+ButtonOMouseClicked)
-  ld    h,(iy+ButtonOMouseClicked+1)
-;  bit   4,(ix+HeroOverviewWindowButtonStatus)
+  ld    l,(ix+CastleOverviewWindowButton_SYSX_Clicked)
+  ld    h,(ix+CastleOverviewWindowButton_SYSX_Clicked+1)
+;  bit   4,(ix+CastleOverviewWindowButtonStatus)
 ;  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   
   .go:
-  ld    e,(ix+HeroOverviewWindowButton_de)
-  ld    d,(ix+HeroOverviewWindowButton_de+1)
+;  ld    e,(ix+HeroOverviewWindowButton_de)
+;  ld    d,(ix+HeroOverviewWindowButton_de+1)
 
-  ld    c,(ix+Buttonnynx)
-  ld    b,(ix+Buttonnynx+1)
+;  ld    c,(ix+Buttonnynx)
+;  ld    b,(ix+Buttonnynx+1)
 
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
 
 ;button 1 (build)
-  ld    hl,$4000 + (000*128) + (010/2) - 128  ;y,x
-  ld    de,$0000 + (212*128) + (012/2) - 128  ;y,x
+;  ld    hl,$4000 + (000*128) + (010/2) - 128  ;sy,sx
+
+
+
+  ld    de,$0000 + (212*128) + (012/2) - 128  ;dy,dx
   ld    bc,$0000 + (031*256) + (040/2)        ;ny,nx
   ld    a,ButtonsBlock                  ;buttons block
   call  CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -131,8 +134,12 @@ SetCastleButtons:                       ;put button in mirror page below screen,
   xor   1
 	ld    (CopyCastleButton+dPage),a
 
+  ld    a,(ix+CastleOverviewWindowButton_dx)
+  ld    (CopyCastleButton+dx),a
+
   ld    hl,CopyCastleButton
   call  docopy
+  halt
   ret
 
 

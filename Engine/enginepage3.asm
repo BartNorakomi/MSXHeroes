@@ -507,7 +507,7 @@ ButtonTableArmyIconsSYSX:
 
 CopyCastleButton:
 	db		012,0,212,1
-	db		012,0,181,255
+	db		012,0,179,255
 	db		040,0,031,0
 	db		0,%0000 0000,$98
 	
@@ -524,16 +524,22 @@ CastleOverviewButton5DY:   equ HeroOverViewArmyWindowDY + 180
 CastleOverviewButton6DX:   equ HeroOverViewArmyWindowDX + 214
 CastleOverviewButton6DY:   equ HeroOverViewArmyWindowDY + 180
 
+CastleOverviewWindowButtonStatus:             equ 0
+CastleOverviewWindowButton_dx:                equ 1
+CastleOverviewWindowButton_SYSX_Ontouched:    equ 2
+CastleOverviewWindowButton_SYSX_MovedOver:    equ 4
+CastleOverviewWindowButton_SYSX_Clicked:      equ 6
+
 CastleOverviewButtonTableLenghtPerButton:  equ CastleOverviewButtonTable.endlenght-CastleOverviewButtonTable
 CastleOverviewButtonTableAmountOfButtons:  db  6
-CastleOverviewButtonTable: ;y,x, status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
-  dw  $0000 + (CastleOverviewButton1DY*128) + (CastleOverviewButton1DX/2) | db %1100 0011
+CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), dy, CastleOverviewWindowButton_SYSX_Ontouched, CastleOverviewWindowButton_SYSX_MovedOver, CastleOverviewWindowButton_SYSX_Clicked
+  db  %1100 0011 | db 008 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (031*128) + (000/2) - 128 | dw $4000 + (062*128) + (000/2) - 128
   .endlenght:
-  dw  $0000 + (CastleOverviewButton2DY*128) + (CastleOverviewButton2DX/2) | db %0100 0011
-  dw  $0000 + (CastleOverviewButton3DY*128) + (CastleOverviewButton3DX/2) | db %0100 0011
-  dw  $0000 + (CastleOverviewButton4DY*128) + (CastleOverviewButton4DX/2) | db %0100 0011
-  dw  $0000 + (CastleOverviewButton5DY*128) + (CastleOverviewButton5DX/2) | db %0100 0011
-  dw  $0000 + (CastleOverviewButton6DY*128) + (CastleOverviewButton6DX/2) | db %0100 0011
+  db  %1010 0011 | db 048 | dw $4000 + (000*128) + (040/2) - 128 | dw $4000 + (031*128) + (040/2) - 128 | dw $4000 + (062*128) + (040/2) - 128
+  db  %1001 0011 | db 088 | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (031*128) + (080/2) - 128 | dw $4000 + (062*128) + (080/2) - 128
+  db  %1100 0011 | db 128 | dw $4000 + (000*128) + (120/2) - 128 | dw $4000 + (031*128) + (120/2) - 128 | dw $4000 + (062*128) + (120/2) - 128
+  db  %1100 0011 | db 168 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (031*128) + (160/2) - 128 | dw $4000 + (062*128) + (160/2) - 128
+  db  %1100 0011 | db 208 | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (031*128) + (200/2) - 128 | dw $4000 + (062*128) + (200/2) - 128
   
 ;deze shit mag erin verwerkt zijn
 ;ButtonTableArmyIconsSYSX:
