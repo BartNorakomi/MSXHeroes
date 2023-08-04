@@ -505,74 +505,65 @@ ButtonTableArmyIconsSYSX:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+CastleButtonsDY:  equ 179
 CopyCastleButton:
 	db		012,0,212,1
-	db		012,0,179,255
+	db		008,0,CastleButtonsDY,255
 	db		040,0,031,0
 	db		0,%0000 0000,$98
 	
-CastleOverviewButton1DX:   equ HeroOverViewArmyWindowDX + 014
-CastleOverviewButton1DY:   equ HeroOverViewArmyWindowDY + 180
-CastleOverviewButton2DX:   equ HeroOverViewArmyWindowDX + 053
-CastleOverviewButton2DY:   equ HeroOverViewArmyWindowDY + 180
-CastleOverviewButton3DX:   equ HeroOverViewArmyWindowDX + 094
-CastleOverviewButton3DY:   equ HeroOverViewArmyWindowDY + 180
-CastleOverviewButton4DX:   equ HeroOverViewArmyWindowDX + 134
-CastleOverviewButton4DY:   equ HeroOverViewArmyWindowDY + 180
-CastleOverviewButton5DX:   equ HeroOverViewArmyWindowDX + 174
-CastleOverviewButton5DY:   equ HeroOverViewArmyWindowDY + 180
-CastleOverviewButton6DX:   equ HeroOverViewArmyWindowDX + 214
-CastleOverviewButton6DY:   equ HeroOverViewArmyWindowDY + 180
+CastleOverviewWindowButton1Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton1YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton1XLeft:     equ 008
+CastleOverviewWindowButton1XRight:    equ CastleOverviewWindowButton1XLeft + 40
+
+CastleOverviewWindowButton2Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton2YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton2XLeft:     equ 048
+CastleOverviewWindowButton2XRight:    equ CastleOverviewWindowButton2XLeft + 40
+
+CastleOverviewWindowButton3Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton3YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton3XLeft:     equ 088
+CastleOverviewWindowButton3XRight:    equ CastleOverviewWindowButton3XLeft + 40
+
+CastleOverviewWindowButton4Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton4YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton4XLeft:     equ 128
+CastleOverviewWindowButton4XRight:    equ CastleOverviewWindowButton4XLeft + 40
+
+CastleOverviewWindowButton5Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton5YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton5XLeft:     equ 168
+CastleOverviewWindowButton5XRight:    equ CastleOverviewWindowButton5XLeft + 40
+
+CastleOverviewWindowButton6Ytop:      equ CastleButtonsDY
+CastleOverviewWindowButton6YBottom:   equ CastleButtonsDY + 31
+CastleOverviewWindowButton6XLeft:     equ 208
+CastleOverviewWindowButton6XRight:    equ CastleOverviewWindowButton6XLeft + 40
+
 
 CastleOverviewWindowButtonStatus:             equ 0
 CastleOverviewWindowButton_dx:                equ 1
 CastleOverviewWindowButton_SYSX_Ontouched:    equ 2
 CastleOverviewWindowButton_SYSX_MovedOver:    equ 4
 CastleOverviewWindowButton_SYSX_Clicked:      equ 6
+CastleOverviewWindowButtonYtop:               equ 8
+CastleOverviewWindowButtonYbottom:            equ 9
+CastleOverviewWindowButtonXleft:              equ 10
+CastleOverviewWindowButtonXright:             equ 11
+
 
 CastleOverviewButtonTableLenghtPerButton:  equ CastleOverviewButtonTable.endlenght-CastleOverviewButtonTable
 CastleOverviewButtonTableAmountOfButtons:  db  6
-CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), dy, CastleOverviewWindowButton_SYSX_Ontouched, CastleOverviewWindowButton_SYSX_MovedOver, CastleOverviewWindowButton_SYSX_Clicked
-  db  %1100 0011 | db 008 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (031*128) + (000/2) - 128 | dw $4000 + (062*128) + (000/2) - 128
+CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), dy, CastleOverviewWindowButton_SYSX_Ontouched, CastleOverviewWindowButton_SYSX_MovedOver, CastleOverviewWindowButton_SYSX_Clicked, ytop, ybottom, xleft, xright
+  db  %1100 0011 | db CastleOverviewWindowButton1XLeft | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (031*128) + (000/2) - 128 | dw $4000 + (062*128) + (000/2) - 128 | db CastleOverviewWindowButton1Ytop,CastleOverviewWindowButton1YBottom,CastleOverviewWindowButton1XLeft,CastleOverviewWindowButton1XRight
   .endlenght:
-  db  %1010 0011 | db 048 | dw $4000 + (000*128) + (040/2) - 128 | dw $4000 + (031*128) + (040/2) - 128 | dw $4000 + (062*128) + (040/2) - 128
-  db  %1001 0011 | db 088 | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (031*128) + (080/2) - 128 | dw $4000 + (062*128) + (080/2) - 128
-  db  %1100 0011 | db 128 | dw $4000 + (000*128) + (120/2) - 128 | dw $4000 + (031*128) + (120/2) - 128 | dw $4000 + (062*128) + (120/2) - 128
-  db  %1100 0011 | db 168 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (031*128) + (160/2) - 128 | dw $4000 + (062*128) + (160/2) - 128
-  db  %1100 0011 | db 208 | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (031*128) + (200/2) - 128 | dw $4000 + (062*128) + (200/2) - 128
-  
-;deze shit mag erin verwerkt zijn
-;ButtonTableArmyIconsSYSX:
-;  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-;  dw  $4000 + (HeroOverViewArmyIconButton1OffSY*128) + (HeroOverViewArmyIconButton1OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton1MouseOverSY*128) + (HeroOverViewArmyIconButton1MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-;  dw  $4000 + (HeroOverViewArmyIconButton3OffSY*128) + (HeroOverViewArmyIconButton3OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton3MouseOverSY*128) + (HeroOverViewArmyIconButton3MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-;  dw  $4000 + (HeroOverViewArmyIconButton4OffSY*128) + (HeroOverViewArmyIconButton4OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton4MouseOverSY*128) + (HeroOverViewArmyIconButton4MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-;  dw  $4000 + (HeroOverViewArmyIconButton5OffSY*128) + (HeroOverViewArmyIconButton5OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton5MouseOverSY*128) + (HeroOverViewArmyIconButton5MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-;  dw  $4000 + (HeroOverViewArmyIconButton6OffSY*128) + (HeroOverViewArmyIconButton6OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButton6MouseOverSY*128) + (HeroOverViewArmyIconButton6MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewArmyIconButtonMouseClickedSY*128) + (HeroOverViewArmyIconButtonMouseClickedSX/2) - 128
-
-
-
-
-
-
-
+  db  %1010 0011 | db CastleOverviewWindowButton2XLeft | dw $4000 + (000*128) + (040/2) - 128 | dw $4000 + (031*128) + (040/2) - 128 | dw $4000 + (062*128) + (040/2) - 128 | db CastleOverviewWindowButton2Ytop,CastleOverviewWindowButton2YBottom,CastleOverviewWindowButton2XLeft,CastleOverviewWindowButton2XRight
+  db  %1001 0011 | db CastleOverviewWindowButton3XLeft | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (031*128) + (080/2) - 128 | dw $4000 + (062*128) + (080/2) - 128 | db CastleOverviewWindowButton3Ytop,CastleOverviewWindowButton3YBottom,CastleOverviewWindowButton3XLeft,CastleOverviewWindowButton3XRight
+  db  %1100 0011 | db CastleOverviewWindowButton4XLeft | dw $4000 + (000*128) + (120/2) - 128 | dw $4000 + (031*128) + (120/2) - 128 | dw $4000 + (062*128) + (120/2) - 128 | db CastleOverviewWindowButton4Ytop,CastleOverviewWindowButton4YBottom,CastleOverviewWindowButton4XLeft,CastleOverviewWindowButton4XRight
+  db  %1100 0011 | db CastleOverviewWindowButton5XLeft | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (031*128) + (160/2) - 128 | dw $4000 + (062*128) + (160/2) - 128 | db CastleOverviewWindowButton5Ytop,CastleOverviewWindowButton5YBottom,CastleOverviewWindowButton5XLeft,CastleOverviewWindowButton5XRight
+  db  %1100 0011 | db CastleOverviewWindowButton6XLeft | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (031*128) + (200/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | db CastleOverviewWindowButton6Ytop,CastleOverviewWindowButton6YBottom,CastleOverviewWindowButton6XLeft,CastleOverviewWindowButton6XRight
 
 HeroOverViewInventoryIconButton1OffSX:           equ 146
 HeroOverViewInventoryIconButton1OffSY:           equ 000
@@ -1264,7 +1255,8 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  call  CastleOverviewCode
+  call  CastleOverviewBuildCode
+;  call  CastleOverviewCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  

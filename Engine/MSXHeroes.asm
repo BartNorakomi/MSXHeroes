@@ -665,7 +665,25 @@ dephase
 ;
 ButtonsBlock:  equ   $30
 phase	$4000
-  incbin "..\grapx\CastleOverview\Buttons.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\Buttons.SC5",7,093 * 128      ;093 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $32 - 33
+;
+BuildBlock:  equ   $32
+phase	$4000
+  incbin "..\grapx\CastleOverview\build.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $34 - 35
+;
+Block:  equ   $34
+phase	$4000
+  incbin "..\grapx\CastleOverview\ButtonsBuild.SC5",7,109 * 128      ;109 lines
 	ds		$c000-$,$ff
 dephase
 
