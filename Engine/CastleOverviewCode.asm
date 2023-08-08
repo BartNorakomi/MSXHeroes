@@ -56,19 +56,241 @@ CastleOverviewBuildCode:                ;in: iy-castle
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-
   ld    ix,CastleOverviewButtonTable ;  ld    iy,ButtonTableArmyIconsSYSX (;deze shit mag erin verwerkt zijn)
   call  CheckButtonMouseInteractionCastle
-
 
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
 
 
 
+  ld    ix,BuildButtonTable ;  ld    iy,ButtonTableArmyIconsSYSX (;deze shit mag erin verwerkt zijn)
+  call  CheckButtonMouseInteractionBuildButtons
+
+  ld    ix,BuildButtonTable
+  call  SetBuildButtons                ;copies button state from rom -> vram
+
 
   halt
   jp  .engine
+
+
+
+
+
+
+
+
+
+CheckButtonMouseInteractionBuildButtons:
+  ld    b,9
+  ld    de,BuildButtonTableLenghtPerButton
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+  bit   7,(ix+BuildButtonStatus)
+  ret   z
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+BuildButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+BuildButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+  cp    (ix+BuildButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+BuildButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+BuildButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+BuildButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+BuildButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+BuildButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+ret
+  ld    a,b
+  cp    1                                     ;exit
+  jr    nz,.EndCheckExit
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  ret
+  .EndCheckExit:
+
+  cp    2                                     ;tavern
+  jr    nz,.EndCheckTavern
+  ret
+  .EndCheckTavern:
+
+  cp    3                                     ;market
+  jr    nz,.EndCheckMarket
+  ret
+  .EndCheckMarket:
+
+  cp    4                                     ;magic guild
+  jr    nz,.EndCheckMagicGuild
+  ret
+  .EndCheckMagicGuild:
+
+  cp    5                                     ;recruit
+  jr    nz,.EndCheckRecruit
+  ret
+  .EndCheckRecruit:
+
+  ;build
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  jp    CastleOverviewBuildCode               ;jump to the build code
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SetBuildButtons:                        ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    b,9
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,BuildButtonTableLenghtPerButton
+  add   ix,de
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   7,(ix+BuildButtonStatus)
+  ret   z                               ;check on/off bit
+
+  bit   0,(ix+BuildButtonStatus)        ;bit 0 and bit 1 represent the 2 frames in which we copy the button
+  res   0,(ix+BuildButtonStatus)  
+  jr    nz,.goCopyButton
+  bit   1,(ix+BuildButtonStatus)
+  res   1,(ix+BuildButtonStatus)
+  ret   z  
+  .goCopyButton:
+
+  ld    l,(ix+BuildButton_SYSX_Ontouched)
+  ld    h,(ix+BuildButton_SYSX_Ontouched+1)
+  bit   6,(ix+BuildButtonStatus)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+
+  ld    l,(ix+BuildButton_SYSX_MovedOver)
+  ld    h,(ix+BuildButton_SYSX_MovedOver+1)
+  bit   5,(ix+BuildButtonStatus)
+  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+
+  ld    l,(ix+BuildButton_SYSX_Clicked)
+  ld    h,(ix+BuildButton_SYSX_Clicked+1)
+  .go:
+
+  ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    de,$0000 + (212*128) + (000/2) - 128  ;dy,dx
+  ld    bc,$0000 + (038*256) + (050/2)        ;ny,nx
+  ld    a,ButtonsBuildBlock                   ;buttons block
+  call  CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyBuildButton+dPage),a
+	ld    (CopyBuildButtonImage+dPage),a
+
+  ;set dx, dy button and button image
+  ld    a,(ix+BuildButtonYtop)
+  ld    (CopyBuildButton+dy),a
+  ld    (CopyBuildButtonImage+dy),a
+  ld    a,(ix+BuildButtonXleft)
+  ld    (CopyBuildButton+dx),a
+  ld    (CopyBuildButtonImage+dx),a
+
+  ld    hl,CopyBuildButton
+  call  docopy
+
+  ;copy image on top of button
+  ld    l,(ix+BuildButtonImage_SYSX)
+  ld    h,(ix+BuildButtonImage_SYSX+1)
+  ld    de,$0000 + (212*128) + (050/2) - 128  ;dy,dx
+  ld    bc,$0000 + (033*256) + (050/2)        ;ny,nx
+  ld    a,ButtonsBuildBlock                   ;buttons block
+  call  CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+  ld    hl,CopyBuildButtonImage
+  call  docopy
+  halt
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 CastleOverviewCode:                     ;in: iy-castle

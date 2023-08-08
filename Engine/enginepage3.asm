@@ -565,6 +565,93 @@ CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
   db  %1100 0011 | db CastleOverviewWindowButton5XLeft | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (031*128) + (160/2) - 128 | dw $4000 + (062*128) + (160/2) - 128 | db CastleOverviewWindowButton5Ytop,CastleOverviewWindowButton5YBottom,CastleOverviewWindowButton5XLeft,CastleOverviewWindowButton5XRight
   db  %1100 0011 | db CastleOverviewWindowButton6XLeft | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (031*128) + (200/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | db CastleOverviewWindowButton6Ytop,CastleOverviewWindowButton6YBottom,CastleOverviewWindowButton6XLeft,CastleOverviewWindowButton6XRight
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CopyBuildButton:
+	db		000,0,212,1
+	db		004,0,042,255
+	db		050,0,038,0
+	db		0,%0000 0000,$98
+
+CopyBuildButtonImage:
+	db		050,0,212,1
+	db		004,0,042,255
+	db		050,0,033,0
+	db		0,%0000 0000,$98
+	
+BuildButton1Ytop:           equ 042
+BuildButton1YBottom:        equ BuildButton1Ytop + 038
+BuildButton1XLeft:          equ 004
+BuildButton1XRight:         equ BuildButton1XLeft+50
+
+BuildButton2Ytop:           equ 042
+BuildButton2YBottom:        equ BuildButton2Ytop + 038
+BuildButton2XLeft:          equ 064
+BuildButton2XRight:         equ BuildButton2XLeft+50
+
+BuildButton3Ytop:           equ 042
+BuildButton3YBottom:        equ BuildButton3Ytop + 038
+BuildButton3XLeft:          equ 124
+BuildButton3XRight:         equ BuildButton3XLeft+50
+
+BuildButton4Ytop:           equ 092
+BuildButton4YBottom:        equ BuildButton4Ytop + 038
+BuildButton4XLeft:          equ 004
+BuildButton4XRight:         equ BuildButton4XLeft+50
+
+BuildButton5Ytop:           equ 092
+BuildButton5YBottom:        equ BuildButton5Ytop + 038
+BuildButton5XLeft:          equ 064
+BuildButton5XRight:         equ BuildButton5XLeft+50
+
+BuildButton6Ytop:           equ 092
+BuildButton6YBottom:        equ BuildButton6Ytop + 038
+BuildButton6XLeft:          equ 124
+BuildButton6XRight:         equ BuildButton6XLeft+50
+
+BuildButton7Ytop:           equ 142
+BuildButton7YBottom:        equ BuildButton7Ytop + 038
+BuildButton7XLeft:          equ 004
+BuildButton7XRight:         equ BuildButton7XLeft+50
+
+BuildButton8Ytop:           equ 142
+BuildButton8YBottom:        equ BuildButton8Ytop + 038
+BuildButton8XLeft:          equ 064
+BuildButton8XRight:         equ BuildButton8XLeft+50
+
+BuildButton9Ytop:           equ 142
+BuildButton9YBottom:        equ BuildButton9Ytop + 038
+BuildButton9XLeft:          equ 124
+BuildButton9XRight:         equ BuildButton9XLeft+50
+
+
+BuildButtonStatus:            equ 0
+BuildButton_SYSX_Ontouched:   equ 1
+BuildButton_SYSX_MovedOver:   equ 3
+BuildButton_SYSX_Clicked:     equ 5
+BuildButtonYtop:              equ 7
+BuildButtonYbottom:           equ 8
+BuildButtonXleft:             equ 9
+BuildButtonXright:            equ 10
+BuildButtonImage_SYSX:        equ 11
+
+BuildButtonTableLenghtPerButton:  equ BuildButtonTable.endlenght-BuildButtonTable
+BuildButtonTableAmountOfButtons:  db  9
+BuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, ButtonImage_SYSX
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton1Ytop,BuildButton1YBottom,BuildButton1XLeft,BuildButton1XRight | dw $4000 + (076*128) + (000/2) - 128 | 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton2Ytop,BuildButton2YBottom,BuildButton2XLeft,BuildButton2XRight | dw $4000 + (076*128) + (050/2) - 128 | 
+  db  %1001 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton3Ytop,BuildButton3YBottom,BuildButton3XLeft,BuildButton3XRight | dw $4000 + (076*128) + (100/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton4Ytop,BuildButton4YBottom,BuildButton4XLeft,BuildButton4XRight | dw $4000 + (076*128) + (150/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton5Ytop,BuildButton5YBottom,BuildButton5XLeft,BuildButton5XRight | dw $4000 + (076*128) + (200/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton6Ytop,BuildButton6YBottom,BuildButton6XLeft,BuildButton6XRight | dw $4000 + (114*128) + (000/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton7Ytop,BuildButton7YBottom,BuildButton7XLeft,BuildButton7XRight | dw $4000 + (114*128) + (050/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton8Ytop,BuildButton8YBottom,BuildButton8XLeft,BuildButton8XRight | dw $4000 + (114*128) + (100/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128 | db BuildButton9Ytop,BuildButton9YBottom,BuildButton9XLeft,BuildButton9XRight | dw $4000 + (114*128) + (150/2) - 128 | 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 HeroOverViewInventoryIconButton1OffSX:           equ 146
 HeroOverViewInventoryIconButton1OffSY:           equ 000
 HeroOverViewInventoryIconButton1MouseOverSX:     equ 146
