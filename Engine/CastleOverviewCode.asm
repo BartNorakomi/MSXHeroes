@@ -56,23 +56,208 @@ CastleOverviewBuildCode:                ;in: iy-castle
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-  ld    ix,CastleOverviewButtonTable ;  ld    iy,ButtonTableArmyIconsSYSX (;deze shit mag erin verwerkt zijn)
+  ;buttons in the bottom of screen
+  ld    ix,CastleOverviewButtonTable 
   call  CheckButtonMouseInteractionCastle
 
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
+  ;/buttons in the bottom of screen
 
-
-
-  ld    ix,BuildButtonTable ;  ld    iy,ButtonTableArmyIconsSYSX (;deze shit mag erin verwerkt zijn)
+  ;9 build buttons
+  ld    ix,BuildButtonTable 
   call  CheckButtonMouseInteractionBuildButtons
 
   ld    ix,BuildButtonTable
-  call  SetBuildButtons                ;copies button state from rom -> vram
+  call  SetBuildButtons                 ;copies button state from rom -> vram
+  call  SetTextBuildingWhenClicked      ;when a building is clicked display text on the right side
+  ;/9 build buttons
 
 
   halt
   jp  .engine
+
+
+
+SetTextBuildingWhenClicked:
+  ld    a,(SetTextBuilding)
+  dec   a
+  ret   z
+  ld    (SetTextBuilding),a
+  
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    hl,(PutWhichBuildText)
+  ld    a,182
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,047
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dy of text
+  call  .SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set dy of text
+  ret
+
+  .SetText:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+	xor		1                               ;now we switch and set our page
+  ld    (PutLetter+dPage),a             ;set page where to put text
+
+  ld    a,-1
+  ld    (TextPointer),a                 ;increase text pointer
+  .NextLetter:
+  ld    a,(TextPointer)
+  inc   a
+  ld    (TextPointer),a                 ;increase text pointer
+
+  ld    hl,(TextAddresspointer)
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+
+  ld    a,(hl)                          ;letter
+  cp    255                             ;end
+  ret   z
+  cp    254                             ;next line
+  jr    z,.NextLine
+  cp    TextSpace                       ;space
+  jr    z,.Space
+  cp    TextPercentageSymbol            ;%
+  jr    z,.TextPercentageSymbol
+  cp    TextPlusSymbol                  ;+
+  jr    z,.TextPlusSymbol
+  cp    TextMinusSymbol                 ;-
+  jr    z,.TextMinusSymbol
+  cp    TextApostrofeSymbol             ;'
+  jr    z,.TextApostrofeSymbol
+  cp    TextColonSymbol                 ;/
+  jr    z,.TextColonSymbol
+
+
+  cp    TextNumber0+10
+  jr    c,.Number
+
+
+  sub   $41
+  ld    hl,.TextCoordinateTable  
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a
+
+  add   hl,de
+  
+  .GoPutLetter:
+  ld    a,(hl)                          ;sx
+  ld    (PutLetter+sx),a                ;set sx of letter
+  inc   hl
+  ld    a,(hl)                          ;nx
+  ld    (PutLetter+nx),a                ;set nx of letter
+
+  ld    hl,PutLetter
+  call  DoCopy
+
+  ld    hl,PutLetter+nx                 ;nx of letter
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  add   a,(hl)                          ;add lenght
+  inc   a                               ;+1
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  
+  jp    .NextLetter
+
+  .Number:
+  sub   TextNumber0                     ;hex value of number "0"
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a  
+
+  ld    hl,.TextNumberSymbolsSXNX
+  add   hl,de
+  jr    .GoPutLetter
+  
+  .TextPercentageSymbol:
+  ld    hl,.TextPercentageSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextPlusSymbol:
+  ld    hl,.TextPlusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextMinusSymbol:
+  ld    hl,.TextMinusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextApostrofeSymbol:
+  ld    hl,.TextApostrofeSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextColonSymbol:
+  ld    hl,.TextColonSymbolSXNX  
+  jr    .GoPutLetter
+
+  .Space:
+  ld    a,(PutLetter+dx)                ;set dx of next letter
+  add   a,5
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+  .NextLine:
+  ld    a,(PutLetter+dy)                ;set dy of next letter
+  add   a,7
+  ld    (PutLetter+dy),a                ;set dy of next letter
+  ld    a,(TextDX)
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+
+;                          0       1       2       3       4       5       6       7       8       9
+.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
+.TextSlashSymbolSXNX: db  158+49,4  ;"/"
+.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
+.TextPlusSymbolSXNX: db  166+49,5 ;"+"
+.TextMinusSymbolSXNX: db  169+49,5 ;"-"
+.TextApostrofeSymbolSXNX: db  195,1  ;"'"
+.TextColonSymbolSXNX: db  008,1  ;":"
+
+;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
+.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
+;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
+ds 12
+.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -93,8 +278,8 @@ CheckButtonMouseInteractionBuildButtons:
   ret
   
   .check:
-  bit   7,(ix+BuildButtonStatus)
-  ret   z
+  bit   7,(ix+BuildButtonStatus)        ;check if button is on/off
+  ret   z                               ;don't handle button if this button is off
   
   ld    a,(spat+0)                      ;y mouse
   cp    (ix+BuildButtonYtop)
@@ -117,14 +302,14 @@ CheckButtonMouseInteractionBuildButtons:
   ld    a,(Controls)
   bit   4,a                             ;check trigger a / space
   jr    nz,.MouseOverButtonAndSpacePressed
-  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
   ld    (ix+BuildButtonStatus),%1010 0011
   ret
 
   .MouseOverButtonAndSpacePressed:
-  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
 	ld		a,(NewPrContr)
   bit   4,a                             ;check trigger a / space
@@ -139,50 +324,88 @@ CheckButtonMouseInteractionBuildButtons:
   ret
 
   .NotOverButton:
-  bit   4,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.buttonIsStillLit
-  bit   5,(ix+BuildButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   5,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ret   z
   .buttonIsStillLit:
   ld    (ix+BuildButtonStatus),%1100 0011
   ret
 
   .MenuOptionSelected:
-ret
+  ld    (ix+BuildButtonStatus),%1010 0011
+
+  ld    a,3
+  ld    (SetTextBuilding),a
+
   ld    a,b
   cp    1                                     ;exit
-  jr    nz,.EndCheckExit
-  pop   af                                    ;pop the call in the button check loop 
-  pop   af                                    ;pop the call to the CastleOverViewCode
+  ld    hl,TextCityWalls
+  jr    z,.SetWhichTextToPut
+  cp    2                                     ;exit
+  ld    hl,TextBarracksTower
+  jr    z,.SetWhichTextToPut
+  cp    3                                     ;exit
+  ld    hl,TextBarracks
+  jr    z,.SetWhichTextToPut
+  cp    4                                     ;exit
+  ld    hl,TextMine
+  jr    z,.SetWhichTextToPut
+  cp    5                                     ;exit
+  ld    hl,TextSawmill
+  jr    z,.SetWhichTextToPut
+  cp    6                                     ;exit
+  ld    hl,TextMagicGuild
+  jr    z,.SetWhichTextToPut
+  cp    7                                     ;exit
+  ld    hl,TextTavern
+  jr    z,.SetWhichTextToPut
+  cp    8                                     ;exit
+  ld    hl,TextMarketPlace
+  jr    z,.SetWhichTextToPut
+  cp    9                                     ;exit
+  ld    hl,TextCastle
+  jr    z,.SetWhichTextToPut
+
+
+  .SetWhichTextToPut:
+  ld    (PutWhichBuildText),hl
   ret
-  .EndCheckExit:
 
-  cp    2                                     ;tavern
-  jr    nz,.EndCheckTavern
-  ret
-  .EndCheckTavern:
-
-  cp    3                                     ;market
-  jr    nz,.EndCheckMarket
-  ret
-  .EndCheckMarket:
-
-  cp    4                                     ;magic guild
-  jr    nz,.EndCheckMagicGuild
-  ret
-  .EndCheckMagicGuild:
-
-  cp    5                                     ;recruit
-  jr    nz,.EndCheckRecruit
-  ret
-  .EndCheckRecruit:
-
-  ;build
-  pop   af                                    ;pop the call in the button check loop 
-  pop   af                                    ;pop the call to the CastleOverViewCode
-  jp    CastleOverviewBuildCode               ;jump to the build code
+TextCastle:        
+                          db  "TextCastle",255
+TextMarketPlace:        
+                          db  "TextMarketPlace",255
+TextTavern:        
+                          db  "TextTavern",255
+TextMagicGuild:        
+                          db  "TextMagicGuild",255
+TextSawmill:        
+                          db  "TextSawmill",255
+TextMine:        
+                          db  "TextMine",255
+TextBarracks:        
+                          db  "TextBarracks",255
+TextBarracksTower:        
+                          db  "TextBarracksTower",255
+TextCityWalls:        
+                          db  "TextCityWalls",255
 
 
+TextMagicGuild2:        
+                          db  " Magic Guild 2",254
+                          db  " ",254
+                          db  "Teaches visiting",254
+                          db  "heroes 2nd level",254
+                          db  "spells",254
+                          db  " ",254
+                          db  "Cost:",254
+                          db  "2000 Gold",254
+                          db  "5 Stones",254
+                          db  "1 Ruby",254
+                          db  " ",254
+                          db  "Requires:",254
+                          db  "Magic Guild 1",255
 
 
 
@@ -222,12 +445,12 @@ SetBuildButtons:                        ;put button in mirror page below screen,
   ld    l,(ix+BuildButton_SYSX_Ontouched)
   ld    h,(ix+BuildButton_SYSX_Ontouched+1)
   bit   6,(ix+BuildButtonStatus)
-  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
 
   ld    l,(ix+BuildButton_SYSX_MovedOver)
   ld    h,(ix+BuildButton_SYSX_MovedOver+1)
   bit   5,(ix+BuildButtonStatus)
-  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
 
   ld    l,(ix+BuildButton_SYSX_Clicked)
   ld    h,(ix+BuildButton_SYSX_Clicked+1)
@@ -432,17 +655,17 @@ SetCastleButtons:                       ;put button in mirror page below screen,
   ld    l,(ix+CastleOverviewWindowButton_SYSX_Ontouched)
   ld    h,(ix+CastleOverviewWindowButton_SYSX_Ontouched+1)
   bit   6,(ix+CastleOverviewWindowButtonStatus)
-  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
 
   ld    l,(ix+CastleOverviewWindowButton_SYSX_MovedOver)
   ld    h,(ix+CastleOverviewWindowButton_SYSX_MovedOver+1)
   bit   5,(ix+CastleOverviewWindowButtonStatus)
-  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
 
   ld    l,(ix+CastleOverviewWindowButton_SYSX_Clicked)
   ld    h,(ix+CastleOverviewWindowButton_SYSX_Clicked+1)
 ;  bit   4,(ix+CastleOverviewWindowButtonStatus)
-;  jr    nz,.go                          ;(bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)  
+;  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)  
   .go:
 
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
@@ -498,14 +721,14 @@ CheckButtonMouseInteractionCastle:
   ld    a,(Controls)
   bit   4,a                             ;check trigger a / space
   jr    nz,.MouseOverButtonAndSpacePressed
-  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
   ld    (ix+CastleOverviewWindowButtonStatus),%1010 0011
   ret
 
   .MouseOverButtonAndSpacePressed:
-  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
 	ld		a,(NewPrContr)
   bit   4,a                             ;check trigger a / space
@@ -520,9 +743,9 @@ CheckButtonMouseInteractionCastle:
   ret
 
   .NotOverButton:
-  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.buttonIsStillLit
-  bit   5,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  bit   5,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ret   z
   .buttonIsStillLit:
   ld    (ix+CastleOverviewWindowButtonStatus),%1100 0011
@@ -734,7 +957,14 @@ CopyCityWalls:
 
 
 
-
+SetCastleOverViewFontPage0Y212:           ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+;  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
 
 
 

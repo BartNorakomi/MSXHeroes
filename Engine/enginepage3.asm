@@ -31,17 +31,17 @@ StartGame:
 
 
 
-
-
-
-
 CopyRamToVramCorrectedWithoutActivePageSetting:
+	ld		a,(memblocks.1)
+	push  af
+
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   call  .go                             ;go copy
 
 ;now set engine back in page 1
-  ld    a,HeroOverviewCodeBlock         ;Map block
+;  ld    a,HeroOverviewCodeBlock         ;Map block
+  pop   af
   jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
 .go:
@@ -566,6 +566,9 @@ CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
   db  %1100 0011 | db CastleOverviewWindowButton6XLeft | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (031*128) + (200/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | db CastleOverviewWindowButton6Ytop,CastleOverviewWindowButton6YBottom,CastleOverviewWindowButton6XLeft,CastleOverviewWindowButton6XRight
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetTextBuilding:  db  1
+PutWhichBuildText: dw TextMagicGuild2
 
 CopyBuildButton:
 	db		000,0,212,1

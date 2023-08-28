@@ -637,7 +637,7 @@ dephase
 CastleOverviewCodeBlock:  equ   $2b
 CastleOverviewFontBlock:  equ   $2b
 phase	$4000
-  incbin "..\grapx\HeroOverview\font.SC5",7,7 * 128      ;5 lines
+  incbin "..\grapx\CastleOverview\font.SC5",7,7 * 128      ;5 lines
   include "CastleOverviewCode.asm"
 	ds		$8000-$,$ff
 dephase
