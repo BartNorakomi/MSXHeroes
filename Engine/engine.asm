@@ -4636,12 +4636,13 @@ CastleLevel4UnitsAvail: equ 31
 CastleLevel5UnitsAvail: equ 33
 CastleLevel6UnitsAvail: equ 35
 CastleTerrainSY:        equ 37
+AlreadyBuiltThisTurn?:  equ 38
 AmountOfCastles:  equ 4
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY
-Castle1:  db  004,  001,  1,      6,          1,        1,        1,              1,            1,            1,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  060
-Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  069
-Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  078
-Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  087
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?
+Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  060       , 0
+Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  069       , 0
+Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  078       , 0
+Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  087       , 0
 Castle5:  db  000,  000,  255
 
 LenghtCastleTable:  equ Castle2-Castle1
@@ -4733,6 +4734,31 @@ player4human?:			db	1
 whichplayernowplaying?:	db	1
 
 
+CheckRequirementsWhichBuilding?:  ds  2
+ResourcesPlayer1:
+.Gold:    dw  3000
+.Wood:    dw  400
+.Ore:     dw  200
+.Gems:    dw  70
+.Rubies:  dw  40
+ResourcesPlayer2:
+.Gold:    dw  5000
+.Wood:    dw  300
+.Ore:     dw  100
+.Gems:    dw  60
+.Rubies:  dw  30
+ResourcesPlayer3:
+.Gold:    dw  5000
+.Wood:    dw  300
+.Ore:     dw  100
+.Gems:    dw  60
+.Rubies:  dw  30
+ResourcesPlayer4:
+.Gold:    dw  5000
+.Wood:    dw  300
+.Ore:     dw  100
+.Gems:    dw  60
+.Rubies:  dw  30
 
 
 movementpathpointer:	ds	1	

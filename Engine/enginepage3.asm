@@ -567,8 +567,20 @@ CastleOverviewButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+SingleBuildButton1Ytop:           equ 168
+SingleBuildButton1YBottom:        equ SingleBuildButton1Ytop + 009
+SingleBuildButton1XLeft:          equ 180
+SingleBuildButton1XRight:         equ SingleBuildButton1XLeft+072
+
+SingleBuildButtonTableAmountOfButtons:  db  1
+SingleBuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, ButtonImage_SYSX
+  db  %1100 0011 | dw $4000 + (148*128) + (144/2) - 128 | dw $4000 + (157*128) + (000/2) - 128 | dw $4000 + (157*128) + (072/2) - 128 | db SingleBuildButton1Ytop,SingleBuildButton1YBottom,SingleBuildButton1XLeft,SingleBuildButton1XRight | dw $4000 + (076*128) + (000/2) - 128 | 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+WhichBuildingWasClicked?:  ds  1
 SetTextBuilding:  db  1
-PutWhichBuildText: dw TextMagicGuild2
+PutWhichBuildText: ds 2
 
 CopyBuildButton:
 	db		000,0,212,1
