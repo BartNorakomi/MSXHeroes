@@ -3458,33 +3458,16 @@ SetNumber16Bit:                         ;in hl=number (16bit)
   cp    l
   ret   z
 
-  call  ConvertToDecimal16bit
+  call  .ConvertToDecimal16bit
 
   ld    hl,TextNumber
   ld    (TextAddresspointer),hl  
   call  SetTextInButton.go
   ret
 
-SetNumber8Bit:                          ;in a=number (8bit)
-  call  ConvertToDecimal                ;converts 8 bit number to decimal and stores it in (TextNumber)
-
-  ld    a,b                             ;dx
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c                             ;dy
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    hl,TextNumber
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-
-
-ConvertToDecimal16bit:
+  .ConvertToDecimal16bit:
   ld    iy,TextNumber
   ld    e,0                             ;e=has an xfold already been set prior ?
-
-
 
   .Check10000Folds:
   ld    d,$30                           ;10000folds in d ($30 = 0)
@@ -3507,9 +3490,6 @@ ConvertToDecimal16bit:
   .EndSet10000Fold:
 
   add   hl,bc
-
-
-
 
   .Check1000Folds:
   ld    d,$30                           ;1000folds in d ($30 = 0)
@@ -3535,20 +3515,6 @@ ConvertToDecimal16bit:
   .EndSet1000Fold:
 
   add   hl,bc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   .Check100Folds:
   ld    d,$30                           ;100folds in d ($30 = 0)
@@ -3583,10 +3549,6 @@ ConvertToDecimal16bit:
 
   add   hl,bc
 
-
-
-
-  
   .Check10Folds:
   ld    d,$30                           ;10folds in d ($30 = 0)
 
@@ -3611,18 +3573,11 @@ ConvertToDecimal16bit:
 
   jr    .EndSet10Fold  
 
-
-
   .DoSet10Fold:
   ld    e,1                             ;e=has an xfold already been set prior ?
   ld    (iy),d                          ;set 10fold
   inc   iy
   .EndSet10Fold:
-
-
-
-
-
 
   .Check1Fold:
   ld    bc,10 + $30
@@ -3633,6 +3588,19 @@ ConvertToDecimal16bit:
   ld    (iy+1),255                      ;end text
   ret
 
+SetNumber8Bit:                          ;in a=number (8bit)
+  call  ConvertToDecimal                ;converts 8 bit number to decimal and stores it in (TextNumber)
+
+  ld    a,b                             ;dx
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c                             ;dy
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    hl,TextNumber
+  ld    (TextAddresspointer),hl  
+  call  SetTextInButton.go
+  ret
 
 ConvertToDecimal:
   ld    iy,TextNumber

@@ -1,3 +1,655 @@
+CastleOverviewRecruitCode:
+  ld    iy,Castle1
+
+  ld    hl,World1Palette
+  call  SetPalette
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0
+
+  call  SetRecruitGraphics              ;put gfx in page 1
+  call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+  ld    hl,CopyPage1To0
+  call  docopy
+
+  ld    a,%1100 0011
+  ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
+  xor   a
+  ld    (CastleOverviewButtonTable+0*CastleOverviewButtonTableLenghtPerButton),a ;build
+  ld    (CastleOverviewButtonTable+1*CastleOverviewButtonTableLenghtPerButton),a ;recruit
+  ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
+  ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
+  ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
+
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;buttons in the bottom of screen
+  ld    ix,CastleOverviewButtonTable 
+  call  CheckButtonMouseInteractionCastle
+
+  ld    ix,CastleOverviewButtonTable
+  call  SetCastleButtons                ;copies button state from rom -> vram
+  ;/buttons in the bottom of screen
+
+
+
+  halt
+  jp  .engine
+
+
+  ret
+
+
+NameCreature000:  db  "Empty:",255
+NameCreature001:  db  "Green Ghoul:",255
+NameCreature002:  db  "Drollie:",255
+NameCreature003:  db  "Wappie:",255
+NameCreature004:  db  "Green Ghoul:",255
+NameCreature005:  db  "Green Ghoul:",255
+NameCreature006:  db  "Green Ghoul:",255
+NameCreature007:  db  "Green Ghoul:",255
+NameCreature008:  db  "Green Ghoul:",255
+NameCreature009:  db  "Green Ghoul:",255
+NameCreature010:  db  "Green Ghoul:",255
+NameCreature011:  db  "Green Ghoul:",255
+NameCreature012:  db  "Green Ghoul:",255
+NameCreature013:  db  "Green Ghoul:",255
+NameCreature014:  db  "Green Ghoul:",255
+NameCreature015:  db  "Green Ghoul:",255
+NameCreature016:  db  "Green Ghoul:",255
+NameCreature017:  db  "Green Ghoul:",255
+NameCreature018:  db  "Green Ghoul:",255
+
+CostCreatureTable:  
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
+
+SpeedCreatureTable:  
+  db  000,012,002,003,009,005,006,007,008,009,010,011,012,013,014,015,016,017
+
+DefenseCreatureTable:  
+  db  000,001,002,003,006,005,006,007,008,009,010,011,012,013,014,015,016,017
+
+AttackCreatureTable:  
+  db  000,001,002,003,055,005,006,007,008,009,010,011,012,013,014,015,016,017
+
+CreatureNameTable:  
+  dw NameCreature000,NameCreature001,NameCreature002,NameCreature003,NameCreature004,NameCreature005,NameCreature006,NameCreature007,NameCreature008,NameCreature009,NameCreature010,NameCreature011,NameCreature012,NameCreature013,NameCreature014,NameCreature015,NameCreature016,NameCreature017
+
+SetAvailableRecruitArmy:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  .army
+  call  .amount
+  call  .names
+  call  .cost
+  call  .speed
+  call  .defense
+  call  .attack
+  ret
+
+  .attack:
+  ld    a,(iy+CastleLevel1Units+00)
+  ld    b,083-14                        ;dx
+  ld    c,054                           ;dy
+  call  .SetAttack
+
+  ld    a,(iy+CastleLevel1Units+01)
+  ld    b,167-14                        ;dx
+  ld    c,054                           ;dy
+  call  .SetAttack
+
+  ld    a,(iy+CastleLevel1Units+02)
+  ld    b,251-14                        ;dx
+  ld    c,054                           ;dy
+  call  .SetAttack
+
+  ld    a,(iy+CastleLevel1Units+03)
+  ld    b,083-14                        ;dx
+  ld    c,054+56                        ;dy
+  call  .SetAttack
+
+  ld    a,(iy+CastleLevel1Units+04)
+  ld    b,167-14                        ;dx
+  ld    c,054+56                        ;dy
+  call  .SetAttack
+
+  ld    a,(iy+CastleLevel1Units+05)
+  ld    b,251-14                        ;dx
+  ld    c,054+56                        ;dy
+  call  .SetAttack  
+  ret
+
+  .SetAttack:
+  ld    h,0
+  ld    l,a
+  ld    de,AttackCreatureTable
+  add   hl,de
+  ld    l,(hl)
+  ld    h,0
+  call  SetNumber16BitCastle
+  ret
+  
+  .defense:
+  ld    a,(iy+CastleLevel1Units+00)
+  ld    b,083-14                        ;dx
+  ld    c,047                           ;dy
+  call  .SetDefense
+
+  ld    a,(iy+CastleLevel1Units+01)
+  ld    b,167-14                        ;dx
+  ld    c,047                           ;dy
+  call  .SetDefense
+
+  ld    a,(iy+CastleLevel1Units+02)
+  ld    b,251-14                        ;dx
+  ld    c,047                           ;dy
+  call  .SetDefense
+
+  ld    a,(iy+CastleLevel1Units+03)
+  ld    b,083-14                        ;dx
+  ld    c,047+56                        ;dy
+  call  .SetDefense
+
+  ld    a,(iy+CastleLevel1Units+04)
+  ld    b,167-14                        ;dx
+  ld    c,047+56                        ;dy
+  call  .SetDefense
+
+  ld    a,(iy+CastleLevel1Units+05)
+  ld    b,251-14                        ;dx
+  ld    c,047+56                        ;dy
+  call  .SetDefense  
+  ret
+
+  .SetDefense:
+  ld    h,0
+  ld    l,a
+  ld    de,DefenseCreatureTable
+  add   hl,de
+  ld    l,(hl)
+  ld    h,0
+  call  SetNumber16BitCastle
+  ret
+
+  .speed:
+  ld    a,(iy+CastleLevel1Units+00)
+  ld    b,083-14                        ;dx
+  ld    c,040                           ;dy
+  call  .SetSpeed
+
+  ld    a,(iy+CastleLevel1Units+01)
+  ld    b,167-14                        ;dx
+  ld    c,040                           ;dy
+  call  .SetSpeed
+
+  ld    a,(iy+CastleLevel1Units+02)
+  ld    b,251-14                        ;dx
+  ld    c,040                           ;dy
+  call  .SetSpeed
+
+  ld    a,(iy+CastleLevel1Units+03)
+  ld    b,083-14                        ;dx
+  ld    c,040+56                        ;dy
+  call  .SetSpeed
+
+  ld    a,(iy+CastleLevel1Units+04)
+  ld    b,167-14                        ;dx
+  ld    c,040+56                        ;dy
+  call  .SetSpeed
+
+  ld    a,(iy+CastleLevel1Units+05)
+  ld    b,251-14                        ;dx
+  ld    c,040+56                        ;dy
+  call  .SetSpeed  
+  ret
+
+  .SetSpeed:
+  ld    h,0
+  ld    l,a
+  ld    de,SpeedCreatureTable
+  add   hl,de
+  ld    l,(hl)
+  ld    h,0
+  call  SetNumber16BitCastle
+  ret
+  
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dy of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set dy of text
+  ret
+
+
+
+
+
+  .cost:
+  ld    a,(iy+CastleLevel1Units+00)
+  ld    b,005+020                       ;dx
+  ld    c,055                           ;dy
+  call  .SetCost
+
+  ld    a,(iy+CastleLevel1Units+01)
+  ld    b,089+020                       ;dx
+  ld    c,055                           ;dy
+  call  .SetCost
+
+  ld    a,(iy+CastleLevel1Units+02)
+  ld    b,173+020                       ;dx
+  ld    c,055                           ;dy
+  call  .SetCost
+
+  ld    a,(iy+CastleLevel1Units+03)
+  ld    b,005+020                       ;dx
+  ld    c,111                           ;dy
+  call  .SetCost
+
+  ld    a,(iy+CastleLevel1Units+04)
+  ld    b,089+020                       ;dx
+  ld    c,111                           ;dy
+  call  .SetCost
+
+  ld    a,(iy+CastleLevel1Units+05)
+  ld    b,173+020                       ;dx
+  ld    c,111                           ;dy
+  call  .SetCost
+  ret
+
+  .SetCost:
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,CostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+
+  call  SetNumber16BitCastle
+  ret
+  
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dy of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set dy of text
+  ret
+
+  .names:
+  ld    a,(iy+CastleLevel1Units+00)
+  ld    b,007                           ;dx
+  ld    c,027                           ;dy
+  call  .SetName
+
+  ld    a,(iy+CastleLevel1Units+01)
+  ld    b,091                           ;dx
+  ld    c,027                           ;dy
+  call  .SetName
+
+  ld    a,(iy+CastleLevel1Units+02)
+  ld    b,175                           ;dx
+  ld    c,027                           ;dy
+  call  .SetName
+
+  ld    a,(iy+CastleLevel1Units+03)
+  ld    b,007                           ;dx
+  ld    c,083                           ;dy
+  call  .SetName
+
+  ld    a,(iy+CastleLevel1Units+04)
+  ld    b,091                           ;dx
+  ld    c,083                           ;dy
+  call  .SetName
+
+  ld    a,(iy+CastleLevel1Units+05)
+  ld    b,175                           ;dx
+  ld    c,083                           ;dy
+  call  .SetName
+  ret
+
+  .SetName:
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,CreatureNameTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+  
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dy of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set dy of text
+  ret
+
+  .amount:
+  ld    l,(iy+CastleLevel1UnitsAvail+00)
+  ld    h,(iy+CastleLevel1UnitsAvail+01)
+  ld    b,081 - 25
+  ld    c,027 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+
+  ld    l,(iy+CastleLevel1UnitsAvail+02)
+  ld    h,(iy+CastleLevel1UnitsAvail+03)
+  ld    b,166 - 25
+  ld    c,027 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+
+  ld    l,(iy+CastleLevel1UnitsAvail+04)
+  ld    h,(iy+CastleLevel1UnitsAvail+05)
+  ld    b,251 - 25
+  ld    c,027 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+
+  ld    l,(iy+CastleLevel1UnitsAvail+06)
+  ld    h,(iy+CastleLevel1UnitsAvail+07)
+  ld    b,081 - 25
+  ld    c,083 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+
+  ld    l,(iy+CastleLevel1UnitsAvail+08)
+  ld    h,(iy+CastleLevel1UnitsAvail+09)
+  ld    b,166 - 25
+  ld    c,083 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+
+  ld    l,(iy+CastleLevel1UnitsAvail+10)
+  ld    h,(iy+CastleLevel1UnitsAvail+11)
+  ld    b,251 - 25
+  ld    c,083 ;HeroOverViewArmyWindowDY + 056
+  call  SetNumber16BitCastle
+  ret
+  
+.army:
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    a,(iy+CastleLevel1Units)        ;unit slot 1, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit1Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(iy+CastleLevel2Units)        ;unit slot 2, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit2Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(iy+CastleLevel3Units)        ;unit slot 3, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit3Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(iy+CastleLevel4Units)        ;unit slot 4, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit4Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(iy+CastleLevel5Units)        ;unit slot 5, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit5Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(iy+CastleLevel6Units)        ;unit slot 6, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,DYDXUnit6Window         ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,.Unit14x14SYSXTable
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
+
+.Unit14x14SYSXTable:  
+                dw $8000+(00*128)+(00/2)-128, $8000+(00*128)+(14/2)-128, $8000+(00*128)+(28/2)-128, $8000+(00*128)+(42/2)-128, $8000+(00*128)+(56/2)-128, $8000+(00*128)+(70/2)-128, $8000+(00*128)+(84/2)-128, $8000+(00*128)+(98/2)-128, $8000+(00*128)+(112/2)-128, $8000+(00*128)+(126/2)-128, $8000+(00*128)+(140/2)-128, $8000+(00*128)+(154/2)-128, $8000+(00*128)+(168/2)-128, $8000+(00*128)+(182/2)-128, $8000+(00*128)+(196/2)-128, $8000+(00*128)+(210/2)-128, $8000+(00*128)+(224/2)-128, $8000+(00*128)+(238/2)-128
+                dw $8000+(14*128)+(00/2)-128, $8000+(14*128)+(14/2)-128, $8000+(14*128)+(28/2)-128, $8000+(14*128)+(42/2)-128, $8000+(14*128)+(56/2)-128, $8000+(14*128)+(70/2)-128, $8000+(14*128)+(84/2)-128, $8000+(14*128)+(98/2)-128, $8000+(14*128)+(112/2)-128, $8000+(14*128)+(126/2)-128, $8000+(14*128)+(140/2)-128, $8000+(14*128)+(154/2)-128, $8000+(14*128)+(168/2)-128, $8000+(14*128)+(182/2)-128, $8000+(14*128)+(196/2)-128, $8000+(14*128)+(210/2)-128, $8000+(14*128)+(224/2)-128, $8000+(14*128)+(238/2)-128
+                dw $8000+(28*128)+(00/2)-128, $8000+(28*128)+(14/2)-128, $8000+(28*128)+(28/2)-128, $8000+(28*128)+(42/2)-128, $8000+(28*128)+(56/2)-128, $8000+(28*128)+(70/2)-128, $8000+(28*128)+(84/2)-128, $8000+(28*128)+(98/2)-128, $8000+(28*128)+(112/2)-128, $8000+(28*128)+(126/2)-128, $8000+(28*128)+(140/2)-128, $8000+(28*128)+(154/2)-128, $8000+(28*128)+(168/2)-128, $8000+(28*128)+(182/2)-128, $8000+(28*128)+(196/2)-128, $8000+(28*128)+(210/2)-128, $8000+(28*128)+(224/2)-128, $8000+(28*128)+(238/2)-128
+                dw $8000+(42*128)+(00/2)-128, $8000+(42*128)+(14/2)-128, $8000+(42*128)+(28/2)-128, $8000+(42*128)+(42/2)-128, $8000+(42*128)+(56/2)-128, $8000+(42*128)+(70/2)-128, $8000+(42*128)+(84/2)-128, $8000+(42*128)+(98/2)-128, $8000+(42*128)+(112/2)-128, $8000+(42*128)+(126/2)-128, $8000+(42*128)+(140/2)-128, $8000+(42*128)+(154/2)-128, $8000+(42*128)+(168/2)-128, $8000+(42*128)+(182/2)-128, $8000+(42*128)+(196/2)-128, $8000+(42*128)+(210/2)-128, $8000+(42*128)+(224/2)-128, $8000+(42*128)+(238/2)-128
+                dw $8000+(56*128)+(00/2)-128, $8000+(56*128)+(14/2)-128, $8000+(56*128)+(28/2)-128, $8000+(56*128)+(42/2)-128, $8000+(56*128)+(56/2)-128, $8000+(56*128)+(70/2)-128, $8000+(56*128)+(84/2)-128, $8000+(56*128)+(98/2)-128, $8000+(56*128)+(112/2)-128, $8000+(56*128)+(126/2)-128, $8000+(56*128)+(140/2)-128, $8000+(56*128)+(154/2)-128, $8000+(56*128)+(168/2)-128, $8000+(56*128)+(182/2)-128, $8000+(56*128)+(196/2)-128, $8000+(56*128)+(210/2)-128, $8000+(56*128)+(224/2)-128, $8000+(56*128)+(238/2)-128
+                dw $8000+(70*128)+(00/2)-128, $8000+(70*128)+(14/2)-128, $8000+(70*128)+(28/2)-128, $8000+(70*128)+(42/2)-128, $8000+(70*128)+(56/2)-128, $8000+(70*128)+(70/2)-128, $8000+(70*128)+(84/2)-128, $8000+(70*128)+(98/2)-128, $8000+(70*128)+(112/2)-128, $8000+(70*128)+(126/2)-128, $8000+(70*128)+(140/2)-128, $8000+(70*128)+(154/2)-128, $8000+(70*128)+(168/2)-128, $8000+(70*128)+(182/2)-128, $8000+(70*128)+(196/2)-128, $8000+(70*128)+(210/2)-128, $8000+(70*128)+(224/2)-128, $8000+(70*128)+(238/2)-128
+                dw $8000+(84*128)+(00/2)-128, $8000+(84*128)+(14/2)-128, $8000+(84*128)+(28/2)-128, $8000+(84*128)+(42/2)-128, $8000+(84*128)+(56/2)-128, $8000+(84*128)+(70/2)-128, $8000+(84*128)+(84/2)-128, $8000+(84*128)+(98/2)-128, $8000+(84*128)+(112/2)-128, $8000+(84*128)+(126/2)-128, $8000+(84*128)+(140/2)-128, $8000+(84*128)+(154/2)-128, $8000+(84*128)+(168/2)-128, $8000+(84*128)+(182/2)-128, $8000+(84*128)+(196/2)-128, $8000+(84*128)+(210/2)-128, $8000+(84*128)+(224/2)-128, $8000+(84*128)+(238/2)-128
+
+;NXAndNY14x14CharaterPortraits:      equ 014*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
+DYDXUnit1Window:               equ 038*128 + (008/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit2Window:               equ 038*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit3Window:               equ 038*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit4Window:               equ 094*128 + (008/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit5Window:               equ 094*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
+
+
+SetNumber16BitCastle:                   ;in hl=number (16bit)
+  ld    a,b                             ;dx
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c                             ;dy
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    a,h
+  cp    l
+  ret   z
+
+  push  iy
+  call  .ConvertToDecimal16bit
+  pop   iy
+
+  ld    hl,TextNumber
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dy of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set dy of text
+  ret
+
+
+
+  .ConvertToDecimal16bit:
+  ld    iy,TextNumber
+  ld    e,0                             ;e=has an xfold already been set prior ?
+
+  .Check10000Folds:
+  ld    d,$30                           ;10000folds in d ($30 = 0)
+
+  .Loop10000Fold:
+  or    a
+  ld    bc,10000
+  sbc   hl,bc                           ;check for 10000 folds
+  jr    c,.Set10000Fold
+  inc   d
+  jr  .Loop10000Fold
+
+  .Set10000Fold:
+  ld    a,d
+  cp    $30
+  jr    z,.EndSet10000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 1000fold
+  inc   iy
+  .EndSet10000Fold:
+
+  add   hl,bc
+
+  .Check1000Folds:
+  ld    d,$30                           ;1000folds in d ($30 = 0)
+
+  .Loop1000Fold:
+  or    a
+  ld    bc,1000
+  sbc   hl,bc                           ;check for 1000 folds
+  jr    c,.Set1000Fold
+  inc   d
+  jr  .Loop1000Fold
+
+  .Set1000Fold:
+  bit   0,e
+  jr    nz,.DoSet1000Fold    
+  ld    a,d
+  cp    $30
+  jr    z,.EndSet1000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  .DoSet1000Fold:
+  ld    (iy),d                          ;set 100fold
+  inc   iy
+  .EndSet1000Fold:
+
+  add   hl,bc
+
+  .Check100Folds:
+  ld    d,$30                           ;100folds in d ($30 = 0)
+
+  .Loop100Fold:
+  or    a
+  ld    bc,100
+  sbc   hl,bc                           ;check for 100 folds
+  jr    c,.Set100Fold
+  inc   d
+  jr  .Loop100Fold
+
+  .Set100Fold:
+  bit   0,e
+  jr    nz,.DoSet100Fold  
+  ld    a,d
+  cp    $30
+  jr    nz,.DoSet100Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,4
+  ld    (PutLetter+dx),a                ;set dx of text
+
+
+  jr    .EndSet100Fold  
+
+  .DoSet100Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 100fold
+  inc   iy
+  .EndSet100Fold:
+
+  add   hl,bc
+
+  .Check10Folds:
+  ld    d,$30                           ;10folds in d ($30 = 0)
+
+  .Loop10Fold:
+  or    a
+  ld    bc,10
+  sbc   hl,bc                           ;check for 10 folds
+  jr    c,.Set10Fold
+  inc   d
+  jr  .Loop10Fold
+
+  .Set10Fold:
+  bit   0,e
+  jr    nz,.DoSet10Fold
+  ld    a,d
+  cp    $30
+  jr    nz,.DoSet10Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,3
+  ld    (PutLetter+dx),a                ;set dx of text
+
+  jr    .EndSet10Fold  
+
+  .DoSet10Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 10fold
+  inc   iy
+  .EndSet10Fold:
+
+  .Check1Fold:
+  ld    bc,10 + $30
+  add   hl,bc
+  
+;  add   a,10 + $30
+  ld    (iy),l                          ;set 1 fold
+  ld    (iy+1),255                      ;end text
+  ret
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 CastleOverviewBuildCode:                ;in: iy-castle
 
 
@@ -1600,6 +2252,10 @@ CheckButtonMouseInteractionCastle:
 
   cp    5                                     ;recruit
   jr    nz,.EndCheckRecruit
+  ;build
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  jp    CastleOverviewRecruitCode             ;jump to the recruit code
   ret
   .EndCheckRecruit:
 
@@ -1743,7 +2399,12 @@ SetCastleOverViewFontPage0Y212:           ;set font at (0,212) page 0
   ld    a,CastleOverviewFontBlock         ;font graphics block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
-
+SetRecruitGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,RecruitCreaturesBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 CopyBarracks:

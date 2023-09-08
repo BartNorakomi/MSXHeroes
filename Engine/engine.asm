@@ -4624,25 +4624,25 @@ CastleTavernHero1:      equ 10
 CastleTavernHero2:      equ 11
 CastleTavernHero3:      equ 12
 CastleLevel1Units:      equ 13
-CastleLevel2Units:      equ 15
-CastleLevel3Units:      equ 17
-CastleLevel4Units:      equ 19
-CastleLevel5Units:      equ 21
-CastleLevel6Units:      equ 23
-CastleLevel1UnitsAvail: equ 25
-CastleLevel2UnitsAvail: equ 27
-CastleLevel3UnitsAvail: equ 29
-CastleLevel4UnitsAvail: equ 31
-CastleLevel5UnitsAvail: equ 33
-CastleLevel6UnitsAvail: equ 35
-CastleTerrainSY:        equ 37
-AlreadyBuiltThisTurn?:  equ 38
+CastleLevel2Units:      equ 14
+CastleLevel3Units:      equ 15
+CastleLevel4Units:      equ 16
+CastleLevel5Units:      equ 17
+CastleLevel6Units:      equ 18
+CastleLevel1UnitsAvail: equ 19
+CastleLevel2UnitsAvail: equ 21
+CastleLevel3UnitsAvail: equ 23
+CastleLevel4UnitsAvail: equ 25
+CastleLevel5UnitsAvail: equ 27
+CastleLevel6UnitsAvail: equ 29
+CastleTerrainSY:        equ 31
+AlreadyBuiltThisTurn?:  equ 32
 AmountOfCastles:  equ 4
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?
-Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  060       , 0
-Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  069       , 0
-Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  078       , 0
-Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0,          0,              0,              0,              0,              0,              0         | db  087       , 0
+Castle1:  db  004,  001,  1,      1,          0,        0,        0,              1,            0,            0,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             122,            444,            6000,           30000     | db  060       , 0
+Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  069       , 0
+Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  078       , 0
+Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  087       , 0
 Castle5:  db  000,  000,  255
 
 LenghtCastleTable:  equ Castle2-Castle1
