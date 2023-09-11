@@ -696,5 +696,15 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $38 - 39
+;
+ButtonsRecruitBlock:  equ   $38
+phase	$4000
+  incbin "..\grapx\CastleOverview\ButtonsRecruitCreatures.SC5",7,139 * 128      ;139 lines
+	ds		$c000-$,$ff
+dephase
+
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

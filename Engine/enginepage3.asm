@@ -667,6 +667,87 @@ BuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+
+
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+RecruitButton1Ytop:           equ 064
+RecruitButton1YBottom:        equ RecruitButton1Ytop + 009
+RecruitButton1XLeft:          equ 006
+RecruitButton1XRight:         equ RecruitButton1XLeft+076
+
+RecruitButton2Ytop:           equ 064
+RecruitButton2YBottom:        equ RecruitButton2Ytop + 009
+RecruitButton2XLeft:          equ 090
+RecruitButton2XRight:         equ RecruitButton2XLeft+076
+
+RecruitButton3Ytop:           equ 064
+RecruitButton3YBottom:        equ RecruitButton3Ytop + 009
+RecruitButton3XLeft:          equ 174
+RecruitButton3XRight:         equ RecruitButton3XLeft+076
+
+RecruitButton4Ytop:           equ 120
+RecruitButton4YBottom:        equ RecruitButton4Ytop + 009
+RecruitButton4XLeft:          equ 006
+RecruitButton4XRight:         equ RecruitButton4XLeft + 076
+
+RecruitButton5Ytop:           equ 120
+RecruitButton5YBottom:        equ RecruitButton5Ytop + 009
+RecruitButton5XLeft:          equ 090
+RecruitButton5XRight:         equ RecruitButton5XLeft+076
+
+RecruitButton6Ytop:           equ 120
+RecruitButton6YBottom:        equ RecruitButton6Ytop + 009
+RecruitButton6XLeft:          equ 174
+RecruitButton6XRight:         equ RecruitButton6XLeft+076
+
+
+
+RecruitButtonStatus:            equ 0
+RecruitButton_SYSX_Ontouched:   equ 1
+RecruitButton_SYSX_MovedOver:   equ 3
+RecruitButton_SYSX_Clicked:     equ 5
+RecruitButtonYtop:              equ 7
+RecruitButtonYbottom:           equ 8
+RecruitButtonXleft:             equ 9
+RecruitButtonXright:            equ 10
+RecruitButtonImage_SYSX:        equ 11
+
+RecruitButtonTableLenghtPerButton:  equ RecruitButtonTable.endlenght-RecruitButtonTable
+RecruitButtonTableAmountOfButtons:  db  9
+RecruitButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, ButtonImage_SYSX
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton1Ytop,RecruitButton1YBottom,RecruitButton1XLeft,RecruitButton1XRight | dw $4000 + (076*128) + (000/2) - 128 | 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton2Ytop,RecruitButton2YBottom,RecruitButton2XLeft,RecruitButton2XRight | dw $4000 + (076*128) + (050/2) - 128 | 
+  db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton3Ytop,RecruitButton3YBottom,RecruitButton3XLeft,RecruitButton3XRight | dw $4000 + (076*128) + (100/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton4Ytop,RecruitButton4YBottom,RecruitButton4XLeft,RecruitButton4XRight | dw $4000 + (076*128) + (150/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton5Ytop,RecruitButton5YBottom,RecruitButton5XLeft,RecruitButton5XRight | dw $4000 + (076*128) + (200/2) - 128 | 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton6Ytop,RecruitButton6YBottom,RecruitButton6XLeft,RecruitButton6XRight | dw $4000 + (114*128) + (000/2) - 128 | 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 HeroOverViewInventoryIconButton1OffSX:           equ 146
 HeroOverViewInventoryIconButton1OffSY:           equ 000
 HeroOverViewInventoryIconButton1MouseOverSX:     equ 146
@@ -1358,7 +1439,7 @@ EnterCastle:
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
 ;  call  CastleOverviewCode
-;  call  CastleOverviewBuildCode
+;  call  CastleOverviewRecruitCode
   call  CastleOverviewRecruitCode
 
   pop   af
