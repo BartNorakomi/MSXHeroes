@@ -9,6 +9,11 @@ CastleOverviewRecruitCode:
 
   call  SetRecruitGraphics              ;put gfx in page 1
   call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+
+  ld    b,3
+  call  ShowRecruitWindowForSelectedUnit
+
+
   ld    hl,CopyPage1To0
   call  docopy
 
@@ -20,29 +25,6 @@ CastleOverviewRecruitCode:
   ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
   ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
   ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
-
-;  ld    a,%1100 0011
-;  ld    (RecruitButtonTable+0*RecruitButtonTableLenghtPerButton),a ;level 1 creatures
-;  ld    (RecruitButtonTable+1*RecruitButtonTableLenghtPerButton),a ;level 2 creatures
-;  ld    (RecruitButtonTable+2*RecruitButtonTableLenghtPerButton),a ;level 3 creatures
-;  ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a ;level 4 creatures
-;  ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a ;level 5 creatures
-;  ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a ;level 6 creatures
-
-;  ld    hl,SetSingleBuildButtonColor.putgreen
-;  ld    de,SingleBuildButtonTable
-;  ld    bc,7
-;  ldir
-
-
-
-
-
-
-
-
-
-
 
   halt
   halt
@@ -138,8 +120,10 @@ SetRecruitButtons:                        ;put button in mirror page below scree
   .go:
 
   ;put button 
-  ld    de,$0000 + (168*128) + (180/2) - 128  ;dy,dx
-  ld    bc,$0000 + (009*256) + (072/2)        ;ny,nx
+  ld    e,(ix+RecruitButton_DYDX)
+  ld    d,(ix+RecruitButton_DYDX+1)
+
+  ld    bc,$0000 + (009*256) + (076/2)        ;ny,nx
   ld    a,ButtonsRecruitBlock                   ;buttons block
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   halt
@@ -222,11 +206,133 @@ CheckButtonMouseInteractionRecruitButtons:
   ret
 
   .MenuOptionSelected:
-  ld    (ix+RecruitButtonStatus),%1010 0011
+  pop   af                                ;no need to check the other buttons
+;  ld    (ix+RecruitButtonStatus),%1010 0011
+;  ld    a,b
 
-  ld    a,b
+  call  ShowRecruitWindowForSelectedUnit
   ret
 
+ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
+  xor   a                               ;turn all recruit buttons off
+  ld    (RecruitButtonTable+0*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+1*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+2*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
+
+  call  .SetUnit                        ;set selected unit in (SelectedCastleRecruitLevelUnit)
+
+  ;show recruit window for selected unit
+  ld    hl,$4000 + (047*128) + (000/2) - 128
+  ld    de,$0000 + (032*128) + (048/2) - 128
+  ld    bc,$0000 + (092*256) + (162/2)
+  ld    a,ButtonsRecruitBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  .army
+  call  .amount
+  call  .name
+  call  .cost
+  call  .Gemscost
+  call  .Rubiescost
+
+
+;  call  SwapAndSetPage                  ;swap and set page
+
+  ret
+
+.Rubiescost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,063                           ;dx
+  ld    c,083                           ;dy
+  ld    de,$0000 + (078*128) + (052/2) - 128  
+  call  SetAvailableRecruitArmy.SetRubiescost
+
+.Gemscost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,063                           ;dx
+  ld    c,083                           ;dy
+  ld    de,$0000 + (078*128) + (052/2) - 128  
+  jp    SetAvailableRecruitArmy.SetGemscost
+
+.cost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,072                           ;dx
+  ld    c,071                           ;dy
+  jp    SetAvailableRecruitArmy.SetCost
+
+.name:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,125                           ;dx
+  ld    c,038                           ;dy
+  jp    SetAvailableRecruitArmy.SetName
+
+.amount:
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    b,090
+  ld    c,103 ;HeroOverViewArmyWindowDY + 056
+  jp    SetNumber16BitCastle
+
+.army:
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetAvailableRecruitArmy.SetSYSX ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,050*128 + (120/2) - 128      ;(dy*128 + dx/2) = (204,153)              
+  jp    CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+.SetUnit:
+  ld    hl,SelectedCastleRecruitLevelUnit
+  ld    a,b
+  cp    6
+  ld    c,(iy+CastleLevel1Units+00)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+00)
+  ld    d,(iy+CastleLevel1UnitsAvail+01)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+  ret   z
+  cp    5
+  ld    c,(iy+CastleLevel1Units+01)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+02)
+  ld    d,(iy+CastleLevel1UnitsAvail+03)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+  ret   z
+  cp    4
+  ld    c,(iy+CastleLevel1Units+02)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+04)
+  ld    d,(iy+CastleLevel1UnitsAvail+05)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+  ret   z
+  cp    3
+  ld    c,(iy+CastleLevel1Units+03)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+06)
+  ld    d,(iy+CastleLevel1UnitsAvail+07)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+  ret   z
+  cp    2
+  ld    c,(iy+CastleLevel1Units+04)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+08)
+  ld    d,(iy+CastleLevel1UnitsAvail+09)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+  ret   z
+;  cp    1
+  ld    c,(iy+CastleLevel1Units+05)
+  ld    (hl),c
+  ld    e,(iy+CastleLevel1UnitsAvail+10)
+  ld    d,(iy+CastleLevel1UnitsAvail+11)
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),de
+;  ret   z
+  ret
 
 
 
@@ -316,6 +422,8 @@ SetAvailableRecruitArmy:
   ld    bc,$0000 + (047*256) + (076/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  xor   a                               ;turn button off
+  ld    (RecruitButtonTable+1*RecruitButtonTableLenghtPerButton),a 
 
   .Level3UnitsUnavailable:
   ld    hl,$4000 + (000*128) + (076/2) - 128
@@ -323,6 +431,8 @@ SetAvailableRecruitArmy:
   ld    bc,$0000 + (047*256) + (076/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  xor   a                               ;turn button off
+  ld    (RecruitButtonTable+2*RecruitButtonTableLenghtPerButton),a 
 
   .Level4UnitsUnavailable:
   ld    hl,$4000 + (000*128) + (076/2) - 128
@@ -330,6 +440,8 @@ SetAvailableRecruitArmy:
   ld    bc,$0000 + (047*256) + (076/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  xor   a                               ;turn button off
+  ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a 
 
   .Level5UnitsUnavailable:
   ld    hl,$4000 + (000*128) + (076/2) - 128
@@ -337,6 +449,8 @@ SetAvailableRecruitArmy:
   ld    bc,$0000 + (047*256) + (076/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  xor   a                               ;turn button off
+  ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a 
 
   .Level6UnitsUnavailable:
   ld    hl,$4000 + (000*128) + (076/2) - 128
@@ -344,6 +458,8 @@ SetAvailableRecruitArmy:
   ld    bc,$0000 + (047*256) + (076/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  xor   a                               ;turn button off
+  ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
   ret
 
 

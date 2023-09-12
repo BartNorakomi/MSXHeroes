@@ -677,7 +677,8 @@ BuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=
 
 
 
-
+SelectedCastleRecruitLevelUnit: ds  1
+SelectedCastleRecruitLevelUnitAmountAvailable: dw 356
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 RecruitButton1Ytop:           equ 064
 RecruitButton1YBottom:        equ RecruitButton1Ytop + 009
@@ -719,18 +720,18 @@ RecruitButtonYtop:              equ 7
 RecruitButtonYbottom:           equ 8
 RecruitButtonXleft:             equ 9
 RecruitButtonXright:            equ 10
-RecruitButtonImage_SYSX:        equ 11
+RecruitButton_DYDX:             equ 11
 
 RecruitButtonTableLenghtPerButton:  equ RecruitButtonTable.endlenght-RecruitButtonTable
 RecruitButtonTableAmountOfButtons:  db  9
-RecruitButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, ButtonImage_SYSX
-  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton1Ytop,RecruitButton1YBottom,RecruitButton1XLeft,RecruitButton1XRight | dw $4000 + (076*128) + (000/2) - 128 | 
+RecruitButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton1Ytop,RecruitButton1YBottom,RecruitButton1XLeft,RecruitButton1XRight | dw $0000 + (RecruitButton1Ytop*128) + (RecruitButton1XLeft/2) - 128 
   .endlenght:
-  db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton2Ytop,RecruitButton2YBottom,RecruitButton2XLeft,RecruitButton2XRight | dw $4000 + (076*128) + (050/2) - 128 | 
-  db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton3Ytop,RecruitButton3YBottom,RecruitButton3XLeft,RecruitButton3XRight | dw $4000 + (076*128) + (100/2) - 128 | 
-  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton4Ytop,RecruitButton4YBottom,RecruitButton4XLeft,RecruitButton4XRight | dw $4000 + (076*128) + (150/2) - 128 | 
-  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton5Ytop,RecruitButton5YBottom,RecruitButton5XLeft,RecruitButton5XRight | dw $4000 + (076*128) + (200/2) - 128 | 
-  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton6Ytop,RecruitButton6YBottom,RecruitButton6XLeft,RecruitButton6XRight | dw $4000 + (114*128) + (000/2) - 128 | 
+  db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton2Ytop,RecruitButton2YBottom,RecruitButton2XLeft,RecruitButton2XRight | dw $0000 + (RecruitButton2Ytop*128) + (RecruitButton2XLeft/2) - 128 
+  db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton3Ytop,RecruitButton3YBottom,RecruitButton3XLeft,RecruitButton3XRight | dw $0000 + (RecruitButton3Ytop*128) + (RecruitButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton4Ytop,RecruitButton4YBottom,RecruitButton4XLeft,RecruitButton4XRight | dw $0000 + (RecruitButton4Ytop*128) + (RecruitButton4XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton5Ytop,RecruitButton5YBottom,RecruitButton5XLeft,RecruitButton5XRight | dw $0000 + (RecruitButton5Ytop*128) + (RecruitButton5XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db RecruitButton6Ytop,RecruitButton6YBottom,RecruitButton6XLeft,RecruitButton6XRight | dw $0000 + (RecruitButton6Ytop*128) + (RecruitButton6XLeft/2) - 128 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
