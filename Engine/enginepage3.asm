@@ -678,7 +678,9 @@ BuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=
 
 
 SelectedCastleRecruitLevelUnit: ds  1
-SelectedCastleRecruitLevelUnitAmountAvailable: dw 356
+SelectedCastleRecruitLevelUnitAmountAvailable: dw 000
+SelectedCastleRecruitLevelUnitRecruitAmount: dw 000
+SelectedCastleRecruitLevelUnitTotalGoldCost: dw 000
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 RecruitButton1Ytop:           equ 064
 RecruitButton1YBottom:        equ RecruitButton1Ytop + 009
@@ -737,6 +739,36 @@ RecruitButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 
 
 
 
+
+RecruitButtonMAXYtop:           equ 092
+RecruitButtonMAXYBottom:        equ RecruitButtonMAXYtop + 018
+RecruitButtonMAXXLeft:          equ 114
+RecruitButtonMAXXRight:         equ RecruitButtonMAXXLeft + 026
+
+RecruitButtonBUYYtop:           equ 072
+RecruitButtonBUYYBottom:        equ RecruitButtonBUYYtop + 018
+RecruitButtonBUYXLeft:          equ 114
+RecruitButtonBUYXRight:         equ RecruitButtonBUYXLeft + 026
+
+AmountOfButtons:                equ -1
+;RecruitButtonStatus:            equ 0
+;RecruitButton_SYSX_Ontouched:   equ 1
+;RecruitButton_SYSX_MovedOver:   equ 3
+;RecruitButton_SYSX_Clicked:     equ 5
+;RecruitButtonYtop:              equ 7
+;RecruitButtonYbottom:           equ 8
+;RecruitButtonXleft:             equ 9
+;RecruitButtonXright:            equ 10
+;RecruitButton_DYDX:             equ 11
+
+RecruitButtonMAXBUYTableLenghtPerButton:  equ RecruitButtonMAXBUYTable.endlenght-RecruitButtonMAXBUYTable
+RecruitButtonMAXBUYTableAmountOfButtons:  db  2
+RecruitButtonMAXBUYTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
+  db  %1100 0011 | dw $4000 + (027*128) + (152/2) - 128 | dw $4000 + (027*128) + (178/2) - 128 | dw $4000 + (027*128) + (204/2) - 128 | db RecruitButtonMAXYtop,RecruitButtonMAXYBottom,RecruitButtonMAXXLeft,RecruitButtonMAXXRight | dw $0000 + (RecruitButtonMAXYtop*128) + (RecruitButtonMAXXLeft/2) - 128 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (045*128) + (162/2) - 128 | dw $4000 + (045*128) + (188/2) - 128 | dw $4000 + (045*128) + (214/2) - 128 | db RecruitButtonBUYYtop,RecruitButtonBUYYBottom,RecruitButtonBUYXLeft,RecruitButtonBUYXRight | dw $0000 + (RecruitButtonBUYYtop*128) + (RecruitButtonBUYXLeft/2) - 128 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -1439,9 +1471,9 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-;  call  CastleOverviewCode
+  call  CastleOverviewCode
+;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
-  call  CastleOverviewRecruitCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  

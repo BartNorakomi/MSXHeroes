@@ -7,16 +7,9 @@ CastleOverviewRecruitCode:
   xor   a
 	ld		(activepage),a                  ;start in page 0
 
-  call  SetRecruitGraphics              ;put gfx in page 1
-  call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
-
-  ld    b,3
-  call  ShowRecruitWindowForSelectedUnit
-
-
-  ld    hl,CopyPage1To0
-  call  docopy
-
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  
   ld    a,%1100 0011
   ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
   xor   a
@@ -25,6 +18,27 @@ CastleOverviewRecruitCode:
   ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
   ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
   ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
+
+  xor   a
+  ld    (RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton),a ;BUY button
+  ld    (RecruitButtonMAXBUYTable+1*RecruitButtonMAXBUYTableLenghtPerButton),a ;MAX button
+
+  ld    a,%1100 0011                    ;turn all recruit buttons on
+  ld    (RecruitButtonTable+0*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+1*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+2*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
+
+  call  SetRecruitGraphics              ;put gfx in page 1
+  call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+
+;  ld    b,3                             ;which unit ?
+;  call  ShowRecruitWindowForSelectedUnit
+
+  ld    hl,CopyPage1To0
+  call  docopy
 
   halt
   halt
@@ -68,9 +82,96 @@ CastleOverviewRecruitCode:
   call  SetRecruitButtons                ;copies button state from rom -> vram
   ;/recruit button for level 1-6 creatures
 
+  ;recruit buttons MAX and BUY
+  ld    ix,RecruitButtonMAXBUYTable 
+;  call  CheckButtonMouseInteractionRecruitButtons
+  call  CheckButtonMouseInteractionRecruitMAXBUYButtons
+
+  ld    ix,RecruitButtonMAXBUYTable
+;  call  SetRecruitButtons                ;copies button state from rom -> vram
+  call  SetRecruitMAXBUYButtons                ;copies button state from rom -> vram
+  ;/recruit buttons MAX and BUY
+
+  call  CheckEndRecruitUnitWindow   ;check if mouse is clicked outside of recruit single unit window. If so, close this window
+
   halt
   jp  .engine
 
+CheckEndRecruitUnitWindow:
+  ld    a,(RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton) ;BUY button
+  or    a
+  ret   z
+
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    032                             ;dy
+  jr    c,.NotOverRecruitSingleUnitWindow
+  cp    032+092                         ;dy+ny
+  jr    nc,.NotOverRecruitSingleUnitWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    048                             ;dx
+  jr    c,.NotOverRecruitSingleUnitWindow
+  cp    048+162                         ;dx+nx
+  ret   c
+
+  .NotOverRecruitSingleUnitWindow:
+  pop   af                                ;pop the call to this routine
+  jp    CastleOverviewRecruitCode
+
+
+
+
+SetRecruitMAXBUYButtons:                  ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    b,(ix+AmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,RecruitButtonMAXBUYTableLenghtPerButton
+  add   ix,de
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   7,(ix+RecruitButtonStatus)
+  ret   z                               ;check on/off bit
+
+  bit   0,(ix+RecruitButtonStatus)        ;bit 0 and bit 1 represent the 2 frames in which we copy the button
+  res   0,(ix+RecruitButtonStatus)  
+  jr    nz,.goCopyButton
+  bit   1,(ix+RecruitButtonStatus)
+  res   1,(ix+RecruitButtonStatus)
+  ret   z  
+  .goCopyButton:
+
+  ld    l,(ix+RecruitButton_SYSX_Ontouched)
+  ld    h,(ix+RecruitButton_SYSX_Ontouched+1)
+  bit   6,(ix+RecruitButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+RecruitButton_SYSX_MovedOver)
+  ld    h,(ix+RecruitButton_SYSX_MovedOver+1)
+  bit   5,(ix+RecruitButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+RecruitButton_SYSX_Clicked)
+  ld    h,(ix+RecruitButton_SYSX_Clicked+1)
+  .go:
+
+  ;put button 
+  ld    e,(ix+RecruitButton_DYDX)
+  ld    d,(ix+RecruitButton_DYDX+1)
+
+  ld    bc,$0000 + (018*256) + (026/2)        ;ny,nx
+  ld    a,ButtonsRecruitBlock                   ;buttons block
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  halt
+  ret
 
 
 
@@ -80,6 +181,145 @@ CastleOverviewRecruitCode:
 
 
 
+
+CheckButtonMouseInteractionRecruitMAXBUYButtons:
+  ld    b,(ix+AmountOfButtons)
+  ld    de,RecruitButtonMAXBUYTableLenghtPerButton
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+  bit   7,(ix+RecruitButtonStatus)        ;check if button is on/off
+  ret   z                               ;don't handle button if this button is off
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+RecruitButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+RecruitButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+  cp    (ix+RecruitButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+RecruitButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+RecruitButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+RecruitButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+RecruitButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+RecruitButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+  pop   af                                ;no need to check the other buttons
+  ld    (ix+RecruitButtonStatus),%1010 0011
+  ld    a,b
+  cp    2
+  jr    z,.BuyButtonPressed
+  cp    1
+  jr    z,.MaxButtonPressed
+  ret
+
+  .MaxButtonPressed:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ;add amount available to recruit amount to select all units ready for recruitment
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+
+  call  .SetAvailableAmountRecruitAmountAndTotalCost
+  call  SwapAndSetPage                  ;swap and set page
+  call  .SetAvailableAmountRecruitAmountAndTotalCost
+  ret
+
+  .BuyButtonPressed:
+
+  pop   af                                ;pop the call to this routine
+  jp    CastleOverviewRecruitCode
+
+.SetAvailableAmountRecruitAmountAndTotalCost:
+  ;erase available number
+  ld    hl,$4000 + (118*128) + (040/2) - 128
+  ld    de,$0000 + (103*128) + (088/2) - 128
+  ld    bc,$0000 + (005*256) + (018/2)
+  ld    a,ButtonsRecruitBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;erase total cost and recruit amount
+  ld    hl,$4000 + (086*128) + (102/2) - 128
+  ld    de,$0000 + (071*128) + (150/2) - 128
+  ld    bc,$0000 + (037*256) + (042/2)
+  ld    a,ButtonsRecruitBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+  call  ShowRecruitWindowForSelectedUnit.amountavailable
+  call  ShowRecruitWindowForSelectedUnit.recruitamount
+  call  .SetTotalCost
+  call  ShowRecruitWindowForSelectedUnit.totalcost
+  call  ShowRecruitWindowForSelectedUnit.TotalGemscost
+  call  ShowRecruitWindowForSelectedUnit.TotalRubiescost
+  ret
+
+  .SetTotalCost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,CostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+;  push  bc
+  call  MultiplyHlWithDE
+;  pop   bc
+
+  ld    (SelectedCastleRecruitLevelUnitTotalGoldCost),hl
+  ret
 
 SetRecruitButtons:                        ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   ld    b,6
@@ -210,8 +450,34 @@ CheckButtonMouseInteractionRecruitButtons:
 ;  ld    (ix+RecruitButtonStatus),%1010 0011
 ;  ld    a,b
 
+  push  bc                              ;b=unit selected
+  call  ShowRecruitWindowForSelectedUnit
+  call  SwapAndSetPage                  ;swap and set page
+  pop   bc
   call  ShowRecruitWindowForSelectedUnit
   ret
+
+MultiplyHlWithDE:
+  push  hl
+  pop   bc
+;
+; Multiply 16-bit values (with 16-bit result)
+; In: Multiply BC with DE
+; Out: HL = result
+;
+Mult16:
+    ld a,b
+    ld b,16
+Mult16_Loop:
+    add hl,hl
+    sla c
+    rla
+    jr nc,Mult16_NoAdd
+    add hl,de
+Mult16_NoAdd:
+    djnz Mult16_Loop
+    ret
+
 
 ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   xor   a                               ;turn all recruit buttons off
@@ -221,6 +487,9 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a 
   ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a 
   ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
+  ld    a,%1100 0011
+  ld    (RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton),a ;BUY button
+  ld    (RecruitButtonMAXBUYTable+1*RecruitButtonMAXBUYTableLenghtPerButton),a ;MAX button
 
   call  .SetUnit                        ;set selected unit in (SelectedCastleRecruitLevelUnit)
 
@@ -231,19 +500,105 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
 
   call  .army
-  call  .amount
   call  .name
   call  .cost
   call  .Gemscost
   call  .Rubiescost
 
-
-;  call  SwapAndSetPage                  ;swap and set page
-
+  call  .amountavailable
+  call  .recruitamount
   ret
+
+.TotalRubiescost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,063+101                       ;dx
+  ld    c,083                           ;dy
+  ld    de,$0000 + (078*128) + ((052+97)/2) - 128  
+  call  .SetTotalRubiescost
+  ret
+
+.TotalGemscost:
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,063+101                       ;dx
+  ld    c,083                           ;dy
+  ld    de,$0000 + (078*128) + ((052+97)/2) - 128  
+  call  .SetTotalGemscost
+  ret
+
+  .SetTotalGemscost:
+  push  de
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,GemsCostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+
+  ld    a,h
+  or    l
+  jr    z,.Zero                         ;skip putting number and icon if amount is 0
+
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  push  bc
+  call  MultiplyHlWithDE
+  pop   bc
+
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy
+  
+  ;set Gems Icon
+  ld    hl,$4000 + (000*128) + (228/2) - 128
+;  ld    de,$0000 + ((029+10)*128) + ((010+025)/2) - 128
+  pop   de
+  ld    bc,$0000 + (013*256) + (014/2)
+  ld    a,ButtonsRecruitBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .SetTotalRubiescost:
+  push  de
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,RubiesCostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+
+  ld    a,h
+  or    l
+  jr    z,.Zero                         ;skip putting number and icon if amount is 0
+
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  push  bc
+  call  MultiplyHlWithDE
+  pop   bc
+
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy
+  
+  ;set Ruby Icon
+  ld    hl,$4000 + (000*128) + (242/2) - 128
+;  ld    de,$0000 + ((029+10)*128) + ((010+025)/2) - 128
+  pop   de
+  ld    bc,$0000 + (013*256) + (014/2)
+  ld    a,ButtonsRecruitBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .Zero:                                ;skip putting number and icon if amount is 0
+  pop   de
+  ret
+
+.totalcost:
+  ld    hl,(SelectedCastleRecruitLevelUnitTotalGoldCost)
+  ld    b,177
+  ld    c,071 ;HeroOverViewArmyWindowDY + 056
+  jp    SetNumber16BitCastle
 
 .Rubiescost:
   ld    a,(SelectedCastleRecruitLevelUnit)
@@ -271,7 +626,13 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   ld    c,038                           ;dy
   jp    SetAvailableRecruitArmy.SetName
 
-.amount:
+.recruitamount:
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  ld    b,177
+  ld    c,103 ;HeroOverViewArmyWindowDY + 056
+  jp    SetNumber16BitCastle
+
+.amountavailable:
   ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
   ld    b,090
   ld    c,103 ;HeroOverViewArmyWindowDY + 056
@@ -970,20 +1331,27 @@ DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2)
 
 
 SetNumber16BitCastle:                   ;in hl=number (16bit)
+;  ld    a,"0"                           ;we can set number to 0, then do a zero check and jr z,.zero to put the number 0 at the furthest left side if needed
+;  ld    (TextNumber),a
+;  ld    a,255
+;  ld    (TextNumber+1),a
+
   ld    a,b                             ;dx
   ld    (PutLetter+dx),a                ;set dx of text
   ld    (TextDX),a
   ld    a,c                             ;dy
   ld    (PutLetter+dy),a                ;set dy of text
 
-  ld    a,h
-  cp    l
-  ret   z
+;  ld    a,h
+;  cp    l
+;  ret   z
+;  jr    z,.Zero
 
   push  iy
   call  .ConvertToDecimal16bit
   pop   iy
 
+;  .Zero:
   ld    hl,TextNumber
   ld    (TextAddresspointer),hl  
 
