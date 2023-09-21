@@ -770,6 +770,32 @@ RecruitButtonMAXBUYTable: ;status (bit 7=off/on, bit 6=button normal (untouched)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+GenericButtonGfxBlock:          equ -2
+GenericButtonAmountOfButtons:   equ -1
+GenericButtonStatus:            equ 0
+GenericButton_SYSX_Ontouched:   equ 1
+GenericButton_SYSX_MovedOver:   equ 3
+GenericButton_SYSX_Clicked:     equ 5
+GenericButtonYtop:              equ 7
+GenericButtonYbottom:           equ 8
+GenericButtonXleft:             equ 9
+GenericButtonXright:            equ 10
+GenericButton_DYDX:             equ 11
+GenericButton_NYNX:             equ 13
+
+GenericButtonTableLenghtPerButton:  equ GenericButtonTable.endlenght-GenericButtonTable
+GenericButtonTableGfxBlock:         ds  1
+GenericButtonTableAmountOfButtons:  ds  1
+GenericButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  .endlenght:
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
 
 
 
@@ -1471,9 +1497,10 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  call  CastleOverviewCode
+;  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
+  call  CastleOverviewMagicGuildCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  

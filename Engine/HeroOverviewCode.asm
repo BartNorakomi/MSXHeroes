@@ -2370,68 +2370,68 @@ SetWhiteWindow:
   ld    a,SpellBookGraphicsBlock;Map block
   jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
 
-
-DescriptionEarth1:        db  "earth meteor",254
+SpellDescriptions:
+.DescriptionEarth1:        db  "earth meteor",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionEarth2:        db  "earth",254
+.DescriptionEarth2:        db  "earth",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionEarth3:        db  "earthstorm",254
+.DescriptionEarth3:        db  "earthstorm",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionEarth4:        db  "earthbullet",254
+.DescriptionEarth4:        db  "earthbullet",254
                           db  "damages all units on the",254
                           db  "the screen",255
 
-DescriptionFire1:        db  "meteor",254
+.DescriptionFire1:        db  "meteor",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionFire2:        db  "fire",254
+.DescriptionFire2:        db  "fire",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionFire3:        db  "firestorm",254
+.DescriptionFire3:        db  "firestorm",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-DescriptionFire4:        db  "firebullet",254
+.DescriptionFire4:        db  "firebullet",254
                           db  "damages all units on the",254
                           db  "the screen",255
 
-Descriptionair1:        db  "meteor",254
+.Descriptionair1:        db  "meteor",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionair2:        db  "air",254
+.Descriptionair2:        db  "air",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionair3:        db  "airstorm",254
+.Descriptionair3:        db  "airstorm",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionair4:        db  "airbullet",254
+.Descriptionair4:        db  "airbullet",254
                           db  "damages all units on the",254
                           db  "the screen",255
 
-Descriptionwater1:        db  "meteor",254
+.Descriptionwater1:        db  "meteor",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionwater2:        db  "water",254
+.Descriptionwater2:        db  "water",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionwater3:        db  "waterstorm",254
+.Descriptionwater3:        db  "waterstorm",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
 
-Descriptionwater4:        db  "waterbullet",254
+.Descriptionwater4:        db  "waterbullet",254
                           db  "damages all units on the",254
                           db  "the screen",255
 
@@ -2574,15 +2574,15 @@ SetSpellExplanation_Water:
 
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,Descriptionwater1
+  ld    hl,SpellDescriptions.Descriptionwater1
   jp    z,.SetText
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,Descriptionwater2
+  ld    hl,SpellDescriptions.Descriptionwater2
   jp    z,.SetText
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,Descriptionwater3
+  ld    hl,SpellDescriptions.Descriptionwater3
   jp    z,.SetText
-  ld    hl,Descriptionwater4
+  ld    hl,SpellDescriptions.Descriptionwater4
   .SetText:
 
 
@@ -2742,15 +2742,15 @@ SetSpellExplanation_Air:
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAir1
+  ld    hl,SpellDescriptions.DescriptionAir1
   jp    z,.SetText
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAir2
+  ld    hl,SpellDescriptions.DescriptionAir2
   jp    z,.SetText
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAir3
+  ld    hl,SpellDescriptions.DescriptionAir3
   jp    z,.SetText
-  ld    hl,DescriptionAir4
+  ld    hl,SpellDescriptions.DescriptionAir4
   .SetText:
 
 
@@ -2925,16 +2925,16 @@ SetSpellExplanation_Fire:
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionFire1
+  ld    hl,SpellDescriptions.DescriptionFire1
   jp    z,.SetText
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionFire2
+  ld    hl,SpellDescriptions.DescriptionFire2
   jp    z,.SetText
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionFire3
+  ld    hl,SpellDescriptions.DescriptionFire3
   jp    z,.SetText
   cp    8
-  ld    hl,DescriptionFire4
+  ld    hl,SpellDescriptions.DescriptionFire4
   jp    z,.SetText
   .SetText:
 
@@ -3108,15 +3108,15 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionEarth1
+  ld    hl,SpellDescriptions.DescriptionEarth1
   jp    z,.SetText
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionEarth2
+  ld    hl,SpellDescriptions.DescriptionEarth2
   jp    z,.SetText
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionEarth3
+  ld    hl,SpellDescriptions.DescriptionEarth3
   jp    z,.SetText
-  ld    hl,DescriptionEarth4
+  ld    hl,SpellDescriptions.DescriptionEarth4
   .SetText:
 
 

@@ -705,6 +705,14 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $3a - 3b
+;
+MagicGuildBlock:  equ   $3a
+phase	$4000
+  incbin "..\grapx\CastleOverview\MagicGuild.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

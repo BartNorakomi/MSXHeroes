@@ -1,3 +1,417 @@
+CastleOverviewMagicGuildCode:
+  ld    iy,Castle1
+
+  call  SetMagicGuildButtons
+
+  ld    hl,World1Palette
+  call  SetPalette
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0
+  
+  ld    a,%1100 0011
+  ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
+  xor   a
+  ld    (CastleOverviewButtonTable+0*CastleOverviewButtonTableLenghtPerButton),a ;build
+  ld    (CastleOverviewButtonTable+1*CastleOverviewButtonTableLenghtPerButton),a ;recruit
+  ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
+  ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
+  ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
+
+  call  SetMagicGuildGraphics           ;put gfx in page 1
+
+  ld    hl,CopyPage1To0
+  call  docopy
+
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;buttons in the bottom of screen
+  ld    ix,CastleOverviewButtonTable 
+  call  CheckButtonMouseInteractionCastle
+
+  ld    ix,CastleOverviewButtonTable
+  call  SetCastleButtons                ;copies button state from rom -> vram
+  ;/buttons in the bottom of screen
+
+  ;magic skill icons in the magic guild
+  ld    ix,GenericButtonTable 
+  call  CheckButtonMouseInteractionGenericButtons
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+  ;/magic skill icons in the magic guild
+
+  halt
+  jp  .engine
+
+.CheckButtonClicked:                    ;in: carry=button clicked, b=button number
+  ret   nc
+
+;  ld    a,b                             ;button clicked
+
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+  call  .SetText
+  call  SwapAndSetPage                  ;swap and set page
+  call  .SetText
+  ret
+
+.SetText:
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth1
+  ld    a,030
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,154
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
+
+
+
+
+
+SpellDescriptionsMagicGuild:
+.DescriptionEarth1:        db  "earth meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionEarth2:        db  "earth",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionEarth3:        db  "earthstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionEarth4:        db  "earthbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+.DescriptionFire1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionFire2:        db  "fire",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionFire3:        db  "firestorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.DescriptionFire4:        db  "firebullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+.Descriptionair1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionair2:        db  "air",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionair3:        db  "airstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionair4:        db  "airbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+.Descriptionwater1:        db  "meteor",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionwater2:        db  "water",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionwater3:        db  "waterstorm",254
+                          db  "damages all units on the",254
+                          db  "the battlefield",255
+
+.Descriptionwater4:        db  "waterbullet",254
+                          db  "damages all units on the",254
+                          db  "the screen",255
+
+
+
+
+
+
+
+
+
+
+
+
+SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    b,(ix+GenericButtonAmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,GenericButtonTableLenghtPerButton
+  add   ix,de
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   7,(ix+GenericButtonStatus)
+  ret   z                               ;check on/off bit
+
+  bit   0,(ix+GenericButtonStatus)        ;bit 0 and bit 1 represent the 2 frames in which we copy the button
+  res   0,(ix+GenericButtonStatus)  
+  jr    nz,.goCopyButton
+  bit   1,(ix+GenericButtonStatus)
+  res   1,(ix+GenericButtonStatus)
+  ret   z  
+  .goCopyButton:
+
+  ld    l,(ix+GenericButton_SYSX_Ontouched)
+  ld    h,(ix+GenericButton_SYSX_Ontouched+1)
+  bit   6,(ix+GenericButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+GenericButton_SYSX_MovedOver)
+  ld    h,(ix+GenericButton_SYSX_MovedOver+1)
+  bit   5,(ix+GenericButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+GenericButton_SYSX_Clicked)
+  ld    h,(ix+GenericButton_SYSX_Clicked+1)
+  .go:
+
+  ;put button 
+  ld    e,(ix+GenericButton_DYDX)
+  ld    d,(ix+GenericButton_DYDX+1)
+
+  ld    a,(ix+GenericButtonYbottom)
+  sub   a,(ix+GenericButtonYtop)
+  ld    b,a                             ;ny
+  ld    a,(ix+GenericButtonXright)
+  sub   a,(ix+GenericButtonXleft)
+  srl   a                               ;/2
+  ld    c,a                             ;nx / 2
+;  ld    bc,$0000 + (016*256) + (016/2)        ;ny,nx
+
+  ld    a,(GenericButtonTableGfxBlock)                   ;buttons block
+
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  halt
+  ret
+
+
+
+
+
+CheckButtonMouseInteractionGenericButtons:
+  ld    b,(ix+GenericButtonAmountOfButtons)
+  ld    de,GenericButtonTableLenghtPerButton
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+  bit   7,(ix+GenericButtonStatus)        ;check if button is on/off
+  ret   z                               ;don't handle button if this button is off
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+GenericButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+  cp    (ix+GenericButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+GenericButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+GenericButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+  pop   af                                ;no need to check the other buttons
+  ld    (ix+GenericButtonStatus),%1010 0011
+  scf                                     ;button has been clicked
+;  ld    a,b
+  ret
+
+SetMagicGuildButtons:
+  ld    hl,MagicGuildButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*8)
+  ldir
+  ret
+
+;DYDX of icons in the Magic Guild overview screen
+MagicGuildFireLevel1Y:    equ 046
+MagicGuildFireLevel1X:    equ 034
+MagicGuildFireLevel2Y:    equ 046
+MagicGuildFireLevel2X:    equ 072
+MagicGuildFireLevel3Y:    equ 069
+MagicGuildFireLevel3X:    equ 034
+MagicGuildFireLevel4Y:    equ 069
+MagicGuildFireLevel4X:    equ 072
+
+MagicGuildWaterLevel1Y:   equ 105
+MagicGuildWaterLevel1X:   equ 034
+MagicGuildWaterLevel2Y:   equ 105
+MagicGuildWaterLevel2X:   equ 072
+MagicGuildWaterLevel3Y:   equ 128
+MagicGuildWaterLevel3X:   equ 034
+MagicGuildWaterLevel4Y:   equ 128
+MagicGuildWaterLevel4X:   equ 072
+
+MagicGuildAirLevel1Y:     equ 046
+MagicGuildAirLevel1X:     equ 166
+MagicGuildAirLevel2Y:     equ 046
+MagicGuildAirLevel2X:     equ 204
+MagicGuildAirLevel3Y:     equ 069
+MagicGuildAirLevel3X:     equ 166
+MagicGuildAirLevel4Y:     equ 069
+MagicGuildAirLevel4X:     equ 204
+
+MagicGuildEarthLevel1Y:   equ 105
+MagicGuildEarthLevel1X:   equ 166
+MagicGuildEarthLevel2Y:   equ 105
+MagicGuildEarthLevel2X:   equ 204
+MagicGuildEarthLevel3Y:   equ 128
+MagicGuildEarthLevel3X:   equ 166
+MagicGuildEarthLevel4Y:   equ 128
+MagicGuildEarthLevel4X:   equ 204
+
+;SYSX of the icons Touched and Untouched
+FireLevel1Untouched:    equ $4000 + (000*128) + (224/2) - 128
+FireLevel1Touched:      equ $4000 + (000*128) + (240/2) - 128
+FireLevel2Untouched:    equ $4000 + (016*128) + (224/2) - 128
+FireLevel2Touched:      equ $4000 + (016*128) + (240/2) - 128
+FireLevel3Untouched:    equ $4000 + (032*128) + (224/2) - 128
+FireLevel3Touched:      equ $4000 + (032*128) + (240/2) - 128
+FireLevel4Untouched:    equ $4000 + (048*128) + (224/2) - 128
+FireLevel4Touched:      equ $4000 + (048*128) + (240/2) - 128
+
+WaterLevel1Untouched:   equ $4000 + (064*128) + (224/2) - 128
+WaterLevel1Touched:     equ $4000 + (064*128) + (240/2) - 128
+WaterLevel2Untouched:   equ $4000 + (080*128) + (224/2) - 128
+WaterLevel2Touched:     equ $4000 + (080*128) + (240/2) - 128
+WaterLevel3Untouched:   equ $4000 + (096*128) + (224/2) - 128
+WaterLevel3Touched:     equ $4000 + (096*128) + (240/2) - 128
+WaterLevel4Untouched:   equ $4000 + (112*128) + (224/2) - 128
+WaterLevel4Touched:     equ $4000 + (112*128) + (240/2) - 128
+
+AirLevel1Untouched:     equ $4000 + (128*128) + (224/2) - 128
+AirLevel1Touched:       equ $4000 + (128*128) + (240/2) - 128
+AirLevel2Untouched:     equ $4000 + (144*128) + (224/2) - 128
+AirLevel2Touched:       equ $4000 + (144*128) + (240/2) - 128
+AirLevel3Untouched:     equ $4000 + (160*128) + (224/2) - 128
+AirLevel3Touched:       equ $4000 + (160*128) + (240/2) - 128
+AirLevel4Untouched:     equ $4000 + (176*128) + (224/2) - 128
+AirLevel4Touched:       equ $4000 + (176*128) + (240/2) - 128
+
+EarthLevel1Untouched:   equ $4000 + (184*128) + (000/2) - 128
+EarthLevel1Touched:     equ $4000 + (184*128) + (016/2) - 128
+EarthLevel2Untouched:   equ $4000 + (184*128) + (032/2) - 128
+EarthLevel2Touched:     equ $4000 + (184*128) + (048/2) - 128
+EarthLevel3Untouched:   equ $4000 + (184*128) + (064/2) - 128
+EarthLevel3Touched:     equ $4000 + (184*128) + (080/2) - 128
+EarthLevel4Untouched:   equ $4000 + (184*128) + (096/2) - 128
+EarthLevel4Touched:     equ $4000 + (184*128) + (112/2) - 128
+
+MagicGuildButtonTableLenghtPerButton:  equ MagicGuildButtonTable.endlenght-MagicGuildButtonTable
+MagicGuildButtonTableGfxBlock:  db  SpellBookGraphicsBlock
+MagicGuildButtonTableAmountOfButtons:  db  8
+MagicGuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+;level 1 spells
+  db  %1100 0011 | dw FireLevel1Untouched   | dw FireLevel1Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel1Y ,MagicGuildFireLevel1Y+16 ,MagicGuildFireLevel1X ,MagicGuildFireLevel1X+16  | dw $0000 + (MagicGuildFireLevel1Y*128)  + (MagicGuildFireLevel1X/2)  - 128 |
+  .endlenght:
+  db  %1100 0011 | dw WaterLevel1Untouched  | dw WaterLevel1Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel1Y,MagicGuildWaterLevel1Y+16,MagicGuildWaterLevel1X,MagicGuildWaterLevel1X+16 | dw $0000 + (MagicGuildWaterLevel1Y*128) + (MagicGuildWaterLevel1X/2) - 128 | 
+;level 2 spells
+  db  %1100 0011 | dw WaterLevel2Untouched  | dw WaterLevel2Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel2Y,MagicGuildWaterLevel2Y+16,MagicGuildWaterLevel2X,MagicGuildWaterLevel2X+16 | dw $0000 + (MagicGuildWaterLevel2Y*128) + (MagicGuildWaterLevel2X/2) - 128 | 
+  db  %1100 0011 | dw AirLevel2Untouched    | dw AirLevel2Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel2Y  ,MagicGuildAirLevel2Y+16  ,MagicGuildAirLevel2X  ,MagicGuildAirLevel2X+16   | dw $0000 + (MagicGuildAirLevel2Y*128)   + (MagicGuildAirLevel2X/2) - 128   | 
+;level 3 spells
+  db  %1100 0011 | dw FireLevel3Untouched   | dw FireLevel3Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel3Y ,MagicGuildFireLevel3Y+16 ,MagicGuildFireLevel3X ,MagicGuildFireLevel3X+16  | dw $0000 + (MagicGuildFireLevel3Y*128)  + (MagicGuildFireLevel3X/2)  - 128 |
+  db  %1100 0011 | dw EarthLevel3Untouched  | dw EarthLevel3Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel3Y,MagicGuildEarthLevel3Y+16,MagicGuildEarthLevel3X,MagicGuildEarthLevel3X+16 | dw $0000 + (MagicGuildEarthLevel3Y*128) + (MagicGuildEarthLevel3X/2) - 128 | 
+;level 4 spells
+  db  %1100 0011 | dw AirLevel4Untouched    | dw AirLevel4Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel4Y  ,MagicGuildAirLevel4Y+16  ,MagicGuildAirLevel4X  ,MagicGuildAirLevel4X+16   | dw $0000 + (MagicGuildAirLevel4Y*128)   + (MagicGuildAirLevel4X/2) - 128   | 
+  db  %1100 0011 | dw EarthLevel4Untouched  | dw EarthLevel4Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel4Y,MagicGuildEarthLevel4Y+16,MagicGuildEarthLevel4X,MagicGuildEarthLevel4X+16 | dw $0000 + (MagicGuildEarthLevel4Y*128) + (MagicGuildEarthLevel4X/2) - 128 | 
+
+
+
 CastleOverviewRecruitCode:
   ld    iy,Castle1
 
@@ -2171,10 +2585,10 @@ SetTextBuildingWhenClicked:
   ld    (TextAddresspointer),hl  
 
   ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
+  ld    (PutLetter+ny),a                ;set ny of text
   call  .SetText
   ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
+  ld    (PutLetter+ny),a                ;set ny of text
   ret
 
   .SetText:
@@ -3101,7 +3515,10 @@ CheckButtonMouseInteractionCastle:
 
   cp    4                                     ;magic guild
   jr    nz,.EndCheckMagicGuild
-  ret
+  ;magic guild
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  jp    CastleOverviewMagicGuildCode          ;jump to the magic guild code
   .EndCheckMagicGuild:
 
   cp    5                                     ;recruit
@@ -3110,7 +3527,6 @@ CheckButtonMouseInteractionCastle:
   pop   af                                    ;pop the call in the button check loop 
   pop   af                                    ;pop the call to the CastleOverViewCode
   jp    CastleOverviewRecruitCode             ;jump to the recruit code
-  ret
   .EndCheckRecruit:
 
   ;build
@@ -3260,6 +3676,12 @@ SetRecruitGraphics:
   ld    a,RecruitCreaturesBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+SetMagicGuildGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,MagicGuildBlock                 ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 CopyBarracks:
 	db		176,0,057,0
