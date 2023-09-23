@@ -72,8 +72,175 @@ CastleOverviewMarketPlaceCode:
 .CheckButtonClicked:                    ;in: carry=button clicked, b=button number
   ret   nc
 
+  ld    a,b                             ;only set the i can offer you window if you clicked on buttons in the 2nd or 3d window
+  cp    9                               ;check if a button in the 1st window is clicked
+  jp    nc,.WhichResourceDoYouNeedClicked
+  cp    4                               ;check if a button in the 2nd window is clicked
+  jp    nc,.WhichResourceWillYouTradeClicked
+  ret
+  
+  .WhichResourceWillYouTradeClicked:
+  ld    (MarketPlaceResourceToTrade),a
+
+  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
+
+  ld    a,%1100 0011                    ;enable which resource will you trade buttons
+  ld    (GenericButtonTable+10*GenericButtonTableLenghtPerButton),a ;+
+  ld    (GenericButtonTable+11*GenericButtonTableLenghtPerButton),a ;buy
+  ld    (GenericButtonTable+12*GenericButtonTableLenghtPerButton),a ;-
+  
   call  .SetIcanOfferYouWindow
-  call  .SetWhichResourceWillYouTradeWindow
+  call  .SetIconResourceNeeded
+  call  .SetIconResourceToTrade
+  call  .SetTextResourceNeeded
+  call  .SetTextResourceToTrade
+  call  SwapAndSetPage                  ;swap and set page
+  call  .SetIcanOfferYouWindow
+  call  .SetIconResourceNeeded
+  call  .SetIconResourceToTrade
+  call  .SetTextResourceNeeded
+  call  .SetTextResourceToTrade
+  ret
+  
+  .SetTextResourceNeeded:
+  ld    a,116
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,128
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    a,(MarketPlaceResourceNeeded)
+  call  .SetTextResourceInHL
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
+  .SetTextResourceToTrade:
+  ld    a,214
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,128
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    a,(MarketPlaceResourceToTrade)
+  call  .SetTextResourceInHL
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
+  .SetTextResourceInHL:
+  ld    hl,.TextWood
+  cp    13
+  ret   z
+  cp    8
+  ret   z
+
+  ld    hl,.TextStone
+  cp    12
+  ret   z
+  cp    7
+  ret   z
+
+  ld    hl,.TextGems
+  cp    11
+  ret   z
+  cp    6
+  ret   z
+
+  ld    hl,.TextRubies
+  cp    10
+  ret   z
+  cp    5
+  ret   z
+
+  ld    hl,.TextGold
+;  cp    9
+;  ret   z  
+;  cp    4
+;  ret   z  
+  ret
+
+.TextWood:    db  "wood",255
+.TextStone:   db  "stone",255
+.TextGems:    db  "gems",255
+.TextRubies:  db  "rubies",255
+.TextGold:    db  "gold",255
+
+  
+  .SetIcanOfferYouWindow:
+  ld    hl,$4000 + (109*128) + (000/2) - 128
+  ld    de,$0000 + (123*128) + (000/2) - 128
+  ld    bc,$0000 + (044*256) + (256/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .SetIconResourceNeeded:
+  ld    a,(MarketPlaceResourceNeeded)
+  call  .SetResourceInHL  
+;  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (138*128) + (024/2) - 128
+  ld    bc,$0000 + (022*256) + (028/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .SetIconResourceToTrade:
+  ld    a,(MarketPlaceResourceToTrade)
+  call  .SetResourceInHL
+;  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (138*128) + (206/2) - 128
+  ld    bc,$0000 + (022*256) + (028/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .SetResourceInHL:
+  ld    hl,$4000 + (000*128) + (000/2) - 128  ;wood
+  cp    13
+  ret   z
+  cp    8
+  ret   z
+
+  ld    hl,$4000 + (000*128) + (028/2) - 128  ;stone
+  cp    12
+  ret   z
+  cp    7
+  ret   z
+
+  ld    hl,$4000 + (000*128) + (056/2) - 128  ;gem
+  cp    11
+  ret   z
+  cp    6
+  ret   z
+
+  ld    hl,$4000 + (000*128) + (084/2) - 128  ;ruby
+  cp    10
+  ret   z
+  cp    5
+  ret   z
+
+  ld    hl,$4000 + (000*128) + (112/2) - 128  ;gold
+;  cp    9
+;  ret   z  
+;  cp    4
+;  ret   z  
+  ret
+
+    
+  .WhichResourceDoYouNeedClicked:
+  ld    (MarketPlaceResourceNeeded),a
+  
+  ld    a,(GenericButtonTable+5*GenericButtonTableLenghtPerButton) ;check if this window is already active
+  bit   7,a
+  ret   nz
 
   ld    a,%1100 0011                    ;enable which resource will you trade buttons
   ld    (GenericButtonTable+5*GenericButtonTableLenghtPerButton),a ;wood
@@ -81,66 +248,16 @@ CastleOverviewMarketPlaceCode:
   ld    (GenericButtonTable+7*GenericButtonTableLenghtPerButton),a ;gems
   ld    (GenericButtonTable+8*GenericButtonTableLenghtPerButton),a ;rubies
   ld    (GenericButtonTable+9*GenericButtonTableLenghtPerButton),a ;gold
-
-
-;  push  bc                              ;store button number
-;  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
-;  pop   bc                              ;recall button number
-
-;  push  bc                              ;store button number
-
-  call  SwapAndSetPage                  ;swap and set page
-
-
-;  pop   bc                              ;recall button number
-
-  ret
   
-  .SetIcanOfferYouWindow:
-  ld    a,b                             ;only set the i can offer you window if you clicked on buttons in the 2nd or 3d window
-  cp    9
-  ret   nc
-
-  ld    a,%1100 0011                    ;enable which resource will you trade buttons
-  ld    (GenericButtonTable+10*GenericButtonTableLenghtPerButton),a ;+
-  ld    (GenericButtonTable+11*GenericButtonTableLenghtPerButton),a ;buy
-  ld    (GenericButtonTable+12*GenericButtonTableLenghtPerButton),a ;-
-  
-  ld    hl,$4000 + (109*128) + (000/2) - 128
-  ld    de,$0000 + (123*128) + (000/2) - 128
-  ld    bc,$0000 + (044*256) + (256/2)
-  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
+  call  .SetWhichResourceWillYouTradeWindow
   call  SwapAndSetPage                  ;swap and set page
-
-  ld    hl,$4000 + (109*128) + (000/2) - 128
-  ld    de,$0000 + (123*128) + (000/2) - 128
-  ld    bc,$0000 + (044*256) + (256/2)
-  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-    
   .SetWhichResourceWillYouTradeWindow:
-  ld    a,(GenericButtonTable+5*GenericButtonTableLenghtPerButton) ;check if this window is already active
-  bit   7,a
-  ret   nz
-  
-  ld    hl,$4000 + (066*128) + (000/2) - 128
-  ld    de,$0000 + (080*128) + (000/2) - 128
-  ld    bc,$0000 + (043*256) + (256/2)
-  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  call  SwapAndSetPage                  ;swap and set page
-
   ld    hl,$4000 + (066*128) + (000/2) - 128
   ld    de,$0000 + (080*128) + (000/2) - 128
   ld    bc,$0000 + (043*256) + (256/2)
   ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
-
-
 SetMarketPlaceButtons:
   ld    hl,MarketPlaceButtonTable-2
   ld    de,GenericButtonTable-2
