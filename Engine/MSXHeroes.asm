@@ -714,5 +714,24 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $3c - 3d
+;
+ChamberOfCommerceBlock:  equ   $3c
+phase	$4000
+  incbin "..\grapx\CastleOverview\ChamberOfCommerce.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $3e - 3f
+;
+ChamberOfCommerceButtonsBlock:  equ   $3e
+phase	$4000
+  incbin "..\grapx\CastleOverview\ButtonsChamberOfCommerce.SC5",7,152 * 128      ;152 lines
+	ds		$c000-$,$ff
+dephase
+
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

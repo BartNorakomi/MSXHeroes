@@ -1,3 +1,243 @@
+CastleOverviewMarketPlaceCode:
+  ld    iy,Castle1
+
+  call  SetMarketPlaceButtons
+
+  ld    hl,World1Palette
+  call  SetPalette
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0
+  
+  ld    a,%1100 0011
+  ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
+  xor   a
+  ld    (CastleOverviewButtonTable+0*CastleOverviewButtonTableLenghtPerButton),a ;build
+  ld    (CastleOverviewButtonTable+1*CastleOverviewButtonTableLenghtPerButton),a ;recruit
+  ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
+  ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
+  ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
+
+  call  SetMarketPlaceGraphics          ;put gfx in page 1
+
+  ld    hl,CopyPage1To0
+  call  docopy
+
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;buttons in the bottom of screen
+  ld    ix,CastleOverviewButtonTable 
+  call  CheckButtonMouseInteractionCastle
+
+  ld    ix,CastleOverviewButtonTable
+  call  SetCastleButtons                ;copies button state from rom -> vram
+  ;/buttons in the bottom of screen
+
+  ;market place buttons
+  ld    ix,GenericButtonTable 
+  call  CheckButtonMouseInteractionGenericButtons
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+  ;/market place buttons
+
+  halt
+  jp  .engine
+
+.CheckButtonClicked:                    ;in: carry=button clicked, b=button number
+  ret   nc
+
+  call  .SetIcanOfferYouWindow
+  call  .SetWhichResourceWillYouTradeWindow
+
+  ld    a,%1100 0011                    ;enable which resource will you trade buttons
+  ld    (GenericButtonTable+5*GenericButtonTableLenghtPerButton),a ;wood
+  ld    (GenericButtonTable+6*GenericButtonTableLenghtPerButton),a ;ore
+  ld    (GenericButtonTable+7*GenericButtonTableLenghtPerButton),a ;gems
+  ld    (GenericButtonTable+8*GenericButtonTableLenghtPerButton),a ;rubies
+  ld    (GenericButtonTable+9*GenericButtonTableLenghtPerButton),a ;gold
+
+
+;  push  bc                              ;store button number
+;  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
+;  pop   bc                              ;recall button number
+
+;  push  bc                              ;store button number
+
+  call  SwapAndSetPage                  ;swap and set page
+
+
+;  pop   bc                              ;recall button number
+
+  ret
+  
+  .SetIcanOfferYouWindow:
+  ld    a,b                             ;only set the i can offer you window if you clicked on buttons in the 2nd or 3d window
+  cp    9
+  ret   nc
+
+  ld    a,%1100 0011                    ;enable which resource will you trade buttons
+  ld    (GenericButtonTable+10*GenericButtonTableLenghtPerButton),a ;+
+  ld    (GenericButtonTable+11*GenericButtonTableLenghtPerButton),a ;buy
+  ld    (GenericButtonTable+12*GenericButtonTableLenghtPerButton),a ;-
+  
+  ld    hl,$4000 + (109*128) + (000/2) - 128
+  ld    de,$0000 + (123*128) + (000/2) - 128
+  ld    bc,$0000 + (044*256) + (256/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  SwapAndSetPage                  ;swap and set page
+
+  ld    hl,$4000 + (109*128) + (000/2) - 128
+  ld    de,$0000 + (123*128) + (000/2) - 128
+  ld    bc,$0000 + (044*256) + (256/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+    
+  .SetWhichResourceWillYouTradeWindow:
+  ld    a,(GenericButtonTable+5*GenericButtonTableLenghtPerButton) ;check if this window is already active
+  bit   7,a
+  ret   nz
+  
+  ld    hl,$4000 + (066*128) + (000/2) - 128
+  ld    de,$0000 + (080*128) + (000/2) - 128
+  ld    bc,$0000 + (043*256) + (256/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  SwapAndSetPage                  ;swap and set page
+
+  ld    hl,$4000 + (066*128) + (000/2) - 128
+  ld    de,$0000 + (080*128) + (000/2) - 128
+  ld    bc,$0000 + (043*256) + (256/2)
+  ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+
+
+SetMarketPlaceButtons:
+  ld    hl,MarketPlaceButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*13)
+  ldir
+  ret
+
+MarketPlaceButton1Ytop:           equ 052
+MarketPlaceButton1YBottom:        equ MarketPlaceButton1Ytop + 022
+MarketPlaceButton1XLeft:          equ 030
+MarketPlaceButton1XRight:         equ MarketPlaceButton1XLeft + 028
+
+MarketPlaceButton2Ytop:           equ 052
+MarketPlaceButton2YBottom:        equ MarketPlaceButton2Ytop + 022
+MarketPlaceButton2XLeft:          equ 072
+MarketPlaceButton2XRight:         equ MarketPlaceButton2XLeft + 028
+
+MarketPlaceButton3Ytop:           equ 052
+MarketPlaceButton3YBottom:        equ MarketPlaceButton3Ytop + 022
+MarketPlaceButton3XLeft:          equ 114
+MarketPlaceButton3XRight:         equ MarketPlaceButton3XLeft + 028
+
+MarketPlaceButton4Ytop:           equ 052
+MarketPlaceButton4YBottom:        equ MarketPlaceButton4Ytop + 022
+MarketPlaceButton4XLeft:          equ 156
+MarketPlaceButton4XRight:         equ MarketPlaceButton4XLeft + 028
+
+MarketPlaceButton5Ytop:           equ 052
+MarketPlaceButton5YBottom:        equ MarketPlaceButton5Ytop + 022
+MarketPlaceButton5XLeft:          equ 198
+MarketPlaceButton5XRight:         equ MarketPlaceButton5XLeft + 028
+
+MarketPlaceButton6Ytop:           equ 095
+MarketPlaceButton6YBottom:        equ MarketPlaceButton6Ytop + 022
+MarketPlaceButton6XLeft:          equ 030
+MarketPlaceButton6XRight:         equ MarketPlaceButton6XLeft + 028
+
+MarketPlaceButton7Ytop:           equ 095
+MarketPlaceButton7YBottom:        equ MarketPlaceButton7Ytop + 022
+MarketPlaceButton7XLeft:          equ 072
+MarketPlaceButton7XRight:         equ MarketPlaceButton7XLeft + 028
+
+MarketPlaceButton8Ytop:           equ 095
+MarketPlaceButton8YBottom:        equ MarketPlaceButton8Ytop + 022
+MarketPlaceButton8XLeft:          equ 114
+MarketPlaceButton8XRight:         equ MarketPlaceButton8XLeft + 028
+
+MarketPlaceButton9Ytop:           equ 095
+MarketPlaceButton9YBottom:        equ MarketPlaceButton9Ytop + 022
+MarketPlaceButton9XLeft:          equ 156
+MarketPlaceButton9XRight:         equ MarketPlaceButton9XLeft + 028
+
+MarketPlaceButton10Ytop:           equ 095
+MarketPlaceButton10YBottom:        equ MarketPlaceButton10Ytop + 022
+MarketPlaceButton10XLeft:          equ 198
+MarketPlaceButton10XRight:         equ MarketPlaceButton10XLeft + 028
+
+
+
+MarketPlaceButton11Ytop:           equ 143
+MarketPlaceButton11YBottom:        equ MarketPlaceButton11Ytop + 014
+MarketPlaceButton11XLeft:          equ 092
+MarketPlaceButton11XRight:         equ MarketPlaceButton11XLeft + 014
+
+MarketPlaceButton12Ytop:           equ 141
+MarketPlaceButton12YBottom:        equ MarketPlaceButton12Ytop + 018
+MarketPlaceButton12XLeft:          equ 116
+MarketPlaceButton12XRight:         equ MarketPlaceButton12XLeft + 026
+
+MarketPlaceButton13Ytop:           equ 143
+MarketPlaceButton13YBottom:        equ MarketPlaceButton13Ytop + 014
+MarketPlaceButton13XLeft:          equ 152
+MarketPlaceButton13XRight:         equ MarketPlaceButton13XLeft + 014
+
+MarketPlaceButtonTableLenghtPerButton:  equ MarketPlaceButtonTable.endlenght-MarketPlaceButtonTable
+MarketPlaceButtonTableGfxBlock:  db  ChamberOfCommerceButtonsBlock
+MarketPlaceButtonTableAmountOfButtons:  db  13
+MarketPlaceButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (022*128) + (000/2) - 128 | dw $4000 + (044*128) + (000/2) - 128 | db MarketPlaceButton1Ytop,MarketPlaceButton1YBottom,MarketPlaceButton1XLeft,MarketPlaceButton1XRight | dw $0000 + (MarketPlaceButton1Ytop*128) + (MarketPlaceButton1XLeft/2) - 128 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (000*128) + (028/2) - 128 | dw $4000 + (022*128) + (028/2) - 128 | dw $4000 + (044*128) + (028/2) - 128 | db MarketPlaceButton2Ytop,MarketPlaceButton2YBottom,MarketPlaceButton2XLeft,MarketPlaceButton2XRight | dw $0000 + (MarketPlaceButton2Ytop*128) + (MarketPlaceButton2XLeft/2) - 128 
+  db  %1001 0011 | dw $4000 + (000*128) + (056/2) - 128 | dw $4000 + (022*128) + (056/2) - 128 | dw $4000 + (044*128) + (056/2) - 128 | db MarketPlaceButton3Ytop,MarketPlaceButton3YBottom,MarketPlaceButton3XLeft,MarketPlaceButton3XRight | dw $0000 + (MarketPlaceButton3Ytop*128) + (MarketPlaceButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (084/2) - 128 | dw $4000 + (022*128) + (084/2) - 128 | dw $4000 + (044*128) + (084/2) - 128 | db MarketPlaceButton4Ytop,MarketPlaceButton4YBottom,MarketPlaceButton4XLeft,MarketPlaceButton4XRight | dw $0000 + (MarketPlaceButton4Ytop*128) + (MarketPlaceButton4XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (112/2) - 128 | dw $4000 + (022*128) + (112/2) - 128 | dw $4000 + (044*128) + (112/2) - 128 | db MarketPlaceButton5Ytop,MarketPlaceButton5YBottom,MarketPlaceButton5XLeft,MarketPlaceButton5XRight | dw $0000 + (MarketPlaceButton5Ytop*128) + (MarketPlaceButton5XLeft/2) - 128 
+  ;which resource will you offer window
+  db  %0100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (022*128) + (000/2) - 128 | dw $4000 + (044*128) + (000/2) - 128 | db MarketPlaceButton6Ytop,MarketPlaceButton6YBottom,MarketPlaceButton6XLeft,MarketPlaceButton6XRight | dw $0000 + (MarketPlaceButton6Ytop*128) + (MarketPlaceButton6XLeft/2) - 128 
+  db  %0010 0011 | dw $4000 + (000*128) + (028/2) - 128 | dw $4000 + (022*128) + (028/2) - 128 | dw $4000 + (044*128) + (028/2) - 128 | db MarketPlaceButton7Ytop,MarketPlaceButton7YBottom,MarketPlaceButton7XLeft,MarketPlaceButton7XRight | dw $0000 + (MarketPlaceButton7Ytop*128) + (MarketPlaceButton7XLeft/2) - 128 
+  db  %0001 0011 | dw $4000 + (000*128) + (056/2) - 128 | dw $4000 + (022*128) + (056/2) - 128 | dw $4000 + (044*128) + (056/2) - 128 | db MarketPlaceButton8Ytop,MarketPlaceButton8YBottom,MarketPlaceButton8XLeft,MarketPlaceButton8XRight | dw $0000 + (MarketPlaceButton8Ytop*128) + (MarketPlaceButton8XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + (000*128) + (084/2) - 128 | dw $4000 + (022*128) + (084/2) - 128 | dw $4000 + (044*128) + (084/2) - 128 | db MarketPlaceButton9Ytop,MarketPlaceButton9YBottom,MarketPlaceButton9XLeft,MarketPlaceButton9XRight | dw $0000 + (MarketPlaceButton9Ytop*128) + (MarketPlaceButton9XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + (000*128) + (112/2) - 128 | dw $4000 + (022*128) + (112/2) - 128 | dw $4000 + (044*128) + (112/2) - 128 | db MarketPlaceButton10Ytop,MarketPlaceButton10YBottom,MarketPlaceButton10XLeft,MarketPlaceButton10XRight | dw $0000 + (MarketPlaceButton10Ytop*128) + (MarketPlaceButton10XLeft/2) - 128 
+  ;+ buy - window
+  db  %0100 0011 | dw $4000 + (000*128) + (140/2) - 128 | dw $4000 + (014*128) + (140/2) - 128 | dw $4000 + (028*128) + (140/2) - 128 | db MarketPlaceButton11Ytop,MarketPlaceButton11YBottom,MarketPlaceButton11XLeft,MarketPlaceButton11XRight | dw $0000 + (MarketPlaceButton11Ytop*128) + (MarketPlaceButton11XLeft/2) - 128 
+  db  %0010 0011 | dw $4000 + (042*128) + (140/2) - 128 | dw $4000 + (042*128) + (166/2) - 128 | dw $4000 + (042*128) + (192/2) - 128 | db MarketPlaceButton12Ytop,MarketPlaceButton12YBottom,MarketPlaceButton12XLeft,MarketPlaceButton12XRight | dw $0000 + (MarketPlaceButton12Ytop*128) + (MarketPlaceButton12XLeft/2) - 128 
+  db  %0001 0011 | dw $4000 + (000*128) + (154/2) - 128 | dw $4000 + (014*128) + (154/2) - 128 | dw $4000 + (028*128) + (140/2) - 128 | db MarketPlaceButton13Ytop,MarketPlaceButton13YBottom,MarketPlaceButton13XLeft,MarketPlaceButton13XRight | dw $0000 + (MarketPlaceButton13Ytop*128) + (MarketPlaceButton13XLeft/2) - 128
+
+
 CastleOverviewMagicGuildCode:
   ld    iy,Castle1
 
@@ -72,17 +312,129 @@ CastleOverviewMagicGuildCode:
 .CheckButtonClicked:                    ;in: carry=button clicked, b=button number
   ret   nc
 
-;  ld    a,b                             ;button clicked
-
-  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+  push  bc                              ;store button number
+  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
+  call  .ClearTextWindow
+  call  .SetSpellIcon
+  pop   bc                              ;recall button number
+  push  bc                              ;store button number
   call  .SetText
   call  SwapAndSetPage                  ;swap and set page
+  call  .ClearTextWindow
+  call  .SetSpellIcon
+  pop   bc                              ;recall button number
   call  .SetText
   ret
 
+  .ClearTextWindow:
+  ld    hl,$4000 + (154*128) + (006/2) - 128
+  ld    de,$0000 + (154*128) + (006/2) - 128
+  ld    bc,$0000 + (020*256) + (244/2)
+  ld    a,MagicGuildBlock                 ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  .SetSpellIcon:
+  ld    hl,$4000 + (126*128) + (196/2) - 128
+  ld    de,$0000 + (154*128) + (008/2) - 128
+  ld    bc,$0000 + (020*256) + (020/2)
+  ld    a,SpellBookGraphicsBlock        ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
 .SetText:
+  ld    a,b
+  cp    8
+  ld    de,(GenericButtonTable+1+0*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    7
+  ld    de,(GenericButtonTable+1+1*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    6
+  ld    de,(GenericButtonTable+1+2*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    5
+  ld    de,(GenericButtonTable+1+3*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    4
+  ld    de,(GenericButtonTable+1+4*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    3
+  ld    de,(GenericButtonTable+1+5*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  cp    2
+  ld    de,(GenericButtonTable+1+6*GenericButtonTableLenghtPerButton)
+  jp    z,.ButtonFound
+  ld    de,(GenericButtonTable+1+7*GenericButtonTableLenghtPerButton)
+  .ButtonFound:
+  ld    hl,EarthLevel1Untouched
+  call  CompareHLwithDE
   ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth1
-  ld    a,030
+  jp    z,.SpellFound
+  ld    hl,EarthLevel2Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth2
+  jp    z,.SpellFound
+  ld    hl,EarthLevel3Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth3
+  jp    z,.SpellFound
+  ld    hl,EarthLevel4Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth4
+  jp    z,.SpellFound
+
+  ld    hl,FireLevel1Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire1
+  jp    z,.SpellFound
+  ld    hl,FireLevel2Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire2
+  jp    z,.SpellFound
+  ld    hl,FireLevel3Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire3
+  jp    z,.SpellFound
+  ld    hl,FireLevel4Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire4
+  jp    z,.SpellFound
+
+  ld    hl,AirLevel1Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir1
+  jp    z,.SpellFound
+  ld    hl,AirLevel2Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir2
+  jp    z,.SpellFound
+  ld    hl,AirLevel3Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir3
+  jp    z,.SpellFound
+  ld    hl,AirLevel4Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir4
+  jp    z,.SpellFound
+
+  ld    hl,WaterLevel1Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater1
+  jp    z,.SpellFound
+  ld    hl,WaterLevel2Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater2
+  jp    z,.SpellFound
+  ld    hl,WaterLevel3Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater3
+  jp    z,.SpellFound
+  ld    hl,WaterLevel4Untouched
+  call  CompareHLwithDE
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater4
+  jp    z,.SpellFound
+  
+  .SpellFound:
+  ld    a,031
   ld    (PutLetter+dx),a                ;set dx of text
   ld    (TextDX),a
   ld    a,154
@@ -90,15 +442,22 @@ CastleOverviewMagicGuildCode:
 
   ld    (TextAddresspointer),hl  
 
+  ex    de,hl
+;  ld    hl,FireLevel1Untouched
+  ld    de,$0000 + (156*128) + (010/2) - 128
+  ld    bc,$0000 + (016*256) + (016/2)
+  ld    a,SpellBookGraphicsBlock        ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
   ld    a,6
   ld    (PutLetter+ny),a                ;set ny of text
   call  SetTextBuildingWhenClicked.SetText
   ld    a,5
   ld    (PutLetter+ny),a                ;set ny of text
   ret
-
-
-
 
 
 
@@ -316,26 +675,47 @@ SetMagicGuildButtons:
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*8)
   ldir
+
+  ld    a,(iy+CastleMageGuildLevel)
+  cp    4
+  ret   z
+  xor   a
+  ld    (GenericButtonTable+6*GenericButtonTableLenghtPerButton),a
+  ld    (GenericButtonTable+7*GenericButtonTableLenghtPerButton),a
+
+  ld    a,(iy+CastleMageGuildLevel)
+  cp    3
+  ret   z
+  xor   a
+  ld    (GenericButtonTable+4*GenericButtonTableLenghtPerButton),a
+  ld    (GenericButtonTable+5*GenericButtonTableLenghtPerButton),a
+
+  ld    a,(iy+CastleMageGuildLevel)
+  cp    2
+  ret   z
+  xor   a
+  ld    (GenericButtonTable+2*GenericButtonTableLenghtPerButton),a
+  ld    (GenericButtonTable+3*GenericButtonTableLenghtPerButton),a
   ret
 
 ;DYDX of icons in the Magic Guild overview screen
-MagicGuildFireLevel1Y:    equ 046
-MagicGuildFireLevel1X:    equ 034
-MagicGuildFireLevel2Y:    equ 046
-MagicGuildFireLevel2X:    equ 072
-MagicGuildFireLevel3Y:    equ 069
-MagicGuildFireLevel3X:    equ 034
-MagicGuildFireLevel4Y:    equ 069
-MagicGuildFireLevel4X:    equ 072
+MagicGuildEarthLevel1Y:    equ 046
+MagicGuildEarthLevel1X:    equ 034
+MagicGuildEarthLevel2Y:    equ 046
+MagicGuildEarthLevel2X:    equ 072
+MagicGuildEarthLevel3Y:    equ 069
+MagicGuildEarthLevel3X:    equ 034
+MagicGuildEarthLevel4Y:    equ 069
+MagicGuildEarthLevel4X:    equ 072
 
-MagicGuildWaterLevel1Y:   equ 105
-MagicGuildWaterLevel1X:   equ 034
-MagicGuildWaterLevel2Y:   equ 105
-MagicGuildWaterLevel2X:   equ 072
-MagicGuildWaterLevel3Y:   equ 128
-MagicGuildWaterLevel3X:   equ 034
-MagicGuildWaterLevel4Y:   equ 128
-MagicGuildWaterLevel4X:   equ 072
+MagicGuildFireLevel1Y:   equ 105
+MagicGuildFireLevel1X:   equ 034
+MagicGuildFireLevel2Y:   equ 105
+MagicGuildFireLevel2X:   equ 072
+MagicGuildFireLevel3Y:   equ 128
+MagicGuildFireLevel3X:   equ 034
+MagicGuildFireLevel4Y:   equ 128
+MagicGuildFireLevel4X:   equ 072
 
 MagicGuildAirLevel1Y:     equ 046
 MagicGuildAirLevel1X:     equ 166
@@ -346,33 +726,33 @@ MagicGuildAirLevel3X:     equ 166
 MagicGuildAirLevel4Y:     equ 069
 MagicGuildAirLevel4X:     equ 204
 
-MagicGuildEarthLevel1Y:   equ 105
-MagicGuildEarthLevel1X:   equ 166
-MagicGuildEarthLevel2Y:   equ 105
-MagicGuildEarthLevel2X:   equ 204
-MagicGuildEarthLevel3Y:   equ 128
-MagicGuildEarthLevel3X:   equ 166
-MagicGuildEarthLevel4Y:   equ 128
-MagicGuildEarthLevel4X:   equ 204
+MagicGuildWaterLevel1Y:   equ 105
+MagicGuildWaterLevel1X:   equ 166
+MagicGuildWaterLevel2Y:   equ 105
+MagicGuildWaterLevel2X:   equ 204
+MagicGuildWaterLevel3Y:   equ 128
+MagicGuildWaterLevel3X:   equ 166
+MagicGuildWaterLevel4Y:   equ 128
+MagicGuildWaterLevel4X:   equ 204
 
 ;SYSX of the icons Touched and Untouched
-FireLevel1Untouched:    equ $4000 + (000*128) + (224/2) - 128
-FireLevel1Touched:      equ $4000 + (000*128) + (240/2) - 128
-FireLevel2Untouched:    equ $4000 + (016*128) + (224/2) - 128
-FireLevel2Touched:      equ $4000 + (016*128) + (240/2) - 128
-FireLevel3Untouched:    equ $4000 + (032*128) + (224/2) - 128
-FireLevel3Touched:      equ $4000 + (032*128) + (240/2) - 128
-FireLevel4Untouched:    equ $4000 + (048*128) + (224/2) - 128
-FireLevel4Touched:      equ $4000 + (048*128) + (240/2) - 128
+EarthLevel1Untouched:    equ $4000 + (000*128) + (224/2) - 128
+EarthLevel1Touched:      equ $4000 + (000*128) + (240/2) - 128
+EarthLevel2Untouched:    equ $4000 + (016*128) + (224/2) - 128
+EarthLevel2Touched:      equ $4000 + (016*128) + (240/2) - 128
+EarthLevel3Untouched:    equ $4000 + (032*128) + (224/2) - 128
+EarthLevel3Touched:      equ $4000 + (032*128) + (240/2) - 128
+EarthLevel4Untouched:    equ $4000 + (048*128) + (224/2) - 128
+EarthLevel4Touched:      equ $4000 + (048*128) + (240/2) - 128
 
-WaterLevel1Untouched:   equ $4000 + (064*128) + (224/2) - 128
-WaterLevel1Touched:     equ $4000 + (064*128) + (240/2) - 128
-WaterLevel2Untouched:   equ $4000 + (080*128) + (224/2) - 128
-WaterLevel2Touched:     equ $4000 + (080*128) + (240/2) - 128
-WaterLevel3Untouched:   equ $4000 + (096*128) + (224/2) - 128
-WaterLevel3Touched:     equ $4000 + (096*128) + (240/2) - 128
-WaterLevel4Untouched:   equ $4000 + (112*128) + (224/2) - 128
-WaterLevel4Touched:     equ $4000 + (112*128) + (240/2) - 128
+FireLevel1Untouched:   equ $4000 + (064*128) + (224/2) - 128
+FireLevel1Touched:     equ $4000 + (064*128) + (240/2) - 128
+FireLevel2Untouched:   equ $4000 + (080*128) + (224/2) - 128
+FireLevel2Touched:     equ $4000 + (080*128) + (240/2) - 128
+FireLevel3Untouched:   equ $4000 + (096*128) + (224/2) - 128
+FireLevel3Touched:     equ $4000 + (096*128) + (240/2) - 128
+FireLevel4Untouched:   equ $4000 + (112*128) + (224/2) - 128
+FireLevel4Touched:     equ $4000 + (112*128) + (240/2) - 128
 
 AirLevel1Untouched:     equ $4000 + (128*128) + (224/2) - 128
 AirLevel1Touched:       equ $4000 + (128*128) + (240/2) - 128
@@ -383,14 +763,14 @@ AirLevel3Touched:       equ $4000 + (160*128) + (240/2) - 128
 AirLevel4Untouched:     equ $4000 + (176*128) + (224/2) - 128
 AirLevel4Touched:       equ $4000 + (176*128) + (240/2) - 128
 
-EarthLevel1Untouched:   equ $4000 + (184*128) + (000/2) - 128
-EarthLevel1Touched:     equ $4000 + (184*128) + (016/2) - 128
-EarthLevel2Untouched:   equ $4000 + (184*128) + (032/2) - 128
-EarthLevel2Touched:     equ $4000 + (184*128) + (048/2) - 128
-EarthLevel3Untouched:   equ $4000 + (184*128) + (064/2) - 128
-EarthLevel3Touched:     equ $4000 + (184*128) + (080/2) - 128
-EarthLevel4Untouched:   equ $4000 + (184*128) + (096/2) - 128
-EarthLevel4Touched:     equ $4000 + (184*128) + (112/2) - 128
+WaterLevel1Untouched:   equ $4000 + (184*128) + (000/2) - 128
+WaterLevel1Touched:     equ $4000 + (184*128) + (016/2) - 128
+WaterLevel2Untouched:   equ $4000 + (184*128) + (032/2) - 128
+WaterLevel2Touched:     equ $4000 + (184*128) + (048/2) - 128
+WaterLevel3Untouched:   equ $4000 + (184*128) + (064/2) - 128
+WaterLevel3Touched:     equ $4000 + (184*128) + (080/2) - 128
+WaterLevel4Untouched:   equ $4000 + (184*128) + (096/2) - 128
+WaterLevel4Touched:     equ $4000 + (184*128) + (112/2) - 128
 
 MagicGuildButtonTableLenghtPerButton:  equ MagicGuildButtonTable.endlenght-MagicGuildButtonTable
 MagicGuildButtonTableGfxBlock:  db  SpellBookGraphicsBlock
@@ -3510,7 +3890,10 @@ CheckButtonMouseInteractionCastle:
 
   cp    3                                     ;market
   jr    nz,.EndCheckMarket
-  ret
+  ;market place
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  jp    CastleOverviewMarketPlaceCode         ;jump to the market place code
   .EndCheckMarket:
 
   cp    4                                     ;magic guild
@@ -3681,6 +4064,13 @@ SetMagicGuildGraphics:
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,MagicGuildBlock                 ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetMarketPlaceGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,ChamberOfCommerceBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 CopyBarracks:
