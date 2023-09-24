@@ -1,3 +1,163 @@
+CastleOverviewTavernCode:
+  ld    iy,Castle1
+
+  call  SetTavernButtons
+
+  ld    hl,World1Palette
+  call  SetPalette
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0
+  
+  ld    a,%1100 0011
+  ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
+  xor   a
+  ld    (CastleOverviewButtonTable+0*CastleOverviewButtonTableLenghtPerButton),a ;build
+  ld    (CastleOverviewButtonTable+1*CastleOverviewButtonTableLenghtPerButton),a ;recruit
+  ld    (CastleOverviewButtonTable+2*CastleOverviewButtonTableLenghtPerButton),a ;magic guild
+  ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
+  ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
+
+  call  SetTavernGraphics               ;put gfx in page 1
+  call  SetResourcesPlayer
+
+  ld    hl,CopyPage1To0
+  call  docopy
+
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+  halt
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;buttons in the bottom of screen
+  ld    ix,CastleOverviewButtonTable 
+  call  CheckButtonMouseInteractionCastle
+
+  ld    ix,CastleOverviewButtonTable
+  call  SetCastleButtons                ;copies button state from rom -> vram
+  ;/buttons in the bottom of screen
+
+  ;tavern buttons
+  ld    ix,GenericButtonTable 
+  call  CheckButtonMouseInteractionGenericButtons
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+  ;/tavern buttons
+
+  halt
+  jp  .engine
+
+.CheckButtonClicked:                    ;in: carry=button clicked, b=button number
+  ret   nc
+  ret
+
+SetTavernButtons:
+  ld    hl,TavernButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*3)
+  ldir
+
+  call  .SetRedButtonsIfPlayerHasInsufficientFunds
+  call  .SetBrownButtonIfHeroIsAlreadyRecruited
+  ret
+
+  .SetBrownButtonIfHeroIsAlreadyRecruited:
+  ld    hl,.BrownButton
+  ld    de,GenericButtonTable+1+(GenericButtonTableLenghtPerButton*0)
+  ld    bc,6
+  ldir
+  ret
+
+  .BrownButton:
+  dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128
+  
+  .SetRedButtonsIfPlayerHasInsufficientFunds:
+  call  SetResourcesCurrentPlayerinIX
+
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;gold
+  ld    de,2000
+  xor   a
+  sbc   hl,de
+  ret   nc
+  
+  ld    hl,TavernButtonTableWhenNotEnoughCash
+  ld    de,GenericButtonTable
+  ld    bc,GenericButtonTableLenghtPerButton*3
+  ldir
+  ret
+
+
+
+
+
+
+
+TavernButton1Ytop:           equ 118
+TavernButton1YBottom:        equ TavernButton1Ytop + 009
+TavernButton1XLeft:          equ 004
+TavernButton1XRight:         equ TavernButton1XLeft + 076
+
+TavernButton2Ytop:           equ 118
+TavernButton2YBottom:        equ TavernButton2Ytop + 009
+TavernButton2XLeft:          equ 090
+TavernButton2XRight:         equ TavernButton2XLeft + 076
+
+TavernButton3Ytop:           equ 118
+TavernButton3YBottom:        equ TavernButton3Ytop + 009
+TavernButton3XLeft:          equ 176
+TavernButton3XRight:         equ TavernButton3XLeft + 076
+
+TavernButtonTableLenghtPerButton:  equ TavernButtonTable.endlenght-TavernButtonTable
+TavernButtonTableGfxBlock:  db  ButtonsRecruitBlock
+TavernButtonTableAmountOfButtons:  db  3
+TavernButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
+  db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
+
+TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
+  .endlenght:
+  db  %1010 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
+  db  %1001 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
+
+
+
+
+
+
+
+
+
+
 CastleOverviewMarketPlaceCode:
 
   ld    iy,Castle1
@@ -4284,6 +4444,10 @@ CheckButtonMouseInteractionCastle:
 
   cp    2                                     ;tavern
   jr    nz,.EndCheckTavern
+  ;market place
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to the CastleOverViewCode
+  jp    CastleOverviewTavernCode              ;jump to the tavern code
   ret
   .EndCheckTavern:
 
@@ -4470,6 +4634,13 @@ SetMarketPlaceGraphics:
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,ChamberOfCommerceBlock          ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetTavernGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,TavernBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 CopyBarracks:

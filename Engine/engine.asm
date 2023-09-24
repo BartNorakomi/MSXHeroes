@@ -4637,12 +4637,15 @@ CastleLevel5UnitsAvail: equ 27
 CastleLevel6UnitsAvail: equ 29
 CastleTerrainSY:        equ 31
 AlreadyBuiltThisTurn?:  equ 32
+TavernHero1DayRemain:   equ 33
+TavernHero2DayRemain:   equ 34
+TavernHero3DayRemain:   equ 35
 AmountOfCastles:  equ 4
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?
-Castle1:  db  004,  001,  1,      1,          1,        1,        0,              4,            0,            0,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             122,            444,            6000,           30000     | db  060       , 0
-Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  069       , 0
-Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  078       , 0
-Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  087       , 0
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days
+Castle1:  db  004,  001,  1,      1,          1,        1,        0,              4,            0,            0,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             122,            444,            6000,           30000     | db  060       , 0                          ,001    ,002    ,003
+Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  069       , 0                          ,004    ,005    ,006
+Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  078       , 0                          ,007    ,008    ,009
+Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  087       , 0                          ,010    ,011    ,012
 Castle5:  db  000,  000,  255
 
 LenghtCastleTable:  equ Castle2-Castle1
@@ -4737,7 +4740,7 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  15535
+.Gold:    dw  4000
 .Wood:    dw  22200
 .Ore:     dw  24400
 .Gems:    dw  65535

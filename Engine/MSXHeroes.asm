@@ -732,6 +732,14 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $40 - 41
+;
+TavernBlock:  equ   $40
+phase	$4000
+  incbin "..\grapx\CastleOverview\Tavern.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

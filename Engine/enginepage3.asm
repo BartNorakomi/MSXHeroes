@@ -1508,7 +1508,8 @@ EnterCastle:
 ;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
-  call  CastleOverviewMarketPlaceCode
+;  call  CastleOverviewMarketPlaceCode
+  call  CastleOverviewTavernCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
