@@ -4733,14 +4733,15 @@ player3human?:			db	1
 player4human?:			db	1
 whichplayernowplaying?:	db	1
 
-
+AmountOfResourcesOffered:   ds  2
+AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  3000
-.Wood:    dw  400
-.Ore:     dw  200
-.Gems:    dw  70
-.Rubies:  dw  40
+.Gold:    dw  65535
+.Wood:    dw  22200
+.Ore:     dw  24400
+.Gems:    dw  20000
+.Rubies:  dw  25500
 ResourcesPlayer2:
 .Gold:    dw  5000
 .Wood:    dw  300

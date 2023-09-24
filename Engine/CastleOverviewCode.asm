@@ -1,4 +1,5 @@
 CastleOverviewMarketPlaceCode:
+
   ld    iy,Castle1
 
   call  SetMarketPlaceButtons
@@ -19,6 +20,7 @@ CastleOverviewMarketPlaceCode:
   ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
 
   call  SetMarketPlaceGraphics          ;put gfx in page 1
+  call  SetResourcesPlayer
 
   ld    hl,CopyPage1To0
   call  docopy
@@ -77,6 +79,113 @@ CastleOverviewMarketPlaceCode:
   jp    nc,.WhichResourceDoYouNeedClicked
   cp    4                               ;check if a button in the 2nd window is clicked
   jp    nc,.WhichResourceWillYouTradeClicked
+  cp    3
+  jp    z,.PlusButtonPressed
+  cp    2
+  jp    z,.BuyButtonPressed
+  cp    1
+  jp    z,.MinusButtonPressed
+  ret
+  
+  .BuyButtonPressed:
+  call  SetResourcesCurrentPlayerinIX
+  call  .SetTradeCostInHL  
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;amount of resources offered
+  inc   hl
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;amount of resources required
+
+  ld    l,(ix+2)
+  ld    h,(ix+3)                        ;wood
+  add   hl,de
+  ld    (ix+2),l
+  ld    (ix+3),h                        ;wood
+
+  ld    l,(ix+4)
+  ld    h,(ix+5)                        ;ore
+  xor   a
+  sbc   hl,bc
+  ld    (ix+4),l
+  ld    (ix+5),h                        ;ore
+  
+  call  SetResourcesPlayer
+  call  SwapAndSetPage                  ;swap and set page  
+  call  SetResourcesPlayer
+  ret
+  
+  .MinusButtonPressed:
+  call  .SetTradeCostInHL  
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;amount of resources offered
+  inc   hl
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;amount of resources required
+
+  ;add the amounts offered and cost/requirement
+  ld    hl,(AmountOfResourcesOffered)
+  xor   a
+  sbc   hl,de
+  ret   z
+  ld    (AmountOfResourcesOffered),hl
+  ld    hl,(AmountOfResourcesRequired)
+  xor   a
+  sbc   hl,bc
+  ld    (AmountOfResourcesRequired),hl
+
+  call  .ClearAmountsOfferedAndRequired
+  call  .SetTotalAmountOfferedVSRequired
+  call  SwapAndSetPage                  ;swap and set page
+  call  .ClearAmountsOfferedAndRequired
+  call  .SetTotalAmountOfferedVSRequired
+  ret
+  
+  .PlusButtonPressed:
+  call  .SetTradeCostInHL  
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;amount of resources offered
+  inc   hl
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;amount of resources required
+
+  ;add the amounts offered and cost/requirement
+  ld    hl,(AmountOfResourcesRequired)
+  add   hl,bc
+  ret   c
+
+  ld    hl,(AmountOfResourcesOffered)
+  add   hl,de
+  ret   c
+  ld    (AmountOfResourcesOffered),hl
+  ld    hl,(AmountOfResourcesRequired)
+  add   hl,bc
+  ld    (AmountOfResourcesRequired),hl
+
+  call  .ClearAmountsOfferedAndRequired
+  call  .SetTotalAmountOfferedVSRequired
+  call  SwapAndSetPage                  ;swap and set page
+  call  .ClearAmountsOfferedAndRequired
+  call  .SetTotalAmountOfferedVSRequired
+  ret
+
+  .ClearAmountsOfferedAndRequired:
+  ld    hl,$4000 + (131*128) + (052/2) - 128
+  ld    de,$0000 + (147*128) + (054/2) - 128
+  ld    bc,$0000 + (006*256) + (036/2)
+  ld    a,ChamberOfCommerceButtonsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (131*128) + (052/2) - 128
+  ld    de,$0000 + (147*128) + (170/2) - 128
+  ld    bc,$0000 + (006*256) + (036/2)
+  ld    a,ChamberOfCommerceButtonsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY 
   ret
   
   .WhichResourceWillYouTradeClicked:
@@ -89,21 +198,114 @@ CastleOverviewMarketPlaceCode:
   ld    (GenericButtonTable+11*GenericButtonTableLenghtPerButton),a ;buy
   ld    (GenericButtonTable+12*GenericButtonTableLenghtPerButton),a ;-
   
+  .EntryPointWhenClickedOnWhichResourceDoYouNeed:
   call  .SetIcanOfferYouWindow
   call  .SetIconResourceNeeded
   call  .SetIconResourceToTrade
   call  .SetTextResourceNeeded
   call  .SetTextResourceToTrade
+  call  .SetCost
+  call  .SetTotalAmountOfferedVSRequired
   call  SwapAndSetPage                  ;swap and set page
   call  .SetIcanOfferYouWindow
   call  .SetIconResourceNeeded
   call  .SetIconResourceToTrade
   call  .SetTextResourceNeeded
   call  .SetTextResourceToTrade
+  call  .SetCost
+  call  .SetTotalAmountOfferedVSRequired
+  ret
+
+  .SetTotalAmountOfferedVSRequired:
+  ld    b,054                           ;dx
+  ld    c,147                           ;dy
+  ld    hl,(AmountOfResourcesOffered)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+
+  ld    b,181                           ;dx
+  ld    c,147                           ;dy
+  ld    hl,(AmountOfResourcesRequired)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ret
+
+  .SetCost:
+  call  .SetTradeCostInHL
+  
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)
+  ld    (AmountOfResourcesOffered),de
+  inc   hl
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)
+  ld    (AmountOfResourcesRequired),de
+
+  ld    b,069                           ;dx
+  ld    c,128                           ;dy
+  ld    hl,(AmountOfResourcesOffered)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+
+  ld    b,167                           ;dx
+  ld    c,128                           ;dy
+  ld    hl,(AmountOfResourcesRequired)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ret
+
+.TextCostRequireWoodTradeStone:  dw 0001,0010 
+.TextCostRequireWoodTradeGems:   dw 0001,0005
+.TextCostRequireWoodTradeGold:   dw 0001,2500
+
+.TextCostRequireGemTradeStone:   dw 0001,0020
+.TextCostRequireGemTradeGems:    dw 0001,0010
+.TextCostRequireGemTradeGold:    dw 0001,5000
+
+.TextCostRequireGoldTradeWood:   dw 0025,0001
+.TextCostRequireGoldTradeRuby:   dw 0050,0001
+.TextCostRequireGoldTradeGold:   dw 0001,0001
+
+  .SetTradeCostInHL:
+  ld    a,(MarketPlaceResourceNeeded)
+  cp    12                              ;13=wood, 12=stone
+  jp    nc,.RequireWoodOrStone
+  cp    10                              ;11=gems, 10=rubies
+  jp    nc,.RequireGemsOrRubies
+
+  .RequireGold:
+  ld    a,(MarketPlaceResourceToTrade)  
+  cp    07                              ;08=wood, 07=stone
+  ld    hl,.TextCostRequireGoldTradeWood
+  ret   nc
+  cp    05                              ;06=gems, 05=rubies
+  ld    hl,.TextCostRequireGoldTradeRuby
+  ret   nc
+  ld    hl,.TextCostRequireGoldTradeGold
+  ret 
+  
+  .RequireGemsOrRubies:
+  ld    a,(MarketPlaceResourceToTrade)  
+  cp    07                              ;08=wood, 07=stone
+  ld    hl,.TextCostRequireGemTradeStone
+  ret   nc
+  cp    05                              ;06=gems, 05=rubies
+  ld    hl,.TextCostRequireGemTradeGems
+  ret   nc
+  ld    hl,.TextCostRequireGemTradeGold
   ret
   
+  .RequireWoodOrStone:
+  ld    a,(MarketPlaceResourceToTrade)  
+  cp    07                              ;08=wood, 07=stone
+  ld    hl,.TextCostRequireWoodTradeStone
+  ret   nc
+  cp    05                              ;06=gems, 05=rubies
+  ld    hl,.TextCostRequireWoodTradeGems
+  ret   nc
+  ld    hl,.TextCostRequireWoodTradeGold
+  ret
+
   .SetTextResourceNeeded:
-  ld    a,116
+  ld    a,127
   ld    (PutLetter+dx),a                ;set dx of text
   ld    (TextDX),a
   ld    a,128
@@ -121,7 +323,7 @@ CastleOverviewMarketPlaceCode:
   ret
 
   .SetTextResourceToTrade:
-  ld    a,214
+  ld    a,227
   ld    (PutLetter+dx),a                ;set dx of text
   ld    (TextDX),a
   ld    a,128
@@ -237,11 +439,15 @@ CastleOverviewMarketPlaceCode:
     
   .WhichResourceDoYouNeedClicked:
   ld    (MarketPlaceResourceNeeded),a
+
+  ld    a,(GenericButtonTable+10*GenericButtonTableLenghtPerButton) ;+
+  bit   7,a                             ;if the +, buy and - button are visible then set resource in bottom window
+  jp    nz,.EntryPointWhenClickedOnWhichResourceDoYouNeed
   
   ld    a,(GenericButtonTable+5*GenericButtonTableLenghtPerButton) ;check if this window is already active
   bit   7,a
   ret   nz
-
+  
   ld    a,%1100 0011                    ;enable which resource will you trade buttons
   ld    (GenericButtonTable+5*GenericButtonTableLenghtPerButton),a ;wood
   ld    (GenericButtonTable+6*GenericButtonTableLenghtPerButton),a ;ore
@@ -4238,7 +4444,48 @@ CopyCityWalls:
 	db		000,1,027,0
 	db		0,%0000 0000,$98
 
+SetResourcesPlayer:
+  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
+  ;clear resources
+  ld    hl,$4000 + (007*128) + (032/2) - 128
+  ld    de,$0000 + (007*128) + (032/2) - 128
+  ld    bc,$0000 + (005*256) + (220/2)
+  ld    a,ChamberOfCommerceBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+  call  SetResourcesCurrentPlayerinIX
+
+  ;gold
+  ld    b,217                           ;dx
+  ld    c,007                           ;dy
+  ld    l,(ix+0)
+  ld    h,(ix+1)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ;wood
+  ld    b,035                           ;dx
+  ld    c,007                           ;dy
+  ld    l,(ix+2)
+  ld    h,(ix+3)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ;ore
+  ld    b,078                           ;dx
+  ld    c,007                           ;dy
+  ld    l,(ix+4)
+  ld    h,(ix+5)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ;gems
+  ld    b,122                           ;dx
+  ld    c,007                           ;dy
+  ld    l,(ix+6)
+  ld    h,(ix+7)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ;rubies
+  ld    b,166                           ;dx
+  ld    c,007                           ;dy
+  ld    l,(ix+8)
+  ld    h,(ix+9)
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+  ret
 
 
 
