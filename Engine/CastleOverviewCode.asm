@@ -88,32 +88,108 @@ CastleOverviewMarketPlaceCode:
   ret
   
   .BuyButtonPressed:
+  ;Check if we overflow the amount we gain
   call  SetResourcesCurrentPlayerinIX
-  call  .SetTradeCostInHL  
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;amount of resources offered
-  inc   hl
-  ld    c,(hl)
-  inc   hl
-  ld    b,(hl)                          ;amount of resources required
+  ld    a,(MarketPlaceResourceNeeded)
+  cp    09                              ;gold
+  jr    z,.IXPointsToResourceNeededCheckOverflow
+  inc   ix
+  inc   ix
+  cp    13                              ;wood
+  jr    z,.IXPointsToResourceNeededCheckOverflow
+  inc   ix
+  inc   ix
+  cp    12                              ;stone
+  jr    z,.IXPointsToResourceNeededCheckOverflow
+  inc   ix
+  inc   ix
+  cp    11                              ;gems
+  jr    z,.IXPointsToResourceNeededCheckOverflow
+  inc   ix
+  inc   ix
+  cp    10                              ;rubies
+  jr    z,.IXPointsToResourceNeededCheckOverflow
 
-  ld    l,(ix+2)
-  ld    h,(ix+3)                        ;wood
-  add   hl,de
-  ld    (ix+2),l
-  ld    (ix+3),h                        ;wood
+  .IXPointsToResourceNeededCheckOverflow:
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;resource needed
+  ld    de,(AmountOfResourcesOffered)
+  add   hl,de                           ;amount of resources offered
+  ret   c
+  ;/Check if we overflow the amount we gain
 
-  ld    l,(ix+4)
-  ld    h,(ix+5)                        ;ore
+  ;reduce the amount of resources we have to invest
+  call  SetResourcesCurrentPlayerinIX
+  ld    a,(MarketPlaceResourceToTrade)  
+  cp    04                              ;gold
+  jr    z,.IXPointsToResourceRequired
+  inc   ix
+  inc   ix
+  cp    08                              ;wood
+  jr    z,.IXPointsToResourceRequired
+  inc   ix
+  inc   ix
+  cp    07                              ;stone
+  jr    z,.IXPointsToResourceRequired
+  inc   ix
+  inc   ix
+  cp    06                              ;gems
+  jr    z,.IXPointsToResourceRequired
+  inc   ix
+  inc   ix
+  cp    05                              ;rubies
+  jr    z,.IXPointsToResourceRequired
+
+  .IXPointsToResourceRequired:
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;resource required
+  ld    de,(AmountOfResourcesRequired)
   xor   a
-  sbc   hl,bc
-  ld    (ix+4),l
-  ld    (ix+5),h                        ;ore
-  
+  sbc   hl,de                           ;amount of resources required
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;resource required
+  ;/reduce the amount of resources we have to invest
+
+  ;increase the amount of resources we gain/buy
+  call  SetResourcesCurrentPlayerinIX
+  ld    a,(MarketPlaceResourceNeeded)
+  cp    09                              ;gold
+  jr    z,.IXPointsToResourceNeeded
+  inc   ix
+  inc   ix
+  cp    13                              ;wood
+  jr    z,.IXPointsToResourceNeeded
+  inc   ix
+  inc   ix
+  cp    12                              ;stone
+  jr    z,.IXPointsToResourceNeeded
+  inc   ix
+  inc   ix
+  cp    11                              ;gems
+  jr    z,.IXPointsToResourceNeeded
+  inc   ix
+  inc   ix
+  cp    10                              ;rubies
+  jr    z,.IXPointsToResourceNeeded
+
+  .IXPointsToResourceNeeded:
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;resource needed
+  ld    de,(AmountOfResourcesOffered)
+  add   hl,de                           ;amount of resources offered
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;resource needed
+  ;/increase the amount of resources we gain/buy
+
   call  SetResourcesPlayer
   call  SwapAndSetPage                  ;swap and set page  
   call  SetResourcesPlayer
+  ret
+  
+  .WoodNeeded:
+  inc   ix
+  inc   ix                              ;wood
   ret
   
   .MinusButtonPressed:

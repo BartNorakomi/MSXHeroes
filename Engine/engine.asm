@@ -4737,10 +4737,10 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  65535
+.Gold:    dw  15535
 .Wood:    dw  22200
 .Ore:     dw  24400
-.Gems:    dw  20000
+.Gems:    dw  65535
 .Rubies:  dw  25500
 ResourcesPlayer2:
 .Gold:    dw  5000
