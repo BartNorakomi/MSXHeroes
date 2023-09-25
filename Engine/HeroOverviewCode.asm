@@ -1,3 +1,10 @@
+;  call  HeroOverviewCode
+;  call  HeroOverviewSkillsWindowCode
+;  call  HeroOverviewSpellBookWindowCode_Earth
+;  call  HeroOverviewSpellBookWindowCode_Fire
+;  call  HeroOverviewInventoryWindowCode
+;  call  HeroOverviewArmyWindowCode
+
 HeroOverViewFirstWindowchoicesSX:   equ 000
 HeroOverViewFirstWindowchoicesSY:   equ 000
 HeroOverViewFirstWindowchoicesDX:   equ 058

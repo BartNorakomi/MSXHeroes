@@ -12,7 +12,7 @@ LevelEngine:
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
 
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
-  call  CheckHeroEntersCastle           ;check if a hero walked into a castle
+;  call  CheckHeroEntersCastle           ;check if a hero walked into a castle
   call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
 
   call  CheckHeroPicksUpItem
@@ -478,9 +478,12 @@ CheckHeroEntersCastle:
 	cp    (iy+CastlePlayer)
   ret   nz                              ;return (for now) if its an enemy castle
 
-  inc   (ix+Heroy)                      ;move hero out of castle 
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    002
+  ret   z                               ;dont enter castle if hero has already entered castle
+  ld    (ix+HeroStatus),002             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   
-  pop   af                              ;pop the call from the engine to this routine
+  pop   af                              ;pop the call to this check
   pop   af                              ;pop the call from the engine to this routine
   jp    EnterCastle
   
@@ -500,7 +503,7 @@ CheckHeroCollidesWithEnemyHero:
   ld    (LastHeroForThisPlayer),bc
 	ld		b,amountofheroesperplayer
   .checkpointerenemyloop:
-	ld		a,(iy+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	ld		a,(iy+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   inc   a                               ;check if status is inactive
   jp    z,.endcheck1                    ;hero is inactive
 
@@ -1027,7 +1030,7 @@ ThirdHeroWindowClicked:
   call  SetHero1ForCurrentPlayerInIX
   call  SetHeroForWindow3DeterminedByHeroWindowPointerInIX
   
-	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	ld		a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 	cp		255                             ;255=inactive
 	ret		z						                    ;there is no hero in this window
 
@@ -1049,7 +1052,7 @@ SecondHeroWindowClicked:
   call  SetHero1ForCurrentPlayerInIX
   call  SetHeroForWindow2DeterminedByHeroWindowPointerInIX
   
-	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	ld		a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 	cp		255                             ;255=inactive
 	ret		z						                    ;there is no hero in this window
 
@@ -1071,7 +1074,7 @@ FirstHeroWindowClicked:                        ;hero window 1 is clicked. check 
   call  SetHero1ForCurrentPlayerInIX
   call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
   
-	ld		a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+	ld		a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 	cp		255                             ;255=inactive
 	ret		z						                    ;there is no hero in this window
 
@@ -1242,8 +1245,8 @@ CheckCastleArrowDown:
 
 movehero:
 	ld		a,(movehero?)
-	or		a
-	ret		z
+	or		a                               ;if hero stopped moving, check if he should enter castle
+  jp    z,CheckHeroEntersCastle  
 
   call  .GoMove
   jp    CenterScreenForCurrentHero
@@ -1272,6 +1275,7 @@ movehero:
 	
   .domovehero:
   ld    ix,(plxcurrentheroAddress)
+  ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   
 ;  call  SetHero1ForCurrentPlayerInIX
 ;	call	CheckHeroNearObject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
@@ -2110,42 +2114,42 @@ puttopheroes:
 	ld		(doputheros.SelfModifyingCodeAddYToSYHero),a
 	ld		(doputheros.SelfModifyingCodeAddYToHero),a
 
-doputheros:        ;HeroStatus: 1=active on map, 254=in castle, 255=inactive
-  ld    hl,256*00 + 000 |   ld    ix,pl1hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 016 |   ld    ix,pl1hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 032 |   ld    ix,pl1hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 048 |   ld    ix,pl1hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 064 |   ld    ix,pl1hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 080 |   ld    ix,pl1hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 096 |   ld    ix,pl1hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 112 |   ld    ix,pl1hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  ld    hl,256*00 + 000 |   ld    ix,pl1hero1y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 016 |   ld    ix,pl1hero2y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 032 |   ld    ix,pl1hero3y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 048 |   ld    ix,pl1hero4y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 064 |   ld    ix,pl1hero5y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 080 |   ld    ix,pl1hero6y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 096 |   ld    ix,pl1hero7y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 112 |   ld    ix,pl1hero8y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
 
-  ld    hl,256*00 + 128 |   ld    ix,pl2hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 144 |   ld    ix,pl2hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 160 |   ld    ix,pl2hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 176 |   ld    ix,pl2hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 192 |   ld    ix,pl2hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 208 |   ld    ix,pl2hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 224 |   ld    ix,pl2hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*00 + 240 |   ld    ix,pl2hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*00 + 128 |   ld    ix,pl2hero1y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 144 |   ld    ix,pl2hero2y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 160 |   ld    ix,pl2hero3y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 176 |   ld    ix,pl2hero4y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 192 |   ld    ix,pl2hero5y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 208 |   ld    ix,pl2hero6y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 224 |   ld    ix,pl2hero7y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*00 + 240 |   ld    ix,pl2hero8y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
 
-  ld    hl,256*32 + 000 |   ld    ix,pl3hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 016 |   ld    ix,pl3hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 032 |   ld    ix,pl3hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 048 |   ld    ix,pl3hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 064 |   ld    ix,pl3hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 080 |   ld    ix,pl3hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 096 |   ld    ix,pl3hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 112 |   ld    ix,pl3hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 000 |   ld    ix,pl3hero1y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 016 |   ld    ix,pl3hero2y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 032 |   ld    ix,pl3hero3y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 048 |   ld    ix,pl3hero4y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 064 |   ld    ix,pl3hero5y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 080 |   ld    ix,pl3hero6y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 096 |   ld    ix,pl3hero7y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 112 |   ld    ix,pl3hero8y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
 
-  ld    hl,256*32 + 128 |   ld    ix,pl4hero1y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 144 |   ld    ix,pl4hero2y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 160 |   ld    ix,pl4hero3y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 176 |   ld    ix,pl4hero4y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 192 |   ld    ix,pl4hero5y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 208 |   ld    ix,pl4hero6y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 224 |   ld    ix,pl4hero7y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
-  ld    hl,256*32 + 240 |   ld    ix,pl4hero8y | ld a,(ix+HeroStatus) | dec a | call z,.doputhero
+  ld    hl,256*32 + 128 |   ld    ix,pl4hero1y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 144 |   ld    ix,pl4hero2y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 160 |   ld    ix,pl4hero3y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 176 |   ld    ix,pl4hero4y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 192 |   ld    ix,pl4hero5y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 208 |   ld    ix,pl4hero6y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 224 |   ld    ix,pl4hero7y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
+  ld    hl,256*32 + 240 |   ld    ix,pl4hero8y | ld a,(ix+HeroStatus) | or a | call p,.doputhero
   ret
 ;pl1hero1y:		db	4
 ;pl1hero1x:		db	2
@@ -2365,7 +2369,7 @@ SetHeroUsingHeroWindowPointer:      ;set hero hero window points to in IX
   ret
 
 FindHeroThatIsNotInCastleAndDecreaseHeroWindowPointerEachTime:
-	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+	ld    a,(ix+HeroStatus)         ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    254
   ret   nz
   ld    de,-lenghtherotable
@@ -2377,7 +2381,7 @@ FindHeroThatIsNotInCastleAndDecreaseHeroWindowPointerEachTime:
   jp    FindHeroThatIsNotInCastle 
 
 FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime:
-	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+	ld    a,(ix+HeroStatus)         ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    254
   ret   nz
 	add		ix,de
@@ -2389,7 +2393,7 @@ FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime:
   jp    FindHeroThatIsNotInCastle 
   
 FindHeroThatIsNotInCastle:
-	ld    a,(ix+HeroStatus)         ;1=active on map, 254=in castle, 255=inactive
+	ld    a,(ix+HeroStatus)         ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    254
   ret   nz
 	add		ix,de
@@ -2582,7 +2586,7 @@ DoSetManaandMovementBars:
 ;	jp    .PutManaAndMovement
 
   .PutManaAndMovement:
-  ld    a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    255                             ;inactive
   ret   z
   cp    254                             ;in castle
@@ -2644,7 +2648,7 @@ doSetHeroesInWindows:
   ld    hl,DYDXThirdHeroWindow14x9InHud ;(dy*128 + dx/2) = (208,089)
 
   .setherowindow:
-  ld    a,(ix+HeroStatus)               ;1=active on map, 254=in castle, 255=inactive
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 	cp		255
 	ret		z
   cp    254                             ;in castle
@@ -3205,7 +3209,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		a,l                           ;mouseposx (/16)
 	cp		(ix+HeroX)                    ;cp hero x
 	jp		nz,.endcheck1
-  ld    a,(ix+HeroStatus)             ;1=active on map, 254=in castle, 255=inactive
+  ld    a,(ix+HeroStatus)             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   or    a
 	jp		p,.pointeronenemyhero
   ;pointer on enemy hero?
@@ -3232,7 +3236,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		a,l                           ;mouseposx (/16)
 	cp		(ix+HeroX)                    ;cp hero x
 	jp		nz,.endcheck2
-  ld    a,(ix+HeroStatus)             ;1=active on map, 254=in castle, 255=inactive
+  ld    a,(ix+HeroStatus)             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   or    a
 	jp		p,.PointerIsOnFriendlyHero
   .endcheck2:
@@ -4023,7 +4027,7 @@ HeroMana:               equ 7
 HeroTotalMana:          equ 8
 HeroManarec:            equ 9
 HeroItems:              equ 10
-HeroStatus:             equ 15          ;1=active on map, 254=in castle, 255=inactive
+HeroStatus:             equ 15          ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 HeroUnits:              equ 16          ;unit,amount (6 in total)
 HeroEquipment:          equ 34          ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 HeroSYSX:               equ 43
@@ -4049,6 +4053,12 @@ HeroSpecificInfo:       equ HeroPortrait16x30SYSX + 2
 lenghtinventorytable:   equ 9 + 6
 
 
+HeroInfoName:               equ 0
+HeroInfoSpriteBlock:        equ 33
+HeroInfoSYSX:               equ 34
+HeroInfoPortrait10x18SYSX:  equ 36
+HeroInfoPortrait14x9SYSX:   equ 38
+HeroInfoPortrait16x30SYSX:  equ 40
 
 HeroAddressesAdol:            db "   adol   ",254,"          ",254,"  knight  ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroPortrait14x9SYSXAdol,HeroPortrait16x30SYSXAdol
 HeroAddressesGoemon1:         db " goemon1  ",254,"          ",254,"  ranger  ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroPortrait14x9SYSXGoemon1,HeroPortrait16x30SYSXGoemon1
@@ -4083,7 +4093,7 @@ HeroAddressesSimonBelmont:    db "   simon  ",254,"  belmont ",254,"          ",
 HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254,"          ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroPortrait14x9SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich
 HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroPortrait14x9SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont
 
-pl1hero1y:		db	07
+pl1hero1y:		db	13
 pl1hero1x:		db	2
 pl1hero1type:	db	0		                  	
 pl1hero1xp: dw 0940
@@ -4091,7 +4101,7 @@ pl1hero1move:	db	12,20
 pl1hero1mana:	db	10,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1items:	db	255,255,255,255,255
-pl1hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero1SYSX:  dw HeroSYSXUndeadline3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4114,15 +4124,15 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .Portrait16x30SYSX:  dw HeroPortrait16x30SYSXUndeadline3
 .HeroSpecificInfo: dw HeroAddressesUndeadline3
 
-pl1hero2y:		db	7
-pl1hero2x:		db	3
+pl1hero2y:		db	3
+pl1hero2x:		db	2
 pl1hero2type:	db	8		                  
 pl1hero2life:	db	05,20
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	10,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2items:	db	255,255,255,255,255
-pl1hero2status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero2status:	db	254		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 001 |      db 022 | dw 001 |      db 021 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero2Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero2SYSX:  dw HeroSYSXGoemon1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4145,17 +4155,15 @@ Pl1Hero2Block:  db Goemon1SpriteBlock
 .Portrait16x30SYSX:  dw HeroPortrait16x30SYSXGoemon1
 .HeroSpecificInfo: dw HeroAddressesGoemon1
 
-
-
-pl1hero3y:		db	07		                ;
-pl1hero3x:		db	04		
+pl1hero3y:		db	03		                ;
+pl1hero3x:		db	02		
 pl1hero3type:	db	16		                
 pl1hero3life:	db	03,20
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	10,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3items:	db	255,255,255,255,255
-pl1hero3status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero3status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero3Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero3SYSX:  dw HeroSYSXPixy ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4187,7 +4195,7 @@ pl1hero4move:	db	30,20
 pl1hero4mana:	db	10,20
 pl1hero4manarec:db	5		                ;recover x mana every turn
 pl1hero4items:	db	255,255,255,255,255
-pl1hero4status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero4status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero4Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero4SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4219,7 +4227,7 @@ pl1hero5move:	db	30,20
 pl1hero5mana:	db	10,20
 pl1hero5manarec:db	5		                ;recover x mana every turn
 pl1hero5items:	db	255,255,255,255,255
-pl1hero5status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero5status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero5Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero5SYSX:  dw HeroSYSXLatok ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4251,7 +4259,7 @@ pl1hero6move:	db	30,20
 pl1hero6mana:	db	10,20
 pl1hero6manarec:db	5		                ;recover x mana every turn
 pl1hero6items:	db	255,255,255,255,255
-pl1hero6status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero6status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero6Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero6SYSX:  dw HeroSYSXDrasle2 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4283,7 +4291,7 @@ pl1hero7move:	db	30,20
 pl1hero7mana:	db	10,20
 pl1hero7manarec:db	5		                ;recover x mana every turn
 pl1hero7items:	db	255,255,255,255,255
-pl1hero7status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero7status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero7Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero7SYSX:  dw HeroSYSXSnake1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4315,7 +4323,7 @@ pl1hero8move:	db	30,20
 pl1hero8mana:	db	10,20
 pl1hero8manarec:db	5		                ;recover x mana every turn
 pl1hero8items:	db	255,255,255,255,255
-pl1hero8status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl1hero8status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero8Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl1Hero8SYSX:  dw HeroSYSXDrasle3 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4351,7 +4359,7 @@ pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1items:	db	255,255,255,255,255
-pl2hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl2Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl2Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4392,7 +4400,7 @@ pl3hero1move:	db	10,20
 pl3hero1mana:	db	10,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1items:	db	255,255,255,255,255
-pl3hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl3Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl3Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
@@ -4432,7 +4440,7 @@ pl4hero1move:	db	10,20
 pl4hero1mana:	db	10,20
 pl4hero1manarec:db	2		                ;recover x mana every turn
 pl4hero1items:	db	255,255,255,255,255
-pl4hero1status:	db	1		                ;1=active on map, 254=in castle, 255=inactive
+pl4hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl4Hero1Equpment: db  000,000,000,000,000,000,000,000,000 ;sword, armor, shield, helmet, boots, gloves,ring, necklace, robe
 Pl4Hero1SYSX:  dw HeroSYSXDrasle1 ;(sy*128 + sx/2) Source in HeroesSprites.bmp in rom
