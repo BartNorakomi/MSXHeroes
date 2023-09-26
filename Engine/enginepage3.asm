@@ -32,9 +32,12 @@ StartGame:
 
 
 CopyRamToVramCorrectedWithoutActivePageSetting:
+  ex    af,af'
+
 	ld		a,(memblocks.1)
 	push  af
 
+  ex    af,af'
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   call  .go                             ;go copy
@@ -505,7 +508,7 @@ ButtonTableArmyIconsSYSX:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-CastleButtonsDY:  equ 179
+CastleButtonsDY:  equ 132;179
 CopyCastleButton:
 	db		012,0,212,1
 	db		008,0,CastleButtonsDY,255
@@ -801,13 +804,28 @@ GenericButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+GenericButtonTable2GfxBlock:         ds  1
+GenericButtonTable2AmountOfButtons:  ds  1
+GenericButtonTable2: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db 0,0,0,0 | dw $0000 + (0*128) + (0/2) - 128 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 MarketPlaceResourceNeeded:  ds  1
 MarketPlaceResourceToTrade: ds  1
 
-
-
+CopyCastleButton2:
+	db		000,0,212,1
+	db		100,0,100,255
+	db		020,0,030,0
+	db		0,%0000 0000,$98
 
 
 
@@ -2352,17 +2370,32 @@ enginepage3length:	Equ	$-enginepage3
 
 variables: org $c000+enginepage3length
 slot:						
-.ram:		                    equ	  $e000
-.page1rom:	                equ	  slot.ram+1
-.page2rom:	                equ	  slot.ram+2
-.page12rom:	                equ	  slot.ram+3
+;.ram:		                    equ	  $e000
+;.page1rom:	                equ	  slot.ram+1
+;.page2rom:	                equ	  slot.ram+2
+;.page12rom:	                equ	  slot.ram+3
+;memblocks:
+;.1:			                    equ	  slot.ram+4
+;.2:			                    equ	  slot.ram+5
+;.3:			                    equ	  slot.ram+6
+;.4:			                    equ	  slot.ram+7
+
+.ram:		                    rb    1
+.page1rom:	                rb    1
+.page2rom:	                rb    1
+.page12rom:	                rb    1
 memblocks:
-.1:			                    equ	  slot.ram+4
-.2:			                    equ	  slot.ram+5
-.3:			                    equ	  slot.ram+6
-.4:			                    equ	  slot.ram+7	
-VDP_0:		                  equ   $F3DF
-VDP_8:		                  equ   $FFE7
+.1:			                    rb    1
+.2:			                    rb    1
+.3:			                    rb    1
+.4:			                    rb    1
+
+;VDP_0:		                  equ   $F3DF
+;VDP_8:		                  equ   $FFE7
+
+VDP_0:		                  rb    8
+VDP_8:		                  rb    30
+
 engaddr:	                  equ	  $03e
 loader.address:             equ   $8000
 enginepage3addr:            equ   $c000

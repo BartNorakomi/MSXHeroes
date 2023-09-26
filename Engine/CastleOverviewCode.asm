@@ -2,6 +2,7 @@ CastleOverviewTavernCode:
   ld    iy,Castle1
 
   call  SetTavernButtons
+  call  SetDefendingAndVisitingHeroButtons
 
   ld    hl,World1Palette
   call  SetPalette
@@ -21,6 +22,7 @@ CastleOverviewTavernCode:
   call  SetTavernGraphics               ;put gfx in page 1
   call  SetResourcesPlayer
   call  SetVisitingAndDefendingHeroesAndArmy
+  call  SetTavernHeroes
 
   ld    hl,CopyPage1To0
   call  docopy
@@ -56,24 +58,185 @@ CastleOverviewTavernCode:
   call  CheckButtonMouseInteractionCastle
 
   ld    ix,CastleOverviewButtonTable
-;  call  SetCastleButtons                ;copies button state from rom -> vram
+  call  SetCastleButtons                ;copies button state from rom -> vram
   ;/buttons in the bottom of screen
 
-  ;tavern buttons
+  ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
   call  CheckButtonMouseInteractionGenericButtons
-  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+  call  .CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+  ;/VisitingAndDefendingHeroesAndArmy buttons
+
+  ;tavern buttons
+  ld    ix,GenericButtonTable2 
+  call  CheckButtonMouseInteractionGenericButtons
+  call  .CheckTavernButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable2
   call  SetGenericButtons               ;copies button state from rom -> vram
   ;/tavern buttons
 
   halt
   jp  .engine
 
-.CheckButtonClicked:                    ;in: carry=button clicked, b=button number
+.CheckButtonClickedVisitingAndDefendingHeroesAndArmy:                    ;in: carry=button clicked, b=button number
   ret   nc
   ret
+
+.CheckTavernButtonClicked:                    ;in: carry=button clicked, b=button number
+  ret   nc
+  ret
+
+SetTavernHeroes:
+  call  SettavernHeroIcons
+  call  SettavernHeroNames
+  call  SettavernHeroSkill
+  ret
+
+SettavernHeroSkill:
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    b,004+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    b,090+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    b,176+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+  ret
+
+  .SetHeroSkill:
+  or    a
+  ret   z
+
+  push  bc
+
+  ld    b,a
+  ld    ix,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght
+  .loop:
+  add   ix,de
+  djnz  .loop
+
+  pop   bc
+  
+  ld    a,(ix+HeroInfoSkill)            ;hero skill  
+  ld    l,a
+  ld    h,0
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  push  hl
+  add   hl,hl                           ;*64
+  pop   de
+  add   hl,de                           ;*96
+  ld    de,SkillEmpty+$4000
+  add   hl,de
+  
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetText:                                ;in: b=dx, c=dy, hl->text
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    (TextAddresspointer),hl  
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+  
+SettavernHeroNames:
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    b,004+30                        ;dx
+  ld    c,033+13                        ;dy
+  call  .SetHeroName
+
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    b,090+30                        ;dx
+  ld    c,033+13                        ;dy
+  call  .SetHeroName
+
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    b,176+30                        ;dx
+  ld    c,033+13                        ;dy
+  call  .SetHeroName
+  ret
+
+  .SetHeroName:
+  or    a
+  ret   z
+
+  push  bc
+
+  ld    b,a
+  ld    hl,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght
+  .loop:
+  add   hl,de
+  djnz  .loop
+
+  pop   bc
+    
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+  
+SettavernHeroIcons:  
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    de,DYDX16x30HeroIconTavernWindow1
+  call  .SetHeroIcon
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    de,DYDX16x30HeroIconTavernWindow2
+  call  .SetHeroIcon
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    de,DYDX16x30HeroIconTavernWindow3
+  call  .SetHeroIcon
+  ret
+  
+  .SetHeroIcon:
+  or    a
+  ret   z
+
+  push  de  
+  ld    b,a
+  ld    ix,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght
+  .loop:
+  add   ix,de
+  djnz  .loop
+
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+
+  pop   de                                  ;DYDX16x30HeroIconTavernWindow1,2,3
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+DYDX16x30HeroIconTavernWindow1: equ $0000 + (047*128) + (008/2) - 128
+DYDX16x30HeroIconTavernWindow2: equ $0000 + (047*128) + (094/2) - 128
+DYDX16x30HeroIconTavernWindow3: equ $0000 + (047*128) + (180/2) - 128
+
 
 SetVisitingAndDefendingHeroesAndArmy:
 ;  ld    iy,Castle1
@@ -95,37 +258,37 @@ SetDefendingHeroArmyAndAmount:
   .amount:
   ld    l,(ix+HeroUnits+01)
   ld    h,(ix+HeroUnits+02)
-  ld    b,025+1
+  ld    b,029
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
-  ld    b,042+1
+  ld    b,045
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
-  ld    b,059+1
+  ld    b,061
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
-  ld    b,076+1
+  ld    b,077
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
-  ld    b,093+1
+  ld    b,093
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
-  ld    b,110+1
+  ld    b,109
   ld    c,197
   call  SetNumber16BitCastle
   ret
@@ -183,12 +346,12 @@ SetDefendingHeroArmyAndAmount:
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ret
 
-DYDXDefendingHeroUnit1:          equ (181*128) + (025/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXDefendingHeroUnit2:          equ (181*128) + (042/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXDefendingHeroUnit3:          equ (181*128) + (059/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXDefendingHeroUnit1:          equ (181*128) + (028/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXDefendingHeroUnit2:          equ (181*128) + (044/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXDefendingHeroUnit3:          equ (181*128) + (060/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXDefendingHeroUnit4:          equ (181*128) + (076/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXDefendingHeroUnit5:          equ (181*128) + (093/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXDefendingHeroUnit6:          equ (181*128) + (110/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXDefendingHeroUnit5:          equ (181*128) + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXDefendingHeroUnit6:          equ (181*128) + (108/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
 
 
@@ -204,37 +367,37 @@ SetVisitingHeroArmyAndAmount:
   .amount:
   ld    l,(ix+HeroUnits+01)
   ld    h,(ix+HeroUnits+02)
-  ld    b,151+1
+  ld    b,157
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
-  ld    b,168+1
+  ld    b,173
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
-  ld    b,185+1
+  ld    b,189
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
-  ld    b,202+1
+  ld    b,205
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
-  ld    b,219+1
+  ld    b,221
   ld    c,197
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
-  ld    b,236+1
+  ld    b,237
   ld    c,197
   call  SetNumber16BitCastle
   ret
@@ -302,11 +465,11 @@ SetVisitingHeroArmyAndAmount:
                 dw $8000+(70*128)+(00/2)-128, $8000+(70*128)+(14/2)-128, $8000+(70*128)+(28/2)-128, $8000+(70*128)+(42/2)-128, $8000+(70*128)+(56/2)-128, $8000+(70*128)+(70/2)-128, $8000+(70*128)+(84/2)-128, $8000+(70*128)+(98/2)-128, $8000+(70*128)+(112/2)-128, $8000+(70*128)+(126/2)-128, $8000+(70*128)+(140/2)-128, $8000+(70*128)+(154/2)-128, $8000+(70*128)+(168/2)-128, $8000+(70*128)+(182/2)-128, $8000+(70*128)+(196/2)-128, $8000+(70*128)+(210/2)-128, $8000+(70*128)+(224/2)-128, $8000+(70*128)+(238/2)-128
                 dw $8000+(84*128)+(00/2)-128, $8000+(84*128)+(14/2)-128, $8000+(84*128)+(28/2)-128, $8000+(84*128)+(42/2)-128, $8000+(84*128)+(56/2)-128, $8000+(84*128)+(70/2)-128, $8000+(84*128)+(84/2)-128, $8000+(84*128)+(98/2)-128, $8000+(84*128)+(112/2)-128, $8000+(84*128)+(126/2)-128, $8000+(84*128)+(140/2)-128, $8000+(84*128)+(154/2)-128, $8000+(84*128)+(168/2)-128, $8000+(84*128)+(182/2)-128, $8000+(84*128)+(196/2)-128, $8000+(84*128)+(210/2)-128, $8000+(84*128)+(224/2)-128, $8000+(84*128)+(238/2)-128
 
-DYDXVisitingHeroUnit1:          equ (181*128) + (151/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXVisitingHeroUnit2:          equ (181*128) + (168/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXVisitingHeroUnit3:          equ (181*128) + (185/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXVisitingHeroUnit4:          equ (181*128) + (202/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXVisitingHeroUnit5:          equ (181*128) + (219/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXVisitingHeroUnit1:          equ (181*128) + (156/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXVisitingHeroUnit2:          equ (181*128) + (172/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXVisitingHeroUnit3:          equ (181*128) + (188/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXVisitingHeroUnit4:          equ (181*128) + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
+DYDXVisitingHeroUnit5:          equ (181*128) + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXVisitingHeroUnit6:          equ (181*128) + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
 
@@ -379,7 +542,7 @@ SetDefendingHero:
 
   .SetNoHeroDefendingCastle:
   ld    hl,$4000 + (013*128) + (230/2) - 128
-  ld    de,$0000 + (177*128) + (004/2) - 128
+  ld    de,$0000 + (176*128) + (004/2) - 128
   ld    bc,$0000 + (028*256) + (020/2)
   ld    a,ButtonsRecruitBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -436,17 +599,131 @@ SetVisitingHero:
 
   .SetNoHeroVisitingCastle:
   ld    hl,$4000 + (013*128) + (230/2) - 128
-  ld    de,$0000 + (177*128) + (130/2) - 128
-  ld    bc,$0000 + (028*256) + (020/2)
+  ld    de,$0000 + (176*128) + (132/2) - 128
+  ld    bc,$0000 + (030*256) + (020/2)
   ld    a,ButtonsRecruitBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
-DYDX16x30HeroIconAtVisitingHeroWindow: equ $0000 + (176*128) + (132/2) - 128
+DYDX16x30HeroIconAtVisitingHeroWindow: equ $0000 + (176*128) + (134/2) - 128
 DYDX16x30HeroIconAtDefendingHeroWindow: equ $0000 + (176*128) + (006/2) - 128
+
+SetDefendingAndVisitingHeroButtons:
+  ld    hl,DefendingAndVisitingHeroButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*14)
+  ldir
+  ret
+
+DefendingAndVisitingHeroButtonTableGfxBlock:  db  ButtonsRecruitBlock
+DefendingAndVisitingHeroButtonTableAmountOfButtons:  db  14
+DefendingAndVisitingHeroButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %1100 0011 | dw $4000 + (072*128) + (162/2) - 128 | dw $4000 + (072*128) + (182/2) - 128 | dw $4000 + (072*128) + (202/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %1010 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
+
+  db  %1001 0011 | dw $4000 + (072*128) + (162/2) - 128 | dw $4000 + (072*128) + (182/2) - 128 | dw $4000 + (072*128) + (202/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button13Ytop,.Button13YBottom,.Button13XLeft,.Button13XRight | dw $0000 + (.Button13Ytop*128) + (.Button13XLeft/2) - 128
+  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button14Ytop,.Button14YBottom,.Button14XLeft,.Button14XRight | dw $0000 + (.Button14Ytop*128) + (.Button14XLeft/2) - 128
+
+.Button1Ytop:           equ 174
+.Button1YBottom:        equ .Button1Ytop + 034
+.Button1XLeft:          equ 004
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 176
+.Button2YBottom:        equ .Button2Ytop + 030
+.Button2XLeft:          equ 027
+.Button2XRight:         equ .Button2XLeft + 016
+
+.Button3Ytop:           equ 176
+.Button3YBottom:        equ .Button3Ytop + 030
+.Button3XLeft:          equ 043
+.Button3XRight:         equ .Button3XLeft + 016
+
+.Button4Ytop:           equ 176
+.Button4YBottom:        equ .Button4Ytop + 030
+.Button4XLeft:          equ 059
+.Button4XRight:         equ .Button4XLeft + 016
+
+.Button5Ytop:           equ 176
+.Button5YBottom:        equ .Button5Ytop + 030
+.Button5XLeft:          equ 075
+.Button5XRight:         equ .Button5XLeft + 016
+
+.Button6Ytop:           equ 176
+.Button6YBottom:        equ .Button6Ytop + 030
+.Button6XLeft:          equ 091
+.Button6XRight:         equ .Button6XLeft + 016
+
+.Button7Ytop:           equ 176
+.Button7YBottom:        equ .Button7Ytop + 030
+.Button7XLeft:          equ 107
+.Button7XRight:         equ .Button7XLeft + 016
+
+
+
+.Button8Ytop:           equ 174
+.Button8YBottom:        equ .Button8Ytop + 034
+.Button8XLeft:          equ 004 + 128
+.Button8XRight:         equ .Button8XLeft + 020
+
+.Button9Ytop:           equ 176
+.Button9YBottom:        equ .Button9Ytop + 030
+.Button9XLeft:          equ 027 + 128
+.Button9XRight:         equ .Button9XLeft + 016
+
+.Button10Ytop:           equ 176
+.Button10YBottom:        equ .Button10Ytop + 030
+.Button10XLeft:          equ 043 + 128
+.Button10XRight:         equ .Button10XLeft + 016
+
+.Button11Ytop:           equ 176
+.Button11YBottom:        equ .Button11Ytop + 030
+.Button11XLeft:          equ 059 + 128
+.Button11XRight:         equ .Button11XLeft + 016
+
+.Button12Ytop:           equ 176
+.Button12YBottom:        equ .Button12Ytop + 030
+.Button12XLeft:          equ 075 + 128
+.Button12XRight:         equ .Button12XLeft + 016
+
+.Button13Ytop:           equ 176
+.Button13YBottom:        equ .Button13Ytop + 030
+.Button13XLeft:          equ 091 + 128
+.Button13XRight:         equ .Button13XLeft + 016
+
+.Button14Ytop:           equ 176
+.Button14YBottom:        equ .Button14Ytop + 030
+.Button14XLeft:          equ 107 + 128
+.Button14XRight:         equ .Button14XLeft + 016
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SetTavernButtons:
   ld    hl,TavernButtonTable-2
-  ld    de,GenericButtonTable-2
+  ld    de,GenericButtonTable2-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*3)
   ldir
 
@@ -455,8 +732,24 @@ SetTavernButtons:
   ret
 
   .SetBrownButtonIfHeroIsAlreadyRecruited:
+  ld    a,(iy+TavernHero1DayRemain)
+  or    a
+  ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*0)
+  call  z,.AlreadyRecruitedSetBrown
+
+  ld    a,(iy+TavernHero2DayRemain)
+  or    a
+  ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*1)
+  call  z,.AlreadyRecruitedSetBrown
+
+  ld    a,(iy+TavernHero3DayRemain)
+  or    a
+  ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*2)
+  call  z,.AlreadyRecruitedSetBrown
+  ret
+
+  .AlreadyRecruitedSetBrown:
   ld    hl,.BrownButton
-  ld    de,GenericButtonTable+1+(GenericButtonTableLenghtPerButton*0)
   ld    bc,6
   ldir
   ret
@@ -476,7 +769,7 @@ SetTavernButtons:
   ret   nc
   
   ld    hl,TavernButtonTableWhenNotEnoughCash
-  ld    de,GenericButtonTable
+  ld    de,GenericButtonTable2
   ld    bc,GenericButtonTableLenghtPerButton*3
   ldir
   ret
@@ -506,14 +799,12 @@ TavernButtonTableLenghtPerButton:  equ TavernButtonTable.endlenght-TavernButtonT
 TavernButtonTableGfxBlock:  db  ButtonsRecruitBlock
 TavernButtonTableAmountOfButtons:  db  3
 TavernButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
-  ;which resource do you need window
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
   .endlenght:
   db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
   db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
 
 TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
-  ;which resource do you need window
   db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
   .endlenght:
   db  %1010 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
@@ -1519,13 +1810,41 @@ SetGenericButtons:                      ;put button in mirror page below screen,
 
   ld    a,(GenericButtonTableGfxBlock)                   ;buttons block
 
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+;  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
   halt
   ret
 
+CopyTransparantButtons:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    de,$0000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
 
+  ld    a,(ix+GenericButtonXleft)
+  ld    (CopyCastleButton2+dx),a
+  ld    a,(ix+GenericButtonYtop)
+  ld    (CopyCastleButton2+dy),a
 
+  ld    a,(ix+GenericButtonYbottom)
+  sub   a,(ix+GenericButtonYtop)
+  ld    (CopyCastleButton2+ny),a
+
+  ld    a,(ix+GenericButtonXright)
+  sub   a,(ix+GenericButtonXleft)
+  ld    (CopyCastleButton2+nx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+  halt
+  ret
 
 CheckButtonMouseInteractionGenericButtons:
   ld    b,(ix+GenericButtonAmountOfButtons)

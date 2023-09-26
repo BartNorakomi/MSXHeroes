@@ -264,6 +264,20 @@ init:
 	ld 		a,5			    ;switch to screen 5
 	call 	$5f
 
+;let's copy the copies of the vdp registers to our addresses of choice
+  ld    hl,$F3DF
+  ld    de,VDP_0
+  ld    bc,8
+  ldir
+
+  ld    hl,$FFE7
+  ld    de,VDP_8
+  ld    bc,30
+  ldir
+;/let's copy the copies of the vdp registers to our addresses of choice
+  ld    sp,$fd00
+;/then we can set our stack pointer a bit higher, reserving more free space in page 3
+
 	ld		a,(VDP_8+1)	
 	and		%1111 1101	;set 60 hertz
 	or		%1000 0000	;screen height 212
