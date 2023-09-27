@@ -23,7 +23,7 @@ StartGame:
   call  ClearMapPage0AndMapPage1
 
   ld    a,1
-  ld    (EnterCastle?),a
+;  ld    (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine

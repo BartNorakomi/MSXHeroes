@@ -829,12 +829,28 @@ Set16x30HeroIcon:
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    ix,(plxcurrentheroAddress)
-  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-  ld    b,(ix+HeroPortrait16x30SYSX+1)
+
+;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;  ld    b,(ix+HeroPortrait16x30SYSX+1)
+  call  SetAddressHeroPortrait16x30SYSXinBC
+
   ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
   ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 	ret
+
+SetAddressHeroPortrait16x30SYSXinBC:
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+
+  ld    c,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
+  ld    b,(ix+HeroInfoPortrait16x30SYSX+1)  
+;  ld    bc,$4000
+;  xor   a
+;  sbc   hl,bc
+  ret
 
 NXAndNY14x24CharaterPortraits:      equ 024*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
 DYDXUnit1WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+32)/2 - 128      ;(dy*128 + dx/2) = (204,153)
@@ -3297,8 +3313,11 @@ Set16x30HeroIconAtHeroOverviewCode:
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    ix,(plxcurrentheroAddress)
-  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-  ld    b,(ix+HeroPortrait16x30SYSX+1)
+
+;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;  ld    b,(ix+HeroPortrait16x30SYSX+1)
+  call  SetAddressHeroPortrait16x30SYSXinBC
+
   ld    hl,DYDX16x30HeroIconAtHeroOverview  ;(dy*128 + dx/2) = (208,089)
   ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY

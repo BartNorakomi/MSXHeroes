@@ -73,7 +73,7 @@ CastleOverviewTavernCode:
   ;tavern buttons
   ld    ix,GenericButtonTable2 
   call  CheckButtonMouseInteractionGenericButtons
-  call  .CheckTavernButtonClicked             ;in: carry=button clicked, b=button number
+  call  .CheckTavernButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
   call  SetGenericButtons               ;copies button state from rom -> vram
@@ -86,15 +86,68 @@ CastleOverviewTavernCode:
   ret   nc
   ret
 
-.CheckTavernButtonClicked:                    ;in: carry=button clicked, b=button number
+.CheckTavernButtonClicked:              ;in: carry=button clicked, b=button number
   ret   nc
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc                              ;store which tavern button was pressed
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   bc                              ;recall which tavern button was pressed
+  ret   nc                              ;unable to recruit hero if there is already a visiting hero here
+
+  ld    a,b
+  cp    3
+  call  z,.TavernButton1Pressed
+  cp    2
+  call  z,.TavernButton2Pressed
+  cp    1
+  call  z,.TavernButton3Pressed
+
+  ld    a,002                           ;set newly recruited hero as the new visiting hero of this castle
+  ld    (pl1hero3status),a
+
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
+
+  .TavernButton1Pressed:
+  ld    (iy+TavernHero1DayRemain),000   ;remove hero 1 from tavern
+  ret
+
+  .TavernButton2Pressed:
+  ld    (iy+TavernHero2DayRemain),000   ;remove hero 2 from tavern
+  ret
+
+  .TavernButton3Pressed:
+  ld    (iy+TavernHero3DayRemain),000   ;remove hero 3 from tavern
   ret
 
 SetTavernHeroes:
   call  SettavernHeroIcons
   call  SettavernHeroNames
   call  SettavernHeroSkill
+  call  EraseTavernHeroWindowWhenUnavailable
   ret
+
+EraseTavernHeroWindowWhenUnavailable:
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  or    a
+  ld    de,$0000 + (045*128) + (006/2) - 128
+  call  z,.EraseWindow
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  or    a
+  ld    de,$0000 + (045*128) + (092/2) - 128
+  call  z,.EraseWindow
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  or    a
+  ld    de,$0000 + (045*128) + (178/2) - 128
+  call  z,.EraseWindow
+  ret
+
+  .EraseWindow:
+  ld    hl,$4000 + (055*128) + (180/2) - 128
+  ld    bc,$0000 + (069*256) + (072/2)
+  ld    a,BuildBlock                    ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SettavernHeroSkill:
   ld    a,HeroOverviewCodeBlock         ;Map block
@@ -246,10 +299,10 @@ SetVisitingAndDefendingHeroesAndArmy:
   call  SetDefendingHeroArmyAndAmount
   ret
 
-
-
 SetDefendingHeroArmyAndAmount:
-  ld    ix,(plxcurrentheroAddress)
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ret   c
 
   call  .army
 ;  call  .amount
@@ -260,39 +313,38 @@ SetDefendingHeroArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,029
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,045
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,061
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,077
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,093
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,109
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
   ret
-
 
   .army:
   ld    a,Enemy14x14PortraitsBlock      ;Map block
@@ -353,12 +405,10 @@ DYDXDefendingHeroUnit4:          equ (181*128) + (076/2) - 128      ;(dy*128 + d
 DYDXDefendingHeroUnit5:          equ (181*128) + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXDefendingHeroUnit6:          equ (181*128) + (108/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
-
-
-
-
 SetVisitingHeroArmyAndAmount:
-  ld    ix,(plxcurrentheroAddress)
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ret   c
 
   call  .army
 ;  call  .amount
@@ -369,39 +419,38 @@ SetVisitingHeroArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,157
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,173
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,189
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,205
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,221
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,237
   ld    c,197
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSkipIfAmountIs0
   ret
-
 
   .army:
   ld    a,Enemy14x14PortraitsBlock      ;Map block
@@ -472,43 +521,24 @@ DYDXVisitingHeroUnit4:          equ (181*128) + (204/2) - 128      ;(dy*128 + dx
 DYDXVisitingHeroUnit5:          equ (181*128) + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXVisitingHeroUnit6:          equ (181*128) + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-SetDefendingHero:
+SetVisitingOrDefendingHeroInIX:         ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
 	ld		a,(whichplayernowplaying?)
-  cp    1 | ld ix,pl1hero1y |	jr z,.CheckHeroDefendingCastle
-  cp    2 | ld ix,pl2hero1y |	jr z,.CheckHeroDefendingCastle
-  cp    3 | ld ix,pl3hero1y |	jr z,.CheckHeroDefendingCastle
-  cp    4 | ld ix,pl4hero1y |	jr z,.CheckHeroDefendingCastle	
+  cp    1 | ld ix,pl1hero1y |	jr z,.CheckHeroVisitingOrDefendingCastle
+  cp    2 | ld ix,pl2hero1y |	jr z,.CheckHeroVisitingOrDefendingCastle
+  cp    3 | ld ix,pl3hero1y |	jr z,.CheckHeroVisitingOrDefendingCastle
+  cp    4 | ld ix,pl4hero1y |	jr z,.CheckHeroVisitingOrDefendingCastle	
 
-	.CheckHeroDefendingCastle:
+	.CheckHeroVisitingOrDefendingCastle:
   ld    b,amountofheroesperplayer
   .loop:
-  call  .DoCheckIfHeroIsDefending       ;check if this hero is visiting castle
+  call  .DoCheckHero                    ;check if this hero is visiting or defending castle
 	ld		de,lenghtherotable
   add   ix,de                           ;next hero
   djnz  .loop
-  call  .SetNoHeroDefendingCastle
+  scf                                   ;carry=no visiting/defending hero found
   ret
 
-  .DoCheckIfHeroIsDefending:
+  .DoCheckHero:
   ld    a,(iy+CastleY)                  ;check if hero enters castle
   dec   a
   cp    (ix+Heroy)
@@ -518,69 +548,38 @@ SetDefendingHero:
   cp    (ix+Herox)
   ret   nz
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  cp    254                             ;is this hero defending the castle ?
+  cp    c                               ;is this hero defending (254) or visiting (002) the castle ?
   ret   nz
 
-  pop   af                              ;defending hero found, no need to check other heroes
+  pop   bc                              ;defending hero found, no need to check other heroes
+  ret
 
-  ;defending hero found. ix->visiting hero
-  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
-  ld    h,(ix+HeroSpecificInfo+1)
-  push  hl
-  pop   ix
+SetDefendingHero:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
 
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    de,$4000
-  xor   a
-  sbc   hl,de
-
-  ld    de,DYDX16x30HeroIconAtDefendingHeroWindow
-  ld    bc,NXAndNY16x30HeroIcon
-  ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  .SetNoHeroDefendingCastle:
-  ld    hl,$4000 + (013*128) + (230/2) - 128
   ld    de,$0000 + (176*128) + (004/2) - 128
+  jp    c,SetNoHeroVisitingOrDefendingCastle
+  ld    de,DYDX16x30HeroIconAtDefendingHeroWindow
+  jp    DoSetVisitingOrDefendingHero
+  
+SetVisitingHero:  
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+
+  ld    de,$0000 + (176*128) + (132/2) - 128
+  jp    c,SetNoHeroVisitingOrDefendingCastle
+  ld    de,DYDX16x30HeroIconAtVisitingHeroWindow
+  jp    DoSetVisitingOrDefendingHero
+
+SetNoHeroVisitingOrDefendingCastle:
+  ld    hl,$4000 + (013*128) + (230/2) - 128
   ld    bc,$0000 + (028*256) + (020/2)
   ld    a,ButtonsRecruitBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  
 
-SetVisitingHero:  
-	ld		a,(whichplayernowplaying?)
-  cp    1 | ld ix,pl1hero1y |	jr z,.CheckHeroVisitingCastle
-  cp    2 | ld ix,pl2hero1y |	jr z,.CheckHeroVisitingCastle
-  cp    3 | ld ix,pl3hero1y |	jr z,.CheckHeroVisitingCastle
-  cp    4 | ld ix,pl4hero1y |	jr z,.CheckHeroVisitingCastle	
-
-	.CheckHeroVisitingCastle:
-  ld    b,amountofheroesperplayer
-  .loop:
-  call  .DoCheckIfHeroIsVisiting        ;check if this hero is visiting castle
-	ld		de,lenghtherotable
-  add   ix,de                           ;next hero
-  djnz  .loop
-  call  .SetNoHeroVisitingCastle
-  ret
-
-  .DoCheckIfHeroIsVisiting:
-  ld    a,(iy+CastleY)                  ;check if hero enters castle
-  dec   a
-  cp    (ix+Heroy)
-  ret   nz
-  ld    a,(iy+CastleX)
-  inc   a
-  cp    (ix+Herox)
-  ret   nz
-  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  cp    002                             ;is this hero visiting the castle ?
-  ret   nz                              ;is this hero visiting the castle ?
-
-  pop   af                              ;visiting hero found, no need to check other heroes
-
-  ;visiting hero found. ix->visiting hero
+DoSetVisitingOrDefendingHero:
+  ;defending hero found. ix->defending hero
   ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
@@ -588,22 +587,14 @@ SetVisitingHero:
 
   ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
   ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    de,$4000
+  ld    bc,$4000
   xor   a
-  sbc   hl,de
+  sbc   hl,bc
 
-  ld    de,DYDX16x30HeroIconAtVisitingHeroWindow
   ld    bc,NXAndNY16x30HeroIcon
   ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  .SetNoHeroVisitingCastle:
-  ld    hl,$4000 + (013*128) + (230/2) - 128
-  ld    de,$0000 + (176*128) + (132/2) - 128
-  ld    bc,$0000 + (030*256) + (020/2)
-  ld    a,ButtonsRecruitBlock          ;block to copy graphics from
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  
 DYDX16x30HeroIconAtVisitingHeroWindow: equ $0000 + (176*128) + (134/2) - 128
 DYDX16x30HeroIconAtDefendingHeroWindow: equ $0000 + (176*128) + (006/2) - 128
 
@@ -3371,6 +3362,10 @@ DYDXUnit4Window:               equ 094*128 + (008/2) - 128      ;(dy*128 + dx/2)
 DYDXUnit5Window:               equ 094*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
+SetNumber16BitCastleSkipIfAmountIs0:
+  ld    a,h
+  cp    l
+  ret   z
 
 SetNumber16BitCastle:                   ;in hl=number (16bit)
 ;  ld    a,"0"                           ;we can set number to 0, then do a zero check and jr z,.zero to put the number 0 at the furthest left side if needed
