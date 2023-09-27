@@ -103,22 +103,61 @@ CastleOverviewTavernCode:
   cp    1
   call  z,.TavernButton3Pressed
 
-  ld    a,002                           ;set newly recruited hero as the new visiting hero of this castle
-  ld    (pl1hero3status),a
-
   pop   af                              ;pop the call to this routine
   jp    CastleOverviewTavernCode
 
   .TavernButton1Pressed:
-  ld    (iy+TavernHero1DayRemain),000   ;remove hero 1 from tavern
+  ld    a,(iy+TavernHero1DayRemain)     ;which hero are we recruiting ?
+  call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
+  ld    (iy+TavernHero1DayRemain),000   ;remove hero 2 from tavern
   ret
 
   .TavernButton2Pressed:
+  ld    a,(iy+TavernHero2DayRemain)     ;which hero are we recruiting ?
+  call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   ld    (iy+TavernHero2DayRemain),000   ;remove hero 2 from tavern
   ret
-
+  
   .TavernButton3Pressed:
-  ld    (iy+TavernHero3DayRemain),000   ;remove hero 3 from tavern
+  ld    a,(iy+TavernHero3DayRemain)     ;which hero are we recruiting ?
+  call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
+  ld    (iy+TavernHero3DayRemain),000   ;remove hero 2 from tavern
+  ret
+
+  .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
+  push  af                              ;a,(iy+TavernHeroxDayRemain)
+  call  SetEmptyHeroSlotForCurrentPlayerInIX
+  ld    (ix+HeroStatus),002             ;set newly recruited hero as the new visiting hero of this castle
+  ld    a,(iy+CastleY)                  ;castle y
+  dec   a
+  ld    (ix+HeroY),a                    ;set hero y  
+  ld    a,(iy+Castlex)                  ;castle x
+  inc   a
+  ld    (ix+HeroX),a                    ;set hero x
+  pop   af                              ;a,(iy+TavernHeroxDayRemain)
+
+  ld    b,a
+  ld    hl,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght
+  .loop2:
+  add   hl,de
+  djnz  .loop2
+
+  ld    (ix+HeroSpecificInfo+0),l
+  ld    (ix+HeroSpecificInfo+1),h
+  ret
+
+SetEmptyHeroSlotForCurrentPlayerInIX:
+	ld		a,(whichplayernowplaying?)
+  cp    1 | ld ix,pl1hero1y |	jr z,.GoFindEmptySlot
+  cp    2 | ld ix,pl2hero1y |	jr z,.GoFindEmptySlot
+  cp    3 | ld ix,pl3hero1y |	jr z,.GoFindEmptySlot
+  cp    4 | ld ix,pl4hero1y |	jr z,.GoFindEmptySlot
+
+  .GoFindEmptySlot:
+  
+  ld    ix,pl1hero3y
+
   ret
 
 SetTavernHeroes:

@@ -4188,7 +4188,7 @@ pl1hero3life:	db	03,20
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	10,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4212,7 +4212,7 @@ pl1hero4life:	db	03,20
 pl1hero4move:	db	30,20
 pl1hero4mana:	db	10,20
 pl1hero4manarec:db	5		                ;recover x mana every turn
-pl1hero4status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4236,7 +4236,7 @@ pl1hero5life:	db	03,20
 pl1hero5move:	db	30,20
 pl1hero5mana:	db	10,20
 pl1hero5manarec:db	5		                ;recover x mana every turn
-pl1hero5status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero5status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4260,7 +4260,7 @@ pl1hero6life:	db	03,20
 pl1hero6move:	db	30,20
 pl1hero6mana:	db	10,20
 pl1hero6manarec:db	5		                ;recover x mana every turn
-pl1hero6status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4284,7 +4284,7 @@ pl1hero7life:	db	03,20
 pl1hero7move:	db	30,20
 pl1hero7mana:	db	10,20
 pl1hero7manarec:db	5		                ;recover x mana every turn
-pl1hero7status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero7status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4308,7 +4308,7 @@ pl1hero8life:	db	03,20
 pl1hero8move:	db	30,20
 pl1hero8mana:	db	10,20
 pl1hero8manarec:db	5		                ;recover x mana every turn
-pl1hero8status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero8status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4336,7 +4336,7 @@ pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
-pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl2hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
