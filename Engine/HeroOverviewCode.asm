@@ -566,12 +566,8 @@ HeroOverviewArmyWindowCode:
 ;  ld    a,3
 ;  ld    (SetSkillsDescription?),a  
   ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+;  jp    .engine
   jp    HeroOverviewArmyWindowCode
-
-
-
-
-
 
 MarkLastPressedButtonArmy:                  ;mark the button that was pressed as 'mouse hover over'
   ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)

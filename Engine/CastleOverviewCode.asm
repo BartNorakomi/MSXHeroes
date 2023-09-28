@@ -1,4 +1,9 @@
 CastleOverviewTavernCode:
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
+
   ld    iy,Castle1
 
   call  SetTavernButtons
@@ -64,10 +69,30 @@ CastleOverviewTavernCode:
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
   call  CheckButtonMouseInteractionGenericButtons
+
   call  .CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton                ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1001 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
 
   ld    ix,GenericButtonTable
   call  SetGenericButtons               ;copies button state from rom -> vram
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+
+
   ;/VisitingAndDefendingHeroesAndArmy buttons
 
   ;tavern buttons
@@ -83,8 +108,179 @@ CastleOverviewTavernCode:
   jp  .engine
 
 .CheckButtonClickedVisitingAndDefendingHeroesAndArmy:                    ;in: carry=button clicked, b=button number
-  ret   nc
+  ret   nc                              ;carry=button pressed, b=which button
+
+  ;at this point a button has been click. Check 3 possibilities:
+  ;1. previously the same button was clicked-> reset
+  ;2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ;3. previously a different button was clicked->swap
+
+  ;check 1. previously the same button was clicked-> reset
+  ld    a,(PreviousButtonClicked)
+  cp    b
+  jr    nz,.EndCheck1
+  ld    a,255
+  ld    (PreviousButtonClicked),a
   ret
+  .EndCheck1:
+
+  ;check 2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ld    a,(PreviousButtonClicked)
+  cp    255                             ;check if there is a button already highlighted
+  jr    nz,.EndCheck2
+
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    8
+  jp    c,.CheckVisitingHero            ;did we click the defending or visiting hero's windows ?
+
+  .CheckDefendingHero:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   ix
+  pop   bc
+  ret   c                               ;no defending hero found, no need to highlight any button
+  ;defending hero found, but now check if content of creature-button is empty, if so, ignore
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    14
+  jp    z,.HighlightNewButton           ;if hero button is pressed, highlight button, since hero is in this slot
+  ;check empty creature slot for defending hero
+  ld    b,a
+  ld    a,13
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  cp    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  ret   z
+  ;/check empty creature slot for defending hero
+  jp    .HighlightNewButton  
+  
+  .CheckVisitingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   ix
+  pop   bc
+  ret   c                               ;no visiting hero found, no need to highlight any button
+  ;defending hero found, but now check if content of creature-button is empty, if so, ignore
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    07
+  jp    z,.HighlightNewButton           ;if hero button is pressed, highlight button, since hero is in this slot
+  ;check empty creature slot for visiting hero
+  ld    b,a
+  ld    a,06
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  cp    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  ret   z
+  ;/check empty creature slot for defending hero
+  jp    .HighlightNewButton  
+  .EndCheck2:
+
+  ;check 3. previously a different button was clicked->swap
+
+
+;Here we have multiple possibilities
+  ;Heroes:
+;4. swap visiting with defending hero
+;5. change defending hero into visiting hero
+;6. change visiting hero into defending hero and merge units that are in the defending slots
+  ;Creatures:
+;7. second slot clicked is empty, move (and split if possible) 1 unit
+;8. second slot clicked  has the same unit type, combine them 
+;9. both slots have different units, swap them
+
+;6. change visiting hero into defending hero and merge units that are in the defending slots
+  .ChangeVisitingHeroIntoDefendingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    (ix+HeroStatus),254             ;change defending hero into visiting hero 
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
+
+;5. change defending hero into visiting hero
+  .ChangeDefendingHeroIntoVisitingHero:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    (ix+HeroStatus),002             ;change defending hero into visiting hero 
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
+
+;4. swap visiting with defending hero
+  .SwapVisitingHeroWithDefendingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  push  ix                              ;swap after we handled defending hero
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    (ix+HeroStatus),002             ;defending hero now becomes visiting hero 
+  pop   ix                              ;now we can swap visiting hero at the same time
+  ld    (ix+HeroStatus),254             ;visiting hero now becomes defending hero   
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
+
+  .HighlightNewButton:
+  ld    a,b                             ;current button clicked now becomes previous button clicked (for future references)
+  ld    (PreviousButtonClicked),a
+  ld    (PreviousButtonClickedIX),ix
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
 
 .CheckTavernButtonClicked:              ;in: carry=button clicked, b=button number
   ret   nc
@@ -97,32 +293,32 @@ CastleOverviewTavernCode:
 
   ld    a,b
   cp    3
-  call  z,.TavernButton1Pressed
+  jr    z,.TavernButton1Pressed
   cp    2
-  call  z,.TavernButton2Pressed
-  cp    1
-  call  z,.TavernButton3Pressed
+  jr    z,.TavernButton2Pressed
+;  cp    1
+;  jr    z,.TavernButton3Pressed
 
+  .TavernButton3Pressed:
+  ld    a,(iy+TavernHero3DayRemain)     ;which hero are we recruiting ?
+  call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
+  ld    (iy+TavernHero3DayRemain),000   ;remove hero 2 from tavern
   pop   af                              ;pop the call to this routine
   jp    CastleOverviewTavernCode
-
-  .TavernButton1Pressed:
-  ld    a,(iy+TavernHero1DayRemain)     ;which hero are we recruiting ?
-  call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
-  ld    (iy+TavernHero1DayRemain),000   ;remove hero 2 from tavern
-  ret
 
   .TavernButton2Pressed:
   ld    a,(iy+TavernHero2DayRemain)     ;which hero are we recruiting ?
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   ld    (iy+TavernHero2DayRemain),000   ;remove hero 2 from tavern
-  ret
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
   
-  .TavernButton3Pressed:
-  ld    a,(iy+TavernHero3DayRemain)     ;which hero are we recruiting ?
+  .TavernButton1Pressed:
+  ld    a,(iy+TavernHero1DayRemain)     ;which hero are we recruiting ?
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
-  ld    (iy+TavernHero3DayRemain),000   ;remove hero 2 from tavern
-  ret
+  ld    (iy+TavernHero1DayRemain),000   ;remove hero 2 from tavern
+  pop   af                              ;pop the call to this routine
+  jp    CastleOverviewTavernCode
 
   .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
   push  af                              ;a,(iy+TavernHeroxDayRemain)
@@ -148,16 +344,24 @@ CastleOverviewTavernCode:
   ret
 
 SetEmptyHeroSlotForCurrentPlayerInIX:
+  ld    b,amountofheroesperplayer
 	ld		a,(whichplayernowplaying?)
-  cp    1 | ld ix,pl1hero1y |	jr z,.GoFindEmptySlot
-  cp    2 | ld ix,pl2hero1y |	jr z,.GoFindEmptySlot
-  cp    3 | ld ix,pl3hero1y |	jr z,.GoFindEmptySlot
-  cp    4 | ld ix,pl4hero1y |	jr z,.GoFindEmptySlot
+  cp    1 | ld ix,pl1hero1y |	jr z,.GoFindEmptySlotLoop
+  cp    2 | ld ix,pl2hero1y |	jr z,.GoFindEmptySlotLoop
+  cp    3 | ld ix,pl3hero1y |	jr z,.GoFindEmptySlotLoop
+  cp    4 | ld ix,pl4hero1y |	jr z,.GoFindEmptySlotLoop
 
-  .GoFindEmptySlot:
-  
-  ld    ix,pl1hero3y
+  .GoFindEmptySlotLoop:
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ret   z
+  ld    de,lenghtherotable
+  add   ix,de
+  djnz  .GoFindEmptySlotLoop
 
+  pop   af                              ;pop the call to this routine
+  pop   af                              ;pop the push in the previous routine (.SetHeroStats:)
+  pop   af                              ;pop the call to .TavernButtonxPressed:
   ret
 
 SetTavernHeroes:
@@ -649,20 +853,20 @@ DefendingAndVisitingHeroButtonTableAmountOfButtons:  db  14
 DefendingAndVisitingHeroButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
   ;which resource do you need window
   db  %1100 0011 | dw $4000 + (072*128) + (162/2) - 128 | dw $4000 + (072*128) + (182/2) - 128 | dw $4000 + (072*128) + (202/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
-  db  %1010 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
 
-  db  %1001 0011 | dw $4000 + (072*128) + (162/2) - 128 | dw $4000 + (072*128) + (182/2) - 128 | dw $4000 + (072*128) + (202/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button13Ytop,.Button13YBottom,.Button13XLeft,.Button13XRight | dw $0000 + (.Button13Ytop*128) + (.Button13XLeft/2) - 128
-  db  %1001 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button14Ytop,.Button14YBottom,.Button14XLeft,.Button14XRight | dw $0000 + (.Button14Ytop*128) + (.Button14XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (072*128) + (162/2) - 128 | dw $4000 + (072*128) + (182/2) - 128 | dw $4000 + (072*128) + (202/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button13Ytop,.Button13YBottom,.Button13XLeft,.Button13XRight | dw $0000 + (.Button13Ytop*128) + (.Button13XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (106*128) + (162/2) - 128 | dw $4000 + (106*128) + (178/2) - 128 | dw $4000 + (106*128) + (194/2) - 128 | db .Button14Ytop,.Button14YBottom,.Button14XLeft,.Button14XRight | dw $0000 + (.Button14Ytop*128) + (.Button14XLeft/2) - 128
 
 .Button1Ytop:           equ 174
 .Button1YBottom:        equ .Button1Ytop + 034
@@ -1945,7 +2149,12 @@ CheckButtonMouseInteractionGenericButtons:
   pop   af                                ;no need to check the other buttons
   ld    (ix+GenericButtonStatus),%1010 0011
   scf                                     ;button has been clicked
-;  ld    a,b
+
+
+  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    (MenuOptionSelected?),a
+
+
   ret
 
 SetMagicGuildButtons:

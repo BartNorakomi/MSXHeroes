@@ -23,7 +23,7 @@ StartGame:
   call  ClearMapPage0AndMapPage1
 
   ld    a,1
-;  ld    (EnterCastle?),a
+  ld    (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -1405,11 +1405,14 @@ ButtonTableSpellBookSYSX_Water:
 
 ActivatedSkillsButton:  ds  2
 ;ActivatedSpellIconButton:  ds  2
-PreviousActivatedSkillsButton:  ds  2
+;PreviousActivatedSkillsButton:  ds  2
 SetSkillsDescription?:  db  1
 MenuOptionSelected?:  db  0
 MenuOptionSelected?Backup:  db 255
 MenuOptionSelected?BackupLastFrame:  db 255
+
+PreviousButtonClicked:    ds  1
+PreviousButtonClickedIX:  ds  2
 
 LenghtTextSkillsDescription:  equ 24
 TextSkillsWindowButton1:  db  "basic archery          ",255
@@ -2311,8 +2314,6 @@ PopulateControlsOnInterrupt:
   ld    a,(ControlsOnInterrupt)
   and   %1111 0000
   ld    (ControlsOnInterrupt),a
-
-	
 	ret
 
 
