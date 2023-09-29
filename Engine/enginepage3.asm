@@ -508,7 +508,7 @@ ButtonTableArmyIconsSYSX:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-CastleButtonsDY:  equ 132;179
+CastleButtonsDY:  equ 179 ;132;179
 CopyCastleButton:
 	db		012,0,212,1
 	db		008,0,CastleButtonsDY,255
@@ -1525,12 +1525,12 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-;  call  CastleOverviewCode
+  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
-  call  CastleOverviewTavernCode
+;  call  CastleOverviewTavernCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  

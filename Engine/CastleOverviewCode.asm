@@ -1,3 +1,10 @@
+;  call  CastleOverviewCode
+;  call  CastleOverviewBuildCode
+;  call  CastleOverviewRecruitCode
+;  call  CastleOverviewMagicGuildCode
+;  call  CastleOverviewMarketPlaceCode
+;  call  CastleOverviewTavernCode
+
 CastleOverviewTavernCode:
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
@@ -24,6 +31,9 @@ CastleOverviewTavernCode:
   ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
   ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
 
+  ld    a,132
+  call  SetExitButtonHeight
+  
   call  SetTavernGraphics               ;put gfx in page 1
   call  SetResourcesPlayer
   call  SetVisitingAndDefendingHeroesAndArmy
@@ -1352,6 +1362,17 @@ CastleOverviewTavernCode:
 
   ld    (ix+HeroSpecificInfo+0),l
   ld    (ix+HeroSpecificInfo+1),h
+  
+  call  SetResourcesCurrentPlayerinIX
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;gold
+  ld    de,2000
+  xor   a
+  sbc   hl,de
+;  ret   nc
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;gold   
   ret
 
 CheckHeroHasAtLeast2CreatureSlotsFilled:
@@ -3324,7 +3345,12 @@ MagicGuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), b
   db  %1100 0011 | dw AirLevel4Untouched    | dw AirLevel4Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel4Y  ,MagicGuildAirLevel4Y+16  ,MagicGuildAirLevel4X  ,MagicGuildAirLevel4X+16   | dw $0000 + (MagicGuildAirLevel4Y*128)   + (MagicGuildAirLevel4X/2) - 128   | 
   db  %1100 0011 | dw EarthLevel4Untouched  | dw EarthLevel4Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel4Y,MagicGuildEarthLevel4Y+16,MagicGuildEarthLevel4X,MagicGuildEarthLevel4X+16 | dw $0000 + (MagicGuildEarthLevel4Y*128) + (MagicGuildEarthLevel4X/2) - 128 | 
 
-
+SetExitButtonHeight:
+  ld    (CastleOverviewButtonTable + (5*CastleOverviewButtonTableLenghtPerButton) + CastleOverviewWindowButtonYtop),a
+  ld    (CopyCastleButton+dy),a
+  add   a,31
+  ld    (CastleOverviewButtonTable + (5*CastleOverviewButtonTableLenghtPerButton) + CastleOverviewWindowButtonYbottom),a
+  ret
 
 CastleOverviewRecruitCode:
   ld    iy,Castle1
@@ -3347,6 +3373,9 @@ CastleOverviewRecruitCode:
   ld    (CastleOverviewButtonTable+3*CastleOverviewButtonTableLenghtPerButton),a ;trade
   ld    (CastleOverviewButtonTable+4*CastleOverviewButtonTableLenghtPerButton),a ;heroes
 
+  ld    a,133
+  call  SetExitButtonHeight
+
   xor   a
   ld    (RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton),a ;BUY button
   ld    (RecruitButtonMAXBUYTable+1*RecruitButtonMAXBUYTableLenghtPerButton),a ;MAX button
@@ -3360,6 +3389,8 @@ CastleOverviewRecruitCode:
   ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
 
   call  SetRecruitGraphics              ;put gfx in page 1
+  call  SetResourcesPlayer
+  call  SetVisitingAndDefendingHeroesAndArmy
   call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
 
 ;  ld    b,3                             ;which unit ?
@@ -4853,6 +4884,8 @@ CastleOverviewBuildCode:                ;in: iy-castle
 	ld		(activepage),a                  ;start in page 0
 
   call  SetBuildGraphics                ;put gfx in page 1
+  call  SetResourcesPlayer
+
   ld    hl,CopyPage1To0
   call  docopy
 
@@ -4933,7 +4966,6 @@ CastleOverviewBuildCode:                ;in: iy-castle
   ld    ix,SingleBuildButtonTable
   call  SetSingleBuildButton            ;copies button state from rom -> vram
   ;/single build button
-
 
   halt
   jp  .engine
@@ -6178,16 +6210,7 @@ SetBuildButtons:                        ;put button in mirror page below screen,
 
 
 CastleOverviewCode:                     ;in: iy-castle
-
-
-
-
-
-
   ld    iy,Castle1
-
-
-
 
 
 
@@ -6202,8 +6225,11 @@ CastleOverviewCode:                     ;in: iy-castle
   call  SetIndividualBuildings          ;put buildings in page 0, then docopy them from page 0 to page 1 transparantly
   ld    hl,CopyPage1To0
   call  docopy
-  call  SetActiveCastleOverviewButtons
 
+  ld    a,179
+  call  SetExitButtonHeight
+  call  SetActiveCastleOverviewButtons
+  
   halt
   halt
   halt
@@ -6231,16 +6257,11 @@ CastleOverviewCode:                     ;in: iy-castle
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-
   ld    ix,CastleOverviewButtonTable ;  ld    iy,ButtonTableArmyIconsSYSX (;deze shit mag erin verwerkt zijn)
-  call  CheckButtonMouseInteractionCastle
-
+  call  CheckButtonMouseInteractionCastleMainScreen
 
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
-
-
-
 
   halt
   jp  .engine
@@ -6347,7 +6368,7 @@ SetCastleButtons:                       ;put button in mirror page below screen,
   halt
   ret
 
-CheckButtonMouseInteractionCastle:
+CheckButtonMouseInteractionCastleMainScreen:
   ld    b,6
   ld    de,CastleOverviewButtonTableLenghtPerButton
 
@@ -6458,6 +6479,78 @@ CheckButtonMouseInteractionCastle:
   pop   af                                    ;pop the call in the button check loop 
   pop   af                                    ;pop the call to the CastleOverViewCode
   jp    CastleOverviewBuildCode               ;jump to the build code
+
+;THIS ROUTINE IS FROM ONE OF THE 5 INTERNAL WINDOWS (build, recruit, mageguild, tade, heroes)
+CheckButtonMouseInteractionCastle:
+  ld    b,6
+  ld    de,CastleOverviewButtonTableLenghtPerButton
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+  bit   7,(ix+CastleOverviewWindowButtonStatus)
+  ret   z
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+CastleOverviewWindowButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+CastleOverviewWindowButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+  cp    (ix+CastleOverviewWindowButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+CastleOverviewWindowButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+CastleOverviewWindowButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+CastleOverviewWindowButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+  pop   af                                    ;pop the call in the button check loop 
+  pop   af                                    ;pop the call to this internal window in the castle
+  jp    CastleOverviewCode
+ 
 
 SetIndividualBuildings:
 ;barracks
