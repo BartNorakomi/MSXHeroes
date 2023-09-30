@@ -5,7 +5,16 @@
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
 
+ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when refreshing the visiting and defending army heroes and creatures overview
+  ld    a,(AreWeInTavern1OrRecruit2?)
+  dec   a
+  jp    z,CastleOverviewTavernCode
+  jp    CastleOverviewRecruitCode
+
 CastleOverviewTavernCode:
+  ld    a,1
+  ld    (AreWeInTavern1OrRecruit2?),a
+
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
   ld    ix,GenericButtonTable
@@ -286,7 +295,8 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+
+  jp    ExitVisitingAndDefendingArmyRoutine
   .EndCheck4:
 
 ;5. This castle has ONLY a defending hero. Change defending hero into visiting hero
@@ -307,7 +317,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc  
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   .EndCheck5:
 
 ;6. This castle has ONLY a visiting hero. Change visiting hero into defending hero
@@ -328,7 +338,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc  
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   .EndCheck6:
 
 ;7. Defending hero slot is highlighted, but now a non hero slot is clicked ->reset
@@ -455,7 +465,7 @@ CastleOverviewTavernCode:
   ;/put one unit in the second slot/botton pressed
 
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   .EndCheck9:
 
 ;9b. same as 9, but then for defending hero
@@ -549,7 +559,7 @@ CastleOverviewTavernCode:
   ;/put one unit in the second slot/botton pressed
 
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   .EndCheck9b:
 
 
@@ -641,7 +651,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc  
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
 
   .EndCheck10WithPopIXandBC:
   pop   ix
@@ -736,7 +746,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc  
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
 
   .EndCheck10bWithPopIXandBC:
   pop   ix
@@ -858,7 +868,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   ;/move all selected units from visiting hero to defending hero
   .EndCheck11:
 
@@ -958,7 +968,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   ;/move all selected units from visiting hero to defending hero
   .EndCheck11b:
 
@@ -1078,7 +1088,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
   .EndCheck12:
   
@@ -1197,7 +1207,7 @@ CastleOverviewTavernCode:
   pop   ix
   pop   bc
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
   .EndCheck12b:
 
@@ -1242,7 +1252,7 @@ CastleOverviewTavernCode:
   ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
   
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    ExitVisitingAndDefendingArmyRoutine
   ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
   .EndCheck13:
   
@@ -3353,8 +3363,16 @@ SetExitButtonHeight:
   ret
 
 CastleOverviewRecruitCode:
+  ld    a,2
+  ld    (AreWeInTavern1OrRecruit2?),a
+
   ld    iy,Castle1
 
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
+  call  SetDefendingAndVisitingHeroButtons
   ld    hl,World1Palette
   call  SetPalette
 
@@ -3363,6 +3381,9 @@ CastleOverviewRecruitCode:
 
   ld    hl,0
   ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalGoldCost),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalCostGems),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalCostRubies),hl
   
   ld    a,%1100 0011
   ld    (CastleOverviewButtonTable+5*CastleOverviewButtonTableLenghtPerButton),a ;exit
@@ -3392,6 +3413,7 @@ CastleOverviewRecruitCode:
   call  SetResourcesPlayer
   call  SetVisitingAndDefendingHeroesAndArmy
   call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+  call  SetVisitingAndDefendingHeroesAndArmy
 
 ;  ld    b,3                             ;which unit ?
 ;  call  ShowRecruitWindowForSelectedUnit
@@ -3425,6 +3447,49 @@ CastleOverviewRecruitCode:
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
+
+
+
+
+  ;VisitingAndDefendingHeroesAndArmy buttons
+  ld    ix,GenericButtonTable 
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  CastleOverviewTavernCode.CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton                ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1001 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+  ;/VisitingAndDefendingHeroesAndArmy buttons
+
+
+
+
+
+
+
+
+
+
+
+
+
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
   call  CheckButtonMouseInteractionCastle
@@ -3443,11 +3508,9 @@ CastleOverviewRecruitCode:
 
   ;recruit buttons MAX and BUY
   ld    ix,RecruitButtonMAXBUYTable 
-;  call  CheckButtonMouseInteractionRecruitButtons
   call  CheckButtonMouseInteractionRecruitMAXBUYButtons
 
   ld    ix,RecruitButtonMAXBUYTable
-;  call  SetRecruitButtons                ;copies button state from rom -> vram
   call  SetRecruitMAXBUYButtons                ;copies button state from rom -> vram
   ;/recruit buttons MAX and BUY
 
@@ -3619,14 +3682,6 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   .MaxButtonPressed:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
-  ;add amount available to recruit amount to select all units ready for recruitment
-  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
-  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
-  add   hl,de
-  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
-  ld    hl,0
-  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
-
   call  .SetAvailableAmountRecruitAmountAndTotalCost
   call  SwapAndSetPage                  ;swap and set page
   call  .SetAvailableAmountRecruitAmountAndTotalCost
@@ -3634,8 +3689,107 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
   .BuyButtonPressed:
 
+  call  SetResourcesCurrentPlayerinIX
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;player gold in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalGoldCost)
+  xor   a
+  sbc   hl,de
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;player gold in hl
+
+  ld    l,(ix+6)
+  ld    h,(ix+7)                        ;player gold in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalCostGems)
+  xor   a
+  sbc   hl,de
+  ld    (ix+6),l
+  ld    (ix+7),h                        ;player gold in hl
+
+  ld    l,(ix+8)
+  ld    h,(ix+9)                        ;player gold in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalCostRubies)
+  xor   a
+  sbc   hl,de
+  ld    (ix+8),l
+  ld    (ix+9),h                        ;player gold in hl
+
+  call  .SubtractPurchasedUnitsFromCastle
+
   pop   af                                ;pop the call to this routine
   jp    CastleOverviewRecruitCode
+
+
+.SubtractPurchasedUnitsFromCastle:
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  ld    a,(SelectedCastleRecruitLevelUnit)
+
+  cp    1
+  jr    nz,.EndCheckUnitLevel1  
+  ld    l,(iy+CastleLevel1UnitsAvail+00)
+  ld    h,(iy+CastleLevel1UnitsAvail+01)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+00),l
+  ld    (iy+CastleLevel1UnitsAvail+01),h
+  ret
+  .EndCheckUnitLevel1:
+
+  cp    2
+  jr    nz,.EndCheckUnitLevel2  
+  ld    l,(iy+CastleLevel1UnitsAvail+02)
+  ld    h,(iy+CastleLevel1UnitsAvail+03)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+02),l
+  ld    (iy+CastleLevel1UnitsAvail+03),h
+  ret
+  .EndCheckUnitLevel2:
+
+  cp    3
+  jr    nz,.EndCheckUnitLevel3 
+  ld    l,(iy+CastleLevel1UnitsAvail+04)
+  ld    h,(iy+CastleLevel1UnitsAvail+05)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+04),l
+  ld    (iy+CastleLevel1UnitsAvail+05),h
+  ret
+  .EndCheckUnitLevel3:
+
+  cp    4
+  jr    nz,.EndCheckUnitLevel4
+  ld    l,(iy+CastleLevel1UnitsAvail+06)
+  ld    h,(iy+CastleLevel1UnitsAvail+07)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+06),l
+  ld    (iy+CastleLevel1UnitsAvail+07),h
+  ret
+  .EndCheckUnitLevel4:
+
+  cp    5
+  jr    nz,.EndCheckUnitLevel5
+  ld    l,(iy+CastleLevel1UnitsAvail+08)
+  ld    h,(iy+CastleLevel1UnitsAvail+09)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+08),l
+  ld    (iy+CastleLevel1UnitsAvail+09),h
+  ret
+  .EndCheckUnitLevel5:
+
+  cp    6
+  jr    nz,.EndCheckUnitLevel6
+  ld    l,(iy+CastleLevel1UnitsAvail+10)
+  ld    h,(iy+CastleLevel1UnitsAvail+11)
+  sbc   hl,de
+  ld    (iy+CastleLevel1UnitsAvail+10),l
+  ld    (iy+CastleLevel1UnitsAvail+11),h
+  ret
+  .EndCheckUnitLevel6:
+  ret
+
+
+
+
+
 
 .SetAvailableAmountRecruitAmountAndTotalCost:
   ;erase available number
@@ -3651,17 +3805,227 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    bc,$0000 + (037*256) + (042/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  
+
+
+  ;add amount available to recruit amount to select all units ready for recruitment
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+
+  call  .SetTotalCost
+
+
+
+
+  ;check if player has enough gold for all these units
+  call  SetResourcesCurrentPlayerinIX
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;player gold in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalGoldCost)
+  xor   a
+  sbc   hl,de                           ;player gold - total cost. carry=player has not enough gold
+  jr    nc,.EndCheckEnoughGoldToRecruitALLunits
+
+  ;check how many units we CAN buy with the total amount of gold we have
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetCostSelectedCreatureInHL     ;cost per creature in hl
+  push  hl                              ;push cost per creature
+  call  SetResourcesCurrentPlayerinIX
+  ;gold
+  ld    c,(ix+0)
+  ld    b,(ix+1)                        ;player gold in bc
+  pop   de                              ;cost per creature in DE
+  ;now lets divide the total gold by the cost per unit
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  ;set the amount we CAN NOT recruit (they remain in the 'available' section)
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  xor   a
+  sbc   hl,bc
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+  ;set the amount we CAN recruit
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
+  call  .SetTotalCost
+  .EndCheckEnoughGoldToRecruitALLunits:
+
+
+
+
+  ;check if player has enough gems for all these units
+  call  SetResourcesCurrentPlayerinIX
+  ;gems
+  ld    l,(ix+6)
+  ld    h,(ix+7)                        ;Player gems in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalCostGems)
+  xor   a
+  sbc   hl,de                           ;player gems - total cost. carry=player has not enough gold
+  jr    nc,.EndCheckEnoughGemsToRecruitALLunits
+
+  ;reset amount available and recruit amount
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+
+  ;check how many units we CAN buy with the total amount of gems we have
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetGemsCostSelectedCreatureInHL ;cost per creature in hl
+  push  hl                              ;push cost per creature
+  call  SetResourcesCurrentPlayerinIX
+  ;gems
+  ld    c,(ix+6)
+  ld    b,(ix+7)                        ;Player gems in hl
+  pop   de                              ;cost per creature in DE
+  ;now lets divide the total gems by the cost per unit
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  ;set the amount we CAN NOT recruit (they remain in the 'available' section)
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  xor   a
+  sbc   hl,bc
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+  ;set the amount we CAN recruit
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
+  call  .SetTotalCost   
+  .EndCheckEnoughGemsToRecruitALLunits:
+
+
+
+
+
+
+  ;check if player has enough rubies for all these units
+  call  SetResourcesCurrentPlayerinIX
+  ;rubies
+  ld    l,(ix+8)
+  ld    h,(ix+9)                        ;Player rubies in hl
+  ld    de,(SelectedCastleRecruitLevelUnitTotalCostRubies)
+  xor   a
+  sbc   hl,de                           ;player rubies - total cost. carry=player has not enough gold
+  jr    nc,.EndCheckEnoughRubiesToRecruitALLunits
+
+  ;reset amount available and recruit amount
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+
+  ;check how many units we CAN buy with the total amount of rubies we have
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetRubiesCostSelectedCreatureInHL ;cost per creature in hl
+  push  hl                              ;push cost per creature
+  call  SetResourcesCurrentPlayerinIX
+  ;rubies
+  ld    c,(ix+8)
+  ld    b,(ix+9)                        ;Player rubies in hl
+  pop   de                              ;cost per creature in DE
+  ;now lets divide the total rubies by the cost per unit
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  ;set the amount we CAN NOT recruit (they remain in the 'available' section)
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  xor   a
+  sbc   hl,bc
+  ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
+  ;set the amount we CAN recruit
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
+  call  .SetTotalCost   
+  .EndCheckEnoughRubiesToRecruitALLunits:
+
+
+
+
+
+
   call  ShowRecruitWindowForSelectedUnit.amountavailable
   call  ShowRecruitWindowForSelectedUnit.recruitamount
-  call  .SetTotalCost
+
   call  ShowRecruitWindowForSelectedUnit.totalcost
   call  ShowRecruitWindowForSelectedUnit.TotalGemscost
   call  ShowRecruitWindowForSelectedUnit.TotalRubiescost
   ret
 
   .SetTotalCost:
+  ;set total cost gold
   ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetCostSelectedCreatureInHL  
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  call  MultiplyHlWithDE
+  ld    (SelectedCastleRecruitLevelUnitTotalGoldCost),hl
+
+  ;set total cost gems
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetGemsCostSelectedCreatureInHL  
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  call  MultiplyHlWithDE
+  ld    (SelectedCastleRecruitLevelUnitTotalCostGems),hl
+
+  ;set total cost gems
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  call  SetRubiesCostSelectedCreatureInHL  
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  call  MultiplyHlWithDE
+  ld    (SelectedCastleRecruitLevelUnitTotalCostRubies),hl
+  ret
+
+DivideBCbyDE:
+;
+; Divide 16-bit values (with 16-bit result)
+; In: Divide BC by divider DE
+; Out: BC = result, HL = rest
+;
+Div16:
+    ld hl,0
+    ld a,b
+    ld b,8
+Div16_Loop1:
+    rla
+    adc hl,hl
+    sbc hl,de
+    jr nc,Div16_NoAdd1
+    add hl,de
+Div16_NoAdd1:
+    djnz Div16_Loop1
+    rla
+    cpl
+    ld b,a
+    ld a,c
+    ld c,b
+    ld b,8
+Div16_Loop2:
+    rla
+    adc hl,hl
+    sbc hl,de
+    jr nc,Div16_NoAdd2
+    add hl,de
+Div16_NoAdd2:
+    djnz Div16_Loop2
+    rla
+    cpl
+    ld b,c
+    ld c,a
+    ret
+
+
+
+
+
+
+
+
+
+
+
+
+SetCostSelectedCreatureInHL:
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
@@ -3671,13 +4035,30 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   inc   hl
   ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ex    de,hl
+  ret
 
-  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
-;  push  bc
-  call  MultiplyHlWithDE
-;  pop   bc
+SetGemsCostSelectedCreatureInHL:
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,GemsCostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
+  ret
 
-  ld    (SelectedCastleRecruitLevelUnitTotalGoldCost),hl
+SetRubiesCostSelectedCreatureInHL:
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,RubiesCostCreatureTable
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ex    de,hl
   ret
 
 SetRecruitButtons:                        ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
@@ -3889,16 +4270,7 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
   .SetTotalGemscost:
   push  de
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,GemsCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-
+  call  SetGemsCostSelectedCreatureInHL
   ld    a,h
   or    l
   jr    z,.Zero                         ;skip putting number and icon if amount is 0
@@ -3920,15 +4292,7 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
   .SetTotalRubiescost:
   push  de
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,RubiesCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
+  call  SetRubiesCostSelectedCreatureInHL
 
   ld    a,h
   or    l
@@ -4091,10 +4455,10 @@ CostCreatureTable:
   dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
 
 GemsCostCreatureTable:  
-  dw  0000,0000,0000,0000,0000,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
+  dw  0000,0000,0000,0000,0002,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
 
 RubiesCostCreatureTable:  
-  dw  0000,0001,0007,0000,0003,0000,0000,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
+  dw  0000,0001,0007,0000,0000,0000,0000,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
 
 SpeedCreatureTable:  
   db  000,012,002,003,009,005,006,007,008,009,010,011,012,013,014,015,016,017
@@ -4224,15 +4588,7 @@ SetAvailableRecruitArmy:
 
   .SetRubiescost:
   push  de
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,RubiesCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
+  call  SetRubiesCostSelectedCreatureInHL
 
   ld    a,h
   or    l
@@ -4288,16 +4644,7 @@ SetAvailableRecruitArmy:
 
   .SetGemscost:
   push  de
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,GemsCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-
+  call  SetGemsCostSelectedCreatureInHL
   ld    a,h
   or    l
   jr    z,.Zero                         ;skip putting number and icon if amount is 0
@@ -4495,15 +4842,7 @@ SetAvailableRecruitArmy:
   ret
 
   .SetCost:
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,CostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
+  call  SetCostSelectedCreatureInHL
 
   call  SetNumber16BitCastle
   ret
@@ -6821,7 +7160,7 @@ SetResourcesPlayer:
 
 
 
-
+kut:
 
 
 

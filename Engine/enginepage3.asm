@@ -684,6 +684,8 @@ SelectedCastleRecruitLevelUnit: ds  1
 SelectedCastleRecruitLevelUnitAmountAvailable: dw 000
 SelectedCastleRecruitLevelUnitRecruitAmount: dw 000
 SelectedCastleRecruitLevelUnitTotalGoldCost: dw 000
+SelectedCastleRecruitLevelUnitTotalCostGems:    ds 2
+SelectedCastleRecruitLevelUnitTotalCostRubies:  ds 2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 RecruitButton1Ytop:           equ 064
 RecruitButton1YBottom:        equ RecruitButton1Ytop + 009
@@ -1411,8 +1413,9 @@ MenuOptionSelected?:  db  0
 MenuOptionSelected?Backup:  db 255
 MenuOptionSelected?BackupLastFrame:  db 255
 
-PreviousButtonClicked:    ds  1
-PreviousButtonClickedIX:  ds  2
+PreviousButtonClicked:      ds  1
+PreviousButtonClickedIX:    ds  2
+AreWeInTavern1OrRecruit2?:  ds  1
 
 LenghtTextSkillsDescription:  equ 24
 TextSkillsWindowButton1:  db  "basic archery          ",255
@@ -1525,9 +1528,9 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  call  CastleOverviewCode
+;  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-;  call  CastleOverviewRecruitCode
+  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
