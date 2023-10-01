@@ -1832,6 +1832,12 @@ block1234:
 	ei
 	ret
 
+TinyCopyWhichFunctionsAsWaitVDPReady:
+	db		0,0,0,0
+	db		0,0,0,0
+	db		1,0,1,0
+	db		0,%0000 0000,$98
+
 DoCopy:
   ld    a,32
   di

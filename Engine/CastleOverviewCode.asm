@@ -5,6 +5,185 @@
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           WARNING                      ;;
+;;  The following routine is called while                 ;;
+;;  ld    a,HeroOverviewCodeBlock                         ;;
+;;  call  block34                                         ;;
+;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetTextBuildingWhenClicked:
+  ld    a,(SetTextBuilding)
+  dec   a
+  ret   z
+  ld    (SetTextBuilding),a
+  
+  call  ClearTextBuildWindow
+  call  SetSingleBuildButtonColor
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    hl,(PutWhichBuildText)
+  ld    a,182
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,047
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  .SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
+  .SetText:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+	xor		1                               ;now we switch and set our page
+  ld    (PutLetter+dPage),a             ;set page where to put text
+
+  ld    a,-1
+  ld    (TextPointer),a                 ;increase text pointer
+  .NextLetter:
+  ld    a,(TextPointer)
+  inc   a
+  ld    (TextPointer),a                 ;increase text pointer
+
+  ld    hl,(TextAddresspointer)
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+
+  ld    a,(hl)                          ;letter
+  cp    255                             ;end
+  ret   z
+  cp    254                             ;next line
+  jr    z,.NextLine
+  cp    TextSpace                       ;space
+  jr    z,.Space
+  cp    TextPercentageSymbol            ;%
+  jr    z,.TextPercentageSymbol
+  cp    TextPlusSymbol                  ;+
+  jr    z,.TextPlusSymbol
+  cp    TextMinusSymbol                 ;-
+  jr    z,.TextMinusSymbol
+  cp    TextApostrofeSymbol             ;'
+  jr    z,.TextApostrofeSymbol
+  cp    TextColonSymbol                 ;:
+  jr    z,.TextColonSymbol
+  cp    TextSlashSymbol                 ;/
+  jr    z,.TextSlashSymbol
+
+
+
+
+  cp    TextNumber0+10
+  jr    c,.Number
+
+
+  sub   $41
+  ld    hl,.TextCoordinateTable  
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a
+
+  add   hl,de
+  
+  .GoPutLetter:
+  ld    a,(hl)                          ;sx
+  ld    (PutLetter+sx),a                ;set sx of letter
+  inc   hl
+  ld    a,(hl)                          ;nx
+  ld    (PutLetter+nx),a                ;set nx of letter
+
+  ld    hl,PutLetter
+  call  DoCopy
+
+  ld    hl,PutLetter+nx                 ;nx of letter
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  add   a,(hl)                          ;add lenght
+  inc   a                               ;+1
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  
+  jp    .NextLetter
+
+  .Number:
+  sub   TextNumber0                     ;hex value of number "0"
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a  
+
+  ld    hl,.TextNumberSymbolsSXNX
+  add   hl,de
+  jr    .GoPutLetter
+  
+  .TextPercentageSymbol:
+  ld    hl,.TextPercentageSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextPlusSymbol:
+  ld    hl,.TextPlusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextMinusSymbol:
+  ld    hl,.TextMinusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextApostrofeSymbol:
+  ld    hl,.TextApostrofeSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextColonSymbol:
+  ld    hl,.TextColonSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextSlashSymbol:
+  ld    hl,.TextSlashSymbolSXNX  
+  jr    .GoPutLetter
+
+  .Space:
+  ld    a,(PutLetter+dx)                ;set dx of next letter
+  add   a,5
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+  .NextLine:
+  ld    a,(PutLetter+dy)                ;set dy of next letter
+  add   a,7
+  ld    (PutLetter+dy),a                ;set dy of next letter
+  ld    a,(TextDX)
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+
+;                          0       1       2       3       4       5       6       7       8       9
+.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
+.TextSlashSymbolSXNX: db  158+49,4  ;"/"
+.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
+.TextPlusSymbolSXNX: db  166+49,5 ;"+"
+.TextMinusSymbolSXNX: db  169+49,5 ;"-"
+.TextApostrofeSymbolSXNX: db  195,1  ;"'"
+.TextColonSymbolSXNX: db  008,1  ;":"
+
+;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
+.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
+;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
+ds 12
+.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           WARNING                      ;;
+;;  The above routine is called while                     ;;
+;;  ld    a,HeroOverviewCodeBlock                         ;;
+;;  call  block34                                         ;;
+;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
 ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when refreshing the visiting and defending army heroes and creatures overview
   ld    a,(AreWeInTavern1OrRecruit2?)
   dec   a
@@ -1474,177 +1653,6 @@ EraseTavernHeroWindowWhenUnavailable:
 
 
 
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                           WARNING                      ;;
-;;  The following routine is called while                 ;;
-;;  ld    a,HeroOverviewCodeBlock                         ;;
-;;  call  block34                                         ;;
-;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-SetTextBuildingWhenClicked:
-  ld    a,(SetTextBuilding)
-  dec   a
-  ret   z
-  ld    (SetTextBuilding),a
-  
-  call  ClearTextBuildWindow
-  call  SetSingleBuildButtonColor
-  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
-
-  ld    hl,(PutWhichBuildText)
-  ld    a,182
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,047
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  .SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-
-  .SetText:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-  ld    (PutLetter+dPage),a             ;set page where to put text
-
-  ld    a,-1
-  ld    (TextPointer),a                 ;increase text pointer
-  .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
-
-  ld    hl,(TextAddresspointer)
-
-  ld    d,0
-  ld    e,a
-  add   hl,de
-
-  ld    a,(hl)                          ;letter
-  cp    255                             ;end
-  ret   z
-  cp    254                             ;next line
-  jr    z,.NextLine
-  cp    TextSpace                       ;space
-  jr    z,.Space
-  cp    TextPercentageSymbol            ;%
-  jr    z,.TextPercentageSymbol
-  cp    TextPlusSymbol                  ;+
-  jr    z,.TextPlusSymbol
-  cp    TextMinusSymbol                 ;-
-  jr    z,.TextMinusSymbol
-  cp    TextApostrofeSymbol             ;'
-  jr    z,.TextApostrofeSymbol
-  cp    TextColonSymbol                 ;/
-  jr    z,.TextColonSymbol
-
-
-  cp    TextNumber0+10
-  jr    c,.Number
-
-
-  sub   $41
-  ld    hl,.TextCoordinateTable  
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a
-
-  add   hl,de
-  
-  .GoPutLetter:
-  ld    a,(hl)                          ;sx
-  ld    (PutLetter+sx),a                ;set sx of letter
-  inc   hl
-  ld    a,(hl)                          ;nx
-  ld    (PutLetter+nx),a                ;set nx of letter
-
-  ld    hl,PutLetter
-  call  DoCopy
-
-  ld    hl,PutLetter+nx                 ;nx of letter
-  ld    a,(PutLetter+dx)                ;dx of letter we just put
-  add   a,(hl)                          ;add lenght
-  inc   a                               ;+1
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  
-  jp    .NextLetter
-
-  .Number:
-  sub   TextNumber0                     ;hex value of number "0"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a  
-
-  ld    hl,.TextNumberSymbolsSXNX
-  add   hl,de
-  jr    .GoPutLetter
-  
-  .TextPercentageSymbol:
-  ld    hl,.TextPercentageSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextPlusSymbol:
-  ld    hl,.TextPlusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextMinusSymbol:
-  ld    hl,.TextMinusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextApostrofeSymbol:
-  ld    hl,.TextApostrofeSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextColonSymbol:
-  ld    hl,.TextColonSymbolSXNX  
-  jr    .GoPutLetter
-
-  .Space:
-  ld    a,(PutLetter+dx)                ;set dx of next letter
-  add   a,5
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-  .NextLine:
-  ld    a,(PutLetter+dy)                ;set dy of next letter
-  add   a,7
-  ld    (PutLetter+dy),a                ;set dy of next letter
-  ld    a,(TextDX)
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-
-;                          0       1       2       3       4       5       6       7       8       9
-.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
-.TextSlashSymbolSXNX: db  158+49,4  ;"/"
-.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
-.TextPlusSymbolSXNX: db  166+49,5 ;"+"
-.TextMinusSymbolSXNX: db  169+49,5 ;"-"
-.TextApostrofeSymbolSXNX: db  195,1  ;"'"
-.TextColonSymbolSXNX: db  008,1  ;":"
-
-;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
-.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
-;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
-ds 12
-.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                           WARNING                      ;;
-;;  The above routine is called while                     ;;
-;;  ld    a,HeroOverviewCodeBlock                         ;;
-;;  call  block34                                         ;;
-;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
@@ -5932,7 +5940,7 @@ TavernCost:
 
 MagicGuildLevel1Cost:
 .Gold:    dw  2000
-.Wood:    dw  301
+.Wood:    dw  50
 .Ore:     dw  100
 .Gems:    dw  60
 .Rubies:  dw  30
@@ -6281,40 +6289,61 @@ CheckButtonMouseInteractionBuildButtons:
   ret
 
 TextCastleLevel2:        
-                          db  " Castle level 2",254
+                          db  "   Town Hall",254
                           db  " ",254
                           db  "Generates 1000",254
                           db  "gold per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "2500 Gold",254
+                          db  " ",254
+                          db  "Requirements:",254
+                          db  "Tavern",255
+
 TextCastleLevel3:        
-                          db  " Castle level 3",254
-                          db  " ",254
-                          db  "Generates 1500",254
-                          db  "gold per day",254
-                          db  " ",254
-                          db  "Cost:",254
-                          db  "2000 Gold",255
-TextCastleLevel4:        
-                          db  " Castle level 4",254
+                          db  "   City Hall",254
                           db  " ",254
                           db  "Generates 2000",254
                           db  "gold per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
-TextCastleLevel5:        
-                          db  " Castle level 5",254
+                          db  "5000 Gold",254
+                          db  " ",254
+                          db  "Requirements:",254
+                          db  "Magic Guild",254
+                          db  "Level 1",254
+                          db  "Market Place",255
+TextCastleLevel4:        
+                          db  "    Citadel",254
                           db  " ",254
                           db  "Generates 3000",254
                           db  "gold per day",254
                           db  " ",254
+                          db  "increases the",254
+                          db  "production of",254
+                          db  "all creatures",254
+                          db  "by 50%",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "7500 Gold",254
+                          db  "+10 wood",254
+                          db  "+10 ore",255
+TextCastleLevel5:        
+                          db  "    Capitol",254
+                          db  " ",254
+                          db  "Generates 4000",254
+                          db  "gold per day",254
+                          db  " ",254
+                          db  "increases the",254
+                          db  "production of",254
+                          db  "all creatures",254
+                          db  "by 100%",254
+                          db  " ",254
+                          db  "Cost:",254
+                          db  "10000 Gold",254
+                          db  "+20 wood",254
+                          db  "+20 ore",255
 
-
-                          
 TextMarketPlace:        
                           db  " Market Place",254
                           db  " ",254
@@ -6322,96 +6351,113 @@ TextMarketPlace:
                           db  "resources",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "500 Gold",254
+                          db  "+5 Wood",255
 
 TextTavern:        
                           db  "    Tavern",254
                           db  " ",254
-                          db  "Allows recruitment",254
-                          db  "of visiting",254
-                          db  "heroes",254
+                          db  "Allows the ability",254
+                          db  "to recruit",254
+                          db  "visiting heroes",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "500 Gold",255
+                          db  "+5 Wood",255
 
 TextMagicGuildLevel1:        
                           db  " Magic Guild 1",254
                           db  " ",254
-                          db  "Teaches visiting",254
-                          db  "heroes 2nd level",254
-                          db  "spells",254
+                          db  "Adds two level 1",254
+                          db  "spells to the",254
+                          db  "magic guild",254
+                          db  " ",254
+                          db  "Visiting heroes",254
+                          db  "can learn these",254
+                          db  "spells if the",254
+                          db  "skill requirements",254
+                          db  "are met",254
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",254
-                          db  "5 Stones",254
-                          db  "1 Ruby",254
-                          db  " ",254
-                          db  "Requires:",254
-                          db  "Magic Guild 1",255
+                          db  "+5 Wood",254
+                          db  "+5 Ore",255
 TextMagicGuildLevel2:        
                           db  " Magic Guild 2",254
                           db  " ",254
-                          db  "Teaches visiting",254
-                          db  "heroes 2nd level",254
+                          db  "Adds two level 2",254
+                          db  "spells to the",254
+                          db  "magic guild",254
+                          db  " ",254
+                          db  "Visiting heroes",254
+                          db  "can learn these",254
                           db  "spells",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",254
-                          db  "5 Stones",254
-                          db  "1 Ruby",254
-                          db  " ",254
-                          db  "Requires:",254
-                          db  "Magic Guild 1",255
+                          db  "1000 Gold",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",254
+                          db  "+5 Gems",254
+                          db  "+5 Rubies",255
 TextMagicGuildLevel3:        
                           db  " Magic Guild 3",254
                           db  " ",254
-                          db  "Teaches visiting",254
-                          db  "heroes 2nd level",254
+                          db  "Adds two level 3",254
+                          db  "spells to the",254
+                          db  "magic guild",254
+                          db  " ",254
+                          db  "Visiting heroes",254
+                          db  "can learn these",254
                           db  "spells",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",254
-                          db  "5 Stones",254
-                          db  "1 Ruby",254
-                          db  " ",254
-                          db  "Requires:",254
-                          db  "Magic Guild 1",255
+                          db  "1000 Gold",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",254
+                          db  "+10 Gems",254
+                          db  "+10 Rubies",255
 TextMagicGuildLevel4:        
                           db  " Magic Guild 4",254
                           db  " ",254
-                          db  "Teaches visiting",254
-                          db  "heroes 2nd level",254
+                          db  "Adds two level 4",254
+                          db  "spells to the",254
+                          db  "magic guild",254
+                          db  " ",254
+                          db  "Visiting heroes",254
+                          db  "can learn these",254
                           db  "spells",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",254
-                          db  "5 Stones",254
-                          db  "1 Ruby",254
-                          db  " ",254
-                          db  "Requires:",254
-                          db  "Magic Guild 1",255
+                          db  "1000 Gold",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",254
+                          db  "+15 Gems",254
+                          db  "+15 Rubies",255
 
 TextSawmillLevel1:        
                           db  "  Sawmill 1",254
                           db  " ",254
-                          db  "produces 1 wood",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+1 wood",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1000 Gold",255
 TextSawmillLevel2:        
                           db  "  Sawmill 2",254
                           db  " ",254
-                          db  "produces 1 wood",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+2 wood",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1500 Gold",255
 TextSawmillLevel3:        
                           db  "  Sawmill 3",254
                           db  " ",254
-                          db  "produces 1 wood",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+3 wood",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",255
@@ -6419,73 +6465,115 @@ TextSawmillLevel3:
 TextMineLevel1:        
                           db  "   Mine 1",254
                           db  " ",254
-                          db  "produces 1 ore",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+1 ore",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1000 Gold",255
 TextMineLevel2:        
                           db  "   Mine 2",254
                           db  " ",254
-                          db  "produces 1 ore",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+2 ore",254
+                          db  "+1 gem",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "3000 Gold",255
 TextMineLevel3:        
                           db  "   Mine 3",254
                           db  " ",254
-                          db  "produces 1 ore",254
-                          db  "per turn",254
+                          db  "Produces:",254
+                          db  "+3 ore",254
+                          db  "+1 gem",254
+                          db  "+1 ruby",254
+                          db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "5000 Gold",255
 
 TextBarracksLevel1:        
                           db  "  Barracks 1",254
                           db  " ",254
-                          db  "allows production",254
+                          db  "Allows production",254
                           db  "of level 1 units",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "500 Gold",254
+                          db  "+10 Ore",255
 TextBarracksLevel2:        
                           db  "  Barracks 2",254
                           db  " ",254
-                          db  "allows production",254
-                          db  "of level 1 units",254
+                          db  "Allows production",254
+                          db  "of level 2 units",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1000 Gold",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",255
 TextBarracksLevel3:        
                           db  "  Barracks 3",254
                           db  " ",254
-                          db  "allows production",254
-                          db  "of level 1 units",254
+                          db  "Allows production",254
+                          db  "of level 3 units",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1500 Gold",254
+                          db  "+15 Ore",255
 TextBarracksLevel4:        
                           db  "  Barracks 4",254
                           db  " ",254
-                          db  "allows production",254
-                          db  "of level 1 units",254
+                          db  "Allows production",254
+                          db  "of level 4 units",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "1500 Gold",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",254
+                          db  "+4 Gems",254
+                          db  "+4 Rubies",255
 TextBarracksLevel5:        
                           db  "  Barracks 5",254
                           db  " ",254
-                          db  "allows production",254
-                          db  "of level 1 units",254
+                          db  "Allows production",254
+                          db  "of level 5 units",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
+                          db  "5000 Gold",254
+                          db  "+20 Wood",255
 
 TextBarracksTower:        
                           db  " Barracks Tower",254
                           db  " ",254
-                          db  "allows production",254
+                          db  "Allows production",254
                           db  "of level 6 units",254
                           db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",254
+                          db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
-                          
+                          db  "20000 Gold",254
+                          db  "+20 Gems",254
+                          db  "+20 Rubies",254
+                          db  " ",254
+                          db  "Requirements:",254
+                          db  "Barracks 5",255
 TextCityWalls:        
                           db  "   City Walls",254
                           db  " ",254
@@ -6495,9 +6583,12 @@ TextCityWalls:
                           db  "against sieges",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "2000 Gold",255
-
-
+                          db  "2000 Gold",254
+                          db  "+15 Wood",254
+                          db  "+15 Ore",254
+                          db  " ",254
+                          db  "Requirements:",254
+                          db  "Capitol",255
 
 
 
@@ -6604,10 +6695,51 @@ SetBuildButtons:                        ;put button in mirror page below screen,
 
 
 
+kut: equ "/"
+TextGoldPerDay: db "Gold/day",255
 
+SetNameCastleAndDailyIncome:
+  call  SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
+  ld    b,200
+  ld    c,2
 
+  push  iy
+  pop   hl
+  ld    de,CastleName
+  add   hl,de
+  call  SetText
 
+  ld    a,(iy+CastleLevel)
+  cp    1                               ;village hall (500 gold per day)
+  ld    hl,500
+  jr    z,.CastleLevelFound
 
+  cp    2                               ;town hall (1000 gold per day). costs: 2500 gold, requires tavern
+  ld    hl,1000
+  jr    z,.CastleLevelFound
+
+  cp    3                               ;city hall (2000 gold per day). costs: 5000 gold, requires mage guild level 1, market place
+  ld    hl,2000
+  jr    z,.CastleLevelFound
+
+  cp    4                               ;citadel (3000 gold per day). increase creature production by 50%. costs: 7500 gold +10 wood +10 ore
+  ld    hl,3000
+  jr    z,.CastleLevelFound
+
+  cp    5                               ;capitol (4000 gold per day). increase creature production by 100%. costs: 10000 gold +20 wood +20 ore
+  ld    hl,4000
+  jr    z,.CastleLevelFound
+  
+  .CastleLevelFound:
+  ld    b,196                           ;dx
+  ld    c,009                           ;dy
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
+
+  ld    b,219
+  ld    c,009
+  ld    hl,TextGoldPerDay
+  call  SetText
+  ret
 
 
 CastleOverviewCode:                     ;in: iy-castle
@@ -6624,6 +6756,9 @@ CastleOverviewCode:                     ;in: iy-castle
   call  SetCastleOverviewGraphics       ;put gfx in page 1
   call  SwapAndSetPage                  ;swap to and set page 1
   call  SetIndividualBuildings          ;put buildings in page 0, then docopy them from page 0 to page 1 transparantly
+  call  SwapAndSetPage                  ;swap to and set page 1  
+  call  SetNameCastleAndDailyIncome
+
   ld    hl,CopyPage1To0
   call  docopy
 
@@ -6663,6 +6798,10 @@ CastleOverviewCode:                     ;in: iy-castle
 
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
+
+
+
+
 
   halt
   jp  .engine
