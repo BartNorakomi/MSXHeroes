@@ -648,13 +648,7 @@ dephase
 ;
 ; block $2b
 ;
-CastleOverviewCodeBlock:  equ   $2b
-CastleOverviewFontBlock:  equ   $2b
-phase	$4000
-  incbin "..\grapx\CastleOverview\font.SC5",7,7 * 128      ;5 lines
-  include "CastleOverviewCode.asm"
-	ds		$8000-$,$ff
-dephase
+	ds		$4000
 
 ;
 ; block $2c - 2d
@@ -752,6 +746,17 @@ dephase
 TavernBlock:  equ   $40
 phase	$4000
   incbin "..\grapx\CastleOverview\Tavern.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $42 - 43
+;
+CastleOverviewCodeBlock:  equ   $42
+CastleOverviewFontBlock:  equ   $42
+phase	$4000
+  incbin "..\grapx\CastleOverview\font.SC5",7,7 * 128      ;5 lines
+  include "CastleOverviewCode.asm"
 	ds		$c000-$,$ff
 dephase
 

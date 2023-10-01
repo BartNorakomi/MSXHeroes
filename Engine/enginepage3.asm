@@ -53,15 +53,44 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   ld    (AddressToWriteTo),de
   jr    CopyRamToVramCorrected.AddressesSet
 
+
+
+
+
+
+
+CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1:
+  di
+	ld		($6000),a
+	inc   a
+	ld		($7000),a
+	ei
+
+  ;for copies to go to page 1, by setting the current active page to 0 (at the end restore the current active page)
+	ld		a,(activepage)                  ;alternate between page 0 and 1
+  push  af  
+  xor   a
+	ld		(activepage),a                  ;alternate between page 0 and 1
+  call  CopyRamToVramCorrected.go                             ;go copy
+  pop   af
+	ld		(activepage),a                  ;alternate between page 0 and 1
+
+;now set engine back in page 1+2 in rom
+	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
+  jp    block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
 CopyRamToVramCorrectedCastleOverview:
-;we set 32kb HeroOverviewGraphics in page 1 and 2
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  di
+	ld		($6000),a
+	inc   a
+	ld		($7000),a
+	ei
 
   call  CopyRamToVramCorrected.go                             ;go copy
 
-;now set engine back in page 1
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+;now set engine back in page 1+2 in rom
+	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
+  jp    block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
 
 
@@ -116,62 +145,6 @@ CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   otir
   ret
 
-
-
-
-
-
-
-CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1:
-;we set 32kb HeroOverviewGraphics in page 1 and 2
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  call  .go                             ;go copy
-
-;now set engine back in page 1
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  .go:
-  ld    (AddressToWriteFrom),hl
-  ld    (NXAndNY),bc
-
-;	ld		a,(activepage)                  ;alternate between page 0 and 1
-;  or    a
-;  ld    hl,$0000
-;  jr    nz,.SetAddress                  ;page 0
-  ld    hl,$8000
-;  .SetAddress:
-  add   hl,de
-  ld    (AddressToWriteTo),hl
-  .AddressesSet:
-  ld    c,$98                           ;out port
-  ld    de,128                          ;increase 128 bytes to go to the next line
-  di
-
-  .loop:
-  call  .WriteOneLine
-  ld    a,(NXAndNY+1)
-  dec   a
-  ld    (NXAndNY+1),a
-  jp    nz,.loop
-  ei
-  ret
-
-  .WriteOneLine:
-  xor   a                               ;we want to write to (204,151)
-  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
-  add   hl,de                           ;increase 128 bytes to go to the next line
-  ld    (AddressToWriteTo),hl
-	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
-
-  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
-  add   hl,de                           ;increase 128 bytes to go to the next line
-  ld    (AddressToWriteFrom),hl
-  ld    a,(NXAndNY)
-  ld    b,a
-  otir
-  ret
 
 
 
@@ -1526,11 +1499,11 @@ EnterCastle:
   out   ($a8),a      
 
   ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-;  call  CastleOverviewCode
+  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-  call  CastleOverviewRecruitCode
+;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
@@ -2391,8 +2364,8 @@ slot:
 memblocks:
 .1:			                    rb    1
 .2:			                    rb    1
-.3:			                    rb    1
-.4:			                    rb    1
+;.3:			                    rb    1
+;.4:			                    rb    1
 
 ;VDP_0:		                  equ   $F3DF
 ;VDP_8:		                  equ   $FFE7

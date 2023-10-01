@@ -1470,6 +1470,200 @@ EraseTavernHeroWindowWhenUnavailable:
   ld    a,BuildBlock                    ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           WARNING                      ;;
+;;  The following routine is called while                 ;;
+;;  ld    a,HeroOverviewCodeBlock                         ;;
+;;  call  block34                                         ;;
+;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetTextBuildingWhenClicked:
+  ld    a,(SetTextBuilding)
+  dec   a
+  ret   z
+  ld    (SetTextBuilding),a
+  
+  call  ClearTextBuildWindow
+  call  SetSingleBuildButtonColor
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    hl,(PutWhichBuildText)
+  ld    a,182
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,047
+  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    (TextAddresspointer),hl  
+
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  .SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
+  .SetText:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+	xor		1                               ;now we switch and set our page
+  ld    (PutLetter+dPage),a             ;set page where to put text
+
+  ld    a,-1
+  ld    (TextPointer),a                 ;increase text pointer
+  .NextLetter:
+  ld    a,(TextPointer)
+  inc   a
+  ld    (TextPointer),a                 ;increase text pointer
+
+  ld    hl,(TextAddresspointer)
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+
+  ld    a,(hl)                          ;letter
+  cp    255                             ;end
+  ret   z
+  cp    254                             ;next line
+  jr    z,.NextLine
+  cp    TextSpace                       ;space
+  jr    z,.Space
+  cp    TextPercentageSymbol            ;%
+  jr    z,.TextPercentageSymbol
+  cp    TextPlusSymbol                  ;+
+  jr    z,.TextPlusSymbol
+  cp    TextMinusSymbol                 ;-
+  jr    z,.TextMinusSymbol
+  cp    TextApostrofeSymbol             ;'
+  jr    z,.TextApostrofeSymbol
+  cp    TextColonSymbol                 ;/
+  jr    z,.TextColonSymbol
+
+
+  cp    TextNumber0+10
+  jr    c,.Number
+
+
+  sub   $41
+  ld    hl,.TextCoordinateTable  
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a
+
+  add   hl,de
+  
+  .GoPutLetter:
+  ld    a,(hl)                          ;sx
+  ld    (PutLetter+sx),a                ;set sx of letter
+  inc   hl
+  ld    a,(hl)                          ;nx
+  ld    (PutLetter+nx),a                ;set nx of letter
+
+  ld    hl,PutLetter
+  call  DoCopy
+
+  ld    hl,PutLetter+nx                 ;nx of letter
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  add   a,(hl)                          ;add lenght
+  inc   a                               ;+1
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  
+  jp    .NextLetter
+
+  .Number:
+  sub   TextNumber0                     ;hex value of number "0"
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a  
+
+  ld    hl,.TextNumberSymbolsSXNX
+  add   hl,de
+  jr    .GoPutLetter
+  
+  .TextPercentageSymbol:
+  ld    hl,.TextPercentageSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextPlusSymbol:
+  ld    hl,.TextPlusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextMinusSymbol:
+  ld    hl,.TextMinusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextApostrofeSymbol:
+  ld    hl,.TextApostrofeSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextColonSymbol:
+  ld    hl,.TextColonSymbolSXNX  
+  jr    .GoPutLetter
+
+  .Space:
+  ld    a,(PutLetter+dx)                ;set dx of next letter
+  add   a,5
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+  .NextLine:
+  ld    a,(PutLetter+dy)                ;set dy of next letter
+  add   a,7
+  ld    (PutLetter+dy),a                ;set dy of next letter
+  ld    a,(TextDX)
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+
+;                          0       1       2       3       4       5       6       7       8       9
+.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
+.TextSlashSymbolSXNX: db  158+49,4  ;"/"
+.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
+.TextPlusSymbolSXNX: db  166+49,5 ;"+"
+.TextMinusSymbolSXNX: db  169+49,5 ;"-"
+.TextApostrofeSymbolSXNX: db  195,1  ;"'"
+.TextColonSymbolSXNX: db  008,1  ;":"
+
+;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
+.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
+;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
+ds 12
+.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                           WARNING                      ;;
+;;  The above routine is called while                     ;;
+;;  ld    a,HeroOverviewCodeBlock                         ;;
+;;  call  block34                                         ;;
+;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 SettavernHeroSkill:
   ld    a,HeroOverviewCodeBlock         ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
@@ -1488,6 +1682,9 @@ SettavernHeroSkill:
   ld    b,176+04                        ;dx
   ld    c,043+44                        ;dy
   call  .SetHeroSkill
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
   .SetHeroSkill:
@@ -1706,6 +1903,9 @@ SetDefendingHeroArmyAndAmount:
   ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ld    hl,DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
@@ -1812,6 +2012,9 @@ SetVisitingHeroArmyAndAmount:
   ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ld    hl,DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
@@ -4369,7 +4572,11 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   call  SetAvailableRecruitArmy.SetSYSX ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
   ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ld    hl,050*128 + (120/2) - 128      ;(dy*128 + dx/2) = (204,153)              
-  jp    CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
 
 .SetUnit:
   ld    hl,SelectedCastleRecruitLevelUnit
@@ -4997,6 +5204,9 @@ SetAvailableRecruitArmy:
   ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ld    hl,DYDXUnit6Window         ;(dy*128 + dx/2) = (204,153)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
@@ -5026,6 +5236,13 @@ DYDXUnit3Window:               equ 038*128 + (176/2) - 128      ;(dy*128 + dx/2)
 DYDXUnit4Window:               equ 094*128 + (008/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit5Window:               equ 094*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
+
+
+
+ds $3000
+
+
+
 
 SetNumber16BitCastleSkipIfAmountIs0:
   ld    a,h
@@ -5854,161 +6071,6 @@ SetSingleBuildButtonColor:
 
 
 
-SetTextBuildingWhenClicked:
-  ld    a,(SetTextBuilding)
-  dec   a
-  ret   z
-  ld    (SetTextBuilding),a
-  
-  call  ClearTextBuildWindow
-  call  SetSingleBuildButtonColor
-  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
-
-  ld    hl,(PutWhichBuildText)
-  ld    a,182
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,047
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  .SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-
-  .SetText:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-  ld    (PutLetter+dPage),a             ;set page where to put text
-
-  ld    a,-1
-  ld    (TextPointer),a                 ;increase text pointer
-  .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
-
-  ld    hl,(TextAddresspointer)
-
-  ld    d,0
-  ld    e,a
-  add   hl,de
-
-  ld    a,(hl)                          ;letter
-  cp    255                             ;end
-  ret   z
-  cp    254                             ;next line
-  jr    z,.NextLine
-  cp    TextSpace                       ;space
-  jr    z,.Space
-  cp    TextPercentageSymbol            ;%
-  jr    z,.TextPercentageSymbol
-  cp    TextPlusSymbol                  ;+
-  jr    z,.TextPlusSymbol
-  cp    TextMinusSymbol                 ;-
-  jr    z,.TextMinusSymbol
-  cp    TextApostrofeSymbol             ;'
-  jr    z,.TextApostrofeSymbol
-  cp    TextColonSymbol                 ;/
-  jr    z,.TextColonSymbol
-
-
-  cp    TextNumber0+10
-  jr    c,.Number
-
-
-  sub   $41
-  ld    hl,.TextCoordinateTable  
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a
-
-  add   hl,de
-  
-  .GoPutLetter:
-  ld    a,(hl)                          ;sx
-  ld    (PutLetter+sx),a                ;set sx of letter
-  inc   hl
-  ld    a,(hl)                          ;nx
-  ld    (PutLetter+nx),a                ;set nx of letter
-
-  ld    hl,PutLetter
-  call  DoCopy
-
-  ld    hl,PutLetter+nx                 ;nx of letter
-  ld    a,(PutLetter+dx)                ;dx of letter we just put
-  add   a,(hl)                          ;add lenght
-  inc   a                               ;+1
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  
-  jp    .NextLetter
-
-  .Number:
-  sub   TextNumber0                     ;hex value of number "0"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a  
-
-  ld    hl,.TextNumberSymbolsSXNX
-  add   hl,de
-  jr    .GoPutLetter
-  
-  .TextPercentageSymbol:
-  ld    hl,.TextPercentageSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextPlusSymbol:
-  ld    hl,.TextPlusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextMinusSymbol:
-  ld    hl,.TextMinusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextApostrofeSymbol:
-  ld    hl,.TextApostrofeSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextColonSymbol:
-  ld    hl,.TextColonSymbolSXNX  
-  jr    .GoPutLetter
-
-  .Space:
-  ld    a,(PutLetter+dx)                ;set dx of next letter
-  add   a,5
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-  .NextLine:
-  ld    a,(PutLetter+dy)                ;set dy of next letter
-  add   a,7
-  ld    (PutLetter+dy),a                ;set dy of next letter
-  ld    a,(TextDX)
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-
-;                          0       1       2       3       4       5       6       7       8       9
-.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
-.TextSlashSymbolSXNX: db  158+49,4  ;"/"
-.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
-.TextPlusSymbolSXNX: db  166+49,5 ;"+"
-.TextMinusSymbolSXNX: db  169+49,5 ;"-"
-.TextApostrofeSymbolSXNX: db  195,1  ;"'"
-.TextColonSymbolSXNX: db  008,1  ;":"
-
-;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
-.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
-;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
-ds 12
-.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
-
-
-
 
 
 
@@ -6808,7 +6870,7 @@ CheckButtonMouseInteractionCastleMainScreen:
 
   cp    5                                     ;recruit
   jr    nz,.EndCheckRecruit
-  ;build
+  ;recruit
   pop   af                                    ;pop the call in the button check loop 
   pop   af                                    ;pop the call to the CastleOverViewCode
   jp    CastleOverviewRecruitCode             ;jump to the recruit code
@@ -7004,12 +7066,16 @@ SetCastleOverviewGraphics:
   ld    a,CastleOverviewBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+
+
 SetBuildGraphics:              
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,BuildBlock                    ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
 
 ClearTextBuildWindow:
   ld    hl,$4000 + (046*128) + (180/2) - 128
@@ -7154,13 +7220,6 @@ SetResourcesPlayer:
 
 
 
-
-
-
-
-
-
-kut:
 
 
 
