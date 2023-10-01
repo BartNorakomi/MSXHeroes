@@ -5635,37 +5635,44 @@ CheckButtonMouseInteractionSingleBuildButton:
   .CityWalls:  
   .Castle:
   inc   (iy+CastleLevel)
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .MarketPlace:  
   ld    (iy+CastleMarket),1
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .Tavern:
   ld    (iy+CastleTavern),1
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .MagicGuild:
   inc   (iy+CastleMageGuildLevel)
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .Sawmill:
   inc   (iy+CastleSawmillLevel)
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .Mine:
   inc   (iy+CastleMineLevel)
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
   .BarracksTower:
   .Barracks:
   inc   (iy+CastleBarracksLevel)
+  call  PurchaseBuilding
   pop   af
   jp    CastleOverviewBuildCode
 
@@ -5673,7 +5680,75 @@ CheckButtonMouseInteractionSingleBuildButton:
 
 
 
+PurchaseBuilding:
+  ;gold
+  ld    ix,(CheckRequirementsWhichBuilding?)
+  ld    e,(ix+0)
+  ld    d,(ix+1)                        ;Gold cost
+  call  SetResourcesCurrentPlayerinIX
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;Total Gold Player
+  xor   a
+  sbc   hl,de
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;Total Gold Player-Gold cost
 
+  ;wood
+  ld    ix,(CheckRequirementsWhichBuilding?)
+  ld    e,(ix+2)
+  ld    d,(ix+3)                        ;wood cost
+  call  SetResourcesCurrentPlayerinIX
+  ld    l,(ix+2)
+  ld    h,(ix+3)                        ;Total woodPlayer
+  xor   a
+  sbc   hl,de
+  ld    (ix+2),l
+  ld    (ix+3),h                        ;Total wood Player-wood cost
+
+  ;ore
+  ld    ix,(CheckRequirementsWhichBuilding?)
+  ld    e,(ix+4)
+  ld    d,(ix+5)                        ;ore cost
+  call  SetResourcesCurrentPlayerinIX
+  ld    l,(ix+4)
+  ld    h,(ix+5)                        ;Total ore Player
+  xor   a
+  sbc   hl,de
+  ld    (ix+4),l
+  ld    (ix+5),h                        ;Total ore Player-ore cost
+
+  ;gems
+  ld    ix,(CheckRequirementsWhichBuilding?)
+  ld    e,(ix+6)
+  ld    d,(ix+7)                        ;gems cost
+  call  SetResourcesCurrentPlayerinIX
+  ld    l,(ix+6)
+  ld    h,(ix+7)                        ;Total gems Player
+  xor   a
+  sbc   hl,de
+  ld    (ix+6),l
+  ld    (ix+7),h                        ;Total gems Player-gems cost
+
+  ;rubies
+  ld    ix,(CheckRequirementsWhichBuilding?)
+  ld    e,(ix+8)
+  ld    d,(ix+9)                        ;rubies cost
+  call  SetResourcesCurrentPlayerinIX
+  ld    l,(ix+8)
+  ld    h,(ix+9)                        ;Total rubies Player
+  xor   a
+  sbc   hl,de
+  ld    (ix+8),l
+  ld    (ix+9),h                        ;Total rubies Player-rubies cost
+  ret
+
+;CheckRequirementsWhichBuilding->
+;CityWallsCost:
+;.Gold:    dw  2000
+;.Wood:    dw  301
+;.Ore:     dw  100
+;.Gems:    dw  60
+;.Rubies:  dw  30
 
 
 
@@ -5749,7 +5824,7 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    nz,.Red
   ld    hl,CityWallsCost
   ld    (CheckRequirementsWhichBuilding?),hl
-  jp    .CheckRequirementsBuildingMet
+  jp    .CheckRequirementsBuildingMetCityWalls
 
   .BarracksTower:
   ld    de,BuildButtonTable+1+(7*BuildButtonTableLenghtPerButton)
@@ -5760,7 +5835,7 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    nz,.Red
   ld    hl,BarracksTowerCost
   ld    (CheckRequirementsWhichBuilding?),hl
-  jp    .CheckRequirementsBuildingMet
+  jp    .CheckRequirementsBuildingMetBarracksTower
 
   .Barracks:
   ld    de,BuildButtonTable+1+(6*BuildButtonTableLenghtPerButton)
@@ -5834,8 +5909,28 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    nc,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
+
+
+  ld    a,(iy+CastleLevel)
+  cp    1
   ld    hl,CastleLevel2Cost
   ld    (CheckRequirementsWhichBuilding?),hl
+  jp    z,.CheckRequirementsBuildingMetCastleLevel2
+
+  cp    2
+  ld    hl,CastleLevel3Cost
+  ld    (CheckRequirementsWhichBuilding?),hl
+  jp    z,.CheckRequirementsBuildingMetCastleLevel3
+
+  cp    3
+  ld    hl,CastleLevel4Cost
+  ld    (CheckRequirementsWhichBuilding?),hl
+  jp    z,.CheckRequirementsBuildingMet
+
+;  cp    4
+  ld    hl,CastleLevel5Cost
+  ld    (CheckRequirementsWhichBuilding?),hl
+;  jp    z,.CheckRequirementsBuildingMet
   jp    .CheckRequirementsBuildingMet
   
   .Blue:
@@ -5859,6 +5954,33 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
 .BlueButton:  dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (050/2) - 128 | dw $4000 + (000*128) + (100/2) - 128
 .GreenButton: dw $4000 + (000*128) + (150/2) - 128 | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (038*128) + (000/2) - 128
 .RedButton:   dw $4000 + (038*128) + (050/2) - 128 | dw $4000 + (038*128) + (100/2) - 128 | dw $4000 + (038*128) + (150/2) - 128
+
+.CheckRequirementsBuildingMetCastleLevel2:
+  ld    a,(iy+CastleTavern)             ;tavern is required for CastleLevel2
+  or    a
+  jp    z,.Red
+  jp    .CheckRequirementsBuildingMet
+
+.CheckRequirementsBuildingMetCastleLevel3:
+  ld    a,(iy+CastleMarket)             ;market place is required for CastleLevel3
+  or    a
+  jp    z,.Red
+  ld    a,(iy+CastleMageGuildLevel)     ;magic guild is required for CastleLevel3
+  or    a
+  jp    z,.Red
+  jp    .CheckRequirementsBuildingMet
+
+.CheckRequirementsBuildingMetBarracksTower:
+  ld    a,(iy+CastleBarracksLevel)      ;barracks 5 is required for barracks tower
+  cp    5
+  jp    nz,.Red
+  jp    .CheckRequirementsBuildingMet
+
+.CheckRequirementsBuildingMetCityWalls:
+  ld    a,(iy+CastleLevel)              ;castle level 5 is required for city walls
+  cp    5
+  jp    nz,.Red
+  jp    .CheckRequirementsBuildingMet
 
 .CheckRequirementsBuildingMet:
   ;check if gold requirements for this building are met
@@ -5917,68 +6039,6 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    c,.Red  
   jp    .Blue  
 
-CastleLevel2Cost:
-.Gold:    dw  2000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-MarketPlaceCost:
-.Gold:    dw  2000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-TavernCost:
-.Gold:    dw  2000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-MagicGuildLevel1Cost:
-.Gold:    dw  2000
-.Wood:    dw  50
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-SawmillLevel1Cost:
-.Gold:    dw  2001
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-MineLevel1Cost:
-.Gold:    dw  2000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-BarracksLevel1Cost:
-.Gold:    dw  2000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-BarracksTowerCost:
-.Gold:    dw  2000
-.Wood:    dw  301
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
-
-CityWallsCost:
-.Gold:    dw  2000
-.Wood:    dw  301
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
 
 SetResourcesCurrentPlayerinIX:
 	ld		a,(whichplayernowplaying?)
@@ -6187,9 +6247,11 @@ CheckButtonMouseInteractionBuildButtons:
 
   ld    a,b
   cp    1                                     ;CityWalls
+  ld    de,CityWallsCost
   ld    hl,TextCityWalls
   jp    z,.SetWhichTextToPut
   cp    2                                     ;BarracksTower
+  ld    de,BarracksTowerCost
   ld    hl,TextBarracksTower
   jp    z,.SetWhichTextToPut
   cp    3                                     ;Barracks
@@ -6201,9 +6263,11 @@ CheckButtonMouseInteractionBuildButtons:
   cp    6                                     ;MagicGuild
   jp    z,.MagicGuild
   cp    7                                     ;Tavern
+  ld    de,TavernCost
   ld    hl,TextTavern
   jp    z,.SetWhichTextToPut
   cp    8                                     ;MarketPlace
+  ld    de,MarketPlaceCost
   ld    hl,TextMarketPlace
   jp    z,.SetWhichTextToPut
   cp    9                                     ;Castle
@@ -6212,77 +6276,96 @@ CheckButtonMouseInteractionBuildButtons:
   .Barracks:
   ld    a,(iy+CastleBarracksLevel)
   cp    0
+  ld    de,BarracksLevel1Cost
   ld    hl,TextBarracksLevel1
   jp    z,.SetWhichTextToPut
   cp    1
+  ld    de,BarracksLevel2Cost
   ld    hl,TextBarracksLevel2
   jp    z,.SetWhichTextToPut
   cp    2
+  ld    de,BarracksLevel3Cost
   ld    hl,TextBarracksLevel3
   jp    z,.SetWhichTextToPut
   cp    3
+  ld    de,BarracksLevel4Cost
   ld    hl,TextBarracksLevel4
   jp    z,.SetWhichTextToPut
   cp    4
+  ld    de,BarracksLevel5Cost
   ld    hl,TextBarracksLevel5
   jp    .SetWhichTextToPut
 
   .Mine:
   ld    a,(iy+CastleMineLevel)
   cp    0
+  ld    de,MineLevel1Cost
   ld    hl,TextMineLevel1
   jp    z,.SetWhichTextToPut
   cp    1
+  ld    de,MineLevel2Cost
   ld    hl,TextMineLevel2
   jp    z,.SetWhichTextToPut
   cp    2
+  ld    de,MineLevel3Cost
   ld    hl,TextMineLevel3
   jp    .SetWhichTextToPut
 
   .Sawmill:
   ld    a,(iy+CastleSawmillLevel)
   cp    0
+  ld    de,SawmillLevel1Cost  
   ld    hl,TextSawmillLevel1
   jp    z,.SetWhichTextToPut
   cp    1
+  ld    de,SawmillLevel2Cost  
   ld    hl,TextSawmillLevel2
   jp    z,.SetWhichTextToPut
   cp    2
+  ld    de,SawmillLevel3Cost  
   ld    hl,TextSawmillLevel3
   jp    .SetWhichTextToPut
 
   .MagicGuild:
   ld    a,(iy+CastleMageGuildLevel)
   cp    0
+  ld    de,MagicGuildLevel1Cost
   ld    hl,TextMagicGuildLevel1
   jp    z,.SetWhichTextToPut
   cp    1
+  ld    de,MagicGuildLevel2Cost
   ld    hl,TextMagicGuildLevel2
   jp    z,.SetWhichTextToPut
   cp    2
+  ld    de,MagicGuildLevel3Cost
   ld    hl,TextMagicGuildLevel3
   jp    z,.SetWhichTextToPut
   cp    3
+  ld    de,MagicGuildLevel4Cost
   ld    hl,TextMagicGuildLevel4
   jp    .SetWhichTextToPut
 
   .Castle:
   ld    a,(iy+CastleLevel)
   cp    1
+  ld    de,CastleLevel2Cost
   ld    hl,TextCastleLevel2
   jp    z,.SetWhichTextToPut
   cp    2
+  ld    de,CastleLevel3Cost
   ld    hl,TextCastleLevel3
   jp    z,.SetWhichTextToPut
   cp    3
+  ld    de,CastleLevel4Cost
   ld    hl,TextCastleLevel4
   jp    z,.SetWhichTextToPut
   cp    4
+  ld    de,CastleLevel5Cost
   ld    hl,TextCastleLevel5
   jp    .SetWhichTextToPut
 
-
   .SetWhichTextToPut:
+  ld    (CheckRequirementsWhichBuilding?),de
   ld    (PutWhichBuildText),hl
   ld    a,b
   ld    (WhichBuildingWasClicked?),a
@@ -6300,6 +6383,13 @@ TextCastleLevel2:
                           db  "Requirements:",254
                           db  "Tavern",255
 
+CastleLevel2Cost:             ;Town Hall
+.Gold:    dw  2500
+.Wood:    dw  000
+.Ore:     dw  000
+.Gems:    dw  000
+.Rubies:  dw  000
+
 TextCastleLevel3:        
                           db  "   City Hall",254
                           db  " ",254
@@ -6313,6 +6403,14 @@ TextCastleLevel3:
                           db  "Magic Guild",254
                           db  "Level 1",254
                           db  "Market Place",255
+
+CastleLevel3Cost:             ;City Hall
+.Gold:    dw  5000
+.Wood:    dw  000
+.Ore:     dw  000
+.Gems:    dw  000
+.Rubies:  dw  000
+
 TextCastleLevel4:        
                           db  "    Citadel",254
                           db  " ",254
@@ -6328,6 +6426,14 @@ TextCastleLevel4:
                           db  "7500 Gold",254
                           db  "+10 wood",254
                           db  "+10 ore",255
+
+CastleLevel4Cost:             ;Citadel
+.Gold:    dw  7500
+.Wood:    dw  010
+.Ore:     dw  010
+.Gems:    dw  000
+.Rubies:  dw  000
+
 TextCastleLevel5:        
                           db  "    Capitol",254
                           db  " ",254
@@ -6344,6 +6450,13 @@ TextCastleLevel5:
                           db  "+20 wood",254
                           db  "+20 ore",255
 
+CastleLevel5Cost:             ;Capitol
+.Gold:    dw  10000
+.Wood:    dw  020
+.Ore:     dw  020
+.Gems:    dw  000
+.Rubies:  dw  000
+
 TextMarketPlace:        
                           db  " Market Place",254
                           db  " ",254
@@ -6354,6 +6467,13 @@ TextMarketPlace:
                           db  "500 Gold",254
                           db  "+5 Wood",255
 
+MarketPlaceCost:
+.Gold:    dw  500
+.Wood:    dw  05
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextTavern:        
                           db  "    Tavern",254
                           db  " ",254
@@ -6362,8 +6482,15 @@ TextTavern:
                           db  "visiting heroes",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "500 Gold",255
+                          db  "500 Gold",254
                           db  "+5 Wood",255
+
+TavernCost:
+.Gold:    dw  500
+.Wood:    dw  05
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
 
 TextMagicGuildLevel1:        
                           db  " Magic Guild 1",254
@@ -6382,6 +6509,14 @@ TextMagicGuildLevel1:
                           db  "2000 Gold",254
                           db  "+5 Wood",254
                           db  "+5 Ore",255
+
+MagicGuildLevel1Cost:
+.Gold:    dw  2000
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextMagicGuildLevel2:        
                           db  " Magic Guild 2",254
                           db  " ",254
@@ -6399,6 +6534,14 @@ TextMagicGuildLevel2:
                           db  "+5 Ore",254
                           db  "+5 Gems",254
                           db  "+5 Rubies",255
+
+MagicGuildLevel2Cost:
+.Gold:    dw  1000
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  05
+.Rubies:  dw  05
+
 TextMagicGuildLevel3:        
                           db  " Magic Guild 3",254
                           db  " ",254
@@ -6416,6 +6559,14 @@ TextMagicGuildLevel3:
                           db  "+5 Ore",254
                           db  "+10 Gems",254
                           db  "+10 Rubies",255
+
+MagicGuildLevel3Cost:
+.Gold:    dw  1000
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  10
+.Rubies:  dw  10
+
 TextMagicGuildLevel4:        
                           db  " Magic Guild 4",254
                           db  " ",254
@@ -6434,6 +6585,13 @@ TextMagicGuildLevel4:
                           db  "+15 Gems",254
                           db  "+15 Rubies",255
 
+MagicGuildLevel4Cost:
+.Gold:    dw  1000
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  15
+.Rubies:  dw  15
+
 TextSawmillLevel1:        
                           db  "  Sawmill 1",254
                           db  " ",254
@@ -6443,6 +6601,14 @@ TextSawmillLevel1:
                           db  " ",254
                           db  "Cost:",254
                           db  "1000 Gold",255
+
+SawmillLevel1Cost:
+.Gold:    dw  1000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextSawmillLevel2:        
                           db  "  Sawmill 2",254
                           db  " ",254
@@ -6452,6 +6618,14 @@ TextSawmillLevel2:
                           db  " ",254
                           db  "Cost:",254
                           db  "1500 Gold",255
+
+SawmillLevel2Cost:
+.Gold:    dw  1500
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextSawmillLevel3:        
                           db  "  Sawmill 3",254
                           db  " ",254
@@ -6462,6 +6636,13 @@ TextSawmillLevel3:
                           db  "Cost:",254
                           db  "2000 Gold",255
 
+SawmillLevel3Cost:
+.Gold:    dw  2000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextMineLevel1:        
                           db  "   Mine 1",254
                           db  " ",254
@@ -6471,6 +6652,14 @@ TextMineLevel1:
                           db  " ",254
                           db  "Cost:",254
                           db  "1000 Gold",255
+
+MineLevel1Cost:
+.Gold:    dw  1000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextMineLevel2:        
                           db  "   Mine 2",254
                           db  " ",254
@@ -6481,6 +6670,14 @@ TextMineLevel2:
                           db  " ",254
                           db  "Cost:",254
                           db  "3000 Gold",255
+
+MineLevel2Cost:
+.Gold:    dw  3000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextMineLevel3:        
                           db  "   Mine 3",254
                           db  " ",254
@@ -6492,6 +6689,13 @@ TextMineLevel3:
                           db  " ",254
                           db  "Cost:",254
                           db  "5000 Gold",255
+
+MineLevel3Cost:
+.Gold:    dw  5000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
 
 TextBarracksLevel1:        
                           db  "  Barracks 1",254
@@ -6505,6 +6709,14 @@ TextBarracksLevel1:
                           db  "Cost:",254
                           db  "500 Gold",254
                           db  "+10 Ore",255
+
+BarracksLevel1Cost:
+.Gold:    dw  500
+.Wood:    dw  00
+.Ore:     dw  10
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextBarracksLevel2:        
                           db  "  Barracks 2",254
                           db  " ",254
@@ -6518,6 +6730,14 @@ TextBarracksLevel2:
                           db  "1000 Gold",254
                           db  "+5 Wood",254
                           db  "+5 Ore",255
+
+BarracksLevel2Cost:
+.Gold:    dw  1000
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextBarracksLevel3:        
                           db  "  Barracks 3",254
                           db  " ",254
@@ -6530,6 +6750,14 @@ TextBarracksLevel3:
                           db  "Cost:",254
                           db  "1500 Gold",254
                           db  "+15 Ore",255
+
+BarracksLevel3Cost:
+.Gold:    dw  1500
+.Wood:    dw  00
+.Ore:     dw  15
+.Gems:    dw  00
+.Rubies:  dw  00
+
 TextBarracksLevel4:        
                           db  "  Barracks 4",254
                           db  " ",254
@@ -6545,6 +6773,14 @@ TextBarracksLevel4:
                           db  "+5 Ore",254
                           db  "+4 Gems",254
                           db  "+4 Rubies",255
+
+BarracksLevel4Cost:
+.Gold:    dw  1500
+.Wood:    dw  05
+.Ore:     dw  05
+.Gems:    dw  04
+.Rubies:  dw  04
+
 TextBarracksLevel5:        
                           db  "  Barracks 5",254
                           db  " ",254
@@ -6557,6 +6793,13 @@ TextBarracksLevel5:
                           db  "Cost:",254
                           db  "5000 Gold",254
                           db  "+20 Wood",255
+
+BarracksLevel5Cost:
+.Gold:    dw  5000
+.Wood:    dw  20
+.Ore:     dw  00
+.Gems:    dw  00
+.Rubies:  dw  00
 
 TextBarracksTower:        
                           db  " Barracks Tower",254
@@ -6574,6 +6817,14 @@ TextBarracksTower:
                           db  " ",254
                           db  "Requirements:",254
                           db  "Barracks 5",255
+
+BarracksTowerCost:
+.Gold:    dw  20000
+.Wood:    dw  00
+.Ore:     dw  00
+.Gems:    dw  20
+.Rubies:  dw  20
+
 TextCityWalls:        
                           db  "   City Walls",254
                           db  " ",254
@@ -6590,7 +6841,12 @@ TextCityWalls:
                           db  "Requirements:",254
                           db  "Capitol",255
 
-
+CityWallsCost:
+.Gold:    dw  2000
+.Wood:    dw  15
+.Ore:     dw  15
+.Gems:    dw  00
+.Rubies:  dw  00
 
 
 
@@ -6694,8 +6950,6 @@ SetBuildButtons:                        ;put button in mirror page below screen,
 
 
 
-
-kut: equ "/"
 TextGoldPerDay: db "Gold/day",255
 
 SetNameCastleAndDailyIncome:
