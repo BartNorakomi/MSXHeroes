@@ -13,6 +13,77 @@
 ;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+SettavernHeroSkill:
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    b,004+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    b,090+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    b,176+04                        ;dx
+  ld    c,043+44                        ;dy
+  call  .SetHeroSkill
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+  .SetHeroSkill:
+  or    a
+  ret   z
+
+  push  bc
+
+  ld    b,a
+  ld    ix,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght
+  .loop:
+  add   ix,de
+  djnz  .loop
+
+  pop   bc
+  
+  ld    a,(ix+HeroInfoSkill)            ;hero skill  
+  ld    l,a
+  ld    h,0
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  push  hl
+  add   hl,hl                           ;*64
+  pop   de
+  add   hl,de                           ;*96
+  ld    de,SkillEmpty+$4000
+  add   hl,de
+  
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetText:                                ;in: b=dx, c=dy, hl->text
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    (TextAddresspointer),hl  
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set ny of text
+  call  SetTextBuildingWhenClicked.SetText
+  ld    a,5
+  ld    (PutLetter+ny),a                ;set ny of text
+  ret
+
 SetTextBuildingWhenClicked:
   ld    a,(SetTextBuilding)
   dec   a
@@ -1696,76 +1767,6 @@ EraseTavernHeroWindowWhenUnavailable:
 
 
 
-SettavernHeroSkill:
-  ld    a,HeroOverviewCodeBlock         ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
-  ld    b,004+04                        ;dx
-  ld    c,043+44                        ;dy
-  call  .SetHeroSkill
-
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
-  ld    b,090+04                        ;dx
-  ld    c,043+44                        ;dy
-  call  .SetHeroSkill
-
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
-  ld    b,176+04                        ;dx
-  ld    c,043+44                        ;dy
-  call  .SetHeroSkill
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-  ret
-
-  .SetHeroSkill:
-  or    a
-  ret   z
-
-  push  bc
-
-  ld    b,a
-  ld    ix,HeroAddressesAdol-heroAddressesLenght
-  ld    de,heroAddressesLenght
-  .loop:
-  add   ix,de
-  djnz  .loop
-
-  pop   bc
-  
-  ld    a,(ix+HeroInfoSkill)            ;hero skill  
-  ld    l,a
-  ld    h,0
-  add   hl,hl                           ;*2
-  add   hl,hl                           ;*4
-  add   hl,hl                           ;*8
-  add   hl,hl                           ;*16
-  add   hl,hl                           ;*32
-  push  hl
-  add   hl,hl                           ;*64
-  pop   de
-  add   hl,de                           ;*96
-  ld    de,SkillEmpty+$4000
-  add   hl,de
-  
-  call  SetText                         ;in: b=dx, c=dy, hl->text
-  ret
-
-SetText:                                ;in: b=dx, c=dy, hl->text
-  ld    a,b
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    (TextAddresspointer),hl  
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-  
 SettavernHeroNames:
   ld    a,(iy+TavernHero1DayRemain)     ;hero number
   ld    b,004+30                        ;dx
@@ -3348,7 +3349,9 @@ SetGenericButtons:                      ;put button in mirror page below screen,
 
 
 
-  halt
+;  halt
+
+
   ret
 
 CopyTransparantButtons:  
@@ -3375,7 +3378,11 @@ CopyTransparantButtons:
 
   ld    hl,CopyCastleButton2
   call  docopy
-  halt
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
   ret
 
 CheckButtonMouseInteractionGenericButtons:
@@ -3789,7 +3796,10 @@ ExitSingleUnitRecruitWindow:
   call  SetResourcesPlayer
   
   pop   af                                ;pop the call to this routine
-  jp    CastleOverviewRecruitCode.engine
+
+  jp    ExitVisitingAndDefendingArmyRoutine
+
+;  jp    CastleOverviewRecruitCode.engine
 
 
 
@@ -3839,7 +3849,7 @@ SetRecruitMAXBUYButtons:                  ;put button in mirror page below scree
   ld    bc,$0000 + (018*256) + (026/2)        ;ny,nx
   ld    a,ButtonsRecruitBlock                   ;buttons block
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  halt
+;  halt
   ret
 
 
@@ -3935,7 +3945,22 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
 
   .BuyButtonPressed:
+  ;check if any unit has been purchase, or did the amount stay on 0 ?
+  ld    de,(SelectedCastleRecruitLevelUnitTotalGoldCost)
+  ld    a,d
+  or    e
+  jp    z,ExitSingleUnitRecruitWindow   ;return if amount stayed on 0
 
+  ;add the units to visiting or defending hero
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  .CheckAddCreaturesToVisitingHero
+  jr    nc,.UnitsAdded                  ;not carry=units added to hero. carry=no visiting hero, no empty slots or no similar creatures in slots
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  .CheckAddCreaturesToVisitingHero
+  jr    nc,.UnitsAdded                  ;not carry=units added to hero. carry=no visiting hero, no empty slots or no similar creatures in slots
+  jp    ExitSingleUnitRecruitWindow
+  .UnitsAdded:
+  
   call  SetResourcesCurrentPlayerinIX
   ;gold
   ld    l,(ix+0)
@@ -3964,6 +3989,123 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
   call  .SubtractPurchasedUnitsFromCastle
   jp    ExitSingleUnitRecruitWindow
+
+  .CheckAddCreaturesToVisitingHero:
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ret   c                               ;carry=no visiting/defending hero found
+
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  ld    b,a
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+
+  ;check if any of the slots has the same creature that we just purchased
+  ld    a,(SelectedCastleRecruitLevelUnit)
+  cp    (ix+HeroUnits+0)                ;check if 1st creature slot has the same type of unit that we purchased
+  jp    z,.Slot1SameUnit
+  cp    (ix+HeroUnits+3)                ;check if 2nd creature slot has the same type of unit that we purchased
+  jp    z,.Slot2SameUnit
+  cp    (ix+HeroUnits+6)                ;check if 3d creature slot has the same type of unit that we purchased
+  jp    z,.Slot3SameUnit
+  cp    (ix+HeroUnits+9)                ;check if 4th creature slot has the same type of unit that we purchased
+  jp    z,.Slot4SameUnit
+  cp    (ix+HeroUnits+12)                ;check if 5th creature slot has the same type of unit that we purchased
+  jp    z,.Slot5SameUnit
+  cp    (ix+HeroUnits+15)                ;check if 6th creature slot has the same type of unit that we purchased
+  jp    z,.Slot6SameUnit
+  
+  ;check if any of the slots are empty
+  xor   a
+  cp    (ix+HeroUnits+0)                ;check if 1st creature slot has the same type of unit that we purchased
+  jp    z,.Slot1IsEmpty
+  cp    (ix+HeroUnits+3)                ;check if 2nd creature slot has the same type of unit that we purchased
+  jp    z,.Slot2IsEmpty
+  cp    (ix+HeroUnits+6)                ;check if 3d creature slot has the same type of unit that we purchased
+  jp    z,.Slot3IsEmpty
+  cp    (ix+HeroUnits+9)                ;check if 4th creature slot has the same type of unit that we purchased
+  jp    z,.Slot4IsEmpty
+  cp    (ix+HeroUnits+12)                ;check if 5th creature slot has the same type of unit that we purchased
+  jp    z,.Slot5IsEmpty
+  cp    (ix+HeroUnits+15)                ;check if 6th creature slot has the same type of unit that we purchased
+  jp    z,.Slot6IsEmpty
+  scf
+  ret
+  
+  .Slot1SameUnit:
+  ld    e,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+2)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+1),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+2),h              ;unit amount (16 bit)
+  ret
+  .Slot2SameUnit:
+  ld    e,(ix+HeroUnits+4)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+5)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+4),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+5),h              ;unit amount (16 bit)
+  ret
+  .Slot3SameUnit:
+  ld    e,(ix+HeroUnits+7)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+8)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+7),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+8),h              ;unit amount (16 bit)
+  ret
+  .Slot4SameUnit:
+  ld    e,(ix+HeroUnits+10)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+11)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+10),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+11),h              ;unit amount (16 bit)
+  ret
+  .Slot5SameUnit:
+  ld    e,(ix+HeroUnits+13)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+14)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+13),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+14),h              ;unit amount (16 bit)
+  ret
+  .Slot6SameUnit:
+  ld    e,(ix+HeroUnits+16)              ;unit amount (16 bit)
+  ld    d,(ix+HeroUnits+17)              ;unit amount (16 bit)
+  add   hl,de
+  ld    (ix+HeroUnits+16),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+17),h              ;unit amount (16 bit)
+  ret
+
+  .Slot1IsEmpty:
+  ld    (ix+HeroUnits+0),b              ;unit type
+  ld    (ix+HeroUnits+1),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+2),h              ;unit amount (16 bit)
+  ret
+  .Slot2IsEmpty:
+  ld    (ix+HeroUnits+3),b              ;unit type
+  ld    (ix+HeroUnits+4),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+5),h              ;unit amount (16 bit)
+  ret
+  .Slot3IsEmpty:
+  ld    (ix+HeroUnits+6),b              ;unit type
+  ld    (ix+HeroUnits+7),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+8),h              ;unit amount (16 bit)
+  ret
+  .Slot4IsEmpty:
+  ld    (ix+HeroUnits+9),b              ;unit type
+  ld    (ix+HeroUnits+10),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+11),h              ;unit amount (16 bit)
+  ret
+  .Slot5IsEmpty:
+  ld    (ix+HeroUnits+12),b              ;unit type
+  ld    (ix+HeroUnits+13),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+14),h              ;unit amount (16 bit)
+  ret
+  .Slot6IsEmpty:
+  ld    (ix+HeroUnits+15),b              ;unit type
+  ld    (ix+HeroUnits+16),l              ;unit amount (16 bit)
+  ld    (ix+HeroUnits+17),h              ;unit amount (16 bit)
+  ret
+
+
+
 
 .SubtractPurchasedUnitsFromCastle:
   ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
@@ -4350,7 +4492,7 @@ SetRecruitButtons:                        ;put button in mirror page below scree
   ld    bc,$0000 + (009*256) + (076/2)        ;ny,nx
   ld    a,ButtonsRecruitBlock                   ;buttons block
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  halt
+;  halt
   ret
 
 
@@ -5280,7 +5422,6 @@ DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2)
 
 
 
-ds $3000
 
 
 
@@ -5542,7 +5683,6 @@ CastleOverviewBuildCode:                ;in: iy-castle
   ld    ix,BuildButtonTable
   call  SetBuildButtons                 ;copies button state from rom -> vram
   call  SetTextBuildingWhenClicked      ;when a building is clicked display text on the right side
-;  call  SetSingleBuildButtonColor      ;is integrated in the above code
   ;/9 build buttons
 
   ;single build button
@@ -5624,6 +5764,9 @@ CheckButtonMouseInteractionSingleBuildButton:
   ret
 
   .MenuOptionSelected:
+  
+
+  
   ld    (ix+BuildButtonStatus),%1010 0011
 
   ;only build if single build button is blue
@@ -5797,7 +5940,7 @@ SetSingleBuildButton:                   ;put button in mirror page below screen,
   ld    bc,$0000 + (009*256) + (072/2)        ;ny,nx
   ld    a,ButtonsBuildBlock                   ;buttons block
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  halt
+;  halt
   ret
 
 
@@ -5915,12 +6058,12 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
     
   .Castle:
   ld    de,BuildButtonTable+1+(0*BuildButtonTableLenghtPerButton)
-  ld    a,(iy+CastleLevel)
-  cp    5
-  jp    nc,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
 
+  ld    a,(iy+CastleLevel)
+  cp    5
+  jp    nc,.Green
 
   ld    a,(iy+CastleLevel)
   cp    1
@@ -6049,6 +6192,7 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   sbc   hl,bc
   jp    c,.Red  
   jp    .Blue  
+
 
 
 SetResourcesCurrentPlayerinIX:
@@ -6394,12 +6538,17 @@ TextCastleLevel2:
                           db  "Requirements:",254
                           db  "Tavern",255
 
+;ds $3000
+
+
 CastleLevel2Cost:             ;Town Hall
 .Gold:    dw  2500
 .Wood:    dw  000
 .Ore:     dw  000
 .Gems:    dw  000
 .Rubies:  dw  000
+
+
 
 TextCastleLevel3:        
                           db  "   City Hall",254
@@ -6940,7 +7089,10 @@ SetBuildButtons:                        ;put button in mirror page below screen,
   
   ld    hl,CopyBuildButtonImage
   call  docopy
-  halt
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
   ret
 
 
@@ -7165,7 +7317,10 @@ SetCastleButtons:                       ;put button in mirror page below screen,
 
   ld    hl,CopyCastleButton
   call  docopy
-  halt
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
   ret
 
 CheckButtonMouseInteractionCastleMainScreen:

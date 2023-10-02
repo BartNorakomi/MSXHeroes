@@ -1501,8 +1501,8 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  call  CastleOverviewCode
-;  call  CastleOverviewBuildCode
+;  call  CastleOverviewCode
+  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
