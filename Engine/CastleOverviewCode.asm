@@ -185,12 +185,23 @@ ds 12
 
 
 ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when refreshing the visiting and defending army heroes and creatures overview
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+  call  SetVisitingAndDefendingHeroesAndArmyWindow  
+  call  SetVisitingAndDefendingHeroesAndArmy
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetVisitingAndDefendingHeroesAndArmyWindow  
+  call  SetVisitingAndDefendingHeroesAndArmy
+
   ld    a,(AreWeInTavern1OrRecruit2?)
   dec   a
-  jp    z,CastleOverviewTavernCode
-  jp    CastleOverviewRecruitCode
+  jp    z,CastleOverviewTavernCode.engine
+  jp    CastleOverviewRecruitCode.engine
 
 CastleOverviewTavernCode:
+  call  SetScreenOff
+
   ld    a,1
   ld    (AreWeInTavern1OrRecruit2?),a
 
@@ -230,18 +241,8 @@ CastleOverviewTavernCode:
   ld    hl,CopyPage1To0
   call  docopy
 
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -303,6 +304,7 @@ CastleOverviewTavernCode:
   ;/tavern buttons
 
   halt
+  call  SetScreenOn
   jp  .engine
 
 .CheckButtonClickedVisitingAndDefendingHeroesAndArmy:                    ;in: carry=button clicked, b=button number
@@ -1513,22 +1515,44 @@ CastleOverviewTavernCode:
   ld    a,(iy+TavernHero3DayRemain)     ;which hero are we recruiting ?
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   ld    (iy+TavernHero3DayRemain),000   ;remove hero 2 from tavern
-  pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    .HeroRecruited
 
   .TavernButton2Pressed:
   ld    a,(iy+TavernHero2DayRemain)     ;which hero are we recruiting ?
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   ld    (iy+TavernHero2DayRemain),000   ;remove hero 2 from tavern
-  pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
-  
+  jp    .HeroRecruited
+
   .TavernButton1Pressed:
   ld    a,(iy+TavernHero1DayRemain)     ;which hero are we recruiting ?
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   ld    (iy+TavernHero1DayRemain),000   ;remove hero 2 from tavern
+  jp    .HeroRecruited
+
+
+  .HeroRecruited:
+  call  SetResourcesPlayer
+  call  SetVisitingAndDefendingHeroesAndArmy
+  call  SetTavernHeroes
+  call  SetTavernButtons
+  ld    ix,GenericButtonTable2
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  call  SwapAndSetPage                  ;swap and set page
+
+  call  SetResourcesPlayer
+  call  SetVisitingAndDefendingHeroesAndArmy
+  call  SetTavernHeroes
+  call  SetTavernButtons
+  ld    ix,GenericButtonTable2
+  call  SetGenericButtons               ;copies button state from rom -> vram
   pop   af                              ;pop the call to this routine
-  jp    CastleOverviewTavernCode
+  jp    CastleOverviewTavernCode.engine
+
+
+
+
+
 
   .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
   push  af                              ;a,(iy+TavernHeroxDayRemain)
@@ -2324,14 +2348,14 @@ TavernButtonTableAmountOfButtons:  db  3
 TavernButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
   .endlenght:
-  db  %1010 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
-  db  %1001 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
 
 TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
   db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
   .endlenght:
-  db  %1010 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
-  db  %1001 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
 
 
 
@@ -2343,6 +2367,7 @@ TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (
 
 
 CastleOverviewMarketPlaceCode:
+  call  SetScreenOff
 
   ld    iy,Castle1
 
@@ -2369,18 +2394,8 @@ CastleOverviewMarketPlaceCode:
   ld    hl,CopyPage1To0
   call  docopy
 
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -2413,6 +2428,7 @@ CastleOverviewMarketPlaceCode:
   ;/market place buttons
 
   halt
+  call  SetScreenOn
   jp  .engine
 
 .CheckButtonClicked:                    ;in: carry=button clicked, b=button number
@@ -2982,6 +2998,8 @@ MarketPlaceButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), 
 
 
 CastleOverviewMagicGuildCode:
+  call  SetScreenOff
+
   ld    iy,Castle1
 
   call  SetMagicGuildButtons
@@ -3006,18 +3024,8 @@ CastleOverviewMagicGuildCode:
   ld    hl,CopyPage1To0
   call  docopy
 
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -3050,6 +3058,7 @@ CastleOverviewMagicGuildCode:
   ;/magic skill icons in the magic guild
 
   halt
+  call  SetScreenOn
   jp  .engine
 
 .CheckButtonClicked:                    ;in: carry=button clicked, b=button number
@@ -3574,6 +3583,8 @@ SetExitButtonHeight:
   ret
 
 CastleOverviewRecruitCode:
+  call  SetScreenOff
+
   ld    a,2
   ld    (AreWeInTavern1OrRecruit2?),a
 
@@ -3632,18 +3643,8 @@ CastleOverviewRecruitCode:
   ld    hl,CopyPage1To0
   call  docopy
 
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -3717,6 +3718,14 @@ CastleOverviewRecruitCode:
   call  SetRecruitButtons                ;copies button state from rom -> vram
   ;/recruit button for level 1-6 creatures
 
+;WE SET UP TO COPY THE BUTTON TWICE, SINCE CLICKING THE BUTTON
+;INSTANTLY POPS UP A SUBMENU, WHICH PREVENTS THE BUTTON FROM BEING COPIED TWICE
+;RESULTING IN FLICKERING OF THE BUTTON
+  call  SwapAndSetPage                  ;swap and set page
+  ld    ix,RecruitButtonTable
+  call  SetRecruitButtons                ;copies button state from rom -> vram
+  call  SwapAndSetPage                  ;swap and set page
+
   ;recruit buttons MAX and BUY
   ld    ix,RecruitButtonMAXBUYTable 
   call  CheckButtonMouseInteractionRecruitMAXBUYButtons
@@ -3728,6 +3737,7 @@ CastleOverviewRecruitCode:
   call  CheckEndRecruitUnitWindow   ;check if mouse is clicked outside of recruit single unit window. If so, close this window
 
   halt
+  call  SetScreenOn
   jp  .engine
 
 CheckEndRecruitUnitWindow:
@@ -3741,19 +3751,45 @@ CheckEndRecruitUnitWindow:
 
   ld    a,(spat+0)                      ;y mouse
   cp    032                             ;dy
-  jr    c,.NotOverRecruitSingleUnitWindow
+  jr    c,ExitSingleUnitRecruitWindow
   cp    032+092                         ;dy+ny
-  jr    nc,.NotOverRecruitSingleUnitWindow
+  jr    nc,ExitSingleUnitRecruitWindow
   
   ld    a,(spat+1)                      ;x mouse
   cp    048                             ;dx
-  jr    c,.NotOverRecruitSingleUnitWindow
+  jr    c,ExitSingleUnitRecruitWindow
   cp    048+162                         ;dx+nx
   ret   c
 
-  .NotOverRecruitSingleUnitWindow:
+ExitSingleUnitRecruitWindow:
+  ld    hl,0
+  ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalGoldCost),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalCostGems),hl
+  ld    (SelectedCastleRecruitLevelUnitTotalCostRubies),hl
+
+  xor   a
+  ld    (RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton),a ;BUY button
+  ld    (RecruitButtonMAXBUYTable+1*RecruitButtonMAXBUYTableLenghtPerButton),a ;MAX button
+
+  ld    a,%1100 0011                    ;turn all recruit buttons on
+  ld    (RecruitButtonTable+0*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+1*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+2*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+3*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+4*RecruitButtonTableLenghtPerButton),a 
+  ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
+
+  call  SetRecruitGraphics6CreatureWindows              ;put gfx in page 1
+  call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+  call  SetResourcesPlayer
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetRecruitGraphics6CreatureWindows              ;put gfx in page 1
+  call  SetAvailableRecruitArmy         ;put army icons, amount and info in the 6 windows
+  call  SetResourcesPlayer
+  
   pop   af                                ;pop the call to this routine
-  jp    CastleOverviewRecruitCode
+  jp    CastleOverviewRecruitCode.engine
 
 
 
@@ -3927,10 +3963,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    (ix+9),h                        ;player gold in hl
 
   call  .SubtractPurchasedUnitsFromCastle
-
-  pop   af                                ;pop the call to this routine
-  jp    CastleOverviewRecruitCode
-
+  jp    ExitSingleUnitRecruitWindow
 
 .SubtractPurchasedUnitsFromCastle:
   ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
@@ -5433,7 +5466,7 @@ SetNumber16BitCastle:                   ;in hl=number (16bit)
 
 CastleOverviewBuildCode:                ;in: iy-castle
 
-
+  call  SetScreenOff
 
   ld    iy,Castle1
 
@@ -5478,19 +5511,8 @@ CastleOverviewBuildCode:                ;in: iy-castle
   ld    bc,7
   ldir
 
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -5532,6 +5554,9 @@ CastleOverviewBuildCode:                ;in: iy-castle
   ;/single build button
 
   halt
+
+  call  SetScreenOn
+  
   jp  .engine
 
 
@@ -5635,50 +5660,32 @@ CheckButtonMouseInteractionSingleBuildButton:
   .CityWalls:  
   .Castle:
   inc   (iy+CastleLevel)
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .MarketPlace:  
   ld    (iy+CastleMarket),1
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .Tavern:
   ld    (iy+CastleTavern),1
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .MagicGuild:
   inc   (iy+CastleMageGuildLevel)
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .Sawmill:
   inc   (iy+CastleSawmillLevel)
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .Mine:
   inc   (iy+CastleMineLevel)
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
+  jp    PurchaseBuilding
 
   .BarracksTower:
   .Barracks:
   inc   (iy+CastleBarracksLevel)
-  call  PurchaseBuilding
-  pop   af
-  jp    CastleOverviewBuildCode
-
-
-
-
+  jp    PurchaseBuilding
 
 PurchaseBuilding:
   ;gold
@@ -5740,7 +5747,11 @@ PurchaseBuilding:
   sbc   hl,de
   ld    (ix+8),l
   ld    (ix+9),h                        ;Total rubies Player-rubies cost
-  ret
+
+  pop   af
+  jp    CastleOverviewCode
+;  jp    CastleOverviewBuildCode
+
 
 ;CheckRequirementsWhichBuilding->
 ;CityWallsCost:
@@ -6997,6 +7008,8 @@ SetNameCastleAndDailyIncome:
 
 
 CastleOverviewCode:                     ;in: iy-castle
+  call  SetScreenOff
+
   ld    iy,Castle1
 
 
@@ -7020,18 +7033,8 @@ CastleOverviewCode:                     ;in: iy-castle
   call  SetExitButtonHeight
   call  SetActiveCastleOverviewButtons
   
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
-  halt
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
 
   .engine:  
@@ -7058,6 +7061,9 @@ CastleOverviewCode:                     ;in: iy-castle
 
 
   halt
+
+  call  SetScreenOn
+    
   jp  .engine
 
 
@@ -7489,6 +7495,20 @@ SetRecruitGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,RecruitCreaturesBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetRecruitGraphics6CreatureWindows:
+  ld    hl,$4000 + (026*128) + (000/2) - 128
+  ld    de,$0000 + (026*128) + (000/2) - 128
+  ld    bc,$0000 + (103*256) + (256/2)
+  ld    a,RecruitCreaturesBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetVisitingAndDefendingHeroesAndArmyWindow:
+  ld    hl,$4000 + (174*128) + (004/2) - 128
+  ld    de,$0000 + (174*128) + (004/2) - 128
+  ld    bc,$0000 + (034*256) + (248/2)
   ld    a,RecruitCreaturesBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 

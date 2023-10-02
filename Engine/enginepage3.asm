@@ -2298,6 +2298,22 @@ PopulateControlsOnInterrupt:
   ld    (ControlsOnInterrupt),a
 	ret
 
+SetScreenOff:
+  ld    a,(vdp_0+1)   ;screen off
+  and   %1011 1111
+  jr    SetScreenon.go
+
+SetScreenon:
+  ld    a,(vdp_0+1)   ;screen on
+  or    %0100 0000
+  .go:
+  ld    (vdp_0+1),a
+  di
+  out   ($99),a
+  ld    a,1+128
+  ei
+  out   ($99),a
+  ret
 
 outix384:
   call  outix256
