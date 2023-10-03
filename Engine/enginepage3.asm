@@ -23,7 +23,7 @@ StartGame:
   call  ClearMapPage0AndMapPage1
 
   ld    a,1
-  ld    (EnterCastle?),a
+;  ld    (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -728,6 +728,16 @@ RecruitButtonBUYYBottom:        equ RecruitButtonBUYYtop + 018
 RecruitButtonBUYXLeft:          equ 114
 RecruitButtonBUYXRight:         equ RecruitButtonBUYXLeft + 026
 
+RecruitButtonPLUSYtop:          equ 084
+RecruitButtonPLUSYBottom:       equ RecruitButtonPLUSYtop + 014
+RecruitButtonPLUSXLeft:         equ 096
+RecruitButtonPLUSXRight:        equ RecruitButtonPLUSXLeft + 014
+
+RecruitButtonMINUSYtop:         equ 084
+RecruitButtonMINUSYBottom:      equ RecruitButtonMINUSYtop + 014
+RecruitButtonMINUSXLeft:        equ 144
+RecruitButtonMINUSXRight:       equ RecruitButtonMINUSXLeft + 014
+
 AmountOfButtons:                equ -1
 ;RecruitButtonStatus:            equ 0
 ;RecruitButton_SYSX_Ontouched:   equ 1
@@ -740,11 +750,13 @@ AmountOfButtons:                equ -1
 ;RecruitButton_DYDX:             equ 11
 
 RecruitButtonMAXBUYTableLenghtPerButton:  equ RecruitButtonMAXBUYTable.endlenght-RecruitButtonMAXBUYTable
-RecruitButtonMAXBUYTableAmountOfButtons:  db  2
+RecruitButtonMAXBUYTableAmountOfButtons:  db  4
 RecruitButtonMAXBUYTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
   db  %1100 0011 | dw $4000 + (027*128) + (152/2) - 128 | dw $4000 + (027*128) + (178/2) - 128 | dw $4000 + (027*128) + (204/2) - 128 | db RecruitButtonMAXYtop,RecruitButtonMAXYBottom,RecruitButtonMAXXLeft,RecruitButtonMAXXRight | dw $0000 + (RecruitButtonMAXYtop*128) + (RecruitButtonMAXXLeft/2) - 128 
   .endlenght:
-  db  %1010 0011 | dw $4000 + (045*128) + (162/2) - 128 | dw $4000 + (045*128) + (188/2) - 128 | dw $4000 + (045*128) + (214/2) - 128 | db RecruitButtonBUYYtop,RecruitButtonBUYYBottom,RecruitButtonBUYXLeft,RecruitButtonBUYXRight | dw $0000 + (RecruitButtonBUYYtop*128) + (RecruitButtonBUYXLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (045*128) + (162/2) - 128 | dw $4000 + (045*128) + (188/2) - 128 | dw $4000 + (045*128) + (214/2) - 128 | db RecruitButtonBUYYtop,RecruitButtonBUYYBottom,RecruitButtonBUYXLeft,RecruitButtonBUYXRight | dw $0000 + (RecruitButtonBUYYtop*128) + (RecruitButtonBUYXLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (072*128) + (222/2) - 128 | dw $4000 + (086*128) + (222/2) - 128 | dw $4000 + (100*128) + (222/2) - 128 | db RecruitButtonPLUSYtop,RecruitButtonPLUSYBottom,RecruitButtonPLUSXLeft,RecruitButtonPLUSXRight | dw $0000 + (RecruitButtonPLUSYtop*128) + (RecruitButtonPLUSXLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (072*128) + (236/2) - 128 | dw $4000 + (086*128) + (236/2) - 128 | dw $4000 + (100*128) + (222/2) - 128 | db RecruitButtonMINUSYtop,RecruitButtonMINUSYBottom,RecruitButtonMINUSXLeft,RecruitButtonMINUSXRight | dw $0000 + (RecruitButtonMINUSYtop*128) + (RecruitButtonMINUSXLeft/2) - 128 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1390,6 +1402,10 @@ PreviousButtonClicked:      ds  1
 PreviousButtonClickedIX:    ds  2
 AreWeInTavern1OrRecruit2?:  ds  1
 
+PreviousButton2Clicked:      ds  1
+PreviousButton2ClickedIX:    ds  2
+
+
 LenghtTextSkillsDescription:  equ 24
 TextSkillsWindowButton1:  db  "basic archery          ",255
                           db  "basic archery          ",254
@@ -1501,8 +1517,8 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-;  call  CastleOverviewCode
-  call  CastleOverviewBuildCode
+  call  CastleOverviewCode
+;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode

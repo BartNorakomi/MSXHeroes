@@ -1,0 +1,2 @@
+https://www.msx.org/wiki/Mouse/Trackball
+https://www.msx.org/forum/development/msx-development/mouse-control-asm
