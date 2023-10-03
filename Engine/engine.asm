@@ -1,13 +1,13 @@
 LevelEngine:
 
 ;For now PopulateControls and PopulateKeyMatrix are ONLY used in the routine scrollscreen
+  call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
-  call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
 
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
 
@@ -65,6 +65,9 @@ LevelEngine:
   ld    (hl),0
 
 ;  halt
+  ld    a,(framecounter)
+  cp    2
+  call  z,SetScreenOn
   jp    LevelEngine
 
 PreviousVblankIntFlag:  db  1
@@ -130,7 +133,7 @@ vblank:
   ret
 
 vblankintflag:  db  0
-lineintflag:  db  0
+;lineintflag:  db  0
 InterruptHandler:
   push  af
 
@@ -4136,7 +4139,7 @@ HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254," barbarian",
 HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroPortrait14x9SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
 
 pl1hero1y:		db	13
-pl1hero1x:		db	2
+pl1hero1x:		db	7
 pl1hero1xp: dw 0940
 pl1hero1move:	db	12,20
 pl1hero1mana:	db	10,20
@@ -4336,7 +4339,7 @@ pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
-pl2hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1

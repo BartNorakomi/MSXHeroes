@@ -10,11 +10,17 @@ InitiateGame:
 	ld		(whichplayernowplaying?),a       ;which hero has it's first turn
 
 StartGame:
+  call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
-  call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
   call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
+
+  .WhenExitingHeroOverviewCastleAndBattle:
+  call  SetScreenOff
+  ld    hl,World1Palette
+  call  SetPalette  
+  call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
@@ -1456,12 +1462,6 @@ PutLetter:
   db    005,000,005,000                 ;nx,--,ny,--
   db    000,000,$98              ;fast copy -> Copy from right to left     
 
-ResetAllControls:
-  xor   a
-	ld		(Controls),a
-	ld		(NewPrContr),a  
-  ret
-
 SetHeroOverviewMenuInPage1ROM:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
@@ -1478,15 +1478,12 @@ SetHeroOverviewMenuInPage1ROM:
   ld    (MenuOptionSelected?Backup),a   ;which inventory slot has been clicked (count from rightbottom to lefttop)
   ld    (MenuOptionSelected?BackupLastFrame),a
 
-
-
+  call  HeroOverviewCode
 ;  call  HeroOverviewSkillsWindowCode
 ;  call  HeroOverviewSpellBookWindowCode_Earth
 ;  call  HeroOverviewSpellBookWindowCode_Fire
 ;  call  HeroOverviewInventoryWindowCode
 ;  call  HeroOverviewArmyWindowCode
-
-  call  HeroOverviewCode
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
@@ -1495,11 +1492,25 @@ SetHeroOverviewMenuInPage1ROM:
   ld    hl,CursorBoots
   ld    (CurrentCursorSpriteCharacter),hl
 
-  call  ClearMapPage0AndMapPage1
-  call  ResetAllControls
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    a,(slot.page1rom)               ;all RAM except page 1
   out   ($a8),a      
+
+  xor   a
+  ld    (vblankintflag),a
+  ;if there were movement stars before entering Hero Overview, then remove them
+	ld		(putmovementstars?),a
+;	ld		(movementpathpointer),a
+;	ld		(movehero?),a	
+;
+; bit	7	  6	  5		    4		    3		    2		  1		  0
+;		  0	  0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  F5	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;	
+  ;before we jumped to Hero Overview, trig A was pressed on the interrupt, end the same way, otherwise trig A gets triggered again when going back to the game
+  ld    a,%0001 0000
+	ld		(ControlsOnInterrupt),a
   ret
 
 EnterCastle:
@@ -1531,9 +1542,23 @@ EnterCastle:
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (vblankintflag),a
+  ;if there were movement stars before entering Hero Overview, then remove them
+	ld		(putmovementstars?),a
+  ld    (framecounter),a
+;	ld		(movementpathpointer),a
+;	ld		(movehero?),a	
+;
+; bit	7	  6	  5		    4		    3		    2		  1		  0
+;		  0	  0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  F5	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;	
+  ;before we jumped to Hero Overview, trig A was pressed on the interrupt, end the same way, otherwise trig A gets triggered again when going back to the game
+  ld    a,%0001 0000
+	ld		(ControlsOnInterrupt),a
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
-  jp    StartGame                       ;back to game
+  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
 
 SwapAndSetPage:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
@@ -1541,11 +1566,11 @@ SwapAndSetPage:
 	ld		(activepage),a			
 	jp    SetPageSpecial					        ;set page
 
-
-
-
 EnterCombat:
   call  SetTempisr                      ;end the current interrupt handler used in the engine
+
+  ld    a,3
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
 	ld		a,(activepage)
   or    a
@@ -1568,7 +1593,16 @@ EnterCombat:
   ld    ix,(HeroThatGetsAttacked)       ;y hero that gets attacked
   call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
 ;  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
-  jp    StartGame                       ;back to game
+
+  xor   a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (vblankintflag),a
+  ;if there were movement stars before entering Hero Overview, then remove them
+	ld		(putmovementstars?),a
+	ld		(movementpathpointer),a
+	ld		(movehero?),a	
+  ld    (framecounter),a
+  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
 
 DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
   ld    (ix+HeroStatus),255             ;255 = inactive
@@ -1713,9 +1747,6 @@ LoadWorldTiles:
   ld    a,1
   ld    hl,$8000                        ;write to page 3
   call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-
-  ld    hl,World1Palette
-  call  SetPalette
   ret
 
 LoadWorldObjectLayerMap:

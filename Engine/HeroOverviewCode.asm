@@ -3344,6 +3344,7 @@ HeroOverviewCode:
 
   .engine:  
   call  PopulateControls                ;read out keys
+
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
   call  CheckButtonMouseInteraction
@@ -3359,7 +3360,14 @@ HeroOverviewCode:
   call  SetButtonStatusAndText          ;copies button state from rom -> vram
   call  SwapAndSetPage                  ;swap and set page  
 
-  halt
+;  halt
+
+;.kut:
+;	ld		a,(NewPrContr)
+;  bit   4,a                             ;check trigger a / space
+;  ret   nz
+
+
   jp  .engine
 
   .MenuOptionSelected:
