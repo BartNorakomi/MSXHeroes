@@ -492,7 +492,11 @@ CheckHeroEntersCastle:
 
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    002
-  ret   z                               ;dont enter castle if hero has already entered castle
+  ret   z                               ;dont enter castle if hero is visiting
+  cp    254
+  ret   z                               ;dont enter castle if hero is defending
+
+  ;when hero enters castle, he becomes a visiting hero
   ld    (ix+HeroStatus),002             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   
   pop   af                              ;pop the call to this check
@@ -982,6 +986,7 @@ endturn:
 ;  call  InitiatePlayerTurn
 ;  ret
 
+ActivateFirstActiveHeroForCurrentPlayer:
   xor   a
 	ld		(herowindowpointer),a           ;each player has 10 heroes. The herowindowpointer tells us which hero is in window 1
 	ld		(CastleWindowPointer),a         ;The castlewindowpointer tells us which castle is in window 1
@@ -1009,8 +1014,10 @@ endturn:
 
   ld    ix,(plxcurrentheroAddress)
   call  centrescreenforthishero.GoCenter
-  ld    a,(ix+HeroStatus)
-  cp    255
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    254                             ;if current hero went defending into castle, then select a active hero as current hero
+  jr    z,ActivateFirstActiveHeroForCurrentPlayer
+  cp    255                             ;inactive
   call  z,CenterScreenOnPlayersCastle
   
   ;if this player is in castle, center screen around castle instead
@@ -4138,13 +4145,13 @@ HeroAddressesSimonBelmont:    db "   simon  ",254,"  belmont ",254,"          ",
 HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254," barbarian",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroPortrait14x9SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
 HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroPortrait14x9SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
 
-pl1hero1y:		db	13
-pl1hero1x:		db	7
+pl1hero1y:		db	3
+pl1hero1x:		db	2
 pl1hero1xp: dw 0940
 pl1hero1move:	db	12,20
 pl1hero1mana:	db	10,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 8
 Pl1Hero1StatDefense:  db 2
@@ -4163,12 +4170,12 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 
 
 pl1hero2y:		db	3
-pl1hero2x:		db	2
+pl1hero2x:		db	5
 pl1hero2life:	db	05,20
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	10,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1

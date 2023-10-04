@@ -1547,7 +1547,7 @@ EnterCastle:
 	ld		(putmovementstars?),a
   ld    (framecounter),a
 ;	ld		(movementpathpointer),a
-;	ld		(movehero?),a	
+	ld		(movehero?),a	
 ;
 ; bit	7	  6	  5		    4		    3		    2		  1		  0
 ;		  0	  0	  trig-b	trig-a	right	  left	down	up	(joystick)

@@ -2092,6 +2092,7 @@ SetVisitingOrDefendingHeroInIX:         ;in: iy->castle, c=002 (check visiting),
 	ld		de,lenghtherotable
   add   ix,de                           ;next hero
   djnz  .loop
+  add   ix,de                           ;next hero (in this case its out of the hero table, which registers as NO hero)
   scf                                   ;carry=no visiting/defending hero found
   ret
 
@@ -7621,9 +7622,53 @@ SetNameCastleAndDailyIncome:
 
 
 CastleOverviewCode:                     ;in: iy-castle
+  ld    iy,Castle1
+
+
+
+
+;What we do here is check if visiting hero and defending hero are the same when entering and leaving castle
+;if they are not the same, then reset active hero in game
+
+  ;store current visiting and defending heroes
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  push  ix
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  push  ix
+  ;/store current visiting and defending heroes
+
+  call  .goEnterCastle
+
+  ;compare old visiting and defending heroes with new
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  push  ix
+  pop   hl
+  pop   de
+  call  CompareHLwithDE                 ;check if 
+  jr    z,.Same
+
+  pop   af  
+  jp    ActivateFirstActiveHeroForCurrentPlayer  
+  
+  .Same:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  push  ix
+  pop   hl
+  pop   de
+  call  CompareHLwithDE                 ;check if 
+  ret   z
+  jp    ActivateFirstActiveHeroForCurrentPlayer  
+  ;/compare old visiting and defending heroes with new
+  .goEnterCastle:
+
+
+
   call  SetScreenOff
 
-  ld    iy,Castle1
 
 
 
