@@ -1623,7 +1623,7 @@ DeactivateHero:                         ;sets Status to 255 and moves all heros 
 
   ldir
 
-  ld    iy,(LastHeroForThisPlayer)
+  ld    iy,(LastHeroForPlayerThatGetsAttacked)
   ld    (iy+HeroStatus),255             ;255 = inactive
   ret
 

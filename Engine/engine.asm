@@ -6,7 +6,9 @@ LevelEngine:
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
 
+  call  CheckEnterTradeMenuBetween2FriendlyHeroes
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
+
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
@@ -69,6 +71,70 @@ LevelEngine:
   cp    2
   call  z,SetScreenOn
   jp    LevelEngine
+
+
+CheckEnterTradeMenuBetween2FriendlyHeroes:
+  ld    a,(HeroCollidesWithFriendlyHero?)
+  or    a
+  ret   z
+  xor   a
+  ld    (HeroCollidesWithFriendlyHero?),a
+  jp    SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+
+CheckHeroCollidesWithFriendlyHero:      ;out: carry=Hero Collides With Friendly Hero
+  ld    ix,(plxcurrentheroAddress)
+  
+;check if this hero touches an enemy hero
+	ld		a,(whichplayernowplaying?) | cp 1 | ld iy,pl1hero1y | jp  z,.CheckHeroTouchesFriendlyHero
+	ld		a,(whichplayernowplaying?) | cp 2 | ld iy,pl2hero1y | jp  z,.CheckHeroTouchesFriendlyHero
+	ld		a,(whichplayernowplaying?) | cp 3 | ld iy,pl3hero1y | jp  z,.CheckHeroTouchesFriendlyHero
+	ld		a,(whichplayernowplaying?) | cp 4 | ld iy,pl4hero1y | jp  z,.CheckHeroTouchesFriendlyHero
+  ret
+
+  .CheckHeroTouchesFriendlyHero:           ;in: ix->active hero, iy->hero we check collision with
+	ld		b,amountofheroesperplayer
+  .checkpointerFriendlyloop:
+  push  ix
+  pop   hl
+  push  iy
+  pop   de
+  call  CompareHLwithDE
+  jr    z,.endcheck1
+
+	ld		a,(iy+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255                             ;check if status is inactive
+  jr    z,.endcheck1                    ;hero is inactive
+  cp    254                             ;defending in castle
+  jr    z,.endcheck1
+
+	ld		a,(ix+HeroY)
+	cp		(iy+HeroY)
+	jr		nz,.endcheck1
+
+	ld		a,(ix+HeroX)
+	cp		(iy+HeroX)
+	jr		z,.HeroTouchesFriendlyHero
+  .endcheck1:
+	ld		de,lenghtherotable
+	add   iy,de
+	djnz	.checkpointerFriendlyloop
+	ret
+
+  .HeroTouchesFriendlyHero:
+  ld    (HeroWeTradeWith),iy            ;which hero are we trading with
+  scf
+  ret
+
+
+HeroWeTradeWith: ds 2
+HeroCollidesWithFriendlyHero?: ds 1
+
+
+
+
+
+
+
 
 PreviousVblankIntFlag:  db  1
 page1bank:  ds  1
@@ -516,7 +582,7 @@ CheckHeroCollidesWithEnemyHero:
   ret
 
   .CheckHeroTouchesEnemyHero:           ;in: ix->active hero, iy->hero we check collision with
-  ld    (LastHeroForThisPlayer),bc
+  ld    (LastHeroForPlayerThatGetsAttacked),bc
 	ld		b,amountofheroesperplayer
   .checkpointerenemyloop:
 	ld		a,(iy+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -547,7 +613,7 @@ CheckHeroCollidesWithEnemyHero:
 
 	jp		EnterCombat
 
-LastHeroForThisPlayer: ds  2
+LastHeroForPlayerThatGetsAttacked: ds  2
 HeroThatGetsAttacked: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
@@ -1266,7 +1332,6 @@ movehero:
 	ld		a,(movehero?)
 	or		a                               ;if hero stopped moving, check if he should enter castle
   jp    z,CheckHeroEntersCastle  
-
   call  .GoMove
   jp    CenterScreenForCurrentHero
 
@@ -1313,6 +1378,26 @@ movehero:
 	add		a,c                             ;add x movement
 	ld		(ix+HeroX),a
 
+  push  ix
+  push  bc
+  call  CheckHeroCollidesWithFriendlyHero ;check if exchange army/inventory menu should appear. out: carry=Hero Collides With Friendly Hero
+  pop   bc
+  pop   ix
+  jp    nc,.animate                     ;carry=Hero Collides With Friendly Hero. animate sprite when not colliding
+
+  ;move hero back to previous location
+	ld		a,(ix+HeroY)
+	sub		a,b                             ;add y movement
+	ld		(ix+HeroY),a
+	ld		a,(ix+Herox)
+	sub		a,c                             ;add x movement
+	ld		(ix+HeroX),a
+
+  ld    a,1
+  ld    (HeroCollidesWithFriendlyHero?),a
+  jp    .endmovement
+  
+  .animate:
   ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
   ld    d,(ix+HeroSpecificInfo+1)
   push  de
@@ -4169,8 +4254,8 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
-pl1hero2y:		db	3
-pl1hero2x:		db	5
+pl1hero2y:		db	7
+pl1hero2x:		db	1
 pl1hero2life:	db	05,20
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	10,20
