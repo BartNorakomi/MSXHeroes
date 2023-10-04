@@ -89,7 +89,7 @@ SetTextBuildingWhenClicked:
   dec   a
   ret   z
   ld    (SetTextBuilding),a
-  
+
   call  ClearTextBuildWindow
   call  SetSingleBuildButtonColor
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
@@ -2303,7 +2303,7 @@ SetTavernButtons:
   ret
 
   .BrownButton:
-  dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128
+  dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128
   
   .SetRedButtonsIfPlayerHasInsufficientFunds:
   call  SetResourcesCurrentPlayerinIX
@@ -2353,10 +2353,10 @@ TavernButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5
   db  %1100 0011 | dw $4000 + (000*128) + (152/2) - 128 | dw $4000 + (009*128) + (152/2) - 128 | dw $4000 + (018*128) + (152/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
 
 TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
-  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | db TavernButton1Ytop,TavernButton1YBottom,TavernButton1XLeft,TavernButton1XRight | dw $0000 + (TavernButton1Ytop*128) + (TavernButton1XLeft/2) - 128 
   .endlenght:
-  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
-  db  %1100 0011 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | dw $4000 + (038*128) + (076/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | db TavernButton2Ytop,TavernButton2YBottom,TavernButton2XLeft,TavernButton2XRight | dw $0000 + (TavernButton2Ytop*128) + (TavernButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | dw $4000 + (063*128) + (162/2) - 128 | db TavernButton3Ytop,TavernButton3YBottom,TavernButton3XLeft,TavernButton3XRight | dw $0000 + (TavernButton3Ytop*128) + (TavernButton3XLeft/2) - 128
 
 
 
@@ -4036,12 +4036,21 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   jp    .GoSetAvailableAmountRecruitAmountAndTotalCost
 
   .PlusButtonPressed:
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    a,l
+  or    h
+  ret   z                               ;return if amount available=0
+
   ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
   inc   hl
+
+;ld hl,344
   ld    (SelectedCastleRecruitLevelUnitRecruitAmount),hl
 
   ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
   dec   hl
+
+;ld hl,100
   ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
 
   call  .GoSetAvailableAmountRecruitAmountAndTotalCost
@@ -4316,7 +4325,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  call  .SetTotalCost
+  call  .SetTotalCost                   ;set total gold, gems and rubies (store in ram)
 
   ;check if player has enough gold for all these units
   call  SetResourcesCurrentPlayerinIX
@@ -4341,11 +4350,11 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
 
   ;set the amount we CAN NOT recruit (they remain in the 'available' section)
-  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
-  xor   a
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
   sbc   hl,bc
   ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
-  ;set the amount we CAN recruit
   ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
   call  .SetTotalCost
   .EndCheckEnoughGoldToRecruitALLunits:
@@ -4384,13 +4393,13 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
 
   ;set the amount we CAN NOT recruit (they remain in the 'available' section)
-  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
-  xor   a
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
   sbc   hl,bc
   ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
-  ;set the amount we CAN recruit
   ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
-  call  .SetTotalCost   
+  call  .SetTotalCost 
   .EndCheckEnoughGemsToRecruitALLunits:
 
 
@@ -4429,22 +4438,23 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
 
   ;set the amount we CAN NOT recruit (they remain in the 'available' section)
-  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
-  xor   a
+  ld    hl,(SelectedCastleRecruitLevelUnitAmountAvailable)
+  ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  add   hl,de
   sbc   hl,bc
   ld    (SelectedCastleRecruitLevelUnitAmountAvailable),hl
-  ;set the amount we CAN recruit
   ld    (SelectedCastleRecruitLevelUnitRecruitAmount),bc
-  call  .SetTotalCost   
+  call  .SetTotalCost
   .EndCheckEnoughRubiesToRecruitALLunits:
-
-
-
-
 
 
   call  ShowRecruitWindowForSelectedUnit.amountavailable
   call  ShowRecruitWindowForSelectedUnit.recruitamount
+
+  ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
+  ld    a,h
+  or    l
+  ret   z
 
   call  ShowRecruitWindowForSelectedUnit.totalcost
   call  ShowRecruitWindowForSelectedUnit.TotalGemscost
@@ -4466,7 +4476,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   call  MultiplyHlWithDE
   ld    (SelectedCastleRecruitLevelUnitTotalCostGems),hl
 
-  ;set total cost gems
+  ;set total cost rubies
   ld    a,(SelectedCastleRecruitLevelUnit)
   call  SetRubiesCostSelectedCreatureInHL  
   ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
@@ -5887,6 +5897,9 @@ CastleOverviewBuildCode:                ;in: iy-castle
   call  SetTextBuildingWhenClicked      ;when a building is clicked display text on the right side
   ;/9 build buttons
 
+  call  SetVandXSymbols
+
+
   ;single build button
   ld    ix,SingleBuildButtonTable 
   call  CheckButtonMouseInteractionSingleBuildButton
@@ -5901,11 +5914,256 @@ CastleOverviewBuildCode:                ;in: iy-castle
   
   jp  .engine
 
+xOffsetVandX: equ 39
+YOffsetVandX: equ +0
+
+BlueBuildButton:  equ $4000 + (000*128) + (000/2) - 128
+GreenBuildButton: equ $4000 + (000*128) + (150/2) - 128
+RedBuildButton:   equ $4000 + (038*128) + (050/2) - 128
+
+
+SetVandXSymbols:
+  ;castle
+  ld    hl,(BuildButtonTable+1+(0*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;market place
+  ld    hl,(BuildButtonTable+1+(1*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;tavern place
+  ld    hl,(BuildButtonTable+1+(2*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+
+  ;magic guild
+  ld    hl,(BuildButtonTable+1+(3*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;sawmill
+  ld    hl,(BuildButtonTable+1+(4*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;mine
+  ld    hl,(BuildButtonTable+1+(5*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+
+  ;barracks
+  ld    hl,(BuildButtonTable+1+(6*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;barracks tower
+  ld    hl,(BuildButtonTable+1+(7*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
+
+  ;city walls
+  ld    hl,(BuildButtonTable+1+(8*BuildButtonTableLenghtPerButton))
+  ld    de,GreenBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetGreenButton
 
 
 
 
 
+
+
+
+  ;castle
+  ld    hl,(BuildButtonTable+1+(0*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;market place
+  ld    hl,(BuildButtonTable+1+(1*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;tavern place
+  ld    hl,(BuildButtonTable+1+(2*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(042 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((042 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+
+  ;magic guild
+  ld    hl,(BuildButtonTable+1+(3*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;sawmill
+  ld    hl,(BuildButtonTable+1+(4*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;mine
+  ld    hl,(BuildButtonTable+1+(5*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(092 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((092 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+
+  ;barracks
+  ld    hl,(BuildButtonTable+1+(6*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (004 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((004 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;barracks tower
+  ld    hl,(BuildButtonTable+1+(7*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (064 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+
+  ;city walls
+  ld    hl,(BuildButtonTable+1+(8*BuildButtonTableLenghtPerButton))
+  ld    de,RedBuildButton
+  call  CompareHLwithDE
+  ld    de,256*(142 + YOffsetVandX) + (124 + xOffsetVandX)
+  exx
+  ld    de,$0000 + ((142 + YOffsetVandX)*128) + ((124 + xOffsetVandX)/2) - 128  ;y,x
+  call  z,.SetRedButton
+  ret
+
+.SetGreenButton:
+;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
+;  exx
+  ld    hl,$4000 + (114*128) + (200/2) - 128  ;y,x
+;  ld    de,$0000 + ((042+YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  ld    bc,$0000 + (017*256) + (018/2)        ;ny,nx
+  ld    a,ButtonsBuildBlock      ;font graphics block
+  call  CopyTransparantImage
+  ret
+
+.SetRedButton:
+;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
+;  exx
+  ld    hl,$4000 + (115*128) + (218/2) - 128  ;y,x
+;  ld    de,$0000 + ((042+YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+  ld    bc,$0000 + (016*256) + (014/2)        ;ny,nx
+  ld    a,ButtonsBuildBlock      ;font graphics block
+  call  CopyTransparantImage
+  ret
+
+
+
+;  Example of input:
+;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
+;  exx
+;  ld    hl,$4000 + (114*128) + (200/2) - 128  ;y,x
+;  ld    de,$0000 + ((042+YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+;  ld    bc,$0000 + (017*256) + (018/2)        ;ny,nx
+;  ld    a,ButtonsBuildBlock      ;font graphics block
+CopyTransparantImage:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  push  af
+  ld    a,b
+  ld    (CopyCastleButton2+ny),a
+  ld    a,c
+  add   a,a
+  ld    (CopyCastleButton2+nx),a
+  pop   af
+
+  ld    de,$0000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  exx
+  ld    a,d
+  ld    (CopyCastleButton2+dy),a
+  ld    a,e
+  ld    (CopyCastleButton2+dx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
+  ret
+
+;CopyCastleButton2:
+;	db		000,0,212,1
+;	db		100,0,100,255
+;	db		020,0,030,0
+;	db		0,%0000 0000,$98
 
 
 
@@ -6597,6 +6855,7 @@ CheckButtonMouseInteractionBuildButtons:
   ret
 
   .MenuOptionSelected:
+  pop   af                                ;no need to check the other buttons
   ld    (ix+BuildButtonStatus),%1010 0011
 
   ld    a,3
