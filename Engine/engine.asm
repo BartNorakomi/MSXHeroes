@@ -73,13 +73,23 @@ LevelEngine:
   jp    LevelEngine
 
 
+
+
 CheckEnterTradeMenuBetween2FriendlyHeroes:
+ld ix,pl1hero1y
+ld    (plxcurrentheroAddress),ix      ; lets call this defending
+ld ix,pl1hero2y
+ld    (HeroWeTradeWith),ix      ; lets call this defending
+call ScreenOn
+jp    EnterTradeMenuBetween2FriendlyHeroes
+
+
   ld    a,(HeroCollidesWithFriendlyHero?)
   or    a
   ret   z
   xor   a
   ld    (HeroCollidesWithFriendlyHero?),a
-  jp    SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+  jp    EnterTradeMenuBetween2FriendlyHeroes
 
 CheckHeroCollidesWithFriendlyHero:      ;out: carry=Hero Collides With Friendly Hero
   ld    ix,(plxcurrentheroAddress)

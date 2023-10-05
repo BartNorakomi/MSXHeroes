@@ -255,6 +255,1846 @@ ds 12
 
 
 
+
+
+
+
+
+TradeMenuCode:
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
+
+  call  SetTradingHeroesButtons
+
+;  ld    hl,World1Palette
+;  call  SetPalette
+
+;  xor   a
+;	ld		(activepage),a                  ;start in page 0
+
+  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetTradingHeroesAndArmy
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetTradingHeroesAndArmy
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+
+  ;VisitingAndDefendingHeroesAndArmy buttons
+  ld    ix,GenericButtonTable 
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton                ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1001 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+  ;/VisitingAndDefendingHeroesAndArmy buttons
+
+
+
+
+
+  call  CheckEndTradeMenuWindow   ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+
+
+
+
+
+
+
+.CheckButtonClickedVisitingAndDefendingHeroesAndArmy:                    ;in: carry=button clicked, b=button number
+  ret   nc                              ;carry=button pressed, b=which button
+
+  ;at this point a button has been click. Check 3 possibilities:
+  ;1. previously the same button was clicked-> reset
+  ;2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ;3. previously a different button was clicked->swap
+
+  ;check 1. previously the same button was clicked-> reset
+  ld    a,(PreviousButtonClicked)
+  cp    b
+  jr    nz,.EndCheck1
+  ld    a,255
+  ld    (PreviousButtonClicked),a
+  ret
+  .EndCheck1:
+
+  ;check 2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ld    a,(PreviousButtonClicked)
+  cp    255                             ;check if there is a button already highlighted
+  jr    nz,.EndCheck2
+
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    8
+  jp    c,.CheckVisitingHero            ;did we click the defending or visiting hero's windows ?
+
+  .CheckDefendingHero:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   ix
+  pop   bc
+;  ret   c                               ;no defending hero found, no need to highlight any button
+  ;defending hero found, but now check if content of creature-button is empty, if so, ignore
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    14
+  jp    z,.HighlightNewButton           ;if hero button is pressed, highlight button, since hero is in this slot
+  ;check empty creature slot for defending hero
+  ld    b,a
+  ld    a,13
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  cp    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  ret   z
+  ;/check empty creature slot for defending hero
+  jp    .HighlightNewButton  
+  
+  .CheckVisitingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   ix
+  pop   bc
+;  ret   c                               ;no visiting hero found, no need to highlight any button
+  ;defending hero found, but now check if content of creature-button is empty, if so, ignore
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    07
+  jp    z,.HighlightNewButton           ;if hero button is pressed, highlight button, since hero is in this slot
+  ;check empty creature slot for visiting hero
+  ld    b,a
+  ld    a,06
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  cp    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  ret   z
+  ;/check empty creature slot for defending hero
+  jp    .HighlightNewButton  
+  .EndCheck2:
+
+  ;check 3. previously a different button was clicked->swap
+
+;Here we have multiple possibilities.First handle hero slots:
+
+;4. This castle has a visiting AND a defending hero. Swap visiting with defending hero
+;5. This castle has ONLY a defending hero. Change defending hero into visiting hero
+;6. This castle has ONLY a visiting hero. Change visiting hero into defending hero
+;7. Defending hero slot is highlighted, but now a non hero slot is clicked ->reset
+;8. Visiting hero slot is highlighted, but now a non hero slot is clicked ->reset
+
+;at this point we are only dealing only with creatures
+
+;9. Both creature slots clicked belong to the same hero. Second slot clicked is empty, move (and split if possible) 1 unit
+;10. Both creature slots clicked belong to the same hero. second slot clicked  has the same unit type, combine them 
+
+;11. Both creature slots clicked belong to different heroes. Second slot clicked is empty, move all units if possible
+;12. Both creature slots clicked belong to different heroes. second slot clicked  has the same unit type, combine them is possible 
+
+;13. both slots have different units, swap them
+
+;4. This castle has a visiting AND a defending hero. Swap visiting with defending hero
+  ;check if there is a visiting AND a defending hero
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   ix
+  pop   bc
+;  jr    c,.EndCheck4
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   ix
+  pop   bc
+;  jr    c,.EndCheck4
+  ;check if defending hero was previously clicked, and visiting hero is now clicked
+  ld    a,(PreviousButtonClicked)
+  cp    014                             ;check if defending hero was previously clicked
+  jr    nz,.EndCheckPreviousButtonClickedWasDefendingHero
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    7                               ;check if visiting hero is now clicked
+  jr    z,.SwapVisitingHeroWithDefendingHero
+  .EndCheckPreviousButtonClickedWasDefendingHero:
+  ;check if visiting hero was previously clicked, and defending hero is now clicked
+  ld    a,(PreviousButtonClicked)
+  cp    007                             ;check if visiting hero was previously clicked
+  jr    nz,.EndCheck4
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    014                             ;check if defending hero is now clicked
+  jr    nz,.EndCheck4
+
+  .SwapVisitingHeroWithDefendingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  push  ix                              ;swap after we handled defending hero
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  ld    (ix+HeroStatus),002             ;defending hero now becomes visiting hero 
+  pop   ix                              ;now we can swap visiting hero at the same time
+  ld    (ix+HeroStatus),254             ;visiting hero now becomes defending hero   
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  .EndCheck4:
+
+;5. This castle has ONLY a defending hero. Change defending hero into visiting hero
+   ;check if defending hero was previously clicked, and visiting hero is now clicked
+  ld    a,(PreviousButtonClicked)
+  cp    014                             ;check if defending hero was previously clicked
+  jr    nz,.EndCheck5
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    7                               ;check if visiting hero slot is now clicked
+  jr    nz,.EndCheck5
+ 
+  .ChangeDefendingHeroIntoVisitingHero:
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  ld    (ix+HeroStatus),002             ;change defending hero into visiting hero 
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  .EndCheck5:
+
+;6. This castle has ONLY a visiting hero. Change visiting hero into defending hero
+   ;check if visiting hero was previously clicked, and defending hero is now clicked
+  ld    a,(PreviousButtonClicked)
+  cp    007                             ;check if visiting hero was previously clicked
+  jr    nz,.EndCheck6
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    014                             ;check if defending hero slot is now clicked
+  jr    nz,.EndCheck6
+
+  .ChangeVisitingHeroIntoDefendingHero:
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  ld    (ix+HeroStatus),254             ;change defending hero into visiting hero 
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  .EndCheck6:
+
+;7. Defending hero slot is highlighted, but now a non hero slot is clicked ->reset
+  ld    a,(PreviousButtonClicked)       ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    014                             ;check if visiting hero was previously clicked
+  jr    nz,.EndCheck7
+  ld    a,255
+  ld    (PreviousButtonClicked),a
+  ret
+  .EndCheck7:
+
+;8. Visiting hero slot is highlighted, but now a non hero slot is clicked ->reset
+  ld    a,(PreviousButtonClicked)       ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    007                             ;check if visiting hero was previously clicked
+  jr    nz,.EndCheck8
+  ld    a,255
+  ld    (PreviousButtonClicked),a
+  ret
+  .EndCheck8:
+
+;at this point we are only dealing only with creatures
+;check if one of the 2 slots click is a hero slot. If so, reset buttons
+  ld    a,b                             ;both buttons pressed belong to visiting hero?
+  cp    14                              ;hero slot defending hero
+  jp    z,.ResetButtons
+  cp    07                              ;hero slot visiting hero
+  jp    z,.ResetButtons
+  ld    a,(PreviousButtonClicked)
+  cp    14                              ;hero slot defending hero
+  jp    z,.ResetButtons
+  cp    07                              ;hero slot visiting hero
+  jp    z,.ResetButtons
+
+;9. Both creature slots clicked belong to the same hero. Second slot clicked is 
+  ;empty, move (and split if possible) 1 unit
+  ;check if 2nd slot clicked is an empty creature slot for visiting hero
+  ld    a,b                             ;both buttons pressed belong to visiting hero?
+  cp    8
+  jp    nc,.EndCheck9
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    nc,.EndCheck9
+
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck9
+  ;/check if 2nd slot clicked is an empty creature slot for visiting hero
+
+  ;reduce amount of unit we want to split
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,06
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+  dec   hl
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+  ld    l,(ix+HeroUnits+0)              ;unit type
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  jr    nz,.EndCheckZero
+  ld    (ix+HeroUnits+0),0              ;unit type (remove when amount is zero)
+  .EndCheckZero:
+  pop   ix
+  pop   bc
+  ;/reduce amount of unit we want to split
+
+  ;put one unit in the second slot/botton pressed
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    (ix+HeroUnits+0),l              ;unit type
+  ld    (ix+HeroUnits+1),1              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+  pop   ix
+  pop   bc
+  ;/put one unit in the second slot/botton pressed
+
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  .EndCheck9:
+
+;9b. same as 9, but then for defending hero
+  ld    a,b                             ;both buttons pressed belong to defending hero?
+  cp    8
+  jp    c,.EndCheck9b
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    c,.EndCheck9b
+
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck9b
+  ;/check if 2nd slot clicked is an empty creature slot for visiting hero
+
+  ;reduce amount of unit we want to split
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,13
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+  dec   hl
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+  ld    l,(ix+HeroUnits+0)              ;unit type
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  jr    nz,.EndCheckZerob
+  ld    (ix+HeroUnits+0),0              ;unit type (remove when amount is zero)
+  .EndCheckZerob:
+  pop   ix
+  pop   bc
+  ;/reduce amount of unit we want to split
+
+  ;put one unit in the second slot/botton pressed
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    (ix+HeroUnits+0),l              ;unit type
+  ld    (ix+HeroUnits+1),1              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+  pop   ix
+  pop   bc
+  ;/put one unit in the second slot/botton pressed
+
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  .EndCheck9b:
+
+
+;10. Both creature slots clicked belong to the same hero. second slot clicked  has the same unit type, combine them 
+  ;check if 2nd slot clicked has the same unit type (as the first slot clicked)
+  ld    a,b                             ;both buttons pressed belong to visiting hero?
+  cp    8
+  jp    nc,.EndCheck10
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    nc,.EndCheck10
+
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+0)              ;unit type
+  pop   ix
+  pop   bc
+
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,06
+  sub   a,c                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  cp    l
+  jp    nz,.EndCheck10WithPopIXandBC
+
+  ld    (ix+HeroUnits+0),0              ;unit type second button pressed
+  ld    l,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit type second button pressed
+
+  ld    (ix+HeroUnits+1),0              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit type second button pressed
+  
+  ;/check if 2nd slot clicked has the same unit type (as the first slot clicked)
+  pop   ix
+  pop   bc
+  
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    e,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    d,(ix+HeroUnits+2)              ;unit type second button pressed
+  add   hl,de
+
+  ld    (ix+HeroUnits+1),l              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit type second button pressed
+
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+
+  .EndCheck10WithPopIXandBC:
+  pop   ix
+  pop   bc
+  .EndCheck10:
+
+;10b. same as 10 but then for defending hero
+  ld    a,b                             ;both buttons pressed belong to defending hero?
+  cp    8
+  jp    c,.EndCheck10b
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    c,.EndCheck10b
+
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+0)              ;unit type
+  pop   ix
+  pop   bc
+
+
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,13
+  sub   a,c                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  cp    l
+  jp    nz,.EndCheck10bWithPopIXandBC
+
+  ld    (ix+HeroUnits+0),0              ;unit type second button pressed
+  ld    l,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit type second button pressed
+
+  ld    (ix+HeroUnits+1),0              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit type second button pressed
+  
+  ;/check if 2nd slot clicked has the same unit type (as the first slot clicked)
+  pop   ix
+  pop   bc
+  
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    e,(ix+HeroUnits+1)              ;unit type second button pressed
+  ld    d,(ix+HeroUnits+2)              ;unit type second button pressed
+  add   hl,de
+
+  ld    (ix+HeroUnits+1),l              ;unit type second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit type second button pressed
+
+  pop   ix
+  pop   bc  
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+
+  .EndCheck10bWithPopIXandBC:
+  pop   ix
+  pop   bc
+  .EndCheck10b:
+
+;11. Both creature slots clicked belong to different heroes. 
+  ;Second slot clicked is empty, move all units if possible
+  ;first check if castle has both a defending and a visiting hero present
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   ix
+  pop   bc
+;  jp    c,.EndCheck12b
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   ix
+  pop   bc
+;  jp    c,.EndCheck12b
+  ;/first check if castle has both a defending and a visiting hero present
+
+  ;check if visiting hero has AT LEAST 2 creature slots filled
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero  
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  call  CheckHeroHasAtLeast2CreatureSlotsFilled
+  pop   ix
+  pop   bc
+  jp    c,.EndCheck11                 ;carry=hero does NOT have 2 or more creature slots filled
+  ;/check if visiting hero has AT LEAST 2 creature slots filled
+
+  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to defending hero
+  ld    a,b                             ;last  button pressed belongs to visiting hero?
+  cp    8
+  jp    c,.EndCheck11
+
+  ;check if 2nd slot clicked is an empty creature slot for visiting hero
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck11
+  ;/check if 2nd slot clicked is an empty creature slot for visiting hero
+
+  ;move all selected units from visiting hero to defending hero
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,06
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  ex    af,af'
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    (ix+HeroUnits+0),0              ;unit type
+  ld    (ix+HeroUnits+1),0              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ex    af,af'
+  ld    (ix+HeroUnits+0),a              ;unit type
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  ;/move all selected units from visiting hero to defending hero
+  .EndCheck11:
+
+;11b same as 11 but then for opposite hero
+  ;check if defending hero has AT LEAST 2 creature slots filled
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  call  CheckHeroHasAtLeast2CreatureSlotsFilled
+  pop   ix
+  pop   bc
+  jp    c,.EndCheck11b                 ;carry=hero does NOT have 2 or more creature slots filled
+  ;/check if defending hero has AT LEAST 2 creature slots filled
+
+  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to visiting hero
+  ld    a,b                             ;last  button pressed belongs to visiting hero?
+  cp    8
+  jp    nc,.EndCheck11b
+
+  ;check if 2nd slot clicked is an empty creature slot for visiting hero
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+1)              ;unit amount (16 bit)
+  or    (ix+HeroUnits+2)                ;unit amount (16 bit)
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck11b
+  ;/check if 2nd slot clicked is an empty creature slot for visiting hero
+
+  ;move all selected units from defending hero to visiting hero
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,13
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  ex    af,af'
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    (ix+HeroUnits+0),0              ;unit type
+  ld    (ix+HeroUnits+1),0              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ex    af,af'
+  ld    (ix+HeroUnits+0),a              ;unit type
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  ;/move all selected units from visiting hero to defending hero
+  .EndCheck11b:
+
+;12. Both creature slots clicked belong to different heroes. second slot clicked  has the same unit type, combine them is possible 
+
+  ;check if visiting hero has AT LEAST 2 creature slots filled
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero  
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  call  CheckHeroHasAtLeast2CreatureSlotsFilled
+  pop   ix
+  pop   bc
+  jp    c,.EndCheck12                 ;carry=hero does NOT have 2 or more creature slots filled
+  ;/check if visiting hero has AT LEAST 2 creature slots filled
+
+  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to defending hero
+  ld    a,b                             ;last  button pressed belongs to defending hero?
+  cp    8
+  jp    c,.EndCheck12
+
+  ;check if the unit type is the same for both buttons clicked
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,06
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ld    l,(ix+HeroUnits+0)              ;unit type visiting hero
+  pop   ix
+  pop   bc
+  
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ld    a,(ix+HeroUnits+0)              ;unit type defending hero
+  cp    l
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck12
+  ;/check if the unit type is the same for both buttons clicked
+
+  ;move and merge all selected units from visiting hero to defending hero 
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,06
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    (ix+HeroUnits+0),0              ;unit type
+  ld    (ix+HeroUnits+1),0              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+
+  ld    a,13
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    e,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    d,(ix+HeroUnits+2)              ;unit amount second button pressed
+  add   hl,de
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
+  .EndCheck12:
+  
+;12b. same as 12, but then for opposite heroes
+  ;check if defending hero has AT LEAST 2 creature slots filled
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero  
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  call  CheckHeroHasAtLeast2CreatureSlotsFilled
+  pop   ix
+  pop   bc
+  jp    c,.EndCheck12b                 ;carry=hero does NOT have 2 or more creature slots filled
+  ;/check if visiting hero has AT LEAST 2 creature slots filled
+
+  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to visiting hero
+  ld    a,b                             ;last  button pressed belongs to visiting hero?
+  cp    8
+  jp    nc,.EndCheck12b
+
+  ;check if the unit type is the same for both buttons clicked
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,13
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ld    l,(ix+HeroUnits+0)              ;unit type visiting hero
+  pop   ix
+  pop   bc
+  
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ld    a,(ix+HeroUnits+0)              ;unit type defending hero
+  cp    l
+  pop   ix
+  pop   bc
+  jp    nz,.EndCheck12b
+  ;/check if the unit type is the same for both buttons clicked
+
+  ;move and merge all selected units from defending hero to visiting hero 
+  ld    a,(PreviousButtonClicked)
+  ld    c,a
+  ld    a,13
+  sub   a,c
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    (ix+HeroUnits+0),0              ;unit type
+  ld    (ix+HeroUnits+1),0              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),0              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+
+  ld    a,06
+  sub   a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  ix
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+
+  ld    e,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    d,(ix+HeroUnits+2)              ;unit amount second button pressed
+  add   hl,de
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+
+  pop   ix
+  pop   bc
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
+  .EndCheck12b:
+
+;13. both slots have different units, swap them
+  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to defending hero
+  ld    a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  call  .SetHeroUnitsInIX
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  ex    af,af'
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    a,l
+  or    h
+  jp    z,.ResetButtons                 ;no need to swap if this slot has no units
+  exx
+
+  ld    a,(PreviousButtonClicked)       ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  call  .SetHeroUnitsInIX
+
+  ld    a,(ix+HeroUnits+0)              ;unit type
+  ex    af,af'
+  ld    (ix+HeroUnits+0),a              ;unit type
+  ld    l,(ix+HeroUnits+1)              ;unit amount second button pressed
+  ld    h,(ix+HeroUnits+2)              ;unit amount second button pressed
+
+  ld    a,l
+  or    h
+  jp    z,.ResetButtons                 ;no need to swap if this slot has no units
+
+  exx
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+
+  ld    a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  call  .SetHeroUnitsInIX
+  ex    af,af'
+  ld    (ix+HeroUnits+0),a              ;unit type
+  exx
+  ld    (ix+HeroUnits+1),l              ;unit amount second button pressed
+  ld    (ix+HeroUnits+2),h              ;unit amount second button pressed
+  
+  pop   af                              ;pop the call to this routine
+  jp    .ExitVisitingAndDefendingArmyRoutine
+  ;/move and merge all selected units from visiting hero to defending hero IF THE UNIT TYPE IS THE SAME
+  .EndCheck13:
+  
+  .HighlightNewButton:
+  ld    a,b                             ;current button clicked now becomes previous button clicked (for future references)
+  ld    (PreviousButtonClicked),a
+  ld    (PreviousButtonClickedIX),ix
+  ret
+
+  .ResetButtons:
+  ld    a,255                           ;reset previous button clicked  
+  ld    (PreviousButtonClicked),a
+  ret
+
+.SetHeroUnitsInIX:
+  cp    8
+  jp    c,.VisitingHero
+
+  .DefendingHero:
+  ld    c,a
+  ld    a,13
+  sub   a,c                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  pop   de
+  pop   bc
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ret
+  
+  .VisitingHero:  
+  ld    c,a
+  ld    a,06
+  sub   a,c                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  ld    d,0
+  ld    e,a
+
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  de
+;  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  ld    ix,(HeroWeTradeWith)      ;lets call this visiting
+  pop   de
+  pop   bc
+  add   ix,de  
+  add   ix,de  
+  add   ix,de  
+  ret
+
+
+.ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when refreshing the visiting and defending army heroes and creatures overview
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+;  call  SetVisitingAndDefendingHeroesAndArmyWindow  
+;  call  SetVisitingAndDefendingHeroesAndArmy
+;  call  SwapAndSetPage                  ;swap and set page
+;  call  SetVisitingAndDefendingHeroesAndArmyWindow  
+;  call  SetVisitingAndDefendingHeroesAndArmy
+
+
+  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetTradingHeroesAndArmy
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetTradingHeroesAndArmy
+
+
+  jp    .engine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CheckEndTradeMenuWindow:
+  ld    a,(RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton) ;BUY button
+  or    a
+  ret   z
+
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    032                             ;dy
+  jr    c,.Exit
+  cp    032+092                         ;dy+ny
+  jr    nc,.Exit
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    048                             ;dx
+  jr    c,.Exit
+  cp    048+162                         ;dx+nx
+  ret   c
+
+  .Exit:
+  ret
+
+
+
+
+
+
+
+
+
+
+SetTradingHeroesButtons:
+  ld    hl,TradingHeroesButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*14)
+  ldir
+  ret
+
+TradingHeroesButtonTableGfxBlock:  db  HeroArmyTransferGraphicsBlock
+TradingHeroesButtonTableAmountOfButtons:  db  14
+TradingHeroesButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %0100 0011 | dw $4000 + (000*128) + (156/2) - 128 | dw $4000 + (000*128) + (176/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
+
+  db  %0100 0011 | dw $4000 + (000*128) + (156/2) - 128 | dw $4000 + (000*128) + (176/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button13Ytop,.Button13YBottom,.Button13XLeft,.Button13XRight | dw $0000 + (.Button13Ytop*128) + (.Button13XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button14Ytop,.Button14YBottom,.Button14XLeft,.Button14XRight | dw $0000 + (.Button14Ytop*128) + (.Button14XLeft/2) - 128
+
+.Button1Ytop:           equ 038
+.Button1YBottom:        equ .Button1Ytop + 034
+.Button1XLeft:          equ 032
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 040
+.Button2YBottom:        equ .Button2Ytop + 030
+.Button2XLeft:          equ 054
+.Button2XRight:         equ .Button2XLeft + 018
+
+.Button3Ytop:           equ 040
+.Button3YBottom:        equ .Button3Ytop + 030
+.Button3XLeft:          equ 074
+.Button3XRight:         equ .Button3XLeft + 018
+
+.Button4Ytop:           equ 040
+.Button4YBottom:        equ .Button4Ytop + 030
+.Button4XLeft:          equ 094
+.Button4XRight:         equ .Button4XLeft + 018
+
+.Button5Ytop:           equ 040
+.Button5YBottom:        equ .Button5Ytop + 030
+.Button5XLeft:          equ 114
+.Button5XRight:         equ .Button5XLeft + 018
+
+.Button6Ytop:           equ 040
+.Button6YBottom:        equ .Button6Ytop + 030
+.Button6XLeft:          equ 134
+.Button6XRight:         equ .Button6XLeft + 018
+
+.Button7Ytop:           equ 040
+.Button7YBottom:        equ .Button7Ytop + 030
+.Button7XLeft:          equ 154
+.Button7XRight:         equ .Button7XLeft + 018
+
+
+
+.Button8Ytop:           equ 102
+.Button8YBottom:        equ .Button8Ytop + 034
+.Button8XLeft:          equ 032
+.Button8XRight:         equ .Button8XLeft + 020
+
+.Button9Ytop:           equ 104
+.Button9YBottom:        equ .Button9Ytop + 030
+.Button9XLeft:          equ 054
+.Button9XRight:         equ .Button9XLeft + 018
+
+.Button10Ytop:           equ 104
+.Button10YBottom:        equ .Button10Ytop + 030
+.Button10XLeft:          equ 074
+.Button10XRight:         equ .Button10XLeft + 018
+
+.Button11Ytop:           equ 104
+.Button11YBottom:        equ .Button11Ytop + 030
+.Button11XLeft:          equ 094
+.Button11XRight:         equ .Button11XLeft + 018
+
+.Button12Ytop:           equ 104
+.Button12YBottom:        equ .Button12Ytop + 030
+.Button12XLeft:          equ 114
+.Button12XRight:         equ .Button12XLeft + 018
+
+.Button13Ytop:           equ 104
+.Button13YBottom:        equ .Button13Ytop + 030
+.Button13XLeft:          equ 134
+.Button13XRight:         equ .Button13XLeft + 018
+
+.Button14Ytop:           equ 104
+.Button14YBottom:        equ .Button14Ytop + 030
+.Button14XLeft:          equ 154
+.Button14XRight:         equ .Button14XLeft + 018
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SetTradingHeroesAndArmy:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  call  SetActiveTradingHero
+  call  SetHeroWhoGetsTradeWith
+  call  SetActiveTradingHeroArmyAndAmount
+  call  SetHeroWhoGetsTradeWithArmyAndAmount
+  ret
+
+
+
+
+
+
+
+SetActiveTradingHero:                   ;which hero commences trade ?
+  ld    ix,(plxcurrentheroAddress)
+  ld    de,$0000 + (040*128) + (034/2) - 128
+  jp    DoSetVisitingOrDefendingHero
+  
+SetHeroWhoGetsTradeWith:  
+  ld    ix,(HeroWeTradeWith)            ;which hero are we trading with
+  ld    de,$0000 + (104*128) + (034/2) - 128
+  jp    DoSetVisitingOrDefendingHero
+
+
+
+
+
+SetActiveTradingHeroArmyAndAmount:
+  ld    ix,(plxcurrentheroAddress)
+
+
+  call  .army
+;  call  .amount
+;  ret
+
+  .amount:
+  ld    l,(ix+HeroUnits+01)
+  ld    h,(ix+HeroUnits+02)
+  ld    b,056
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+04)
+  ld    h,(ix+HeroUnits+05)
+  ld    b,076
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+07)
+  ld    h,(ix+HeroUnits+08)
+  ld    b,096
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+10)
+  ld    h,(ix+HeroUnits+11)
+  ld    b,116
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+13)
+  ld    h,(ix+HeroUnits+14)
+  ld    b,136
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+16)
+  ld    h,(ix+HeroUnits+17)
+  ld    b,156
+  ld    c,061
+  call  SetNumber16BitCastleSkipIfAmountIs0
+  ret
+
+  .army:
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,SetVisitingHeroArmyAndAmount.UnitSYSXTable14x24Portraits
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
+
+.DYDXDefendingHeroUnit1:          equ (044*128) + (056/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXDefendingHeroUnit2:          equ (044*128) + (076/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXDefendingHeroUnit3:          equ (044*128) + (096/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXDefendingHeroUnit4:          equ (044*128) + (116/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXDefendingHeroUnit5:          equ (044*128) + (136/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXDefendingHeroUnit6:          equ (044*128) + (156/2) - 128      ;(dy*128 + dx/2) = (204,153)
+
+SetHeroWhoGetsTradeWithArmyAndAmount:
+  ld    ix,(HeroWeTradeWith)
+
+
+  call  .army
+;  call  .amount
+;  ret
+
+  .amount:
+  ld    l,(ix+HeroUnits+01)
+  ld    h,(ix+HeroUnits+02)
+  ld    b,056
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+04)
+  ld    h,(ix+HeroUnits+05)
+  ld    b,076
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+07)
+  ld    h,(ix+HeroUnits+08)
+  ld    b,096
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+10)
+  ld    h,(ix+HeroUnits+11)
+  ld    b,116
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+13)
+  ld    h,(ix+HeroUnits+14)
+  ld    b,136
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+
+  ld    l,(ix+HeroUnits+16)
+  ld    h,(ix+HeroUnits+17)
+  ld    b,156
+  ld    c,125
+  call  SetNumber16BitCastleSkipIfAmountIs0
+  ret
+
+  .army:
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
+  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
+  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    hl,.DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,.UnitSYSXTable14x24Portraits
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ret
+
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+.UnitSYSXTable14x24Portraits:  
+                dw $8000+(00*128)+(00/2)-128, $8000+(00*128)+(14/2)-128, $8000+(00*128)+(28/2)-128, $8000+(00*128)+(42/2)-128, $8000+(00*128)+(56/2)-128, $8000+(00*128)+(70/2)-128, $8000+(00*128)+(84/2)-128, $8000+(00*128)+(98/2)-128, $8000+(00*128)+(112/2)-128, $8000+(00*128)+(126/2)-128, $8000+(00*128)+(140/2)-128, $8000+(00*128)+(154/2)-128, $8000+(00*128)+(168/2)-128, $8000+(00*128)+(182/2)-128, $8000+(00*128)+(196/2)-128, $8000+(00*128)+(210/2)-128, $8000+(00*128)+(224/2)-128, $8000+(00*128)+(238/2)-128
+                dw $8000+(14*128)+(00/2)-128, $8000+(14*128)+(14/2)-128, $8000+(14*128)+(28/2)-128, $8000+(14*128)+(42/2)-128, $8000+(14*128)+(56/2)-128, $8000+(14*128)+(70/2)-128, $8000+(14*128)+(84/2)-128, $8000+(14*128)+(98/2)-128, $8000+(14*128)+(112/2)-128, $8000+(14*128)+(126/2)-128, $8000+(14*128)+(140/2)-128, $8000+(14*128)+(154/2)-128, $8000+(14*128)+(168/2)-128, $8000+(14*128)+(182/2)-128, $8000+(14*128)+(196/2)-128, $8000+(14*128)+(210/2)-128, $8000+(14*128)+(224/2)-128, $8000+(14*128)+(238/2)-128
+                dw $8000+(28*128)+(00/2)-128, $8000+(28*128)+(14/2)-128, $8000+(28*128)+(28/2)-128, $8000+(28*128)+(42/2)-128, $8000+(28*128)+(56/2)-128, $8000+(28*128)+(70/2)-128, $8000+(28*128)+(84/2)-128, $8000+(28*128)+(98/2)-128, $8000+(28*128)+(112/2)-128, $8000+(28*128)+(126/2)-128, $8000+(28*128)+(140/2)-128, $8000+(28*128)+(154/2)-128, $8000+(28*128)+(168/2)-128, $8000+(28*128)+(182/2)-128, $8000+(28*128)+(196/2)-128, $8000+(28*128)+(210/2)-128, $8000+(28*128)+(224/2)-128, $8000+(28*128)+(238/2)-128
+                dw $8000+(42*128)+(00/2)-128, $8000+(42*128)+(14/2)-128, $8000+(42*128)+(28/2)-128, $8000+(42*128)+(42/2)-128, $8000+(42*128)+(56/2)-128, $8000+(42*128)+(70/2)-128, $8000+(42*128)+(84/2)-128, $8000+(42*128)+(98/2)-128, $8000+(42*128)+(112/2)-128, $8000+(42*128)+(126/2)-128, $8000+(42*128)+(140/2)-128, $8000+(42*128)+(154/2)-128, $8000+(42*128)+(168/2)-128, $8000+(42*128)+(182/2)-128, $8000+(42*128)+(196/2)-128, $8000+(42*128)+(210/2)-128, $8000+(42*128)+(224/2)-128, $8000+(42*128)+(238/2)-128
+                dw $8000+(56*128)+(00/2)-128, $8000+(56*128)+(14/2)-128, $8000+(56*128)+(28/2)-128, $8000+(56*128)+(42/2)-128, $8000+(56*128)+(56/2)-128, $8000+(56*128)+(70/2)-128, $8000+(56*128)+(84/2)-128, $8000+(56*128)+(98/2)-128, $8000+(56*128)+(112/2)-128, $8000+(56*128)+(126/2)-128, $8000+(56*128)+(140/2)-128, $8000+(56*128)+(154/2)-128, $8000+(56*128)+(168/2)-128, $8000+(56*128)+(182/2)-128, $8000+(56*128)+(196/2)-128, $8000+(56*128)+(210/2)-128, $8000+(56*128)+(224/2)-128, $8000+(56*128)+(238/2)-128
+                dw $8000+(70*128)+(00/2)-128, $8000+(70*128)+(14/2)-128, $8000+(70*128)+(28/2)-128, $8000+(70*128)+(42/2)-128, $8000+(70*128)+(56/2)-128, $8000+(70*128)+(70/2)-128, $8000+(70*128)+(84/2)-128, $8000+(70*128)+(98/2)-128, $8000+(70*128)+(112/2)-128, $8000+(70*128)+(126/2)-128, $8000+(70*128)+(140/2)-128, $8000+(70*128)+(154/2)-128, $8000+(70*128)+(168/2)-128, $8000+(70*128)+(182/2)-128, $8000+(70*128)+(196/2)-128, $8000+(70*128)+(210/2)-128, $8000+(70*128)+(224/2)-128, $8000+(70*128)+(238/2)-128
+                dw $8000+(84*128)+(00/2)-128, $8000+(84*128)+(14/2)-128, $8000+(84*128)+(28/2)-128, $8000+(84*128)+(42/2)-128, $8000+(84*128)+(56/2)-128, $8000+(84*128)+(70/2)-128, $8000+(84*128)+(84/2)-128, $8000+(84*128)+(98/2)-128, $8000+(84*128)+(112/2)-128, $8000+(84*128)+(126/2)-128, $8000+(84*128)+(140/2)-128, $8000+(84*128)+(154/2)-128, $8000+(84*128)+(168/2)-128, $8000+(84*128)+(182/2)-128, $8000+(84*128)+(196/2)-128, $8000+(84*128)+(210/2)-128, $8000+(84*128)+(224/2)-128, $8000+(84*128)+(238/2)-128
+
+.DYDXVisitingHeroUnit1:          equ (108*128) + (056/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXVisitingHeroUnit2:          equ (108*128) + (076/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXVisitingHeroUnit3:          equ (108*128) + (096/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXVisitingHeroUnit4:          equ (108*128) + (116/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXVisitingHeroUnit5:          equ (108*128) + (136/2) - 128      ;(dy*128 + dx/2) = (204,153)
+.DYDXVisitingHeroUnit6:          equ (108*128) + (156/2) - 128      ;(dy*128 + dx/2) = (204,153)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when refreshing the visiting and defending army heroes and creatures overview
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
@@ -8192,6 +10032,13 @@ SetTavernGraphics:
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,TavernBlock          ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetHeroArmyTransferGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (030*128) + (024/2) - 128
+  ld    bc,$0000 + (137*256) + (156/2)
+  ld    a,HeroArmyTransferGraphicsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 CopyBarracks:
