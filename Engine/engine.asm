@@ -4259,7 +4259,7 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .AirSpells:         db  %0000 1111
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
-.Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,018,023,028,033 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,045,045,028,033 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesUndeadline3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 

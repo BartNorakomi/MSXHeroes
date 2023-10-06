@@ -4,6 +4,7 @@
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
+;  call  TradeMenuCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -257,28 +258,220 @@ ds 12
 
 
 
+SetTradingHeroesInventoryIcons:
+  ld    ix,(plxcurrentheroAddress)
+  ld    de,9                            ;skip the first 9 equiped inventory items, and go to the 6 open slots
+  add   ix,de
 
+  ;6 open slots
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (036/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (058/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (080/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (102/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (124/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (076*128) + (146/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+  ld    ix,(HeroWeTradeWith)            ;which hero are we trading with
+  ld    de,9                            ;skip the first 9 equiped inventory items, and go to the 6 open slots
+  add   ix,de
+
+  ;6 open slots
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (036/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (058/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (080/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (102/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (124/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  .SetIconHLBCandA  
+  ld    de,$0000 + (140*128) + (146/2)
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
+
+  .SetIconHLBCandA:
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  add   a,a                             ;*2
+  add   a,a                             ;*2
+  ld    iy,.InventoryIconTableSYSX
+  ld    d,0
+  ld    e,a
+  add   iy,de
+  ld    l,(iy)
+  ld    h,(iy+1)
+  inc   ix
+  ld    bc,$0000 + (InventoryItemNY*256) + (InventoryItemNX/2)
+  ld    a,InventoryGraphicsBlock;Map block  
+  ret
+  
+  
+
+
+.InventoryIconTableSYSX: 
+                    dw $4000 + (InventoryItem00ButtonOffSY*128) + (InventoryItem00ButtonOffSX/2) - 128  ;sword 1
+                    dw $4000 + (InventoryItem00MouseOverSY*128) + (InventoryItem00MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem01ButtonOffSY*128) + (InventoryItem01ButtonOffSX/2) - 128  ;sword 2
+                    dw $4000 + (InventoryItem01MouseOverSY*128) + (InventoryItem01MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem02ButtonOffSY*128) + (InventoryItem02ButtonOffSX/2) - 128  ;sword 3
+                    dw $4000 + (InventoryItem02MouseOverSY*128) + (InventoryItem02MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem03ButtonOffSY*128) + (InventoryItem03ButtonOffSX/2) - 128  ;sword 4
+                    dw $4000 + (InventoryItem03MouseOverSY*128) + (InventoryItem03MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem04ButtonOffSY*128) + (InventoryItem04ButtonOffSX/2) - 128  ;sword 5
+                    dw $4000 + (InventoryItem04MouseOverSY*128) + (InventoryItem04MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem05ButtonOffSY*128) + (InventoryItem05ButtonOffSX/2) - 128  ;armor 1
+                    dw $4000 + (InventoryItem05MouseOverSY*128) + (InventoryItem05MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem06ButtonOffSY*128) + (InventoryItem06ButtonOffSX/2) - 128  ;armor 2
+                    dw $4000 + (InventoryItem06MouseOverSY*128) + (InventoryItem06MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem07ButtonOffSY*128) + (InventoryItem07ButtonOffSX/2) - 128  ;armor 3
+                    dw $4000 + (InventoryItem07MouseOverSY*128) + (InventoryItem07MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem08ButtonOffSY*128) + (InventoryItem08ButtonOffSX/2) - 128  ;armor 4
+                    dw $4000 + (InventoryItem08MouseOverSY*128) + (InventoryItem08MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem09ButtonOffSY*128) + (InventoryItem09ButtonOffSX/2) - 128  ;armor 5
+                    dw $4000 + (InventoryItem09MouseOverSY*128) + (InventoryItem09MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem10ButtonOffSY*128) + (InventoryItem10ButtonOffSX/2) - 128  ;shield 1
+                    dw $4000 + (InventoryItem10MouseOverSY*128) + (InventoryItem10MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem11ButtonOffSY*128) + (InventoryItem11ButtonOffSX/2) - 128  ;shield 2
+                    dw $4000 + (InventoryItem11MouseOverSY*128) + (InventoryItem11MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem12ButtonOffSY*128) + (InventoryItem12ButtonOffSX/2) - 128  ;shield 3
+                    dw $4000 + (InventoryItem12MouseOverSY*128) + (InventoryItem12MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem13ButtonOffSY*128) + (InventoryItem13ButtonOffSX/2) - 128  ;shield 4
+                    dw $4000 + (InventoryItem13MouseOverSY*128) + (InventoryItem13MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem14ButtonOffSY*128) + (InventoryItem14ButtonOffSX/2) - 128  ;shield 5
+                    dw $4000 + (InventoryItem14MouseOverSY*128) + (InventoryItem14MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem15ButtonOffSY*128) + (InventoryItem15ButtonOffSX/2) - 128  ;helmet 1
+                    dw $4000 + (InventoryItem15MouseOverSY*128) + (InventoryItem15MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem16ButtonOffSY*128) + (InventoryItem16ButtonOffSX/2) - 128  ;helmet 2
+                    dw $4000 + (InventoryItem16MouseOverSY*128) + (InventoryItem16MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem17ButtonOffSY*128) + (InventoryItem17ButtonOffSX/2) - 128  ;helmet 3
+                    dw $4000 + (InventoryItem17MouseOverSY*128) + (InventoryItem17MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem18ButtonOffSY*128) + (InventoryItem18ButtonOffSX/2) - 128  ;helmet 4
+                    dw $4000 + (InventoryItem18MouseOverSY*128) + (InventoryItem18MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem19ButtonOffSY*128) + (InventoryItem19ButtonOffSX/2) - 128  ;helmet 5
+                    dw $4000 + (InventoryItem19MouseOverSY*128) + (InventoryItem19MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem20ButtonOffSY*128) + (InventoryItem20ButtonOffSX/2) - 128  ;boots 1
+                    dw $4000 + (InventoryItem20MouseOverSY*128) + (InventoryItem20MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem21ButtonOffSY*128) + (InventoryItem21ButtonOffSX/2) - 128  ;boots 2
+                    dw $4000 + (InventoryItem21MouseOverSY*128) + (InventoryItem21MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem22ButtonOffSY*128) + (InventoryItem22ButtonOffSX/2) - 128  ;boots 3
+                    dw $4000 + (InventoryItem22MouseOverSY*128) + (InventoryItem22MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem23ButtonOffSY*128) + (InventoryItem23ButtonOffSX/2) - 128  ;boots 4
+                    dw $4000 + (InventoryItem23MouseOverSY*128) + (InventoryItem23MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem24ButtonOffSY*128) + (InventoryItem24ButtonOffSX/2) - 128  ;boots 5
+                    dw $4000 + (InventoryItem24MouseOverSY*128) + (InventoryItem24MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem25ButtonOffSY*128) + (InventoryItem25ButtonOffSX/2) - 128  ;gloves 1
+                    dw $4000 + (InventoryItem25MouseOverSY*128) + (InventoryItem25MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem26ButtonOffSY*128) + (InventoryItem26ButtonOffSX/2) - 128  ;gloves 2
+                    dw $4000 + (InventoryItem26MouseOverSY*128) + (InventoryItem26MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem27ButtonOffSY*128) + (InventoryItem27ButtonOffSX/2) - 128  ;gloves 3
+                    dw $4000 + (InventoryItem27MouseOverSY*128) + (InventoryItem27MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem28ButtonOffSY*128) + (InventoryItem28ButtonOffSX/2) - 128  ;gloves 4
+                    dw $4000 + (InventoryItem28MouseOverSY*128) + (InventoryItem28MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem29ButtonOffSY*128) + (InventoryItem29ButtonOffSX/2) - 128  ;gloves 5
+                    dw $4000 + (InventoryItem29MouseOverSY*128) + (InventoryItem29MouseOverSX/2) - 128
+
+
+
+                    dw $4000 + (InventoryItem30ButtonOffSY*128) + (InventoryItem30ButtonOffSX/2) - 128  ;ring 1
+                    dw $4000 + (InventoryItem30MouseOverSY*128) + (InventoryItem30MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem31ButtonOffSY*128) + (InventoryItem31ButtonOffSX/2) - 128  ;ring 2
+                    dw $4000 + (InventoryItem31MouseOverSY*128) + (InventoryItem31MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem32ButtonOffSY*128) + (InventoryItem32ButtonOffSX/2) - 128  ;ring 3
+                    dw $4000 + (InventoryItem32MouseOverSY*128) + (InventoryItem32MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem33ButtonOffSY*128) + (InventoryItem33ButtonOffSX/2) - 128  ;ring 4
+                    dw $4000 + (InventoryItem33MouseOverSY*128) + (InventoryItem33MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem34ButtonOffSY*128) + (InventoryItem34ButtonOffSX/2) - 128  ;ring 5
+                    dw $4000 + (InventoryItem34MouseOverSY*128) + (InventoryItem34MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem35ButtonOffSY*128) + (InventoryItem35ButtonOffSX/2) - 128  ;Necklace 1
+                    dw $4000 + (InventoryItem35MouseOverSY*128) + (InventoryItem35MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem36ButtonOffSY*128) + (InventoryItem36ButtonOffSX/2) - 128  ;Necklace 2
+                    dw $4000 + (InventoryItem36MouseOverSY*128) + (InventoryItem36MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem37ButtonOffSY*128) + (InventoryItem37ButtonOffSX/2) - 128  ;Necklace 3
+                    dw $4000 + (InventoryItem37MouseOverSY*128) + (InventoryItem37MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem38ButtonOffSY*128) + (InventoryItem38ButtonOffSX/2) - 128  ;Necklace 4
+                    dw $4000 + (InventoryItem38MouseOverSY*128) + (InventoryItem38MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem39ButtonOffSY*128) + (InventoryItem39ButtonOffSX/2) - 128  ;Necklace 5
+                    dw $4000 + (InventoryItem39MouseOverSY*128) + (InventoryItem39MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem40ButtonOffSY*128) + (InventoryItem40ButtonOffSX/2) - 128  ;robe 1
+                    dw $4000 + (InventoryItem40MouseOverSY*128) + (InventoryItem40MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem41ButtonOffSY*128) + (InventoryItem41ButtonOffSX/2) - 128  ;robe 2
+                    dw $4000 + (InventoryItem41MouseOverSY*128) + (InventoryItem41MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem42ButtonOffSY*128) + (InventoryItem42ButtonOffSX/2) - 128  ;robe 3
+                    dw $4000 + (InventoryItem42MouseOverSY*128) + (InventoryItem42MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem43ButtonOffSY*128) + (InventoryItem43ButtonOffSX/2) - 128  ;robe 4
+                    dw $4000 + (InventoryItem43MouseOverSY*128) + (InventoryItem43MouseOverSX/2) - 128
+                    dw $4000 + (InventoryItem44ButtonOffSY*128) + (InventoryItem44ButtonOffSX/2) - 128  ;robe 5
+                    dw $4000 + (InventoryItem44MouseOverSY*128) + (InventoryItem44MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
+                    dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
+
+
+
+
+
+
+  
 
 
 TradeMenuCode:
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
+  ld    (PreviousButton2Clicked),a
+  
   ld    ix,GenericButtonTable
   ld    (PreviousButtonClickedIX),ix
 
-  call  SetTradingHeroesButtons
+  ld    ix,GenericButtonTable2
+  ld    (PreviousButton2ClickedIX),ix
 
-;  ld    hl,World1Palette
-;  call  SetPalette
-
-;  xor   a
-;	ld		(activepage),a                  ;start in page 0
+  call  SetTradingHeroesArmyButtons
+  call  SetTradingHeroesInventoryButtons
 
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetTradingHeroesAndArmy
+  call  SetTradingHeroesInventoryIcons
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetTradingHeroesAndArmy
+  call  SetTradingHeroesInventoryIcons
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -294,11 +487,49 @@ TradeMenuCode:
   ret   nz
 
 
+
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable2
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClickedTradingHeroesInventory             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButton2ClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButton2Clicked)
+  cp    255
+  jr    z,.EndMarkButton2               ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1001 0011
+  .EndMarkButton2:
+  ;we mark previous button clicked
+
+  ld    ix,GenericButtonTable2
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButton2ClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+  ;/Trading Heroes Inventory buttons
+
+
+
+
+
+
+
+
+
+
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
   call  CheckButtonMouseInteractionGenericButtons
 
-  call  .CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
+  call  .CheckButtonClickedTradingHeroesArmy             ;in: carry=button clicked, b=button number
 
   ;we mark previous button clicked
   ld    ix,(PreviousButtonClickedIX) 
@@ -332,15 +563,28 @@ TradeMenuCode:
 
 
 
-
-
-
-
-
-.CheckButtonClickedVisitingAndDefendingHeroesAndArmy:                    ;in: carry=button clicked, b=button number
+.CheckButtonClickedTradingHeroesInventory:
   ret   nc                              ;carry=button pressed, b=which button
 
-  ;at this point a button has been click. Check 3 possibilities:
+  ;at this point a button has been clicked. Check 3 possibilities:
+  ;1. previously the same button was clicked-> reset
+  ;2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ;3. previously a different button was clicked->swap
+
+
+  .HighlightNewButton2:
+  ld    a,b                             ;current button clicked now becomes previous button clicked (for future references)
+  ld    (PreviousButton2Clicked),a
+  ld    (PreviousButton2ClickedIX),ix
+  ret
+
+
+
+
+.CheckButtonClickedTradingHeroesArmy:                    ;in: carry=button clicked, b=button number
+  ret   nc                              ;carry=button pressed, b=which button
+
+  ;at this point a button has been clicked. Check 3 possibilities:
   ;1. previously the same button was clicked-> reset
   ;2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
   ;3. previously a different button was clicked->swap
@@ -1593,9 +1837,11 @@ TradeMenuCode:
 
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetTradingHeroesAndArmy
+  call  SetTradingHeroesInventoryIcons
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
+  call  SetTradingHeroesInventoryIcons
   call  SetTradingHeroesAndArmy
 
 
@@ -1689,9 +1935,145 @@ CheckEndTradeMenuWindow:
 
 
 
+SetTradingHeroesInventoryButtons:
+  ld    hl,TradingHeroesInventoryButtonTable-2
+  ld    de,GenericButtonTable2-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*12)
+  ldir
+
+  .CreateInventoryListTradingHeroes:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
+  ld    ix,(plxcurrentheroAddress)
+  ld    de,9                            ;skip the first 9 equiped inventory items, and go to the 6 open slots
+  add   ix,de
+
+  ld    iy,GenericButtonTable2+1
+  ld    b,6                             ;6 inventory slots
+  call  .loop
 
 
-SetTradingHeroesButtons:
+  ld    ix,(HeroWeTradeWith)
+  ld    de,9                            ;skip the first 9 equiped inventory items, and go to the 6 open slots
+  add   ix,de
+
+  ld    b,6                             ;6 inventory slots
+
+
+
+  .loop:
+  ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  add   a,a                             ;*2
+  add   a,a                             ;*4
+  ld    d,0
+  ld    e,a
+  ld    hl,SetTradingHeroesInventoryIcons.InventoryIconTableSYSX
+  add   hl,de
+  ld    a,(hl)
+  ld    (iy+0),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+1),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+2),a
+  inc   hl
+  ld    a,(hl)
+  ld    (iy+3),a
+  ld    de,GenericButtonTableLenghtPerButton
+  add   iy,de                           ;next button in ButtonTableInventoryIconsSYSX
+  inc   ix                              ;next hero-inventory item
+  djnz  .loop
+  ret
+
+
+
+TradingHeroesInventoryButtonTableGfxBlock:  db  InventoryGraphicsBlock
+TradingHeroesInventoryButtonTableAmountOfButtons:  db  12
+TradingHeroesInventoryButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (021*128) + (170/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (180*128) + (100/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (050*128) + (050/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (060*128) + (060/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+
+  db  %1100 0011 | dw $4000 + (040*128) + (040/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (030*128) + (030/2) - 128 | dw $4000 + (000*128) + (176/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (020*128) + (020/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (056*128) + (176/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (HeroOverViewInventoryIconButtonMouseClickedSY*128) + (HeroOverViewInventoryIconButtonMouseClickedSX/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+
+.Button1Ytop:           equ 077
+.Button1YBottom:        equ .Button1Ytop + 020
+.Button1XLeft:          equ 036
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 077
+.Button2YBottom:        equ .Button2Ytop + 020
+.Button2XLeft:          equ 058
+.Button2XRight:         equ .Button2XLeft + 020
+
+.Button3Ytop:           equ 077
+.Button3YBottom:        equ .Button3Ytop + 020
+.Button3XLeft:          equ 080
+.Button3XRight:         equ .Button3XLeft + 020
+
+.Button4Ytop:           equ 077
+.Button4YBottom:        equ .Button4Ytop + 020
+.Button4XLeft:          equ 102
+.Button4XRight:         equ .Button4XLeft + 020
+
+.Button5Ytop:           equ 077
+.Button5YBottom:        equ .Button5Ytop + 020
+.Button5XLeft:          equ 124
+.Button5XRight:         equ .Button5XLeft + 020
+
+.Button6Ytop:           equ 077
+.Button6YBottom:        equ .Button6Ytop + 020
+.Button6XLeft:          equ 146
+.Button6XRight:         equ .Button6XLeft + 020
+
+
+
+.Button7Ytop:           equ 141
+.Button7YBottom:        equ .Button7Ytop + 020
+.Button7XLeft:          equ 036
+.Button7XRight:         equ .Button7XLeft + 020
+
+.Button8Ytop:           equ 141
+.Button8YBottom:        equ .Button8Ytop + 020
+.Button8XLeft:          equ 058
+.Button8XRight:         equ .Button8XLeft + 020
+
+.Button9Ytop:           equ 141
+.Button9YBottom:        equ .Button9Ytop + 020
+.Button9XLeft:          equ 080
+.Button9XRight:         equ .Button9XLeft + 020
+
+.Button10Ytop:           equ 141
+.Button10YBottom:        equ .Button10Ytop + 020
+.Button10XLeft:          equ 102
+.Button10XRight:         equ .Button10XLeft + 020
+
+.Button11Ytop:           equ 141
+.Button11YBottom:        equ .Button11Ytop + 020
+.Button11XLeft:          equ 124
+.Button11XRight:         equ .Button11XLeft + 020
+
+.Button12Ytop:           equ 141
+.Button12YBottom:        equ .Button12Ytop + 020
+.Button12XLeft:          equ 146
+.Button12XRight:         equ .Button12XLeft + 020
+
+
+
+
+
+
+
+
+SetTradingHeroesArmyButtons:
   ld    hl,TradingHeroesButtonTable-2
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*14)
@@ -5195,6 +5577,9 @@ SpellDescriptionsMagicGuild:
 
 
 SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    a,(ix+GenericButtonGfxBlock)
+  ld    (ButtonGfxBlockCopy),a
+
   ld    b,(ix+GenericButtonAmountOfButtons)
   .loop:
   push  bc
@@ -5245,7 +5630,9 @@ SetGenericButtons:                      ;put button in mirror page below screen,
   ld    c,a                             ;nx / 2
 ;  ld    bc,$0000 + (016*256) + (016/2)        ;ny,nx
 
-  ld    a,(GenericButtonTableGfxBlock)                   ;buttons block
+  ld    a,(ButtonGfxBlockCopy)
+
+
 
 ;  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   call  CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

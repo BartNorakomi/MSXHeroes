@@ -985,17 +985,25 @@ HeroOverviewInventoryWindowCode:
 
   .engine:
   call  PopulateControls                ;read out keys
+
   ld    ix,HeroOverviewInventoryIconButtonTable
   ld    iy,ButtonTableInventoryIconsSYSX
   call  CheckButtonMouseInteraction
   ld    a,(MenuOptionSelected?)
   or    a
   jp    nz,.InventoryIconPressed
+
+
+
   call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
   call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
+
   call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
   ld    ix,HeroOverviewInventoryIconButtonTable
   call  SetButtonStatusAndText3         ;copies button state from rom -> vram
+
+
+
   call  SwapAndSetPage                  ;swap and set page  
   call  CheckEndHeroOverviewInventory   ;check if mouse is clicked outside of window. If so, return to game
   halt
