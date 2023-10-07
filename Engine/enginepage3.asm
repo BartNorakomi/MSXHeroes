@@ -833,6 +833,103 @@ GenericButtonTable2: ;status (bit 7=off/on, bit 6=button normal (untouched), bit
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+GenericButtonTable3GfxBlock:         db Hero14x9PortraitsBlock
+GenericButtonTable3AmountOfButtons:  db 12
+GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
+  ;arrow up, 3 hero buttons, arrow down
+  db  %1100 0011 | dw $4000 + (128*128) + (000/2) - 128 | dw $4000 + (128*128) + (020/2) - 128 | dw $4000 + (128*128) + (040/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (128*128) + (060/2) - 128 | dw $4000 + (128*128) + (080/2) - 128 | dw $4000 + (128*128) + (100/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  ;arrow up, 3 castle buttons, arrow down
+  db  %1100 0011 | dw $4000 + (128*128) + (120/2) - 128 | dw $4000 + (128*128) + (140/2) - 128 | dw $4000 + (128*128) + (160/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + (000*128) + (156/2) - 128 | dw $4000 + (000*128) + (176/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + (034*128) + (156/2) - 128 | dw $4000 + (034*128) + (174/2) - 128 | dw $4000 + (034*128) + (192/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (128*128) + (180/2) - 128 | dw $4000 + (128*128) + (200/2) - 128 | dw $4000 + (128*128) + (220/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  ;system/options
+  db  %1100 0011 | dw $4000 + (139*128) + (000/2) - 128 | dw $4000 + (139*128) + (016/2) - 128 | dw $4000 + (139*128) + (032/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  ;end turn
+  db  %1100 0011 | dw $4000 + (139*128) + (048/2) - 128 | dw $4000 + (139*128) + (064/2) - 128 | dw $4000 + (139*128) + (080/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+
+  ;arrow up, 3 hero buttons, arrow down
+.Button1Ytop:           equ 055
+.Button1YBottom:        equ .Button1Ytop + 011
+.Button1XLeft:          equ 206
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 040
+.Button2YBottom:        equ .Button2Ytop + 011
+.Button2XLeft:          equ 054
+.Button2XRight:         equ .Button2XLeft + 020
+
+.Button3Ytop:           equ 040
+.Button3YBottom:        equ .Button3Ytop + 011
+.Button3XLeft:          equ 074
+.Button3XRight:         equ .Button3XLeft + 020
+
+.Button4Ytop:           equ 040
+.Button4YBottom:        equ .Button4Ytop + 011
+.Button4XLeft:          equ 094
+.Button4XRight:         equ .Button4XLeft + 020
+
+.Button5Ytop:           equ 099
+.Button5YBottom:        equ .Button5Ytop + 011
+.Button5XLeft:          equ 206
+.Button5XRight:         equ .Button5XLeft + 020
+
+  ;arrow up, 3 castle buttons, arrow down
+.Button6Ytop:           equ 055
+.Button6YBottom:        equ .Button6Ytop + 011
+.Button6XLeft:          equ 230
+.Button6XRight:         equ .Button6XLeft + 020
+
+.Button7Ytop:           equ 040
+.Button7YBottom:        equ .Button7Ytop + 011
+.Button7XLeft:          equ 154
+.Button7XRight:         equ .Button7XLeft + 020
+
+.Button8Ytop:           equ 102
+.Button8YBottom:        equ .Button8Ytop + 011
+.Button8XLeft:          equ 032
+.Button8XRight:         equ .Button8XLeft + 020
+
+.Button9Ytop:           equ 104
+.Button9YBottom:        equ .Button9Ytop + 011
+.Button9XLeft:          equ 054
+.Button9XRight:         equ .Button9XLeft + 020
+
+.Button10Ytop:           equ 099
+.Button10YBottom:        equ .Button10Ytop + 011
+.Button10XLeft:          equ 230
+.Button10XRight:         equ .Button10XLeft + 020
+
+  ;system/options
+.Button11Ytop:           equ 110
+.Button11YBottom:        equ .Button11Ytop + 016
+.Button11XLeft:          equ 208
+.Button11XRight:         equ .Button11XLeft + 016
+
+  ;end turn
+.Button12Ytop:           equ 110
+.Button12YBottom:        equ .Button12Ytop + 016
+.Button12XLeft:          equ 232
+.Button12XRight:         equ .Button12XLeft + 016
+
+
+
+
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 MarketPlaceResourceNeeded:  ds  1
 MarketPlaceResourceToTrade: ds  1

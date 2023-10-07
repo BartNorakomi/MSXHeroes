@@ -5,6 +5,7 @@
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
 ;  call  TradeMenuCode
+;  call  HudButtonsCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -448,7 +449,34 @@ SetTradingHeroesInventoryIcons:
 
 
 
-  
+HudButtonsCode:
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable3
+  call  CheckButtonMouseInteractionGenericButtons
+
+;  call  .CheckButtonClickedTradingHeroesInventory             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+;  ld    ix,(PreviousButton2ClickedIX) 
+;  ld    a,(ix+GenericButtonStatus)
+;  push  af
+;  ld    a,(PreviousButton2Clicked)
+;  cp    255
+;  jr    z,.EndMarkButton2               ;skip if no button was pressed previously
+;  ld    (ix+GenericButtonStatus),%1010 0011
+;  .EndMarkButton2:
+  ;we mark previous button clicked
+
+  ld    ix,GenericButtonTable3
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  ;and unmark it after we copy all the buttons in their state
+;  pop   af
+;  ld    ix,(PreviousButton2ClickedIX) 
+;  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+  ;/Trading Heroes Inventory buttons
+  ret
 
 
 TradeMenuCode:

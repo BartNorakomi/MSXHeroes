@@ -38,6 +38,7 @@ LevelEngine:
 ;  call  CheckEnterCastle                ;press F1 to enter castle
 
   ;HUD
+  call  CheckHudButtons
 	call	CheckHudButtonsNoLongerOver     ;check if mousepointer is no longer on a button
 	call	CheckHudButtonsOver             ;check if mousepointer moves over a button (a button can be, the map, the castle, system settings, end turn, left arrow, right arrow)
 	call	CheckhudButtonsClicked          ;check if any of the buttons in the hud are pressed
@@ -1065,6 +1066,37 @@ AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
 
 
+
+
+
+CheckHudButtons:
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+
+	ld		a,(memblocks.1)                 ;save page 1+2 block settings
+	push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  call  HudButtonsCode
+
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+
+  xor   a
+  ld    (vblankintflag),a
+  ret
+
+
+
+
 CheckHudButtonsNoLongerOver:	;check if mousepointer is no longer on a button
   ld    ix,ButtonHeroArrowUp                ;hero arrow up button
 	call	.check
@@ -1116,7 +1148,7 @@ CheckHudButtonsNoLongerOver:	;check if mousepointer is no longer on a button
 	ret		z
 	
 .thisoneislit:
-	dec		(ix+ButtonLit?)			;leave this one lit
+	dec		(ix+ButtonLit?)			;no longer lit
 
 	ld		a,colormiddlebrown+16*colormiddlebrown
 	jp		lightupbutton
@@ -1227,6 +1259,7 @@ CheckHudButtonsOver:	;check if mousepointer moves over a button (a button can be
 	ret
 
 lightupbutton:
+ret
 	ld		(putline+clr),a
 
 
@@ -4659,7 +4692,7 @@ Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
 .Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,045,045,028,033 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesUndeadline3
+.HeroSpecificInfo: dw HeroAddressesAdol
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
