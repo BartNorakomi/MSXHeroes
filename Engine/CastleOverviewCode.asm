@@ -452,6 +452,9 @@ SetTradingHeroesInventoryIcons:
 
 
 TradeMenuCode:
+	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
+	ld		(SetHeroArmyAndStatusInHud?),a
+
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
   ld    (PreviousButton2Clicked),a
@@ -502,7 +505,7 @@ TradeMenuCode:
   ld    a,(PreviousButton2Clicked)
   cp    255
   jr    z,.EndMarkButton2               ;skip if no button was pressed previously
-  ld    (ix+GenericButtonStatus),%1001 0011
+  ld    (ix+GenericButtonStatus),%1010 0011
   .EndMarkButton2:
   ;we mark previous button clicked
 
@@ -515,13 +518,6 @@ TradeMenuCode:
   ld    (ix+GenericButtonStatus),a
   ;/and unmark it after we copy all the buttons in their state
   ;/Trading Heroes Inventory buttons
-
-
-
-
-
-
-
 
 
 
@@ -566,11 +562,82 @@ TradeMenuCode:
 .CheckButtonClickedTradingHeroesInventory:
   ret   nc                              ;carry=button pressed, b=which button
 
+  ld    a,255
+  ld    (PreviousButtonClicked),a
+
+
   ;at this point a button has been clicked. Check 3 possibilities:
   ;1. previously the same button was clicked-> reset
   ;2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
   ;3. previously a different button was clicked->swap
 
+  ;check 1. previously the same button was clicked-> reset
+  ld    a,(PreviousButton2Clicked)
+  cp    b
+  jr    nz,.EndCheck1b
+  ld    a,255
+  ld    (PreviousButton2Clicked),a
+  ret
+  .EndCheck1b:
+
+  ;check 2. previously a button has not been clicked/highlighted-> check if content of button is empty, if so, ignore, otherwise -> highlight
+  ld    a,(PreviousButton2Clicked)
+  cp    255                             ;check if there is a button already highlighted
+  jr    nz,.EndCheck2b
+
+  ld    a,b                             ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1
+  cp    6
+  jp    nc,.CheckTradingHero            ;did we click the defending or visiting hero's windows ?
+
+  .CheckHeroWeTradeWith:
+  push  ix
+  ld    ix,(HeroWeTradeWith)            ;hero who gets traded with
+  ld    a,6
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+
+  ld    a,(ix+HeroInventory+9)          ;selected inventory slot for this hero
+  cp    045                             ;045=empty
+  pop   ix
+  ret   z
+  jp    .HighlightNewButton2  
+  
+  .CheckTradingHero:                      ;check empty inventory slot
+  push  ix
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ld    a,12
+  sub   a,b  
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+
+  ld    a,(ix+HeroInventory+9)          ;selected inventory slot for this hero
+  cp    045                             ;045=empty
+  pop   ix
+  ret   z
+  jp    .HighlightNewButton2  
+  .EndCheck2b:
+
+  ;3. previously a different button was clicked->swap
+  ld    d,b                             ;trading:  12 11 10 9 8 7 tradewith: 6 5 4 3 2 1
+  call  .SetInventorySlotOfHeroInIX     ;in: d=slot
+  ld    c,(ix+HeroInventory+9)          ;store item in selected inventory slot for this hero
+
+  ld    a,(PreviousButton2Clicked)
+  ld    d,a
+  call  .SetInventorySlotOfHeroInIX     ;in: d=slot
+  ld    d,(ix+HeroInventory+9)          ;selected inventory slot for this hero
+  ld    (ix+HeroInventory+9),c          ;selected inventory slot for this hero
+  ld    c,d
+
+  ld    d,b                             ;trading:  12 11 10 9 8 7 tradewith: 6 5 4 3 2 1
+  call  .SetInventorySlotOfHeroInIX     ;in: b=slot
+  ld    (ix+HeroInventory+9),c          ;selected inventory slot for this hero
+
+  pop   af
+  jp    TradeMenuCode
 
   .HighlightNewButton2:
   ld    a,b                             ;current button clicked now becomes previous button clicked (for future references)
@@ -578,11 +645,35 @@ TradeMenuCode:
   ld    (PreviousButton2ClickedIX),ix
   ret
 
+.SetInventorySlotOfHeroInIX:
+  ld    a,d
+  cp    7
+  jp    nc,.TradingHero                 ;did we click the defending or visiting hero's windows ?
 
+  .HeroWeTradeWith:
+  ld    ix,(HeroWeTradeWith)            ;hero who gets traded with
+  ld    a,6
+  sub   a,d
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  ret
+  
+  .TradingHero:                      ;check empty inventory slot
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ld    a,12
+  sub   a,d
+  ld    d,0
+  ld    e,a
+  add   ix,de  
+  ret
 
 
 .CheckButtonClickedTradingHeroesArmy:                    ;in: carry=button clicked, b=button number
   ret   nc                              ;carry=button pressed, b=which button
+
+  ld    a,255
+  ld    (PreviousButton2Clicked),a
 
   ;at this point a button has been clicked. Check 3 possibilities:
   ;1. previously the same button was clicked-> reset
@@ -1840,11 +1931,8 @@ TradeMenuCode:
   call  SetTradingHeroesInventoryIcons
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
-  call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetTradingHeroesInventoryIcons
   call  SetTradingHeroesAndArmy
-
-
   jp    .engine
 
 
@@ -1905,27 +1993,24 @@ TradeMenuCode:
 
 
 CheckEndTradeMenuWindow:
-  ld    a,(RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton) ;BUY button
-  or    a
-  ret   z
-
 	ld		a,(NewPrContr)
   bit   4,a                             ;check trigger a / space
   ret   z
 
   ld    a,(spat+0)                      ;y mouse
-  cp    032                             ;dy
+  cp    030                             ;dy
   jr    c,.Exit
-  cp    032+092                         ;dy+ny
+  cp    030+137                         ;dy+ny
   jr    nc,.Exit
   
   ld    a,(spat+1)                      ;x mouse
-  cp    048                             ;dx
+  cp    024                             ;dx
   jr    c,.Exit
-  cp    048+162                         ;dx+nx
+  cp    024+156                         ;dx+nx
   ret   c
 
   .Exit:
+  pop   af
   ret
 
 
@@ -9851,7 +9936,8 @@ SetNameCastleAndDailyIncome:
 CastleOverviewCode:                     ;in: iy-castle
   ld    iy,Castle1
 
-
+  ld    a,3
+	ld		(SetResources?),a
 
 
 ;What we do here is check if visiting hero and defending hero are the same when entering and leaving castle

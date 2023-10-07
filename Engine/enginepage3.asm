@@ -86,6 +86,15 @@ CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1:
   jp    block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
 CopyRamToVramCorrectedCastleOverview:
+  ex    af,af'                          ;store rom block
+
+  in    a,($a8)                         ;store current rom/ram settings of page 1+2
+  push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1+2
+  out   ($a8),a      
+
+  ex    af,af'
   di
 	ld		($6000),a
 	inc   a
@@ -96,9 +105,11 @@ CopyRamToVramCorrectedCastleOverview:
 
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
-  jp    block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+  ret
 
 CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 ;we set 32kb HeroOverviewGraphics in page 1 and 2
