@@ -453,31 +453,77 @@ HudButtonsCode:
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable3
   call  CheckButtonMouseInteractionGenericButtons
+  call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
 
-;  call  .CheckButtonClickedTradingHeroesInventory             ;in: carry=button clicked, b=button number
-
-  ;we mark previous button clicked
-;  ld    ix,(PreviousButton2ClickedIX) 
-;  ld    a,(ix+GenericButtonStatus)
-;  push  af
-;  ld    a,(PreviousButton2Clicked)
-;  cp    255
-;  jr    z,.EndMarkButton2               ;skip if no button was pressed previously
-;  ld    (ix+GenericButtonStatus),%1010 0011
-;  .EndMarkButton2:
-  ;we mark previous button clicked
+  call  CheckIfHeroButtonShouldRemainLit
 
   ld    ix,GenericButtonTable3
   call  SetGenericButtons               ;copies button state from rom -> vram
-
-  ;and unmark it after we copy all the buttons in their state
-;  pop   af
-;  ld    ix,(PreviousButton2ClickedIX) 
-;  ld    (ix+GenericButtonStatus),a
-  ;/and unmark it after we copy all the buttons in their state
-  ;/Trading Heroes Inventory buttons
   ret
 
+.CheckButtonClicked:
+  ret   nc                              ;carry=button pressed, b=which button
+
+  ld    a,b
+  cp    12
+  jp    z,.ButtonHeroArrowUp
+  cp    11
+  jp    z,.Button1stHeroWindow
+  cp    10
+  jp    z,.Button2ndHeroWindow
+  cp    09
+  jp    z,.Button3dHeroWindow
+  cp    08
+  jp    z,.ButtonHeroArrowDown
+
+  cp    07
+  jp    z,.ButtonCastleArrowUp
+  cp    06
+  jp    z,.Button1stCastleWindow
+  cp    05
+  jp    z,.Button2ndCastleWindow
+  cp    04
+  jp    z,.Button3dCastleWindow
+  cp    03
+  jp    z,.ButtonCastleArrowDown
+
+  cp    01
+  jp    z,.ButtonEndTurn
+  ret
+
+  .ButtonHeroArrowUp:
+  jp    CheckHeroArrowUp
+
+  .Button1stHeroWindow:
+  jp    FirstHeroWindowClicked
+
+  .Button2ndHeroWindow:
+  jp    SecondHeroWindowClicked
+
+  .Button3dHeroWindow:
+  jp    ThirdHeroWindowClicked
+
+  .ButtonHeroArrowDown:
+  jp    CheckHeroArrowDown
+
+
+  .ButtonCastleArrowUp:
+  jp    CheckCastleArrowUp
+
+  .Button1stCastleWindow:
+  jp    FirstCastleWindowClicked
+
+  .Button2ndCastleWindow:
+  jp    SecondCastleWindowClicked
+
+  .Button3dCastleWindow:
+  jp    ThirdCastleWindowClicked
+
+  .ButtonCastleArrowDown:
+  jp    CheckCastleArrowDown
+
+  .ButtonEndTurn:
+	jp		endturn
 
 TradeMenuCode:
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
