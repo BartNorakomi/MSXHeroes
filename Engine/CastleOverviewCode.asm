@@ -449,8 +449,12 @@ SetTradingHeroesInventoryIcons:
 
 
 
-HudButtonsCode:
-  ;Trading Heroes Inventory buttons
+HudCode:
+	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
+	call	SetCastlesInWindows             ;erase castle windows, then put the castles in the windows
+	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
+
+  ;handle all hud buttons
   ld    ix,GenericButtonTable3
   call  CheckButtonMouseInteractionGenericButtons
   call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
@@ -459,6 +463,8 @@ HudButtonsCode:
 
   ld    ix,GenericButtonTable3
   call  SetGenericButtons               ;copies button state from rom -> vram
+  ;/handle all hud buttons
+
   ret
 
 .CheckButtonClicked:
@@ -466,64 +472,474 @@ HudButtonsCode:
 
   ld    a,b
   cp    12
-  jp    z,.ButtonHeroArrowUp
+  jp    z,CheckHeroArrowUp
   cp    11
-  jp    z,.Button1stHeroWindow
+  jp    z,FirstHeroWindowClicked
   cp    10
-  jp    z,.Button2ndHeroWindow
+  jp    z,SecondHeroWindowClicked
   cp    09
-  jp    z,.Button3dHeroWindow
+  jp    z,ThirdHeroWindowClicked
   cp    08
-  jp    z,.ButtonHeroArrowDown
+  jp    z,CheckHeroArrowDown
 
   cp    07
-  jp    z,.ButtonCastleArrowUp
+  jp    z,CheckCastleArrowUp
   cp    06
-  jp    z,.Button1stCastleWindow
+  jp    z,FirstCastleWindowClicked
   cp    05
-  jp    z,.Button2ndCastleWindow
+  jp    z,SecondCastleWindowClicked
   cp    04
-  jp    z,.Button3dCastleWindow
+  jp    z,ThirdCastleWindowClicked
   cp    03
-  jp    z,.ButtonCastleArrowDown
+  jp    z,CheckCastleArrowDown
 
   cp    01
-  jp    z,.ButtonEndTurn
+  jp    z,endturn
   ret
 
-  .ButtonHeroArrowUp:
-  jp    CheckHeroArrowUp
 
-  .Button1stHeroWindow:
-  jp    FirstHeroWindowClicked
+SetManaAndMovementBars:
+	ld		a,(ChangeManaAndMovement?)
+	dec		a
+	ret		z
+	ld		(ChangeManaAndMovement?),a
 
-  .Button2ndHeroWindow:
-  jp    SecondHeroWindowClicked
+	call	EraseManaandMovementBars
+	call	.PutManaandMovementBars
+  ret
 
-  .Button3dHeroWindow:
-  jp    ThirdHeroWindowClicked
+.PutManaandMovementBars:
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
 
-  .ButtonHeroArrowDown:
-  jp    CheckHeroArrowDown
+  ld    de,$0000 + (067*128) + (226/2) - 128
+  ld    hl,$0000 + (067*128) + (204/2) - 128
+  call  .PutManaAndMovement               ;hero in window1
+
+  ld    de,$0000 + (078*128) + (226/2) - 128
+  ld    hl,$0000 + (078*128) + (204/2) - 128
+  call  .PutManaAndMovement               ;hero in window2
+
+  ld    de,$0000 + (089*128) + (226/2) - 128
+  ld    hl,$0000 + (089*128) + (204/2) - 128
+  call  .PutManaAndMovement               ;hero in window3
+  ret
+
+  .PutManaAndMovement:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255                             ;inactive
+  ret   z
+  cp    254                             ;in castle
+  jp    nz,.EndCheckInCastle
+  ;if hero is in castle, we stay in the same hero window, but we skip to the next hero
+	ld		bc,lenghtherotable
+	add		ix,bc                           ;next hero
+  jp    .PutManaAndMovement
+  .EndCheckInCastle:
+  push  hl
+	call	PutManaBar 	                  ;put hero mana
+  pop   de
+	call	PutMovementBar 	                ;put hero movement
+	ld		bc,lenghtherotable
+	add		ix,bc                           ;next hero
+	ret
+
+  PutManaBar:
+  exx
+  ;multiply current mana by 10
+  ld    h,0
+  ld    l,(ix+HeroMana)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  add   hl,hl                           ;*2
+  push  hl
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  pop   de
+  add   hl,de                           ;*10
+
+  ld    e,(ix+HeroTotalMana)            ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (042/2) - 128
+  jr    c,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (040/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (038/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (036/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (034/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (032/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (030/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (028/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (026/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (024/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  ld    bc,$4000 + (107*128) + (022/2) - 128
+  jr    .EndSearchPercentageMovement
+
+  .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
+  ld    a,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  and   a
+  jr    z,.EndSearchPercentageMovement
+  ld    bc,$4000 + (107*128) + (018/2) - 128
+
+  .EndSearchPercentageMovement:
+  push  bc
+  exx
+  pop   hl
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+	ret
+
+  PutMovementBar:
+  exx
+  ;multiply current move by 10
+  ld    h,0
+  ld    l,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  add   hl,hl                           ;*2
+  push  hl
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  pop   de
+  add   hl,de                           ;*10
+
+  ld    e,(ix+HeroTotalMove)            ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (020/2) - 128
+  jr    c,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (018/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (016/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (014/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (012/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (010/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (008/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (006/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (004/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    bc,$4000 + (107*128) + (002/2) - 128
+  jr    c,.EndSearchPercentageMovement
+  ld    bc,$4000 + (107*128) + (000/2) - 128
+  jr    .EndSearchPercentageMovement
+
+  .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
+  ld    a,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  and   a
+  jr    z,.EndSearchPercentageMovement
+  ld    bc,$4000 + (107*128) + (018/2) - 128
+
+  .EndSearchPercentageMovement:
+  push  bc
+  exx
+  pop   hl
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+	ret
+
+EraseManaandMovementBars:
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (067*128) + (204/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (078*128) + (204/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (089*128) + (204/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (067*128) + (226/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (078*128) + (226/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    de,$0000 + (089*128) + (226/2) - 128
+  ld    bc,$0000 + (010*256) + (002/2)
+  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ret
 
 
-  .ButtonCastleArrowUp:
-  jp    CheckCastleArrowUp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  .Button1stCastleWindow:
-  jp    FirstCastleWindowClicked
+SetCastlesInWindows:                    ;erase castle windows, then put the castles in the windows
+	ld		a,(SetCastlesInWindows?)
+	dec		a
+	ret		z
+	ld		(SetCastlesInWindows?),a
 
-  .Button2ndCastleWindow:
-  jp    SecondCastleWindowClicked
+  call  ClearCastleButtons              ;first clear the buttons, before we set the castle buttons
 
-  .Button3dCastleWindow:
-  jp    ThirdCastleWindowClicked
+  call  SetCastleUsingCastleWindowPointerInIX
+  ld    de,GenericButtonTable3+(6*GenericButtonTableLenghtPerButton)
+	call	.setCastlewindow
 
-  .ButtonCastleArrowDown:
-  jp    CheckCastleArrowDown
+  call  SetCastleUsingCastleWindowPointerInIX
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
+  ld    de,GenericButtonTable3+(7*GenericButtonTableLenghtPerButton)
+	call	.setCastlewindow
 
-  .ButtonEndTurn:
-	jp		endturn
+  call  SetCastleUsingCastleWindowPointerInIX
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle  
+  ld    de,GenericButtonTable3+(8*GenericButtonTableLenghtPerButton)
+	jp		.setCastlewindow
+
+  .setCastlewindow:
+  ld    a,(ix+CastleTerrainSY)      ;terrain 0=grassland,1=swamp,2=hell,3=snow
+  or    a
+  ld    hl,CastleButtonGrassLand
+  jr    z,.EndCheckTerrain
+  dec   a
+  ld    hl,CastleButtonSwamp
+  jr    z,.EndCheckTerrain
+  dec   a
+  ld    hl,CastleButtonHell
+  jr    z,.EndCheckTerrain
+  ld    hl,CastleButtonSnow
+
+  .EndCheckTerrain:
+  ld    bc,7
+  ldir
+	ret
+
+CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128
+CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + (117*128) + (000/2) - 128 | dw $4000 + (117*128) + (020/2) - 128 | dw $4000 + (117*128) + (040/2) - 128
+CastleButtonSwamp:          db  %1100 0011 | dw $4000 + (117*128) + (060/2) - 128 | dw $4000 + (117*128) + (080/2) - 128 | dw $4000 + (117*128) + (100/2) - 128
+CastleButtonHell:           db  %1100 0011 | dw $4000 + (117*128) + (120/2) - 128 | dw $4000 + (117*128) + (140/2) - 128 | dw $4000 + (117*128) + (160/2) - 128
+CastleButtonSnow:           db  %1100 0011 | dw $4000 + (117*128) + (180/2) - 128 | dw $4000 + (117*128) + (200/2) - 128 | dw $4000 + (117*128) + (220/2) - 128
+
+ClearCastleButtons:
+  ld    hl,CastleButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(6*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,CastleButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(7*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,CastleButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(8*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+  ret
+
+SetCastleUsingCastleWindowPointerInIX:
+	ld		a,(CastleWindowPointer)     ;CastleWindowPointer points to the castle that should be in castlewindows1 
+	ld    c,a	
+  ld    a,(whichplayernowplaying?)
+  ld    b,AmountOfCastles
+  ld    ix,Castle1
+  ld    de,LenghtCastleTable
+  .SearchLoop:
+  cp    (ix+CastlePlayer)
+  jp    z,.CastleFound
+  add   ix,de
+  djnz  .SearchLoop
+  ;no castle found, this player has no castles at all
+  pop   af
+  ret
+
+  .CastleFound:
+  dec   c
+  ret   m
+  add   ix,de
+  djnz  .SearchLoop
+  ;no castle found, this player has no castles at all
+  pop   af
+  ret
+
+  .SearchNextCastle:  
+  add   ix,de
+  cp    (ix+CastlePlayer)
+  ret   z               ;castle found
+  djnz  .SearchNextCastle
+  ;no castle
+  pop   af
+  ret  
+
+ThirdCastleWindowClicked:
+  call  SetCastleUsingCastleWindowPointerInIX
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle  
+  jp    centrescreenforthisCastle
+  
+SecondCastleWindowClicked:
+  call  SetCastleUsingCastleWindowPointerInIX
+  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
+  jp    centrescreenforthisCastle
+
+FirstCastleWindowClicked:
+  call  SetCastleUsingCastleWindowPointerInIX
+  jp    centrescreenforthisCastle
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetHeroesInWindows:
+	ld		a,(SetHeroesInWindows?)
+	dec		a
+	ret		z
+	ld		(SetHeroesInWindows?),a
+
+  call  ClearHeroButtons                ;first clear the buttons, before we set the hero buttons
+  call  SetHero1ForCurrentPlayerInIX
+  call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
+
+  ld    de,GenericButtonTable3+(1*GenericButtonTableLenghtPerButton)
+	call	.setherowindow
+  ld    de,GenericButtonTable3+(2*GenericButtonTableLenghtPerButton)
+	call	.setherowindow
+  ld    de,GenericButtonTable3+(3*GenericButtonTableLenghtPerButton)
+
+  .setherowindow:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+	cp		255
+	ret		z
+  cp    254                             ;in castle
+  jp    nz,.EndCheckInCastle
+  ;if hero is in castle, we stay in the same hero window, but we skip to the next hero
+	ld		bc,lenghtherotable
+	add		ix,bc                           ;next hero
+  jp    .setherowindow
+  .EndCheckInCastle:
+
+  ld    c,(ix+HeroSpecificInfo+0)       ;get hero specific info
+  ld    b,(ix+HeroSpecificInfo+1)
+  push  bc
+  pop   iy
+  ld    l,(iy+HeroButton20x11SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(iy+HeroButton20x11SYSX+1)  
+
+  ld    bc,7
+  ldir
+
+	ld		de,lenghtherotable
+	add		ix,de                           ;next hero
+	ret
+
+ClearHeroButtons:
+  ld    hl,HeroButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(1*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,HeroButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(2*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,HeroButton20x11SYSXEmpty
+  ld    de,GenericButtonTable3+(3*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+  ret
+
+HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + (139*128) + (096/2) - 128 | dw $4000 + (139*128) + (116/2) - 128 | dw $4000 + (139*128) + (136/2) - 128
+
+HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (018*128) + (000/2) - 128 | dw $4000 + (018*128) + (020/2) - 128 | dw $4000 + (018*128) + (040/2) - 128
+HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (018*128) + (060/2) - 128 | dw $4000 + (018*128) + (080/2) - 128 | dw $4000 + (018*128) + (100/2) - 128
+HeroButton20x11SYSXPixy:            db  %1100 0011 | dw $4000 + (018*128) + (120/2) - 128 | dw $4000 + (018*128) + (140/2) - 128 | dw $4000 + (018*128) + (160/2) - 128
+HeroButton20x11SYSXDrasle1:         db  %1100 0011 | dw $4000 + (018*128) + (180/2) - 128 | dw $4000 + (018*128) + (200/2) - 128 | dw $4000 + (018*128) + (220/2) - 128
+
+HeroButton20x11SYSXLatok:           db  %1100 0011 | dw $4000 + (029*128) + (000/2) - 128 | dw $4000 + (029*128) + (020/2) - 128 | dw $4000 + (029*128) + (040/2) - 128
+HeroButton20x11SYSXDrasle2:         db  %1100 0011 | dw $4000 + (029*128) + (060/2) - 128 | dw $4000 + (029*128) + (080/2) - 128 | dw $4000 + (029*128) + (100/2) - 128
+HeroButton20x11SYSXSnake1:          db  %1100 0011 | dw $4000 + (029*128) + (120/2) - 128 | dw $4000 + (029*128) + (140/2) - 128 | dw $4000 + (029*128) + (160/2) - 128
+HeroButton20x11SYSXDrasle3:         db  %1100 0011 | dw $4000 + (029*128) + (180/2) - 128 | dw $4000 + (029*128) + (200/2) - 128 | dw $4000 + (029*128) + (220/2) - 128
+
+HeroButton20x11SYSXSnake2:          db  %1100 0011 | dw $4000 + (040*128) + (000/2) - 128 | dw $4000 + (040*128) + (020/2) - 128 | dw $4000 + (040*128) + (040/2) - 128
+HeroButton20x11SYSXDrasle4:         db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (080/2) - 128 | dw $4000 + (040*128) + (100/2) - 128
+HeroButton20x11SYSXAshguine:        db  %1100 0011 | dw $4000 + (040*128) + (120/2) - 128 | dw $4000 + (040*128) + (140/2) - 128 | dw $4000 + (040*128) + (160/2) - 128
+HeroButton20x11SYSXUndeadline1:     db  %1100 0011 | dw $4000 + (040*128) + (180/2) - 128 | dw $4000 + (040*128) + (200/2) - 128 | dw $4000 + (040*128) + (220/2) - 128
+
+HeroButton20x11SYSXPsychoWorld:     db  %1100 0011 | dw $4000 + (051*128) + (000/2) - 128 | dw $4000 + (051*128) + (020/2) - 128 | dw $4000 + (051*128) + (040/2) - 128
+HeroButton20x11SYSXUndeadline2:     db  %1100 0011 | dw $4000 + (051*128) + (060/2) - 128 | dw $4000 + (051*128) + (080/2) - 128 | dw $4000 + (051*128) + (100/2) - 128
+HeroButton20x11SYSXGoemon2:         db  %1100 0011 | dw $4000 + (051*128) + (120/2) - 128 | dw $4000 + (051*128) + (140/2) - 128 | dw $4000 + (051*128) + (160/2) - 128
+HeroButton20x11SYSXUndeadline3:     db  %1100 0011 | dw $4000 + (051*128) + (180/2) - 128 | dw $4000 + (051*128) + (200/2) - 128 | dw $4000 + (051*128) + (220/2) - 128
+
+HeroButton20x11SYSXFray:            db  %1100 0011 | dw $4000 + (062*128) + (000/2) - 128 | dw $4000 + (062*128) + (020/2) - 128 | dw $4000 + (062*128) + (040/2) - 128
+HeroButton20x11SYSXBlackColor:      db  %1100 0011 | dw $4000 + (062*128) + (060/2) - 128 | dw $4000 + (062*128) + (080/2) - 128 | dw $4000 + (062*128) + (100/2) - 128
+HeroButton20x11SYSXWit:             db  %1100 0011 | dw $4000 + (062*128) + (120/2) - 128 | dw $4000 + (062*128) + (140/2) - 128 | dw $4000 + (062*128) + (160/2) - 128
+HeroButton20x11SYSXMitchell:        db  %1100 0011 | dw $4000 + (062*128) + (180/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | dw $4000 + (062*128) + (220/2) - 128
+
+HeroButton20x11SYSXJanJackGibson:   db  %1100 0011 | dw $4000 + (073*128) + (000/2) - 128 | dw $4000 + (073*128) + (020/2) - 128 | dw $4000 + (073*128) + (040/2) - 128
+HeroButton20x11SYSXGillianSeed:     db  %1100 0011 | dw $4000 + (073*128) + (060/2) - 128 | dw $4000 + (073*128) + (080/2) - 128 | dw $4000 + (073*128) + (100/2) - 128
+HeroButton20x11SYSXSnatcher:        db  %1100 0011 | dw $4000 + (073*128) + (120/2) - 128 | dw $4000 + (073*128) + (140/2) - 128 | dw $4000 + (073*128) + (160/2) - 128
+HeroButton20x11SYSXGolvellius:      db  %1100 0011 | dw $4000 + (073*128) + (180/2) - 128 | dw $4000 + (073*128) + (200/2) - 128 | dw $4000 + (073*128) + (220/2) - 128
+
+HeroButton20x11SYSXBillRizer:       db  %1100 0011 | dw $4000 + (084*128) + (000/2) - 128 | dw $4000 + (084*128) + (020/2) - 128 | dw $4000 + (084*128) + (040/2) - 128
+HeroButton20x11SYSXPochi:           db  %1100 0011 | dw $4000 + (084*128) + (060/2) - 128 | dw $4000 + (084*128) + (080/2) - 128 | dw $4000 + (084*128) + (100/2) - 128
+HeroButton20x11SYSXGreyFox:         db  %1100 0011 | dw $4000 + (084*128) + (120/2) - 128 | dw $4000 + (084*128) + (140/2) - 128 | dw $4000 + (084*128) + (160/2) - 128
+HeroButton20x11SYSXTrevorBelmont:   db  %1100 0011 | dw $4000 + (084*128) + (180/2) - 128 | dw $4000 + (084*128) + (200/2) - 128 | dw $4000 + (084*128) + (220/2) - 128
+
+HeroButton20x11SYSXBigBoss:         db  %1100 0011 | dw $4000 + (095*128) + (000/2) - 128 | dw $4000 + (095*128) + (020/2) - 128 | dw $4000 + (095*128) + (040/2) - 128
+HeroButton20x11SYSXSimonBelmont:    db  %1100 0011 | dw $4000 + (095*128) + (060/2) - 128 | dw $4000 + (095*128) + (080/2) - 128 | dw $4000 + (095*128) + (100/2) - 128
+HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (095*128) + (120/2) - 128 | dw $4000 + (095*128) + (140/2) - 128 | dw $4000 + (095*128) + (160/2) - 128
+HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180/2) - 128 | dw $4000 + (095*128) + (200/2) - 128 | dw $4000 + (095*128) + (220/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 TradeMenuCode:
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 

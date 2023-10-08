@@ -24,11 +24,7 @@ LevelEngine:
 
   ;HUD
   call  SetResources
-  call  CheckHudButtons                 ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
-	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
-	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
-	call	SetCastlesInWindows             ;erase castle windows, then put the castles in the windows
-
+  call  HandleHud                       ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
   call  SetHeroArmyAndStatusInHud
 
 
@@ -102,6 +98,19 @@ vblank:
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
 
+
+
+
+
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+
+  ld    a,(slot.page1rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+
+
+
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
@@ -114,6 +123,14 @@ vblank:
 
   ld    a,(page1bank)                   ;put the bank back in page 1 which was there before we ran setspritecharacter
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+
+
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+
+
+
 
 	call	putsprite                       ;out spat data
 
@@ -783,37 +800,16 @@ SetHeroPortrait10x18:
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    ix,(plxcurrentheroAddress)
-
-;  ld    a,(ix+HeroType)                 ;check which hero
-;  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-
-;  ld    c,(ix+HeroPortrait10x18SYSX+0)
-;  ld    b,(ix+HeroPortrait10x18SYSX+1)
-
-;  push  ix
   ld    c,(ix+HeroSpecificInfo+0)         ;get hero specific info
   ld    b,(ix+HeroSpecificInfo+1)
   push  bc
   pop   ix
   ld    c,(ix+HeroInfoPortrait10x18SYSX+0)  ;find hero portrait 16x30 address
   ld    b,(ix+HeroInfoPortrait10x18SYSX+1)  
-;  pop   ix
-
   ld    de,NXAndNY10x18HeroPortraits    ;(ny*256 + nx/2) = (10x18)
   ld    hl,DYDXHeroWindow10x18InHud          ;(dy*128 + dx/2) = (204,132)
   call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
-
-;  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-;  ld    h,0
-;  ld    l,a
-;  add   hl,hl                           ;Unit*2
-;  ld    de,UnitSYSXTable
-;  add   hl,de
-;  ld    c,(hl)
-;  inc   hl
-;  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-;  ret
 
 SetArmyUnits:
   ld    a,(slot.page1rom)               ;all RAM except page 1
@@ -1059,7 +1055,7 @@ AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
 
 
-CheckHudButtons:
+HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
 
@@ -1072,7 +1068,7 @@ CheckHudButtons:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  call  HudButtonsCode
+  call  HudCode
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
@@ -1165,20 +1161,7 @@ HerowindowNX:	equ	14
 
 
 
-ThirdCastleWindowClicked:
-  call  SetCastleUsingCastleWindowPointerInIX
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle  
-  jp    centrescreenforthisCastle
-  
-SecondCastleWindowClicked:
-  call  SetCastleUsingCastleWindowPointerInIX
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
-  jp    centrescreenforthisCastle
 
-FirstCastleWindowClicked:
-  call  SetCastleUsingCastleWindowPointerInIX
-  jp    centrescreenforthisCastle
 
 centrescreenforthisCastle:
 	ld		a,TilesPerColumn
@@ -2748,345 +2731,10 @@ SetHeroForWindow3DeterminedByHeroWindowPointerInIX:
   jp    FindHeroThatIsNotInCastle
 
 ChangeManaAndMovement?:	db		3
-SetManaAndMovementBars:
-	ld		a,(ChangeManaAndMovement?)
-	dec		a
-	ret		z
-	ld		(ChangeManaAndMovement?),a
-
-	call	EraseManaandMovementBars
-	call	DoSetManaandMovementBars
-	ret
-
-SetCastlesInWindows:                    ;erase castle windows, then put the castles in the windows
-	ld		a,(SetCastlesInWindows?)
-	dec		a
-	ret		z
-	ld		(SetCastlesInWindows?),a
-
-  call  ClearCastleButtons              ;first clear the buttons, before we set the castle buttons
-
-  call  SetCastleUsingCastleWindowPointerInIX
-  ld    de,GenericButtonTable3+(6*GenericButtonTableLenghtPerButton)
-	call	.setCastlewindow
-
-  call  SetCastleUsingCastleWindowPointerInIX
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
-  ld    de,GenericButtonTable3+(7*GenericButtonTableLenghtPerButton)
-	call	.setCastlewindow
-
-  call  SetCastleUsingCastleWindowPointerInIX
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
-  call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle  
-  ld    de,GenericButtonTable3+(8*GenericButtonTableLenghtPerButton)
-	jp		.setCastlewindow
-
-.setCastlewindow:
-  ld    a,(ix+CastleTerrainSY)          
-  or    a
-  ld    hl,CastleButtonGrassLand
-  jr    z,.EndCheckTerrain
-  dec   a
-  ld    hl,CastleButtonSwamp
-  jr    z,.EndCheckTerrain
-  dec   a
-  ld    hl,CastleButtonHell
-  jr    z,.EndCheckTerrain
-  ld    hl,CastleButtonSnow
-
-  .EndCheckTerrain:
-  ld    bc,7
-  ldir
-	ret
-
-CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128
-CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + (117*128) + (000/2) - 128 | dw $4000 + (117*128) + (020/2) - 128 | dw $4000 + (117*128) + (040/2) - 128
-CastleButtonSwamp:          db  %1100 0011 | dw $4000 + (117*128) + (060/2) - 128 | dw $4000 + (117*128) + (080/2) - 128 | dw $4000 + (117*128) + (100/2) - 128
-CastleButtonHell:           db  %1100 0011 | dw $4000 + (117*128) + (120/2) - 128 | dw $4000 + (117*128) + (140/2) - 128 | dw $4000 + (117*128) + (160/2) - 128
-CastleButtonSnow:           db  %1100 0011 | dw $4000 + (117*128) + (180/2) - 128 | dw $4000 + (117*128) + (200/2) - 128 | dw $4000 + (117*128) + (220/2) - 128
-
-ClearCastleButtons:
-  ld    hl,CastleButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(6*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-
-  ld    hl,CastleButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(7*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-
-  ld    hl,CastleButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(8*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-  ret
-
-
-
-
-SetCastleUsingCastleWindowPointerInIX:
-	ld		a,(CastleWindowPointer)     ;CastleWindowPointer points to the castle that should be in castlewindows1 
-	ld    c,a	
-  ld    a,(whichplayernowplaying?)
-  ld    b,AmountOfCastles
-  ld    ix,Castle1
-  ld    de,LenghtCastleTable
-  .SearchLoop:
-  cp    (ix+CastlePlayer)
-  jp    z,.CastleFound
-  add   ix,de
-  djnz  .SearchLoop
-  ;no castle found, this player has no castles at all
-  pop   af
-  ret
-
-  .CastleFound:
-  dec   c
-  ret   m
-  add   ix,de
-  djnz  .SearchLoop
-  ;no castle found, this player has no castles at all
-  pop   af
-  ret
-
-  .SearchNextCastle:  
-  add   ix,de
-  cp    (ix+CastlePlayer)
-  ret   z               ;castle found
-  djnz  .SearchNextCastle
-  ;no castle
-  pop   af
-  ret  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 herowindowpointer:	db	0               ;each player has 10 heroes. The herowindowpointer tells us which hero is in window 1
 SetHeroesInWindows?:	db	3             ;this means for 2 frames the heroes are set in the windows (in page 0 and page 1)
 CastleWindowPointer:	db	0             ;The castlewindowpointer tells us which castle is in castlewindow 1
 SetCastlesInWindows?:  db  3
-SetHeroesInWindows:
-	ld		a,(SetHeroesInWindows?)
-	dec		a
-	ret		z
-	ld		(SetHeroesInWindows?),a
-
-  call  ClearHeroButtons                ;first clear the buttons, before we set the hero buttons
-  call  SetHero1ForCurrentPlayerInIX
-  call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
-
-  ld    de,GenericButtonTable3+(1*GenericButtonTableLenghtPerButton)
-	call	.setherowindow
-  ld    de,GenericButtonTable3+(2*GenericButtonTableLenghtPerButton)
-	call	.setherowindow
-  ld    de,GenericButtonTable3+(3*GenericButtonTableLenghtPerButton)
-
-  .setherowindow:
-  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-	cp		255
-	ret		z
-  cp    254                             ;in castle
-  jp    nz,.EndCheckInCastle
-  ;if hero is in castle, we stay in the same hero window, but we skip to the next hero
-	ld		bc,lenghtherotable
-	add		ix,bc                           ;next hero
-  jp    .setherowindow
-  .EndCheckInCastle:
-
-  ld    c,(ix+HeroSpecificInfo+0)       ;get hero specific info
-  ld    b,(ix+HeroSpecificInfo+1)
-  push  bc
-  pop   iy
-  ld    l,(iy+HeroButton20x11SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(iy+HeroButton20x11SYSX+1)  
-
-  ld    bc,7
-  ldir
-
-	ld		de,lenghtherotable
-	add		ix,de                           ;next hero
-	ret
-
-ClearHeroButtons:
-  ld    hl,HeroButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(1*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-
-  ld    hl,HeroButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(2*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-
-  ld    hl,HeroButton20x11SYSXEmpty
-  ld    de,GenericButtonTable3+(3*GenericButtonTableLenghtPerButton)
-  ld    bc,7
-  ldir
-  ret
-
-HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + (139*128) + (096/2) - 128 | dw $4000 + (139*128) + (116/2) - 128 | dw $4000 + (139*128) + (136/2) - 128
-
-HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (018*128) + (000/2) - 128 | dw $4000 + (018*128) + (020/2) - 128 | dw $4000 + (018*128) + (040/2) - 128
-HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (018*128) + (060/2) - 128 | dw $4000 + (018*128) + (080/2) - 128 | dw $4000 + (018*128) + (100/2) - 128
-HeroButton20x11SYSXPixy:            db  %1100 0011 | dw $4000 + (018*128) + (120/2) - 128 | dw $4000 + (018*128) + (140/2) - 128 | dw $4000 + (018*128) + (160/2) - 128
-HeroButton20x11SYSXDrasle1:         db  %1100 0011 | dw $4000 + (018*128) + (180/2) - 128 | dw $4000 + (018*128) + (200/2) - 128 | dw $4000 + (018*128) + (220/2) - 128
-
-HeroButton20x11SYSXLatok:           db  %1100 0011 | dw $4000 + (029*128) + (000/2) - 128 | dw $4000 + (029*128) + (020/2) - 128 | dw $4000 + (029*128) + (040/2) - 128
-HeroButton20x11SYSXDrasle2:         db  %1100 0011 | dw $4000 + (029*128) + (060/2) - 128 | dw $4000 + (029*128) + (080/2) - 128 | dw $4000 + (029*128) + (100/2) - 128
-HeroButton20x11SYSXSnake1:          db  %1100 0011 | dw $4000 + (029*128) + (120/2) - 128 | dw $4000 + (029*128) + (140/2) - 128 | dw $4000 + (029*128) + (160/2) - 128
-HeroButton20x11SYSXDrasle3:         db  %1100 0011 | dw $4000 + (029*128) + (180/2) - 128 | dw $4000 + (029*128) + (200/2) - 128 | dw $4000 + (029*128) + (220/2) - 128
-
-HeroButton20x11SYSXSnake2:          db  %1100 0011 | dw $4000 + (040*128) + (000/2) - 128 | dw $4000 + (040*128) + (020/2) - 128 | dw $4000 + (040*128) + (040/2) - 128
-HeroButton20x11SYSXDrasle4:         db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (080/2) - 128 | dw $4000 + (040*128) + (100/2) - 128
-HeroButton20x11SYSXAshguine:        db  %1100 0011 | dw $4000 + (040*128) + (120/2) - 128 | dw $4000 + (040*128) + (140/2) - 128 | dw $4000 + (040*128) + (160/2) - 128
-HeroButton20x11SYSXUndeadline1:     db  %1100 0011 | dw $4000 + (040*128) + (180/2) - 128 | dw $4000 + (040*128) + (200/2) - 128 | dw $4000 + (040*128) + (220/2) - 128
-
-HeroButton20x11SYSXPsychoWorld:     db  %1100 0011 | dw $4000 + (051*128) + (000/2) - 128 | dw $4000 + (051*128) + (020/2) - 128 | dw $4000 + (051*128) + (040/2) - 128
-HeroButton20x11SYSXUndeadline2:     db  %1100 0011 | dw $4000 + (051*128) + (060/2) - 128 | dw $4000 + (051*128) + (080/2) - 128 | dw $4000 + (051*128) + (100/2) - 128
-HeroButton20x11SYSXGoemon2:         db  %1100 0011 | dw $4000 + (051*128) + (120/2) - 128 | dw $4000 + (051*128) + (140/2) - 128 | dw $4000 + (051*128) + (160/2) - 128
-HeroButton20x11SYSXUndeadline3:     db  %1100 0011 | dw $4000 + (051*128) + (180/2) - 128 | dw $4000 + (051*128) + (200/2) - 128 | dw $4000 + (051*128) + (220/2) - 128
-
-HeroButton20x11SYSXFray:            db  %1100 0011 | dw $4000 + (062*128) + (000/2) - 128 | dw $4000 + (062*128) + (020/2) - 128 | dw $4000 + (062*128) + (040/2) - 128
-HeroButton20x11SYSXBlackColor:      db  %1100 0011 | dw $4000 + (062*128) + (060/2) - 128 | dw $4000 + (062*128) + (080/2) - 128 | dw $4000 + (062*128) + (100/2) - 128
-HeroButton20x11SYSXWit:             db  %1100 0011 | dw $4000 + (062*128) + (120/2) - 128 | dw $4000 + (062*128) + (140/2) - 128 | dw $4000 + (062*128) + (160/2) - 128
-HeroButton20x11SYSXMitchell:        db  %1100 0011 | dw $4000 + (062*128) + (180/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | dw $4000 + (062*128) + (220/2) - 128
-
-HeroButton20x11SYSXJanJackGibson:   db  %1100 0011 | dw $4000 + (073*128) + (000/2) - 128 | dw $4000 + (073*128) + (020/2) - 128 | dw $4000 + (073*128) + (040/2) - 128
-HeroButton20x11SYSXGillianSeed:     db  %1100 0011 | dw $4000 + (073*128) + (060/2) - 128 | dw $4000 + (073*128) + (080/2) - 128 | dw $4000 + (073*128) + (100/2) - 128
-HeroButton20x11SYSXSnatcher:        db  %1100 0011 | dw $4000 + (073*128) + (120/2) - 128 | dw $4000 + (073*128) + (140/2) - 128 | dw $4000 + (073*128) + (160/2) - 128
-HeroButton20x11SYSXGolvellius:      db  %1100 0011 | dw $4000 + (073*128) + (180/2) - 128 | dw $4000 + (073*128) + (200/2) - 128 | dw $4000 + (073*128) + (220/2) - 128
-
-HeroButton20x11SYSXBillRizer:       db  %1100 0011 | dw $4000 + (084*128) + (000/2) - 128 | dw $4000 + (084*128) + (020/2) - 128 | dw $4000 + (084*128) + (040/2) - 128
-HeroButton20x11SYSXPochi:           db  %1100 0011 | dw $4000 + (084*128) + (060/2) - 128 | dw $4000 + (084*128) + (080/2) - 128 | dw $4000 + (084*128) + (100/2) - 128
-HeroButton20x11SYSXGreyFox:         db  %1100 0011 | dw $4000 + (084*128) + (120/2) - 128 | dw $4000 + (084*128) + (140/2) - 128 | dw $4000 + (084*128) + (160/2) - 128
-HeroButton20x11SYSXTrevorBelmont:   db  %1100 0011 | dw $4000 + (084*128) + (180/2) - 128 | dw $4000 + (084*128) + (200/2) - 128 | dw $4000 + (084*128) + (220/2) - 128
-
-HeroButton20x11SYSXBigBoss:         db  %1100 0011 | dw $4000 + (095*128) + (000/2) - 128 | dw $4000 + (095*128) + (020/2) - 128 | dw $4000 + (095*128) + (040/2) - 128
-HeroButton20x11SYSXSimonBelmont:    db  %1100 0011 | dw $4000 + (095*128) + (060/2) - 128 | dw $4000 + (095*128) + (080/2) - 128 | dw $4000 + (095*128) + (100/2) - 128
-HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (095*128) + (120/2) - 128 | dw $4000 + (095*128) + (140/2) - 128 | dw $4000 + (095*128) + (160/2) - 128
-HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180/2) - 128 | dw $4000 + (095*128) + (200/2) - 128 | dw $4000 + (095*128) + (220/2) - 128
-
-
-
-
-
-
-DoSetManaandMovementBars:
-  call  SetHero1ForCurrentPlayerInIX
-  call  SetHeroForWindow1DeterminedByHeroWindowPointerInIX
-
-	ld		a,ButtonHeroWindow1SY                  ;hero window 1
-	ld		(MovementAndMana_line+dy),a
-	call	.PutManaAndMovement
-
-	ld		a,ButtonHeroWindow2SY                  ;hero window 2
-	ld		(MovementAndMana_line+dy),a
-	call	.PutManaAndMovement
-
-	ld		a,ButtonHeroWindow3SY                  ;hero window 3
-	ld		(MovementAndMana_line+dy),a
-;	jp    .PutManaAndMovement
-
-  .PutManaAndMovement:
-  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  cp    255                             ;inactive
-  ret   z
-  cp    254                             ;in castle
-  jp    nz,.EndCheckInCastle
-  ;if hero is in castle, we stay in the same hero window, but we skip to the next hero
-	ld		de,lenghtherotable
-	add		ix,de                           ;next hero
-  jp    .PutManaAndMovement
-  .EndCheckInCastle:
-	call	.putmana			                  ;put hero mana
-	call	.putmovement			              ;put hero movement
-	ld		de,lenghtherotable
-	add		ix,de                           ;next hero
-	ret
-
-  .putmana:
-	ld		a,ButtonHeroWindow1SX-3
-	ld		(MovementAndMana_line+dx),a
-	ld		a,colorlightgreen+16*colormidgreen
-	ld		(MovementAndMana_line+clr),a
-
-	ld		a,(ix+HeroMana)
-	cp		11
-	jp		c,.EndCheckOverflowMana
-	ld		a,10
-  .EndCheckOverflowMana:
-	ld		(MovementAndMana_line+ny),a
-	or		a
-
-	ld		hl,MovementAndMana_line
-	jp    nz,docopy				                ;dont put line if life/move = 0
-	ret
-
-  .putmovement:
-	ld		a,ButtonHeroWindow1SX+15
-	ld		(MovementAndMana_line+dx),a
-	ld		a,colorblue+16*colorsnowishwhite
-	ld		(MovementAndMana_line+clr),a
-
-	ld		a,(ix+HeroMove)
-	cp		11
-	jp		c,.EndCheckOverflowMovement
-	ld		a,10
-  .EndCheckOverflowMovement:
-	ld		(MovementAndMana_line+ny),a
-	or		a
-	ld		hl,MovementAndMana_line
-	jp    nz,docopy				                ;dont put line if life/move = 0
-	ret
-
-EraseManaandMovementBars:
-	ld		a,colorlightgrey+16*colordarkgrey
-	ld		(MovementAndMana_line+clr),a
-	ld		a,herowindowny
-	ld		(MovementAndMana_line+ny),a
-
-	ld		a,ButtonHeroWindow1SY
-	ld		(MovementAndMana_line+dy),a
-	call	.putdoubleline
-
-	ld		a,ButtonHeroWindow2SY
-	ld		(MovementAndMana_line+dy),a
-	call	.putdoubleline
-
-	ld		a,ButtonHeroWindow3SY
-	ld		(MovementAndMana_line+dy),a
-;	jp		.putdoubleline
-
-  .putdoubleline:
-	ld		a,ButtonHeroWindow1SX - 4
-	ld		(MovementAndMana_line+dx),a
-	ld		hl,MovementAndMana_line
-	call	docopy
-	ld		a,ButtonHeroWindow1SX +14
-	ld		(MovementAndMana_line+dx),a
-	ld		hl,MovementAndMana_line
-	call	docopy
-	ret
-
-
 
 
 
@@ -4133,7 +3781,7 @@ buildupscreen:
 	ld		(putline+dpage),a
 ;	ld		(eraseherowindow+dpage),a
 ;	ld		(eraseCastlewindow+dpage),a
-	ld		(MovementAndMana_line+dpage),a
+;	ld		(MovementAndMana_line+dpage),a
 	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
 	xor		1                               ;now we switch and set our page
@@ -4444,8 +4092,8 @@ HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",
 pl1hero1y:		db	3
 pl1hero1x:		db	2
 pl1hero1xp: dw 0940
-pl1hero1move:	db	12,20
-pl1hero1mana:	db	10,20
+pl1hero1move:	db	30,30
+pl1hero1mana:	db	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
@@ -4469,7 +4117,7 @@ pl1hero2y:		db	7
 pl1hero2x:		db	1
 pl1hero2life:	db	05,20
 pl1hero2move:	db	10,20
-pl1hero2mana:	db	10,20
+pl1hero2mana:	db	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4492,7 +4140,7 @@ pl1hero3y:		db	03		                ;
 pl1hero3x:		db	02		
 pl1hero3life:	db	03,20
 pl1hero3move:	db	30,20
-pl1hero3mana:	db	10,20
+pl1hero3mana:	db	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3status:	db	254		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4956,11 +4604,7 @@ putstarbehindobject:
 	DB    colorwhite+16*colorwhite,1,$80
 
 colordarkbrown: equ 13
-MovementAndMana_line:
-	DB    0,0,0,0   ;sx,--,sy,spage
-	DB    0,0,0,0   ;dx,--,dy,dpage
-	DB    2,0,1,0   ;nx,--,ny,--
-	DB    0,1,$c0       ;fill
+
 
 ;herowindownx:	equ	14
 ;herowindowny:	equ	29
