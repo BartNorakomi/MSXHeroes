@@ -13,8 +13,8 @@ LevelEngine:
   call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
-  call  putbottomobjects
 
+  call  putbottomobjects
 	call	putbottomcastles
 	call	putbottomheroes	
   call  puttopobjects
@@ -22,11 +22,7 @@ LevelEngine:
 	call	puttopcastles
 	call	putmovementstars
 
-  ;HUD
   call  HandleHud                       ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
-
-
-
 
 ;	call	docomputerplayerturn
 ;	call	textwindow
@@ -356,7 +352,6 @@ SetHeroArmyAndStatusInHud?: db  3
 ;Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
 
 
-
 CheckEnterCastle:
   ld    a,(EnterCastle?)
   or    a
@@ -364,6 +359,7 @@ CheckEnterCastle:
   xor   a
   ld    (EnterCastle?),a
   pop   af                              ;pop the call from the engine to this routine
+  ld    iy,(WhichCastleIsPointerPointingAt?)
   jp    EnterCastle
 
 CheckHeroEntersCastle:
@@ -3549,13 +3545,37 @@ HeroAddressesSimonBelmont:    db "   simon  ",254,"  belmont ",254,"          ",
 HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254," barbarian",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
 HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
 
+EmptyHeroRecruitedAtTavern:
+.heroy:		ds  1
+.herox:		ds  1
+.heroxp: dw 000
+.heromove:	db	20,20
+.heromana:	db	20,20
+.heromanarec:db	5		                ;recover x mana every turn
+.herostatus:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.HeroUnits:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  0,0,0,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0000
+.AirSpells:         db  %0000 0000
+.WaterSpells:       db  %0000 0000
+.AllSchoolsSpells:  db  %0000 0000
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.HeroSpecificInfo: ds 2
+;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
 pl1hero1y:		db	3
-pl1hero1x:		db	2
+pl1hero1x:		db	6
 pl1hero1xp: dw 0940
 pl1hero1move:	db	30,30
 pl1hero1mana:	db	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 2
 Pl1Hero1StatDefense:  db 3
@@ -3692,52 +3712,9 @@ Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
-pl1hero7y:		db	07		                ;
-pl1hero7x:		db	08		
-pl1hero7life:	db	03,20
-pl1hero7move:	db	30,20
-pl1hero7mana:	db	10,20
-pl1hero7manarec:db	5		                ;recover x mana every turn
-pl1hero7status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero7Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesSnake1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+pl1hero7y:		ds  lenghtherotable,255
+pl1hero8y:		ds  lenghtherotable,255
 
-
-pl1hero8y:		db	07		                ;
-pl1hero8x:		db	09		
-pl1hero8life:	db	03,20
-pl1hero8move:	db	30,20
-pl1hero8mana:	db	10,20
-pl1hero8manarec:db	5		                ;recover x mana every turn
-pl1hero8status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero8Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle3
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
 
@@ -4021,10 +3998,10 @@ CastleName:             equ 36
 AmountOfCastles:  equ 4
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days,   castle name
-Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            1,            1,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
-Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
-Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
-Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
+Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            1,            1,        0,            0,          0      | db   19,        20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
+Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   7,         08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
+Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
+Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   9,         12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
 Castle5:  db  000,  000,  255
 
 LenghtCastleTable:  equ Castle2-Castle1

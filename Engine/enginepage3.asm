@@ -28,6 +28,8 @@ StartGame:
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
   call  ClearMapPage0AndMapPage1
 
+  ld    hl,Castle1
+  ld    (WhichCastleIsPointerPointingAt?),hl
   ld    a,1
 ;  ld    (EnterCastle?),a
 

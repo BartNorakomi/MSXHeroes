@@ -234,47 +234,6 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
 
 
-NameCreature000:  db  "Empty:",255
-NameCreature001:  db  "Green Ghoul:",255
-NameCreature002:  db  "Drollie:",255
-NameCreature003:  db  "Wappie:",255
-NameCreature004:  db  "Green Ghoul:",255
-NameCreature005:  db  "Green Ghoul:",255
-NameCreature006:  db  "Green Ghoul:",255
-NameCreature007:  db  "Green Ghoul:",255
-NameCreature008:  db  "Green Ghoul:",255
-NameCreature009:  db  "Green Ghoul:",255
-NameCreature010:  db  "Green Ghoul:",255
-NameCreature011:  db  "Green Ghoul:",255
-NameCreature012:  db  "Green Ghoul:",255
-NameCreature013:  db  "Green Ghoul:",255
-NameCreature014:  db  "Green Ghoul:",255
-NameCreature015:  db  "Green Ghoul:",255
-NameCreature016:  db  "Green Ghoul:",255
-NameCreature017:  db  "Green Ghoul:",255
-NameCreature018:  db  "Green Ghoul:",255
-
-CostCreatureTable:  
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
-
-GemsCostCreatureTable:  
-  dw  0000,0000,0000,0000,0002,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
-
-RubiesCostCreatureTable:  
-  dw  0000,0001,0007,0000,0000,0000,0000,0007,0008,0009,0010,0011,0012,0013,0014,0015,0016,0017
-
-SpeedCreatureTable:  
-  db  000,012,002,003,009,005,006,007,008,009,010,011,012,013,014,015,016,017
-
-DefenseCreatureTable:  
-  db  000,001,002,003,006,005,006,007,008,009,010,011,012,013,014,015,016,017
-
-AttackCreatureTable:  
-  db  000,001,002,003,055,005,006,007,008,009,010,011,012,013,014,015,016,017
-
-CreatureNameTable:  
-  dw NameCreature000,NameCreature001,NameCreature002,NameCreature003,NameCreature004,NameCreature005,NameCreature006,NameCreature007,NameCreature008,NameCreature009,NameCreature010,NameCreature011,NameCreature012,NameCreature013,NameCreature014,NameCreature015,NameCreature016,NameCreature017
-
 
 
 
@@ -4240,8 +4199,6 @@ CastleOverviewTavernCode:
   ld    ix,GenericButtonTable
   ld    (PreviousButtonClickedIX),ix
 
-  ld    iy,Castle1
-
   call  SetTavernButtons
   call  SetDefendingAndVisitingHeroButtons
 
@@ -5587,7 +5544,15 @@ CastleOverviewTavernCode:
   .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
   push  af                              ;a,(iy+TavernHeroxDayRemain)
   call  SetEmptyHeroSlotForCurrentPlayerInIX
-  ld    (ix+HeroStatus),002             ;set newly recruited hero as the new visiting hero of this castle
+
+  ;set empty hero
+  ld    hl,EmptyHeroRecruitedAtTavern
+  push  ix
+  pop   de
+  ld    bc,lenghtherotable-2            ;don't copy .HeroDYDX:  dw $ffff 
+  ldir
+
+  ;set y,x
   ld    a,(iy+CastleY)                  ;castle y
   dec   a
   ld    (ix+HeroY),a                    ;set hero y  
@@ -5596,17 +5561,27 @@ CastleOverviewTavernCode:
   ld    (ix+HeroX),a                    ;set hero x
   pop   af                              ;a,(iy+TavernHeroxDayRemain)
 
-  ld    b,a
+  ;set hero specific info
+  ld    b,a                             ;hero number
   ld    hl,HeroAddressesAdol-heroAddressesLenght
-  ld    de,heroAddressesLenght
+  ld    de,heroAddressesLenght          ;search hero specific info address
   .loop2:
   add   hl,de
   djnz  .loop2
-
   ld    (ix+HeroSpecificInfo+0),l
   ld    (ix+HeroSpecificInfo+1),h
   
-  call  SetResourcesCurrentPlayerinIX
+  ;set hero skill
+  ld    de,HeroInfoSkill
+  add   hl,de
+  ld    a,(hl)
+  ld    (ix+HeroSkills),a
+  
+  ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
+  ld    a,(iy+CastleLevel1Units)        ;castle x  
+  ld    (ix+HeroUnits),a
+  
+  call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
   ;gold
   ld    l,(ix+0)
   ld    h,(ix+1)                        ;gold
@@ -5802,7 +5777,6 @@ DYDX16x30HeroIconTavernWindow3: equ $0000 + (047*128) + (180/2) - 128
 
 
 SetVisitingAndDefendingHeroesAndArmy:
-;  ld    iy,Castle1
   call  SetVisitingHero
   call  SetDefendingHero
   call  SetVisitingHeroArmyAndAmount
@@ -6330,7 +6304,6 @@ TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (
 CastleOverviewMarketPlaceCode:
   call  SetScreenOff
 
-  ld    iy,Castle1
 
   call  SetMarketPlaceButtons
 
@@ -7024,7 +6997,6 @@ MarketPlaceButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), 
 CastleOverviewMagicGuildCode:
   call  SetScreenOff
 
-  ld    iy,Castle1
 
   call  SetMagicGuildButtons
 
@@ -7622,7 +7594,6 @@ CastleOverviewRecruitCode:
   ld    a,2
   ld    (AreWeInTavern1OrRecruit2?),a
 
-  ld    iy,Castle1
 
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
@@ -8879,7 +8850,6 @@ CastleOverviewBuildCode:                ;in: iy-castle
 
   call  SetScreenOff
 
-  ld    iy,Castle1
 
 
 
@@ -10678,8 +10648,6 @@ SetNameCastleAndDailyIncome:
 
 
 CastleOverviewCode:                     ;in: iy-castle
-  ld    iy,Castle1
-
   ld    a,3
 	ld		(SetResources?),a
 
@@ -11352,6 +11320,113 @@ SetResourcesPlayer:
 
 
 
+NameCreature000:  db  "Empty:",255
+NameCreature001:  db  "Green Ghoul:",255
+NameCreature002:  db  "Drollie:",255
+NameCreature003:  db  "Wappie:",255
+NameCreature004:  db  "Green Ghoul:",255
+NameCreature005:  db  "Green Ghoul:",255
+NameCreature006:  db  "Green Ghoul:",255
+NameCreature007:  db  "Green Ghoul:",255
+NameCreature008:  db  "Green Ghoul:",255
+NameCreature009:  db  "Green Ghoul:",255
+NameCreature010:  db  "Green Ghoul:",255
+NameCreature011:  db  "Green Ghoul:",255
+NameCreature012:  db  "Green Ghoul:",255
+NameCreature013:  db  "Green Ghoul:",255
+NameCreature014:  db  "Green Ghoul:",255
+NameCreature015:  db  "Green Ghoul:",255
+NameCreature016:  db  "Green Ghoul:",255
+NameCreature017:  db  "Green Ghoul:",255
+NameCreature018:  db  "Green Ghoul:",255
+NameCreature019:  db  "Green Ghoul:",255
+NameCreature020:  db  "Green Ghoul:",255
+NameCreature021:  db  "Green Ghoul:",255
+NameCreature022:  db  "Green Ghoul:",255
+NameCreature023:  db  "Green Ghoul:",255
+NameCreature024:  db  "Green Ghoul:",255
+NameCreature025:  db  "Green Ghoul:",255
+NameCreature026:  db  "Green Ghoul:",255
+NameCreature027:  db  "Green Ghoul:",255
+NameCreature028:  db  "Green Ghoul:",255
+NameCreature029:  db  "Green Ghoul:",255
+NameCreature030:  db  "Green Ghoul:",255
+NameCreature031:  db  "Green Ghoul:",255
+NameCreature032:  db  "Green Ghoul:",255
+NameCreature033:  db  "Green Ghoul:",255
+NameCreature034:  db  "Green Ghoul:",255
+NameCreature035:  db  "Green Ghoul:",255
+NameCreature036:  db  "Green Ghoul:",255
+NameCreature037:  db  "Green Ghoul:",255
+NameCreature038:  db  "Green Ghoul:",255
+NameCreature039:  db  "Green Ghoul:",255
+NameCreature040:  db  "Green Ghoul:",255
+NameCreature041:  db  "Green Ghoul:",255
+NameCreature042:  db  "Green Ghoul:",255
+NameCreature043:  db  "Green Ghoul:",255
+NameCreature044:  db  "Green Ghoul:",255
+NameCreature045:  db  "Green Ghoul:",255
+NameCreature046:  db  "Green Ghoul:",255
+NameCreature047:  db  "Green Ghoul:",255
+NameCreature048:  db  "Green Ghoul:",255
+NameCreature049:  db  "Green Ghoul:",255
+NameCreature050:  db  "Green Ghoul:",255
+NameCreature051:  db  "Green Ghoul:",255
+NameCreature052:  db  "Green Ghoul:",255
+NameCreature053:  db  "Green Ghoul:",255
+NameCreature054:  db  "Green Ghoul:",255
+NameCreature055:  db  "Green Ghoul:",255
+NameCreature056:  db  "Green Ghoul:",255
+NameCreature057:  db  "Green Ghoul:",255
+NameCreature058:  db  "Green Ghoul:",255
+NameCreature059:  db  "Green Ghoul:",255
+NameCreature060:  db  "Green Ghoul:",255
+NameCreature061:  db  "Green Ghoul:",255
+NameCreature062:  db  "Green Ghoul:",255
+NameCreature063:  db  "Green Ghoul:",255
+
+
+CostCreatureTable:  
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+GemsCostCreatureTable:  
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+RubiesCostCreatureTable:  
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+SpeedCreatureTable:  
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+DefenseCreatureTable:  
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+AttackCreatureTable:  
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
+
+CreatureNameTable:  
+  dw NameCreature000,NameCreature001,NameCreature002,NameCreature003,NameCreature004,NameCreature005,NameCreature006,NameCreature007,NameCreature008,NameCreature009,NameCreature010,NameCreature011,NameCreature012,NameCreature013,NameCreature014,NameCreature015
+  dw NameCreature016,NameCreature017,NameCreature018,NameCreature019,NameCreature020,NameCreature021,NameCreature022,NameCreature023,NameCreature024,NameCreature025,NameCreature026,NameCreature027,NameCreature028,NameCreature029,NameCreature030,NameCreature031
+  dw NameCreature032,NameCreature033,NameCreature034,NameCreature035,NameCreature036,NameCreature037,NameCreature038,NameCreature039,NameCreature040,NameCreature041,NameCreature042,NameCreature043,NameCreature044,NameCreature045,NameCreature046,NameCreature047
+  dw NameCreature048,NameCreature049,NameCreature050,NameCreature051,NameCreature052,NameCreature053,NameCreature054,NameCreature055,NameCreature056,NameCreature057,NameCreature058,NameCreature059,NameCreature060,NameCreature061,NameCreature062,NameCreature063
 
 
 
