@@ -35,55 +35,45 @@ StartGame:
   jp    LevelEngine
 
 
+CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    (AddressToWriteFrom),bc
+  ld    (NXAndNY),de
 
+	ld		a,(activepage)                  ;alternate between page 0 and 1
+  or    a
+  jp    nz,CopyRamToVramCorrectedCastleOverview.SetAddress2
+  ld    de,$8000
+  add   hl,de                           ;page 1
+  jp    CopyRamToVramCorrectedCastleOverview.SetAddress2
 
 CopyRamToVramCorrectedWithoutActivePageSetting:
+  ex    af,af'                          ;store rom block
+
+  in    a,($a8)                         ;store current rom/ram settings of page 1+2
+  push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1+2
+  out   ($a8),a      
+
   ex    af,af'
-
-	ld		a,(memblocks.1)
-	push  af
-
-  ex    af,af'
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  call  .go                             ;go copy
-
-;now set engine back in page 1
-;  ld    a,HeroOverviewCodeBlock         ;Map block
-  pop   af
-  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-.go:
-  ld    (AddressToWriteFrom),hl
-  ld    (NXAndNY),bc
-  ld    (AddressToWriteTo),de
-  jr    CopyRamToVramCorrected.AddressesSet
-
-
-
-
-
-
-
-CopyRamToVramCorrectedCastleOverviewOnlyCopyToPage1:
   di
 	ld		($6000),a
 	inc   a
 	ld		($7000),a
 	ei
 
-  ;for copies to go to page 1, by setting the current active page to 0 (at the end restore the current active page)
-	ld		a,(activepage)                  ;alternate between page 0 and 1
-  push  af  
-  xor   a
-	ld		(activepage),a                  ;alternate between page 0 and 1
-  call  CopyRamToVramCorrected.go                             ;go copy
-  pop   af
-	ld		(activepage),a                  ;alternate between page 0 and 1
+  ld    (AddressToWriteFrom),hl
+  ld    (NXAndNY),bc
+  ld    (AddressToWriteTo),de
+  call  CopyRamToVramCorrectedCastleOverview.AddressesSet
 
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
-  jp    block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+  ret
 
 CopyRamToVramCorrectedCastleOverview:
   ex    af,af'                          ;store rom block
@@ -101,7 +91,7 @@ CopyRamToVramCorrectedCastleOverview:
 	ld		($7000),a
 	ei
 
-  call  CopyRamToVramCorrected.go                             ;go copy
+  call  .go                             ;go copy
 
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
@@ -110,16 +100,6 @@ CopyRamToVramCorrectedCastleOverview:
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
   ret
-
-CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-;we set 32kb HeroOverviewGraphics in page 1 and 2
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  call  .go                             ;go copy
-
-;now set engine back in page 1
-  ld    a,HeroOverviewCodeBlock         ;Map block
-  jp    block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
 .go:
   ld    (AddressToWriteFrom),hl
@@ -132,6 +112,7 @@ CopyRamToVramCorrected:                 ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$8000
   .SetAddress:
   add   hl,de
+  .SetAddress2:
   ld    (AddressToWriteTo),hl
   .AddressesSet:
   ld    c,$98                           ;out port
@@ -1598,12 +1579,6 @@ EnterTradeMenuBetween2FriendlyHeroes:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-;  call  CastleOverviewCode
-;  call  CastleOverviewBuildCode
-;  call  CastleOverviewRecruitCode
-;  call  CastleOverviewMagicGuildCode
-;  call  CastleOverviewMarketPlaceCode
-;  call  CastleOverviewTavernCode
   call  TradeMenuCode
 
   pop   af
@@ -1621,21 +1596,11 @@ EnterTradeMenuBetween2FriendlyHeroes:
 	ld		(movehero?),a	
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
-;
-; bit	7	  6	  5		    4		    3		    2		  1		  0
-;		  0	  0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  F5	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;	
-  ;before we jumped to Hero Overview, trig A was pressed on the interrupt, end the same way, otherwise trig A gets triggered again when going back to the game
-;  ld    a,%0001 0000
-;	ld		(ControlsOnInterrupt),a
-
-;  call  SetTempisr                      ;end the current interrupt handler used in the engine
+  ld    hl,CursorBoots
+  ld    (CurrentCursorSpriteCharacter),hl
   ret
 
-
-
-SetHeroOverviewMenuInPage1ROM:
+EnterHeroOverviewMenu:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
@@ -1739,11 +1704,19 @@ SwapAndSetPage:
 	ld		(activepage),a			
 	jp    SetPageSpecial					        ;set page
 
+SwapButDontSetPage:
+	ld		a,(activepage)                  ;
+	xor		1                               ;
+	ld		(activepage),a			
+  ret
+
 EnterCombat:
   call  SetTempisr                      ;end the current interrupt handler used in the engine
 
   ld    a,3
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,3
+	ld		(SetResources?),a               ;this piece can be moved to the combat code
 
 	ld		a,(activepage)
   or    a

@@ -1495,64 +1495,64 @@ SetInventoryIcons:
 
   call  .SetIconHLBCandA
   ld    de,$0000 + (InventoryItem01DY*128) + (InventoryItem01DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem02DY*128) + (InventoryItem02DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem03DY*128) + (InventoryItem03DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem04DY*128) + (InventoryItem04DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem05DY*128) + (InventoryItem05DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem06DY*128) + (InventoryItem06DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem07DY*128) + (InventoryItem07DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem08DY*128) + (InventoryItem08DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem09DY*128) + (InventoryItem09DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;6 open slots
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem10DY*128) + (InventoryItem10DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem11DY*128) + (InventoryItem11DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem12DY*128) + (InventoryItem12DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem13DY*128) + (InventoryItem13DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem14DY*128) + (InventoryItem14DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  .SetIconHLBCandA  
   ld    de,$0000 + (InventoryItem15DY*128) + (InventoryItem15DX/2)
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
   .SetIconHLBCandA:
@@ -1586,12 +1586,12 @@ PlaceWaterSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
   ld    hl,$4000 + (Spell13IconSY*128) + (Spell13IconSX/2) -128
   ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell1:
 
   ld    a,%0000 0000
@@ -1605,12 +1605,12 @@ PlaceWaterSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell14IconSY*128) + (Spell14IconSX/2) -128
   ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell2:
 
   ld    a,%0000 0000
@@ -1624,12 +1624,12 @@ PlaceWaterSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell15IconSY*128) + (Spell15IconSX/2) -128
   ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell3:
 
   ld    a,%0000 0000
@@ -1644,12 +1644,12 @@ PlaceWaterSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell16IconSY*128) + (Spell16IconSX/2) -128
   ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell4:
   jp    PlaceAllSpellSchoolSpellsInSpellBook
 
@@ -1668,12 +1668,12 @@ PlaceAirSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
   ld    hl,$4000 + (Spell09IconSY*128) + (Spell09IconSX/2) -128
   ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell1:
 
   ld    a,%0000 0000
@@ -1687,12 +1687,12 @@ PlaceAirSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell10IconSY*128) + (Spell10IconSX/2) -128
   ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell2:
 
   ld    a,%0000 0000
@@ -1706,12 +1706,12 @@ PlaceAirSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell11IconSY*128) + (Spell11IconSX/2) -128
   ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell3:
 
   ld    a,%0000 0000
@@ -1725,12 +1725,12 @@ PlaceAirSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell12IconSY*128) + (Spell12IconSX/2) -128
   ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell4:
   jp    PlaceAllSpellSchoolSpellsInSpellBook
   
@@ -1749,12 +1749,12 @@ PlaceFireSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
   ld    hl,$4000 + (Spell05IconSY*128) + (Spell05IconSX/2) -128
   ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell1:
 
   ld    a,%0000 0000
@@ -1768,12 +1768,12 @@ PlaceFireSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell06IconSY*128) + (Spell06IconSX/2) -128
   ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell2:
 
   ld    a,%0000 0000
@@ -1787,12 +1787,12 @@ PlaceFireSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell07IconSY*128) + (Spell07IconSX/2) -128
   ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell3:
 
   ld    a,%0000 0000
@@ -1806,12 +1806,12 @@ PlaceFireSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell08IconSY*128) + (Spell08IconSX/2) -128
   ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell4:
   jp    PlaceAllSpellSchoolSpellsInSpellBook
 
@@ -1830,12 +1830,12 @@ PlaceEarthSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell1backdropDY*128) + (HeroOverViewSpell1backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
   ld    hl,$4000 + (Spell01IconSY*128) + (Spell01IconSX/2) -128
   ld    de,$0000 + (Spell1DY*128) + (Spell1DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell1:
 
   ld    a,%0000 0000
@@ -1848,12 +1848,12 @@ PlaceEarthSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell2backdropDY*128) + (HeroOverViewSpell2backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell02IconSY*128) + (Spell02IconSX/2) -128
   ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell2:
 
   ld    a,%0000 0000
@@ -1866,12 +1866,12 @@ PlaceEarthSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell3backdropDY*128) + (HeroOverViewSpell3backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell03IconSY*128) + (Spell03IconSX/2) -128
   ld    de,$0000 + (Spell3DY*128) + (Spell3DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell3:
 
   ld    a,%0000 0000
@@ -1884,12 +1884,12 @@ PlaceEarthSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell4backdropDY*128) + (HeroOverViewSpell4backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell04IconSY*128) + (Spell04IconSX/2) -128
   ld    de,$0000 + (Spell4DY*128) + (Spell4DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell4:
   jp    PlaceAllSpellSchoolSpellsInSpellBook
 
@@ -1914,12 +1914,12 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell5backdropDY*128) + (HeroOverViewSpell5backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
   ld    de,$0000 + (Spell5DY*128) + (Spell5DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell1:
 
   ld    a,%0000 0000
@@ -1939,12 +1939,12 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell6backdropDY*128) + (HeroOverViewSpell6backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
   ld    de,$0000 + (Spell6DY*128) + (Spell6DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell2:
 
   ld    a,%0000 0000
@@ -1964,12 +1964,12 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell7backdropDY*128) + (HeroOverViewSpell7backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
   ld    de,$0000 + (Spell7DY*128) + (Spell7DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell3:
 
   ld    a,%0000 0000
@@ -1989,12 +1989,12 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    de,$0000 + (HeroOverViewSpell8backdropDY*128) + (HeroOverViewSpell8backdropDX/2)
   ld    bc,$0000 + (HeroOverViewSpellbackdropNY*256) + (HeroOverViewSpellbackdropNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
   ld    de,$0000 + (Spell8DY*128) + (Spell8DX/2)
   ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell4:
   ret
 
@@ -2388,14 +2388,14 @@ ClearWhiteWindow:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY+159)*128) + ((HeroOverViewSpellBookWindowDX+008)/2)
   ld    bc,$0000 + (18*256) + (20/2)
   ld    a,SpellBookGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
 
 SetWhiteWindow:
   ld    hl,$4000 + ((HeroOverViewSpellBookWindowSY+159)*128) + ((HeroOverViewSpellBookWindowSX+008)/2) -128
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY+159)*128) + ((HeroOverViewSpellBookWindowDX+008)/2)
   ld    bc,$0000 + (18*256) + (20/2)
   ld    a,SpellBookGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
 
 SpellDescriptions:
 .DescriptionEarth1:        db  "earth meteor",254
@@ -2579,7 +2579,7 @@ SetSpellExplanation_Water:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 
@@ -2748,7 +2748,7 @@ SetSpellExplanation_Air:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 
@@ -2932,7 +2932,7 @@ SetSpellExplanation_Fire:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 
@@ -3114,7 +3114,7 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 
@@ -3226,7 +3226,7 @@ SetElementalButton:
   ld    b,(ix+Buttonnynx+1)
 
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 
@@ -3297,7 +3297,7 @@ SetTextNameHeroAndLevel:
   ld    (PutLetter+dy),a                ;set dy of text
 
   ld    ix,(plxcurrentheroAddress)
-  ld    l,(ix+HeroSpecificInfo+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+  ld    l,(ix+HeroSpecificInfo+0)       ;hero name
   ld    h,(ix+HeroSpecificInfo+1)
 
   ld    (TextAddresspointer),hl  
@@ -3987,7 +3987,7 @@ SetButtonStatusAndText4:
   ld    b,(ix+Buttonnynx+1)
 
   ld    a,ArmyGraphicsBlock             ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText3:
@@ -4047,7 +4047,7 @@ SetButtonStatusAndText3:
   ld    b,(ix+Buttonnynx+1)
 
   ld    a,InventoryGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText2:                       ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
@@ -4107,7 +4107,7 @@ SetButtonStatusAndText2:                       ;copies button state from rom -> 
   ld    b,(ix+Buttonnynx+1)
 
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
 SetButtonStatusAndText:                        ;copies button state from rom -> vram. in IX->ix,HeroOverview*****ButtonTable, bc->$0000 + (HeroOverViewFirstWindowButtonNY*256) + (HeroOverViewFirstWindowButtonNX/2)
@@ -4161,7 +4161,7 @@ SetButtonStatusAndText:                        ;copies button state from rom -> 
   ld    bc,(BCStored)
 
   ld    a,HeroOverviewGraphicsBlock     ;Map block
-  call  CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
 ;  jp    SetTextInButton
  
@@ -4513,39 +4513,39 @@ SetHeroOverViewFirstWindow:
   ld    de,$0000 + (HeroOverViewFirstWindowchoicesDY*128) + (HeroOverViewFirstWindowchoicesDX/2)
   ld    bc,$0000 + (HeroOverViewFirstWindowchoicesNY*256) + (HeroOverViewFirstWindowchoicesNX/2)
   ld    a,HeroOverviewGraphicsBlock     ;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroOverViewSkillsWindow:
   ld    hl,$4000 + (HeroOverViewSkillsWindowSY*128) + (HeroOverViewSkillsWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewSkillsWindowDY*128) + (HeroOverViewSkillsWindowDX/2)
   ld    bc,$0000 + (HeroOverViewSkillsWindowNY*256) + (HeroOverViewSkillsWindowNX/2)
   ld    a,HeroOverviewGraphicsBlock     ;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroOverViewStatusWindow:
   ld    hl,$4000 + (HeroOverViewStatusWindowSY*128) + (HeroOverViewStatusWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewStatusWindowDY*128) + (HeroOverViewStatusWindowDX/2)
   ld    bc,$0000 + (HeroOverViewStatusWindowNY*256) + (HeroOverViewStatusWindowNX/2)
   ld    a,HeroOverviewStatusGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroOverViewSpellBookWindow:
   ld    hl,$4000 + (HeroOverViewSpellBookWindowSY*128) + (HeroOverViewSpellBookWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewSpellBookWindowDY*128) + (HeroOverViewSpellBookWindowDX/2)
   ld    bc,$0000 + (HeroOverViewSpellBookWindowNY*256) + (HeroOverViewSpellBookWindowNX/2)
   ld    a,SpellBookGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroOverViewInventoryWindow:
   ld    hl,$4000 + (HeroOverViewInventoryWindowSY*128) + (HeroOverViewInventoryWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewInventoryWindowDY*128) + (HeroOverViewInventoryWindowDX/2)
   ld    bc,$0000 + (HeroOverViewInventoryWindowNY*256) + (HeroOverViewInventoryWindowNX/2)
   ld    a,InventoryGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroOverViewArmyWindow:
   ld    hl,$4000 + (HeroOverViewArmyWindowSY*128) + (HeroOverViewArmyWindowSX/2) -128
   ld    de,$0000 + (HeroOverViewArmyWindowDY*128) + (HeroOverViewArmyWindowDX/2)
   ld    bc,$0000 + (HeroOverViewArmyWindowNY*256) + (HeroOverViewArmyWindowNX/2)
   ld    a,ArmyGraphicsBlock;Map block
-  jp    CopyRamToVramCorrected          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

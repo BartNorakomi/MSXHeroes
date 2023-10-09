@@ -10,22 +10,20 @@ LevelEngine:
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
-;  call  CheckHeroEntersCastle           ;check if a hero walked into a castle
   call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
   call  putbottomobjects
+
 	call	putbottomcastles
 	call	putbottomheroes	
   call  puttopobjects
-	call	puttopcastles
 	call	puttopheroes	
+	call	puttopcastles
 	call	putmovementstars
 
   ;HUD
-  call  SetResources
   call  HandleHud                       ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
-  call  SetHeroArmyAndStatusInHud
 
 
 
@@ -325,398 +323,8 @@ DYDXUnit5WindowInHud:               equ 176*128 + (220/2) - 128      ;(dy*128 + 
 DYDXUnit6WindowInHud:               equ 176*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
 
-                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
-UnitSYSXTable:  dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
-                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
-                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
-                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
-                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
-                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
-                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
-;                dw $4000+(98*128)+(00/2)-128, $4000+(98*128)+(14/2)-128, $4000+(98*128)+(28/2)-128, $4000+(98*128)+(42/2)-128, $4000+(98*128)+(56/2)-128, $4000+(98*128)+(70/2)-128, $4000+(98*128)+(84/2)-128, $4000+(98*128)+(98/2)-128, $4000+(98*128)+(112/2)-128, $4000+(98*128)+(126/2)-128, $4000+(98*128)+(140/2)-128, $4000+(98*128)+(154/2)-128, $4000+(98*128)+(168/2)-128, $4000+(98*128)+(182/2)-128, $4000+(98*128)+(196/2)-128, $4000+(98*128)+(210/2)-128, $4000+(98*128)+(224/2)-128, $4000+(98*128)+(238/2)-128
-;                dw $4000+(112*128)+(00/2)-128, $4000+(112*128)+(14/2)-128, $4000+(112*128)+(28/2)-128, $4000+(112*128)+(42/2)-128, $4000+(112*128)+(56/2)-128, $4000+(112*128)+(70/2)-128, $4000+(112*128)+(84/2)-128, $4000+(112*128)+(98/2)-128, $4000+(112*128)+(112/2)-128, $4000+(112*128)+(126/2)-128, $4000+(112*128)+(140/2)-128, $4000+(112*128)+(154/2)-128, $4000+(112*128)+(168/2)-128, $4000+(112*128)+(182/2)-128, $4000+(112*128)+(196/2)-128, $4000+(112*128)+(210/2)-128, $4000+(112*128)+(224/2)-128, $4000+(112*128)+(238/2)-128
-;                dw $4000+(126*128)+(00/2)-128, $4000+(126*128)+(14/2)-128, $4000+(126*128)+(28/2)-128, $4000+(126*128)+(42/2)-128, $4000+(126*128)+(56/2)-128, $4000+(126*128)+(70/2)-128, $4000+(126*128)+(84/2)-128, $4000+(126*128)+(98/2)-128, $4000+(126*128)+(112/2)-128, $4000+(126*128)+(126/2)-128, $4000+(126*128)+(140/2)-128, $4000+(126*128)+(154/2)-128, $4000+(126*128)+(168/2)-128, $4000+(126*128)+(182/2)-128, $4000+(126*128)+(196/2)-128, $4000+(126*128)+(210/2)-128, $4000+(126*128)+(224/2)-128, $4000+(126*128)+(238/2)-128
-;                dw $4000+(140*128)+(00/2)-128, $4000+(140*128)+(14/2)-128, $4000+(140*128)+(28/2)-128, $4000+(140*128)+(42/2)-128, $4000+(140*128)+(56/2)-128, $4000+(140*128)+(70/2)-128, $4000+(140*128)+(84/2)-128, $4000+(140*128)+(98/2)-128, $4000+(140*128)+(112/2)-128, $4000+(140*128)+(126/2)-128, $4000+(140*128)+(140/2)-128, $4000+(140*128)+(154/2)-128, $4000+(140*128)+(168/2)-128, $4000+(140*128)+(182/2)-128, $4000+(140*128)+(196/2)-128, $4000+(140*128)+(210/2)-128, $4000+(140*128)+(224/2)-128, $4000+(140*128)+(238/2)-128
-;                dw $4000+(154*128)+(00/2)-128, $4000+(154*128)+(14/2)-128, $4000+(154*128)+(28/2)-128, $4000+(154*128)+(42/2)-128, $4000+(154*128)+(56/2)-128, $4000+(154*128)+(70/2)-128, $4000+(154*128)+(84/2)-128, $4000+(154*128)+(98/2)-128, $4000+(154*128)+(112/2)-128, $4000+(154*128)+(126/2)-128, $4000+(154*128)+(140/2)-128, $4000+(154*128)+(154/2)-128, $4000+(154*128)+(168/2)-128, $4000+(154*128)+(182/2)-128, $4000+(154*128)+(196/2)-128, $4000+(154*128)+(210/2)-128, $4000+(154*128)+(224/2)-128, $4000+(154*128)+(238/2)-128
-;                dw $4000+(168*128)+(00/2)-128, $4000+(168*128)+(14/2)-128, $4000+(168*128)+(28/2)-128, $4000+(168*128)+(42/2)-128, $4000+(168*128)+(56/2)-128, $4000+(168*128)+(70/2)-128, $4000+(168*128)+(84/2)-128, $4000+(168*128)+(98/2)-128, $4000+(168*128)+(112/2)-128, $4000+(168*128)+(126/2)-128, $4000+(168*128)+(140/2)-128, $4000+(168*128)+(154/2)-128, $4000+(168*128)+(168/2)-128, $4000+(168*128)+(182/2)-128, $4000+(168*128)+(196/2)-128, $4000+(168*128)+(210/2)-128, $4000+(168*128)+(224/2)-128, $4000+(168*128)+(238/2)-128
-;                dw $4000+(182*128)+(00/2)-128, $4000+(182*128)+(14/2)-128, $4000+(182*128)+(28/2)-128, $4000+(182*128)+(42/2)-128, $4000+(182*128)+(56/2)-128, $4000+(182*128)+(70/2)-128, $4000+(182*128)+(84/2)-128, $4000+(182*128)+(98/2)-128, $4000+(182*128)+(112/2)-128, $4000+(182*128)+(126/2)-128, $4000+(182*128)+(140/2)-128, $4000+(182*128)+(154/2)-128, $4000+(182*128)+(168/2)-128, $4000+(182*128)+(182/2)-128, $4000+(182*128)+(196/2)-128, $4000+(182*128)+(210/2)-128, $4000+(182*128)+(224/2)-128, $4000+(182*128)+(238/2)-128
 
 SetResources?:  db  3
-SetResources:
-	ld		a,(SetResources?)
-	dec		a
-	ret		z
-	ld		(SetResources?),a
-
-  call  .SetCastleOverViewFontPage0Y212  ;set font at (0,212) page 0
-  ;clear resources
-  ld    hl,$4000 + (204*128) + (032/2) - 128
-  ld    de,$0000 + (204*128) + (032/2) - 128
-  ld    bc,$0000 + (005*256) + (224/2)
-  ld    a,HudNewBlock                   ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  call  .SetResourcesCurrentPlayerinIX
-
-  ;gold
-  ld    b,229                           ;dx
-  ld    c,204                           ;dy
-  ld    l,(ix+0)
-  ld    h,(ix+1)
-  call  .SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
-  ;wood
-  ld    b,032+004                       ;dx
-  ld    c,204                           ;dy
-  ld    l,(ix+2)
-  ld    h,(ix+3)
-  call  .SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
-  ;ore
-  ld    b,078+004                       ;dx
-  ld    c,204                           ;dy
-  ld    l,(ix+4)
-  ld    h,(ix+5)
-  call  .SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
-  ;gems
-  ld    b,124+004                       ;dx
-  ld    c,204                           ;dy
-  ld    l,(ix+6)
-  ld    h,(ix+7)
-  call  .SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
-  ;rubies
-  ld    b,169+004                       ;dx
-  ld    c,204                           ;dy
-  ld    l,(ix+8)
-  ld    h,(ix+9)
-  call  .SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
-  ret
-
-.SetCastleOverViewFontPage0Y212:           ;set font at (0,212) page 0
-  ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
-;  ld    de,$0000 + (000*128) + (000/2) - 128
-  ld    bc,$0000 + (006*256) + (256/2)
-  ld    a,CastleOverviewFontBlock         ;font graphics block
-  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  
-
-.SetResourcesCurrentPlayerinIX:
-	ld		a,(whichplayernowplaying?)
-  ld    ix,ResourcesPlayer1
-  cp    1
-  ret   z
-  ld    ix,ResourcesPlayer2
-  cp    2
-  ret   z
-  ld    ix,ResourcesPlayer3
-  cp    3
-  ret   z
-  ld    ix,ResourcesPlayer4
-  cp    4
-  ret   z
-  ret
-
-
-
-.SetNumber16BitCastle:                   ;in hl=number (16bit)
-;  ld    a,"0"                           ;we can set number to 0, then do a zero check and jr z,.zero to put the number 0 at the furthest left side if needed
-;  ld    (TextNumber),a
-;  ld    a,255
-;  ld    (TextNumber+1),a
-
-  ld    a,b                             ;dx
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c                             ;dy
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    a,h
-;  cp    l
-;  ret   z
-;  jr    z,.Zero
-
-  push  iy
-  call  .ConvertToDecimal16bit
-  pop   iy
-
-;  .Zero:
-  ld    hl,TextNumber
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
-  call  .SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
-  ret
-
-
-
-  .ConvertToDecimal16bit:
-  ld    iy,TextNumber
-  ld    e,0                             ;e=has an xfold already been set prior ?
-
-  .Check10000Folds:
-  ld    d,$30                           ;10000folds in d ($30 = 0)
-
-  .Loop10000Fold:
-  or    a
-  ld    bc,10000
-  sbc   hl,bc                           ;check for 10000 folds
-  jr    c,.Set10000Fold
-  inc   d
-  jr  .Loop10000Fold
-
-  .Set10000Fold:
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet10000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 1000fold
-  inc   iy
-  .EndSet10000Fold:
-
-  add   hl,bc
-
-  .Check1000Folds:
-  ld    d,$30                           ;1000folds in d ($30 = 0)
-
-  .Loop1000Fold:
-  or    a
-  ld    bc,1000
-  sbc   hl,bc                           ;check for 1000 folds
-  jr    c,.Set1000Fold
-  inc   d
-  jr  .Loop1000Fold
-
-  .Set1000Fold:
-  bit   0,e
-  jr    nz,.DoSet1000Fold    
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet1000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  .DoSet1000Fold:
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet1000Fold:
-
-  add   hl,bc
-
-  .Check100Folds:
-  ld    d,$30                           ;100folds in d ($30 = 0)
-
-  .Loop100Fold:
-  or    a
-  ld    bc,100
-  sbc   hl,bc                           ;check for 100 folds
-  jr    c,.Set100Fold
-  inc   d
-  jr  .Loop100Fold
-
-  .Set100Fold:
-  bit   0,e
-  jr    nz,.DoSet100Fold  
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet100Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,4
-  ld    (PutLetter+dx),a                ;set dx of text
-
-
-  jr    .EndSet100Fold  
-
-  .DoSet100Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet100Fold:
-
-  add   hl,bc
-
-  .Check10Folds:
-  ld    d,$30                           ;10folds in d ($30 = 0)
-
-  .Loop10Fold:
-  or    a
-  ld    bc,10
-  sbc   hl,bc                           ;check for 10 folds
-  jr    c,.Set10Fold
-  inc   d
-  jr  .Loop10Fold
-
-  .Set10Fold:
-  bit   0,e
-  jr    nz,.DoSet10Fold
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet10Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,3
-  ld    (PutLetter+dx),a                ;set dx of text
-
-  jr    .EndSet10Fold  
-
-  .DoSet10Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 10fold
-  inc   iy
-  .EndSet10Fold:
-
-  .Check1Fold:
-  ld    bc,10 + $30
-  add   hl,bc
-  
-;  add   a,10 + $30
-  ld    (iy),l                          ;set 1 fold
-  ld    (iy+1),255                      ;end text
-  ret
-
-
-
-
-
-
-  .SetText:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-  ld    (PutLetter+dPage),a             ;set page where to put text
-
-  ld    a,-1
-  ld    (TextPointer),a                 ;increase text pointer
-  .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
-
-  ld    hl,(TextAddresspointer)
-
-  ld    d,0
-  ld    e,a
-  add   hl,de
-
-  ld    a,(hl)                          ;letter
-  cp    255                             ;end
-  ret   z
-  cp    254                             ;next line
-  jr    z,.NextLine
-  cp    TextSpace                       ;space
-  jr    z,.Space
-  cp    TextPercentageSymbol            ;%
-  jr    z,.TextPercentageSymbol
-  cp    TextPlusSymbol                  ;+
-  jr    z,.TextPlusSymbol
-  cp    TextMinusSymbol                 ;-
-  jr    z,.TextMinusSymbol
-  cp    TextApostrofeSymbol             ;'
-  jr    z,.TextApostrofeSymbol
-  cp    TextColonSymbol                 ;:
-  jr    z,.TextColonSymbol
-  cp    TextSlashSymbol                 ;/
-  jr    z,.TextSlashSymbol
-
-  cp    TextNumber0+10
-  jr    c,.Number
-
-  sub   $41
-  ld    hl,.TextCoordinateTable  
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a
-
-  add   hl,de
-  
-  .GoPutLetter:
-  ld    a,(hl)                          ;sx
-  ld    (PutLetter+sx),a                ;set sx of letter
-  inc   hl
-  ld    a,(hl)                          ;nx
-  ld    (PutLetter+nx),a                ;set nx of letter
-
-  ld    hl,PutLetter
-  call  DoCopy
-
-  ld    hl,PutLetter+nx                 ;nx of letter
-  ld    a,(PutLetter+dx)                ;dx of letter we just put
-  add   a,(hl)                          ;add lenght
-  inc   a                               ;+1
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  
-  jp    .NextLetter
-
-  .Number:
-  sub   TextNumber0                     ;hex value of number "0"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a  
-
-  ld    hl,.TextNumberSymbolsSXNX
-  add   hl,de
-  jr    .GoPutLetter
-  
-  .TextPercentageSymbol:
-  ld    hl,.TextPercentageSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextPlusSymbol:
-  ld    hl,.TextPlusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextMinusSymbol:
-  ld    hl,.TextMinusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextApostrofeSymbol:
-  ld    hl,.TextApostrofeSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextColonSymbol:
-  ld    hl,.TextColonSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextSlashSymbol:
-  ld    hl,.TextSlashSymbolSXNX  
-  jr    .GoPutLetter
-
-  .Space:
-  ld    a,(PutLetter+dx)                ;set dx of next letter
-  add   a,5
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-  .NextLine:
-  ld    a,(PutLetter+dy)                ;set dy of next letter
-  add   a,7
-  ld    (PutLetter+dy),a                ;set dy of next letter
-  ld    a,(TextDX)
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-
-;                          0       1       2       3       4       5       6       7       8       9
-.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
-.TextSlashSymbolSXNX: db  158+49,4  ;"/"
-.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
-.TextPlusSymbolSXNX: db  166+49,5 ;"+"
-.TextMinusSymbolSXNX: db  169+49,5 ;"-"
-.TextApostrofeSymbolSXNX: db  195,1  ;"'"
-.TextColonSymbolSXNX: db  008,1  ;":"
-
-;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
-.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
-;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
-ds 12
-.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
-
-
-
-
-
-
-
-
 
 
 
@@ -738,175 +346,7 @@ ds 12
 
 
 SetHeroArmyAndStatusInHud?: db  3
-SetHeroArmyAndStatusInHud:
-	ld		a,(SetHeroArmyAndStatusInHud?)
-	dec		a
-	ret		z
-	ld		(SetHeroArmyAndStatusInHud?),a
 
-  call  SetArmyUnits
-  call  SetHeroPortrait10x18
-  ret
-;
-
-HeroPortrait10x18SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGoemon1:      equ $4000+(000*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXPixy:         equ $4000+(000*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXDrasle1:      equ $4000+(000*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXLatok:        equ $4000+(000*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXDrasle2:      equ $4000+(000*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXSnake1:       equ $4000+(000*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXDrasle3:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXSnake2:       equ $4000+(000*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXDrasle4:      equ $4000+(000*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXAshguine:     equ $4000+(000*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXUndeadline1:  equ $4000+(000*128)+(110/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXPsychoWorld:  equ $4000+(000*128)+(120/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXUndeadline2:  equ $4000+(000*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGoemon2:      equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXUndeadline3:  equ $4000+(000*128)+(150/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXFray:         equ $4000+(000*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXBlackColor:   equ $4000+(000*128)+(170/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXWit:          equ $4000+(000*128)+(180/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXMitchell:     equ $4000+(000*128)+(190/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXJanJackGibson:equ $4000+(000*128)+(200/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGillianSeed:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXSnatcher:     equ $4000+(000*128)+(220/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGolvellius:   equ $4000+(000*128)+(230/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXBillRizer:    equ $4000+(000*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-
-HeroPortrait10x18SYSXPochi:        equ $4000+(018*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXGreyFox:      equ $4000+(018*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXTrevorBelmont:equ $4000+(018*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXBigBoss:      equ $4000+(018*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXSimonBelmont: equ $4000+(018*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXDrPettrovich: equ $4000+(018*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXRichterBelmont:equ $4000+(018*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-
-
-
-
-
-
-
-
-SetHeroPortrait10x18:
-  ld    a,(slot.page1rom)               ;all RAM except page 1
-  out   ($a8),a      
-
-  ld    a,Hero10x18PortraitsBlock       ;Map block
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  ld    ix,(plxcurrentheroAddress)
-  ld    c,(ix+HeroSpecificInfo+0)         ;get hero specific info
-  ld    b,(ix+HeroSpecificInfo+1)
-  push  bc
-  pop   ix
-  ld    c,(ix+HeroInfoPortrait10x18SYSX+0)  ;find hero portrait 16x30 address
-  ld    b,(ix+HeroInfoPortrait10x18SYSX+1)  
-  ld    de,NXAndNY10x18HeroPortraits    ;(ny*256 + nx/2) = (10x18)
-  ld    hl,DYDXHeroWindow10x18InHud          ;(dy*128 + dx/2) = (204,132)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-  ret
-
-SetArmyUnits:
-  ld    a,(slot.page1rom)               ;all RAM except page 1
-  out   ($a8),a      
-
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  ld    ix,(plxcurrentheroAddress)
-
-  ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit1WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit2WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit3WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit4WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit5WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
-  call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXUnit6WindowInHud         ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-  ret
-
-  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,UnitSYSXTable
-  add   hl,de
-  ld    c,(hl)
-  inc   hl
-  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ret
-
-CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-  ld    (AddressToWriteFrom),bc
-  ld    (NXAndNY),de
-
-	ld		a,(activepage)                  ;alternate between page 0 and 1
-  or    a
-  jr    nz,.SetAddress                  ;page 0
-  ld    de,$8000
-  add   hl,de                           ;page 1
-  .SetAddress:
-  ld    (AddressToWriteTo),hl
-
-  ld    c,$98                           ;out port
-  ld    de,128                          ;increase 128 bytes to go to the next line
-  di
-
-  .loop:
-  call  .WriteOneLine
-  ld    a,(NXAndNY+1)
-  dec   a
-  ld    (NXAndNY+1),a
-  jp    nz,.loop
-  ei
-  ret
-
-  .WriteOneLine:
-  xor   a                               ;we want to write to (204,151)
-  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
-  add   hl,de                           ;increase 128 bytes to go to the next line
-  ld    (AddressToWriteTo),hl
-	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
-
-  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
-  add   hl,de                           ;increase 128 bytes to go to the next line
-  ld    (AddressToWriteFrom),hl
-  ld    a,(NXAndNY)
-  ld    b,a
-  otir
-  ret
 
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available
@@ -1002,11 +442,8 @@ CheckHeroCollidesWithEnemyHero:
   .HeroTouchesEnemyHero:
   ld    (HeroThatGetsAttacked),iy       ;y hero that gets attacked
   ld    (AmountHeroesTimesLenghtHerotableBelowHero),hl
-
   pop   af
   pop   af                              ;pop the calls from the engine to this routine
-
-
 	jp		EnterCombat
 
 LastHeroForPlayerThatGetsAttacked: ds  2
@@ -1105,6 +542,8 @@ CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a
 	ld		a,(ix+ButtonLit?)			          ;button lit ?
 	or		a
 	ret		z                               ;return if not lit	
+  bit   4,(hl)                          ;is this button pressed down?
+  ret   nz
 	ld    (hl),%1010 0011                 ;leave this one lit
   ret
 
@@ -1576,6 +1015,8 @@ movehero:
 
   ld    a,1
   ld    (HeroCollidesWithFriendlyHero?),a
+  ld    a,1
+	ld		(ChangeManaAndMovement?),a  
   jp    .endmovement
   
   .animate:
@@ -1927,7 +1368,7 @@ GoCheckEnterHeroOverviewMenu:
   ld    a,(SetHeroOverViewMenu?)
   or    a
   ret   z
-  jp    SetHeroOverviewMenuInPage1ROM ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+  jp    EnterHeroOverviewMenu           ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
 
 
 
@@ -2258,6 +1699,7 @@ puttopcastles:
 	inc		a
 	ld		(TempVariableCastleX),a
 	call	putbottomcastles.puttwopieces
+
 	ld		a,(putcastle+sx)
 	add		a,16
 	ld		(putcastle+sx),a
@@ -2268,6 +1710,7 @@ puttopcastles:
 	sub		a,2
 	ld		(TempVariableCastleX),a
 	call	putbottomcastles.putthreepieces
+ret
 	ld		a,(putcastle+sx)
 	add		a,16
 	ld		(putcastle+sx),a
@@ -2277,14 +1720,14 @@ puttopcastles:
 	ld		a,(TempVariableCastleX)
 	sub		a,2
 	ld		(TempVariableCastleX),a
-	call	putbottomcastles.doputthispiece
+	call	putbottomcastles.PutOnePiece
 	ld		a,(putcastle+sx)
 	add		a,16
 	ld		(putcastle+sx),a
 	ld		a,(TempVariableCastleX)
 	add		a,2
 	ld		(TempVariableCastleX),a
-	call	putbottomcastles.doputthispiece
+	call	putbottomcastles.PutOnePiece
 	ret
 
 putbottomcastles:
@@ -2298,18 +1741,38 @@ putbottomcastles:
 ;	call	.doputcastle
 
 .doputcastle:
-	ld		a,112
-	ld		(putcastle+sx),a
 	ld		a,(hl)			                    ;castle y
 	or    a
 	ret   z                               ;if y=0 there is no castle
+  dec   a
 	ld		(TempVariableCastleY),a
 	inc		hl
 	ld		a,(hl)			                    ;castle x
 	ld		(TempVariableCastleX),a
 
+	ld		a,080
+	ld		(putcastle+sx),a
+	call	.PutOnePiece
+	
+	ld		a,(TempVariableCastleX)
+  add   a,2
+	ld		(TempVariableCastleX),a
+	ld		a,096
+	ld		(putcastle+sx),a
+	call	.PutOnePiece
+	
+	ld		a,(TempVariableCastleX)
+  sub   a,2
+	ld		(TempVariableCastleX),a
+  
+	ld		a,112
+	ld		(putcastle+sx),a
+	ld		a,(TempVariableCastleY)
+  inc   a
+	ld		(TempVariableCastleY),a
+
 .putthreepieces:
-	call	.doputthispiece
+	call	.PutOnePiece
 	ld		a,(putcastle+sx)
 	add		a,16
 	ld		(putcastle+sx),a
@@ -2317,17 +1780,14 @@ putbottomcastles:
 	inc		a
 	ld		(TempVariableCastleX),a
 .puttwopieces:
-	call	.doputthispiece
+	call	.PutOnePiece
 	ld		a,(putcastle+sx)
 	add		a,16
 	ld		(putcastle+sx),a
 	ld		a,(TempVariableCastleX)
 	inc		a
 	ld		(TempVariableCastleX),a
-	jp		.doputthispiece
-;	ret
-
-.doputthispiece:
+.PutOnePiece:
 	ld		a,(activepage)	                ;check mirror page to mark background hero position as 'dirty'
 	or		a
 	ld		hl,mappage1
@@ -4097,10 +3557,10 @@ pl1hero1mana:	db	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
-Pl1Hero1StatAttack:  db 8
-Pl1Hero1StatDefense:  db 2
-Pl1Hero1StatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
+Pl1Hero1StatAttack:  db 2
+Pl1Hero1StatDefense:  db 3
+Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  67
 .EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
@@ -4561,7 +4021,7 @@ CastleName:             equ 36
 AmountOfCastles:  equ 4
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days,   castle name
-Castle1:  db  004,  001,  1,      1,          1,        1,        1,              5,            1,            1,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            1,            1,        0,            0,          0      | db   1,          2,          3,          4,          5,          6   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   0,          0,          0,          0,          0,          0   | dw   0,              0,              0,              0,              0,              0         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
