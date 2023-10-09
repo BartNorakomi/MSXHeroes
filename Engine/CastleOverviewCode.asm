@@ -1367,7 +1367,91 @@ HudCode:
   jp    z,CheckCastleArrowDown
 
   cp    01
-  jp    z,endturn
+  jp    z,EndTurn
+  ret
+
+EndTurn:
+  call  SetHero1ForCurrentPlayerInIX
+
+  ;reset all heroes mana and movement for this player
+	ld		b,amountofheroesperplayer 
+	ld		de,lenghtherotable
+  .loop:
+	ld		a,(ix+HeroManarec)				;mana recovery
+	add		a,(ix+HeroMana)           ;add current hero mana
+	cp		(ix+HeroTotalMana)				;cp with total mana 
+	jp		nc,.nooverflowmana
+	ld		a,(ix+HeroTotalMana)
+	.nooverflowmana:
+	ld		(ix+HeroMana),a           ;set mana for next turn
+	ld		a,(ix+HeroTotalMove)		  ;total movement
+	ld		(ix+HeroMove),a		        ;reset total movement
+	add		ix,de				              ;next hero
+	djnz	.loop
+  ;set next player's turn
+	ld		a,(amountofplayers)       ;set next player to have their turn
+	ld		b,a
+	ld		a,(whichplayernowplaying?)
+	cp		b
+	jp		nz,.endchecklastplayer
+	xor		a
+  .endchecklastplayer:	
+	inc		a
+	ld		(whichplayernowplaying?),a
+
+  call  AddCastlesIncomeToPlayer        ;add total income of castles and heroes with 'estates' to player's gold
+
+
+
+
+  ;add resources from castles' sawmills and mines 
+
+
+  ;/add resources from castles' sawmills and mines 
+  jp    ActivateFirstActiveHeroForCurrentPlayer
+
+
+AddCastlesIncomeToPlayer:               ;add total income of castles and heroes with 'estates' to player's gold
+  call  SetResourcesCurrentPlayerinIX  
+
+  ld    iy,Castle1
+  call  .CheckCastle
+  ld    iy,Castle2
+  call  .CheckCastle
+  ld    iy,Castle3
+  call  .CheckCastle
+  ld    iy,Castle4
+  call  .CheckCastle
+  ret
+
+  .CheckCastle:
+	ld		a,(whichplayernowplaying?)      ;check which player is now playing
+	cp    (iy+CastlePlayer)               ;check if this castle belongs to this player
+  ret   nz                              ;return if its an enemy castle
+
+  ld    a,(iy+CastleLevel)              ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
+  cp    1
+  ld    de,500                          ;castle level 1=500 gold per day
+  jr    z,.CastleLevelFound
+  cp    2
+  ld    de,1000                         ;castle level 2=1000 gold per day
+  jr    z,.CastleLevelFound
+  cp    3
+  ld    de,2000                         ;castle level 3=2000 gold per day
+  jr    z,.CastleLevelFound
+  cp    4
+  ld    de,3000                         ;castle level 4=3000 gold per day
+  jr    z,.CastleLevelFound
+  ld    de,4000                         ;castle level 5=4000 gold per day
+  .CastleLevelFound:
+
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)
+  add   hl,de
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h
   ret
 
 SetResources:

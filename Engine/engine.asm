@@ -638,36 +638,6 @@ centrescreenforthisCastle:
 .notoutofscreenright:	
 	ret
 
-endturn:
-  call  SetHero1ForCurrentPlayerInIX
-
-	ld		b,amountofheroesperplayer ;reset all heroes mana and movement
-	ld		de,lenghtherotable
-  .loop:
-	ld		a,(ix+HeroManarec)				;mana recovery
-	add		a,(ix+HeroMana)           ;add current hero mana
-	cp		(ix+HeroTotalMana)				;cp with total mana 
-	jp		nc,.nooverflowmana
-	ld		a,(ix+HeroTotalMana)
-	.nooverflowmana:
-	ld		(ix+HeroMana),a           ;set mana for next turn
-	ld		a,(ix+HeroTotalMove)		  ;total movement
-	ld		(ix+HeroMove),a		        ;reset total movement
-	add		ix,de				              ;next hero
-	djnz	.loop
-
-	ld		a,(amountofplayers)       ;set next player to have their turn
-	ld		b,a
-	ld		a,(whichplayernowplaying?)
-	cp		b
-	jp		nz,.endchecklastplayer
-	xor		a
-  .endchecklastplayer:	
-	inc		a
-	ld		(whichplayernowplaying?),a
-;  call  InitiatePlayerTurn
-;  ret
-
 ActivateFirstActiveHeroForCurrentPlayer:
   xor   a
 	ld		(herowindowpointer),a           ;each player has 10 heroes. The herowindowpointer tells us which hero is in window 1
@@ -709,6 +679,7 @@ ActivateFirstActiveHeroForCurrentPlayer:
 	ld		(SetCastlesInWindows?),a	
 	ld		(ChangeManaAndMovement?),a	
 	ld		(SetHeroArmyAndStatusInHud?),a
+	ld		(SetResources?),a
 	ret
 
 
@@ -4003,7 +3974,7 @@ Castle2:  db  004,  100,  2,      1,          1,        0,        0,            
 Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   9,         12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
 Castle5:  db  000,  000,  255
-
+;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 LenghtCastleTable:  equ Castle2-Castle1
 
 castlepl1y:	db	004 | castlepl1x:	db	001
@@ -4092,7 +4063,7 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  65500
+.Gold:    dw  10000
 .Wood:    dw  300
 .Ore:     dw  400
 .Gems:    dw  130
