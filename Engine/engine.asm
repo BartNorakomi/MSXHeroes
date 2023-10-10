@@ -3479,6 +3479,7 @@ HeroButton20x11SYSX:        equ 38
 HeroInfoPortrait16x30SYSX:  equ 40
 HeroInfoSkill:              equ 42
 
+;hero class that doesnt fit: battle mage, beastmaster, death knight, necromancer
 heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol
 HeroAddressesAdol:            db "   adol   ",254,"          ",254,"  knight  ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 |
 HeroAddressesGoemon1:         db " goemon1  ",254,"          ",254,"  ranger  ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 |
@@ -3487,14 +3488,14 @@ HeroAddressesDrasle1:         db " drasle1  ",254,"          ",254," demoniac ",
 HeroAddressesLatok:           db "  latok   ",254,"          ",254," overlord ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 |
 HeroAddressesDrasle2:         db " drasle2  ",254,"          ",254," barbarian",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 |
 HeroAddressesSnake1:          db " snake1   ",254,"          ",254," deathlord",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 |
-HeroAddressesDrasle3:         db " drasle3  ",254,"          ",254,"          ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 |
-HeroAddressesSnake2:          db " snake2   ",254,"          ",254,"          ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 |
+HeroAddressesDrasle3:         db " drasle3  ",254,"          ",254,"  cleric  ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 |
+HeroAddressesSnake2:          db " snake2   ",254,"          ",254,"   druid  ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 |
 HeroAddressesDrasle4:         db " drasle4  ",254,"          ",254,"          ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 |
 
-HeroAddressesAshguine:        db " ashguine ",254,"          ",254,"          ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 |
-HeroAddressesUndeadline1:     db " warrior  ",254,"          ",254,"          ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 |
-HeroAddressesPsychoWorld:     db " psycho   ",254,"          ",254,"          ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 |
-HeroAddressesUndeadline2:     db "  ninja   ",254,"          ",254,"          ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 |
+HeroAddressesAshguine:        db " ashguine ",254,"          ",254," heretic  ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 |
+HeroAddressesUndeadline1:     db " warrior  ",254,"          ",254," warlock  ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 |
+HeroAddressesPsychoWorld:     db " psycho   ",254,"          ",254," wizzard  ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 |
+HeroAddressesUndeadline2:     db "  ninja   ",254,"          ",254,"  witch   ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 |
 HeroAddressesGoemon2:         db " goemon   ",254,"          ",254,"          ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 |
 HeroAddressesUndeadline3:     db "  marco   ",254,"          ",254,"   mage   ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 |
 HeroAddressesFray:            db "   fray   ",254,"          ",254,"          ",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 |
@@ -3576,7 +3577,7 @@ Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 | 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  4,7,10,0,0,0
+.HeroSkills:  db  4,7,10,16,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0001
@@ -3599,7 +3600,7 @@ Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  8,17,24,0,0,0
+.HeroSkills:  db  8,30,24,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0001
@@ -3665,13 +3666,13 @@ pl1hero6life:	db	03,20
 pl1hero6move:	db	30,20
 pl1hero6mana:	db	10,20
 pl1hero6manarec:db	5		                ;recover x mana every turn
-pl1hero6status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
+.HeroSkills:  db  33,10,1,0,0,18
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0001
@@ -3704,7 +3705,7 @@ Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
+.HeroSkills:  db  33,10,1,0,0,17
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0001
@@ -3737,7 +3738,7 @@ Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 | 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
+.HeroSkills:  db  33,10,1,0,18,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0001
@@ -3970,8 +3971,8 @@ AmountOfCastles:  equ 4
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days,   castle name
 Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            1,            1,        0,            0,          0      | db   19,        20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
-Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   7,         08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
-Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
+Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        0,            0,          0      | db   7,         08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
+Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   9,         12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
 Castle5:  db  000,  000,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd

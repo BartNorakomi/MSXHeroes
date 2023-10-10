@@ -4486,12 +4486,12 @@ SkillwisdomBasic:
                           db  "basic wisdom           ",255   ;skillnr# 031
                           db  "basic wisdom           ",254
                           db  "hero can learn spells  ",254
-                          db  "level 3 and below      ",255
+                          db  "level 2 and below      ",255
 SkillwisdomAdvanced:
                           db  "advanced wisdom        ",255
                           db  "advanced wisdom        ",254
                           db  "hero can learn spells  ",254
-                          db  "level 4 and below      ",255
+                          db  "level 3 and below      ",255
 SkillwisdomExpert:
                           db  "expert wisdom          ",255
                           db  "expert wisdom          ",254

@@ -1399,17 +1399,160 @@ EndTurn:
 	inc		a
 	ld		(whichplayernowplaying?),a
 
-  call  AddCastlesIncomeToPlayer        ;add total income of castles and heroes with 'estates' to player's gold
-
-
-
-
-  ;add resources from castles' sawmills and mines 
-
-
-  ;/add resources from castles' sawmills and mines 
+  call  AddCastlesIncomeToPlayer        ;add total income of castles
+  call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
+  call  AddCastlesMineResources         ;add mine's resources of castles to player
+  call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
   jp    ActivateFirstActiveHeroForCurrentPlayer
 
+AddEstatesIncomeToPlayer:  
+  call  SetHero1ForCurrentPlayerInIX
+
+  ld    c,amountofheroesperplayer
+  .loop:
+  ld    b,6                             ;each hero has 6 skills
+  push  ix
+  call  .CheckSkill
+  pop   ix
+  
+  ld    de,lenghtherotable
+  add   ix,de                           ;next hero
+  dec   c
+  jr    nz,.loop
+  ret
+  
+  .CheckSkill:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255
+  ret   z                               ;dont add estates gold if hero is inactive/died/retreated
+
+  ld    a,(ix+HeroSkills)
+  cp    16
+  ld    de,125
+  jr    z,.EstatesFound                 ;basic estates (125 gold per day)
+  cp    17
+  ld    de,250
+  jr    z,.EstatesFound                 ;advanced estates (250 gold per day)
+  cp    18
+  ld    de,500
+  jr    z,.EstatesFound                 ;expert estates (500 gold per day)
+
+  inc   ix                              ;next skill
+  djnz  .CheckSkill
+  ret
+
+.EstatesFound:
+   call  SetResourcesCurrentPlayerinIX  
+ ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)
+  add   hl,de
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h
+  ret
+
+AddCastlesMineResources:                ;add resources from castles' mines
+  call  SetResourcesCurrentPlayerinIX  
+
+  ld    iy,Castle1
+  call  .CheckCastle
+  ld    iy,Castle2
+  call  .CheckCastle
+  ld    iy,Castle3
+  call  .CheckCastle
+  ld    iy,Castle4
+  call  .CheckCastle
+  ret
+
+  .CheckCastle:
+	ld		a,(whichplayernowplaying?)      ;check which player is now playing
+	cp    (iy+CastlePlayer)               ;check if this castle belongs to this player
+  ret   nz                              ;return if its an enemy castle
+
+  ld    a,(iy+CastleMineLevel)          ;Mine 1=1 ore pd, Mine 2=2 ore pd, Mine 3=3 ore pd
+  or    a
+  ret   z
+  cp    1
+  ld    de,0001                         ;Mine level 1=1 ore per day
+  ld    bc,000                          ;Mine level 1=0 gems per day
+  ld    hl,000                          ;Mine level 1=0 rubies per day
+  jr    z,.MineLevelFound
+  cp    2
+  ld    de,0002                         ;Mine level 1=2 ore per day
+  ld    bc,001                          ;Mine level 2=1 gems per day
+  ld    hl,000                          ;Mine level 2=0 rubies per day
+  jr    z,.MineLevelFound
+  ld    de,0003                         ;Mine level 1=3 ore per day
+  ld    bc,001                          ;Mine level 2=1 gems per day
+  ld    hl,001                          ;Mine level 3=1 rubies per day
+  .MineLevelFound:
+
+  push  de
+  ;rubies
+  ld    e,(ix+8)
+  ld    d,(ix+9)
+  add   hl,de
+  pop   de
+  ret   c
+  ld    (ix+8),l
+  ld    (ix+9),h
+
+  ;ore
+  ld    l,(ix+6)
+  ld    h,(ix+7)
+  add   hl,bc
+  ret   c
+  ld    (ix+6),l
+  ld    (ix+7),h
+
+  ;ore
+  ld    l,(ix+4)
+  ld    h,(ix+5)
+  add   hl,de
+  ret   c
+  ld    (ix+4),l
+  ld    (ix+5),h
+  ret
+
+AddCastlesSawmillResources:             ;add resources from castles' sawmills
+  call  SetResourcesCurrentPlayerinIX  
+
+  ld    iy,Castle1
+  call  .CheckCastle
+  ld    iy,Castle2
+  call  .CheckCastle
+  ld    iy,Castle3
+  call  .CheckCastle
+  ld    iy,Castle4
+  call  .CheckCastle
+  ret
+
+  .CheckCastle:
+	ld		a,(whichplayernowplaying?)      ;check which player is now playing
+	cp    (iy+CastlePlayer)               ;check if this castle belongs to this player
+  ret   nz                              ;return if its an enemy castle
+
+  ld    a,(iy+CastleSawmillLevel)       ;sawmill 1=1 wood pd, sawmill 2=2 wood pd, sawmill 3=3 wood pd
+  or    a
+  ret   z
+  cp    1
+  ld    de,0001                         ;Sawmill level 1=1 wood per day
+  jr    z,.SawmillLevelFound
+  cp    2
+  ld    de,0002                         ;Sawmill level 1=2 wood per day
+  jr    z,.SawmillLevelFound
+  ld    de,0003                         ;Sawmill level 1=3 wood per day
+  .SawmillLevelFound:
+
+  ;wood
+  ld    l,(ix+2)
+  ld    h,(ix+3)
+  add   hl,de
+  ret   c
+  ld    (ix+2),l
+  ld    (ix+3),h
+  ret
 
 AddCastlesIncomeToPlayer:               ;add total income of castles and heroes with 'estates' to player's gold
   call  SetResourcesCurrentPlayerinIX  
@@ -7310,9 +7453,22 @@ SpellDescriptionsMagicGuild:
                           db  "damages all units on the",254
                           db  "the screen",255
 
-.DescriptionFire1:        db  "meteor",254
+
+
+
+;.DescriptionFire1:        db  "meteor",254
                           db  "damages all units on the",254
                           db  "the battlefield",255
+
+
+.DescriptionFire1:        db  "chest After scouting the area you fall upon a",254
+                          db  "hidden treasure cache You may take the gold",254
+                          db  "or distribute it to the peasants for experience",254
+                          db  "which do you choose",255
+
+
+
+
 
 .DescriptionFire2:        db  "fire",254
                           db  "damages all units on the",254
