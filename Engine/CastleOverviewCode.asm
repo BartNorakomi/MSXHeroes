@@ -7461,12 +7461,15 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "chest After scouting the area you fall upon a",254
-                          db  "hidden treasure cache You may take the gold",254
-                          db  "or distribute it to the peasants for experience",254
-                          db  "which do you choose",255
+.DescriptionFire1:        db  "Having scoured the land you stumble upon  ",254
+                          db  "hidden treasure: the choice lies between ",254
+                          db  "claiming the gold or bestowing it upon peasants ",254
+                          db  " for enlightenment",255
 
-
+;.AncientScroll:           db  "Unearthing an ancient scroll you",254
+;                          db  "imbue your spellbook with its mystic spell",254
+;                          db  "acient scroll hypnotism",254
+;                          db  " ",255
 
 
 
