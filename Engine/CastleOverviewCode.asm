@@ -8,6 +8,8 @@
 ;  call  HudCode
 ;  call  DisplayStartOfTurnMessageCode
 ;  call  DisplayQuickTipsCode
+;  call  DisplayScrollCode
+;  call  DisplayChestCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -1027,6 +1029,8 @@ SetTextBuildingWhenClicked:
   jp    z,.TextQuestionMarkSymbol
   cp    TextCommaSymbol                 ;,
   jp    z,.TextCommaSymbol
+  cp    TextDotSymbol                   ;.
+  jp    z,.TextDotSymbol
 
   cp    TextNumber0+10
   jr    c,.Number
@@ -1099,6 +1103,10 @@ SetTextBuildingWhenClicked:
   ld    hl,.TextCommaSymbolSXNX  
   jr    .GoPutLetter
 
+  .TextDotSymbol:
+  ld    hl,.TextDotSymbolSXNX  
+  jr    .GoPutLetter
+
   .Space:
   ld    a,(PutLetter+dx)                ;set dx of next letter
   add   a,5
@@ -1124,6 +1132,7 @@ SetTextBuildingWhenClicked:
 .TextColonSymbolSXNX: db  008,1  ;":"
 .TextQuestionMarkSymbolSXNX:  db  223,3 ;"?"
 .TextCommaSymbolSXNX:  db  226,2 ;","
+.TextDotSymbolSXNX:  db  207,1 ;","
 
 ;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
 .TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,4, 107,3, 110,3, 113,3, 116,4, 120,3, 123,5, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
@@ -2288,6 +2297,254 @@ HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (095*128) + (120
 HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180/2) - 128 | dw $4000 + (095*128) + (200/2) - 128 | dw $4000 + (095*128) + (220/2) - 128
 
 
+DisplayChestCode:
+call ScreenOn
+
+  call  SetChestButtons
+  
+  call  SetChestGraphics               ;put gfx
+  call  SetChestText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetChestGraphics               ;put gfx
+  call  SetChestText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonMouseInteractionGenericButtons
+
+;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+;  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af
+  ret
+
+SetChestButtons:
+  ld    hl,ChestButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*03)
+  ldir
+  ret
+
+ChestButtonTableGfxBlock:  db  PlayerStartTurnBlock
+ChestButtonTableAmountOfButtons:  db  3
+ChestButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  ;V button
+  db  %0100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;money button
+  db  %1100 0011 | dw $4000 + (000*128) + (184/2) - 128 | dw $4000 + (032*128) + (184/2) - 128 | dw $4000 + (064*128) + (184/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  ;xp button
+  db  %1100 0011 | dw $4000 + (000*128) + (216/2) - 128 | dw $4000 + (032*128) + (216/2) - 128 | dw $4000 + (064*128) + (216/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+
+.Button1Ytop:           equ 157
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 164
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 137
+.Button2YBottom:        equ .Button2Ytop + 032
+.Button2XLeft:          equ 058
+.Button2XRight:         equ .Button2XLeft + 032
+
+.Button3Ytop:           equ 137
+.Button3YBottom:        equ .Button3Ytop + 032
+.Button3XLeft:          equ 116
+.Button3XRight:         equ .Button3XLeft + 032
+
+
+TextChest1:
+                db "Chest",255
+TextChest2:
+                db "Having scoured the land you stumble",254
+                db "upon hidden treasure: The choice lies",254
+                db "between claiming the gold or bestowing",254
+                db "it upon peasants for enlightenment.",255
+TextChest3:
+                db "Which do you choose ?",255
+TextChest4:
+                db "or",255
+
+                
+SetChestText:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,093+00                        ;dx
+  ld    c,022+00                        ;dy
+  ld    hl,TextChest1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,025+00                        ;dx
+  ld    c,032+00                        ;dy
+  ld    hl,TextChest2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,061+00                        ;dx
+  ld    c,130+00                        ;dy
+  ld    hl,TextChest3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,097+00                        ;dx
+  ld    c,151+00                        ;dy
+  ld    hl,TextChest4
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,065+00                        ;dx
+  ld    c,171+00                        ;dy
+  ld    hl,1500
+  call  SetNumber16BitCastle
+
+  ld    b,121+00                        ;dx
+  ld    c,171+00                        ;dy
+  ld    hl,1000
+  call  SetNumber16BitCastle
+  ret
+
+SetChestGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (015*128) + (016/2) - 128
+  ld    bc,$0000 + (168*256) + (174/2)
+  ld    a,ChestBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+DisplayScrollCode:
+  call  SetScrollVButton
+  
+  call  SetScrollGraphics               ;put gfx
+  call  SetScrollText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetScrollGraphics               ;put gfx
+  call  SetScrollText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af
+  ret
+
+  .CheckEndWindow:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    024                             ;dy
+  jr    c,.Exit
+  cp    024+148                         ;dy+ny
+  jr    nc,.Exit
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    020                             ;dx
+  jr    c,.Exit
+  cp    020+162                         ;dx+nx
+  ret   c
+
+  .Exit:
+  pop   af
+  ret
+
+
+SetScrollVButton:
+  ld    hl,SetScrollVButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+SetScrollVButtonTableGfxBlock:  db  PlayerStartTurnBlock
+SetScrollVButtonTableAmountOfButtons:  db  01
+SetScrollVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 146
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 154
+.Button1XRight:         equ .Button1XLeft + 020
+
+
+TextScroll1:
+                db "Ancient scroll discovered",255
+TextScroll2:
+                db "Unearthing an ancient scroll, you",254
+                db "imbue your spellbook with its",254
+                db "mystic spell.",255
+TextScroll3:
+                db "Hypnotism",255
+                
+SetScrollText:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,053+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextScroll1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,030+00                        ;dx
+  ld    c,041+00                        ;dy
+  ld    hl,TextScroll2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,083+00                        ;dx
+  ld    c,147+00                        ;dy
+  ld    hl,TextScroll3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetScrollGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (020/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 DisplayQuickTipsCode:
   call  SetQuickTipsButtons
@@ -2369,28 +2626,25 @@ TextQuickTip1:  db "As the kingdom's network of",254
                 db "the scales of fortune tilt",254
                 db "increasingly in favor of the",254
                 db "player, unveiling a more",254
-                db "exquisite advantage",255
+                db "exquisite advantage.",255
 
-TextQuickTip2:  db "As the kingdom's network of",254
-                db "marketplaces in towns expands,",254
-                db "the scales of fortune tilt",254
-                db "increasingly in favor of the",254
-                db "player, unveiling a more",254
-                db "exquisite advantage",255
+TextQuickTip2:  db "Press and hold the Shift key to",254
+                db "double the pointer's speed,",254
+                db "and hold the Ctrl key to scroll",254
+                db "directly through the map.",255
 
-TextQuickTip3:  db "As the kingdom's network of",254
-                db "marketplaces in towns expands,",254
-                db "the scales of fortune tilt",254
-                db "increasingly in favor of the",254
-                db "player, unveiling a more",254
-                db "exquisite advantage",255
+TextQuickTip3:  db "Pressing the right mouse button",254
+                db "or 'm' on your keyboard lets you",254
+                db "close the window you're",254
+                db "in or exit the castle screen.",255
 
-TextQuickTip4:  db "As the kingdom's network of",254
-                db "marketplaces in towns expands,",254
-                db "the scales of fortune tilt",254
-                db "increasingly in favor of the",254
-                db "player, unveiling a more",254
-                db "exquisite advantage",255
+TextQuickTip4:  
+                db "When a hero retreats from",254
+                db "battle, they halt their",254
+                db "contribution of experience to the",254
+                db "enemy. Be assured, they shall",254
+                db "soon embark on a graceful",254
+                db "journey back to your tavern.",255
 
 SetQuickTipsText:
 ;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
@@ -2400,7 +2654,7 @@ SetQuickTipsText:
   ld    hl,TextDidYouKnow
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    a,r
+  ld    a,(framecounter)
   and   3
   ld    hl,TextQuickTip1
   jr    z,.setQuickTip
@@ -2415,7 +2669,6 @@ SetQuickTipsText:
 
   ld    b,038+00                        ;dx
   ld    c,064+00                        ;dy
-  ld    hl,TextQuickTip1
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
   ld    b,047+00                        ;dx
@@ -2565,7 +2818,6 @@ SetPlayerStartTurnGraphics:
   ld    bc,$0000 + (095*256) + (144/2)
   ld    a,PlayerStartTurnBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
 
 SetPlayerStartTurnVButton:
   ld    hl,PlayerStartTurnVButtonTable-2

@@ -4312,6 +4312,7 @@ TextColonSymbol:            equ $3a
 TextSlashSymbol:            equ $2f
 TextQuestionMarkSymbol:     equ $3f
 TextCommaSymbol:            equ $2c
+TextDotSymbol:              equ $2e
 
 TextNumberSymbolsSXNX: db 121,5,  126,2,  128,4,  132,3,  135,3,  138,4,  142,4,  146,4,  150,4,  154,4,  158,4  
 TextPercentageSymbolSXNX: db  162,4 ;"%"

@@ -1,6 +1,9 @@
 LevelEngine:
 
 ;For now PopulateControls and PopulateKeyMatrix are ONLY used in the routine scrollscreen
+  call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
+  call  DisplayChestFound               ;Show gfx for chest found on the adventure map
+
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
   call  PopulateControls                ;read out keys
@@ -142,6 +145,36 @@ InterruptHandler:
   pop   af 
   ei
   ret
+
+ChestFound?: db  3
+DisplayChestFound:
+  ld    a,(ChestFound?)
+  dec   a
+  ret   m
+  ld    (ChestFound?),a
+  ret   nz  
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplayChestCode
+  jp    EnterSpecificRoutineInCastleOverviewCode
+
+ScrollFound?: db  0
+DisplayScrollFound:
+  ld    a,(ScrollFound?)
+  dec   a
+  ret   m
+  ld    (ScrollFound?),a
+  ret   nz  
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplayScrollCode
+  jp    EnterSpecificRoutineInCastleOverviewCode
 
 DisplayStartOfTurnMessage?: db  3
 DisplayQuickTips?: db  1

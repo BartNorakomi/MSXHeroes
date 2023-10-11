@@ -769,5 +769,23 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $46 - 47
+;
+ScrollBlock:  equ   $46
+phase	$4000
+  incbin "..\grapx\ObjectsOnMap\Scroll.SC5",7,162 * 128      ;162 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $48 - 49
+;
+ChestBlock:  equ   $48
+phase	$4000
+  incbin "..\grapx\ObjectsOnMap\Chest.SC5",7,174 * 128      ;174 lines
+	ds		$c000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
