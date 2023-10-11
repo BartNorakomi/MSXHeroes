@@ -1565,43 +1565,6 @@ PutLetter:
   db    005,000,005,000                 ;nx,--,ny,--
   db    000,000,$98              ;fast copy -> Copy from right to left     
 
-
-EnterTradeMenuBetween2FriendlyHeroes:
-  ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-
-  in    a,($a8)      
-  push  af                              ;save ram/rom page settings 
-	ld		a,(memblocks.1)
-	push  af
-
-  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
-  out   ($a8),a      
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  call  TradeMenuCode
-
-  pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-  pop   af
-  out   ($a8),a                         ;restore ram/rom page settings     
-
-  xor   a
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-  ld    (vblankintflag),a
-  ;if there were movement stars before entering Hero Overview, then remove them
-	ld		(putmovementstars?),a
-  ld    (framecounter),a
-;	ld		(movementpathpointer),a
-	ld		(movehero?),a	
-  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
-
-  ld    hl,CursorBoots
-  ld    (CurrentCursorSpriteCharacter),hl
-  ret
-
 EnterHeroOverviewMenu:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle

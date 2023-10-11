@@ -755,8 +755,17 @@ dephase
 CastleOverviewCodeBlock:  equ   $42
 CastleOverviewFontBlock:  equ   $42
 phase	$4000
-  incbin "..\grapx\CastleOverview\font.SC5",7,7 * 128      ;5 lines
+  incbin "..\grapx\CastleOverview\font.SC5",7,6 * 128      ;6 lines
   include "CastleOverviewCode.asm"
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $44 - 45
+;
+PlayerStartTurnBlock:  equ   $44
+phase	$4000
+  incbin "..\grapx\HeroOverview\PlayerStartTurnWindow.SC5",7,95 * 128      ;95 lines
 	ds		$c000-$,$ff
 dephase
 

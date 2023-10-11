@@ -1,6 +1,7 @@
 LevelEngine:
 
 ;For now PopulateControls and PopulateKeyMatrix are ONLY used in the routine scrollscreen
+  call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
@@ -54,17 +55,6 @@ LevelEngine:
   call  z,SetScreenOn
   jp    LevelEngine
 
-
-
-
-
-
-
-
-
-
-
-
 PreviousVblankIntFlag:  db  1
 page1bank:  ds  1
 
@@ -92,18 +82,11 @@ vblank:
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
 
-
-
-
-
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
 
   ld    a,(slot.page1rom)              ;all RAM except page 1 and 2
   out   ($a8),a
-
-
-
 
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
@@ -118,13 +101,8 @@ vblank:
   ld    a,(page1bank)                   ;put the bank back in page 1 which was there before we ran setspritecharacter
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-
-
   pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
-
-
-
 
 	call	putsprite                       ;out spat data
 
@@ -165,9 +143,82 @@ InterruptHandler:
   ei
   ret
 
+DisplayStartOfTurnMessage?: db  3
+DisplayQuickTips?: db  1
+Date: dw  -1                          ;days, weeks, months
+DisplayStartOfTurnMessage:
+  ld    a,(DisplayStartOfTurnMessage?)
+  dec   a
+  ret   m
+  ld    (DisplayStartOfTurnMessage?),a
+  ret   nz
 
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
+  ld    hl,DisplayStartOfTurnMessageCode
+  call  EnterSpecificRoutineInCastleOverviewCode
 
+  ld    a,(DisplayQuickTips?)
+  or    a
+  ret   z
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  ld    hl,DisplayQuickTipsCode
+  jp    EnterSpecificRoutineInCastleOverviewCode
+
+HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
+  ld    hl,HudCode
+  jp    EnterSpecificRoutineInCastleOverviewCode
+
+EnterTradeMenuBetween2FriendlyHeroes:
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  ld    hl,TradeMenuCode
+  call  EnterSpecificRoutineInCastleOverviewCode
+
+  xor   a
+  ld    (vblankintflag),a
+	ld		(putmovementstars?),a           ;if there were movement stars before entering trade menu, remove them
+  ld    (framecounter),a
+	ld		(movehero?),a                   ;stop hero movement
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+  ld    hl,CursorBoots
+  ld    (CurrentCursorSpriteCharacter),hl
+  ret
+
+EnterSpecificRoutineInCastleOverviewCode:
+  ld    (EnterSpecificRoutineInCastleOverviewCode.SelfModifyingCodeRoutine),hl
+
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+
+	ld		a,(memblocks.1)                 ;save page 1+2 block settings
+	push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  .SelfModifyingCodeRoutine:	equ	$+1
+  call  HudCode
+
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+
+  xor   a
+  ld    (vblankintflag),a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ret
 
 HeroWeTradeWith: ds 2
 HeroCollidesWithFriendlyHero?: ds 1
@@ -178,7 +229,6 @@ CheckEnterTradeMenuBetween2FriendlyHeroes:
 ;ld    (HeroWeTradeWith),ix      ; lets call this defending
 ;call ScreenOn
 ;jp    EnterTradeMenuBetween2FriendlyHeroes
-
 
   ld    a,(HeroCollidesWithFriendlyHero?)
   or    a
@@ -309,7 +359,6 @@ DYDXFirstHeroWindow14x9InHud:       equ 067*128 + (208/2) - 128      ;(dy*128 + 
 DYDXSecondHeroWindow14x9InHud:      equ 078*128 + (208/2) - 128      ;(dy*128 + dx/2) = (208,078)
 DYDXThirdHeroWindow14x9InHud:       equ 089*128 + (208/2) - 128      ;(dy*128 + dx/2) = (208,089)
 
-
 NXAndNY14x14CharaterPortraits:      equ 014*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
 DYDXUnit1WindowInHud:               equ 153*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit2WindowInHud:               equ 153*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -318,39 +367,8 @@ DYDXUnit4WindowInHud:               equ 176*128 + (204/2) - 128      ;(dy*128 + 
 DYDXUnit5WindowInHud:               equ 176*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit6WindowInHud:               equ 176*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
-
-
 SetResources?:  db  3
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 SetHeroArmyAndStatusInHud?: db  3
-
-
-
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available
-;Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
-;Castle2:  db  004,  100,  2,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
-;Castle3:  db  100,  001,  3,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
-;Castle4:  db  100,  100,  4,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | dw   0,          0,          0,          0,          0,          0           0,              0,              0,              0,              0,              0
-
 
 CheckEnterCastle:
   ld    a,(EnterCastle?)
@@ -446,76 +464,6 @@ LastHeroForPlayerThatGetsAttacked: ds  2
 HeroThatGetsAttacked: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
-
-
-
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-;  ld    a,(Controls)
-;  bit   6,a
-;  ret   z
-    
-  ; set temp ISR
-;  di
-;	ld		hl,.tempisr
-;	ld		de,$38
-;	ld		bc,6
-;	ldir
-;  ei
-
-;  pop   af                              ;pop the call to this routine         
-;  jp    LoadCastleOverview
-
-		; set temp ISR
-;  .tempisr:	
-;	push	af
-;	in		a,($99)                         ;check and acknowledge vblank int (ei0 is set)
-;	pop		af
-;	ei	
-;	ret
-
-
-
-
-
-
-
-
-
-
-
-HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
-  in    a,($a8)      
-  push  af                              ;save ram/rom page settings 
-
-	ld		a,(memblocks.1)                 ;save page 1+2 block settings
-	push  af
-
-  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
-  out   ($a8),a
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  call  HudCode
-
-  pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  pop   af
-  out   ($a8),a                         ;restore ram/rom page settings     
-
-  xor   a
-  ld    (vblankintflag),a
-  ret
-
-
-
-
 CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a button, but button should remain lit
 	ld		a,(currentherowindowclicked)
 	
@@ -548,55 +496,18 @@ CompareHLwithDE:
   sbc   hl,de
   ret
 
-
-ButtonSY:   equ 0
-ButtonNY:   equ 1
-ButtonSX:   equ 2
-ButtonNX:   equ 3
-ButtonLit?: equ 4
-                            ;	sy(-2),			ny(-2),	       sx-7, nx-2,	lit?	
-ButtonHeroArrowUp:          db	ButtonHeroArrowUpSY-2,	06-2,	ButtonHeroArrowUpSX-7,	20-2,	0	;hero arrow up
-ButtonHeroWindow1:			    db	ButtonHeroWindow1SY-2,	10-2,	ButtonHeroWindow1SX-7,	14-2,	0	;1st hero window
-ButtonHeroWindow2:			    db	ButtonHeroWindow2SY-2,	10-2,	ButtonHeroWindow2SX-7,	14-2,	0	;2nd hero window
-ButtonHeroWindow3:			    db	ButtonHeroWindow3SY-2,	10-2,	ButtonHeroWindow3SX-7,	14-2,	0	;3rd hero window	
-ButtonHeroArrowDown:			  db	ButtonHeroArrowDownSY-2,	06-2,	ButtonHeroArrowDownSX-7,	20-2,	0 ;hero arrow down
-  ButtonHeroArrowUpSY:      equ 059 | ButtonHeroArrowUpSX:      equ 205
-  ButtonHeroWindow1SY:      equ 066 | ButtonHeroWindow1SX:      equ 208
-  ButtonHeroWindow2SY:      equ 077 | ButtonHeroWindow2SX:      equ 208
-  ButtonHeroWindow3SY:      equ 088 | ButtonHeroWindow3SX:      equ 208
-  ButtonHeroArrowDownSY:    equ 099 | ButtonHeroArrowDownSX:    equ 205
-  
-                            ;	sy(-2),			ny(-2),	       sx-7, nx-2,	lit?	
-ButtonCastleArrowUp:        db	ButtonCastleArrowUpSY-2,	06-2,	ButtonCastleArrowUpSX-7,	20-2,	0	;hero arrow up
-ButtonCastleWindow1:			  db	ButtonCastleWindow1Sy-2,	10-2,	ButtonCastleWindow1SX-7,	20-2,	0	;1st hero window
-ButtonCastleWindow2:			  db	ButtonCastleWindow2SY-2,	10-2,	ButtonCastleWindow2SX-7,	20-2,	0	;2nd hero window
-ButtonCastleWindow3:			  db	ButtonCastleWindow3SY-2,	10-2,	ButtonCastleWindow3SX-7,	20-2,	0	;3rd hero window	
-ButtonCastleArrowDown:			db	ButtonCastleArrowDownSY-2,	06-2,	ButtonCastleArrowDownSX-7,	20-2,	0 ;hero arrow down
-  ButtonCastleArrowUpSY:    equ 059 | ButtonCastleArrowUpSX:    equ 229
-  ButtonCastleWindow1SY:    equ 066 | ButtonCastleWindow1SX:    equ 229
-  ButtonCastleWindow2SY:    equ 077 | ButtonCastleWindow2SX:    equ 229
-  ButtonCastleWindow3SY:    equ 088 | ButtonCastleWindow3SX:    equ 229
-  ButtonCastleArrowDownSY:  equ 099 | ButtonCastleArrowDownSX:  equ 229
-
-ButtonEndTurn:			        db	ButtonEndTurnSY-2,	16-2,	ButtonEndTurnSX-7,	16-2,	0	;end turn
-  ButtonEndTurnSY:          equ 109 | ButtonEndTurnSX:          equ 232
-
+ButtonLit?: equ 0           ;lit?
+ButtonHeroWindow1:			    db  0
+ButtonHeroWindow2:			    db	0
+ButtonHeroWindow3:			    db	0
+ButtonCastleWindow1:			  db	0
+ButtonCastleWindow2:			  db	0
+ButtonCastleWindow3:			  db	0
 
 CastleWindownY:	equ	10
 CastleWindownX:	equ 20
 HerowindowNY:	equ 10
 HerowindowNX:	equ	14
-
-
-
-
-
-
-
-
-
-
-
 
 centrescreenforthisCastle:
 	ld		a,TilesPerColumn
@@ -682,21 +593,9 @@ ActivateFirstActiveHeroForCurrentPlayer:
 	ld		(SetResources?),a
 	ret
 
-
 CenterScreenOnPlayersCastle:            ;if at the start of a turn, a player has no heroes, center screen around his 1st castle instead
   call  SetCastleUsingCastleWindowPointerInIX
   jp    centrescreenforthisCastle
-
-
-
-
-
-
-
-
-
-
-
 
 ThirdHeroWindowClicked:
   call  SetHero1ForCurrentPlayerInIX
@@ -898,22 +797,6 @@ CheckCastleArrowDown:
 	ld		(ButtonCastleWindow2+ButtonLit?),a
 	ld		(ButtonCastleWindow3+ButtonLit?),a	
   ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 movehero:
 	ld		a,(movehero?)
@@ -1153,38 +1036,6 @@ SetHeroPoseInVram:
   otir
   ret
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 putmovementstars:
 	ld		a,(putmovementstars?)
 	or		a
@@ -1336,11 +1187,6 @@ GoCheckEnterHeroOverviewMenu:
   or    a
   ret   z
   jp    EnterHeroOverviewMenu           ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
-
-
-
-
-
 
 ;mouseposy:		ds	1
 ;mouseposx:		ds	1
@@ -1577,7 +1423,7 @@ checktriggermapscreen:
 	jr		c,.noobstacle
 	cp		24
 	jr		c,.obstacle
-	cp		149
+	cp		UnwalkableTerrainPieces         ;tiles 149 and up are unwalkable terrain
 	jr		c,.noobstacle
 .obstacle:
 	dec		hl
@@ -1622,35 +1468,21 @@ checktriggermapscreen:
 	inc		hl
 	ret
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;castlepl1y:	db	04 | castlepl1x:	db	01
-;castlepl2y:	db	14 | castlepl2x:	db	19
-;castlepl3y:	db	06 | castlepl3x:	db	18
-;castlepl4y:	db	15 | castlepl4x:	db	03
+;Castle1:	db	04 | castlepl1x:	db	01
+;Castle2:	db	14 | castlepl2x:	db	19
+;Castle3:	db	06 | castlepl3x:	db	18
+;Castle4:	db	15 | castlepl4x:	db	03
 ;castley:	ds	1
 ;castlex:	ds	1
 
 puttopcastles:
-	ld		hl,castlepl1y
+	ld		hl,Castle1
 	call	.doputcastletop
-	ld		hl,castlepl2y
+	ld		hl,Castle2
 	call	.doputcastletop
-	ld		hl,castlepl3y
+	ld		hl,Castle3
 	call	.doputcastletop
-	ld		hl,castlepl4y
+	ld		hl,Castle4
 ;	call	.doputcastletop
 
 .doputcastletop:
@@ -1698,13 +1530,13 @@ ret
 	ret
 
 putbottomcastles:
-	ld		hl,castlepl1y
+	ld		hl,Castle1
 	call	.doputcastle
-	ld		hl,castlepl2y
+	ld		hl,Castle2
 	call	.doputcastle
-	ld		hl,castlepl3y
+	ld		hl,Castle3
 	call	.doputcastle
-	ld		hl,castlepl4y
+	ld		hl,Castle4
 ;	call	.doputcastle
 
 .doputcastle:
@@ -1824,16 +1656,6 @@ putbottomcastles:
 	ld		hl,putcastle
   jp    docopy
 
-
-
-
-
-
-
-
-
-
-
 putbottomheroes:
 	ld		a,(activepage)	                ;check mirror page to mark background hero position as 'dirty'
 	or		a
@@ -1900,7 +1722,6 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 ;pl1hero1manarec:db	5		;recover x mana every turn
 ;pl1hero1items:	db	255,255,255,255,255
 
-
 .doputhero:
 	ld		a,(mappointery)                 ;check if hero y is within screen range
 	ld		b,a
@@ -1939,18 +1760,8 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
   add   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  
 	ld		(putherotopbottom+dy),a         ;set hero dy
 
-;	ld		a,(ix+HeroType)                   (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
-;	add		a,a				                      ;*2
-;	add		a,a				                      ;*4
-;	add		a,a				                      ;*8
-;	add		a,a				                      ;*16
-
   ld    a,l                             ;sx
 	ld		(putherotopbottom+sx),a	        ;hero sx
-
-;	ld		a,(ix+HeroType)                  (0=adol, 8=goemon, 32=pixie...... 255=no more hero)
-;	and		%1111 0000
-
 
   ld    a,h                             ;sy
   .SelfModifyingCodeAddYToSYHero:	equ	$+1
@@ -2070,18 +1881,6 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	pop		hl
 	ret
 
-
-
-
-
-
-
-
-
-
-
-
-
 SetHero1ForCurrentPlayerInIX:           ;sets hero 1 of current player in IX
 	ld		a,(whichplayernowplaying?)
 	dec		a
@@ -2162,25 +1961,6 @@ herowindowpointer:	db	0               ;each player has 10 heroes. The herowindow
 SetHeroesInWindows?:	db	3             ;this means for 2 frames the heroes are set in the windows (in page 0 and page 1)
 CastleWindowPointer:	db	0             ;The castlewindowpointer tells us which castle is in castlewindow 1
 SetCastlesInWindows?:  db  3
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 checkcurrentplayerhuman:	              ;out zero flag, current player is computer
 ;dont react to space / mouse click if current player is a computer
@@ -2376,21 +2156,6 @@ ReadOutKeyboardAndMovePointer:
 	ld		(spat+5),a
 	ld		(spat+9),a
 	ret
-
-
-
-
-
-
-
-
-
-
-storeHL:	ds	2
-spritechar:
-	include "../sprites/sprites.tgs.gen"
-spritecolor:
-	include "../sprites/sprites.tcs.gen"
 
 ycoordinateStartPlayfield:  equ 04
 xcoordinateStartPlayfield:  equ 06
@@ -2834,34 +2599,12 @@ colorsnowishwhite:  equ 10
 colorpink:          equ 11
 colorwhite:         equ 12
 colorblack:         equ 13
-
+colordarkbrown:     equ 13
 
 SpriteCharCursorSprites:
 	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
 SpriteColCursorSprites:
   ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
-
-
-
-;SpriteCharCursorSwitchingArrows:
-;	include "../sprites/MouseCursorSwitchingArrows.tgs.gen"
-;SpriteColCursorSwitchingArrows:
-;	include "../sprites/MouseCursorSwitchingArrows.tcs.gen"
-;
-;SpriteCharCursorSwords:
-;	include "../sprites/MouseCursorSwords.tgs.gen"
-;SpriteColCursorSwords:
-;	include "../sprites/MouseCursorSwords.tcs.gen"
-;
-;SpriteCharCursorShoeAndStar:
-;	include "../sprites/MouseCursorShoeAndStar.tgs.gen"
-;SpriteColCursorShoeAndStar:
-;	include "../sprites/MouseCursorShoeAndStar.tcs.gen"
-
-
-
-
-
 
 putsprite:
 ;	ld		a,1				;page 2/3
@@ -2882,23 +2625,6 @@ spat:						;sprite attribute table
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
-
-;	db		100,100,00,0	,100,100,04,0	,255,000,08,0	,255,000,12,0
-;	db		015,000,08,0	,015,000,12,0	,031,000,08,0	,031,000,12,0
-;	db		047,000,08,0	,047,000,12,0	,063,000,08,0	,063,000,12,0
-;	db		079,000,08,0	,079,000,12,0	,095,000,08,0	,095,000,12,0
-;	db		111,000,08,0	,111,000,12,0	,127,000,08,0	,127,000,12,0
-;	db		143,000,08,0	,143,000,12,0	,230,230,00,0	,230,230,00,0
-;	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
-;	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
-
-
-
-
-
-
-
-
 
 scrollscreen:                           ;you can either scroll the scroll by moving with the mouse pointer to the edges of the screen, or by holding CTRL and let/right/up/down
 ;
@@ -2958,7 +2684,6 @@ scrollscreen:                           ;you can either scroll the scroll by mov
   jr    z,.up
 	inc		b
 
-
   .up:                                  ;check if cursor is at the top side of the screen and up is pressed
 	ld		a,(spat)			                  ;x cursor
   cp    ycoordinateStartPlayfield
@@ -2996,8 +2721,6 @@ scrollscreen:                           ;you can either scroll the scroll by mov
   ret   nc
 	ld		(mappointery),a	
 	ret	
-
-
 
 SetPageSpecial:                         
   ld    a,0*32+31
@@ -3094,20 +2817,6 @@ PutBottomObjectFromObjectLayer:         ;hl->points to tile in inactive page, de
   ld    a,(hl)
   jp    PutTile.go
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 PutTopObjects:
   Call  SetMapposition                  ;adds mappointer x and y to the mapdata, gives our current camera location in hl
 
@@ -3186,14 +2895,6 @@ SetMapposition:                         ;adds mappointer x and y to the mapdata,
 	djnz	.setypointerloop
   ret
 
-
-
-
-
-
-
-
-
 buildupscreen:
   Call  SetMapposition                  ;adds mappointer x and y to the mapdata, gives our current camera location in hl
 
@@ -3201,14 +2902,9 @@ buildupscreen:
 	ld		(Copy16x16Tile+dpage),a		      ;copy new blocks to inactive page
 	ld		(putherotopbottom+dpage),a
 	ld		(putcastle+dpage),a
-;	ld		(putCastleInWindow+dpage),a
 	ld		(putbackgroundoverhero+dpage),a
 	ld		(putstar+dpage),a
 	ld		(putstarbehindobject+dpage),a
-	ld		(putline+dpage),a
-;	ld		(eraseherowindow+dpage),a
-;	ld		(eraseCastlewindow+dpage),a
-;	ld		(MovementAndMana_line+dpage),a
 	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
 	xor		1                               ;now we switch and set our page
@@ -3303,82 +2999,29 @@ PutTile:                                ;copy 16x16 tile into the inactive page
 	exx
 	ret
 
-
-
-ymapstart:	equ	0
-;put items / artifacts / heroes on map
-
 Copy16x16Tile:
 	db		255,000,255,003
 	db		255,000,255,000
 	db		016,000,016,000
 	db		000,000,$d0	
 
+;FreeToUseFastCopy1:                     ;freely usable anywhere
+;  db    000,000,000,000                 ;sx,--,sy,spage
+;  db    000,000,000,000                 ;dx,--,dy,dpage
+;  db    000,000,000,000                 ;nx,--,ny,--
+;  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
 
+;FreeToUseFastCopy2:                     ;freely usable anywhere
+;  db    000,000,000,000                 ;sx,--,sy,spage
+;  db    000,000,000,000                 ;dx,--,dy,dpage
+;  db    000,000,000,000                 ;nx,--,ny,--
+;  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BackdropRandom:
-  ld    a,r
-  jp    SetBackDrop
-
-BackdropOrange:
-  ld    a,13
-  jp    SetBackDrop
-
-BackdropGreen:
-  ld    a,10
-  jp    SetBackDrop
-
-BackdropRed:
-  ld    a,14
-  jp    SetBackDrop
-
-BackdropBlack:
-  ld    a,15
-  jp    SetBackDrop
-
-BackdropBlue:
-  xor   a
-  SetBackDrop:
-ret
-  di
-  out   ($99),a
-  ld    a,7+128
-  ei
-  out   ($99),a	
-  ret
-
-FreeToUseFastCopy1:                     ;freely usable anywhere
-  db    000,000,000,000                 ;sx,--,sy,spage
-  db    000,000,000,000                 ;dx,--,dy,dpage
-  db    000,000,000,000                 ;nx,--,ny,--
-  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
-
-FreeToUseFastCopy2:                     ;freely usable anywhere
-  db    000,000,000,000                 ;sx,--,sy,spage
-  db    000,000,000,000                 ;dx,--,dy,dpage
-  db    000,000,000,000                 ;nx,--,ny,--
-  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
-
-FreeToUseFastCopy3:                     ;freely usable anywhere
-  db    000,000,000,000                 ;sx,--,sy,spage
-  db    000,000,000,000                 ;dx,--,dy,dpage
-  db    000,000,000,000                 ;nx,--,ny,--
-  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
+;FreeToUseFastCopy3:                     ;freely usable anywhere
+;  db    000,000,000,000                 ;sx,--,sy,spage
+;  db    000,000,000,000                 ;dx,--,dy,dpage
+;  db    000,000,000,000                 ;nx,--,ny,--
+;  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
 
 ScreenOff:
   ld    a,(VDP_0+1)                     ;screen off
@@ -3400,76 +3043,80 @@ ScreenOn:
   out   ($99),a
   ret
 
-PutSpatToVram:
-;	ld		hl,(invisspratttableaddress)		;sprite attribute table in VRAM ($17600)
-;	ld		a,1
-;	call	SetVdp_Write	
-
-  ;SetVdp_Write address for Spat
-	di
-;  ld    a,$05
-;	out   ($99),a       ;set bits 15-17
-;	ld    a,14+128
-;	out   ($99),a       ;/first set register 14 (actually this only needs to be done once)
-  xor   a
-;  nop
-	out   ($99),a       ;set bits 0-7
-  SelfmodifyingCodeSpatAddress: equ $+1
-	ld    a,$6e         ;$6e /$76 
-;  nop
-	ld		hl,spat			;sprite attribute table, and replace the nop required wait time
-	out   ($99),a       ;set bits 8-14 + write access
-
-  ld    c,$98
-;	call	outix128
-
-;outi = 16 (4 cycles) (4,5,3,4)
-;nop = 4 (1 cycle)
-;in a,($98) = 11 (3 cycles)
-  outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|
-  outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|
-  outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|
-  outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi|nop|in a,($98)|nop|in a,($98)|outi|outi;|nop|in a,($98)|nop|in a,($98)|
-	ei
-  ret
-
 activepage:		db	0
 mappointerx:	dw  0
 mappointery:	db	0
 heroymirror:	ds	1
 heroxmirror:	ds	1
 
-amountofheroesperplayer:	equ	8
-plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
-plxcurrentheroAddress:	dw  pl1hero1y
-lenghtherotable:	equ	pl1hero2y-pl1hero1y
+non_see_throughpieces:      equ 16    ;tiles 0-15: background pieces a hero can stand behind, but they are not see through
+amountoftransparantpieces:  equ 64    ;tiles 16-63: see-through background pieces hero can stand behind
+UnwalkableTerrainPieces:    equ 149   ;tiles 149 and up are unwalkable terrain
 
-HeroY:                  equ 0
-HeroX:                  equ 1
-HeroXp:                 equ 2
-HeroMove:               equ 4
-HeroTotalMove:          equ 5
-HeroMana:               equ 6
-HeroTotalMana:          equ 7
-HeroManarec:            equ 8
-HeroStatus:             equ 9           ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-HeroUnits:              equ 10          ;unit,amount (6 in total * 3 bytes) 18 bytes in total
-HeroStatAttack:         equ 28
-HeroStatDefense:        equ 29
-HeroStatKnowledge:      equ 30
-HeroStatSpelldamage:    equ 31
-HeroSkills:             equ 32
-HeroLevel:              equ 38
-HeroEarthSpells:        equ 39
-HeroFireSpells:         equ 40
-HeroAirSpells:          equ 41
-HeroWaterSpells:        equ 42
-HeroAllSchoolsSpells:   equ 43
-HeroInventory:          equ 44          ;9 body slots (sword, armor, shield, helmet, boots, gloves,ring, necklace, robe) and 6 open slots (045 = empty slot)
-HeroSpecificInfo:       equ 59
-HeroDYDX:               equ 61          ;all PlxHeroxDYDX (coordinates where sprite is located in page 2)
+mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
+  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
+  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
+  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
+  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
 
-lenghtinventorytable:   equ 9 + 6
+putbackgroundoverhero:
+	db		16,0,64,3
+	db		255,0,255,0
+	db		16,0,16,0
+	db		0,%0000 0000,$98	
+;	db		0,%0000 1000,$98	
+
+putherotopbottom:
+	db		224,0,0,2
+	db		96,0,96,0
+	db		16,0,16,0
+	db		0,%0000 0000,$98	
+
+putcastle:
+	db		255,0,208,3
+	db		255,0,255,0
+	db		16,0,16,0
+	db		0,%0000 0000,$98	
+;	db		0,%0000 1000,$98	
+
+putstar:
+	db		208,0,192,3
+	db		255,0,255,0
+	db		10,0,8,0
+	db		0,%0000 0000,$98	
+
+putstarbehindobject:
+	db		208,0,200,3
+	db		255,0,255,0
+	db		10,0,8,0
+	db		0,%0000 0000,$98	
+
+putlettre:
+	db		0,0,212,1
+	db		40,0,40,0
+	db		16,0,5,0
+	db		0,%0000 0000,$98	
+
+blackrectangle:
+	db	0,0,0,0
+	db	255,0,255,0
+	db	255,0,255,0
+	db	colorblack+colorblack*16,1,$c0
+
+mouseposy:		ds	1
+mouseposx:		ds	1
+mouseclicky:	ds	1
+mouseclickx:	ds	1
+addxtomouse:	equ	8
+subyfrommouse:	equ	4
+addytomouse:	equ	4
+
+amountofplayers:		db	4
+player1human?:			db	1
+player2human?:			db	1
+player3human?:			db	1
+player4human?:			db	1
+whichplayernowplaying?:	db	1
 
 HeroInfoName:               equ 0
 HeroInfoSpriteBlock:        equ 33
@@ -3516,283 +3163,6 @@ HeroAddressesSimonBelmont:    db "   simon  ",254,"  belmont ",254,"          ",
 
 HeroAddressesDrPettrovich:    db "  doctor  ",254,"pettrovich",254," barbarian",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
 HeroAddressesRichterBelmont:  db " richter  ",254,"  belmont ",254,"          ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
-
-EmptyHeroRecruitedAtTavern:
-.heroy:		ds  1
-.herox:		ds  1
-.heroxp: dw 000
-.heromove:	db	20,20
-.heromana:	db	20,20
-.heromanarec:db	5		                ;recover x mana every turn
-.herostatus:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.HeroUnits:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  0,0,0,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0000
-.AirSpells:         db  %0000 0000
-.WaterSpells:       db  %0000 0000
-.AllSchoolsSpells:  db  %0000 0000
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: ds 2
-;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-pl1hero1y:		db	3
-pl1hero1x:		db	6
-pl1hero1xp: dw 0940
-pl1hero1move:	db	30,30
-pl1hero1mana:	db	20,20
-pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
-Pl1Hero1StatAttack:  db 2
-Pl1Hero1StatDefense:  db 3
-Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
-.HeroSkills:  db  1,0,0,0,0,0
-.HeroLevel: db  67
-.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 1111
-.AirSpells:         db  %0000 1111
-.WaterSpells:       db  %0000 1111
-.AllSchoolsSpells:  db  %0000 1111
-.Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,045,045,028,033 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesAdol
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-pl1hero2y:		db	7
-pl1hero2x:		db	1
-pl1hero2life:	db	05,20
-pl1hero2move:	db	10,20
-pl1hero2mana:	db	16,20
-pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  4,7,10,16,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesGoemon1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-pl1hero3y:		db	03		                ;
-pl1hero3x:		db	02		
-pl1hero3life:	db	03,20
-pl1hero3move:	db	30,20
-pl1hero3mana:	db	04,20
-pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  8,30,24,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesPixy
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-pl1hero4y:		db	07		                ;
-pl1hero4x:		db	05		
-pl1hero4life:	db	03,20
-pl1hero4move:	db	30,20
-pl1hero4mana:	db	10,20
-pl1hero4manarec:db	5		                ;recover x mana every turn
-pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-pl1hero5y:		db	07		                ;
-pl1hero5x:		db	06		
-pl1hero5life:	db	03,20
-pl1hero5move:	db	30,20
-pl1hero5mana:	db	10,20
-pl1hero5manarec:db	5		                ;recover x mana every turn
-pl1hero5status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesLatok
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-pl1hero6y:		db	07		                ;
-pl1hero6x:		db	07		
-pl1hero6life:	db	03,20
-pl1hero6move:	db	30,20
-pl1hero6mana:	db	10,20
-pl1hero6manarec:db	5		                ;recover x mana every turn
-pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,18
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle2
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-pl1hero7y:		ds  lenghtherotable,255
-pl1hero8y:		ds  lenghtherotable,255
-
-
-
-
-
-
-
-pl2hero1y:		db	9
-pl2hero1x:		db	6 ;100
-pl2hero1xp: dw 0000
-pl2hero1move:	db	10,20
-pl2hero1mana:	db	10,20
-pl2hero1manarec:db	2		                ;recover x mana every turn
-pl2hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,17
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-pl2hero2y:		ds  lenghtherotable,255
-pl2hero3y:		ds  lenghtherotable,255
-pl2hero4y:		ds  lenghtherotable,255
-pl2hero5y:		ds  lenghtherotable,255
-pl2hero6y:		ds  lenghtherotable,255
-pl2hero7y:		ds  lenghtherotable,255
-pl2hero8y:		ds  lenghtherotable,255
-
-
-;pl3amountherosonmap:	db	2
-pl3hero1y:		db	100
-pl3hero1x:		db	02
-pl3hero1xp: dw 0000
-pl3hero1move:	db	10,20
-pl3hero1mana:	db	10,20
-pl3hero1manarec:db	2		                ;recover x mana every turn
-pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,18,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-pl3hero2y:		ds  lenghtherotable,255
-pl3hero3y:		ds  lenghtherotable,255
-pl3hero4y:		ds  lenghtherotable,255
-pl3hero5y:		ds  lenghtherotable,255
-pl3hero6y:		ds  lenghtherotable,255
-pl3hero7y:		ds  lenghtherotable,255
-pl3hero8y:		ds  lenghtherotable,255
-
-;pl4amountherosonmap:	db	2
-pl4hero1y:		db	100
-pl4hero1x:		db	100
-pl4hero1xp: dw 0000
-pl4hero1move:	db	10,20
-pl4hero1mana:	db	10,20
-pl4hero1manarec:db	2		                ;recover x mana every turn
-pl4hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,0
-.HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
-.Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
-.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-pl4hero2y:		ds  lenghtherotable,255
-pl4hero3y:		ds  lenghtherotable,255
-pl4hero4y:		ds  lenghtherotable,255
-pl4hero5y:		ds  lenghtherotable,255
-pl4hero6y:		ds  lenghtherotable,255
-pl4hero7y:		ds  lenghtherotable,255
-pl4hero8y:		ds  lenghtherotable,255
-
-
-
-
-
 
 HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -3898,42 +3268,295 @@ HeroPortrait16x30SYSXSimonBelmont: equ $8000+(030*128)+(208/2)-128 ;(dy*128 + dx
 HeroPortrait16x30SYSXDrPettrovich: equ $8000+(030*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXRichterBelmont:equ $8000+(030*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+amountofheroesperplayer:	equ	8
+plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
+plxcurrentheroAddress:	dw  pl1hero1y
+lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
+HeroY:                  equ 0
+HeroX:                  equ 1
+HeroXp:                 equ 2
+HeroMove:               equ 4
+HeroTotalMove:          equ 5
+HeroMana:               equ 6
+HeroTotalMana:          equ 7
+HeroManarec:            equ 8
+HeroStatus:             equ 9           ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+HeroUnits:              equ 10          ;unit,amount (6 in total * 3 bytes) 18 bytes in total
+HeroStatAttack:         equ 28
+HeroStatDefense:        equ 29
+HeroStatKnowledge:      equ 30
+HeroStatSpelldamage:    equ 31
+HeroSkills:             equ 32
+HeroLevel:              equ 38
+HeroEarthSpells:        equ 39
+HeroFireSpells:         equ 40
+HeroAirSpells:          equ 41
+HeroWaterSpells:        equ 42
+HeroAllSchoolsSpells:   equ 43
+HeroInventory:          equ 44          ;9 body slots (sword, armor, shield, helmet, boots, gloves,ring, necklace, robe) and 6 open slots (045 = empty slot)
+HeroSpecificInfo:       equ 59
+HeroDYDX:               equ 61          ;all PlxHeroxDYDX (coordinates where sprite is located in page 2)
+lenghtinventorytable:   equ 9 + 6
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+EmptyHeroRecruitedAtTavern:
+.heroy:		ds  1
+.herox:		ds  1
+.heroxp: dw 000
+.heromove:	db	20,20
+.heromana:	db	20,20
+.heromanarec:db	5		                ;recover x mana every turn
+.herostatus:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.HeroUnits:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  0,0,0,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0000
+.AirSpells:         db  %0000 0000
+.WaterSpells:       db  %0000 0000
+.AllSchoolsSpells:  db  %0000 0000
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.HeroSpecificInfo: ds 2
+;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
+pl1hero1y:		db	3
+pl1hero1x:		db	6
+pl1hero1xp: dw 0940
+pl1hero1move:	db	30,30
+pl1hero1mana:	db	20,20
+pl1hero1manarec:db	5		                ;recover x mana every turn
+pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
+Pl1Hero1StatAttack:  db 2
+Pl1Hero1StatDefense:  db 3
+Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
+.HeroSkills:  db  1,0,0,0,0,0
+.HeroLevel: db  67
+.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1111
+.AirSpells:         db  %0000 1111
+.WaterSpells:       db  %0000 1111
+.AllSchoolsSpells:  db  %0000 1111
+.Inventory: db  000,006,012,016,045,026,031,036,041,  007,013,045,045,028,033 ;9 body slots and 6 open slots (045 = empty slot)
+.HeroSpecificInfo: dw HeroAddressesAdol
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
+pl1hero2y:		db	7
+pl1hero2x:		db	1
+pl1hero2life:	db	05,20
+pl1hero2move:	db	10,20
+pl1hero2mana:	db	16,20
+pl1hero2manarec:db	5		                ;recover x mana every turn
+pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  4,7,10,16,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
+.HeroSpecificInfo: dw HeroAddressesGoemon1
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-non_see_throughpieces:  equ 16
-amountoftransparantpieces:  equ 64
-;/check if hero is behind a tree
+pl1hero3y:		db	03		                ;
+pl1hero3x:		db	02		
+pl1hero3life:	db	03,20
+pl1hero3move:	db	30,20
+pl1hero3mana:	db	04,20
+pl1hero3manarec:db	5		                ;recover x mana every turn
+pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  8,30,24,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesPixy
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
-  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
-  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
-  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
-  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
-  
-unpassablepieces:
-	db	0,1,2,3,4,5,48,49,50,51,52,53,54,55,56,57,58,59,60,61,64,65,66,67,68,69,107,108,109
+pl1hero4y:		db	07		                ;
+pl1hero4x:		db	05		
+pl1hero4life:	db	03,20
+pl1hero4move:	db	30,20
+pl1hero4mana:	db	10,20
+pl1hero4manarec:db	5		                ;recover x mana every turn
+pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-putbackgroundoverhero:
-	db		16,0,64,3
-	db		255,0,255,0
-	db		16,0,16,0
-	db		0,%0000 0000,$98	
-;	db		0,%0000 1000,$98	
+pl1hero5y:		db	07		                ;
+pl1hero5x:		db	06		
+pl1hero5life:	db	03,20
+pl1hero5move:	db	30,20
+pl1hero5mana:	db	10,20
+pl1hero5manarec:db	5		                ;recover x mana every turn
+pl1hero5status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesLatok
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-putherotopbottom:
-	db		224,0,0,2
-	db		96,0,96,0
-	db		16,0,16,0
-	db		0,%0000 0000,$98	
+pl1hero6y:		db	07		                ;
+pl1hero6x:		db	07		
+pl1hero6life:	db	03,20
+pl1hero6move:	db	30,20
+pl1hero6mana:	db	10,20
+pl1hero6manarec:db	5		                ;recover x mana every turn
+pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,18
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle2
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-;puthero:
-;	db		224,0,0,2
-;	db		96,0,96,0
-;	db		16,0,32,0
-;	db		0,%0000 0000,$d0
-;	db		0,%0000 1000,$98	
+pl1hero7y:		ds  lenghtherotable,255
+pl1hero8y:		ds  lenghtherotable,255
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl2hero1y:		db	9
+pl2hero1x:		db	6 ;100
+pl2hero1xp: dw 0000
+pl2hero1move:	db	10,20
+pl2hero1mana:	db	10,20
+pl2hero1manarec:db	2		                ;recover x mana every turn
+pl2hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,17
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl2hero2y:		ds  lenghtherotable,255
+pl2hero3y:		ds  lenghtherotable,255
+pl2hero4y:		ds  lenghtherotable,255
+pl2hero5y:		ds  lenghtherotable,255
+pl2hero6y:		ds  lenghtherotable,255
+pl2hero7y:		ds  lenghtherotable,255
+pl2hero8y:		ds  lenghtherotable,255
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl3hero1y:		db	100
+pl3hero1x:		db	02
+pl3hero1xp: dw 0000
+pl3hero1move:	db	10,20
+pl3hero1mana:	db	10,20
+pl3hero1manarec:db	2		                ;recover x mana every turn
+pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,18,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl3hero2y:		ds  lenghtherotable,255
+pl3hero3y:		ds  lenghtherotable,255
+pl3hero4y:		ds  lenghtherotable,255
+pl3hero5y:		ds  lenghtherotable,255
+pl3hero6y:		ds  lenghtherotable,255
+pl3hero7y:		ds  lenghtherotable,255
+pl3hero8y:		ds  lenghtherotable,255
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl4hero1y:		db	100
+pl4hero1x:		db	100
+pl4hero1xp: dw 0000
+pl4hero1move:	db	10,20
+pl4hero1mana:	db	10,20
+pl4hero1manarec:db	2		                ;recover x mana every turn
+pl4hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,0
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl4hero2y:		ds  lenghtherotable,255
+pl4hero3y:		ds  lenghtherotable,255
+pl4hero4y:		ds  lenghtherotable,255
+pl4hero5y:		ds  lenghtherotable,255
+pl4hero6y:		ds  lenghtherotable,255
+pl4hero7y:		ds  lenghtherotable,255
+pl4hero8y:		ds  lenghtherotable,255
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 WhichCastleIsPointerPointingAt?:  ds  2
 CastleY:                equ 0
@@ -3970,7 +3593,7 @@ CastleName:             equ 36
 AmountOfCastles:  equ 4
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days,   castle name
-Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        0,            0,          0      | db   19,        20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            0,            0,        0,            0,          0      | db   19,        20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,000    ,032      , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        0,            0,          0      | db   7,         08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   9,         12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
@@ -3978,87 +3601,8 @@ Castle5:  db  000,  000,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 LenghtCastleTable:  equ Castle2-Castle1
 
-castlepl1y:	db	004 | castlepl1x:	db	001
-castlepl2y:	db	004 | castlepl2x:	db	100
-castlepl3y:	db	100 | castlepl3x:	db	001
-castlepl4y:	db	100 | castlepl4x:	db	100
-
 TempVariableCastleY:	ds	1
 TempVariableCastleX:	ds	1
-
-putcastle:
-	db		255,0,208,3
-	db		255,0,255,0
-	db		16,0,16,0
-	db		0,%0000 0000,$98	
-;	db		0,%0000 1000,$98	
-
-putstar:
-	db		208,0,192,3
-	db		255,0,255,0
-	db		10,0,8,0
-	db		0,%0000 0000,$98	
-
-putstarbehindobject:
-	db		208,0,200,3
-	db		255,0,255,0
-	db		10,0,8,0
-	db		0,%0000 0000,$98	
-
-;colorwhite: equ 1
-  putline:
-	DB    0,0,0,0
-	DB    0,0,0,0
-	DB    0,0,0,0
-	DB    colorwhite+16*colorwhite,1,$80
-
-colordarkbrown: equ 13
-
-
-;herowindownx:	equ	14
-;herowindowny:	equ	29
-
-
-FreeToUseFastCopy:                    ;freely usable anywhere
-  db    000,000,000,000   ;sx,--,sy,spage
-  db    000,000,074,000   ;dx,--,dy,dpage
-  db    004,000,004,000   ;nx,--,ny,--
-  db    000,%0000 0000,$D0       ;fast copy -> Copy from right to left     
-
-
-
-				;	a,b,c, d, e, f, g, h, i, j, k, l, m, n, o, p, q,  r,  s,  t,  u,  v,  w,  x,  y,  z
-lettreoffset:	db	0,7,14,21,28,33,38,45,52,54,60,67,73,79,86,93,100,107,114,121,126,134,141,148,155,162
-				;	0   1   2   3   4   5   6   7   8   9	space	dot
-				db	168,174,177,182,187,192,198,203,208,213,218,223,69,71
-
-putlettre:
-	db		0,0,212,1
-	db		40,0,40,0
-	db		16,0,5,0
-	db		0,%0000 0000,$98	
-
-blackrectangle:
-	db	0,0,0,0
-	db	255,0,255,0
-	db	255,0,255,0
-	db	colorblack+colorblack*16,1,$c0
-
-mouseposy:		ds	1
-mouseposx:		ds	1
-mouseclicky:	ds	1
-mouseclickx:	ds	1
-addxtomouse:	equ	8
-subyfrommouse:	equ	4
-addytomouse:	equ	4
-
-turnbased?:				db	1
-amountofplayers:		db	4
-player1human?:			db	1
-player2human?:			db	1
-player3human?:			db	1
-player4human?:			db	1
-whichplayernowplaying?:	db	1
 
 AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
@@ -4087,7 +3631,6 @@ ResourcesPlayer4:
 .Ore:     dw  100
 .Gems:    dw  60
 .Rubies:  dw  30
-
 
 movementpathpointer:	ds	1	
 movehero?:				ds	1

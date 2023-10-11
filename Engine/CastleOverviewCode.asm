@@ -6,6 +6,8 @@
 ;  call  CastleOverviewTavernCode
 ;  call  TradeMenuCode
 ;  call  HudCode
+;  call  DisplayStartOfTurnMessageCode
+;  call  DisplayQuickTipsCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -1006,28 +1008,28 @@ SetTextBuildingWhenClicked:
   cp    255                             ;end
   ret   z
   cp    254                             ;next line
-  jr    z,.NextLine
+  jp    z,.NextLine
   cp    TextSpace                       ;space
-  jr    z,.Space
+  jp    z,.Space
   cp    TextPercentageSymbol            ;%
-  jr    z,.TextPercentageSymbol
+  jp    z,.TextPercentageSymbol
   cp    TextPlusSymbol                  ;+
-  jr    z,.TextPlusSymbol
+  jp    z,.TextPlusSymbol
   cp    TextMinusSymbol                 ;-
-  jr    z,.TextMinusSymbol
+  jp    z,.TextMinusSymbol
   cp    TextApostrofeSymbol             ;'
-  jr    z,.TextApostrofeSymbol
+  jp    z,.TextApostrofeSymbol
   cp    TextColonSymbol                 ;:
-  jr    z,.TextColonSymbol
+  jp    z,.TextColonSymbol
   cp    TextSlashSymbol                 ;/
-  jr    z,.TextSlashSymbol
-
-
-
+  jp    z,.TextSlashSymbol
+  cp    TextQuestionMarkSymbol          ;?
+  jp    z,.TextQuestionMarkSymbol
+  cp    TextCommaSymbol                 ;,
+  jp    z,.TextCommaSymbol
 
   cp    TextNumber0+10
   jr    c,.Number
-
 
   sub   $41
   ld    hl,.TextCoordinateTable  
@@ -1089,6 +1091,14 @@ SetTextBuildingWhenClicked:
   ld    hl,.TextSlashSymbolSXNX  
   jr    .GoPutLetter
 
+  .TextQuestionMarkSymbol:
+  ld    hl,.TextQuestionMarkSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextCommaSymbol:
+  ld    hl,.TextCommaSymbolSXNX  
+  jr    .GoPutLetter
+
   .Space:
   ld    a,(PutLetter+dx)                ;set dx of next letter
   add   a,5
@@ -1105,19 +1115,21 @@ SetTextBuildingWhenClicked:
 
 
 ;                          0       1       2       3       4       5       6       7       8       9
-.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,4,  191,4,  195,4,  199,4,  203,4,  158,4  
+.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,3,  191,3,  195,4,  199,3,  203,3,  158,4  
 .TextSlashSymbolSXNX: db  158+49,4  ;"/"
 .TextPercentageSymbolSXNX: db  162+49,4 ;"%"
 .TextPlusSymbolSXNX: db  166+49,5 ;"+"
 .TextMinusSymbolSXNX: db  169+49,5 ;"-"
-.TextApostrofeSymbolSXNX: db  195,1  ;"'"
+.TextApostrofeSymbolSXNX: db  053,1  ;"'"
 .TextColonSymbolSXNX: db  008,1  ;":"
+.TextQuestionMarkSymbolSXNX:  db  223,3 ;"?"
+.TextCommaSymbolSXNX:  db  226,2 ;","
 
 ;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
-.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,5, 107,3, 110,3, 113,3, 116,4, 120,3, 123,6, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
+.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,4, 107,3, 110,3, 113,3, 116,4, 120,3, 123,5, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
 ;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
 ds 12
-.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 018,4, 022,3, 025,1, 026,2, 028,4, 032,1, 033,5, 038,4, 042,4, 046,4, 050,4, 054,2, 056,4, 060,2, 062,3, 065,3, 068,5, 073,3, 076,4, 080,4
+.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 019,3, 022,3, 025,1, 026,2, 028,3, 032,1, 033,5, 038,3, 042,3, 046,3, 050,3, 054,2, 057,3, 060,2, 062,3, 065,3, 068,5, 073,3, 076,3, 080,4
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
 ;;  The above routine is called while                     ;;
@@ -1371,6 +1383,9 @@ HudCode:
   ret
 
 EndTurn:
+  ld    a,3
+  ld    (DisplayStartOfTurnMessage?),a
+
   call  SetHero1ForCurrentPlayerInIX
 
   ;reset all heroes mana and movement for this player
@@ -2274,6 +2289,160 @@ HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180
 
 
 
+DisplayQuickTipsCode:
+  call  SetQuickTipsButtons
+  
+  call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+  call  SetQuickTipsText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+  call  SetQuickTipsText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+
+  ld    a,(DisplayQuickTips?)
+  xor   1
+  ld    (DisplayQuickTips?),a
+  ld    hl,QuicktipsOff
+  jr    z,.SetQuicktipsOnOff
+  ld    hl,QuicktipsOn
+  .SetQuicktipsOnOff:
+  ld    de,GenericButtonTable+1
+  ld    bc,6
+  ldir
+  ret
+
+  .CheckEndWindow:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    046                             ;dy
+  jr    c,.Exit
+  cp    046+095                         ;dy+ny
+  jr    nc,.Exit
+  
+  ld    a,(spat+1)                      ;x mouse
+  cp    030                             ;dx
+  jr    c,.Exit
+  cp    030+144                         ;dx+nx
+  ret   c
+
+  .Exit:
+  pop   af
+  ret
+
+TextDidYouKnow:       db "Did you know ?",255
+TextShowTipsAtStart:  db "Show tips at start of turn ?",255
+
+TextQuickTip1:  db "As the kingdom's network of",254
+                db "marketplaces in towns expands,",254
+                db "the scales of fortune tilt",254
+                db "increasingly in favor of the",254
+                db "player, unveiling a more",254
+                db "exquisite advantage",255
+
+TextQuickTip2:  db "As the kingdom's network of",254
+                db "marketplaces in towns expands,",254
+                db "the scales of fortune tilt",254
+                db "increasingly in favor of the",254
+                db "player, unveiling a more",254
+                db "exquisite advantage",255
+
+TextQuickTip3:  db "As the kingdom's network of",254
+                db "marketplaces in towns expands,",254
+                db "the scales of fortune tilt",254
+                db "increasingly in favor of the",254
+                db "player, unveiling a more",254
+                db "exquisite advantage",255
+
+TextQuickTip4:  db "As the kingdom's network of",254
+                db "marketplaces in towns expands,",254
+                db "the scales of fortune tilt",254
+                db "increasingly in favor of the",254
+                db "player, unveiling a more",254
+                db "exquisite advantage",255
+
+SetQuickTipsText:
+;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,069+00                        ;dx
+  ld    c,053+00                        ;dy
+  ld    hl,TextDidYouKnow
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,r
+  and   3
+  ld    hl,TextQuickTip1
+  jr    z,.setQuickTip
+  dec   a
+  ld    hl,TextQuickTip2
+  jr    z,.setQuickTip
+  dec   a
+  ld    hl,TextQuickTip3
+  jr    z,.setQuickTip
+  ld    hl,TextQuickTip4
+  .setQuickTip:
+
+  ld    b,038+00                        ;dx
+  ld    c,064+00                        ;dy
+  ld    hl,TextQuickTip1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,047+00                        ;dx
+  ld    c,115+00                        ;dy
+  ld    hl,TextShowTipsAtStart  
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetQuickTipsButtons:
+  ld    hl,QuickTipsButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+QuicktipsOn:  dw $4000 + (057*128) + (144/2) - 128 | dw $4000 + (069*128) + (144/2) - 128 | dw $4000 + (081*128) + (144/2) - 128
+QuicktipsOff: dw $4000 + (057*128) + (158/2) - 128 | dw $4000 + (069*128) + (158/2) - 128 | dw $4000 + (081*128) + (158/2) - 128
+
+QuickTipsButtonTableGfxBlock:  db  PlayerStartTurnBlock
+QuickTipsButtonTableAmountOfButtons:  db  01
+QuickTipsButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (057*128) + (144/2) - 128 | dw $4000 + (069*128) + (144/2) - 128 | dw $4000 + (081*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 122
+.Button1YBottom:        equ .Button1Ytop + 012
+.Button1XLeft:          equ 096
+.Button1XRight:         equ .Button1XLeft + 014
 
 
 
@@ -2283,7 +2452,137 @@ HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180
 
 
 
+DisplayStartOfTurnMessageCode:
+call ScreenOn
 
+	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
+  dec   a
+  jr    nz,.EndCheckIncreaseDate
+  ld    hl,(Date)
+  inc   hl
+  ld    (Date),hl
+  .EndCheckIncreaseDate:
+
+  call  SetPlayerStartTurnVButton
+  
+  call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+  call  SetPlayerStartTurnText
+;  call  SetTradingHeroesInventoryIcons
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetPlayerStartTurnGraphics     ;put gfx at (24,30)
+  call  SetPlayerStartTurnText
+;  call  SetTradingHeroesInventoryIcons
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+;  call  CheckEndTradeMenuWindow   ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af
+  ret
+
+TextDate:           db "Day:   Week:   Month:",255
+TextPlayerTurn:     db "Player  's turn",255
+
+SetPlayerStartTurnText:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,056+00                        ;dx
+  ld    c,053+00                        ;dy
+  ld    hl,TextDate  
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ;set day
+  ld    bc,(Date)
+  ld    de,7                            ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  inc   hl                              ;1-7
+  ld    b,069+00                        ;dx
+  ld    c,053+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set week
+  ld    bc,(Date)
+  ld    de,7                            ;divide days by 7, the result is the weeks
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  ;set week
+  ld    de,4                            ;divide weeks by 4, the result is the months, and the rest is the weeks of the month
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc                              ;months
+  inc   hl
+  ld    b,104+00                        ;dx
+  ld    c,053+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set month
+  pop   hl
+  inc   hl
+  ld    b,142+00                        ;dx
+  ld    c,053+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ld    b,075+00                        ;dx
+  ld    c,091+00                        ;dy
+  ld    hl,TextPlayerTurn  
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+	ld		a,(whichplayernowplaying?)
+	ld    h,0
+	ld    l,a
+  ld    b,095+00                        ;dx
+  ld    c,091+00                        ;dy
+  call  SetNumber16BitCastle
+  ret
+
+SetPlayerStartTurnGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (046*128) + (030/2) - 128
+  ld    bc,$0000 + (095*256) + (144/2)
+  ld    a,PlayerStartTurnBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+SetPlayerStartTurnVButton:
+  ld    hl,PlayerStartTurnVButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+PlayerStartTurnVButtonTableGfxBlock:  db  PlayerStartTurnBlock
+PlayerStartTurnVButtonTableAmountOfButtons:  db  01
+PlayerStartTurnVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 114
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 092
+.Button1XRight:         equ .Button1XLeft + 020
 
 
 
@@ -7461,10 +7760,10 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "Having scoured the land you stumble upon  ",254
-                          db  "hidden treasure: the choice lies between ",254
-                          db  "claiming the gold or bestowing it upon peasants ",254
-                          db  " for enlightenment",255
+.DescriptionFire1:        db  "Day 1 Week 12 Month 13 trades if you",254
+                          db  "Michael's turn show tips at start of turn",254
+                          db  "Did you know A marketplace will give better ",254
+                          db  " ",255
 
 ;.AncientScroll:           db  "Unearthing an ancient scroll you",254
 ;                          db  "imbue your spellbook with its mystic spell",254
