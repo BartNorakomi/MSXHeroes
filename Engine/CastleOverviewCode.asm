@@ -10,6 +10,7 @@
 ;  call  DisplayQuickTipsCode
 ;  call  DisplayScrollCode
 ;  call  DisplayChestCode
+;  call  HeroLevelUpCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -180,7 +181,9 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
 .SetUnit:
   ld    hl,SelectedCastleRecruitLevelUnit
-  ld    a,b
+  ld    a,b  
+  ld    (SelectedCastleRecruitUnitWindow),a
+  
   cp    6
   ld    c,(iy+CastleLevel1Units+00)
   ld    (hl),c
@@ -2296,9 +2299,321 @@ HeroButton20x11SYSXSimonBelmont:    db  %1100 0011 | dw $4000 + (095*128) + (060
 HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (095*128) + (120/2) - 128 | dw $4000 + (095*128) + (140/2) - 128 | dw $4000 + (095*128) + (160/2) - 128
 HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180/2) - 128 | dw $4000 + (095*128) + (200/2) - 128 | dw $4000 + (095*128) + (220/2) - 128
 
+HeroLevelUpCode:
+call ScreenOn
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a  
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
+
+  call  SetLevelUpButtons
+  call  IncreasePrimairySkill
+
+  call  SetLevelUpGraphics              ;put gfx
+  call  SetLevelUpHeroIcon
+  call  SetPrimairySkillUpIcon          ;which primairy skill does the hero get ?
+  call  SetLevelUpText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetLevelUpGraphics              ;put gfx
+  call  SetLevelUpHeroIcon
+  call  SetPrimairySkillUpIcon          ;which primairy skill does the hero get ?
+  call  SetLevelUpText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton               ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1010 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
+
+
+  ld    ix,GenericButtonTable
+  call  SetGenericButtons               ;copies button state from rom -> vram
+
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+
+
+
+;  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  ld    a,%1100 0011
+  ld    (GenericButtonTable),a          ;enable the V button once any other button is pressed
+
+  ld    a,b
+  cp    3                               ;V button pressed ?
+  jr    z,.VButton
+  ld    (PreviousButtonClicked),a
+  ld    (PreviousButtonClickedIX),ix
+  cp    2                               ;left skill button pressed ?
+  jr    z,.LeftSkillButton
+  
+  .RightSkillButton:                    ;right skill button pressed
+  ret
+
+  .LeftSkillButton:
+  ret
+  
+  .VButton:
+  pop   af                              ;end DisplayLevelUpCode
+  ld    a,(PreviousButtonClicked)
+  cp    2                               ;money was selected ?
+  jr    z,.AddSkillOnTheLeft
+
+  .AddSkillOnTheRight:
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ret
+
+  .AddSkillOnTheLeft:
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ret  
+
+SetLevelUpButtons:
+  ld    hl,LevelUpButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*03)
+  ldir
+  ret
+
+LevelUpButtonTableGfxBlock:  db  LevelUpBlock
+LevelUpButtonTableAmountOfButtons:  db  3
+LevelUpButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;which resource do you need window
+  ;V button
+  db  %0100 0011 | dw $4000 + (148*128) + (000/2) - 128 | dw $4000 + (148*128) + (020/2) - 128 | dw $4000 + (148*128) + (040/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;left skill button
+  db  %1100 0011 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (020*128) + (160/2) - 128 | dw $4000 + (040*128) + (160/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  ;right skill button
+  db  %1100 0011 | dw $4000 + (000*128) + (180/2) - 128 | dw $4000 + (020*128) + (180/2) - 128 | dw $4000 + (040*128) + (180/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+
+.Button1Ytop:           equ 137
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 156
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 118
+.Button2YBottom:        equ .Button2Ytop + 020
+.Button2XLeft:          equ 066
+.Button2XRight:         equ .Button2XLeft + 020
+
+.Button3Ytop:           equ 118
+.Button3YBottom:        equ .Button3Ytop + 020
+.Button3XLeft:          equ 118
+.Button3XRight:         equ .Button3XLeft + 020
+
+SetLevelUpHeroIcon:
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + (034*128) + (094/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+TextLevelUp2:
+                db "has gained a level",255
+TextLevelUp3:
+                db "level",255
+TextLevelUp5a:
+                db "  Attack + 1",255
+TextLevelUp5b:
+                db "  Defense + 1",255
+TextLevelUp5c:
+                db " Knowledge + 1",255
+TextLevelUp5d:
+                db "Spell Power + 1",255
+TextLevelUp6:
+                db "or",255
+TextLevelUp7:
+                db "Expert",254
+                db "Air Magic",255
+TextLevelUp8:
+                db "Advanced",254
+                db "Logistics",255
+                
+SetLevelUpText:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  ;hero name
+  ld    b,034+00                        ;dx
+  ld    c,022+00                        ;dy
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  sub   a,5
+  ;has gained a level
+  ld    b,a                             ;dx
+  ld    c,022+00                        ;dy
+  ld    hl,TextLevelUp2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ;level text
+  ld    b,073-10                        ;dx
+  ld    c,071+00                        ;dy
+  ld    hl,TextLevelUp3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ;level number
+  ld    a,(ix+HeroLevel)                ;current level
+  ld    l,a
+  ld    h,0
+  ld    b,088-10                        ;dx
+  ld    c,071+00                        ;dy
+  call  SetNumber16BitCastle
+  ;class
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  ld    de,HeroInfoClass
+  add   hl,de
+  ld    b,104-10                        ;dx
+  ld    c,071+00                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(framecounter)
+  and   3
+  ld    hl,TextLevelUp5a                ;attack
+  jr    z,.PrimairySkillUpFound
+  dec   a
+  ld    hl,TextLevelUp5b                ;defense
+  jr    z,.PrimairySkillUpFound
+  dec   a
+  ld    hl,TextLevelUp5c                ;knowledge
+  jr    z,.PrimairySkillUpFound
+  ld    hl,TextLevelUp5d                ;spell power
+  .PrimairySkillUpFound:  
+  ld    b,072+00                        ;dx
+  ld    c,102+00                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,096+00                        ;dx
+  ld    c,126+00                        ;dy
+  ld    hl,TextLevelUp6
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,065+00                        ;dx
+  ld    c,141+00                        ;dy
+  ld    hl,TextLevelUp7
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,117+00                        ;dx
+  ld    c,141+00                        ;dy
+  ld    hl,TextLevelUp8
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetLevelUpGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128          ;red LevelUp (rubies)
+  ld    de,$0000 + (015*128) + (022/2) - 128
+  ld    bc,$0000 + (148*256) + (160/2)
+  ld    a,LevelUpBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetPrimairySkillUpIcon:
+  ld    a,(framecounter)
+  and   3
+  ld    hl,$4000 + (148*128) + (060/2) - 128 ;attack
+  jr    z,.PrimairySkillUpFound
+  dec   a
+  ld    hl,$4000 + (148*128) + (076/2) - 128 ;defense
+  jr    z,.PrimairySkillUpFound
+  dec   a
+  ld    hl,$4000 + (148*128) + (092/2) - 128 ;knowledge
+  jr    z,.PrimairySkillUpFound
+  ld    hl,$4000 + (148*128) + (108/2) - 128 ;spell power
+  .PrimairySkillUpFound:  
+
+  ld    de,$0000 + (081*128) + (094/2) - 128
+  ld    bc,$0000 + (016*256) + (016/2)
+  ld    a,LevelUpBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+IncreasePrimairySkill:
+  ld    a,3
+ 	ld		(SetHeroArmyAndStatusInHud?),a
+
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+
+  ld    a,(framecounter)
+  and   3                         ;attack
+  jr    z,.AttackUp
+  dec   a
+  jr    z,.DefenseUp
+  dec   a
+  jr    z,.KnowledgeUp
+
+  .SpellDamageUp:
+  inc   (ix+HeroStatSpellDamage)
+  ret
+
+  .KnowledgeUp:
+  inc   (ix+HeroStatKnowledge)
+  ret
+
+  .DefenseUp:
+  inc   (ix+HeroStatDefense)
+  ret
+
+  .AttackUp:
+  inc   (ix+HeroStatAttack)
+  ret
+
+
+
+
+
+
+
+
+
 
 DisplayChestCode:
 call ScreenOn
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a  
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
 
   call  SetChestButtons
   
@@ -2317,18 +2632,43 @@ call ScreenOn
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ret   nz
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
   call  CheckButtonMouseInteractionGenericButtons
 
-;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton               ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1010 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
+
 
   ld    ix,GenericButtonTable
   call  SetGenericButtons               ;copies button state from rom -> vram
+
+
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+  ;/Trading Heroes Inventory buttons
+
+
+
 
 ;  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
 
@@ -2337,8 +2677,64 @@ call ScreenOn
 
   .CheckButtonClicked:
   ret   nc
-  pop   af
+  ld    a,%1100 0011
+  ld    (GenericButtonTable),a          ;enable the V button once any other button is pressed
+
+  ld    a,b
+  cp    3                               ;V button pressed ?
+  jr    z,.VButton
+  ld    (PreviousButtonClicked),a
+  ld    (PreviousButtonClickedIX),ix
+  cp    2                               ;money button pressed ?
+  jr    z,.MoneyButton
+  
+  .XPButton:                            ;XP button pressed
   ret
+
+  .MoneyButton:
+  ret
+  
+  .VButton:
+  pop   af                              ;end DisplayChestCode
+  ld    a,(PreviousButtonClicked)
+  cp    2                               ;money was selected ?
+  jr    z,.AddMoney
+
+  .AddXp:
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+
+  ld    a,(BigChest?)
+  or    a
+  ld    de,750                          ;gold
+  jr    z,.SetAmountOfXp                ;zero flag: chest is red
+  ld    de,1000                         ;gold
+  .SetAmountOfXp:
+  ld    l,(ix+HeroXp+0)
+  ld    h,(ix+HeroXp+1)
+  add   hl,de
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  ret
+
+  .AddMoney:
+   call  SetResourcesCurrentPlayerinIX  
+ 
+  ld    a,(BigChest?)
+  or    a
+  ld    de,1000                         ;gold
+  jr    z,.SetAmountOfGold              ;zero flag: chest is red
+  ld    de,1500                         ;gold
+  .SetAmountOfGold: 
+ ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)
+  add   hl,de
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h
+  ld    a,3
+	ld		(SetResources?),a  
+  ret  
 
 SetChestButtons:
   ld    hl,ChestButtonTable-2
@@ -2410,21 +2806,41 @@ SetChestText:
   ld    hl,TextChest4
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    a,(BigChest?)
+  or    a
+  ld    hl,1000                         ;gold
+  jr    z,.SetAmountOfGold              ;zero flag: chest is red
+  ld    hl,1500                         ;gold
+  .SetAmountOfGold:
   ld    b,065+00                        ;dx
   ld    c,171+00                        ;dy
-  ld    hl,1500
   call  SetNumber16BitCastle
 
+  ld    a,(BigChest?)
+  or    a
+  ld    hl,750                          ;gold
+  jr    z,.SetAmountOfXp                ;zero flag: chest is red
+  ld    hl,1000                         ;gold
+  .SetAmountOfXp:
   ld    b,121+00                        ;dx
   ld    c,171+00                        ;dy
-  ld    hl,1000
   call  SetNumber16BitCastle
   ret
 
 SetChestGraphics:
-  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    hl,$4000 + (000*128) + (000/2) - 128          ;red chest (rubies)
   ld    de,$0000 + (015*128) + (016/2) - 128
   ld    bc,$0000 + (168*256) + (174/2)
+  ld    a,ChestBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    a,(BigChest?)
+  or    a
+  ret   nz                                            ;non zero flag: chest is red
+
+  ld    hl,$4000 + (000*128) + (174/2) - 128          ;green chest (gems)
+  ld    de,$0000 + (064*128) + (074/2) - 128
+  ld    bc,$0000 + (062*256) + (058/2)
   ld    a,ChestBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -6431,6 +6847,7 @@ SetEmptyHeroSlotForCurrentPlayerInIX:
 SetTavernHeroes:
   call  SettavernHeroIcons
   call  SettavernHeroNames
+  call  SettavernHeroClass
   call  SettavernHeroSkill
   call  EraseTavernHeroWindowWhenUnavailable
   ret
@@ -6452,7 +6869,7 @@ EraseTavernHeroWindowWhenUnavailable:
 
   .EraseWindow:
   ld    hl,$4000 + (055*128) + (180/2) - 128
-  ld    bc,$0000 + (069*256) + (072/2)
+  ld    bc,$0000 + (070*256) + (072/2)
   ld    a,BuildBlock                    ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -6475,24 +6892,71 @@ EraseTavernHeroWindowWhenUnavailable:
 
 
 
+TextClass: db "Class:",255
+SettavernHeroClass:
+  ld    hl,TextClass
+  ld    b,004+28                        ;dx
+  ld    c,048+02                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    hl,TextClass
+  ld    b,090+28                        ;dx
+  ld    c,048+02                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    hl,TextClass
+  ld    b,176+28                        ;dx
+  ld    c,048+02                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    b,004+28                        ;dx
+  ld    c,058+00                        ;dy
+  call  .SetHeroClass
+
+  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    b,090+28                        ;dx
+  ld    c,058+00                        ;dy
+  call  .SetHeroClass
+
+  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    b,176+28                        ;dx
+  ld    c,058+00                        ;dy
+  call  .SetHeroClass
+  ret
+
+  .SetHeroClass:
+  or    a
+  ret   z
+
+  push  bc
+
+  ld    b,a
+  ld    hl,HeroAddressesAdol-heroAddressesLenght+HeroInfoClass
+  ld    de,heroAddressesLenght
+  .loop:
+  add   hl,de
+  djnz  .loop
+
+  pop   bc
+    
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
 
 SettavernHeroNames:
   ld    a,(iy+TavernHero1DayRemain)     ;hero number
-  ld    b,004+30                        ;dx
-  ld    c,033+13                        ;dy
+  ld    b,004+10                        ;dx
+  ld    c,035+00                        ;dy
   call  .SetHeroName
 
   ld    a,(iy+TavernHero2DayRemain)     ;hero number
-  ld    b,090+30                        ;dx
-  ld    c,033+13                        ;dy
+  ld    b,090+10                        ;dx
+  ld    c,035+00                        ;dy
   call  .SetHeroName
 
   ld    a,(iy+TavernHero3DayRemain)     ;hero number
-  ld    b,176+30                        ;dx
-  ld    c,033+13                        ;dy
+  ld    b,176+10                        ;dx
+  ld    c,035+00                        ;dy
   call  .SetHeroName
   ret
 
@@ -8012,10 +8476,10 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "Day 1 Week 12 Month 13 trades if you",254
-                          db  "Michael's turn show tips at start of turn",254
-                          db  "Did you know A marketplace will give better ",254
-                          db  " ",255
+.DescriptionFire1:        db  "Cost per troop: Available:",254
+                          db  "Total Cost: Recruit:",254
+                          db  "Explore various building options ",254
+                          db  "Take a look at the available building options. ",255
 
 ;.AncientScroll:           db  "Unearthing an ancient scroll you",254
 ;                          db  "imbue your spellbook with its mystic spell",254
@@ -8961,9 +9425,8 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
 .SubtractPurchasedUnitsFromCastle:
   ld    de,(SelectedCastleRecruitLevelUnitRecruitAmount)
-  ld    a,(SelectedCastleRecruitLevelUnit)
-
-  cp    1
+  ld    a,(SelectedCastleRecruitUnitWindow)
+  cp    6
   jr    nz,.EndCheckUnitLevel1  
   ld    l,(iy+CastleLevel1UnitsAvail+00)
   ld    h,(iy+CastleLevel1UnitsAvail+01)
@@ -8973,7 +9436,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
   .EndCheckUnitLevel1:
 
-  cp    2
+  cp    5
   jr    nz,.EndCheckUnitLevel2  
   ld    l,(iy+CastleLevel1UnitsAvail+02)
   ld    h,(iy+CastleLevel1UnitsAvail+03)
@@ -8983,7 +9446,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
   .EndCheckUnitLevel2:
 
-  cp    3
+  cp    4
   jr    nz,.EndCheckUnitLevel3 
   ld    l,(iy+CastleLevel1UnitsAvail+04)
   ld    h,(iy+CastleLevel1UnitsAvail+05)
@@ -8993,7 +9456,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
   .EndCheckUnitLevel3:
 
-  cp    4
+  cp    3
   jr    nz,.EndCheckUnitLevel4
   ld    l,(iy+CastleLevel1UnitsAvail+06)
   ld    h,(iy+CastleLevel1UnitsAvail+07)
@@ -9003,7 +9466,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
   .EndCheckUnitLevel4:
 
-  cp    5
+  cp    2
   jr    nz,.EndCheckUnitLevel5
   ld    l,(iy+CastleLevel1UnitsAvail+08)
   ld    h,(iy+CastleLevel1UnitsAvail+09)
@@ -9013,7 +9476,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ret
   .EndCheckUnitLevel5:
 
-  cp    6
+  cp    1
   jr    nz,.EndCheckUnitLevel6
   ld    l,(iy+CastleLevel1UnitsAvail+10)
   ld    h,(iy+CastleLevel1UnitsAvail+11)
@@ -10473,24 +10936,6 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   sbc   hl,bc
   jp    c,.Red  
   jp    .Blue  
-
-
-
-SetResourcesCurrentPlayerinIX:
-	ld		a,(whichplayernowplaying?)
-  ld    ix,ResourcesPlayer1
-  cp    1
-  ret   z
-  ld    ix,ResourcesPlayer2
-  cp    2
-  ret   z
-  ld    ix,ResourcesPlayer3
-  cp    3
-  ret   z
-  ld    ix,ResourcesPlayer4
-  cp    4
-  ret   z
-  ret
 
 SetSingleBuildButtonColor:
   push  iy

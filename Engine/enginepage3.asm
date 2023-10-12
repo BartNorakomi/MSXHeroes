@@ -1,14 +1,10 @@
 phase	$c000
 
+StartOfTurnMessageOn?:  equ 0
+
 InitiateGame:
-;	ld		a,1
-;	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
-;	ld		a,3
-;	ld		(ChangeManaAndMovement?),a
-
 	ld		a,1
-	ld		(whichplayernowplaying?),a       ;which hero has it's first turn
-
+	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
 StartGame:
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
@@ -654,6 +650,7 @@ BuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=
 
 
 SelectedCastleRecruitLevelUnit: ds  1
+SelectedCastleRecruitUnitWindow: ds  1
 SelectedCastleRecruitLevelUnitAmountAvailable: dw 000
 SelectedCastleRecruitLevelUnitRecruitAmount: dw 000
 SelectedCastleRecruitLevelUnitTotalGoldCost: dw 000

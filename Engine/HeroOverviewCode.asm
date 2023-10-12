@@ -4,6 +4,7 @@
 ;  call  HeroOverviewSpellBookWindowCode_Fire
 ;  call  HeroOverviewInventoryWindowCode
 ;  call  HeroOverviewArmyWindowCode
+;  call  HeroOverviewStatusWindowCode
 
 HeroOverViewFirstWindowchoicesSX:   equ 000
 HeroOverViewFirstWindowchoicesSY:   equ 000
@@ -3454,7 +3455,16 @@ SetStatusTextAttack:
   ld    c,HeroOverViewStatusWindowDY + 059
   call  SetNumber16Bit
 
-  ld    hl,61358 ;xp next
+  ld    a,(ix+HeroLevel)                ;current level
+  add   a,a
+  ld    d,0
+  ld    e,a
+  ld    hl,HeroXPTable-2
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)                          ;amount of xp needed for next level 
+  ex    de,hl
   ld    b,HeroOverViewStatusWindowDX + 090
   ld    c,HeroOverViewStatusWindowDY + 059
   call  SetNumber16Bit
