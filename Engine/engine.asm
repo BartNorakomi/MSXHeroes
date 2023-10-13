@@ -1,7 +1,5 @@
 LevelEngine:
-
 ;For now PopulateControls and PopulateKeyMatrix are ONLY used in the routine scrollscreen
-  call  CheckHeroLevelUp                ;Check if hero should level up
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
@@ -15,10 +13,18 @@ LevelEngine:
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
-  call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
+
   call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  jr    z,.EndHeroChecks                ;don't check hero, if player has no active heroes
+  call  CheckHeroLevelUp                ;Check if hero should level up
+  call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
+  .EndHeroChecks:
 
   call  putbottomobjects
 	call	putbottomcastles
@@ -58,6 +64,9 @@ LevelEngine:
   ld    a,(framecounter)
   cp    2
   call  z,SetScreenOn
+
+call  SetScreenOn
+
   jp    LevelEngine
 
 PreviousVblankIntFlag:  db  1
@@ -148,6 +157,335 @@ InterruptHandler:
   pop   af 
   ei
   ret
+
+SetText:                                ;in: b=dx, c=dy, hl->text
+  ld    a,6
+  ld    (PutLetter+ny),a                ;set dx of text
+
+
+  ld    a,b
+  ld    (PutLetter+dx),a                ;set dx of text
+  ld    (TextDX),a
+  ld    a,c
+  ld    (PutLetter+dy),a                ;set dy of text
+  ld    (TextAddresspointer),hl  
+;  ld    a,6
+;  ld    (PutLetter+ny),a                ;set ny of text
+;  call  SetTextBuildingWhenClicked.SetText
+;  ld    a,5
+;  ld    (PutLetter+ny),a                ;set ny of text
+;  ret
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+	xor		1                               ;now we switch and set our page
+  ld    (PutLetter+dPage),a             ;set page where to put text
+
+  ld    a,-1
+  ld    (TextPointer),a                 ;increase text pointer
+  .NextLetter:
+  ld    a,(TextPointer)
+  inc   a
+  ld    (TextPointer),a                 ;increase text pointer
+
+  ld    hl,(TextAddresspointer)
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+
+  ld    a,(hl)                          ;letter
+  cp    255                             ;end
+  ret   z
+  cp    254                             ;next line
+  jp    z,.NextLine
+  cp    TextSpace                       ;space
+  jp    z,.Space
+  cp    TextPercentageSymbol            ;%
+  jp    z,.TextPercentageSymbol
+  cp    TextPlusSymbol                  ;+
+  jp    z,.TextPlusSymbol
+  cp    TextMinusSymbol                 ;-
+  jp    z,.TextMinusSymbol
+  cp    TextApostrofeSymbol             ;'
+  jp    z,.TextApostrofeSymbol
+  cp    TextColonSymbol                 ;:
+  jp    z,.TextColonSymbol
+  cp    TextSlashSymbol                 ;/
+  jp    z,.TextSlashSymbol
+  cp    TextQuestionMarkSymbol          ;?
+  jp    z,.TextQuestionMarkSymbol
+  cp    TextCommaSymbol                 ;,
+  jp    z,.TextCommaSymbol
+  cp    TextDotSymbol                   ;.
+  jp    z,.TextDotSymbol
+
+  cp    TextNumber0+10
+  jr    c,.Number
+
+  sub   $41
+  ld    hl,.TextCoordinateTable  
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a
+
+  add   hl,de
+  
+  .GoPutLetter:
+  ld    a,(hl)                          ;sx
+  ld    (PutLetter+sx),a                ;set sx of letter
+  inc   hl
+  ld    a,(hl)                          ;nx
+  ld    (PutLetter+nx),a                ;set nx of letter
+
+  ld    hl,PutLetter
+  call  DoCopy
+
+  ld    hl,PutLetter+nx                 ;nx of letter
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  add   a,(hl)                          ;add lenght
+  inc   a                               ;+1
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  
+  jp    .NextLetter
+
+  .Number:
+  sub   TextNumber0                     ;hex value of number "0"
+  add   a,a                             ;*2
+  ld    d,0
+  ld    e,a  
+
+  ld    hl,.TextNumberSymbolsSXNX
+  add   hl,de
+  jr    .GoPutLetter
+  
+  .TextPercentageSymbol:
+  ld    hl,.TextPercentageSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextPlusSymbol:
+  ld    hl,.TextPlusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextMinusSymbol:
+  ld    hl,.TextMinusSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextApostrofeSymbol:
+  ld    hl,.TextApostrofeSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextColonSymbol:
+  ld    hl,.TextColonSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextSlashSymbol:
+  ld    hl,.TextSlashSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextQuestionMarkSymbol:
+  ld    hl,.TextQuestionMarkSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextCommaSymbol:
+  ld    hl,.TextCommaSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextDotSymbol:
+  ld    hl,.TextDotSymbolSXNX  
+  jr    .GoPutLetter
+
+  .Space:
+  ld    a,(PutLetter+dx)                ;set dx of next letter
+  add   a,5
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+  .NextLine:
+  ld    a,(PutLetter+dy)                ;set dy of next letter
+  add   a,7
+  ld    (PutLetter+dy),a                ;set dy of next letter
+  ld    a,(TextDX)
+  ld    (PutLetter+dx),a                ;set dx of next letter
+  jp    .NextLetter
+
+;                          0       1       2       3       4       5       6       7       8       9
+.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,3,  191,3,  195,4,  199,3,  203,3,  158,4  
+.TextSlashSymbolSXNX: db  158+49,4  ;"/"
+.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
+.TextPlusSymbolSXNX: db  166+49,5 ;"+"
+.TextMinusSymbolSXNX: db  169+49,5 ;"-"
+.TextApostrofeSymbolSXNX: db  053,1  ;"'"
+.TextColonSymbolSXNX: db  008,1  ;":"
+.TextQuestionMarkSymbolSXNX:  db  223,3 ;"?"
+.TextCommaSymbolSXNX:  db  226,2 ;","
+.TextDotSymbolSXNX:  db  207,1 ;","
+
+;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
+.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,4, 107,3, 110,3, 113,3, 116,4, 120,3, 123,5, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
+;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
+ds 12
+.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 019,3, 022,3, 025,1, 026,2, 028,3, 032,1, 033,5, 038,3, 042,3, 046,3, 050,3, 054,2, 057,3, 060,2, 062,3, 065,3, 068,5, 073,3, 076,3, 080,4
+
+SetNumber16BitCastleSkipIfAmountIs0:
+  ld    a,h
+  cp    l
+  ret   z
+
+SetNumber16BitCastle:                   ;in hl=number (16bit)
+  push  bc
+  push  iy
+  call  .ConvertToDecimal16bit
+  pop   iy
+  pop   bc
+
+  ld    hl,TextNumber
+  jp    SetText
+
+  .ConvertToDecimal16bit:
+  ld    iy,TextNumber
+  ld    e,0                             ;e=has an xfold already been set prior ?
+
+  .Check10000Folds:
+  ld    d,$30                           ;10000folds in d ($30 = 0)
+
+  .Loop10000Fold:
+  or    a
+  ld    bc,10000
+  sbc   hl,bc                           ;check for 10000 folds
+  jr    c,.Set10000Fold
+  inc   d
+  jr  .Loop10000Fold
+
+  .Set10000Fold:
+  ld    a,d
+  cp    $30
+  jr    z,.EndSet10000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 1000fold
+  inc   iy
+  .EndSet10000Fold:
+
+  add   hl,bc
+
+  .Check1000Folds:
+  ld    d,$30                           ;1000folds in d ($30 = 0)
+
+  .Loop1000Fold:
+  or    a
+  ld    bc,1000
+  sbc   hl,bc                           ;check for 1000 folds
+  jr    c,.Set1000Fold
+  inc   d
+  jr  .Loop1000Fold
+
+  .Set1000Fold:
+  bit   0,e
+  jr    nz,.DoSet1000Fold    
+  ld    a,d
+  cp    $30
+  jr    z,.EndSet1000Fold  
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  .DoSet1000Fold:
+  ld    (iy),d                          ;set 100fold
+  inc   iy
+  .EndSet1000Fold:
+
+  add   hl,bc
+
+  .Check100Folds:
+  ld    d,$30                           ;100folds in d ($30 = 0)
+
+  .Loop100Fold:
+  or    a
+  ld    bc,100
+  sbc   hl,bc                           ;check for 100 folds
+  jr    c,.Set100Fold
+  inc   d
+  jr  .Loop100Fold
+
+  .Set100Fold:
+  bit   0,e
+  jr    nz,.DoSet100Fold  
+  ld    a,d
+  cp    $30
+  jr    nz,.DoSet100Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,4
+  ld    (PutLetter+dx),a                ;set dx of text
+
+
+  jr    .EndSet100Fold  
+
+  .DoSet100Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 100fold
+  inc   iy
+  .EndSet100Fold:
+
+  add   hl,bc
+
+  .Check10Folds:
+  ld    d,$30                           ;10folds in d ($30 = 0)
+
+  .Loop10Fold:
+  or    a
+  ld    bc,10
+  sbc   hl,bc                           ;check for 10 folds
+  jr    c,.Set10Fold
+  inc   d
+  jr  .Loop10Fold
+
+  .Set10Fold:
+  bit   0,e
+  jr    nz,.DoSet10Fold
+  ld    a,d
+  cp    $30
+  jr    nz,.DoSet10Fold  
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,3
+  ld    (PutLetter+dx),a                ;set dx of text
+
+  jr    .EndSet10Fold  
+
+  .DoSet10Fold:
+  ld    e,1                             ;e=has an xfold already been set prior ?
+  ld    (iy),d                          ;set 10fold
+  inc   iy
+  .EndSet10Fold:
+
+  .Check1Fold:
+  ld    bc,10 + $30
+  add   hl,bc
+  
+;  add   a,10 + $30
+  ld    (iy),l                          ;set 1 fold
+  ld    (iy+1),255                      ;end text
+  ret
+
+
+
+
+
+
+
+
+
+
+;TavernHero1DayRemain:   equ 33
+;TavernHero2DayRemain:   equ 34
+;TavernHero3DayRemain:   equ 35
+;AmountOfCastles:  equ 4
+;            tavernhero1, tavernhero2, tavernhero3 
+;Castle1:    030    ,031    ,032   
+;Castle2:    030    ,031    ,032     
+;Castle3:    030    ,031    ,032    
+;Castle4:    030    ,031    ,032   
+
+Player1TavernPointer:  dw  0 | TavernHeroesPlayer1:        db  001,002,003,004,005,255,255,255,255,255
+Player2TavernPointer:  dw  0 | TavernHeroesPlayer2:        db  006,007,008,009,010,255,255,255,255,255
+Player3TavernPointer:  dw  0 | TavernHeroesPlayer3:        db  011,012,013,014,015,255,255,255,255,255
+Player4TavernPointer:  dw  0 | TavernHeroesPlayer4:        db  016,017,018,019,020,255,255,255,255,255
 
 HeroXPTable:
   dw    01000 ;level 2
@@ -243,7 +581,7 @@ DisplayScrollFound:
 
 DisplayStartOfTurnMessage?: db  3
 DisplayQuickTips?: db  1
-Date: dw  -1                          ;days, weeks, months
+Date: dw  0                          ;days, weeks, months
 DisplayStartOfTurnMessage:
   if    StartOfTurnMessageOn?
   else
@@ -868,15 +1206,13 @@ ActivateFirstActiveHeroForCurrentPlayer:
 
   call  SetHero1ForCurrentPlayerInIX
   call  FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime
+
+;ld ix,pl1hero2y
   ld    (plxcurrentheroAddress),ix  
 	call	FirstHeroWindowClicked          ;if possible click first window to center screen for this hero. hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.                                      
 
 
   InitiatePlayerTurn:
-;  call  SetHero1ForCurrentPlayerInIX
-;  call  FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime
-;  ld    (plxcurrentheroAddress),ix  
-;	call	FirstHeroWindowClicked          ;if possible click first window to center screen for this hero. hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.                                      
 	ld		a,2							                ;reset all lit hero windows
 	ld		(ButtonHeroWindow1+ButtonLit?),a
 	ld		(ButtonHeroWindow2+ButtonLit?),a
@@ -889,10 +1225,10 @@ ActivateFirstActiveHeroForCurrentPlayer:
   ld    ix,(plxcurrentheroAddress)
   call  centrescreenforthishero.GoCenter
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  cp    254                             ;if current hero went defending into castle, then select a active hero as current hero
+  cp    254                             ;if current hero went defending into castle, find the next active hero
   jr    z,ActivateFirstActiveHeroForCurrentPlayer
   cp    255                             ;inactive
-  call  z,CenterScreenOnPlayersCastle
+  call  z,CenterScreenOnPlayersCastleAndNoActiveHero
   
   ;if this player is in castle, center screen around castle instead
   
@@ -902,11 +1238,80 @@ ActivateFirstActiveHeroForCurrentPlayer:
 	ld		(ChangeManaAndMovement?),a	
 	ld		(SetHeroArmyAndStatusInHud?),a
 	ld		(SetResources?),a
-	ret
 
+  call  CheckIfCurrentPlayerIsDisabled  ;if player has no castles and no heroes, he's out of the game
+  ret   nc
+  call  SetNextPlayersTurn            ;carry flag=player is out of the game
+  jp    ActivateFirstActiveHeroForCurrentPlayer
+
+CheckIfCurrentPlayerIsDisabled:         ;out: carry flag=player is out of the game
+  ld		a,(whichplayernowplaying?)      ;check if current player has a castle
+  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
+
+  call  SetHero1ForCurrentPlayerInIX    ;check if current player has an active hero
+  ld    a,(ix+HeroStatus)
+  cp    1                               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  ret   z
+  scf                                   ;carry=player has no castles and no active hero
+  ret
+
+  ;set next player's turn
+SetNextPlayersTurn:
+	ld		a,(amountofplayers)       ;set next player to have their turn
+	ld		b,a
+	ld		a,(whichplayernowplaying?)
+	cp		b
+	jp		nz,.endchecklastplayer
+	xor		a
+  .endchecklastplayer:	
+	inc		a
+	ld		(whichplayernowplaying?),a
+  ret
+
+CenterScreenOnPlayersCastleAndNoActiveHero:
+	ld		a,0							                ;reset lit hero window
+	ld		(ButtonHeroWindow1+ButtonLit?),a
 CenterScreenOnPlayersCastle:            ;if at the start of a turn, a player has no heroes, center screen around his 1st castle instead
   call  SetCastleUsingCastleWindowPointerInIX
   jp    centrescreenforthisCastle
+
+SetCastleUsingCastleWindowPointerInIX:
+	ld		a,(CastleWindowPointer)     ;CastleWindowPointer points to the castle that should be in castlewindows1 
+	ld    c,a	
+  ld    a,(whichplayernowplaying?)
+  ld    b,AmountOfCastles
+  ld    ix,Castle1
+  ld    de,LenghtCastleTable
+  .SearchLoop:
+  cp    (ix+CastlePlayer)
+  jp    z,.CastleFound
+  add   ix,de
+  djnz  .SearchLoop
+  ;no castle found, this player has no castles at all
+  pop   af
+  ret
+
+  .CastleFound:
+  dec   c
+  ret   m
+  add   ix,de
+  djnz  .SearchLoop
+  ;no castle found, this player has no castles at all
+  pop   af
+  ret
+
+  .SearchNextCastle:  
+  add   ix,de
+  cp    (ix+CastlePlayer)
+  ret   z               ;castle found
+  djnz  .SearchNextCastle
+  ;no castle
+  pop   af
+  ret  
+
 
 ThirdHeroWindowClicked:
   call  SetHero1ForCurrentPlayerInIX
@@ -927,7 +1332,7 @@ ThirdHeroWindowClicked:
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
-	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+;	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
 
 SecondHeroWindowClicked:
@@ -949,7 +1354,7 @@ SecondHeroWindowClicked:
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
-	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+;	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
 
 FirstHeroWindowClicked:                        ;hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.
@@ -971,7 +1376,7 @@ FirstHeroWindowClicked:                        ;hero window 1 is clicked. check 
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
-	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
+;	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero;
 
 CenterScreenForCurrentHero:
@@ -980,8 +1385,8 @@ CenterScreenForCurrentHero:
 	
 centrescreenforthishero:
 ;a new player is clicked, set new player as current player, and reset movement stars
-	ld		a,b
-	ld		(plxcurrenthero),a
+;	ld		a,b
+;	ld		(plxcurrenthero),a
 
 	xor		a
 	ld		(putmovementstars?),a
@@ -1489,6 +1894,11 @@ CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon)
   ld    de,CursorHand
   call  CompareHLwithDE
   ret   nz  
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ret   z                               ;dont check if player has no active heroes
 
   ld    a,1
   ld    (SetHeroOverViewMenu?),a
@@ -2217,7 +2627,7 @@ SetHeroUsingHeroWindowPointer:          ;set hero hero window points to in IX
 	ld		b,a
   .loop:
 	add		ix,de
-	djnz	.loop
+	djnz	.loop	
   ret
 
 FindHeroThatIsNotInCastleAndDecreaseHeroWindowPointerEachTime:
@@ -2236,13 +2646,14 @@ FindHeroThatIsNotInCastleAndIncreaseHeroWindowPointerEachTime:
 	ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    254
   ret   nz
+	ld		de,lenghtherotable
 	add		ix,de
 	ld		a,(herowindowpointer)
 	add		a,1
 	cp		8
 	ret		nc
 	ld		(herowindowpointer),a
-  jp    FindHeroThatIsNotInCastle 
+  jp    FindHeroThatIsNotInCastle
   
 FindHeroThatIsNotInCastle:
 	ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -2599,12 +3010,27 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		(mouseposy),a
 ;/set relative mouse position
 
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+	jp		z,.EndCheckPointerOnHero         ;if player has no active heroes, skip checking if pointer is on enemy hero
+
 	ld		de,lenghtherotable
 	ld		a,(whichplayernowplaying?) | cp 1 | ld ix,pl1hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 2 | ld ix,pl2hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 3 | ld ix,pl3hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 4 | ld ix,pl4hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
+  .EndCheckPointerOnHero:
+
 	call	.CheckPointerOnCastle           ;check if pointer is on a castle
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ld    hl,CursorHand
+	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
+
 	call	.checkpointeroncreature         ;check if pointer is on creature
 	call	.checkpointeritem               ;check if pointer is on an item
 	jp		.shoe					                  ;pointer on no hero at all, show shoe
@@ -3458,69 +3884,74 @@ HeroAddressesLatok:           db "latok            ",255,"overlord    ",255,Lato
 HeroAddressesDrasle2:         db "drasle2          ",255,"barbarian   ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 |
 HeroAddressesSnake1:          db "snake1           ",255,"deathlord   ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 |
 HeroAddressesDrasle3:         db "drasle3          ",255,"cleric      ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 |
+
 HeroAddressesSnake2:          db "snake2           ",255,"druid       ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 |
 HeroAddressesDrasle4:         db "drasle4          ",255,"battle mage ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 |
-
 HeroAddressesAshguine:        db "ashguine         ",255,"heretic     ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 |
 HeroAddressesUndeadline1:     db "warrior          ",255,"warlock     ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 |
 HeroAddressesPsychoWorld:     db "psycho           ",255,"wizzard     ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 |
 HeroAddressesUndeadline2:     db "ninja            ",255,"witch       ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 |
 HeroAddressesGoemon2:         db "goemon           ",255,"beastmaster ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 |
 HeroAddressesUndeadline3:     db "marco            ",255,"mage        ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 |
+
 HeroAddressesFray:            db "fray             ",255,"death knight",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 |
 HeroAddressesBlackColor:      db "black color      ",255,"necromancer ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroButton20x11SYSXBlackColor,HeroPortrait16x30SYSXBlackColor                     | db 19 |
 HeroAddressesWit:             db "wit              ",255,"death knight",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroButton20x11SYSXWit,HeroPortrait16x30SYSXWit                                                        | db 22 |
 HeroAddressesMitchell:        db "mitchell         ",255,"death knight",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroButton20x11SYSXMitchell,HeroPortrait16x30SYSXMitchell                               | db 25 |
-
 HeroAddressesJanJackGibson:   db "jan jack gibson  ",255,"overlord    ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroButton20x11SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson      | db 28 |
 HeroAddressesGillianSeed:     db "gillian seed     ",255,"death knight",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroButton20x11SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed                | db 31 |
 HeroAddressesSnatcher:        db "snatcher         ",255,"death knight",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 |
 HeroAddressesGolvellius:      db "golvellius       ",255,"death knight",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 |
+
 HeroAddressesBillRizer:       db "bill rizer       ",255,"death knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 |
 HeroAddressesPochi:           db "pochi            ",255,"death knight",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 |
 HeroAddressesGreyFox:         db "grey fox         ",255,"death knight",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 |
 HeroAddressesTrevorBelmont:   db "trevor belmont   ",255,"death knight",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 |
 HeroAddressesBigBoss:         db "big boss         ",255,"death knight",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 |
 HeroAddressesSimonBelmont:    db "simon belmont    ",255,"beastmaster ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont         | db 22 |
-
-HeroAddressesDrPettrovich:    db "doctor pettrovich",255,"barbarian   ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
+HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,"barbarian   ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
 HeroAddressesRichterBelmont:  db "Richter Belmont  ",255,"Death Knight",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
 
-HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXPixy:         equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrasle1:      equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXLatok:        equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrasle2:      equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXSnake1:       equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrasle3:      equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroAddressesUltraBox:        db "Ultrabox         ",255,"Death Knight",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox | db 28 |
 
-HeroSYSXSnake2:       equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrasle4:      equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXAshguine:     equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXUndeadline1:  equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXPsychoWorld:  equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXUndeadline2:  equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGoemon2:      equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXUndeadline3:  equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPixy:         equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle1:      equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXLatok:        equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle2:      equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSnake1:       equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle3:      equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXFray:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXBlackColor:   equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXWit:          equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXMitchell:     equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXJanJackGibson:equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGillianSeed:  equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXSnatcher:     equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGolvellius:   equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXSnake2:       equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle4:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXAshguine:     equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline1:  equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPsychoWorld:  equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline2:  equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGoemon2:      equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline3:  equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXBillRizer:    equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXPochi:        equ $4000+(000*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXGreyFox:      equ $4000+(032*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXTrevorBelmont:equ $4000+(032*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXBigBoss:      equ $4000+(064*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXSimonBelmont: equ $4000+(064*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXDrPettrovich: equ $4000+(096*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroSYSXRichterBelmont:equ $4000+(096*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroSYSXFray:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXBlackColor:   equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXWit:          equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXMitchell:     equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXJanJackGibson:equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGillianSeed:  equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSnatcher:     equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGolvellius:   equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+
+HeroSYSXBillRizer:    equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPochi:        equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGreyFox:      equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXTrevorBelmont:equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXBigBoss:      equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSimonBelmont: equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrPettrovich: equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXRichterBelmont:equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+
+HeroSYSXUltrabox:     equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+
 ;------------------------------------------------------------------------------------------------------------
 HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXGoemon1:      equ $4000+(000*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -3555,6 +3986,8 @@ HeroPortrait14x9SYSXBigBoss:      equ $4000+(009*128)+(140/2)-128 ;(dy*128 + dx/
 HeroPortrait14x9SYSXSimonBelmont: equ $4000+(009*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXDrPettrovich: equ $4000+(009*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait14x9SYSXUltrbox:      equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 ;------------------------------------------------------------------------------------------------------------
 HeroPortrait16x30SYSXAdol:         equ $8000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXGoemon1:      equ $8000+(000*128)+(016/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -3590,8 +4023,9 @@ HeroPortrait16x30SYSXSimonBelmont: equ $8000+(030*128)+(208/2)-128 ;(dy*128 + dx
 HeroPortrait16x30SYSXDrPettrovich: equ $8000+(030*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXRichterBelmont:equ $8000+(030*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+HeroPortrait16x30SYSXUltrabox:     equ $8000+(060*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
 amountofheroesperplayer:	equ	8
-plxcurrenthero:	db	0*lenghtherotable		;0=pl1hero1, 1=pl1hero2
 plxcurrentheroAddress:	dw  pl1hero1y
 lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
@@ -3646,7 +4080,7 @@ EmptyHeroRecruitedAtTavern:
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero1y:		db	3
-pl1hero1x:		db	6
+pl1hero1x:		db	3
 pl1hero1xp: dw 999
 pl1hero1move:	db	30,30
 pl1hero1mana:	db	02,20
@@ -3659,22 +4093,22 @@ Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 1111
-.AirSpells:         db  %0000 1111
-.WaterSpells:       db  %0000 1111
-.AllSchoolsSpells:  db  %0000 1111
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesFray
+.HeroSpecificInfo: dw HeroAddressesDrPettrovich
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero2y:		db	7
-pl1hero2x:		db	1
+pl1hero2y:		db	3
+pl1hero2x:		db	2
 pl1hero2xp: dw 0000
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	254		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -3682,22 +4116,22 @@ Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 | 
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  4,7,10,16,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
+.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0000
+.AirSpells:         db  %0000 0000
+.WaterSpells:       db  %0000 0000
+.AllSchoolsSpells:  db  %0000 0000
 .Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesGoemon1
+.HeroSpecificInfo: dw HeroAddressesUltraBox
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero3y:		db	03		                ;
-pl1hero3x:		db	02		
+pl1hero3y:		db	05	                ;
+pl1hero3x:		db	06
 pl1hero3xp: dw 0000
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	254		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -3705,23 +4139,23 @@ Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  8,30,24,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0001
-.AirSpells:         db  %0000 0001
-.WaterSpells:       db  %0000 0001
-.AllSchoolsSpells:  db  %0000 0001
+.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0000
+.AirSpells:         db  %0000 0000
+.WaterSpells:       db  %0000 0000
+.AllSchoolsSpells:  db  %0000 0000
 .Inventory: ds  lenghtinventorytable,045
 .HeroSpecificInfo: dw HeroAddressesPixy
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero4y:		db	07		                ;
-pl1hero4x:		db	05		
+pl1hero4y:		db	00		                ;
+pl1hero4x:		db	00		
 pl1hero4xp: dw 0000
 pl1hero4move:	db	30,20
 pl1hero4mana:	db	10,20
 pl1hero4manarec:db	5		                ;recover x mana every turn
 pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero4Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -3761,13 +4195,13 @@ Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero6y:		db	07		                ;
-pl1hero6x:		db	07		
-pl1hero6xp: dw 0000
-pl1hero6move:	db	30,20
-pl1hero6mana:	db	10,20
-pl1hero6manarec:db	5		                ;recover x mana every turn
-pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.pl1hero6x:		db	07		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	30,20
+.pl1hero6mana:	db	10,20
+.pl1hero6manarec:db	5		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -3786,13 +4220,13 @@ Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 pl1hero7y:		ds  lenghtherotable,255
 pl1hero8y:		ds  lenghtherotable,255
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-pl2hero1y:		db	9
-pl2hero1x:		db	6 ;100
+pl2hero1y:		db	5
+pl2hero1x:		db	5 ;100
 pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
-pl2hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -3891,9 +4325,9 @@ CastleMageGuildLevel:   equ 6
 CastleBarracksLevel:    equ 7
 CastleSawmillLevel:     equ 8
 CastleMineLevel:        equ 9
-CastleTavernHero1:      equ 10
-CastleTavernHero2:      equ 11
-CastleTavernHero3:      equ 12
+.Empty1:      equ 10
+.Empty2:      equ 11
+.Empty3:      equ 12
 CastleLevel1Units:      equ 13
 CastleLevel2Units:      equ 14
 CastleLevel3Units:      equ 15

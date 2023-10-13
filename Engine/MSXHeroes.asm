@@ -458,6 +458,7 @@ SimonBelmontSpriteBlock:      equ HeroesSpritesBlock4
 DrPettrovichSpriteBlock:      equ HeroesSpritesBlock4
 RichterBelmontSpriteBlock:    equ HeroesSpritesBlock4
 
+UltraBoxSpriteBlock:          equ HeroesSpritesBlock5
 ;
 ; block $06 - 07
 ;
@@ -481,11 +482,13 @@ phase	$4000
 dephase
 
 ;
-; block $0a - 0b
+; block $9a - 9b
 ;
-HudNewBlock:  equ   $0a
+HeroesSpritesBlock5:  equ   HeroesSpritesBlock1 + 4
+HeroesSpritesBlock6:  equ   HeroesSpritesBlock1 + 5
 phase	$4000
-  incbin "..\grapx\hud\HudNew.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet3.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet3Bottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -534,9 +537,9 @@ dephase
 ;
 ; block $14 - 15
 ;
-Hero14x9PortraitsBlock:  equ   $14
+Hero20x11PortraitsBlock:  equ   $14
 phase	$4000
-  incbin "..\grapx\HeroesSprites\14x9Portraits.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\20x11Portraits.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -793,6 +796,15 @@ dephase
 LevelUpBlock:  equ   $4a
 phase	$4000
   incbin "..\grapx\HeroOverview\LevelUp.SC5",7,167 * 128      ;167 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $4c - 4d
+;
+HudNewBlock:  equ   $4c
+phase	$4000
+  incbin "..\grapx\hud\HudNew.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

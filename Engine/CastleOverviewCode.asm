@@ -650,25 +650,6 @@ SetAvailableRecruitArmy:
   call  SetNumber16BitCastle
   ret
   
-  ld    a,b
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
-  ret
-
-
-
-
-
   .cost:
   ld    a,(iy+CastleLevel1Units+00)
   ld    b,005+020                       ;dx
@@ -703,25 +684,9 @@ SetAvailableRecruitArmy:
 
   .SetCost:
   call  SetCostSelectedCreatureInHL
-
   call  SetNumber16BitCastle
   ret
   
-  ld    a,b
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
-  ret
-
   .names:
   ld    a,(iy+CastleLevel1Units+00)
   ld    b,007                           ;dx
@@ -764,21 +729,7 @@ SetAvailableRecruitArmy:
   inc   hl
   ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ex    de,hl
-  
-  ld    a,b
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
-  ret
+  jp    SetText
 
   .amount:
   ld    l,(iy+CastleLevel1UnitsAvail+00)
@@ -951,20 +902,6 @@ SettavernHeroSkill:
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
 
-SetText:                                ;in: b=dx, c=dy, hl->text
-  ld    a,b
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c
-  ld    (PutLetter+dy),a                ;set dy of text
-  ld    (TextAddresspointer),hl  
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-
 SetTextBuildingWhenClicked:
   ld    a,(SetTextBuilding)
   dec   a
@@ -976,172 +913,11 @@ SetTextBuildingWhenClicked:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   ld    hl,(PutWhichBuildText)
-  ld    a,182
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,047
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  .SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-
-  .SetText:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-  ld    (PutLetter+dPage),a             ;set page where to put text
-
-  ld    a,-1
-  ld    (TextPointer),a                 ;increase text pointer
-  .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
-
-  ld    hl,(TextAddresspointer)
-
-  ld    d,0
-  ld    e,a
-  add   hl,de
-
-  ld    a,(hl)                          ;letter
-  cp    255                             ;end
-  ret   z
-  cp    254                             ;next line
-  jp    z,.NextLine
-  cp    TextSpace                       ;space
-  jp    z,.Space
-  cp    TextPercentageSymbol            ;%
-  jp    z,.TextPercentageSymbol
-  cp    TextPlusSymbol                  ;+
-  jp    z,.TextPlusSymbol
-  cp    TextMinusSymbol                 ;-
-  jp    z,.TextMinusSymbol
-  cp    TextApostrofeSymbol             ;'
-  jp    z,.TextApostrofeSymbol
-  cp    TextColonSymbol                 ;:
-  jp    z,.TextColonSymbol
-  cp    TextSlashSymbol                 ;/
-  jp    z,.TextSlashSymbol
-  cp    TextQuestionMarkSymbol          ;?
-  jp    z,.TextQuestionMarkSymbol
-  cp    TextCommaSymbol                 ;,
-  jp    z,.TextCommaSymbol
-  cp    TextDotSymbol                   ;.
-  jp    z,.TextDotSymbol
-
-  cp    TextNumber0+10
-  jr    c,.Number
-
-  sub   $41
-  ld    hl,.TextCoordinateTable  
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a
-
-  add   hl,de
-  
-  .GoPutLetter:
-  ld    a,(hl)                          ;sx
-  ld    (PutLetter+sx),a                ;set sx of letter
-  inc   hl
-  ld    a,(hl)                          ;nx
-  ld    (PutLetter+nx),a                ;set nx of letter
-
-  ld    hl,PutLetter
-  call  DoCopy
-
-  ld    hl,PutLetter+nx                 ;nx of letter
-  ld    a,(PutLetter+dx)                ;dx of letter we just put
-  add   a,(hl)                          ;add lenght
-  inc   a                               ;+1
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  
-  jp    .NextLetter
-
-  .Number:
-  sub   TextNumber0                     ;hex value of number "0"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a  
-
-  ld    hl,.TextNumberSymbolsSXNX
-  add   hl,de
-  jr    .GoPutLetter
-  
-  .TextPercentageSymbol:
-  ld    hl,.TextPercentageSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextPlusSymbol:
-  ld    hl,.TextPlusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextMinusSymbol:
-  ld    hl,.TextMinusSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextApostrofeSymbol:
-  ld    hl,.TextApostrofeSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextColonSymbol:
-  ld    hl,.TextColonSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextSlashSymbol:
-  ld    hl,.TextSlashSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextQuestionMarkSymbol:
-  ld    hl,.TextQuestionMarkSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextCommaSymbol:
-  ld    hl,.TextCommaSymbolSXNX  
-  jr    .GoPutLetter
-
-  .TextDotSymbol:
-  ld    hl,.TextDotSymbolSXNX  
-  jr    .GoPutLetter
-
-  .Space:
-  ld    a,(PutLetter+dx)                ;set dx of next letter
-  add   a,5
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-  .NextLine:
-  ld    a,(PutLetter+dy)                ;set dy of next letter
-  add   a,7
-  ld    (PutLetter+dy),a                ;set dy of next letter
-  ld    a,(TextDX)
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
+  ld    b,182
+  ld    c,047
+  jp    SetText
 
 
-;                          0       1       2       3       4       5       6       7       8       9
-.TextNumberSymbolsSXNX: db 171,4,  175,2,  177,4,  181,3,  184,3,  187,3,  191,3,  195,4,  199,3,  203,3,  158,4  
-.TextSlashSymbolSXNX: db  158+49,4  ;"/"
-.TextPercentageSymbolSXNX: db  162+49,4 ;"%"
-.TextPlusSymbolSXNX: db  166+49,5 ;"+"
-.TextMinusSymbolSXNX: db  169+49,5 ;"-"
-.TextApostrofeSymbolSXNX: db  053,1  ;"'"
-.TextColonSymbolSXNX: db  008,1  ;":"
-.TextQuestionMarkSymbolSXNX:  db  223,3 ;"?"
-.TextCommaSymbolSXNX:  db  226,2 ;","
-.TextDotSymbolSXNX:  db  207,1 ;","
-
-;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
-.TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,4, 107,3, 110,3, 113,3, 116,4, 120,3, 123,5, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
-;                               a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
-ds 12
-.TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 019,3, 022,3, 025,1, 026,2, 028,3, 032,1, 033,5, 038,3, 042,3, 046,3, 050,3, 054,2, 057,3, 060,2, 062,3, 065,3, 068,5, 073,3, 076,3, 080,4
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
 ;;  The above routine is called while                     ;;
@@ -1415,22 +1191,72 @@ EndTurn:
 	ld		(ix+HeroMove),a		        ;reset total movement
 	add		ix,de				              ;next hero
 	djnz	.loop
-  ;set next player's turn
-	ld		a,(amountofplayers)       ;set next player to have their turn
-	ld		b,a
-	ld		a,(whichplayernowplaying?)
-	cp		b
-	jp		nz,.endchecklastplayer
-	xor		a
-  .endchecklastplayer:	
-	inc		a
-	ld		(whichplayernowplaying?),a
 
+  call  SetNextPlayersTurn
+  
+	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
+  dec   a
+  jr    nz,.EndCheckIncreaseDate
+  ld    hl,(Date)
+  inc   hl
+  ld    (Date),hl
+  .EndCheckIncreaseDate:  
+  
+  call  SetAndRotateTavernHeroes        ;At start of day, rotate all tavern heroes
   call  AddCastlesIncomeToPlayer        ;add total income of castles
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
   jp    ActivateFirstActiveHeroForCurrentPlayer
+
+SetAndRotateTavernHeroes:               ;At start of day 1 for Player 1, rotate all tavern heroes
+ret
+	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
+  dec   a
+  ret   nz
+  
+  ld    iy,Castle1
+
+  ld    hl,(Player1TavernPointer)
+  inc   (hl)                            ;increase tavern hero pointer
+  ld    de,TavernHeroesPlayer1
+  add   hl,de  
+  ld    a,(hl)
+  cp    255                             ;check if there is this a hero present at this location in the table
+  ret   nz                              ;yes, a hero is present, return
+  ld    hl,0
+  ld    (Player1TavernPointer),hl       ;if a hero is not present, reset Player1TavernPointer
+  ret
+
+
+
+  call  .SetHero                        ;set hero in tavern slot 1
+  ld    a,(hl)                          ;if after setting the 1st hero, we reach the end of the table, reset hl and Tavern Table Pointer
+  cp    255
+  jr    nz,.EndCheckEndTable1
+  ld    hl,TavernHeroesPlayer1
+  ld    de,-1
+  ld    (Player1TavernPointer),de
+  .EndCheckEndTable1:
+
+  call  .SetHero                        ;set hero in tavern slot 2
+  ld    a,(hl)                          ;if after setting the 2nd hero, we reach the end of the table, reset hl
+  cp    255
+  jr    nz,.EndCheckEndTable2
+  ld    hl,TavernHeroesPlayer1
+  .EndCheckEndTable2:
+
+  call  .SetHero                        ;set hero in tavern slot 3
+  inc   de
+  ld    (Player1TavernPointer),de
+  ret
+
+  .SetHero:  
+  ld    a,(hl)
+  ld    (iy+TavernHero1DayRemain),a
+  inc   hl                              ;next tavern hero in player's tavern table
+  inc   iy                              ;next tavern slot (3 slots total)
+  ret
 
 AddEstatesIncomeToPlayer:  
   call  SetHero1ForCurrentPlayerInIX
@@ -1680,10 +1506,13 @@ SetHeroArmyAndStatusInHud:
 	ret		z
 	ld		(SetHeroArmyAndStatusInHud?),a
 
-  ld    ix,(plxcurrentheroAddress)
-  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
-
   call  ClearHeroStatsAndArmyUnitsAmount
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ret   z                                 ;don't set hero in hud, if player has no active heroes
+
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
   call  SetArmyUnits
   call  SetArmyUnitsAmount
   call  SetHeroPortrait10x18
@@ -1691,9 +1520,9 @@ SetHeroArmyAndStatusInHud:
   ret
 
 ClearHeroStatsAndArmyUnitsAmount:
-  ld    hl,$4000 + (145*128) + (202/2) - 128
-  ld    de,$0000 + (145*128) + (202/2) - 128
-  ld    bc,$0000 + (052*256) + (050/2)
+  ld    hl,$4000 + (122*128) + (202/2) - 128
+  ld    de,$0000 + (122*128) + (202/2) - 128
+  ld    bc,$0000 + (065*256) + (050/2)
   ld    a,HudNewBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -1702,25 +1531,25 @@ SetHeroStats:
 
   ld    l,(ix+HeroStatAttack)           ;attack
   ld    h,0
-  ld    b,216-004                       ;dx
+  ld    b,216+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroStatDefense)          ;defense
   ld    h,0
-  ld    b,225-004                       ;dx
+  ld    b,225+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroStatKnowledge)        ;knowledge
   ld    h,0
-  ld    b,234-004                       ;dx
+  ld    b,234+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
   ld    l,(ix+HeroStatSpelldamage)      ;spell damage
   ld    h,0
-  ld    b,243-004                       ;dx
+  ld    b,243+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
   ret
@@ -1747,6 +1576,7 @@ HeroPortrait10x18SYSXLatok:        equ $4000+(000*128)+(040/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXDrasle2:      equ $4000+(000*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXSnake1:       equ $4000+(000*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXDrasle3:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
 HeroPortrait10x18SYSXSnake2:       equ $4000+(000*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXDrasle4:      equ $4000+(000*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXAshguine:     equ $4000+(000*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -1755,6 +1585,7 @@ HeroPortrait10x18SYSXPsychoWorld:  equ $4000+(000*128)+(120/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXUndeadline2:  equ $4000+(000*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXGoemon2:      equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXUndeadline3:  equ $4000+(000*128)+(150/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
 HeroPortrait10x18SYSXFray:         equ $4000+(000*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXBlackColor:   equ $4000+(000*128)+(170/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXWit:          equ $4000+(000*128)+(180/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -1763,8 +1594,8 @@ HeroPortrait10x18SYSXJanJackGibson:equ $4000+(000*128)+(200/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXGillianSeed:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXSnatcher:     equ $4000+(000*128)+(220/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXGolvellius:   equ $4000+(000*128)+(230/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait10x18SYSXBillRizer:    equ $4000+(000*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+HeroPortrait10x18SYSXBillRizer:    equ $4000+(000*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXPochi:        equ $4000+(018*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXGreyFox:      equ $4000+(018*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXTrevorBelmont:equ $4000+(018*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -1773,6 +1604,7 @@ HeroPortrait10x18SYSXSimonBelmont: equ $4000+(018*128)+(040/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXDrPettrovich: equ $4000+(018*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXRichterBelmont:equ $4000+(018*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+HeroPortrait10x18SYSXUltrabox:     equ $4000+(018*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 SetArmyUnits:
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
@@ -1834,37 +1666,37 @@ SetArmyUnits:
 SetArmyUnitsAmount:
   ld    l,(ix+HeroUnits+01)
   ld    h,(ix+HeroUnits+02)
-  ld    b,204
+  ld    b,204 + 1
   ld    c,169
   call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
-  ld    b,220
+  ld    b,220 + 1
   ld    c,169
   call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
-  ld    b,236
+  ld    b,236 + 1
   ld    c,169
   call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
-  ld    b,204
+  ld    b,204 + 1
   ld    c,192
   call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
-  ld    b,220
+  ld    b,220 + 1
   ld    c,192
   call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
-  ld    b,236
+  ld    b,236 + 1
   ld    c,192
   call  SetNumber16BitCastleSkipIfAmountIs0
   ret
@@ -1976,7 +1808,7 @@ SetManaAndMovementBars:
   exx
   pop   hl
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 	ret
 
@@ -2038,7 +1870,7 @@ SetManaAndMovementBars:
   exx
   pop   hl
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 	ret
 
@@ -2046,37 +1878,37 @@ EraseManaandMovementBars:
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (107*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
-  ld    a,Hero14x9PortraitsBlock          ;block to copy graphics from
+  ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ret
 
@@ -2147,39 +1979,6 @@ ClearCastleButtons:
   ldir
   ret
 
-SetCastleUsingCastleWindowPointerInIX:
-	ld		a,(CastleWindowPointer)     ;CastleWindowPointer points to the castle that should be in castlewindows1 
-	ld    c,a	
-  ld    a,(whichplayernowplaying?)
-  ld    b,AmountOfCastles
-  ld    ix,Castle1
-  ld    de,LenghtCastleTable
-  .SearchLoop:
-  cp    (ix+CastlePlayer)
-  jp    z,.CastleFound
-  add   ix,de
-  djnz  .SearchLoop
-  ;no castle found, this player has no castles at all
-  pop   af
-  ret
-
-  .CastleFound:
-  dec   c
-  ret   m
-  add   ix,de
-  djnz  .SearchLoop
-  ;no castle found, this player has no castles at all
-  pop   af
-  ret
-
-  .SearchNextCastle:  
-  add   ix,de
-  cp    (ix+CastlePlayer)
-  ret   z               ;castle found
-  djnz  .SearchNextCastle
-  ;no castle
-  pop   af
-  ret  
 
 ThirdCastleWindowClicked:
   call  SetCastleUsingCastleWindowPointerInIX
@@ -2230,7 +2029,7 @@ SetHeroesInWindows:
   ld    b,(ix+HeroSpecificInfo+1)
   push  bc
   pop   iy
-  ld    l,(iy+HeroButton20x11SYSX+0)    ;find hero portrait 16x30 address
+  ld    l,(iy+HeroButton20x11SYSX+0)    ;find hero portrait 20x11 address
   ld    h,(iy+HeroButton20x11SYSX+1)  
 
   ld    bc,7
@@ -2259,45 +2058,47 @@ ClearHeroButtons:
 
 HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + (139*128) + (096/2) - 128 | dw $4000 + (139*128) + (116/2) - 128 | dw $4000 + (139*128) + (136/2) - 128
 
-HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (018*128) + (000/2) - 128 | dw $4000 + (018*128) + (020/2) - 128 | dw $4000 + (018*128) + (040/2) - 128
-HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (018*128) + (060/2) - 128 | dw $4000 + (018*128) + (080/2) - 128 | dw $4000 + (018*128) + (100/2) - 128
-HeroButton20x11SYSXPixy:            db  %1100 0011 | dw $4000 + (018*128) + (120/2) - 128 | dw $4000 + (018*128) + (140/2) - 128 | dw $4000 + (018*128) + (160/2) - 128
-HeroButton20x11SYSXDrasle1:         db  %1100 0011 | dw $4000 + (018*128) + (180/2) - 128 | dw $4000 + (018*128) + (200/2) - 128 | dw $4000 + (018*128) + (220/2) - 128
+HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (020/2) - 128 | dw $4000 + (000*128) + (040/2) - 128
+HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (000*128) + (060/2) - 128 | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (000*128) + (100/2) - 128
+HeroButton20x11SYSXPixy:            db  %1100 0011 | dw $4000 + (000*128) + (120/2) - 128 | dw $4000 + (000*128) + (140/2) - 128 | dw $4000 + (000*128) + (160/2) - 128
+HeroButton20x11SYSXDrasle1:         db  %1100 0011 | dw $4000 + (000*128) + (180/2) - 128 | dw $4000 + (000*128) + (200/2) - 128 | dw $4000 + (000*128) + (220/2) - 128
 
-HeroButton20x11SYSXLatok:           db  %1100 0011 | dw $4000 + (029*128) + (000/2) - 128 | dw $4000 + (029*128) + (020/2) - 128 | dw $4000 + (029*128) + (040/2) - 128
-HeroButton20x11SYSXDrasle2:         db  %1100 0011 | dw $4000 + (029*128) + (060/2) - 128 | dw $4000 + (029*128) + (080/2) - 128 | dw $4000 + (029*128) + (100/2) - 128
-HeroButton20x11SYSXSnake1:          db  %1100 0011 | dw $4000 + (029*128) + (120/2) - 128 | dw $4000 + (029*128) + (140/2) - 128 | dw $4000 + (029*128) + (160/2) - 128
-HeroButton20x11SYSXDrasle3:         db  %1100 0011 | dw $4000 + (029*128) + (180/2) - 128 | dw $4000 + (029*128) + (200/2) - 128 | dw $4000 + (029*128) + (220/2) - 128
+HeroButton20x11SYSXLatok:           db  %1100 0011 | dw $4000 + (011*128) + (000/2) - 128 | dw $4000 + (011*128) + (020/2) - 128 | dw $4000 + (011*128) + (040/2) - 128
+HeroButton20x11SYSXDrasle2:         db  %1100 0011 | dw $4000 + (011*128) + (060/2) - 128 | dw $4000 + (011*128) + (080/2) - 128 | dw $4000 + (011*128) + (100/2) - 128
+HeroButton20x11SYSXSnake1:          db  %1100 0011 | dw $4000 + (011*128) + (120/2) - 128 | dw $4000 + (011*128) + (140/2) - 128 | dw $4000 + (011*128) + (160/2) - 128
+HeroButton20x11SYSXDrasle3:         db  %1100 0011 | dw $4000 + (011*128) + (180/2) - 128 | dw $4000 + (011*128) + (200/2) - 128 | dw $4000 + (011*128) + (220/2) - 128
 
-HeroButton20x11SYSXSnake2:          db  %1100 0011 | dw $4000 + (040*128) + (000/2) - 128 | dw $4000 + (040*128) + (020/2) - 128 | dw $4000 + (040*128) + (040/2) - 128
-HeroButton20x11SYSXDrasle4:         db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (080/2) - 128 | dw $4000 + (040*128) + (100/2) - 128
-HeroButton20x11SYSXAshguine:        db  %1100 0011 | dw $4000 + (040*128) + (120/2) - 128 | dw $4000 + (040*128) + (140/2) - 128 | dw $4000 + (040*128) + (160/2) - 128
-HeroButton20x11SYSXUndeadline1:     db  %1100 0011 | dw $4000 + (040*128) + (180/2) - 128 | dw $4000 + (040*128) + (200/2) - 128 | dw $4000 + (040*128) + (220/2) - 128
+HeroButton20x11SYSXSnake2:          db  %1100 0011 | dw $4000 + (022*128) + (000/2) - 128 | dw $4000 + (022*128) + (020/2) - 128 | dw $4000 + (022*128) + (040/2) - 128
+HeroButton20x11SYSXDrasle4:         db  %1100 0011 | dw $4000 + (022*128) + (060/2) - 128 | dw $4000 + (022*128) + (080/2) - 128 | dw $4000 + (022*128) + (100/2) - 128
+HeroButton20x11SYSXAshguine:        db  %1100 0011 | dw $4000 + (022*128) + (120/2) - 128 | dw $4000 + (022*128) + (140/2) - 128 | dw $4000 + (022*128) + (160/2) - 128
+HeroButton20x11SYSXUndeadline1:     db  %1100 0011 | dw $4000 + (022*128) + (180/2) - 128 | dw $4000 + (022*128) + (200/2) - 128 | dw $4000 + (022*128) + (220/2) - 128
 
-HeroButton20x11SYSXPsychoWorld:     db  %1100 0011 | dw $4000 + (051*128) + (000/2) - 128 | dw $4000 + (051*128) + (020/2) - 128 | dw $4000 + (051*128) + (040/2) - 128
-HeroButton20x11SYSXUndeadline2:     db  %1100 0011 | dw $4000 + (051*128) + (060/2) - 128 | dw $4000 + (051*128) + (080/2) - 128 | dw $4000 + (051*128) + (100/2) - 128
-HeroButton20x11SYSXGoemon2:         db  %1100 0011 | dw $4000 + (051*128) + (120/2) - 128 | dw $4000 + (051*128) + (140/2) - 128 | dw $4000 + (051*128) + (160/2) - 128
-HeroButton20x11SYSXUndeadline3:     db  %1100 0011 | dw $4000 + (051*128) + (180/2) - 128 | dw $4000 + (051*128) + (200/2) - 128 | dw $4000 + (051*128) + (220/2) - 128
+HeroButton20x11SYSXPsychoWorld:     db  %1100 0011 | dw $4000 + (033*128) + (000/2) - 128 | dw $4000 + (033*128) + (020/2) - 128 | dw $4000 + (033*128) + (040/2) - 128
+HeroButton20x11SYSXUndeadline2:     db  %1100 0011 | dw $4000 + (033*128) + (060/2) - 128 | dw $4000 + (033*128) + (080/2) - 128 | dw $4000 + (033*128) + (100/2) - 128
+HeroButton20x11SYSXGoemon2:         db  %1100 0011 | dw $4000 + (033*128) + (120/2) - 128 | dw $4000 + (033*128) + (140/2) - 128 | dw $4000 + (033*128) + (160/2) - 128
+HeroButton20x11SYSXUndeadline3:     db  %1100 0011 | dw $4000 + (033*128) + (180/2) - 128 | dw $4000 + (033*128) + (200/2) - 128 | dw $4000 + (033*128) + (220/2) - 128
 
-HeroButton20x11SYSXFray:            db  %1100 0011 | dw $4000 + (062*128) + (000/2) - 128 | dw $4000 + (062*128) + (020/2) - 128 | dw $4000 + (062*128) + (040/2) - 128
-HeroButton20x11SYSXBlackColor:      db  %1100 0011 | dw $4000 + (062*128) + (060/2) - 128 | dw $4000 + (062*128) + (080/2) - 128 | dw $4000 + (062*128) + (100/2) - 128
-HeroButton20x11SYSXWit:             db  %1100 0011 | dw $4000 + (062*128) + (120/2) - 128 | dw $4000 + (062*128) + (140/2) - 128 | dw $4000 + (062*128) + (160/2) - 128
-HeroButton20x11SYSXMitchell:        db  %1100 0011 | dw $4000 + (062*128) + (180/2) - 128 | dw $4000 + (062*128) + (200/2) - 128 | dw $4000 + (062*128) + (220/2) - 128
+HeroButton20x11SYSXFray:            db  %1100 0011 | dw $4000 + (044*128) + (000/2) - 128 | dw $4000 + (044*128) + (020/2) - 128 | dw $4000 + (044*128) + (040/2) - 128
+HeroButton20x11SYSXBlackColor:      db  %1100 0011 | dw $4000 + (044*128) + (060/2) - 128 | dw $4000 + (044*128) + (080/2) - 128 | dw $4000 + (044*128) + (100/2) - 128
+HeroButton20x11SYSXWit:             db  %1100 0011 | dw $4000 + (044*128) + (120/2) - 128 | dw $4000 + (044*128) + (140/2) - 128 | dw $4000 + (044*128) + (160/2) - 128
+HeroButton20x11SYSXMitchell:        db  %1100 0011 | dw $4000 + (044*128) + (180/2) - 128 | dw $4000 + (044*128) + (200/2) - 128 | dw $4000 + (044*128) + (220/2) - 128
 
-HeroButton20x11SYSXJanJackGibson:   db  %1100 0011 | dw $4000 + (073*128) + (000/2) - 128 | dw $4000 + (073*128) + (020/2) - 128 | dw $4000 + (073*128) + (040/2) - 128
-HeroButton20x11SYSXGillianSeed:     db  %1100 0011 | dw $4000 + (073*128) + (060/2) - 128 | dw $4000 + (073*128) + (080/2) - 128 | dw $4000 + (073*128) + (100/2) - 128
-HeroButton20x11SYSXSnatcher:        db  %1100 0011 | dw $4000 + (073*128) + (120/2) - 128 | dw $4000 + (073*128) + (140/2) - 128 | dw $4000 + (073*128) + (160/2) - 128
-HeroButton20x11SYSXGolvellius:      db  %1100 0011 | dw $4000 + (073*128) + (180/2) - 128 | dw $4000 + (073*128) + (200/2) - 128 | dw $4000 + (073*128) + (220/2) - 128
+HeroButton20x11SYSXJanJackGibson:   db  %1100 0011 | dw $4000 + (055*128) + (000/2) - 128 | dw $4000 + (055*128) + (020/2) - 128 | dw $4000 + (055*128) + (040/2) - 128
+HeroButton20x11SYSXGillianSeed:     db  %1100 0011 | dw $4000 + (055*128) + (060/2) - 128 | dw $4000 + (055*128) + (080/2) - 128 | dw $4000 + (055*128) + (100/2) - 128
+HeroButton20x11SYSXSnatcher:        db  %1100 0011 | dw $4000 + (055*128) + (120/2) - 128 | dw $4000 + (055*128) + (140/2) - 128 | dw $4000 + (055*128) + (160/2) - 128
+HeroButton20x11SYSXGolvellius:      db  %1100 0011 | dw $4000 + (055*128) + (180/2) - 128 | dw $4000 + (055*128) + (200/2) - 128 | dw $4000 + (055*128) + (220/2) - 128
 
-HeroButton20x11SYSXBillRizer:       db  %1100 0011 | dw $4000 + (084*128) + (000/2) - 128 | dw $4000 + (084*128) + (020/2) - 128 | dw $4000 + (084*128) + (040/2) - 128
-HeroButton20x11SYSXPochi:           db  %1100 0011 | dw $4000 + (084*128) + (060/2) - 128 | dw $4000 + (084*128) + (080/2) - 128 | dw $4000 + (084*128) + (100/2) - 128
-HeroButton20x11SYSXGreyFox:         db  %1100 0011 | dw $4000 + (084*128) + (120/2) - 128 | dw $4000 + (084*128) + (140/2) - 128 | dw $4000 + (084*128) + (160/2) - 128
-HeroButton20x11SYSXTrevorBelmont:   db  %1100 0011 | dw $4000 + (084*128) + (180/2) - 128 | dw $4000 + (084*128) + (200/2) - 128 | dw $4000 + (084*128) + (220/2) - 128
+HeroButton20x11SYSXBillRizer:       db  %1100 0011 | dw $4000 + (066*128) + (000/2) - 128 | dw $4000 + (066*128) + (020/2) - 128 | dw $4000 + (066*128) + (040/2) - 128
+HeroButton20x11SYSXPochi:           db  %1100 0011 | dw $4000 + (066*128) + (060/2) - 128 | dw $4000 + (066*128) + (080/2) - 128 | dw $4000 + (066*128) + (100/2) - 128
+HeroButton20x11SYSXGreyFox:         db  %1100 0011 | dw $4000 + (066*128) + (120/2) - 128 | dw $4000 + (066*128) + (140/2) - 128 | dw $4000 + (066*128) + (160/2) - 128
+HeroButton20x11SYSXTrevorBelmont:   db  %1100 0011 | dw $4000 + (066*128) + (180/2) - 128 | dw $4000 + (066*128) + (200/2) - 128 | dw $4000 + (066*128) + (220/2) - 128
 
-HeroButton20x11SYSXBigBoss:         db  %1100 0011 | dw $4000 + (095*128) + (000/2) - 128 | dw $4000 + (095*128) + (020/2) - 128 | dw $4000 + (095*128) + (040/2) - 128
-HeroButton20x11SYSXSimonBelmont:    db  %1100 0011 | dw $4000 + (095*128) + (060/2) - 128 | dw $4000 + (095*128) + (080/2) - 128 | dw $4000 + (095*128) + (100/2) - 128
-HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (095*128) + (120/2) - 128 | dw $4000 + (095*128) + (140/2) - 128 | dw $4000 + (095*128) + (160/2) - 128
-HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (095*128) + (180/2) - 128 | dw $4000 + (095*128) + (200/2) - 128 | dw $4000 + (095*128) + (220/2) - 128
+HeroButton20x11SYSXBigBoss:         db  %1100 0011 | dw $4000 + (077*128) + (000/2) - 128 | dw $4000 + (077*128) + (020/2) - 128 | dw $4000 + (077*128) + (040/2) - 128
+HeroButton20x11SYSXSimonBelmont:    db  %1100 0011 | dw $4000 + (077*128) + (060/2) - 128 | dw $4000 + (077*128) + (080/2) - 128 | dw $4000 + (077*128) + (100/2) - 128
+HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (077*128) + (120/2) - 128 | dw $4000 + (077*128) + (140/2) - 128 | dw $4000 + (077*128) + (160/2) - 128
+HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (077*128) + (180/2) - 128 | dw $4000 + (077*128) + (200/2) - 128 | dw $4000 + (077*128) + (220/2) - 128
+
+HeroButton20x11SYSXUltrabox:        db  %1100 0011 | dw $4000 + (088*128) + (000/2) - 128 | dw $4000 + (088*128) + (020/2) - 128 | dw $4000 + (088*128) + (040/2) - 128
 
 HeroLevelUpCode:
 call ScreenOn
@@ -3123,15 +2924,6 @@ QuickTipsButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bi
 
 DisplayStartOfTurnMessageCode:
 call ScreenOn
-
-	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
-  dec   a
-  jr    nz,.EndCheckIncreaseDate
-  ld    hl,(Date)
-  inc   hl
-  ld    (Date),hl
-  .EndCheckIncreaseDate:
-
   call  SetPlayerStartTurnVButton
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
@@ -7977,40 +7769,18 @@ CastleOverviewMarketPlaceCode:
   ret
 
   .SetTextResourceNeeded:
-  ld    a,127
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,128
-  ld    (PutLetter+dy),a                ;set dy of text
-
   ld    a,(MarketPlaceResourceNeeded)
   call  .SetTextResourceInHL
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
+  ld    b,127
+  ld    c,128
+  jp    SetText
 
   .SetTextResourceToTrade:
-  ld    a,227
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,128
-  ld    (PutLetter+dy),a                ;set dy of text
-
   ld    a,(MarketPlaceResourceToTrade)
   call  .SetTextResourceInHL
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
+  ld    b,227
+  ld    c,128
+  jp    SetText
 
   .SetTextResourceInHL:
   ld    hl,.TextWood
@@ -8424,14 +8194,8 @@ CastleOverviewMagicGuildCode:
   jp    z,.SpellFound
   
   .SpellFound:
-  ld    a,031
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,154
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    (TextAddresspointer),hl  
-
+  push  hl
+  
   ex    de,hl
 ;  ld    hl,FireLevel1Untouched
   ld    de,$0000 + (156*128) + (010/2) - 128
@@ -8439,17 +8203,10 @@ CastleOverviewMagicGuildCode:
   ld    a,SpellBookGraphicsBlock        ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
-
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set ny of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set ny of text
-  ret
-
-
+  pop   hl
+  ld    b,031
+  ld    c,154
+  jp    SetText
 
 SpellDescriptionsMagicGuild:
 .DescriptionEarth1:        db  "earth meteor",254
@@ -8476,8 +8233,8 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "Cost per troop: Available:",254
-                          db  "Total Cost: Recruit:",254
+.DescriptionFire1:        db  "Level Xp Spell Points Recovery Day Movement",254
+                          db  "Boots Gloves Ring Neclace Robe",254
                           db  "Explore various building options ",254
                           db  "Take a look at the available building options. ",255
 
@@ -9924,167 +9681,9 @@ Mult16_NoAdd:
 
 
 
-SetNumber16BitCastleSkipIfAmountIs0:
-  ld    a,h
-  cp    l
-  ret   z
-
-SetNumber16BitCastle:                   ;in hl=number (16bit)
-;  ld    a,"0"                           ;we can set number to 0, then do a zero check and jr z,.zero to put the number 0 at the furthest left side if needed
-;  ld    (TextNumber),a
-;  ld    a,255
-;  ld    (TextNumber+1),a
-
-  ld    a,b                             ;dx
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c                             ;dy
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    a,h
-;  cp    l
-;  ret   z
-;  jr    z,.Zero
-
-  push  iy
-  call  .ConvertToDecimal16bit
-  pop   iy
-
-;  .Zero:
-  ld    hl,TextNumber
-  ld    (TextAddresspointer),hl  
-
-  ld    a,6
-  ld    (PutLetter+ny),a                ;set dy of text
-  call  SetTextBuildingWhenClicked.SetText
-  ld    a,5
-  ld    (PutLetter+ny),a                ;set dy of text
-  ret
 
 
 
-  .ConvertToDecimal16bit:
-  ld    iy,TextNumber
-  ld    e,0                             ;e=has an xfold already been set prior ?
-
-  .Check10000Folds:
-  ld    d,$30                           ;10000folds in d ($30 = 0)
-
-  .Loop10000Fold:
-  or    a
-  ld    bc,10000
-  sbc   hl,bc                           ;check for 10000 folds
-  jr    c,.Set10000Fold
-  inc   d
-  jr  .Loop10000Fold
-
-  .Set10000Fold:
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet10000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 1000fold
-  inc   iy
-  .EndSet10000Fold:
-
-  add   hl,bc
-
-  .Check1000Folds:
-  ld    d,$30                           ;1000folds in d ($30 = 0)
-
-  .Loop1000Fold:
-  or    a
-  ld    bc,1000
-  sbc   hl,bc                           ;check for 1000 folds
-  jr    c,.Set1000Fold
-  inc   d
-  jr  .Loop1000Fold
-
-  .Set1000Fold:
-  bit   0,e
-  jr    nz,.DoSet1000Fold    
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet1000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  .DoSet1000Fold:
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet1000Fold:
-
-  add   hl,bc
-
-  .Check100Folds:
-  ld    d,$30                           ;100folds in d ($30 = 0)
-
-  .Loop100Fold:
-  or    a
-  ld    bc,100
-  sbc   hl,bc                           ;check for 100 folds
-  jr    c,.Set100Fold
-  inc   d
-  jr  .Loop100Fold
-
-  .Set100Fold:
-  bit   0,e
-  jr    nz,.DoSet100Fold  
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet100Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,4
-  ld    (PutLetter+dx),a                ;set dx of text
-
-
-  jr    .EndSet100Fold  
-
-  .DoSet100Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet100Fold:
-
-  add   hl,bc
-
-  .Check10Folds:
-  ld    d,$30                           ;10folds in d ($30 = 0)
-
-  .Loop10Fold:
-  or    a
-  ld    bc,10
-  sbc   hl,bc                           ;check for 10 folds
-  jr    c,.Set10Fold
-  inc   d
-  jr  .Loop10Fold
-
-  .Set10Fold:
-  bit   0,e
-  jr    nz,.DoSet10Fold
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet10Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,3
-  ld    (PutLetter+dx),a                ;set dx of text
-
-  jr    .EndSet10Fold  
-
-  .DoSet10Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 10fold
-  inc   iy
-  .EndSet10Fold:
-
-  .Check1Fold:
-  ld    bc,10 + $30
-  add   hl,bc
-  
-;  add   a,10 + $30
-  ld    (iy),l                          ;set 1 fold
-  ld    (iy+1),255                      ;end text
-  ret
  
  
 

@@ -5,6 +5,10 @@ StartOfTurnMessageOn?:  equ 0
 InitiateGame:
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
+
+  ld    hl,pl1hero1y
+  ld    (plxcurrentheroAddress),hl
+
 StartGame:
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
@@ -420,22 +424,22 @@ HeroOverViewArmyIconButton6MouseOverSX:     equ 174
 HeroOverViewArmyIconButton6MouseOverSY:     equ 021
 
 HeroOverViewArmyIconButton1DX:   equ HeroOverViewArmyWindowDX + 030
-HeroOverViewArmyIconButton1DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton1DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverViewArmyIconButton2DX:   equ HeroOverViewArmyWindowDX + 050
-HeroOverViewArmyIconButton2DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton2DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverViewArmyIconButton3DX:   equ HeroOverViewArmyWindowDX + 070
-HeroOverViewArmyIconButton3DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton3DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverViewArmyIconButton4DX:   equ HeroOverViewArmyWindowDX + 090
-HeroOverViewArmyIconButton4DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton4DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverViewArmyIconButton5DX:   equ HeroOverViewArmyWindowDX + 110
-HeroOverViewArmyIconButton5DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton5DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverViewArmyIconButton6DX:   equ HeroOverViewArmyWindowDX + 130
-HeroOverViewArmyIconButton6DY:   equ HeroOverViewArmyWindowDY + 026
+HeroOverViewArmyIconButton6DY:   equ HeroOverViewArmyWindowDY + 027
 
 HeroOverviewArmyIconButtonTableLenghtPerIcon:  equ HeroOverviewArmyIconButtonTable.endlenght-HeroOverviewArmyIconButtonTable
 HeroOverviewArmyIconButtonTableAmountOfButtons:  db  6
@@ -813,7 +817,7 @@ GenericButtonTable2: ;status (bit 7=off/on, bit 6=button normal (untouched), bit
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-GenericButtonTable3GfxBlock:         db Hero14x9PortraitsBlock
+GenericButtonTable3GfxBlock:         db Hero20x11PortraitsBlock
 GenericButtonTable3AmountOfButtons:  db 12
 GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
   ;arrow up, 3 hero buttons, arrow down

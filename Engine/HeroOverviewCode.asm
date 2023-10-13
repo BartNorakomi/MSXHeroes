@@ -2,6 +2,8 @@
 ;  call  HeroOverviewSkillsWindowCode
 ;  call  HeroOverviewSpellBookWindowCode_Earth
 ;  call  HeroOverviewSpellBookWindowCode_Fire
+;  call  HeroOverviewSpellBookWindowCode_Water
+;  call  HeroOverviewSpellBookWindowCode_Air
 ;  call  HeroOverviewInventoryWindowCode
 ;  call  HeroOverviewArmyWindowCode
 ;  call  HeroOverviewStatusWindowCode
@@ -503,9 +505,9 @@ InventoryItem45MouseOverSX:   equ 180
 HeroOverViewArmyWindowSX:   equ 000
 HeroOverViewArmyWindowSY:   equ 000
 HeroOverViewArmyWindowDX:   equ 024
-HeroOverViewArmyWindowDY:   equ 029
+HeroOverViewArmyWindowDY:   equ 040
 HeroOverViewArmyWindowNX:   equ 156
-HeroOverViewArmyWindowNY:   equ 130
+HeroOverViewArmyWindowNY:   equ 067 ;130
 
 HeroOverViewArmyIconWindowButtonNY:  equ 030
 HeroOverViewArmyIconWindowButtonNX:  equ 018
@@ -522,7 +524,7 @@ HeroOverviewArmyWindowCode:
 	ld		(SetHeroArmyAndStatusInHud?),a
 
 ;################################ CAN REMOVE LATER ################################
-  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 ;################################ CAN REMOVE LATER ################################
 
   call  SetHeroOverViewArmyWindow       ;set overview of hero army
@@ -536,10 +538,13 @@ HeroOverviewArmyWindowCode:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
   ld    ix,HeroOverviewArmyIconButtonTable
   ld    iy,ButtonTableArmyIconsSYSX
   call  CheckButtonMouseInteraction
-
 
   ld    a,(MenuOptionSelected?)
   or    a
@@ -867,39 +872,39 @@ SetArmyIconsAndAmount:
   .amount:
   ld    l,(ix+HeroUnits+01)
   ld    h,(ix+HeroUnits+02)
-  ld    b,HeroOverViewArmyWindowDX + 031
+  ld    b,HeroOverViewArmyWindowDX + 031 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
-  ld    b,HeroOverViewArmyWindowDX + 051
+  ld    b,HeroOverViewArmyWindowDX + 051 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
-  ld    b,HeroOverViewArmyWindowDX + 071
+  ld    b,HeroOverViewArmyWindowDX + 071 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
-  ld    b,HeroOverViewArmyWindowDX + 091
+  ld    b,HeroOverViewArmyWindowDX + 091 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
-  ld    b,HeroOverViewArmyWindowDX + 111
+  ld    b,HeroOverViewArmyWindowDX + 111 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
-  ld    b,HeroOverViewArmyWindowDX + 131
+  ld    b,HeroOverViewArmyWindowDX + 131 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16Bit
+  call  SetNumber16BitCastleSkipIfAmountIs0
   ret
 
 
@@ -987,6 +992,10 @@ HeroOverviewInventoryWindowCode:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
   ld    ix,HeroOverviewInventoryIconButtonTable
   ld    iy,ButtonTableInventoryIconsSYSX
   call  CheckButtonMouseInteraction
@@ -996,7 +1005,7 @@ HeroOverviewInventoryWindowCode:
 
 
 
-  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
   call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
 
   call  MarkLastPressedButton           ;mark the button that was pressed as 'mouse hover over'
@@ -1258,21 +1267,9 @@ SetTextInventoryItem:                   ;when clicking on an item, the explanati
   ld    h,(ix+1)
   .SetText:
 
-
-  ld    a,HeroOverViewSpellBookWindowDX + 031
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 143
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    l,(ix+TextAddress)
-;  ld    h,(ix+TextAddress+1)            ;address of text to put
-;  ld    de,LenghtTextSkillsDescription
-;  add   hl,de
-
-
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  ld    b,HeroOverViewSpellBookWindowDX + 030
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  jp    SetText
 
 InventoryDescriptionList:
   dw    DescriptionSword1, DescriptionSword2, DescriptionSword3, DescriptionSword4, DescriptionSword5
@@ -2015,6 +2012,10 @@ HeroOverviewSpellBookWindowCode_Water:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+  
   ld    ix,HeroOverviewSpellBookButtonTable_Water
   ld    iy,ButtonTableSpellBookSYSX_Water
   call  CheckButtonMouseInteraction
@@ -2041,7 +2042,7 @@ HeroOverviewSpellBookWindowCode_Water:
   or    a
   jp    nz,.SpellIconPressed
 
-call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetSpellExplanation_Water        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
 
@@ -2113,6 +2114,10 @@ HeroOverviewSpellBookWindowCode_Air:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+  
   ld    ix,HeroOverviewSpellBookButtonTable_Air
   ld    iy,ButtonTableSpellBookSYSX_Air
   call  CheckButtonMouseInteraction
@@ -2138,7 +2143,7 @@ HeroOverviewSpellBookWindowCode_Air:
   or    a
   jp    nz,.SpellIconPressed
 
-call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetSpellExplanation_Air        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
 
@@ -2198,6 +2203,10 @@ HeroOverviewSpellBookWindowCode_Fire:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+  
   ld    ix,HeroOverviewSpellBookButtonTable_Fire
   ld    iy,ButtonTableSpellBookSYSX_Fire
   call  CheckButtonMouseInteraction
@@ -2225,7 +2234,7 @@ HeroOverviewSpellBookWindowCode_Fire:
   or    a
   jp    nz,.SpellIconPressed
 
-call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetSpellExplanation_Fire        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
 
@@ -2299,6 +2308,10 @@ HeroOverviewSpellBookWindowCode_Earth:
   .engine:
   call  PopulateControls                ;read out keys
 
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
   ld    ix,HeroOverviewSpellBookButtonTable_Earth
   ld    iy,ButtonTableSpellBookSYSX_Earth
   call  CheckButtonMouseInteraction
@@ -2323,7 +2336,7 @@ HeroOverviewSpellBookWindowCode_Earth:
   or    a
   jp    nz,.SpellIconPressed
 
-call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+;call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetSpellExplanation_Earth             ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
 
@@ -2500,19 +2513,16 @@ SetSpellExplanation_Water:
   ld    b,HeroOverViewSpellBookWindowDX + 170
   ld    c,HeroOverViewSpellBookWindowDY + 159
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 130
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 130
+  ld    c,HeroOverViewSpellBookWindowDY + 159
   ld    hl,.TextDamage
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextDamage: db  "damage",255
+  jp    SetText
+  .TextDamage: db  "Damage",255
 
   .SetCost:
   ld    a,(MenuOptionSelected?Backup)
@@ -2534,19 +2544,17 @@ SetSpellExplanation_Water:
   ld    b,HeroOverViewSpellBookWindowDX + 175
   ld    c,HeroOverViewSpellBookWindowDY + 173
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 146
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 173
-  ld    (PutLetter+dy),a                ;set dy of text
+
+  ld    b,HeroOverViewSpellBookWindowDX + 146
+  ld    c,HeroOverViewSpellBookWindowDY + 173
   ld    hl,.TextCost
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextCost: db  "cost",255
+  jp    SetText
+  .TextCost: db  "Cost",255
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -2613,21 +2621,9 @@ SetSpellExplanation_Water:
   ld    hl,SpellDescriptions.Descriptionwater4
   .SetText:
 
-
-  ld    a,HeroOverViewSpellBookWindowDX + 030
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    l,(ix+TextAddress)
-;  ld    h,(ix+TextAddress+1)            ;address of text to put
-;  ld    de,LenghtTextSkillsDescription
-;  add   hl,de
-
-
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  ld    b,HeroOverViewSpellBookWindowDX + 030
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  jp    SetText
 
 
 
@@ -2668,19 +2664,17 @@ SetSpellExplanation_Air:
   ld    b,HeroOverViewSpellBookWindowDX + 170
   ld    c,HeroOverViewSpellBookWindowDY + 159
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 130
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 130
+  ld    c,HeroOverViewSpellBookWindowDY + 159
   ld    hl,.TextDamage
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextDamage: db  "damage",255
+  jp    SetText
+  .TextDamage: db  "Damage",255
+
 
   .SetCost:
   ld    a,(MenuOptionSelected?Backup)
@@ -2702,19 +2696,16 @@ SetSpellExplanation_Air:
   ld    b,HeroOverViewSpellBookWindowDX + 175
   ld    c,HeroOverViewSpellBookWindowDY + 173
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 146
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 173
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 146
+  ld    c,HeroOverViewSpellBookWindowDY + 173
   ld    hl,.TextCost
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextCost: db  "cost",255
+  jp    SetText
+  .TextCost: db  "Cost",255
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -2781,21 +2772,9 @@ SetSpellExplanation_Air:
   ld    hl,SpellDescriptions.DescriptionAir4
   .SetText:
 
-
-  ld    a,HeroOverViewSpellBookWindowDX + 030
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    l,(ix+TextAddress)
-;  ld    h,(ix+TextAddress+1)            ;address of text to put
-;  ld    de,LenghtTextSkillsDescription
-;  add   hl,de
-
-
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  ld    b,HeroOverViewSpellBookWindowDX + 030
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  jp    SetText
 
 
 
@@ -2854,19 +2833,17 @@ SetSpellExplanation_Fire:
   ld    b,HeroOverViewSpellBookWindowDX + 170
   ld    c,HeroOverViewSpellBookWindowDY + 159
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 130
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 130
+  ld    c,HeroOverViewSpellBookWindowDY + 159
   ld    hl,.TextDamage
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextDamage: db  "damage",255
+  jp    SetText
+  .TextDamage: db  "Damage",255
+
 
   .SetCost:
   ld    a,(MenuOptionSelected?Backup)
@@ -2888,19 +2865,16 @@ SetSpellExplanation_Fire:
   ld    b,HeroOverViewSpellBookWindowDX + 175
   ld    c,HeroOverViewSpellBookWindowDY + 173
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 146
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 173
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 146
+  ld    c,HeroOverViewSpellBookWindowDY + 173
   ld    hl,.TextCost
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextCost: db  "cost",255
+  jp    SetText
+  .TextCost: db  "Cost",255
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -2966,21 +2940,9 @@ SetSpellExplanation_Fire:
   jp    z,.SetText
   .SetText:
 
-
-  ld    a,HeroOverViewSpellBookWindowDX + 030
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    l,(ix+TextAddress)
-;  ld    h,(ix+TextAddress+1)            ;address of text to put
-;  ld    de,LenghtTextSkillsDescription
-;  add   hl,de
-
-
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  ld    b,HeroOverViewSpellBookWindowDX + 030
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  jp    SetText
 
 
 
@@ -3033,19 +2995,17 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    b,HeroOverViewSpellBookWindowDX + 170
   ld    c,HeroOverViewSpellBookWindowDY + 159
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 130
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 130
+  ld    c,HeroOverViewSpellBookWindowDY + 159
   ld    hl,.TextDamage
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextDamage: db  "damage",255
+  jp    SetText
+  .TextDamage: db  "Damage",255
+
 
   .SetCost:
   ld    a,(MenuOptionSelected?Backup)
@@ -3067,19 +3027,16 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    b,HeroOverViewSpellBookWindowDX + 175
   ld    c,HeroOverViewSpellBookWindowDY + 173
   push  iy
-  call  SetNumber8Bit
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
   pop   iy
 
-  ld    a,HeroOverViewSpellBookWindowDX + 146
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 173
-  ld    (PutLetter+dy),a                ;set dy of text
+  ld    b,HeroOverViewSpellBookWindowDX + 146
+  ld    c,HeroOverViewSpellBookWindowDY + 173
   ld    hl,.TextCost
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-  .TextCost: db  "cost",255
+  jp    SetText
+  .TextCost: db  "Cost",255
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -3147,21 +3104,9 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    hl,SpellDescriptions.DescriptionEarth4
   .SetText:
 
-
-  ld    a,HeroOverViewSpellBookWindowDX + 030
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewSpellBookWindowDY + 159
-  ld    (PutLetter+dy),a                ;set dy of text
-
-;  ld    l,(ix+TextAddress)
-;  ld    h,(ix+TextAddress+1)            ;address of text to put
-;  ld    de,LenghtTextSkillsDescription
-;  add   hl,de
-
-
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  ld    b,HeroOverViewSpellBookWindowDX + 030
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  jp    SetText
 
 
 EarthSelected:
@@ -3235,9 +3180,21 @@ HeroOverviewStatusWindowCode:
   call  SetHeroOverViewStatusWindow     ;set skills Window in inactive page
   call  SetStatusTextAttack
   call  SwapAndSetPage                  ;swap and set page
+  call  SetHeroOverViewStatusWindow     ;set skills Window in inactive page
+  call  SetStatusTextAttack
 
   .engine:
   call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
   call  CheckEndHeroOverviewStatus      ;check if mouse is clicked outside of window. If so, return to game
   halt
   jp  .engine
@@ -3264,6 +3221,11 @@ HeroOverviewSkillsWindowCode:
 
   .engine:
   call  PopulateControls                ;read out keys
+
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
   ld    ix,HeroOverviewSkillsButtonTable
   ld    iy,ButtonTableSkillsSYSX
 
@@ -3290,26 +3252,35 @@ HeroOverviewSkillsWindowCode:
   ld    (SetSkillsDescription?),a  
   jp    HeroOverviewSkillsWindowCode
 
+TextLevel:
+                db "level",255
 SetTextNameHeroAndLevel:
-  ld    a,HeroOverViewFirstWindowchoicesDx + 26
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,HeroOverViewFirstWindowchoicesDY + 10
-  ld    (PutLetter+dy),a                ;set dy of text
-
   ld    ix,(plxcurrentheroAddress)
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    c,HeroOverViewFirstWindowchoicesDY + 008
   ld    l,(ix+HeroSpecificInfo+0)       ;hero name
   ld    h,(ix+HeroSpecificInfo+1)
+  call  SetText
 
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    c,HeroOverViewFirstWindowchoicesDY + 032
+  ld    hl,TextLevel
+  call  SetText                         ;text "level"
 
-  ld    a,(ix+HeroStatAttack)
-  ld    b,HeroOverViewFirstWindowchoicesDx + 069
-  ld    c,HeroOverViewFirstWindowchoicesDY + 034
-  call  SetNumber8Bit
-  ret
+  ld    b,HeroOverViewFirstWindowchoicesDx + 050
+  ld    c,HeroOverViewFirstWindowchoicesDY + 032
+  ld    a,(ix+HeroLevel)                ;hero level
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
 
+  ld    l,(ix+HeroSpecificInfo+0)
+  ld    h,(ix+HeroSpecificInfo+1)
+  ld    de,HeroInfoClass
+  add   hl,de                           ;hero class
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    c,HeroOverViewFirstWindowchoicesDY + 016
+  jp    SetText  
 
 DYDX16x30HeroIconAtHeroOverview:       equ (HeroOverViewFirstWindowchoicesDY+10)*128 + ((HeroOverViewFirstWindowchoicesDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
 Set16x30HeroIconAtHeroOverviewCode:
@@ -3336,7 +3307,8 @@ HeroOverviewCode:
   ld    (HeroOverviewFirstWindowButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
   ld    (HeroOverviewFirstWindowButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
 
-  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
   call  Set16x30HeroIconAtHeroOverviewCode
   call  SetTextNameHeroAndLevel         ;sets hero name in hero window
@@ -3351,8 +3323,25 @@ HeroOverviewCode:
   call  Set16x30HeroIconAtHeroOverviewCode
   call  SetTextNameHeroAndLevel         ;sets hero name in hero window
 
+; 
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,%0001 0000
+	ld		(Controls),a                  ;reset trigger a
+
   .engine:  
   call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
 
   ld    ix,HeroOverviewFirstWindowButtonTable
   ld    iy,ButtonTableSYSX
@@ -3370,13 +3359,6 @@ HeroOverviewCode:
   call  SwapAndSetPage                  ;swap and set page  
 
 ;  halt
-
-;.kut:
-;	ld		a,(NewPrContr)
-;  bit   4,a                             ;check trigger a / space
-;  ret   nz
-
-
   jp  .engine
 
   .MenuOptionSelected:
@@ -3427,33 +3409,47 @@ SetStatusTextAttack:
   ld    a,(ix+HeroStatAttack)
   ld    b,HeroOverViewStatusWindowDX + 056
   ld    c,HeroOverViewStatusWindowDY + 034
-  call  SetNumber8Bit
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatDefense)
   ld    b,HeroOverViewStatusWindowDX + 067
   ld    c,HeroOverViewStatusWindowDY + 034
-  call  SetNumber8Bit
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatKnowledge)
   ld    b,HeroOverViewStatusWindowDX + 075
   ld    c,HeroOverViewStatusWindowDY + 034
-  call  SetNumber8Bit
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatSpelldamage)
   ld    b,HeroOverViewStatusWindowDX + 084
   ld    c,HeroOverViewStatusWindowDY + 034
-  call  SetNumber8Bit
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroLevel)
   ld    b,HeroOverViewStatusWindowDX + 091
   ld    c,HeroOverViewStatusWindowDY + 045
-  call  SetNumber8Bit  
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
+
+
+
+
 
   ld    l,(ix+HeroXp)
   ld    h,(ix+HeroXp+1)
-  ld    b,HeroOverViewStatusWindowDX + 058
+  ld    b,HeroOverViewStatusWindowDX + 063
   ld    c,HeroOverViewStatusWindowDY + 059
-  call  SetNumber16Bit
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroLevel)                ;current level
   add   a,a
@@ -3467,32 +3463,42 @@ SetStatusTextAttack:
   ex    de,hl
   ld    b,HeroOverViewStatusWindowDX + 090
   ld    c,HeroOverViewStatusWindowDY + 059
-  call  SetNumber16Bit
-
-  ld    a,(ix+HeroMana)
-  ld    b,HeroOverViewStatusWindowDX + 092
-  ld    c,HeroOverViewStatusWindowDY + 073
-  call  SetNumber8Bit  
-
-  ld    a,(ix+HeroTotalMana)
-  ld    b,HeroOverViewStatusWindowDX + 116
-  ld    c,HeroOverViewStatusWindowDY + 073
-  call  SetNumber8Bit  
-
-  ld    a,(ix+HeroManarec)
-  ld    b,HeroOverViewStatusWindowDX + 097
-  ld    c,HeroOverViewStatusWindowDY + 087
-  call  SetNumber8Bit  
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroMove)
-  ld    b,HeroOverViewStatusWindowDX + 105
-  ld    c,HeroOverViewStatusWindowDY + 101
-  call  SetNumber8Bit  
+  ld    b,HeroOverViewStatusWindowDX + 104
+  ld    c,HeroOverViewStatusWindowDY + 073
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
 
   ld    a,(ix+HeroTotalMove)
   ld    b,HeroOverViewStatusWindowDX + 124
+  ld    c,HeroOverViewStatusWindowDY + 073
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
+
+  ld    a,(ix+HeroMana)
+  ld    b,HeroOverViewStatusWindowDX + 093
+  ld    c,HeroOverViewStatusWindowDY + 087
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
+
+  ld    a,(ix+HeroTotalMana)
+  ld    b,HeroOverViewStatusWindowDX + 116
+  ld    c,HeroOverViewStatusWindowDY + 087
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
+
+  ld    a,(ix+HeroManarec)
+  ld    b,HeroOverViewStatusWindowDX + 098
   ld    c,HeroOverViewStatusWindowDY + 101
-  call  SetNumber8Bit  
+  ld    h,0
+  ld    l,a
+  call  SetNumber16BitCastle
   ret
 
 SetNumber16Bit:                         ;in hl=number (16bit)
@@ -4178,14 +4184,18 @@ SetButtonStatusAndText:                        ;copies button state from rom -> 
 SetTextInButton:
   ld    l,(ix+TextAddress)
   ld    h,(ix+TextAddress+1)            ;address of text to put
-  ld    (TextAddresspointer),hl
+;  ld    (TextAddresspointer),hl
 
   ld    a,(ix+HeroOverviewWindowButtonYtop)
   add   a,4
-  ld    (PutLetter+dy),a                ;set dy of text
+;  ld    (PutLetter+dy),a                ;set dy of text
+  ld    c,a
   ld    a,(ix+HeroOverviewWindowButtonXleft)
   add   a,3
-  ld    (PutLetter+dx),a                ;set dx of text
+;  ld    (PutLetter+dx),a                ;set dx of text
+  ld    b,a
+  call  SetText
+  ret
 
   .go:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
@@ -4299,18 +4309,13 @@ SetSkillExplanation:
   ld    (SetSkillsDescription?),a 
   
   ld    ix,(ActivatedSkillsButton)
-  ld    a,037
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,138
-  ld    (PutLetter+dy),a                ;set dy of text
-
+  ld    b,037
+  ld    c,138
   ld    l,(ix+TextAddress)
   ld    h,(ix+TextAddress+1)            ;address of text to put
   ld    de,LenghtTextSkillsDescription
   add   hl,de
-  ld    (TextAddresspointer),hl  
-  jp    SetTextInButton.go
+  jp    SetText
 
 TextPlusSymbol:             equ $2b
 TextMinusSymbol:            equ $2d
