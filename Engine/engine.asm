@@ -1037,7 +1037,7 @@ CheckHeroEntersCastle:
 
 	ld		a,(whichplayernowplaying?)      ;check if hero enters a friendly or enemy castle
 	cp    (iy+CastlePlayer)
-  ret   nz                              ;return (for now) if its an enemy castle
+  jr    nz,.TakeOverCastle              ;enemy castle entered with no heroes, take control of it !
 
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    002
@@ -1051,6 +1051,12 @@ CheckHeroEntersCastle:
   pop   af                              ;pop the call to this check
   pop   af                              ;pop the call from the engine to this routine
   jp    EnterCastle
+ 
+.TakeOverCastle:                        ;enemy castle entered with no heroes, take control of it !
+  ld    (iy+CastlePlayer),a
+  pop   af                              ;pop the call to this check
+  ret
+ 
   
 CheckHeroCollidesWithEnemyHero:
   ld    ix,(plxcurrentheroAddress)
@@ -1238,9 +1244,16 @@ CheckIfCurrentPlayerIsDisabled:         ;out: carry flag=player is out of the ga
   ld    ix,Castle4 | cp (ix+CastlePlayer) | ret z
 
   call  SetHero1ForCurrentPlayerInIX    ;check if current player has an active hero
+
+  ld    b,7
+  .loop:
   ld    a,(ix+HeroStatus)
   cp    1                               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   ret   z
+  ld    de,lenghtherotable
+  add   ix,de
+  djnz  .loop
+
   scf                                   ;carry=player has no castles and no active hero
   ret
 
@@ -4435,7 +4448,7 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  001,002,031,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer1:        db  001,002,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer2:        db  006,007,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
