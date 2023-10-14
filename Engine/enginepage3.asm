@@ -1702,9 +1702,10 @@ EnterCombat:
 	call	SetPageSpecial					        ;set page
   
   ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
-  ld    ix,(HeroThatGetsAttacked)       ;y hero that gets attacked
-  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-;  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
+;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
+;  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
+  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
@@ -1716,6 +1717,41 @@ EnterCombat:
   ld    (framecounter),a
   jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
 
+HeroFled:
+  ld    (ix+HeroStatus),254             ;254 = hero fled
+  ld    (ix+Heroy),255
+  ld    (ix+Herox),255
+
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  ld    de,HeroInfoNumber
+  add   hl,de
+  ld    b,(hl)                          ;hero number
+
+  ;now start looking at end of table, keep moving left until we found a hero. Then set the stored hero 1 slot right of that hero
+  ld    a,(PlayerThatGetsAttacked)
+  cp    1
+  ld    hl,TavernHeroesPlayer1+TavernHeroTableLenght-2
+  jr    z,.loop
+  cp    2
+  ld    hl,TavernHeroesPlayer2+TavernHeroTableLenght-2
+  jr    z,.loop
+  cp    3
+  ld    hl,TavernHeroesPlayer3+TavernHeroTableLenght-2
+  jr    z,.loop
+  ld    hl,TavernHeroesPlayer4+TavernHeroTableLenght-2
+  .loop:
+  ld    a,(hl)
+  or    a
+  jr    nz,.HeroFound
+  dec   hl
+  jr    .loop
+
+  .HeroFound:
+  inc   hl
+  ld    (hl),b
+  ret
+  
 DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
   ld    (ix+HeroStatus),255             ;255 = inactive
 

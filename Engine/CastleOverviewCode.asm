@@ -410,37 +410,37 @@ SetAvailableRecruitArmy:
 
 .Rubiescost:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,005+038                       ;dx
+  ld    b,005+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((005+030)/2) - 128  
   call  .SetRubiescost
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,089+038                       ;dx
+  ld    b,089+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((089+030)/2) - 128  
   call  .SetRubiescost
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,173+038                       ;dx
+  ld    b,173+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((173+030)/2) - 128  
   call  .SetRubiescost
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,005+038                       ;dx
+  ld    b,005+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((005+030)/2) - 128  
   call  .SetRubiescost
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,089+038                       ;dx
+  ld    b,089+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((089+030)/2) - 128  
   call  .SetRubiescost
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,173+038                       ;dx
+  ld    b,173+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((173+030)/2) - 128  
   call  .SetRubiescost
@@ -449,7 +449,6 @@ SetAvailableRecruitArmy:
   .SetRubiescost:
   push  de
   call  SetRubiesCostSelectedCreatureInHL
-
   ld    a,h
   or    l
   jr    z,.Zero                         ;skip putting number and icon if amount is 0
@@ -466,37 +465,37 @@ SetAvailableRecruitArmy:
 
 .Gemscost:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,005+038                       ;dx
+  ld    b,005+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((005+030)/2) - 128  
   call  .SetGemscost
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,089+038                       ;dx
+  ld    b,089+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((089+030)/2) - 128  
   call  .SetGemscost
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,173+038                       ;dx
+  ld    b,173+45                       ;dx
   ld    c,043                           ;dy
   ld    de,$0000 + ((034+05)*128) + ((173+030)/2) - 128  
   call  .SetGemscost
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,005+038                       ;dx
+  ld    b,005+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((005+030)/2) - 128  
   call  .SetGemscost
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,089+038                       ;dx
+  ld    b,089+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((089+030)/2) - 128  
   call  .SetGemscost
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,173+038                       ;dx
+  ld    b,173+45                       ;dx
   ld    c,099                           ;dy
   ld    de,$0000 + ((090+05)*128) + ((173+030)/2) - 128  
   call  .SetGemscost
@@ -526,32 +525,32 @@ SetAvailableRecruitArmy:
 
   .attack:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,054                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,054                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,054                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,054+56                        ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,054+56                        ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,054+56                        ;dy
   call  .SetAttack  
   ret
@@ -568,32 +567,32 @@ SetAvailableRecruitArmy:
   
   .defense:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense  
   ret
@@ -610,32 +609,32 @@ SetAvailableRecruitArmy:
 
   .speed:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,040                           ;dy
   call  .SetSpeed
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,040                           ;dy
   call  .SetSpeed
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,040                           ;dy
   call  .SetSpeed
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-14                        ;dx
+  ld    b,083-10                        ;dx
   ld    c,040+56                        ;dy
   call  .SetSpeed
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-14                        ;dx
+  ld    b,167-10                        ;dx
   ld    c,040+56                        ;dy
   call  .SetSpeed
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-14                        ;dx
+  ld    b,251-10                        ;dx
   ld    c,040+56                        ;dy
   call  .SetSpeed  
   ret
@@ -652,32 +651,32 @@ SetAvailableRecruitArmy:
   
   .cost:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,005+020                       ;dx
+  ld    b,005+023                       ;dx
   ld    c,055                           ;dy
   call  .SetCost
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,089+020                       ;dx
+  ld    b,089+023                       ;dx
   ld    c,055                           ;dy
   call  .SetCost
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,173+020                       ;dx
+  ld    b,173+023                       ;dx
   ld    c,055                           ;dy
   call  .SetCost
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,005+020                       ;dx
+  ld    b,005+023                       ;dx
   ld    c,111                           ;dy
   call  .SetCost
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,089+020                       ;dx
+  ld    b,089+023                       ;dx
   ld    c,111                           ;dy
   call  .SetCost
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,173+020                       ;dx
+  ld    b,173+023                       ;dx
   ld    c,111                           ;dy
   call  .SetCost
   ret
@@ -850,17 +849,17 @@ SettavernHeroSkill:
   ld    a,HeroOverviewCodeBlock         ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    a,(ix+TavernHero1)
   ld    b,004+04                        ;dx
   ld    c,043+44                        ;dy
   call  .SetHeroSkill
 
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    a,(ix+TavernHero2)
   ld    b,090+04                        ;dx
   ld    c,043+44                        ;dy
   call  .SetHeroSkill
 
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    a,(ix+TavernHero3)
   ld    b,176+04                        ;dx
   ld    c,043+44                        ;dy
   call  .SetHeroSkill
@@ -873,15 +872,14 @@ SettavernHeroSkill:
   or    a
   ret   z
 
+  push  ix                              ;tavern hero table
   push  bc
-
   ld    b,a
   ld    ix,HeroAddressesAdol-heroAddressesLenght
   ld    de,heroAddressesLenght
   .loop:
   add   ix,de
   djnz  .loop
-
   pop   bc
   
   ld    a,(ix+HeroInfoSkill)            ;hero skill  
@@ -900,6 +898,7 @@ SettavernHeroSkill:
   add   hl,de
   
   call  SetText                         ;in: b=dx, c=dy, hl->text
+  pop   ix                              ;tavern hero table
   ret
 
 SetTextBuildingWhenClicked:
@@ -1183,7 +1182,7 @@ EndTurn:
 	ld		a,(ix+HeroManarec)				;mana recovery
 	add		a,(ix+HeroMana)           ;add current hero mana
 	cp		(ix+HeroTotalMana)				;cp with total mana 
-	jp		nc,.nooverflowmana
+	jp		c,.nooverflowmana
 	ld		a,(ix+HeroTotalMana)
 	.nooverflowmana:
 	ld		(ix+HeroMana),a           ;set mana for next turn
@@ -1200,62 +1199,54 @@ EndTurn:
   ld    hl,(Date)
   inc   hl
   ld    (Date),hl
+  call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
   .EndCheckIncreaseDate:  
   
-  call  SetAndRotateTavernHeroes        ;At start of day, rotate all tavern heroes
   call  AddCastlesIncomeToPlayer        ;add total income of castles
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
   jp    ActivateFirstActiveHeroForCurrentPlayer
 
-SetAndRotateTavernHeroes:               ;At start of day 1 for Player 1, rotate all tavern heroes
-ret
-	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
-  dec   a
-  ret   nz
-  
-  ld    iy,Castle1
-
-  ld    hl,(Player1TavernPointer)
-  inc   (hl)                            ;increase tavern hero pointer
+SetAndRotateTavernHeroes:               ;At start of player 1's turn, rotate all tavern heroes
+  ld    hl,TavernHeroesPlayer1+1
   ld    de,TavernHeroesPlayer1
-  add   hl,de  
-  ld    a,(hl)
-  cp    255                             ;check if there is this a hero present at this location in the table
-  ret   nz                              ;yes, a hero is present, return
-  ld    hl,0
-  ld    (Player1TavernPointer),hl       ;if a hero is not present, reset Player1TavernPointer
+  ld    bc,TavernHeroesPlayer1+TavernHeroTableLenght-2
+  call  .RotateForThisPlayer            ;Player 1
+  ld    hl,TavernHeroesPlayer2+1
+  ld    de,TavernHeroesPlayer2
+  ld    bc,TavernHeroesPlayer2+TavernHeroTableLenght-2
+  call  .RotateForThisPlayer            ;Player 2
+  ld    hl,TavernHeroesPlayer3+1;
+  ld    de,TavernHeroesPlayer3
+  ld    bc,TavernHeroesPlayer3+TavernHeroTableLenght-2
+  call  .RotateForThisPlayer            ;Player 3
+  ld    hl,TavernHeroesPlayer4+1
+  ld    de,TavernHeroesPlayer4
+  ld    bc,TavernHeroesPlayer4+TavernHeroTableLenght-2
+  call  .RotateForThisPlayer            ;Player 4
   ret
 
-
-
-  call  .SetHero                        ;set hero in tavern slot 1
-  ld    a,(hl)                          ;if after setting the 1st hero, we reach the end of the table, reset hl and Tavern Table Pointer
-  cp    255
-  jr    nz,.EndCheckEndTable1
-  ld    hl,TavernHeroesPlayer1
-  ld    de,-1
-  ld    (Player1TavernPointer),de
-  .EndCheckEndTable1:
-
-  call  .SetHero                        ;set hero in tavern slot 2
-  ld    a,(hl)                          ;if after setting the 2nd hero, we reach the end of the table, reset hl
-  cp    255
-  jr    nz,.EndCheckEndTable2
-  ld    hl,TavernHeroesPlayer1
-  .EndCheckEndTable2:
-
-  call  .SetHero                        ;set hero in tavern slot 3
-  inc   de
-  ld    (Player1TavernPointer),de
-  ret
-
-  .SetHero:  
+  .RotateForThisPlayer:
+  push  bc
+  ld    a,(de)                          ;first hero in tavern hero table
+  ex    af,af'                          ;store first hero in tavern hero table
+  ld    bc,TavernHeroTableLenght-1
+  ldir
+  
+  ;now start looking at end of table, keep moving left until we found a hero. Then set the stored hero 1 slot right of that hero
+  pop   hl
+  .loop:
   ld    a,(hl)
-  ld    (iy+TavernHero1DayRemain),a
-  inc   hl                              ;next tavern hero in player's tavern table
-  inc   iy                              ;next tavern slot (3 slots total)
+  or    a
+  jr    nz,.HeroFound
+  dec   hl
+  jr    .loop
+
+  .HeroFound:
+  inc   hl
+  ex    af,af'                          ;recall first hero in tavern hero table
+  ld    (hl),a
   ret
 
 AddEstatesIncomeToPlayer:  
@@ -1522,7 +1513,7 @@ SetHeroArmyAndStatusInHud:
 ClearHeroStatsAndArmyUnitsAmount:
   ld    hl,$4000 + (122*128) + (202/2) - 128
   ld    de,$0000 + (122*128) + (202/2) - 128
-  ld    bc,$0000 + (065*256) + (050/2)
+  ld    bc,$0000 + (075*256) + (050/2)
   ld    a,HudNewBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -2272,20 +2263,38 @@ TextLevelUp7:
 TextLevelUp8:
                 db "Advanced",254
                 db "Logistics",255
+        
+
+CenterHeroNameHasGainedALevel:
+  ld    d,0                             ;amount of letters of hero name
+  push  hl
+  .loop:
+  ld    a,(hl)
+  cp    255
+  jr    z,.EndNameFound
+  inc   d
+  inc   hl
+  dec   b
+  dec   b
+  jr    .loop
+  .EndNameFound:
+  pop   hl
+  ret
                 
 SetLevelUpText:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   ld    ix,(plxcurrentheroAddress)            ;lets call this defending
   ;hero name
-  ld    b,034+00                        ;dx
+  ld    b,032+(17*2)                        ;dx
   ld    c,022+00                        ;dy
   ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
+  call  CenterHeroNameHasGainedALevel
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
   ld    a,(PutLetter+dx)                ;set dx of text
-  sub   a,5
+  add   a,5
   ;has gained a level
   ld    b,a                             ;dx
   ld    c,022+00                        ;dy
@@ -2300,7 +2309,7 @@ SetLevelUpText:
   ld    a,(ix+HeroLevel)                ;current level
   ld    l,a
   ld    h,0
-  ld    b,088-10                        ;dx
+  ld    b,094-10                        ;dx
   ld    c,071+00                        ;dy
   call  SetNumber16BitCastle
   ;class
@@ -2308,7 +2317,12 @@ SetLevelUpText:
   ld    h,(ix+HeroSpecificInfo+1)
   ld    de,HeroInfoClass
   add   hl,de
-  ld    b,104-10                        ;dx
+
+  ld    a,(PutLetter+dx)                ;set dx of text
+  add   a,5
+  ld    b,a  
+
+;  ld    b,104-10                        ;dx
   ld    c,071+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
@@ -6485,23 +6499,40 @@ CastleOverviewTavernCode:
 ;  jr    z,.TavernButton3Pressed
 
   .TavernButton3Pressed:
-  ld    a,(iy+TavernHero3DayRemain)     ;which hero are we recruiting ?
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    a,(ix+TavernHero3)              ;recruit hero 3
+  pop   ix
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
-  ld    (iy+TavernHero3DayRemain),000   ;remove hero 2 from tavern
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    (ix+TavernHero3),000            ;remove hero 3 from tavern
+  pop   ix
   jp    .HeroRecruited
 
   .TavernButton2Pressed:
-  ld    a,(iy+TavernHero2DayRemain)     ;which hero are we recruiting ?
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    a,(ix+TavernHero2)              ;recruit hero 2
+  pop   ix
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
-  ld    (iy+TavernHero2DayRemain),000   ;remove hero 2 from tavern
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    (ix+TavernHero2),000            ;remove hero 2 from tavern
+  pop   ix
   jp    .HeroRecruited
 
   .TavernButton1Pressed:
-  ld    a,(iy+TavernHero1DayRemain)     ;which hero are we recruiting ?
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    a,(ix+TavernHero1)              ;recruit hero 1
+  pop   ix
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
-  ld    (iy+TavernHero1DayRemain),000   ;remove hero 2 from tavern
+  push  ix
+  call  SetTavernHeroesTablePlayerinIX
+  ld    (ix+TavernHero1),000            ;remove hero 1 from tavern
+  pop   ix
   jp    .HeroRecruited
-
 
   .HeroRecruited:
   call  SetResourcesPlayer
@@ -6529,22 +6560,10 @@ CastleOverviewTavernCode:
 
   .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
   push  af                              ;a,(iy+TavernHeroxDayRemain)
+  call  .CheckIsHeroAHeroThatHasFled?
   call  SetEmptyHeroSlotForCurrentPlayerInIX
-
-  ;set empty hero
-  ld    hl,EmptyHeroRecruitedAtTavern
-  push  ix
-  pop   de
-  ld    bc,lenghtherotable-2            ;don't copy .HeroDYDX:  dw $ffff 
-  ldir
-
-  ;set y,x
-  ld    a,(iy+CastleY)                  ;castle y
-  dec   a
-  ld    (ix+HeroY),a                    ;set hero y  
-  ld    a,(iy+Castlex)                  ;castle x
-  inc   a
-  ld    (ix+HeroX),a                    ;set hero x
+  call  .ClearHeroSlot                  ;use empty template to fill free hero slot
+  call  .SetYX                          ;place hero in the castle
   pop   af                              ;a,(iy+TavernHeroxDayRemain)
 
   ;set hero specific info
@@ -6566,7 +6585,9 @@ CastleOverviewTavernCode:
   ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
   ld    a,(iy+CastleLevel1Units)        ;castle x  
   ld    (ix+HeroUnits),a
+  ret
   
+  .Reduce2000Gold:
   call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
   ;gold
   ld    l,(ix+0)
@@ -6574,10 +6595,63 @@ CastleOverviewTavernCode:
   ld    de,2000
   xor   a
   sbc   hl,de
-;  ret   nc
   ld    (ix+0),l
   ld    (ix+1),h                        ;gold   
   ret
+
+  .ClearHeroSlot:
+  ld    hl,EmptyHeroRecruitedAtTavern
+  push  ix
+  pop   de
+  ld    bc,lenghtherotable-2            ;don't copy .HeroDYDX:  dw $ffff 
+  ldir
+  ret
+
+  .SetYX:
+  ld    a,(iy+CastleY)                  ;castle y
+  dec   a
+  ld    (ix+HeroY),a                    ;set hero y  
+  ld    a,(iy+Castlex)                  ;castle x
+  inc   a
+  ld    (ix+HeroX),a                    ;set hero x
+  ret
+
+
+
+
+.CheckIsHeroAHeroThatHasFled?:
+  ld    c,a                             ;Tavern Hero HeroNumber
+  ld    b,amountofheroesperplayer
+	ld		a,(whichplayernowplaying?)
+  cp    1 | ld ix,pl1hero1y |	jr z,.GoFindHero
+  cp    2 | ld ix,pl2hero1y |	jr z,.GoFindHero
+  cp    3 | ld ix,pl3hero1y |	jr z,.GoFindHero
+  cp    4 | ld ix,pl4hero1y |	jr z,.GoFindHero
+
+  .GoFindHero:
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  ld    de,HeroInfoNumber
+  add   hl,de
+  ld    a,(hl)                          ;hero number
+  cp    c
+  jr    z,.HeroFound
+  ld    de,lenghtherotable
+  add   ix,de
+  djnz  .GoFindHero
+  ret
+
+  .HeroFound:
+  pop   af                              ;pop the call to this routine
+
+  ld    (ix+heroStatus),2               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  call  .SetYX
+  call  .Reduce2000Gold                 ;Hero cost = 2000 gold
+  pop   af
+  ret
+
+
+
 
 CheckHeroHasAtLeast2CreatureSlotsFilled:
   ld    b,0                             ;amount of filled creature slots
@@ -6637,6 +6711,7 @@ SetEmptyHeroSlotForCurrentPlayerInIX:
   ret
 
 SetTavernHeroes:
+  call  SetTavernHeroesTablePlayerinIX
   call  SettavernHeroIcons
   call  SettavernHeroNames
   call  SettavernHeroClass
@@ -6644,16 +6719,32 @@ SetTavernHeroes:
   call  EraseTavernHeroWindowWhenUnavailable
   ret
 
+SetTavernHeroesTablePlayerinIX:
+	ld		a,(whichplayernowplaying?)
+  ld    ix,TavernHeroesPlayer1
+  cp    1
+  ret   z
+  ld    ix,TavernHeroesPlayer2
+  cp    2
+  ret   z
+  ld    ix,TavernHeroesPlayer3
+  cp    3
+  ret   z
+  ld    ix,TavernHeroesPlayer4
+;  cp    4
+;  ret   z
+  ret
+
 EraseTavernHeroWindowWhenUnavailable:
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    a,(ix+TavernHero1)
   or    a
   ld    de,$0000 + (045*128) + (006/2) - 128
   call  z,.EraseWindow
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    a,(ix+TavernHero2)
   or    a
   ld    de,$0000 + (045*128) + (092/2) - 128
   call  z,.EraseWindow
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    a,(ix+TavernHero3)
   or    a
   ld    de,$0000 + (045*128) + (178/2) - 128
   call  z,.EraseWindow
@@ -6701,17 +6792,17 @@ SettavernHeroClass:
   ld    c,048+02                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    a,(ix+TavernHero1)
   ld    b,004+28                        ;dx
   ld    c,058+00                        ;dy
   call  .SetHeroClass
 
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    a,(ix+TavernHero2)
   ld    b,090+28                        ;dx
   ld    c,058+00                        ;dy
   call  .SetHeroClass
 
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    a,(ix+TavernHero3)
   ld    b,176+28                        ;dx
   ld    c,058+00                        ;dy
   call  .SetHeroClass
@@ -6735,19 +6826,28 @@ SettavernHeroClass:
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
 
+
+
 SettavernHeroNames:
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
-  ld    b,004+10                        ;dx
+  ;erase all names
+  ld    hl,$4000 + (034*128) + (004/2) - 128
+  ld    de,$0000 + (034*128) + (004/2) - 128
+  ld    bc,$0000 + (007*256) + (248/2)
+  ld    a,TavernBlock                    ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    a,(ix+TavernHero1)
+  ld    b,004+06+(17*2)                        ;dx
   ld    c,035+00                        ;dy
   call  .SetHeroName
 
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
-  ld    b,090+10                        ;dx
+  ld    a,(ix+TavernHero2)
+  ld    b,090+06+(17*2)                        ;dx
   ld    c,035+00                        ;dy
   call  .SetHeroName
 
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
-  ld    b,176+10                        ;dx
+  ld    a,(ix+TavernHero3)
+  ld    b,176+06+(17*2)                        ;dx
   ld    c,035+00                        ;dy
   call  .SetHeroName
   ret
@@ -6766,18 +6866,19 @@ SettavernHeroNames:
   djnz  .loop
 
   pop   bc
-    
+
+  call  CenterHeroNameHasGainedALevel
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
   
 SettavernHeroIcons:  
-  ld    a,(iy+TavernHero1DayRemain)     ;hero number
+  ld    a,(ix+TavernHero1)
   ld    de,DYDX16x30HeroIconTavernWindow1
   call  .SetHeroIcon
-  ld    a,(iy+TavernHero2DayRemain)     ;hero number
+  ld    a,(ix+TavernHero2)
   ld    de,DYDX16x30HeroIconTavernWindow2
   call  .SetHeroIcon
-  ld    a,(iy+TavernHero3DayRemain)     ;hero number
+  ld    a,(ix+TavernHero3)
   ld    de,DYDX16x30HeroIconTavernWindow3
   call  .SetHeroIcon
   ret
@@ -6786,6 +6887,7 @@ SettavernHeroIcons:
   or    a
   ret   z
 
+  push  ix                              ;tavern hero table
   push  de  
   ld    b,a
   ld    ix,HeroAddressesAdol-heroAddressesLenght
@@ -6800,7 +6902,8 @@ SettavernHeroIcons:
   xor   a
   sbc   hl,bc
 
-  pop   de                                  ;DYDX16x30HeroIconTavernWindow1,2,3
+  pop   de                              ;DYDX16x30HeroIconTavernWindow1,2,3
+  pop   ix                              ;tavern hero table
   ld    bc,NXAndNY16x30HeroIcon
   ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -7248,17 +7351,18 @@ SetTavernButtons:
   ret
 
   .SetBrownButtonIfHeroIsAlreadyRecruited:
-  ld    a,(iy+TavernHero1DayRemain)
+  call  SetTavernHeroesTablePlayerinIX
+  ld    a,(ix+TavernHero1)              
   or    a
   ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*0)
   call  z,.AlreadyRecruitedSetBrown
 
-  ld    a,(iy+TavernHero2DayRemain)
+  ld    a,(ix+TavernHero2)              
   or    a
   ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*1)
   call  z,.AlreadyRecruitedSetBrown
 
-  ld    a,(iy+TavernHero3DayRemain)
+  ld    a,(ix+TavernHero3)              
   or    a
   ld    de,GenericButtonTable2+1+(GenericButtonTableLenghtPerButton*2)
   call  z,.AlreadyRecruitedSetBrown

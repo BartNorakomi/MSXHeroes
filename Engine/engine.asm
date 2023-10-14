@@ -471,22 +471,6 @@ SetNumber16BitCastle:                   ;in hl=number (16bit)
 
 
 
-
-;TavernHero1DayRemain:   equ 33
-;TavernHero2DayRemain:   equ 34
-;TavernHero3DayRemain:   equ 35
-;AmountOfCastles:  equ 4
-;            tavernhero1, tavernhero2, tavernhero3 
-;Castle1:    030    ,031    ,032   
-;Castle2:    030    ,031    ,032     
-;Castle3:    030    ,031    ,032    
-;Castle4:    030    ,031    ,032   
-
-Player1TavernPointer:  dw  0 | TavernHeroesPlayer1:        db  001,002,003,004,005,255,255,255,255,255
-Player2TavernPointer:  dw  0 | TavernHeroesPlayer2:        db  006,007,008,009,010,255,255,255,255,255
-Player3TavernPointer:  dw  0 | TavernHeroesPlayer3:        db  011,012,013,014,015,255,255,255,255,255
-Player4TavernPointer:  dw  0 | TavernHeroesPlayer4:        db  016,017,018,019,020,255,255,255,255,255
-
 HeroXPTable:
   dw    01000 ;level 2
   dw    02000 ;level 3
@@ -1074,13 +1058,14 @@ CheckHeroCollidesWithEnemyHero:
 ;check if this hero touches an enemy hero
 	ld		de,lenghtherotable
 	ld		hl,lenghtherotable*(amountofheroesperplayer-1)
-	ld		a,(whichplayernowplaying?) | cp 1 | ld bc,pl1hero8y | ld iy,pl1hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 2 | ld bc,pl2hero8y | ld iy,pl2hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 3 | ld bc,pl3hero8y | ld iy,pl3hero1y | call nz,.CheckHeroTouchesEnemyHero
-	ld		a,(whichplayernowplaying?) | cp 4 | ld bc,pl4hero8y | ld iy,pl4hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 1 | ld a,1 | ld bc,pl1hero8y | ld iy,pl1hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 2 | ld a,2 | ld bc,pl2hero8y | ld iy,pl2hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 3 | ld a,3 | ld bc,pl3hero8y | ld iy,pl3hero1y | call nz,.CheckHeroTouchesEnemyHero
+	ld		a,(whichplayernowplaying?) | cp 4 | ld a,4 | ld bc,pl4hero8y | ld iy,pl4hero1y | call nz,.CheckHeroTouchesEnemyHero
   ret
 
   .CheckHeroTouchesEnemyHero:           ;in: ix->active hero, iy->hero we check collision with
+  ld    (PlayerThatGetsAttacked),a
   ld    (LastHeroForPlayerThatGetsAttacked),bc
 	ld		b,amountofheroesperplayer
   .checkpointerenemyloop:
@@ -1110,6 +1095,7 @@ CheckHeroCollidesWithEnemyHero:
 	jp		EnterCombat
 
 LastHeroForPlayerThatGetsAttacked: ds  2
+PlayerThatGetsAttacked: ds  1
 HeroThatGetsAttacked: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
@@ -1247,9 +1233,9 @@ ActivateFirstActiveHeroForCurrentPlayer:
 CheckIfCurrentPlayerIsDisabled:         ;out: carry flag=player is out of the game
   ld		a,(whichplayernowplaying?)      ;check if current player has a castle
   ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle2 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle3 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle4 | cp (ix+CastlePlayer) | ret z
 
   call  SetHero1ForCurrentPlayerInIX    ;check if current player has an active hero
   ld    a,(ix+HeroStatus)
@@ -1474,6 +1460,20 @@ CheckCastleArrowUp:
   ret
 
 CheckHeroArrowDown:
+  ;check if there are 3 more active heroes below current Hero Window Pointer
+;  call  SetHero1ForCurrentPlayerInIX
+;  call  SetHeroUsingHeroWindowPointer
+;  call  FindHeroThatIsNotInCastle
+;	add		ix,de
+;  call  FindHeroThatIsNotInCastle
+;	add		ix,de
+;  call  FindHeroThatIsNotInCastle
+;	add		ix,de
+;  call  FindHeroThatIsNotInCastle
+;	ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+;  cp    253
+;  ret   z
+
 	ld		a,(herowindowpointer)
 	add		a,1
 	cp		6
@@ -3873,46 +3873,47 @@ HeroInfoPortrait10x18SYSX:  equ HeroInfoSYSX+2
 HeroButton20x11SYSX:        equ HeroInfoPortrait10x18SYSX+2
 HeroInfoPortrait16x30SYSX:  equ HeroButton20x11SYSX+2
 HeroInfoSkill:              equ HeroInfoPortrait16x30SYSX+2
+HeroInfoNumber:             equ HeroInfoSkill+1
 
 ;hero class that doesnt fit: battle mage, beastmaster, death knight, necromancer
 heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol
-HeroAddressesAdol:            db "adol             ",255,"knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 |
-HeroAddressesGoemon1:         db "goemon1          ",255,"ranger      ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 |
-HeroAddressesPixy:            db "pixy             ",255,"alchemist   ",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 |
-HeroAddressesDrasle1:         db "drasle1          ",255,"demoniac    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 |
-HeroAddressesLatok:           db "latok            ",255,"overlord    ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 |
-HeroAddressesDrasle2:         db "drasle2          ",255,"barbarian   ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 |
-HeroAddressesSnake1:          db "snake1           ",255,"deathlord   ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 |
-HeroAddressesDrasle3:         db "drasle3          ",255,"cleric      ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 |
+HeroAddressesAdol:            db "adol",255,"             ","knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
+HeroAddressesGoemon1:         db "goemon1",255,"          ","ranger      ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
+HeroAddressesPixy:            db "pixy",255,"             ","alchemist   ",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
+HeroAddressesDrasle1:         db "drasle1",255,"          ","demoniac    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 | db 004 |
+HeroAddressesLatok:           db "latok",255,"            ","overlord    ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 | db 005 |
+HeroAddressesDrasle2:         db "drasle2",255,"          ","barbarian   ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
+HeroAddressesSnake1:          db "snake1",255,"           ","deathlord   ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
+HeroAddressesDrasle3:         db "drasle3",255,"          ","cleric      ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 | db 008 |
 
-HeroAddressesSnake2:          db "snake2           ",255,"druid       ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 |
-HeroAddressesDrasle4:         db "drasle4          ",255,"battle mage ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 |
-HeroAddressesAshguine:        db "ashguine         ",255,"heretic     ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 |
-HeroAddressesUndeadline1:     db "warrior          ",255,"warlock     ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 |
-HeroAddressesPsychoWorld:     db "psycho           ",255,"wizzard     ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 |
-HeroAddressesUndeadline2:     db "ninja            ",255,"witch       ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 |
-HeroAddressesGoemon2:         db "goemon           ",255,"beastmaster ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 |
-HeroAddressesUndeadline3:     db "marco            ",255,"mage        ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 |
+HeroAddressesSnake2:          db "snake2",255,"           ","druid       ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
+HeroAddressesDrasle4:         db "drasle4",255,"          ","battle mage ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
+HeroAddressesAshguine:        db "ashguine",255,"         ","heretic     ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
+HeroAddressesUndeadline1:     db "warrior",255,"          ","warlock     ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
+HeroAddressesPsychoWorld:     db "psycho",255,"           ","wizzard     ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
+HeroAddressesUndeadline2:     db "ninja",255,"            ","witch       ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
+HeroAddressesGoemon2:         db "goemon",255,"           ","beastmaster ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 | db 015 |
+HeroAddressesUndeadline3:     db "marco",255,"            ","mage        ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 | db 016 |
 
-HeroAddressesFray:            db "fray             ",255,"death knight",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 |
-HeroAddressesBlackColor:      db "black color      ",255,"necromancer ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroButton20x11SYSXBlackColor,HeroPortrait16x30SYSXBlackColor                     | db 19 |
-HeroAddressesWit:             db "wit              ",255,"death knight",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroButton20x11SYSXWit,HeroPortrait16x30SYSXWit                                                        | db 22 |
-HeroAddressesMitchell:        db "mitchell         ",255,"death knight",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroButton20x11SYSXMitchell,HeroPortrait16x30SYSXMitchell                               | db 25 |
-HeroAddressesJanJackGibson:   db "jan jack gibson  ",255,"overlord    ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroButton20x11SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson      | db 28 |
-HeroAddressesGillianSeed:     db "gillian seed     ",255,"death knight",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroButton20x11SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed                | db 31 |
-HeroAddressesSnatcher:        db "snatcher         ",255,"death knight",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 |
-HeroAddressesGolvellius:      db "golvellius       ",255,"death knight",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 |
+HeroAddressesFray:            db "fray",255,"             ","death knight",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 | db 017 |
+HeroAddressesBlackColor:      db "black color",255,"      ","necromancer ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroButton20x11SYSXBlackColor,HeroPortrait16x30SYSXBlackColor                     | db 19 | db 018 |
+HeroAddressesWit:             db "wit",255,"              ","death knight",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroButton20x11SYSXWit,HeroPortrait16x30SYSXWit                                                        | db 22 | db 019 |
+HeroAddressesMitchell:        db "mitchell",255,"         ","death knight",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroButton20x11SYSXMitchell,HeroPortrait16x30SYSXMitchell                               | db 25 | db 020 |
+HeroAddressesJanJackGibson:   db "jan jack gibson",255,"  ","overlord    ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroButton20x11SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson      | db 28 | db 021 |
+HeroAddressesGillianSeed:     db "gillian seed",255,"     ","death knight",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroButton20x11SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed                | db 31 | db 022 |
+HeroAddressesSnatcher:        db "snatcher",255,"         ","death knight",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 | db 023 |
+HeroAddressesGolvellius:      db "golvellius",255,"       ","death knight",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 | db 024 |
 
-HeroAddressesBillRizer:       db "bill rizer       ",255,"death knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 |
-HeroAddressesPochi:           db "pochi            ",255,"death knight",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 |
-HeroAddressesGreyFox:         db "grey fox         ",255,"death knight",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 |
-HeroAddressesTrevorBelmont:   db "trevor belmont   ",255,"death knight",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 |
-HeroAddressesBigBoss:         db "big boss         ",255,"death knight",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 |
-HeroAddressesSimonBelmont:    db "simon belmont    ",255,"beastmaster ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont         | db 22 |
-HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,"barbarian   ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 |
-HeroAddressesRichterBelmont:  db "Richter Belmont  ",255,"Death Knight",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 |
+HeroAddressesBillRizer:       db "bill rizer",255,"       ","death knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
+HeroAddressesPochi:           db "pochi",255,"            ","death knight",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
+HeroAddressesGreyFox:         db "grey fox",255,"         ","death knight",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
+HeroAddressesTrevorBelmont:   db "trevor belmont",255,"   ","death knight",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
+HeroAddressesBigBoss:         db "big boss",255,"         ","death knight",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
+HeroAddressesSimonBelmont:    db "simon belmont",255,"    ","beastmaster ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont         | db 22 | db 030 |
+HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,   "barbarian   ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 | db 031 |
+HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Death Knight",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 | db 032 |
 
-HeroAddressesUltraBox:        db "Ultrabox         ",255,"Death Knight",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox | db 28 |
+HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Death Knight",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 28 | db 033 |
 
 HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
@@ -4079,13 +4080,13 @@ EmptyHeroRecruitedAtTavern:
 .HeroSpecificInfo: ds 2
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero1y:		db	3
-pl1hero1x:		db	3
+pl1hero1y:		db	0
+pl1hero1x:		db	7
 pl1hero1xp: dw 999
 pl1hero1move:	db	30,30
 pl1hero1mana:	db	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	1 ;31	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 2
 Pl1Hero1StatDefense:  db 3
@@ -4102,13 +4103,13 @@ Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 .HeroSpecificInfo: dw HeroAddressesDrPettrovich
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero2y:		db	3
-pl1hero2x:		db	2
+pl1hero2y:		db	0
+pl1hero2x:		db	6
 pl1hero2xp: dw 0000
 pl1hero2move:	db	10,20
 pl1hero2mana:	db	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	254		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4131,7 +4132,7 @@ pl1hero3xp: dw 0000
 pl1hero3move:	db	30,20
 pl1hero3mana:	db	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4171,8 +4172,8 @@ Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero5y:		db	07		                ;
-pl1hero5x:		db	06		
+pl1hero5y:		db	00		                ;
+pl1hero5x:		db	01		
 pl1hero5xp: dw 0000
 pl1hero5move:	db	30,20
 pl1hero5mana:	db	10,20
@@ -4194,8 +4195,8 @@ Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .HeroSpecificInfo: dw HeroAddressesLatok
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero6y:		db	07		                ;
-.pl1hero6x:		db	07		
+pl1hero6y:		db	00		                ;
+.pl1hero6x:		db	02		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	30,20
 .pl1hero6mana:	db	10,20
@@ -4214,14 +4215,66 @@ pl1hero6y:		db	07		                ;
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle2
+.HeroSpecificInfo: dw HeroAddressesWit
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero7y:		ds  lenghtherotable,255
-pl1hero8y:		ds  lenghtherotable,255
+pl1hero7y:		db	00		                ;
+.pl1hero6x:		db	03		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	30,20
+.pl1hero6mana:	db	10,20
+.pl1hero6manarec:db	5		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,18
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesJanJackGibson
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero8y:		db	00		                ;
+.pl1hero6x:		db	04		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	30,20
+.pl1hero6mana:	db	10,20
+.pl1hero6manarec:db	5		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,18
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesMitchell
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero9y:		db	00		                ;
+.pl1hero6x:		db	00		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	00,00
+.pl1hero6mana:	db	00,00
+.pl1hero6manarec:db	0		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-pl2hero1y:		db	5
-pl2hero1x:		db	5 ;100
+pl2hero1y:		db	3
+pl2hero1x:		db	6
 pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
 pl2hero1mana:	db	10,20
@@ -4240,7 +4293,7 @@ Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroSpecificInfo: dw HeroAddressesSnatcher
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl2hero2y:		ds  lenghtherotable,255
@@ -4250,6 +4303,15 @@ pl2hero5y:		ds  lenghtherotable,255
 pl2hero6y:		ds  lenghtherotable,255
 pl2hero7y:		ds  lenghtherotable,255
 pl2hero8y:		ds  lenghtherotable,255
+
+pl2hero9y:		db	00		                ;
+.pl1hero6x:		db	00		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	00,00
+.pl1hero6mana:	db	00,00
+.pl1hero6manarec:db	0		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 pl3hero1y:		db	100
 pl3hero1x:		db	02
@@ -4258,7 +4320,7 @@ pl3hero1move:	db	10,20
 pl3hero1mana:	db	10,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl3Hero1Units:  db 033 | dw 003 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -4271,7 +4333,7 @@ Pl3Hero1Units:  db 033 | dw 001 |      db 044 | dw 001 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroSpecificInfo: dw HeroAddressesGolvellius
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl3hero2y:		ds  lenghtherotable,255
@@ -4281,6 +4343,15 @@ pl3hero5y:		ds  lenghtherotable,255
 pl3hero6y:		ds  lenghtherotable,255
 pl3hero7y:		ds  lenghtherotable,255
 pl3hero8y:		ds  lenghtherotable,255
+
+pl3hero9y:		db	00		                ;
+.pl1hero6x:		db	00		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	00,00
+.pl1hero6mana:	db	00,00
+.pl1hero6manarec:db	0		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 pl4hero1y:		db	100
 pl4hero1x:		db	100
@@ -4312,53 +4383,62 @@ pl4hero5y:		ds  lenghtherotable,255
 pl4hero6y:		ds  lenghtherotable,255
 pl4hero7y:		ds  lenghtherotable,255
 pl4hero8y:		ds  lenghtherotable,255
+
+pl4hero9y:		db	00		                ;
+.pl1hero6x:		db	00		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	00,00
+.pl1hero6mana:	db	00,00
+.pl1hero6manarec:db	0		                ;recover x mana every turn
+.pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-WhichCastleIsPointerPointingAt?:  ds  2
 CastleY:                equ 0
-CastleX:                equ 1
-CastlePlayer:           equ 2
-CastleLevel:            equ 3
-CastleTavern:           equ 4
-CastleMarket:           equ 5
-CastleMageGuildLevel:   equ 6
-CastleBarracksLevel:    equ 7
-CastleSawmillLevel:     equ 8
-CastleMineLevel:        equ 9
-.Empty1:      equ 10
-.Empty2:      equ 11
-.Empty3:      equ 12
-CastleLevel1Units:      equ 13
-CastleLevel2Units:      equ 14
-CastleLevel3Units:      equ 15
-CastleLevel4Units:      equ 16
-CastleLevel5Units:      equ 17
-CastleLevel6Units:      equ 18
-CastleLevel1UnitsAvail: equ 19
-CastleLevel2UnitsAvail: equ 21
-CastleLevel3UnitsAvail: equ 23
-CastleLevel4UnitsAvail: equ 25
-CastleLevel5UnitsAvail: equ 27
-CastleLevel6UnitsAvail: equ 29
-CastleTerrainSY:        equ 31
-AlreadyBuiltThisTurn?:  equ 32
-TavernHero1DayRemain:   equ 33
-TavernHero2DayRemain:   equ 34
-TavernHero3DayRemain:   equ 35
-CastleName:             equ 36
-AmountOfCastles:  equ 4
+CastleX:                equ CastleY+1
+CastlePlayer:           equ CastleX+1
+CastleLevel:            equ CastlePlayer+1
+CastleTavern:           equ CastleLevel+1
+CastleMarket:           equ CastleTavern+1
+CastleMageGuildLevel:   equ CastleMarket+1
+CastleBarracksLevel:    equ CastleMageGuildLevel+1
+CastleSawmillLevel:     equ CastleBarracksLevel+1
+CastleMineLevel:        equ CastleSawmillLevel+1
+CastleLevel1Units:      equ CastleMineLevel+1
+CastleLevel2Units:      equ CastleLevel1Units+1
+CastleLevel3Units:      equ CastleLevel2Units+1
+CastleLevel4Units:      equ CastleLevel3Units+1
+CastleLevel5Units:      equ CastleLevel4Units+1
+CastleLevel6Units:      equ CastleLevel5Units+1
+CastleLevel1UnitsAvail: equ CastleLevel6Units+1
+CastleLevel2UnitsAvail: equ CastleLevel1UnitsAvail+2
+CastleLevel3UnitsAvail: equ CastleLevel2UnitsAvail+2
+CastleLevel4UnitsAvail: equ CastleLevel3UnitsAvail+2
+CastleLevel5UnitsAvail: equ CastleLevel4UnitsAvail+2
+CastleLevel6UnitsAvail: equ CastleLevel5UnitsAvail+2
+CastleTerrainSY:        equ CastleLevel6UnitsAvail+2
+AlreadyBuiltThisTurn?:  equ CastleTerrainSY+1
+CastleName:             equ AlreadyBuiltThisTurn?+1
+AmountOfCastles:        equ 4
+LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, tavernhero1, tavernhero2, tavernhero3,  lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?, tavern hero 1,2 and 3 days,   castle name
-Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            0,            0,        0,            0,          0      | db   19,        20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                          ,030    ,031    ,032      , "Outer Heaven",255
-Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        0,            0,          0      | db   7,         08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                          ,004    ,005    ,006      , "   Junker HQ",255
-Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        0,            0,          0      | db   8,         11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                          ,007    ,008    ,009      , "    Arcadiam",255
-Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        0,            0,          0      | db   9,         12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                          ,010    ,011    ,012      , "    Zanzibar",255
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
+Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            0,            0,        19,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
+Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
+Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
+Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
 Castle5:  db  000,  000,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
-LenghtCastleTable:  equ Castle2-Castle1
-
+WhichCastleIsPointerPointingAt?:  ds  2
 TempVariableCastleY:	ds	1
 TempVariableCastleX:	ds	1
+
+TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
+TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
+db 255 | TavernHeroesPlayer1:        db  001,002,031,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer2:        db  006,007,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
 
 AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
