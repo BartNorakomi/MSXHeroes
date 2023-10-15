@@ -822,9 +822,6 @@ CheckHeroPicksUpItem:
   cp    74
   jp    z,.GoodiesBag
 
-.GoodiesBag:
-  ret
-
 .InventoryItems:
   ;items 83-127 are our inventory items
   sub   83
@@ -847,6 +844,9 @@ CheckHeroPicksUpItem:
 	xor		a
 	ld		(movehero?),a
   ld    (hl),a                          ;remove item from object layer map
+  ret
+
+.GoodiesBag:
   ret
 
 .MagicRefill:
@@ -4436,7 +4436,7 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  004,  001,  1,      1,          1,        1,        1,              6,            0,            0,        19,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        19,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
@@ -4457,11 +4457,11 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  10000
-.Wood:    dw  300
-.Ore:     dw  400
-.Gems:    dw  130
-.Rubies:  dw  60
+.Gold:    dw  60000
+.Wood:    dw  5300
+.Ore:     dw  5400
+.Gems:    dw  5130
+.Rubies:  dw  5560
 ResourcesPlayer2:
 .Gold:    dw  5000
 .Wood:    dw  300

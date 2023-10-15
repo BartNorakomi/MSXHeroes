@@ -10,17 +10,17 @@
 
 HeroOverViewFirstWindowchoicesSX:   equ 000
 HeroOverViewFirstWindowchoicesSY:   equ 000
-HeroOverViewFirstWindowchoicesDX:   equ 058
+HeroOverViewFirstWindowchoicesDX:   equ 058 - 05
 HeroOverViewFirstWindowchoicesDY:   equ 037
-HeroOverViewFirstWindowchoicesNX:   equ 088
+HeroOverViewFirstWindowchoicesNX:   equ 088 + 10
 HeroOverViewFirstWindowchoicesNY:   equ 122
 
 HeroOverViewFirstWindowButtonNY:  equ 011
-HeroOverViewFirstWindowButtonNX:  equ 072
+HeroOverViewFirstWindowButtonNX:  equ 072 + 10
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-HeroOverViewSkillsWindowSX:   equ 088
+HeroOverViewSkillsWindowSX:   equ 088 + 10
 HeroOverViewSkillsWindowSY:   equ 000
 HeroOverViewSkillsWindowDX:   equ 030
 HeroOverViewSkillsWindowDY:   equ 025
@@ -1267,8 +1267,8 @@ SetTextInventoryItem:                   ;when clicking on an item, the explanati
   ld    h,(ix+1)
   .SetText:
 
-  ld    b,HeroOverViewSpellBookWindowDX + 030
-  ld    c,HeroOverViewSpellBookWindowDY + 159
+  ld    b,HeroOverViewSpellBookWindowDX + 030 + 1
+  ld    c,HeroOverViewSpellBookWindowDY + 159 - 19
   jp    SetText
 
 InventoryDescriptionList:
@@ -3253,21 +3253,21 @@ HeroOverviewSkillsWindowCode:
   jp    HeroOverviewSkillsWindowCode
 
 TextLevel:
-                db "level",255
+                db "Level",255
 SetTextNameHeroAndLevel:
   ld    ix,(plxcurrentheroAddress)
-  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030 - 001
   ld    c,HeroOverViewFirstWindowchoicesDY + 008
   ld    l,(ix+HeroSpecificInfo+0)       ;hero name
   ld    h,(ix+HeroSpecificInfo+1)
   call  SetText
 
-  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030 - 001
   ld    c,HeroOverViewFirstWindowchoicesDY + 032
   ld    hl,TextLevel
   call  SetText                         ;text "level"
 
-  ld    b,HeroOverViewFirstWindowchoicesDx + 050
+  ld    b,HeroOverViewFirstWindowchoicesDx + 050 - 001
   ld    c,HeroOverViewFirstWindowchoicesDY + 032
   ld    a,(ix+HeroLevel)                ;hero level
   ld    l,a
@@ -3278,7 +3278,7 @@ SetTextNameHeroAndLevel:
   ld    h,(ix+HeroSpecificInfo+1)
   ld    de,HeroInfoClass
   add   hl,de                           ;hero class
-  ld    b,HeroOverViewFirstWindowchoicesDx + 030
+  ld    b,HeroOverViewFirstWindowchoicesDx + 030 - 001
   ld    c,HeroOverViewFirstWindowchoicesDY + 016
   jp    SetText  
 
@@ -3407,28 +3407,28 @@ SetStatusTextAttack:
   ld    ix,(plxcurrentheroAddress)
 
   ld    a,(ix+HeroStatAttack)
-  ld    b,HeroOverViewStatusWindowDX + 056
+  ld    b,HeroOverViewStatusWindowDX + 056 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
   ld    h,0
   ld    l,a
   call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatDefense)
-  ld    b,HeroOverViewStatusWindowDX + 067
+  ld    b,HeroOverViewStatusWindowDX + 067 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
   ld    h,0
   ld    l,a
   call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatKnowledge)
-  ld    b,HeroOverViewStatusWindowDX + 075
+  ld    b,HeroOverViewStatusWindowDX + 075 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
   ld    h,0
   ld    l,a
   call  SetNumber16BitCastle
 
   ld    a,(ix+HeroStatSpelldamage)
-  ld    b,HeroOverViewStatusWindowDX + 084
+  ld    b,HeroOverViewStatusWindowDX + 084 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
   ld    h,0
   ld    l,a

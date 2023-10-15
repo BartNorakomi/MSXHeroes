@@ -7809,7 +7809,7 @@ CastleOverviewMarketPlaceCode:
   ld    d,(hl)
   ld    (AmountOfResourcesRequired),de
 
-  ld    b,069                           ;dx
+  ld    b,069+005                       ;dx
   ld    c,128                           ;dy
   ld    hl,(AmountOfResourcesOffered)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
@@ -8337,8 +8337,8 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "Level Xp Spell Points Recovery Day Movement",254
-                          db  "Boots Gloves Ring Neclace Robe",254
+.DescriptionFire1:        db  "SKILLS INVENTORY ARMY SPELL BOOK STATUS",254
+                          db  "Skills Inventory Army Spell Book Status",254
                           db  "Explore various building options ",254
                           db  "Take a look at the available building options. ",255
 
@@ -10832,13 +10832,9 @@ CheckButtonMouseInteractionBuildButtons:
 
   ld    a,b
   cp    1                                     ;CityWalls
-  ld    de,CityWallsCost
-  ld    hl,TextCityWalls
-  jp    z,.SetWhichTextToPut
+  jp    z,.CityWalls
   cp    2                                     ;BarracksTower
-  ld    de,BarracksTowerCost
-  ld    hl,TextBarracksTower
-  jp    z,.SetWhichTextToPut
+  jp    z,.BarracksTower
   cp    3                                     ;Barracks
   jp    z,.Barracks
   cp    4                                     ;Mine
@@ -10848,16 +10844,48 @@ CheckButtonMouseInteractionBuildButtons:
   cp    6                                     ;MagicGuild
   jp    z,.MagicGuild
   cp    7                                     ;Tavern
-  ld    de,TavernCost
-  ld    hl,TextTavern
-  jp    z,.SetWhichTextToPut
+  jp    z,.Tavern
   cp    8                                     ;MarketPlace
-  ld    de,MarketPlaceCost
-  ld    hl,TextMarketPlace
-  jp    z,.SetWhichTextToPut
+  jp    z,.MarketPlace
   cp    9                                     ;Castle
   jp    z,.Castle
 
+  .MarketPlace:
+  ld    a,(iy+CastleMarket)
+  or    a
+  ld    de,MarketPlaceCost
+  ld    hl,TextMarketPlace
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextMarketPlaceFinished
+  jp    .SetWhichTextToPut
+
+  .Tavern:
+  ld    a,(iy+CastleTavern)
+  or    a
+  ld    de,TavernCost
+  ld    hl,TextTavern
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextTavernFinished
+  jp    .SetWhichTextToPut
+
+  .BarracksTower:
+  ld    a,(iy+CastleBarracksLevel)
+  cp    6
+  ld    de,BarracksTowerCost
+  ld    hl,TextBarracksTower
+  jp    nz,.SetWhichTextToPut
+  ld    hl,TextBarracksTowerFinished
+  jp    .SetWhichTextToPut
+
+  .CityWalls:
+  ld    a,(iy+CastleLevel)
+  cp    6
+  ld    de,CityWallsCost
+  ld    hl,TextCityWalls
+  jp    nz,.SetWhichTextToPut
+  ld    hl,TextCityWallsFinished
+  jp    .SetWhichTextToPut
+  
   .Barracks:
   ld    a,(iy+CastleBarracksLevel)
   cp    0
@@ -10879,6 +10907,8 @@ CheckButtonMouseInteractionBuildButtons:
   cp    4
   ld    de,BarracksLevel5Cost
   ld    hl,TextBarracksLevel5
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextBarracksLevel5Finished
   jp    .SetWhichTextToPut
 
   .Mine:
@@ -10894,6 +10924,8 @@ CheckButtonMouseInteractionBuildButtons:
   cp    2
   ld    de,MineLevel3Cost
   ld    hl,TextMineLevel3
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextMineLevel3Finished
   jp    .SetWhichTextToPut
 
   .Sawmill:
@@ -10909,6 +10941,8 @@ CheckButtonMouseInteractionBuildButtons:
   cp    2
   ld    de,SawmillLevel3Cost  
   ld    hl,TextSawmillLevel3
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextSawmillLevel3Finished
   jp    .SetWhichTextToPut
 
   .MagicGuild:
@@ -10928,6 +10962,8 @@ CheckButtonMouseInteractionBuildButtons:
   cp    3
   ld    de,MagicGuildLevel4Cost
   ld    hl,TextMagicGuildLevel4
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextMagicGuildLevel4Finished
   jp    .SetWhichTextToPut
 
   .Castle:
@@ -10947,6 +10983,8 @@ CheckButtonMouseInteractionBuildButtons:
   cp    4
   ld    de,CastleLevel5Cost
   ld    hl,TextCastleLevel5
+  jp    z,.SetWhichTextToPut
+  ld    hl,TextCastleLevel5Finished
   jp    .SetWhichTextToPut
 
   .SetWhichTextToPut:
@@ -11039,6 +11077,16 @@ TextCastleLevel5:
                           db  "10000 Gold",254
                           db  "+20 wood",254
                           db  "+20 ore",255
+TextCastleLevel5Finished:        
+                          db  "    Capitol",254
+                          db  " ",254
+                          db  "Generates 4000",254
+                          db  "gold per day",254
+                          db  " ",254
+                          db  "increases the",254
+                          db  "production of",254
+                          db  "all creatures",254
+                          db  "by 100%",255
 
 CastleLevel5Cost:             ;Capitol
 .Gold:    dw  10000
@@ -11048,14 +11096,21 @@ CastleLevel5Cost:             ;Capitol
 .Rubies:  dw  000
 
 TextMarketPlace:        
-                          db  " Market Place",254
+                          db  "  Market Place",254
                           db  " ",254
-                          db  "Allows trading of",254
-                          db  "resources",254
+                          db  "Facilitates the",254
+                          db  "commerce of",254
+                          db  "crucial resources",254
                           db  " ",254
                           db  "Cost:",254
                           db  "500 Gold",254
                           db  "+5 Wood",255
+TextMarketPlaceFinished:        
+                          db  "  Market Place",254
+                          db  " ",254
+                          db  "Facilitates the",254
+                          db  "commerce of",254
+                          db  "crucial resources",255
 
 MarketPlaceCost:
 .Gold:    dw  500
@@ -11067,14 +11122,24 @@ MarketPlaceCost:
 TextTavern:        
                           db  "    Tavern",254
                           db  " ",254
-                          db  "Allows the ability",254
-                          db  "to recruit",254
-                          db  "visiting heroes",254
+                          db  "Grants the ",254
+                          db  "capability to",254
+                          db  "enlist visiting",254
+                          db  "heroes into",254
+                          db  "service",254
                           db  " ",254
                           db  "Cost:",254
                           db  "500 Gold",254
                           db  "+5 Wood",255
-
+TextTavernFinished:        
+                          db  "    Tavern",254
+                          db  " ",254
+                          db  "Grants the ",254
+                          db  "capability to",254
+                          db  "enlist visiting",254
+                          db  "heroes into",254
+                          db  "service",255
+                          
 TavernCost:
 .Gold:    dw  500
 .Wood:    dw  05
@@ -11174,7 +11239,18 @@ TextMagicGuildLevel4:
                           db  "+5 Ore",254
                           db  "+15 Gems",254
                           db  "+15 Rubies",255
-
+TextMagicGuildLevel4Finished:        
+                          db  " Magic Guild 4",254
+                          db  " ",254
+                          db  "Adds two level 4",254
+                          db  "spells to the",254
+                          db  "magic guild",254
+                          db  " ",254
+                          db  "Visiting heroes",254
+                          db  "can learn these",254
+                          db  "spells if the",254
+                          db  "skill requirements",254
+                          db  "are met",255
 MagicGuildLevel4Cost:
 .Gold:    dw  1000
 .Wood:    dw  05
@@ -11225,7 +11301,12 @@ TextSawmillLevel3:
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",255
-
+TextSawmillLevel3Finished:        
+                          db  "  Sawmill 3",254
+                          db  " ",254
+                          db  "Produces:",254
+                          db  "+3 wood",254
+                          db  "per day",255
 SawmillLevel3Cost:
 .Gold:    dw  2000
 .Wood:    dw  00
@@ -11279,7 +11360,15 @@ TextMineLevel3:
                           db  " ",254
                           db  "Cost:",254
                           db  "5000 Gold",255
-
+TextMineLevel3Finished:        
+                          db  "   Mine 3",254
+                          db  " ",254
+                          db  "Produces:",254
+                          db  "+3 ore",254
+                          db  "+1 gem",254
+                          db  "+1 ruby",254
+                          db  "per day",255
+                          
 MineLevel3Cost:
 .Gold:    dw  5000
 .Wood:    dw  00
@@ -11290,8 +11379,12 @@ MineLevel3Cost:
 TextBarracksLevel1:        
                           db  "  Barracks 1",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 1 units",254
+                          db  "Manufactures",254
+                          db  "level 1 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11310,8 +11403,12 @@ BarracksLevel1Cost:
 TextBarracksLevel2:        
                           db  "  Barracks 2",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 2 units",254
+                          db  "Manufactures",254
+                          db  "level 2 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11331,8 +11428,12 @@ BarracksLevel2Cost:
 TextBarracksLevel3:        
                           db  "  Barracks 3",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 3 units",254
+                          db  "Manufactures",254
+                          db  "level 3 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11351,8 +11452,8 @@ BarracksLevel3Cost:
 TextBarracksLevel4:        
                           db  "  Barracks 4",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 4 units",254
+                          db  "Manufactures",254
+                          db  "level 4 creatures",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11374,8 +11475,12 @@ BarracksLevel4Cost:
 TextBarracksLevel5:        
                           db  "  Barracks 5",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 5 units",254
+                          db  "Manufactures",254
+                          db  "level 5 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11383,6 +11488,19 @@ TextBarracksLevel5:
                           db  "Cost:",254
                           db  "5000 Gold",254
                           db  "+20 Wood",255
+TextBarracksLevel5Finished:
+                          db  "  Barracks 5",254
+                          db  " ",254
+                          db  "Manufactures",254
+                          db  "level 5 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",255
+
 
 BarracksLevel5Cost:
 .Gold:    dw  5000
@@ -11394,8 +11512,8 @@ BarracksLevel5Cost:
 TextBarracksTower:        
                           db  " Barracks Tower",254
                           db  " ",254
-                          db  "Allows production",254
-                          db  "of level 6 units",254
+                          db  "Manufactures",254
+                          db  "level 6 creatures",254
                           db  " ",254
                           db  "Replenishes every",254
                           db  "week",254
@@ -11407,7 +11525,19 @@ TextBarracksTower:
                           db  " ",254
                           db  "Requirements:",254
                           db  "Barracks 5",255
-
+TextBarracksTowerFinished:        
+                          db  " Barracks Tower",254
+                          db  " ",254
+                          db  "Manufactures",254
+                          db  "level 6 creatures",254
+                          db  "each bearing",254
+                          db  "their own unique",254
+                          db  "attributes and",254
+                          db  "powers",254
+                          db  " ",254
+                          db  "Replenishes every",254
+                          db  "week",255
+                          
 BarracksTowerCost:
 .Gold:    dw  20000
 .Wood:    dw  00
@@ -11418,10 +11548,15 @@ BarracksTowerCost:
 TextCityWalls:        
                           db  "   City Walls",254
                           db  " ",254
-                          db  "fortifies your",254
-                          db  "city with a wall",254
-                          db  " to defend",254
-                          db  "against sieges",254
+
+                          
+                          db  "Enhances your",254
+                          db  "city's security",254
+                          db  "through fortified",254
+                          db  "walls that stand",254
+                          db  "resolute against",254
+                          db  "relentless sieges",254
+                          
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",254
@@ -11430,6 +11565,15 @@ TextCityWalls:
                           db  " ",254
                           db  "Requirements:",254
                           db  "Capitol",255
+TextCityWallsFinished:        
+                          db  "   City Walls",254
+                          db  " ",254
+                          db  "Enhances your",254
+                          db  "city's security",254
+                          db  "through fortified",254
+                          db  "walls that stand",254
+                          db  "resolute against",254
+                          db  "relentless sieges",255
 
 CityWallsCost:
 .Gold:    dw  2000
@@ -11556,10 +11700,15 @@ SetNameCastleAndDailyIncome:
   add   hl,de
   call  SetText
 
+  ld    c,009                           ;dy
+  ld    b,196+004                       ;dx
+
   ld    a,(iy+CastleLevel)
   cp    1                               ;village hall (500 gold per day)
   ld    hl,500
   jr    z,.CastleLevelFound
+
+  ld    b,196                           ;dx
 
   cp    2                               ;town hall (1000 gold per day). costs: 2500 gold, requires tavern
   ld    hl,1000
@@ -11578,8 +11727,7 @@ SetNameCastleAndDailyIncome:
   jr    z,.CastleLevelFound
   
   .CastleLevelFound:
-  ld    b,196                           ;dx
-  ld    c,009                           ;dy
+
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
 
   ld    b,219
