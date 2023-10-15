@@ -2714,6 +2714,9 @@ DisplayScrollCode:
   jr    nc,.Exit
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    020                             ;dx
   jr    c,.Exit
   cp    020+162                         ;dx+nx
@@ -2840,6 +2843,9 @@ DisplayQuickTipsCode:
   jr    nc,.Exit
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    030                             ;dx
   jr    c,.Exit
   cp    030+144                         ;dx+nx
@@ -4615,6 +4621,9 @@ CheckEndTradeMenuWindow:
   jr    nc,.Exit
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    024                             ;dx
   jr    c,.Exit
   cp    024+156                         ;dx+nx
@@ -8523,6 +8532,9 @@ CheckButtonMouseInteractionGenericButtons:
   cp    (ix+GenericButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+  
   cp    (ix+GenericButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+GenericButtonXright)
@@ -8882,6 +8894,9 @@ CheckEndRecruitUnitWindow:
   jr    nc,ExitSingleUnitRecruitWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    048                             ;dx
   jr    c,ExitSingleUnitRecruitWindow
   cp    048+162                         ;dx+nx
@@ -9013,6 +9028,9 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   cp    (ix+RecruitButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+RecruitButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+RecruitButtonXright)
@@ -9701,6 +9719,9 @@ CheckButtonMouseInteractionRecruitButtons:
   cp    (ix+RecruitButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+RecruitButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+RecruitButtonXright)
@@ -10165,6 +10186,9 @@ CheckButtonMouseInteractionSingleBuildButton:
   cp    (ix+BuildButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+BuildButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+BuildButtonXright)
@@ -10778,6 +10802,9 @@ CheckButtonMouseInteractionBuildButtons:
   cp    (ix+BuildButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+BuildButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+BuildButtonXright)
@@ -11964,6 +11991,9 @@ CheckButtonMouseInteractionCastleMainScreen:
   cp    (ix+CastleOverviewWindowButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+CastleOverviewWindowButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+CastleOverviewWindowButtonXright)
@@ -12077,6 +12107,9 @@ CheckButtonMouseInteractionCastle:
   cp    (ix+CastleOverviewWindowButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+CastleOverviewWindowButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+CastleOverviewWindowButtonXright)

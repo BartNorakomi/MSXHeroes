@@ -3715,6 +3715,9 @@ CheckEndHeroOverviewArmy:
   jr    nc,.NotOverHeroOverViewArmyWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewArmyWindowDX
   jr    c,.NotOverHeroOverViewArmyWindow
   cp    HeroOverViewArmyWindowDX+HeroOverViewArmyWindowNX
@@ -3736,6 +3739,9 @@ CheckEndHeroOverviewInventory:
   jr    nc,.NotOverHeroOverViewInventoryWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewInventoryWindowDX
   jr    c,.NotOverHeroOverViewInventoryWindow
   cp    HeroOverViewInventoryWindowDX+HeroOverViewInventoryWindowNX
@@ -3757,6 +3763,9 @@ CheckEndHeroOverviewSpellBook:
   jr    nc,.NotOverHeroOverViewSpellBookWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewSpellBookWindowDX
   jr    c,.NotOverHeroOverViewSpellBookWindow
   cp    HeroOverViewSpellBookWindowDX+HeroOverViewSpellBookWindowNX
@@ -3778,6 +3787,9 @@ CheckEndHeroOverviewStatus:
   jr    nc,.NotOverHeroOverViewStatusWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewStatusWindowDX
   jr    c,.NotOverHeroOverViewStatusWindow
   cp    HeroOverViewStatusWindowDX+HeroOverViewStatusWindowNX
@@ -3799,6 +3811,9 @@ CheckEndHeroOverviewSkills:
   jr    nc,.NotOverHeroOverViewSkillsWindow
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewSkillsWindowDX
   jr    c,.NotOverHeroOverViewSkillsWindow
   cp    HeroOverViewSkillsWindowDX+HeroOverViewSkillsWindowNX
@@ -3820,6 +3835,9 @@ CheckEndHeroOverviewFirstWindow:        ;if mouse is NOT over the overview windo
   jr    nc,.NotOverHeroOverViewFirstWindowChoices
   
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    HeroOverViewFirstWindowchoicesDX
   jr    c,.NotOverHeroOverViewFirstWindowChoices
   cp    HeroOverViewFirstWindowchoicesDX+HeroOverViewFirstWindowchoicesNX
@@ -3896,6 +3914,9 @@ CheckButtonMouseInteraction:
   cp    (ix+HeroOverviewWindowButtonYbottom)
   jr    nc,.NotOverButton
   ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
   cp    (ix+HeroOverviewWindowButtonXleft)
   jr    c,.NotOverButton
   cp    (ix+HeroOverviewWindowButtonXright)
