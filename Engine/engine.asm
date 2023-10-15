@@ -2774,48 +2774,73 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
 	ret
 
 movecursory:                            ;move cursor up(a=-1)/down(a=+1)
+  push  af
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  cp    2
+  ld    d,212-16
+  ld    e,000
+  jr    z,.XBorderSet
+  ld    d,ycoorspritebottom
+  ld    e,ycoordinateStartPlayfield
+  .XBorderSet:
+  pop   af
+
+
 	ld    hl,spat+0 	                    ;cursory
 	or		a			                          ;check if cursor/mouse moves left or right
 	jp		m,.up
   .down:
 	add   a,(hl)
 	jp		c,.outofscreenbottom
-	cp		ycoorspritebottom
+	cp		d
 	jp		c,.sety
   .outofscreenbottom:
-	ld		a,ycoorspritebottom
+	ld		a,d
 	jp		.sety
   .up:
 	add		a,(hl)
 
+  ret   nc
 
-  cp    ycoordinateStartPlayfield       ;check top border for mouse pointer
+  cp    e       ;check top border for mouse pointer
 
 	jp		nc,.sety
-  ld    a,ycoordinateStartPlayfield
+  ld    a,e
   .sety:
 	ld    (hl),a
 	ret
 
-movecursorx:		
+movecursorx:
+  push  af
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  cp    2
+  ld    d,256-16
+  ld    e,000
+  jr    z,.XBorderSet
+  ld    d,xcoorspriteright
+  ld    e,xcoordinateStartPlayfield
+  .XBorderSet:
+  pop   af
+		
 	ld    hl,spat+1                       ;cursorx
 	or		a			                          ;check if cursor/mouse moves left or right
 	jp		m,.left
   .right:
 	add		a,(hl)
 	jp		c,.outofscreenright
-	cp		xcoorspriteright
+	cp		d ;xcoorspriteright
 	jp		c,.setx
   .outofscreenright:
-	ld		a,xcoorspriteright
+	ld		a,d ;xcoorspriteright
 	jp		.setx
   .left:
 	add		a,(hl)
-
-  cp    xcoordinateStartPlayfield       ;check top border for mouse pointer
+	ret   nc
+	
+  cp    e ;xcoordinateStartPlayfield       ;check top border for mouse pointer
 
 	jp		nc,.setx
-  ld    a,xcoordinateStartPlayfield
+  ld    a,e ;xcoordinateStartPlayfield
   .setx:
 	ld		(hl),a
 	ret
