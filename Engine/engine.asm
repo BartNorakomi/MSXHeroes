@@ -67,6 +67,18 @@ LevelEngine:
 
 call  SetScreenOn
 
+
+
+  ld    ix,(plxcurrentheroAddress)    
+  ld    l,(ix+HeroXp+0)                 ;current xp
+  ld    h,(ix+HeroXp+1)
+  ld    de,100
+  add   hl,de
+  ld    (ix+HeroXp+0),l                 ;current xp
+  ld    (ix+HeroXp+1),h
+  
+
+
   jp    LevelEngine
 
 PreviousVblankIntFlag:  db  1
@@ -79,6 +91,7 @@ vblank:
   push  ix
   push  iy
   exx
+  ex    af,af'
   push  af
   push  bc
   push  de
@@ -131,6 +144,7 @@ vblank:
   pop   de 
   pop   bc 
   pop   af 
+  ex    af,af'  
   exx
   pop   iy 
   pop   ix 
@@ -2774,7 +2788,7 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
 	ret
 
 movecursory:                            ;move cursor up(a=-1)/down(a=+1)
-  push  af
+  ex    af,af'
   ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
   cp    2
   ld    d,212-16
@@ -2783,7 +2797,7 @@ movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   ld    d,ycoorspritebottom
   ld    e,ycoordinateStartPlayfield
   .XBorderSet:
-  pop   af
+  ex    af,af'
 
 
 	ld    hl,spat+0 	                    ;cursory
@@ -2811,7 +2825,7 @@ movecursory:                            ;move cursor up(a=-1)/down(a=+1)
 	ret
 
 movecursorx:
-  push  af
+  ex    af,af'
   ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
   cp    2
   ld    d,256-16
@@ -2820,7 +2834,7 @@ movecursorx:
   ld    d,xcoorspriteright
   ld    e,xcoordinateStartPlayfield
   .XBorderSet:
-  pop   af
+  ex    af,af'
 		
 	ld    hl,spat+1                       ;cursorx
 	or		a			                          ;check if cursor/mouse moves left or right
@@ -3913,45 +3927,53 @@ HeroInfoPortrait16x30SYSX:  equ HeroButton20x11SYSX+2
 HeroInfoSkill:              equ HeroInfoPortrait16x30SYSX+2
 HeroInfoNumber:             equ HeroInfoSkill+1
 
-;hero class that doesnt fit: battle mage, beastmaster, death knight, necromancer
+SkillInLevelUpSlot1:  db  1
+SkillInLevelUpSlot2:  db  1
+PlaceSkillInLevelUpSlot1IntoWhichHeroSlot?: ds  1
+PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?: ds  1
+
+ ;-------------------- MIGHT ------------------------------         ------------- ADVENTURE ---------------        ------------------ WIZZARDRY -------------------------------
+;knight   |   barbarian   |   death knight   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
+;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
+;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol
-HeroAddressesAdol:            db "adol",255,"             ","knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
-HeroAddressesGoemon1:         db "goemon1",255,"          ","ranger      ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
-HeroAddressesPixy:            db "pixy",255,"             ","alchemist   ",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
-HeroAddressesDrasle1:         db "drasle1",255,"          ","demoniac    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 | db 004 |
-HeroAddressesLatok:           db "latok",255,"            ","overlord    ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 | db 005 |
-HeroAddressesDrasle2:         db "drasle2",255,"          ","barbarian   ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
-HeroAddressesSnake1:          db "snake1",255,"           ","deathlord   ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
-HeroAddressesDrasle3:         db "drasle3",255,"          ","cleric      ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 | db 008 |
+HeroAddressesAdol:            db "Adol",255,"             ","Knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
+HeroAddressesGoemon1:         db "Goemon1",255,"          ","Barbarian   ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
+HeroAddressesPixy:            db "Pixy",255,"             ","Death Knight",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
+HeroAddressesDrasle1:         db "Drasle1",255,"          ","Overlord    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 | db 004 |
+HeroAddressesLatok:           db "Latok",255,"            ","Alchemist   ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 | db 005 |
+HeroAddressesDrasle2:         db "Drasle2",255,"          ","Sage        ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
+HeroAddressesSnake1:          db "Snake1",255,"           ","Ranger      ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
+HeroAddressesDrasle3:         db "Drasle3",255,"          ","Wizzard     ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 | db 008 |
 
-HeroAddressesSnake2:          db "snake2",255,"           ","druid       ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
-HeroAddressesDrasle4:         db "drasle4",255,"          ","battle mage ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
-HeroAddressesAshguine:        db "ashguine",255,"         ","heretic     ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
-HeroAddressesUndeadline1:     db "warrior",255,"          ","warlock     ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
-HeroAddressesPsychoWorld:     db "psycho",255,"           ","wizzard     ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
-HeroAddressesUndeadline2:     db "ninja",255,"            ","witch       ",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
-HeroAddressesGoemon2:         db "goemon",255,"           ","beastmaster ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 | db 015 |
-HeroAddressesUndeadline3:     db "marco",255,"            ","mage        ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 | db 016 |
+HeroAddressesSnake2:          db "Snake2",255,"           ","Battle Mage ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
+HeroAddressesDrasle4:         db "Drasle4",255,"          ","Scholar     ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
+HeroAddressesAshguine:        db "Ashguine",255,"         ","Necromancer ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
+HeroAddressesUndeadline1:     db "Warrior",255,"          ","Knight      ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
+HeroAddressesPsychoWorld:     db "Psycho",255,"           ","Barbarian   ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
+HeroAddressesUndeadline2:     db "Ninja",255,"            ","Death Knight",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
+HeroAddressesGoemon2:         db "Goemon",255,"           ","Overlord    ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 | db 015 |
+HeroAddressesUndeadline3:     db "Marco",255,"            ","Alchemist   ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 | db 016 |
 
-HeroAddressesFray:            db "fray",255,"             ","death knight",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 | db 017 |
-HeroAddressesBlackColor:      db "black color",255,"      ","necromancer ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroButton20x11SYSXBlackColor,HeroPortrait16x30SYSXBlackColor                     | db 19 | db 018 |
-HeroAddressesWit:             db "wit",255,"              ","death knight",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroButton20x11SYSXWit,HeroPortrait16x30SYSXWit                                                        | db 22 | db 019 |
-HeroAddressesMitchell:        db "mitchell",255,"         ","death knight",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroButton20x11SYSXMitchell,HeroPortrait16x30SYSXMitchell                               | db 25 | db 020 |
-HeroAddressesJanJackGibson:   db "jan jack gibson",255,"  ","overlord    ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroButton20x11SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson      | db 28 | db 021 |
-HeroAddressesGillianSeed:     db "gillian seed",255,"     ","death knight",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroButton20x11SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed                | db 31 | db 022 |
-HeroAddressesSnatcher:        db "snatcher",255,"         ","death knight",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 | db 023 |
-HeroAddressesGolvellius:      db "golvellius",255,"       ","death knight",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 | db 024 |
+HeroAddressesFray:            db "Fray",255,"             ","Sage        ",255,FraySpriteBlock| dw HeroSYSXFray,HeroPortrait10x18SYSXFray,HeroButton20x11SYSXFray,HeroPortrait16x30SYSXFray                                                   | db 16 | db 017 |
+HeroAddressesBlackColor:      db "Black color",255,"      ","Ranger      ",255,BlackColorSpriteBlock| dw HeroSYSXBlackColor,HeroPortrait10x18SYSXBlackColor,HeroButton20x11SYSXBlackColor,HeroPortrait16x30SYSXBlackColor                     | db 19 | db 018 |
+HeroAddressesWit:             db "Wit",255,"              ","Wizzard     ",255,WitSpriteBlock| dw HeroSYSXWit,HeroPortrait10x18SYSXWit,HeroButton20x11SYSXWit,HeroPortrait16x30SYSXWit                                                        | db 22 | db 019 |
+HeroAddressesMitchell:        db "Mitchell",255,"         ","Battle Mage ",255,MitchellSpriteBlock| dw HeroSYSXMitchell,HeroPortrait10x18SYSXMitchell,HeroButton20x11SYSXMitchell,HeroPortrait16x30SYSXMitchell                               | db 25 | db 020 |
+HeroAddressesJanJackGibson:   db "Jan Jack Gibson",255,"  ","Scholar     ",255,JanJackGibsonSpriteBlock| dw HeroSYSXJanJackGibson,HeroPortrait10x18SYSXJanJackGibson,HeroButton20x11SYSXJanJackGibson,HeroPortrait16x30SYSXJanJackGibson      | db 28 | db 021 |
+HeroAddressesGillianSeed:     db "Gillian Seed",255,"     ","Necromancer ",255,GillianSeedSpriteBlock| dw HeroSYSXGillianSeed,HeroPortrait10x18SYSXGillianSeed,HeroButton20x11SYSXGillianSeed,HeroPortrait16x30SYSXGillianSeed                | db 31 | db 022 |
+HeroAddressesSnatcher:        db "Snatcher",255,"         ","Knight      ",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 | db 023 |
+HeroAddressesGolvellius:      db "Golvellius",255,"       ","Barbarian   ",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 | db 024 |
 
-HeroAddressesBillRizer:       db "bill rizer",255,"       ","death knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
-HeroAddressesPochi:           db "pochi",255,"            ","death knight",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
-HeroAddressesGreyFox:         db "grey fox",255,"         ","death knight",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
-HeroAddressesTrevorBelmont:   db "trevor belmont",255,"   ","death knight",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
-HeroAddressesBigBoss:         db "big boss",255,"         ","death knight",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
-HeroAddressesSimonBelmont:    db "simon belmont",255,"    ","beastmaster ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont         | db 22 | db 030 |
-HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,   "barbarian   ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 | db 031 |
-HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Death Knight",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 | db 032 |
+HeroAddressesBillRizer:       db "Bill Rizer",255,"       ","Death Knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
+HeroAddressesPochi:           db "Pochi",255,"            ","Overlord    ",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
+HeroAddressesGreyFox:         db "Grey Fox",255,"         ","Alchemist   ",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
+HeroAddressesTrevorBelmont:   db "Trevor Belmont",255,"   ","Sage        ",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
+HeroAddressesBigBoss:         db "Big Boss",255,"         ","Ranger      ",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
+HeroAddressesSimonBelmont:    db "simon Belmont",255,"    ","Wizzard     ",255,SimonBelmontSpriteBlock  | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont         | db 22 | db 030 |
+HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,   "Battle Mage ",255,DrPettrovichSpriteBlock  | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich         | db 25 | db 031 |
+HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Scholar     ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 | db 032 |
 
-HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Death Knight",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 28 | db 033 |
+HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Necromancer ",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 31 | db 033 |
 
 HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
@@ -4138,8 +4160,15 @@ Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesDrPettrovich
+.HeroSpecificInfo: dw HeroAddressesAdol
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+ ;-------------------- MIGHT ------------------------------         ------------- ADVENTURE ---------------        ------------------ WIZZARDRY -------------------------------
+;knight   |   barbarian   |   death knight   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
+;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
+;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
+
 
 pl1hero2y:		db	0
 pl1hero2x:		db	6

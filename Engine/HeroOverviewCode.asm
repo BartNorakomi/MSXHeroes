@@ -4365,6 +4365,13 @@ TextFirstWindowChoicesButton3:  db  "army",255
 TextFirstWindowChoicesButton4:  db  "spell book",255
 TextFirstWindowChoicesButton5:  db  "status",255
 
+;Skills Might
+
+;Archery
+;Offence
+;Armourer
+;Resistance
+
 LenghtSkillDescription: equ SkillArcheryAdvanced-SkillArcheryBasic
 SkillEmpty:
                           db  "                       ",255   ;skillnr# 000
@@ -4387,18 +4394,18 @@ SkillArcheryExpert:
                           db  "ranged attack damage   ",254
                           db  "is increased by 50%    ",255
 SkillOffenceBasic:
-                          db  "basic offense          ",255   ;skillnr# 004
-                          db  "basic offense          ",254
+                          db  "basic offence          ",255   ;skillnr# 004
+                          db  "basic offence          ",254
                           db  "hand to hand damage is ",254
                           db  "increased by 10%       ",255
 SkillOffenceAdvanced:
-                          db  "advanced offense       ",255
-                          db  "advanced offense       ",254
+                          db  "advanced offence       ",255
+                          db  "advanced offence       ",254
                           db  "hand to hand damage is ",254
                           db  "increased by 20%       ",255
 SkillOffenceExpert:
-                          db  "expert offense         ",255
-                          db  "expert offense         ",254
+                          db  "expert offence         ",255
+                          db  "expert offence         ",254
                           db  "hand to hand damage is ",254
                           db  "increased by 30%       ",255
 SkillArmourerBasic:
@@ -4431,23 +4438,19 @@ SkillresistanceExpert:
                           db  "expert resistance      ",254
                           db  "your units have 15%    ",254
                           db  "chance to block spells ",255
-SkillnecromancyBasic:
-                          db  "basic necromancy       ",255   ;skillnr# 013
-                          db  "basic necromancy       ",254
-                          db  "10% of enemy creatures ",254
-                          db  "killed are resurrected ",255
-SkillnecromancyAdvanced:
-                          db  "advanced necromancy    ",255
-                          db  "advanced necromancy    ",254
-                          db  "20% of enemy creatures ",254
-                          db  "killed are resurrected ",255
-SkillnecromancyExpert:
-                          db  "expert necromancy      ",255
-                          db  "expert necromancy      ",254
-                          db  "30% of enemy creatures ",254
-                          db  "killed are resurrected ",255
+
+
+
+
+
+
+
+
+
+
+
 SkillestatesBasic:
-                          db  "basic estates          ",255   ;skillnr# 016
+                          db  "basic estates          ",255   ;skillnr# 013
                           db  "basic estates          ",254
                           db  "hero generates an extra",254
                           db  "125 gold per day       ",255
@@ -4462,7 +4465,7 @@ SkillestatesExpert:
                           db  "hero generates an extra",254
                           db  "500 gold per day       ",255
 SkilllearningBasic:
-                          db  "basic learning         ",255   ;skillnr# 019
+                          db  "basic learning         ",255   ;skillnr# 016
                           db  "basic learning         ",254
                           db  "earned experience is   ",254
                           db  "increased by 5%        ",255
@@ -4477,7 +4480,7 @@ SkilllearningExpert:
                           db  "earned experience is   ",254
                           db  "increased by 15%       ",255
 SkilllogisticsBasic:
-                          db  "basic logistics        ",255   ;skillnr# 022
+                          db  "basic logistics        ",255   ;skillnr# 019
                           db  "basic logistics        ",254
                           db  "increases land movement",254
                           db  "range of hero by 10%   ",255
@@ -4491,8 +4494,12 @@ SkilllogisticsExpert:
                           db  "expert logistics       ",254
                           db  "increases land movement",254
                           db  "range of hero by 30%   ",255
+
+
+
+
 SkillintelligenceBasic:
-                          db  "basic intelligence     ",255   ;skillnr# 025
+                          db  "basic intelligence     ",255   ;skillnr# 022
                           db  "basic intelligence     ",254
                           db  "maximum spell points   ",254
                           db  "increased by 25%       ",255
@@ -4507,7 +4514,7 @@ SkillintelligenceExpert:
                           db  "maximum spell points   ",254
                           db  "increased by 100%      ",255
 SkillsorceryBasic:
-                          db  "basic sorcery          ",255   ;skillnr# 028
+                          db  "basic sorcery          ",255   ;skillnr# 025
                           db  "basic sorcery          ",254
                           db  "increases spell damage ",254
                           db  "by 5%                  ",255
@@ -4522,7 +4529,7 @@ SkillsorceryExpert:
                           db  "increases spell damage ",254
                           db  "by 15%                 ",255
 SkillwisdomBasic:
-                          db  "basic wisdom           ",255   ;skillnr# 031
+                          db  "basic wisdom           ",255   ;skillnr# 028
                           db  "basic wisdom           ",254
                           db  "hero can learn spells  ",254
                           db  "level 2 and below      ",255
@@ -4537,6 +4544,21 @@ SkillwisdomExpert:
                           db  "hero can learn all     ",254
                           db  "spells                 ",255
 
+SkillnecromancyBasic:
+                          db  "basic necromancy       ",255   ;skillnr# 031
+                          db  "basic necromancy       ",254
+                          db  "10% of enemy creatures ",254
+                          db  "killed are resurrected ",255
+SkillnecromancyAdvanced:
+                          db  "advanced necromancy    ",255
+                          db  "advanced necromancy    ",254
+                          db  "20% of enemy creatures ",254
+                          db  "killed are resurrected ",255
+SkillnecromancyExpert:
+                          db  "expert necromancy      ",255
+                          db  "expert necromancy      ",254
+                          db  "30% of enemy creatures ",254
+                          db  "killed are resurrected ",255
 
 
 SetHeroOverViewFontPage0Y212:           ;set font at (0,212) page 0

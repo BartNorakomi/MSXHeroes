@@ -795,7 +795,7 @@ dephase
 ;
 LevelUpBlock:  equ   $4a
 phase	$4000
-  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,167 * 128      ;167 lines
+  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,148 * 128      ;148 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -805,6 +805,15 @@ dephase
 HudNewBlock:  equ   $4c
 phase	$4000
   incbin "..\grapx\hud\HudNew.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $4e - 4f
+;
+SecondarySkillsButtonsBlock:  equ   $4e
+phase	$4000
+  incbin "..\grapx\HeroOverview\SecondarySkillsButtons.SC5",7,165 * 128      ;165 lines
 	ds		$c000-$,$ff
 dephase
 

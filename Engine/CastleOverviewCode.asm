@@ -2188,44 +2188,727 @@ call ScreenOn
 
   .AddSkillOnTheRight:
   ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
-  ret
+  ld    a,(SkillInLevelUpSlot2)
+  ld    b,a
+  ld    a,(PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?)
+  jp    AddThisSkillToHero
 
   .AddSkillOnTheLeft:
   ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ld    a,(SkillInLevelUpSlot1)
+  ld    b,a
+  ld    a,(PlaceSkillInLevelUpSlot1IntoWhichHeroSlot?)
+  jp    AddThisSkillToHero
+
+AddThisSkillToHero:
+  cp    1
+  jr    z,.HeroSlot1
+  cp    2
+  jr    z,.HeroSlot2
+  cp    3
+  jr    z,.HeroSlot3
+  cp    4
+  jr    z,.HeroSlot4
+  cp    5
+  jr    z,.HeroSlot5
+  cp    6
+  jr    z,.HeroSlot6
+  
+  .SkillShouldBePlacedInaFreeSlot:
+  xor   a
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroSlot2
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroSlot3
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroSlot4
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroSlot5
+
+  .HeroSlot6:
+  ld    (ix+HeroSkills+5),b
+  ret
+  .HeroSlot5:
+  ld    (ix+HeroSkills+4),b
+  ret
+  .HeroSlot4:
+  ld    (ix+HeroSkills+3),b
+  ret
+  .HeroSlot3:
+  ld    (ix+HeroSkills+2),b
+  ret
+  .HeroSlot2:
+  ld    (ix+HeroSkills+1),b
+  ret
+  .HeroSlot1:
+  ld    (ix+HeroSkills+0),b
   ret  
+
+
+
+
+
+
+
+
+
+
+
 
 SetLevelUpButtons:
   ld    hl,LevelUpButtonTable-2
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*03)
   ldir
+
+  ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
+  ;                                       Might                                                               Adventure                                           Wizzardry
+  ld    a,(ix+HeroSkills+0)             ;1-3=knight|4-6=barbarian|7-9=death knight|10-12=overlord       |      13-15=alchemist|16-18=sage|19-21=ranger      |      22-24=wizzard|25-27=battle mage|28-30=scholar|31-33=necromancer       
+  ;the first skill the hero has tells us which class this hero is
+  ;first button should always be a button in that hero's class
+
+  exx
+  ld    hl,SkillInLevelUpSlot1
+  ld    bc,PlaceSkillInLevelUpSlot1IntoWhichHeroSlot?
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*01+1
+  exx
+
+  cp    13
+  jp    c,.SetLeftButtonMightRightButtonAdventureOrWizzardry
+  cp    22
+  jp    c,.SetLeftButtonAdventureRightButtonWizzardryOrMight
+  jp    .SetLeftButtonWizzardryRightButtonMightOrAdventure
+
+  .SetLeftButtonWizzardryRightButtonMightOrAdventure:
+  call  SetButtonWizzardry
+  exx
+  ld    hl,SkillInLevelUpSlot2
+  ld    bc,PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*02+1
+  exx
+  ld    a,r
+  and   1
+  jp    z,SetButtonMight
+  jp    SetButtonAdventure
+
+  .SetLeftButtonMightRightButtonAdventureOrWizzardry:
+  call  SetButtonMight
+  exx
+  ld    hl,SkillInLevelUpSlot2
+  ld    bc,PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*02+1
+  exx
+  ld    a,r
+  and   1
+  jp    z,SetButtonAdventure
+  jp    SetButtonWizzardry
+
+  .SetLeftButtonAdventureRightButtonWizzardryOrMight:
+  call  SetButtonAdventure
+  exx
+  ld    hl,SkillInLevelUpSlot2
+  ld    bc,PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*02+1
+  exx
+  ld    a,r
+  and   1
+  jp    z,SetButtonWizzardry
+  jp    SetButtonMight
+
+SetSkillButton:  
+  inc   b                               ;next level skill
+  ld    a,b
+  exx
+  ld    (hl),a                          ;set this skill in slot 1
+  exx
+  ld    a,c
+  exx
+  ld    (bc),a
+  push  de
+  exx
+  pop   de
+  ld    bc,6
+  ldir
   ret
 
-LevelUpButtonTableGfxBlock:  db  LevelUpBlock
+CheckAmountOfExpertSkills_Wizzardry:
+  ld    b,0                           ;amount of expert skills found
+  ld    a,24                          ;24=expert intelligence
+  call  SearchExpertSkill
+  ld    a,27                          ;27=expert Sorcery
+  call  SearchExpertSkill
+  ld    a,30                          ;30=expert Wisdom
+  call  SearchExpertSkill
+  ld    a,33                          ;33=expert Necromancy
+  call  SearchExpertSkill
+  ret
+
+CheckAmountOfExpertSkills_Adventure:
+  ld    b,0                           ;amount of expert skills found
+  ld    a,15                          ;15=expert estates
+  call  SearchExpertSkill
+  ld    a,18                          ;18=expert learning
+  call  SearchExpertSkill
+  ld    a,21                          ;21=expert logistics
+  call  SearchExpertSkill
+  ret
+
+
+
+SetButtonWizzardry:
+  call  IsItPossibleToLevelOrSetAWizzardrySkill?
+  jp    c,SetButtonAdventure            ;if there is no free spot or all current might skills are maxed, set adventure skill
+
+  call  CheckAmountOfExpertSkills_Wizzardry
+  ld    a,b
+  cp    4
+  jp    z,SetButtonAdventure            ;if all expert wizzardry skills are leveled up, set adventure button instead
+
+  ld    a,r
+  and   3
+  jr    z,.Intelligence
+  dec   a
+  jr    z,.Sorcery
+  dec   a
+  jr    z,.Wisdom
+
+  .Necromancy:
+  call  IsItPossibleToLevelOrSetNecromancy?
+  jr    c,.Wisdom                     ;if there is no free spot or necromancy is maxed, set wisdom
+
+  ld    b,31                            ;31=basic necromancy
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Wisdom                       ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonNecromancy
+  jp    SetSkillButton
+
+  .Wisdom:
+  call  IsItPossibleToLevelOrSetWisdom?
+  jr    c,.Sorcery                      ;if there is no free spot or wisdom is maxed, set sorcery
+
+  ld    b,28                            ;28=basic wisdom
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Sorcery                      ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonWisdom
+  jp    SetSkillButton
+
+  .Sorcery:
+  call  IsItPossibleToLevelOrSetSorcery?
+  jr    c,.Intelligence                 ;if there is no free spot or sorcery is maxed, set intelligence
+
+  ld    b,25                            ;25=basic sorcery
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Intelligence                 ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonSorcery
+  jp    SetSkillButton
+
+  .Intelligence:                        ;22=basic intelligence, 23=advanced intelligence, 24=expert intelligence
+  call  IsItPossibleToLevelOrSetIntelligence?
+  jr    c,.Necromancy                   ;if there is no free spot or intelligence is maxed, set necromancy
+
+  ld    b,22                            ;22=basic intelligence
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Necromancy                   ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonIntelligence
+  jp    SetSkillButton
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+SetButtonAdventure:
+  call  IsItPossibleToLevelOrSetAnAdventureSkill?
+  jp    c,SetButtonMight                ;if there is no free spot or all current adventure skills are maxed, set might skill
+
+  call  CheckAmountOfExpertSkills_Adventure
+  ld    a,b
+  cp    3
+  jp    z,SetButtonMight                ;if all expert adventure skills are leveled up, set might button instead
+
+  ld    a,r
+  and   3
+  jr    z,.Estates
+  dec   a
+  jr    z,.Learning
+  dec   a
+  jr    z,.Logistics
+
+  .Learning:
+  call  IsItPossibleToLevelOrSetLearning?
+  jr    c,.Logistics                    ;if there is no free spot or learning is maxed, set logistics
+
+  ld    b,16                            ;16=basic learning
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Logistics                    ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonLearning
+  jp    SetSkillButton
+
+  .Logistics:
+  call  IsItPossibleToLevelOrSetLogistics?
+  jr    c,.Estates                      ;if there is no free spot or logistics is maxed, set estates
+
+  ld    b,19                            ;19=basic logistics
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Estates                      ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonLogistics
+  jp    SetSkillButton
+  
+  .Estates:
+  call  IsItPossibleToLevelOrSetEstates?
+  jr    c,.Learning                     ;if there is no free spot or estates is maxed, set learning
+
+  ld    b,13                            ;13=basic estates
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Learning                     ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonEstates
+  jp    SetSkillButton
+
+
+CheckAmountOfExpertSkills_Might:
+  ld    b,0                           ;amount of expert skills found
+  ld    a,03                          ;03=expert archery
+  call  SearchExpertSkill
+  ld    a,06                          ;06=expert offence
+  call  SearchExpertSkill
+  ld    a,09                          ;09=expert armourer
+  call  SearchExpertSkill
+  ld    a,12                          ;12=expert resistance
+  call  SearchExpertSkill
+  ret
+
+SearchExpertSkill:
+  cp    (ix+HeroSkills+0)             ;check Skill slot 1
+  jr    z,.ExpertSkillFound
+  cp    (ix+HeroSkills+1)             ;check Skill slot 2
+  jr    z,.ExpertSkillFound
+  cp    (ix+HeroSkills+2)             ;check Skill slot 3
+  jr    z,.ExpertSkillFound
+  cp    (ix+HeroSkills+3)             ;check Skill slot 4
+  jr    z,.ExpertSkillFound
+  cp    (ix+HeroSkills+4)             ;check Skill slot 5
+  jr    z,.ExpertSkillFound
+  cp    (ix+HeroSkills+5)             ;check Skill slot 6
+  jr    z,.ExpertSkillFound
+  ret
+  .ExpertSkillFound:
+  inc   b
+  ret
+
+;there are 6 skills slot, check if there is a might skill that is not maxed yet, OR check if there is an empty slot for a new might skill
+IsItPossibleToLevelOrSetAMightSkill?: ;out: carry=no empty slot
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,1                           
+  call  CheckSkill                   ;check for basic archery 
+  ld    a,2                           
+  call  CheckSkill                   ;check for advanced archery 
+
+  ld    a,4                           
+  call  CheckSkill                   ;check for basic offence 
+  ld    a,5                           
+  call  CheckSkill                   ;check for advanced offence 
+
+  ld    a,7                           
+  call  CheckSkill                   ;check for basic Armourer 
+  ld    a,8                           
+  call  CheckSkill                   ;check for advanced Armourer 
+
+  ld    a,10                           
+  call  CheckSkill                   ;check for basic resistance 
+  ld    a,11                          
+  call  CheckSkill                   ;check for advanced resistance 
+
+  scf
+  ret
+
+;there are 6 skills slot, check if there is an adventure skill that is not maxed yet, OR check if there is an empty slot for a new adventure skill
+IsItPossibleToLevelOrSetAnAdventureSkill?: ;out: carry=no empty slot
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,13                           
+  call  CheckSkill                   ;check for basic estates 
+  ld    a,14                           
+  call  CheckSkill                   ;check for advanced estates 
+
+  ld    a,16                           
+  call  CheckSkill                   ;check for basic learning 
+  ld    a,17                           
+  call  CheckSkill                   ;check for advanced learning 
+
+  ld    a,19                           
+  call  CheckSkill                   ;check for basic logistics 
+  ld    a,20                           
+  call  CheckSkill                   ;check for advanced logistics 
+
+  scf
+  ret
+
+;there are 6 skills slot, check if there is a wizzardry skill that is not maxed yet, OR check if there is an empty slot for a new wizzardry skill
+IsItPossibleToLevelOrSetAWizzardrySkill?: ;out: carry=no empty slot
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,22                           
+  call  CheckSkill                   ;check for basic intelligency 
+  ld    a,23                           
+  call  CheckSkill                   ;check for advanced intelligency 
+
+  ld    a,25                           
+  call  CheckSkill                   ;check for basic sorcery 
+  ld    a,26                           
+  call  CheckSkill                   ;check for advanced sorcery 
+
+  ld    a,28                           
+  call  CheckSkill                   ;check for basic wisdom 
+  ld    a,29                           
+  call  CheckSkill                   ;check for advanced wisdom 
+
+  ld    a,31                           
+  call  CheckSkill                   ;check for basic necromancy 
+  ld    a,32                          
+  call  CheckSkill                   ;check for advanced necromancy 
+
+  scf
+  ret
+  
+IsItPossibleToLevelOrSetNecromancy?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,31                           
+  call  CheckSkill                   ;check for basic necromancy 
+  ld    a,32                          
+  call  CheckSkill                   ;check for advanced necromancy 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetWisdom?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,28                           
+  call  CheckSkill                   ;check for basic wisdom 
+  ld    a,29                          
+  call  CheckSkill                   ;check for advanced wisdom 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetSorcery?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,25                           
+  call  CheckSkill                   ;check for basic sorcery 
+  ld    a,26                           
+  call  CheckSkill                   ;check for advanced sorcery 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetIntelligence?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,22                           
+  call  CheckSkill                   ;check for basic intelligence 
+  ld    a,23                           
+  call  CheckSkill                   ;check for advanced intelligence 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetLogistics?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,19                           
+  call  CheckSkill                   ;check for basic logistics 
+  ld    a,20                           
+  call  CheckSkill                   ;check for advanced logistics 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetLearning?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,16                           
+  call  CheckSkill                   ;check for basic learning 
+  ld    a,17                           
+  call  CheckSkill                   ;check for advanced learning 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetEstates?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,13                           
+  call  CheckSkill                   ;check for basic estates 
+  ld    a,14                           
+  call  CheckSkill                   ;check for advanced estates 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetResistance?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,10                           
+  call  CheckSkill                   ;check for basic resistance 
+  ld    a,11                          
+  call  CheckSkill                   ;check for advanced resistance 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetArmourer?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,7                           
+  call  CheckSkill                   ;check for basic Armourer 
+  ld    a,8                           
+  call  CheckSkill                   ;check for advanced Armourer 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetOffence?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,4                           
+  call  CheckSkill                   ;check for basic offence 
+  ld    a,5                           
+  call  CheckSkill                   ;check for advanced offence 
+
+  scf
+  ret
+
+IsItPossibleToLevelOrSetArchery?:
+  xor   a
+  call  CheckSkill                   ;check if there is an empty slot
+  ld    a,1                           
+  call  CheckSkill                   ;check for basic archery 
+  ld    a,2                           
+  call  CheckSkill                   ;check for advanced archery 
+
+  scf
+  ret
+
+CheckSkill:
+  cp    (ix+HeroSkills+0)             ;check Skill slot 1
+  jr    z,.SkillFound
+  cp    (ix+HeroSkills+1)             ;check Skill slot 2
+  jr    z,.SkillFound
+  cp    (ix+HeroSkills+2)             ;check Skill slot 3
+  jr    z,.SkillFound
+  cp    (ix+HeroSkills+3)             ;check Skill slot 4
+  jr    z,.SkillFound
+  cp    (ix+HeroSkills+4)             ;check Skill slot 5
+  jr    z,.SkillFound
+  cp    (ix+HeroSkills+5)             ;check Skill slot 6
+  jr    z,.SkillFound
+  ret
+  .SkillFound:
+  pop   bc                            ;pop the call to this routine
+  ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+SetButtonMight:
+  call  IsItPossibleToLevelOrSetAMightSkill?
+  jp    c,SetButtonWizzardry            ;if there is no free spot or all current might skills are maxed, set wizzardry skill
+  
+  call  CheckAmountOfExpertSkills_Might
+  ld    a,b
+  cp    4
+  jp    z,SetButtonWizzardry            ;if all expert might skills are leveled up, set wizzardry button instead
+  
+  ld    a,r
+  and   3
+  jr    z,.Archery
+  dec   a
+  jr    z,.Offence
+  dec   a
+  jr    z,.Armourer
+
+  .Resistance:
+  call  IsItPossibleToLevelOrSetResistance?
+  jr    c,.Armourer                     ;if there is no free spot or resistance is maxed, set armourer
+
+  ld    b,10                            ;10=basic resistance
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Armourer                     ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonResistance
+  jp    SetSkillButton
+
+  .Armourer:
+  call  IsItPossibleToLevelOrSetArmourer?
+  jr    c,.Offence                      ;if there is no free spot or armour is maxed, set offence
+  
+  ld    b,07                            ;07=basic armourer
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Offence                      ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonArmourer
+  jp    SetSkillButton
+
+  .Offence:
+  call  IsItPossibleToLevelOrSetOffence?
+  jr    c,.Archery                      ;if there is no free spot or offence is maxed, set archery
+
+  ld    b,04                            ;04=basic offence
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Archery                      ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonOffence
+  jp    SetSkillButton
+  
+  .Archery:
+  call  IsItPossibleToLevelOrSetArchery?
+  jr    c,.Resistance                   ;if there is no free spot or archery is maxed, set resistance
+
+  ld    b,01                            ;01=basic archery
+  call  CheckSkillAvailable             ;out: zero flag, skill is not maxed yet
+  jr    c,.Resistance                   ;carry: skill is maxed out, set next skill
+  ld    hl,ButtonArchery
+  jp    SetSkillButton
+
+
+;Might
+ButtonArchery:     dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (033*128) + (000/2) - 128 | dw $4000 + (066*128) + (000/2) - 128
+ButtonOffence:     dw $4000 + (000*128) + (030/2) - 128 | dw $4000 + (033*128) + (030/2) - 128 | dw $4000 + (066*128) + (030/2) - 128
+ButtonArmourer:    dw $4000 + (000*128) + (060/2) - 128 | dw $4000 + (033*128) + (060/2) - 128 | dw $4000 + (066*128) + (060/2) - 128
+ButtonResistance:  dw $4000 + (000*128) + (090/2) - 128 | dw $4000 + (033*128) + (090/2) - 128 | dw $4000 + (066*128) + (090/2) - 128
+;Adventure
+ButtonEstates:     dw $4000 + (000*128) + (120/2) - 128 | dw $4000 + (033*128) + (120/2) - 128 | dw $4000 + (066*128) + (120/2) - 128
+ButtonLearning:    dw $4000 + (000*128) + (150/2) - 128 | dw $4000 + (033*128) + (150/2) - 128 | dw $4000 + (066*128) + (150/2) - 128
+ButtonLogistics:   dw $4000 + (000*128) + (180/2) - 128 | dw $4000 + (033*128) + (180/2) - 128 | dw $4000 + (066*128) + (180/2) - 128
+;Wizzardry
+ButtonIntelligence:dw $4000 + (000*128) + (210/2) - 128 | dw $4000 + (033*128) + (210/2) - 128 | dw $4000 + (066*128) + (210/2) - 128
+ButtonSorcery:     dw $4000 + (099*128) + (000/2) - 128 | dw $4000 + (099*128) + (030/2) - 128 | dw $4000 + (099*128) + (060/2) - 128
+ButtonWisdom:      dw $4000 + (099*128) + (090/2) - 128 | dw $4000 + (099*128) + (120/2) - 128 | dw $4000 + (099*128) + (150/2) - 128
+ButtonNecromancy:  dw $4000 + (099*128) + (180/2) - 128 | dw $4000 + (099*128) + (210/2) - 128 | dw $4000 + (132*128) + (000/2) - 128
+
+CheckSkillAvailable:
+  ;check if basic skill is already available, if so, ret
+  ld    a,(ix+HeroSkills+0)             ;check Skill slot 1
+  ld    c,1                             ;Hero Slot 1
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+1)             ;check Skill slot 2
+  ld    c,2                             ;Hero Slot 2
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+2)             ;check Skill slot 3
+  ld    c,3                             ;Hero Slot 3
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+3)             ;check Skill slot 4
+  ld    c,4                             ;Hero Slot 4
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+4)             ;check Skill slot 5
+  ld    c,5                             ;Hero Slot 5
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+5)             ;check Skill slot 6
+  ld    c,6                             ;Hero Slot 6
+  cp    b
+  ret   z
+  ;check if advanced skill is already available, if so, ret
+  inc   b
+  ld    a,(ix+HeroSkills+0)             ;check Skill slot 1
+  ld    c,1                             ;Hero Slot 1
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+1)             ;check Skill slot 2
+  ld    c,2                             ;Hero Slot 2
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+2)             ;check Skill slot 3
+  ld    c,3                             ;Hero Slot 3
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+3)             ;check Skill slot 4
+  ld    c,4                             ;Hero Slot 4
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+4)             ;check Skill slot 5
+  ld    c,5                             ;Hero Slot 5
+  cp    b
+  ret   z
+  ld    a,(ix+HeroSkills+5)             ;check Skill slot 6
+  ld    c,6                             ;Hero Slot 6
+  cp    b
+  ret   z
+  ;check if expert skill is already learned, if so, set carry flag
+  inc   b
+  ld    a,(ix+HeroSkills+0)             ;check Skill slot 1
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  ld    a,(ix+HeroSkills+1)             ;check Skill slot 2
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  ld    a,(ix+HeroSkills+2)             ;check Skill slot 3
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  ld    a,(ix+HeroSkills+3)             ;check Skill slot 4
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  ld    a,(ix+HeroSkills+4)             ;check Skill slot 5
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  ld    a,(ix+HeroSkills+5)             ;check Skill slot 6
+  cp    b
+  jr    z,.ExpertSkillAlreadyLearned
+  dec   b
+  dec   b
+  dec   b
+  ld    c,7                             ;Skill should be placed in a free slot
+  or    a                               ;reset carry
+  ret
+
+  .ExpertSkillAlreadyLearned:
+  scf
+  ret
+
+
+;            knight   |   barbarian   |   death knight   |   overlord   |   alchemist   |   sage   |   ranger   |   wizzard   |   battle mage   |   scholar   |   necromancer       
+;Might:
+;Archery    1
+;Offence                1
+;Armourer                               1
+;Resistance                                               1
+
+;Adventure:
+;estates                                                                   1
+;learning                                                                                  1
+;logistics                                                                                             1
+
+;Wizardry:
+;intelligence                                                                                                        1
+;sorcery                                                                                                                           1
+;wisdom                                                                                                                                            1
+;necromancy                                                                                                                                                      1
+
+
+
+LevelUpButtonTableGfxBlock:  db  SecondarySkillsButtonsBlock
 LevelUpButtonTableAmountOfButtons:  db  3
 LevelUpButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
   ;which resource do you need window
   ;V button
-  db  %0100 0011 | dw $4000 + (148*128) + (000/2) - 128 | dw $4000 + (148*128) + (020/2) - 128 | dw $4000 + (148*128) + (040/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + (132*128) + (030/2) - 128 | dw $4000 + (132*128) + (050/2) - 128 | dw $4000 + (132*128) + (070/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
   ;left skill button
-  db  %1100 0011 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (020*128) + (160/2) - 128 | dw $4000 + (040*128) + (160/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (033*128) + (000/2) - 128 | dw $4000 + (066*128) + (000/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
   ;right skill button
-  db  %1100 0011 | dw $4000 + (000*128) + (180/2) - 128 | dw $4000 + (020*128) + (180/2) - 128 | dw $4000 + (040*128) + (180/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (030/2) - 128 | dw $4000 + (033*128) + (030/2) - 128 | dw $4000 + (066*128) + (030/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
 
 .Button1Ytop:           equ 137
 .Button1YBottom:        equ .Button1Ytop + 019
 .Button1XLeft:          equ 156
 .Button1XRight:         equ .Button1XLeft + 020
 
-.Button2Ytop:           equ 118
-.Button2YBottom:        equ .Button2Ytop + 020
-.Button2XLeft:          equ 066
-.Button2XRight:         equ .Button2XLeft + 020
+.Button2Ytop:           equ 111
+.Button2YBottom:        equ .Button2Ytop + 033
+.Button2XLeft:          equ 062
+.Button2XRight:         equ .Button2XLeft + 030
 
-.Button3Ytop:           equ 118
-.Button3YBottom:        equ .Button3Ytop + 020
-.Button3XLeft:          equ 118
-.Button3XRight:         equ .Button3XLeft + 020
+.Button3Ytop:           equ 111
+.Button3YBottom:        equ .Button3Ytop + 033
+.Button3XLeft:          equ 112
+.Button3XRight:         equ .Button3XLeft + 030
 
 SetLevelUpHeroIcon:
   ld    ix,(plxcurrentheroAddress)            ;lets call this defending
@@ -2257,14 +2940,7 @@ TextLevelUp5d:
                 db "Spell Power + 1",255
 TextLevelUp6:
                 db "or",255
-TextLevelUp7:
-                db "Expert",254
-                db "Air Magic",255
-TextLevelUp8:
-                db "Advanced",254
-                db "Logistics",255
-        
-
+       
 CenterHeroNameHasGainedALevel:
   ld    d,0                             ;amount of letters of hero name
   push  hl
@@ -2342,21 +3018,152 @@ SetLevelUpText:
   ld    c,102+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,096+00                        ;dx
-  ld    c,126+00                        ;dy
+  ld    b,099+00                        ;dx
+  ld    c,125+00                        ;dy
   ld    hl,TextLevelUp6
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,065+00                        ;dx
-  ld    c,141+00                        ;dy
-  ld    hl,TextLevelUp7
+  ld    a,(SkillInLevelUpSlot1)
+  ld    l,a
+  ld    h,0
+  add   hl,hl                           ;*2
+  push  hl
+  pop   bc
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  push  hl
+  pop   de
+  add   hl,hl                           ;*16
+  add   hl,de                           ;*24
+  add   hl,bc                           ;*26
+  ld    de,SkillTextEmpty
+  add   hl,de
+  ld    b,062+00                        ;dx
+  ld    c,145+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,117+00                        ;dx
-  ld    c,141+00                        ;dy
-  ld    hl,TextLevelUp8
+  ld    a,(SkillInLevelUpSlot2)
+  ld    l,a
+  ld    h,0
+  add   hl,hl                           ;*2
+  push  hl
+  pop   bc
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  push  hl
+  pop   de
+  add   hl,hl                           ;*16
+  add   hl,de                           ;*24
+  add   hl,bc                           ;*26
+  ld    de,SkillTextEmpty
+  add   hl,de
+  ld    b,112+00                        ;dx
+  ld    c,145+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
+
+SkillTextEmpty:
+                          db  "            ",254   ;SkillTextnr# 000
+                          db  "            ",255
+SkillTextArcheryBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 001
+                          db  "Archery     ",255
+SkillTextArcheryAdvanced:
+                          db  "Advanced    ",254
+                          db  "Archery     ",255
+SkillTextArcheryExpert:
+                          db  "Expert      ",254
+                          db  "Archery     ",255
+SkillTextOffenceBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 004
+                          db  "Offence     ",255
+SkillTextOffenceAdvanced:
+                          db  "Advanced    ",254
+                          db  "Offence     ",255
+SkillTextOffenceExpert:
+                          db  "Expert      ",254
+                          db  "Offence     ",255
+SkillTextArmourerBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 007
+                          db  "Armourer    ",255
+SkillTextArmourerAdvanced:
+                          db  "Advanced    ",254
+                          db  "Armourer    ",255
+SkillTextArmourerExpert:
+                          db  "Expert      ",254
+                          db  "Armourer    ",255
+SkillTextresistanceBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 010
+                          db  "Resistance  ",255
+SkillTextresistanceAdvanced:
+                          db  "Advanced    ",254
+                          db  "Resistance  ",255
+SkillTextresistanceExpert:
+                          db  "Expert      ",254
+                          db  "Resistance  ",255
+SkillTextestatesBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 013
+                          db  "Estates     ",255
+SkillTextestatesAdvanced:
+                          db  "Advanced    ",254
+                          db  "Estates     ",255
+SkillTextestatesExpert:
+                          db  "Expert      ",254
+                          db  "Estates     ",255
+SkillTextlearningBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 016
+                          db  "Learning    ",255
+SkillTextlearningAdvanced:
+                          db  "Advanced    ",254
+                          db  "Learning    ",255
+SkillTextlearningExpert:
+                          db  "Expert      ",254
+                          db  "Learning    ",255
+SkillTextlogisticsBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 019
+                          db  "Logistics   ",255
+SkillTextlogisticsAdvanced:
+                          db  "Advanced    ",254
+                          db  "Logistics   ",255
+SkillTextlogisticsExpert:
+                          db  "Expert      ",254
+                          db  "Logistics   ",255
+SkillTextintelligenceBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 022
+                          db  "Intelligence",255
+SkillTextintelligenceAdvanced:
+                          db  "Advanced    ",254
+                          db  "Intelligence",255
+SkillTextintelligenceExpert:
+                          db  "Expert      ",254
+                          db  "Intelligence",255
+SkillTextsorceryBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 025
+                          db  "Sorcery     ",255
+SkillTextsorceryAdvanced:
+                          db  "Advanced    ",254
+                          db  "Sorcery     ",255
+SkillTextsorceryExpert:
+                          db  "Expert      ",254
+                          db  "Sorcery     ",255
+SkillTextwisdomBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 028
+                          db  "Wisdom      ",255
+SkillTextwisdomAdvanced:
+                          db  "Advanced    ",254
+                          db  "Wisdom      ",255
+SkillTextwisdomExpert:
+                          db  "Expert      ",254
+                          db  "Wisdom      ",255
+SkillTextnecromancyBasic:
+                          db  "Basic       ",254   ;SkillTextnr# 031
+                          db  "Necromancy  ",255
+SkillTextnecromancyAdvanced:
+                          db  "Advanced    ",254
+                          db  "Necromancy  ",255
+SkillTextnecromancyExpert:
+                          db  "Expert      ",254
+                          db  "Necromancy  ",255
 
 SetLevelUpGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128          ;red LevelUp (rubies)
@@ -2368,20 +3175,20 @@ SetLevelUpGraphics:
 SetPrimairySkillUpIcon:
   ld    a,(framecounter)
   and   3
-  ld    hl,$4000 + (148*128) + (060/2) - 128 ;attack
+  ld    hl,$4000 + (132*128) + (090/2) - 128 ;attack
   jr    z,.PrimairySkillUpFound
   dec   a
-  ld    hl,$4000 + (148*128) + (076/2) - 128 ;defense
+  ld    hl,$4000 + (132*128) + (106/2) - 128 ;defense
   jr    z,.PrimairySkillUpFound
   dec   a
-  ld    hl,$4000 + (148*128) + (092/2) - 128 ;knowledge
+  ld    hl,$4000 + (132*128) + (122/2) - 128 ;knowledge
   jr    z,.PrimairySkillUpFound
-  ld    hl,$4000 + (148*128) + (108/2) - 128 ;spell power
+  ld    hl,$4000 + (132*128) + (138/2) - 128 ;spell power
   .PrimairySkillUpFound:  
 
   ld    de,$0000 + (081*128) + (094/2) - 128
   ld    bc,$0000 + (016*256) + (016/2)
-  ld    a,LevelUpBlock           ;block to copy graphics from
+  ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 IncreasePrimairySkill:
