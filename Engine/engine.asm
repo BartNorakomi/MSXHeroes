@@ -69,13 +69,14 @@ call  SetScreenOn
 
 
 
-  ld    ix,(plxcurrentheroAddress)    
-  ld    l,(ix+HeroXp+0)                 ;current xp
-  ld    h,(ix+HeroXp+1)
-  ld    de,100
-  add   hl,de
-  ld    (ix+HeroXp+0),l                 ;current xp
-  ld    (ix+HeroXp+1),h
+;  ld    ix,(plxcurrentheroAddress)    
+;  ld    l,(ix+HeroXp+0)                 ;current xp
+;  ld    h,(ix+HeroXp+1)
+;  ld    de,500
+;  add   hl,de
+;  jp    c,LevelEngine
+;  ld    (ix+HeroXp+0),l                 ;current xp
+;  ld    (ix+HeroXp+1),h
   
 
 
@@ -503,6 +504,7 @@ HeroXPTable:
   dw    40567 ;level 16
   dw    48279 ;level 17
   dw    57533 ;level 18
+  dw    65535 ;end
 
 CheckHeroLevelUp:
   ld    a,(HeroLevelUp?)                ;check if hero is already leveling
@@ -511,6 +513,9 @@ CheckHeroLevelUp:
   
   ld    ix,(plxcurrentheroAddress)
   ld    a,(ix+HeroLevel)                ;current level
+  cp    18
+  ret   z
+
   add   a,a
   ld    d,0
   ld    e,a
@@ -3936,7 +3941,7 @@ PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?: ds  1
 ;knight   |   barbarian   |   death knight   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
 ;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
-heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol
+heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol                                                                                                                                                                             ;skill   class
 HeroAddressesAdol:            db "Adol",255,"             ","Knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
 HeroAddressesGoemon1:         db "Goemon1",255,"          ","Barbarian   ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
 HeroAddressesPixy:            db "Pixy",255,"             ","Death Knight",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
@@ -4142,7 +4147,7 @@ EmptyHeroRecruitedAtTavern:
 
 pl1hero1y:		db	0
 pl1hero1x:		db	7
-pl1hero1xp: dw 999
+pl1hero1xp: dw 3000 ;999
 pl1hero1move:	db	30,30
 pl1hero1mana:	db	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
@@ -4182,7 +4187,7 @@ Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 | 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  4,7,10,16,0,0
+.HeroSkills:  db  31,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000

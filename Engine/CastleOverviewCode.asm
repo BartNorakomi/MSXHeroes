@@ -2183,7 +2183,7 @@ call ScreenOn
   .VButton:
   pop   af                              ;end DisplayLevelUpCode
   ld    a,(PreviousButtonClicked)
-  cp    2                               ;money was selected ?
+  cp    2                               
   jr    z,.AddSkillOnTheLeft
 
   .AddSkillOnTheRight:
@@ -2260,6 +2260,24 @@ SetLevelUpButtons:
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*03)
   ldir
+
+  call  .SetButtons
+
+  ld    a,(SkillInLevelUpSlot1)
+  ld    hl,SkillInLevelUpSlot2
+  cp    (hl)
+  ret   nz
+
+  ld    a,86
+  ld    (GenericButtonTable+(GenericButtonTableLenghtPerButton*01)+GenericButtonXleft),a
+  ld    (GenericButtonTable+(GenericButtonTableLenghtPerButton*02)+GenericButtonXleft),a
+  ld    a,86+30
+  ld    (GenericButtonTable+(GenericButtonTableLenghtPerButton*01)+GenericButtonXright),a
+  ld    (GenericButtonTable+(GenericButtonTableLenghtPerButton*02)+GenericButtonXright),a
+  ret
+
+
+  .SetButtons:
 
   ld    ix,(plxcurrentheroAddress)      ;current active hero (who trades)
   ;                                       Might                                                               Adventure                                           Wizzardry
@@ -2976,8 +2994,9 @@ SetLevelUpText:
   ld    c,022+00                        ;dy
   ld    hl,TextLevelUp2
   call  SetText                         ;in: b=dx, c=dy, hl->text
+
   ;level text
-  ld    b,073-10                        ;dx
+  ld    b,073-00                        ;dx
   ld    c,071+00                        ;dy
   ld    hl,TextLevelUp3
   call  SetText                         ;in: b=dx, c=dy, hl->text
@@ -2985,7 +3004,7 @@ SetLevelUpText:
   ld    a,(ix+HeroLevel)                ;current level
   ld    l,a
   ld    h,0
-  ld    b,094-10                        ;dx
+  ld    b,094-00                        ;dx
   ld    c,071+00                        ;dy
   call  SetNumber16BitCastle
   ;class
@@ -2997,8 +3016,6 @@ SetLevelUpText:
   ld    a,(PutLetter+dx)                ;set dx of text
   add   a,5
   ld    b,a  
-
-;  ld    b,104-10                        ;dx
   ld    c,071+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
@@ -3038,6 +3055,14 @@ SetLevelUpText:
   add   hl,bc                           ;*26
   ld    de,SkillTextEmpty
   add   hl,de
+
+  ld    a,(SkillInLevelUpSlot1)
+  ld    b,a
+  ld    a,(SkillInLevelUpSlot2)
+  cp    b
+  ld    b,(062+112)/2                   ;dx
+  jp    z,.SkillsAreTheSame
+    
   ld    b,062+00                        ;dx
   ld    c,145+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
@@ -3058,6 +3083,8 @@ SetLevelUpText:
   ld    de,SkillTextEmpty
   add   hl,de
   ld    b,112+00                        ;dx
+
+  .SkillsAreTheSame:
   ld    c,145+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
@@ -3168,7 +3195,7 @@ SkillTextnecromancyExpert:
 SetLevelUpGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128          ;red LevelUp (rubies)
   ld    de,$0000 + (015*128) + (022/2) - 128
-  ld    bc,$0000 + (148*256) + (160/2)
+  ld    bc,$0000 + (173*256) + (160/2)
   ld    a,LevelUpBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 

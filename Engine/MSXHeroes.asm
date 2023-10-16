@@ -795,7 +795,7 @@ dephase
 ;
 LevelUpBlock:  equ   $4a
 phase	$4000
-  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,148 * 128      ;148 lines
+  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,173 * 128      ;148 lines
 	ds		$c000-$,$ff
 dephase
 
