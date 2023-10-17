@@ -978,13 +978,13 @@ UnitSYSXTable14x24Portraits:
 
 
 ;inventory has:
-;sword - attack
+;sword - Attack
 ;armor - units hp
-;shield - defense
+;shield - Defense
 ;helmet - protection
 ;boots - movement
 ;gloves - archery +x%
-;ring - spell power
+;ring - Spell power
 ;necklace - spell point recovery / income + 500 when equiped / 
 ;robe - Intelligence (total mana)
 HeroOverviewInventoryWindowCode:
@@ -1252,14 +1252,6 @@ SetTextInventoryItem:                   ;when clicking on an item, the explanati
   ret   z
   ld    (SetSkillsDescription?),a 
 
-;  call  .GoSetText
-;  ret
-
-  .GoSetText:
-;jp .GoSetText
-
-;db "'" ;$27
-
   ld    a,(MenuOptionSelected?Backup)   ;which inventory slot has been clicked (count from rightbottom to lefttop)
   ld    b,a
   ld    a,15
@@ -1280,7 +1272,7 @@ SetTextInventoryItem:                   ;when clicking on an item, the explanati
   .SetText:
 
   ld    b,HeroOverViewSpellBookWindowDX + 030 + 1
-  ld    c,HeroOverViewSpellBookWindowDY + 159 - 19
+  ld    c,HeroOverViewSpellBookWindowDY + 159 - 16
   jp    SetText
 
 InventoryDescriptionList:
@@ -1296,74 +1288,74 @@ InventoryDescriptionList:
   dw    DescriptionEmpty
 
                           ;item 000
-DescriptionSword1:        db  "dagger time",254 | DaggerTimeAttack: equ 4               
-                          db  "attack +",DaggerTimeAttack+$30,255
+DescriptionSword1:        db  "Dagger Time",254 | DaggerTimeAttack: equ 4               
+                          db  "Attack +",DaggerTimeAttack+$30,255
 
                           ;item 001
-DescriptionSword2:        db  "sword of bahrain",254 | SwordOfBahrainAttack: equ 5
-                          db  "attack +5",255
+DescriptionSword2:        db  "Sword of Bahrain",254 | SwordOfBahrainAttack: equ 5
+                          db  "Attack +5",255
 
                           ;item 002
-DescriptionSword3:        db  "hell slayer",254 | HellSlayerAttack: equ 7
-                          db  "attack +7",254
-                          db  "defense -2",255
+DescriptionSword3:        db  "Hell Slayer",254 | HellSlayerAttack: equ 7
+                          db  "Attack +7",254
+                          db  "Defense -2",255
 
                           ;item 003
-DescriptionSword4:        db  "the butterfly",254 | ButterflyAttack: equ 1 | ButterflyDefence: equ 1 | ButterflyIntelligence: equ 1 | ButterflySpellDamage: equ 1
-                          db  "all primary attributes",254
+DescriptionSword4:        db  "The Butterfly",254 | ButterflyAttack: equ 1 | ButterflyDefence: equ 1 | ButterflyIntelligence: equ 1 | ButterflySpellDamage: equ 1
+                          db  "All primary attributes",254
                           db  "+1",255
 
                           ;item 004
 DescriptionSword5:        db  "swiftblade",254 | SwiftbladeAttack: equ 3
-                          db  "attack + 3",254
+                          db  "Attack + 3",254
                           db  "unit movement speed +1",255
 
                           ;item 005
-DescriptionArmor1:        db  "regalia di pleb",254 | RegaliaDiPlebDefence: equ 3
-                          db  "defense +3",254
-                          db  "unit movement speed +1",255
+DescriptionArmor1:        db  "Regalia Di Pleb",254 | RegaliaDiPlebDefence: equ 3
+                          db  "Defense +3",254
+                          db  "Unit movement speed +1",255
 
                           ;item 006
-DescriptionArmor2:        db  "young blood's armor",254 | YoungBloodsArmorDefence: equ 4
-                          db  "defense +4",255
+DescriptionArmor2:        db  "Young Blood's Armor",254 | YoungBloodsArmorDefence: equ 4
+                          db  "Defense +4",255
 
                           ;item 007
-DescriptionArmor3:        db  "the juggernaut",254 | TheJuggernautDefence: equ 7
-                          db  "defense +7",254
-                          db  "unit movement speed - 1",255
+DescriptionArmor3:        db  "The Juggernaut",254 | TheJuggernautDefence: equ 7
+                          db  "Defense +7",254
+                          db  "Unit movement speed - 1",255
 
                           ;item 008
-DescriptionArmor4:        db  "yojimbo the ronin",254 | YojumboTheRoninDefence: equ 3
-                          db  "defense +3",254
+DescriptionArmor4:        db  "Yojimbo the Ronin",254 | YojumboTheRoninDefence: equ 3
+                          db  "Defense +3",254
                           db  "-25% damage from fire",255
 
                           ;item 009
-DescriptionArmor5:        db  "caesar's chestplate",254 | CeasarsChestplateDefence: equ 3
-                          db  "defense +3",254
-                          db  "max hp units +2",255
+DescriptionArmor5:        db  "Caesar's Chestplate",254 | CeasarsChestplateDefence: equ 3
+                          db  "Defense +3",254
+                          db  "Max hp units +2",255
 
                           ;item 010
-DescriptionShield1:        db  "greenleaf shield",254
+DescriptionShield1:        db  "Greenleaf Shield",254
                           db  "50% less damage from",254
                           db  "ranged units",255
 
                           ;item 011
-DescriptionShield2:        db  "wooden shield",254 | WoodenShieldDefence: equ 4
-                          db  "defense +4",255
+DescriptionShield2:        db  "Wooden shield",254 | WoodenShieldDefence: equ 4
+                          db  "Defense +4",255
 
                           ;item 012
-                          db  "defense +3",254
-DescriptionShield3:        db  "the bram stoker",254 | TheBramStokerDefence: equ 3
+                          db  "Defense +3",254
+DescriptionShield3:        db  "The bram stoker",254 | TheBramStokerDefence: equ 3
                           db  "-25% damage from earth",255
 
                           ;item 013
-DescriptionShield4:        db  "impenetrable shield",254
+DescriptionShield4:        db  "Impenetrable shield",254
                           db  "+5% chance to block any",254
                           db  "enemy spell cast",255
 
                           ;item 014
-DescriptionShield5:        db  "training shield",254 | TrainingShieldDefence: equ 3
-                          db  "defense +3",255
+DescriptionShield5:        db  "Training shield",254 | TrainingShieldDefence: equ 3
+                          db  "Defense +3",255
 
 
 
@@ -1374,142 +1366,142 @@ DescriptionShield5:        db  "training shield",254 | TrainingShieldDefence: eq
 
 
                           ;item 015
-DescriptionHelmet1:        db  "yatta shi-ne",254 | YattaShiNeDefence: equ 2 | YattaShiNeSpellDamage: equ 2
-                          db  "spell power +2",254
-                          db  "defense +2",255
+DescriptionHelmet1:        db  "Yatta Shi-ne",254 | YattaShiNeDefence: equ 2 | YattaShiNeSpellDamage: equ 2
+                          db  "Spell power +2",254
+                          db  "Defense +2",255
 
                           ;item 016
-DescriptionHelmet2:        db  "fire hood",254
-                          db  "spell power +4",254
+DescriptionHelmet2:        db  "Fire hood",254
+                          db  "Spell power +4",254
                           db  "+10% fire spell damage",255
 
                           ;item 017
-DescriptionHelmet3:        db  "cerebro",254
+DescriptionHelmet3:        db  "Cerebro",254
                           db  "Intelligence +6",255 | CerebroIntelligence: equ 6
 
                           ;item 018
-DescriptionHelmet4:        db  "the viridescent",254 | TheViridescentDefence: equ 3
-                          db  "defense +3",254
-                          db  "max hp units +3",255
+DescriptionHelmet4:        db  "The Viridescent",254 | TheViridescentDefence: equ 3
+                          db  "Defense +3",254
+                          db  "Max hp units +3",255
 
                           ;item 019
-DescriptionHelmet5:        db  "pikemen's helmet",254 | PikemensHelmetDefence: equ 2
-                          db  "defense +2",254
-                          db  "unit movement speed +1",255
+DescriptionHelmet5:        db  "Pikemen's Helmet",254 | PikemensHelmetDefence: equ 2
+                          db  "Defense +2",254
+                          db  "Unit movement speed +1",255
 
 
                           ;item 020
-DescriptionBoots1:        db  "shadow tramper",254
-                          db  "unit movement speed +2",255
+DescriptionBoots1:        db  "Shadow Tramper",254
+                          db  "Unit movement speed +2",255
 
                           ;item 021
-DescriptionBoots2:        db  "dusk rover",254
-                          db  "no terrain penalty",254
+DescriptionBoots2:        db  "Dusk Rover",254
+                          db  "No terrain penalty",254
                           db  "for hero on worldmap",255
 
                           ;item 022
-DescriptionBoots3:        db  "planeswalkers",254
+DescriptionBoots3:        db  "Planeswalkers",254
                           db  "+3 max movement points",254
                           db  "for hero on worldmap",255
 
                           ;item 023
-DescriptionBoots4:        db  "knight's night slippers",254
+DescriptionBoots4:        db  "Knight's Night Slippers",254
                           db  "-25% damage from water",255
 
                           ;item 024
-DescriptionBoots5:        db  "sturdy boots",254
-                          db  "unit movement speed +3",255
+DescriptionBoots5:        db  "Sturdy Boots",254
+                          db  "Unit movement speed +3",255
 
                           ;item 025
-DescriptionGloves1:        db  "gripfast",254
+DescriptionGloves1:        db  "Gripfast",254
                           db  "+2 max movement points",254
                           db  "for hero on worldmap",255
 
                           ;item 026
-DescriptionGloves2:        db  "iron hand",254
+DescriptionGloves2:        db  "Iron Hand",254
                           db  "-30% damage from air",254
                           db  "unit movement speed -1",255
 
                           ;item 027
-DescriptionGloves3:        db  "elk skin gloves",254
-                          db  "attack +2",254
-                          db  "max hp units +2",255
+DescriptionGloves3:        db  "Elk Skin Gloves",254
+                          db  "Attack +2",254
+                          db  "Max hp units +2",255
 
                           ;item 028
-DescriptionGloves4:        db  "venomous gauntlet",254
-                          db  "melee attacks deal",254
+DescriptionGloves4:        db  "Venomous gauntlet",254
+                          db  "Melee Attacks deal",254
                           db  "poison damage '20 dpt'",255
 
                           ;item 029
-DescriptionGloves5:        db  "emerald gloves",254 | EmeraldGlovesIntelligence: equ 3
+DescriptionGloves5:        db  "Emerald Gloves",254 | EmeraldGlovesIntelligence: equ 3
                           db  "Intelligence +3",255
 
                           ;item 030
-DescriptionRing1:        db  "small ring",254 | SmallRingSpellDamage: equ 3
-                          db  "spell power +3",255
+DescriptionRing1:        db  "Small Ring",254 | SmallRingSpellDamage: equ 3
+                          db  "Spell power +3",255
 
                           ;item 031
-DescriptionRing2:        db  "cyclops",254 | CyclopsIntelligence: equ 4
+DescriptionRing2:        db  "Cyclops",254 | CyclopsIntelligence: equ 4
                           db  "Intelligence +4",255
 
                           ;item 032
-DescriptionRing3:        db  "scarlet ring",254 | ScarletRingAttack: equ 2 | ScarletRingDefence: equ 2 | ScarletRingIntelligence: equ 2 | ScarletRingSpellPower: equ 2    
-                          db  "all primary attributes",254
+DescriptionRing3:        db  "Scarlet Ring",254 | ScarletRingAttack: equ 2 | ScarletRingDefence: equ 2 | ScarletRingIntelligence: equ 2 | ScarletRingSpellPower: equ 2    
+                          db  "All primary attributes",254
                           db  "+2",255
 
                           ;item 033
-DescriptionRing4:        db  "bronze ring",254
+DescriptionRing4:        db  "Bronze Ring",254
                           db  "+10% earth spell damage",255
 
                           ;item 034
-DescriptionRing5:        db  "hypnotising ring",254
+DescriptionRing5:        db  "Hypnotising Ring",254
                           db  "+10% water spell damage",255
 
                           ;item 035
-DescriptionNecklace1:        db  "the blue topaz",254
+DescriptionNecklace1:        db  "The Blue Topaz",254
                           db  "-25% damage from water",255
 
                           ;item 036
-DescriptionNecklace2:        db  "good luck charm",254
+DescriptionNecklace2:        db  "Good Luck Charm",254
                           db  "+10% chance to block any",254
                           db  "enemy spell cast",255
 
                           ;item 037
-DescriptionNecklace3:        db  "negligee of teeth",254 | NegligeeOfTeethIntelligence: equ 3 | NegligeeOfTeethSpellPower: equ 3
+DescriptionNecklace3:        db  "Negligee of Teeth",254 | NegligeeOfTeethIntelligence: equ 3 | NegligeeOfTeethSpellPower: equ 3
                           db  "Intelligence +3",254
-                          db  "spell power +3",255
+                          db  "Spell power +3",255
 
                           ;item 038
-DescriptionNecklace4:        db  "skull of the unborn",254
-                          db  "increases Necromancy",254
+DescriptionNecklace4:        db  "Skull of the Unborn",254
+                          db  "Increases Necromancy",254
                           db  "skill by 5%",255
 
                           ;item 039
-DescriptionNecklace5:        db  "the choker",254 | TheChokerSpellPower: equ 6
-                          db  "spell power +6",255
+DescriptionNecklace5:        db  "The Choker",254 | TheChokerSpellPower: equ 6
+                          db  "Spell power +6",255
 
                           ;item 040
-DescriptionRobe1:        db  "the kings garment",254
-                          db  "increases wealth by",254
+DescriptionRobe1:        db  "The King's Garment",254
+                          db  "Increases wealth by",254
                           db  "125 gold per day",255
 
                           ;item 041
-DescriptionRobe2:        db  "priest's cope",254 | PriestsCopeIntelligence: equ 1  
+DescriptionRobe2:        db  "Priest's Cope",254 | PriestsCopeIntelligence: equ 1  
                           db  "+10% air spell damage",254
                           db  "Intelligence +1",255
 
                           ;item 042
-DescriptionRobe3:        db  "enchanted robe",254 | EnchantedRobeSpellPower: equ 4
-                          db  "spell power +4",255
+DescriptionRobe3:        db  "Enchanted Robe",254 | EnchantedRobeSpellPower: equ 4
+                          db  "Spell power +4",255
 
                           ;item 043
-DescriptionRobe4:        db  "rural vest",254
-                          db  "max hp units +3",255
+DescriptionRobe4:        db  "Rural Vest",254
+                          db  "Max hp units +3",255
 
                           ;item 044
-DescriptionRobe5:        db  "labcoat",254 | LabCoatSpellPower: equ 7
-                          db  "spell power +7",254
-                          db  "max hp units -3",255
+DescriptionRobe5:        db  "Labcoat",254 | LabCoatSpellPower: equ 7
+                          db  "Spell power +7",254
+                          db  "Max hp units -3",255
 
                           ;item 000
 DescriptionEmpty:        db  255
@@ -4433,11 +4425,11 @@ TextApostrofeSymbolSXNX: db  114,2  ;"'"
 
 ;                         a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
 TextCoordinateTable:  db  000,5, 004,5, 009,5, 014,5, 019,5, 024,5, 029,5, 034,5, 039,5, 042,5, 047,4, 051,4, 055,5, 059,5, 063,5, 067,5, 072,5, 076,5, 081,5, 086,5, 091,5, 096,5, 101,5, 106,5, 111,5, 116,5
-TextFirstWindowChoicesButton1:  db  "skills",255
-TextFirstWindowChoicesButton2:  db  "inventory",255
-TextFirstWindowChoicesButton3:  db  "army",255
-TextFirstWindowChoicesButton4:  db  "spell book",255
-TextFirstWindowChoicesButton5:  db  "status",255
+TextFirstWindowChoicesButton1:  db  "Skills",255
+TextFirstWindowChoicesButton2:  db  "Inventory",255
+TextFirstWindowChoicesButton3:  db  "Army",255
+TextFirstWindowChoicesButton4:  db  "Spell Book",255
+TextFirstWindowChoicesButton5:  db  "Status",255
 
 LenghtSkillDescription: equ SkillArcheryAdvanced-SkillArcheryBasic
 SkillEmpty:
@@ -4448,17 +4440,17 @@ SkillEmpty:
 SkillArcheryBasic:
                           db  "Basic Archery                    ",255   ;skillnr# 001
                           db  "Basic Archery                    ",254
-                          db  "The ranged attack damage of your ",254
+                          db  "The ranged Attack damage of your ",254
                           db  "units is increased by 10%.       ",255
 SkillArcheryAdvanced:
                           db  "Advanced Archery                 ",255
                           db  "Advanced Archery                 ",254
-                          db  "The ranged attack damage of your ",254
+                          db  "The ranged Attack damage of your ",254
                           db  "units is increased by 20%.       ",255
 SkillArcheryExpert:
                           db  "Expert Archery                   ",255
                           db  "Expert Archery                   ",254
-                          db  "The ranged attack damage of your ",254
+                          db  "The ranged Attack damage of your ",254
                           db  "units is increased by 50%.       ",255
 SkillOffenceBasic:
                           db  "Basic Offence                    ",255   ;skillnr# 004

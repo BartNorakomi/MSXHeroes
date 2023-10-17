@@ -4219,7 +4219,7 @@ EmptyHeroRecruitedAtTavern:
 
 pl1hero1y:		db	0
 pl1hero1x:		db	7
-pl1hero1xp: dw 10999 ;65000 ;3000 ;999
+pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
 pl1hero1mana:	db	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
