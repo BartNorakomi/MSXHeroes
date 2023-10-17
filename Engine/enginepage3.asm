@@ -1517,31 +1517,38 @@ PreviousButton2Clicked:      ds  1
 PreviousButton2ClickedIX:    ds  2
 
 
-LenghtTextSkillsDescription:  equ 24
-TextSkillsWindowButton1:  db  "basic archery          ",255
-                          db  "basic archery          ",254
-                          db  "ranged attack damage   ",254
-                          db  "is increased by 10%    ",255
-TextSkillsWindowButton2:  db  "advanced resistance    ",255
-                          db  "advanced resistance    ",254
-                          db  "10% chance to block    ",254
-                          db  "spells                 ",255
-TextSkillsWindowButton3:  db  "basic estates          ",255
-                          db  "basic estates          ",254
-                          db  "125 gold per day       ",254
-                          db  "                       ",255
-TextSkillsWindowButton4:  db  "expert logistics       ",255
-                          db  "expert logistics       ",254
-                          db  "increases land movement",254
-                          db  "range of hero by 30%   ",255
-TextSkillsWindowButton5:  db  "                       ",255
-                          db  "                       ",254
-                          db  "                       ",254
-                          db  "                       ",255
-TextSkillsWindowButton6:  db  "                       ",255
-                          db  "                       ",254
-                          db  "                       ",254
-                          db  "                       ",255
+LenghtTextSkillsDescription:  equ EndFirstLine-TextSkillsWindowButton1
+TextSkillsWindowButton1:  
+                          db  "                                 ",255
+EndFirstLine:
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
+TextSkillsWindowButton2:  
+                          db  "                                 ",255   
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
+TextSkillsWindowButton3:  
+                          db  "                                 ",255   
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
+TextSkillsWindowButton4:  
+                          db  "                                 ",255 
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
+TextSkillsWindowButton5:  
+                          db  "                                 ",255  
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
+TextSkillsWindowButton6:  
+                          db  "                                 ",255   
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
 
 ButtonOff:  equ 0
 ButtonMouseOver:  equ 2

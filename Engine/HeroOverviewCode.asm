@@ -530,11 +530,17 @@ HeroOverviewArmyWindowCode:
   call  SetHeroOverViewArmyWindow       ;set overview of hero army
   call  Set16x30HeroIcon                ;sets hero icon in the Army Window
   call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
+  call  UpdateHUd
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle  
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewArmyWindow       ;set overview of hero army
   call  Set16x30HeroIcon                ;sets hero icon in the Army Window
   call  SetArmyIconsAndAmount           ;sets hero's army in the Army Window
-
+  call  UpdateHUd
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle  
+  
   .engine:
   call  PopulateControls                ;read out keys
 
@@ -980,14 +986,20 @@ UnitSYSXTable14x24Portraits:
 ;gloves - archery +x%
 ;ring - spell power
 ;necklace - spell point recovery / income + 500 when equiped / 
-;robe - intelligence (total mana)
+;robe - Intelligence (total mana)
 HeroOverviewInventoryWindowCode:
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
+  call  UpdateHUd
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle  
   call  SwapAndSetPage                  ;swap and set page
   call  SetHeroOverViewInventoryWindow  ;set skills Window in inactive page
   call  SetInventoryIcons               ;sets all available items in inactive page
   call  CreateInventoryListForCurrHero  ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
+  call  UpdateHUd
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle  
 
   .engine:
   call  PopulateControls                ;read out keys
@@ -1282,60 +1294,75 @@ InventoryDescriptionList:
   dw    DescriptionNecklace1, DescriptionNecklace2, DescriptionNecklace3, DescriptionNecklace4, DescriptionNecklace5
   dw    DescriptionRobe1, DescriptionRobe2, DescriptionRobe3, DescriptionRobe4, DescriptionRobe5
   dw    DescriptionEmpty
-  
-DescriptionSword1:        db  "dagger time",254
-                          db  "attack +4",255
 
-DescriptionSword2:        db  "sword of bahrain",254
+                          ;item 000
+DescriptionSword1:        db  "dagger time",254 | DaggerTimeAttack: equ 4               
+                          db  "attack +",DaggerTimeAttack+$30,255
+
+                          ;item 001
+DescriptionSword2:        db  "sword of bahrain",254 | SwordOfBahrainAttack: equ 5
                           db  "attack +5",255
 
-DescriptionSword3:        db  "hell slayer",254
+                          ;item 002
+DescriptionSword3:        db  "hell slayer",254 | HellSlayerAttack: equ 7
                           db  "attack +7",254
                           db  "defense -2",255
 
-DescriptionSword4:        db  "the butterfly",254
+                          ;item 003
+DescriptionSword4:        db  "the butterfly",254 | ButterflyAttack: equ 1 | ButterflyDefence: equ 1 | ButterflyIntelligence: equ 1 | ButterflySpellDamage: equ 1
                           db  "all primary attributes",254
                           db  "+1",255
 
-DescriptionSword5:        db  "swiftblade",254
+                          ;item 004
+DescriptionSword5:        db  "swiftblade",254 | SwiftbladeAttack: equ 3
                           db  "attack + 3",254
                           db  "unit movement speed +1",255
 
-DescriptionArmor1:        db  "regalia di pleb",254
+                          ;item 005
+DescriptionArmor1:        db  "regalia di pleb",254 | RegaliaDiPlebDefence: equ 3
                           db  "defense +3",254
                           db  "unit movement speed +1",255
 
-DescriptionArmor2:        db  "young blood's armor",254
+                          ;item 006
+DescriptionArmor2:        db  "young blood's armor",254 | YoungBloodsArmorDefence: equ 4
                           db  "defense +4",255
 
-DescriptionArmor3:        db  "the juggernaut",254
+                          ;item 007
+DescriptionArmor3:        db  "the juggernaut",254 | TheJuggernautDefence: equ 7
                           db  "defense +7",254
                           db  "unit movement speed - 1",255
 
-DescriptionArmor4:        db  "yojimbo the ronin",254
+                          ;item 008
+DescriptionArmor4:        db  "yojimbo the ronin",254 | YojumboTheRoninDefence: equ 3
                           db  "defense +3",254
                           db  "-25% damage from fire",255
 
-DescriptionArmor5:        db  "caesar's chestplate",254
+                          ;item 009
+DescriptionArmor5:        db  "caesar's chestplate",254 | CeasarsChestplateDefence: equ 3
                           db  "defense +3",254
                           db  "max hp units +2",255
 
+                          ;item 010
 DescriptionShield1:        db  "greenleaf shield",254
                           db  "50% less damage from",254
                           db  "ranged units",255
 
-DescriptionShield2:        db  "wooden shield",254
+                          ;item 011
+DescriptionShield2:        db  "wooden shield",254 | WoodenShieldDefence: equ 4
                           db  "defense +4",255
 
-DescriptionShield3:        db  "the bram stoker",254
+                          ;item 012
                           db  "defense +3",254
+DescriptionShield3:        db  "the bram stoker",254 | TheBramStokerDefence: equ 3
                           db  "-25% damage from earth",255
 
+                          ;item 013
 DescriptionShield4:        db  "impenetrable shield",254
                           db  "+5% chance to block any",254
                           db  "enemy spell cast",255
 
-DescriptionShield5:        db  "training shield",254
+                          ;item 014
+DescriptionShield5:        db  "training shield",254 | TrainingShieldDefence: equ 3
                           db  "defense +3",255
 
 
@@ -1346,114 +1373,145 @@ DescriptionShield5:        db  "training shield",254
 
 
 
-DescriptionHelmet1:        db  "yatta shi-ne",254
+                          ;item 015
+DescriptionHelmet1:        db  "yatta shi-ne",254 | YattaShiNeDefence: equ 2 | YattaShiNeSpellDamage: equ 2
                           db  "spell power +2",254
                           db  "defense +2",255
 
+                          ;item 016
 DescriptionHelmet2:        db  "fire hood",254
                           db  "spell power +4",254
                           db  "+10% fire spell damage",255
 
+                          ;item 017
 DescriptionHelmet3:        db  "cerebro",254
-                          db  "intelligence +6",255
+                          db  "Intelligence +6",255 | CerebroIntelligence: equ 6
 
-DescriptionHelmet4:        db  "the viridescent",254
+                          ;item 018
+DescriptionHelmet4:        db  "the viridescent",254 | TheViridescentDefence: equ 3
                           db  "defense +3",254
                           db  "max hp units +3",255
 
-DescriptionHelmet5:        db  "pikemen's helmet",254
+                          ;item 019
+DescriptionHelmet5:        db  "pikemen's helmet",254 | PikemensHelmetDefence: equ 2
                           db  "defense +2",254
                           db  "unit movement speed +1",255
 
 
+                          ;item 020
 DescriptionBoots1:        db  "shadow tramper",254
                           db  "unit movement speed +2",255
 
+                          ;item 021
 DescriptionBoots2:        db  "dusk rover",254
                           db  "no terrain penalty",254
                           db  "for hero on worldmap",255
 
+                          ;item 022
 DescriptionBoots3:        db  "planeswalkers",254
                           db  "+3 max movement points",254
                           db  "for hero on worldmap",255
 
+                          ;item 023
 DescriptionBoots4:        db  "knight's night slippers",254
                           db  "-25% damage from water",255
 
+                          ;item 024
 DescriptionBoots5:        db  "sturdy boots",254
                           db  "unit movement speed +3",255
 
+                          ;item 025
 DescriptionGloves1:        db  "gripfast",254
                           db  "+2 max movement points",254
                           db  "for hero on worldmap",255
 
+                          ;item 026
 DescriptionGloves2:        db  "iron hand",254
                           db  "-30% damage from air",254
                           db  "unit movement speed -1",255
 
+                          ;item 027
 DescriptionGloves3:        db  "elk skin gloves",254
                           db  "attack +2",254
                           db  "max hp units +2",255
 
+                          ;item 028
 DescriptionGloves4:        db  "venomous gauntlet",254
                           db  "melee attacks deal",254
                           db  "poison damage '20 dpt'",255
 
-DescriptionGloves5:        db  "emerald gloves",254
-                          db  "intelligence +3",255
+                          ;item 029
+DescriptionGloves5:        db  "emerald gloves",254 | EmeraldGlovesIntelligence: equ 3
+                          db  "Intelligence +3",255
 
-DescriptionRing1:        db  "small ring",254
+                          ;item 030
+DescriptionRing1:        db  "small ring",254 | SmallRingSpellDamage: equ 3
                           db  "spell power +3",255
 
-DescriptionRing2:        db  "cyclops",254
-                          db  "intelligence +4",255
+                          ;item 031
+DescriptionRing2:        db  "cyclops",254 | CyclopsIntelligence: equ 4
+                          db  "Intelligence +4",255
 
-DescriptionRing3:        db  "scarlet ring",254
+                          ;item 032
+DescriptionRing3:        db  "scarlet ring",254 | ScarletRingAttack: equ 2 | ScarletRingDefence: equ 2 | ScarletRingIntelligence: equ 2 | ScarletRingSpellPower: equ 2    
                           db  "all primary attributes",254
                           db  "+2",255
 
+                          ;item 033
 DescriptionRing4:        db  "bronze ring",254
                           db  "+10% earth spell damage",255
 
+                          ;item 034
 DescriptionRing5:        db  "hypnotising ring",254
                           db  "+10% water spell damage",255
 
+                          ;item 035
 DescriptionNecklace1:        db  "the blue topaz",254
                           db  "-25% damage from water",255
 
+                          ;item 036
 DescriptionNecklace2:        db  "good luck charm",254
                           db  "+10% chance to block any",254
                           db  "enemy spell cast",255
 
-DescriptionNecklace3:        db  "negligee of teeth",254
-                          db  "intelligence +3",254
+                          ;item 037
+DescriptionNecklace3:        db  "negligee of teeth",254 | NegligeeOfTeethIntelligence: equ 3 | NegligeeOfTeethSpellPower: equ 3
+                          db  "Intelligence +3",254
                           db  "spell power +3",255
 
+                          ;item 038
 DescriptionNecklace4:        db  "skull of the unborn",254
-                          db  "increases necromancy",254
+                          db  "increases Necromancy",254
                           db  "skill by 5%",255
 
-DescriptionNecklace5:        db  "the choker",254
+                          ;item 039
+DescriptionNecklace5:        db  "the choker",254 | TheChokerSpellPower: equ 6
                           db  "spell power +6",255
 
+                          ;item 040
 DescriptionRobe1:        db  "the kings garment",254
                           db  "increases wealth by",254
                           db  "125 gold per day",255
 
-DescriptionRobe2:        db  "priest's cope",254
+                          ;item 041
+DescriptionRobe2:        db  "priest's cope",254 | PriestsCopeIntelligence: equ 1  
                           db  "+10% air spell damage",254
-                          db  "intelligence +1",255
+                          db  "Intelligence +1",255
 
-DescriptionRobe3:        db  "enchanted robe",254
+                          ;item 042
+DescriptionRobe3:        db  "enchanted robe",254 | EnchantedRobeSpellPower: equ 4
                           db  "spell power +4",255
 
+                          ;item 043
 DescriptionRobe4:        db  "rural vest",254
                           db  "max hp units +3",255
 
-DescriptionRobe5:        db  "labcoat",254
+                          ;item 044
+DescriptionRobe5:        db  "labcoat",254 | LabCoatSpellPower: equ 7
                           db  "spell power +7",254
                           db  "max hp units -3",255
 
+                          ;item 000
 DescriptionEmpty:        db  255
 
 CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
@@ -3300,6 +3358,9 @@ Set16x30HeroIconAtHeroOverviewCode:
 	ret
 
 HeroOverviewCode:
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
+
   ld    a, %1000 0011                   ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   ld    (HeroOverviewFirstWindowButtonTable + 0*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
   ld    (HeroOverviewFirstWindowButtonTable + 1*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
@@ -3891,17 +3952,20 @@ SetHeroSkillsInTable:
   add   hl,hl                           ;*2
   add   hl,hl                           ;*4
   add   hl,hl                           ;*8
+  push  hl
   add   hl,hl                           ;*16
   add   hl,hl                           ;*32
-  push  hl
   add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
   pop   bc
-  add   hl,bc                           ;*96
+  add   hl,bc                           ;*136
+
   ld    bc,SkillEmpty
   add   hl,bc
   ld    bc,LenghtSkillDescription
   ldir
   ret
+
 
 CheckButtonMouseInteraction:
   ld    b,(ix+HeroOverviewWindowAmountOfButtons)
@@ -4375,79 +4439,72 @@ TextFirstWindowChoicesButton3:  db  "army",255
 TextFirstWindowChoicesButton4:  db  "spell book",255
 TextFirstWindowChoicesButton5:  db  "status",255
 
-;Skills Might
-
-;Archery
-;Offence
-;Armourer
-;Resistance
-
 LenghtSkillDescription: equ SkillArcheryAdvanced-SkillArcheryBasic
 SkillEmpty:
-                          db  "                       ",255   ;skillnr# 000
-                          db  "                       ",254
-                          db  "                       ",254
-                          db  "                       ",255
+                          db  "                                 ",255   ;skillnr# 000
+                          db  "                                 ",254
+                          db  "                                 ",254
+                          db  "                                 ",255
 SkillArcheryBasic:
-                          db  "basic archery          ",255   ;skillnr# 001
-                          db  "basic archery          ",254
-                          db  "ranged attack damage   ",254
-                          db  "is increased by 10%    ",255
+                          db  "Basic Archery                    ",255   ;skillnr# 001
+                          db  "Basic Archery                    ",254
+                          db  "The ranged attack damage of your ",254
+                          db  "units is increased by 10%.       ",255
 SkillArcheryAdvanced:
-                          db  "advanced archery       ",255
-                          db  "advanced archery       ",254
-                          db  "ranged attack damage   ",254
-                          db  "is increased by 20%    ",255
+                          db  "Advanced Archery                 ",255
+                          db  "Advanced Archery                 ",254
+                          db  "The ranged attack damage of your ",254
+                          db  "units is increased by 20%.       ",255
 SkillArcheryExpert:
-                          db  "expert archery         ",255
-                          db  "expert archery         ",254
-                          db  "ranged attack damage   ",254
-                          db  "is increased by 50%    ",255
+                          db  "Expert Archery                   ",255
+                          db  "Expert Archery                   ",254
+                          db  "The ranged attack damage of your ",254
+                          db  "units is increased by 50%.       ",255
 SkillOffenceBasic:
-                          db  "basic offence          ",255   ;skillnr# 004
-                          db  "basic offence          ",254
-                          db  "hand to hand damage is ",254
-                          db  "increased by 10%       ",255
+                          db  "Basic Offence                    ",255   ;skillnr# 004
+                          db  "Basic Offence                    ",254
+                          db  "The hand to hand damage of your  ",254
+                          db  "units is increased by 10%.       ",255
 SkillOffenceAdvanced:
-                          db  "advanced offence       ",255
-                          db  "advanced offence       ",254
-                          db  "hand to hand damage is ",254
-                          db  "increased by 20%       ",255
+                          db  "Advanced Offence                 ",255
+                          db  "Advanced Offence                 ",254
+                          db  "The hand to hand damage of your  ",254
+                          db  "units is increased by 20%.       ",255
 SkillOffenceExpert:
-                          db  "expert offence         ",255
-                          db  "expert offence         ",254
-                          db  "hand to hand damage is ",254
-                          db  "increased by 30%       ",255
+                          db  "Expert Offence                   ",255
+                          db  "Expert Offence                   ",254
+                          db  "The hand to hand damage of your  ",254
+                          db  "units is increased by 30%.       ",255
 SkillArmourerBasic:
-                          db  "basic armourer         ",255   ;skillnr# 007
-                          db  "basic armourer         ",254
-                          db  "damage inflicted on    ",254
-                          db  "army is reduced by 5%  ",255
+                          db  "Basic Armourer                   ",255   ;skillnr# 007
+                          db  "Basic Armourer                   ",254
+                          db  "Damage inflicted on your army is ",254
+                          db  "reduced by 5%                    ",255
 SkillArmourerAdvanced:
-                          db  "advanced armourer      ",255
-                          db  "advanced armourer      ",254
-                          db  "damage inflicted on    ",254
-                          db  "army is reduced by 10% ",255
+                          db  "Advanced Armourer                ",255
+                          db  "Advanced Armourer                ",254
+                          db  "Damage inflicted on your army is ",254
+                          db  "reduced by 10%                   ",255
 SkillArmourerExpert:
-                          db  "expert armourer        ",255
-                          db  "expert armourer        ",254
-                          db  "damage inflicted on    ",254
-                          db  "army is reduced by 15% ",255
-SkillresistanceBasic:
-                          db  "basic resistance       ",255   ;skillnr# 010
-                          db  "basic resistance       ",254
-                          db  "your units have 5%     ",254
-                          db  "chance to block spells ",255
-SkillresistanceAdvanced:
-                          db  "advanced resistance    ",255
-                          db  "advanced resistance    ",254
-                          db  "your units have 10%    ",254
-                          db  "chance to block spells ",255
-SkillresistanceExpert:
-                          db  "expert resistance      ",255
-                          db  "expert resistance      ",254
-                          db  "your units have 15%    ",254
-                          db  "chance to block spells ",255
+                          db  "Expert Armourer                  ",255
+                          db  "Expert Armourer                  ",254
+                          db  "Damage inflicted on your army is ",254
+                          db  "reduced by 15%                   ",255
+SkillResistanceBasic:
+                          db  "Basic Resistance                 ",255   ;skillnr# 010
+                          db  "Basic Resistance                 ",254
+                          db  "Your units have a 5% chance to   ",254
+                          db  "deflect incoming spells.         ",255
+SkillResistanceAdvanced:
+                          db  "Advanced Resistance              ",255
+                          db  "Advanced Resistance              ",254
+                          db  "Your units have a 10% chance to  ",254
+                          db  "deflect incoming spells.         ",255
+SkillResistanceExpert:
+                          db  "Expert Resistance                ",255
+                          db  "Expert Resistance                ",254
+                          db  "Your units have a 15% chance to  ",254
+                          db  "deflect incoming spells.         ",255
 
 
 
@@ -4459,116 +4516,116 @@ SkillresistanceExpert:
 
 
 
-SkillestatesBasic:
-                          db  "basic estates          ",255   ;skillnr# 013
-                          db  "basic estates          ",254
-                          db  "hero generates an extra",254
-                          db  "125 gold per day       ",255
-SkillestatesAdvanced:
-                          db  "advanced estates       ",255
-                          db  "advanced estates       ",254
-                          db  "hero generates an extra",254
-                          db  "250 gold per day       ",255
-SkillestatesExpert:
-                          db  "expert estates         ",255
-                          db  "expert estates         ",254
-                          db  "hero generates an extra",254
-                          db  "500 gold per day       ",255
-SkilllearningBasic:
-                          db  "basic learning         ",255   ;skillnr# 016
-                          db  "basic learning         ",254
-                          db  "earned experience is   ",254
-                          db  "increased by 5%        ",255
-SkilllearningAdvanced:
-                          db  "advanced learning      ",255
-                          db  "advanced learning      ",254
-                          db  "earned experience is   ",254
-                          db  "increased by 10%       ",255
-SkilllearningExpert:
-                          db  "expert learning        ",255
-                          db  "expert learning        ",254
-                          db  "earned experience is   ",254
-                          db  "increased by 15%       ",255
-SkilllogisticsBasic:
-                          db  "basic logistics        ",255   ;skillnr# 019
-                          db  "basic logistics        ",254
-                          db  "increases land movement",254
-                          db  "range of hero by 10%   ",255
-SkilllogisticsAdvanced:
-                          db  "advanced logistics     ",255
-                          db  "advanced logistics     ",254
-                          db  "increases land movement",254
-                          db  "range of hero by 20%   ",255
-SkilllogisticsExpert:
-                          db  "expert logistics       ",255
-                          db  "expert logistics       ",254
-                          db  "increases land movement",254
-                          db  "range of hero by 30%   ",255
+SkillEstatesBasic:
+                          db  "Basic Estates                    ",255   ;skillnr# 013
+                          db  "Basic Estates                    ",254
+                          db  "Your hero generates an extra 125 ",254
+                          db  "Gold per day.                    ",255
+SkillEstatesAdvanced:
+                          db  "Advanced Estates                 ",255
+                          db  "Advanced Estates                 ",254
+                          db  "Your hero generates an extra 250 ",254
+                          db  "Gold per day.                    ",255
+SkillEstatesExpert:
+                          db  "Expert Estates                   ",255
+                          db  "Expert Estates                   ",254
+                          db  "Your hero generates an extra 500 ",254
+                          db  "Gold per day.                    ",255
+SkillLearningBasic:
+                          db  "Basic Learning                   ",255   ;skillnr# 016
+                          db  "Basic Learning                   ",254
+                          db  "Your hero's accumulated          ",254
+                          db  "experience is amplified by 10%.  ",255
+SkillLearningAdvanced:
+                          db  "Advanced Learning                ",255
+                          db  "Advanced Learning                ",254
+                          db  "Your hero's accumulated          ",254
+                          db  "experience is amplified by 20%.  ",255
+SkillLearningExpert:
+                          db  "Expert Learning                  ",255
+                          db  "Expert Learning                  ",254
+                          db  "Your hero's accumulated          ",254
+                          db  "experience is amplified by 30%.  ",255
+SkillLogisticsBasic:
+                          db  "Basic Logistics                  ",255   ;skillnr# 019
+                          db  "Basic Logistics                  ",254
+                          db  "An additional 10% is added to    ",254
+                          db  "your hero's land movement range. ",255
+SkillLogisticsAdvanced:
+                          db  "Advanced Logistics               ",255
+                          db  "Advanced Logistics               ",254
+                          db  "An additional 20% is added to    ",254
+                          db  "your hero's land movement range. ",255
+SkillLogisticsExpert:
+                          db  "Expert Logistics                 ",255
+                          db  "Expert Logistics                 ",254
+                          db  "An additional 30% is added to    ",254
+                          db  "your hero's land movement range. ",255
 
 
 
 
-SkillintelligenceBasic:
-                          db  "basic intelligence     ",255   ;skillnr# 022
-                          db  "basic intelligence     ",254
-                          db  "maximum spell points   ",254
-                          db  "increased by 25%       ",255
-SkillintelligenceAdvanced:
-                          db  "advanced intelligence  ",255
-                          db  "advanced intelligence  ",254
-                          db  "maximum spell points   ",254
-                          db  "increased by 50%       ",255
-SkillintelligenceExpert:
-                          db  "expert intelligence    ",255
-                          db  "expert intelligence    ",254
-                          db  "maximum spell points   ",254
-                          db  "increased by 100%      ",255
-SkillsorceryBasic:
-                          db  "basic sorcery          ",255   ;skillnr# 025
-                          db  "basic sorcery          ",254
-                          db  "increases spell damage ",254
-                          db  "by 5%                  ",255
-SkillsorceryAdvanced:
-                          db  "advanced sorcery       ",255
-                          db  "advanced sorcery       ",254
-                          db  "increases spell damage ",254
-                          db  "by 10%                 ",255
-SkillsorceryExpert:
-                          db  "expert sorcery         ",255
-                          db  "expert sorcery         ",254
-                          db  "increases spell damage ",254
-                          db  "by 15%                 ",255
-SkillwisdomBasic:
-                          db  "basic wisdom           ",255   ;skillnr# 028
-                          db  "basic wisdom           ",254
-                          db  "hero can learn spells  ",254
-                          db  "level 2 and below      ",255
-SkillwisdomAdvanced:
-                          db  "advanced wisdom        ",255
-                          db  "advanced wisdom        ",254
-                          db  "hero can learn spells  ",254
-                          db  "level 3 and below      ",255
-SkillwisdomExpert:
-                          db  "expert wisdom          ",255
-                          db  "expert wisdom          ",254
-                          db  "hero can learn all     ",254
-                          db  "spells                 ",255
+SkillIntelligenceBasic:
+                          db  "Basic Intelligence               ",255   ;skillnr# 022
+                          db  "Basic Intelligence               ",254
+                          db  "Boosts your hero's maximum spell ",254
+                          db  "points by 25%.                   ",255
+SkillIntelligenceAdvanced:
+                          db  "Advanced Intelligence            ",255
+                          db  "Advanced Intelligence            ",254
+                          db  "Boosts your hero's maximum spell ",254
+                          db  "points by 50%.                   ",255
+SkillIntelligenceExpert:
+                          db  "Expert Intelligence              ",255
+                          db  "Expert Intelligence              ",254
+                          db  "Boosts your hero's maximum spell ",254
+                          db  "points by 100%.                  ",255
+SkillSorceryBasic:
+                          db  "Basic Sorcery                    ",255   ;skillnr# 025
+                          db  "Basic Sorcery                    ",254
+                          db  "An additional 5% is added to     ",254
+                          db  "your hero's spell damage.        ",255
+SkillSorceryAdvanced:
+                          db  "Advanced Sorcery                 ",255
+                          db  "Advanced Sorcery                 ",254
+                          db  "An additional 10% is added to    ",254
+                          db  "your hero's spell damage.        ",255
+SkillSorceryExpert:
+                          db  "Expert Sorcery                   ",255
+                          db  "Expert Sorcery                   ",254
+                          db  "An additional 15% is added to    ",254
+                          db  "your hero's spell damage.        ",255
+SkillWisdomBasic:
+                          db  "Basic Wisdom                     ",255   ;skillnr# 028
+                          db  "Basic Wisdom                     ",254
+                          db  "Your hero is capable of learning ",254
+                          db  "spells of level 2 and lower.     ",255
+SkillWisdomAdvanced:
+                          db  "Advanced Wisdom                  ",255
+                          db  "Advanced Wisdom                  ",254
+                          db  "Your hero is capable of learning ",254
+                          db  "spells of level 3 and lower.     ",255
+SkillWisdomExpert:
+                          db  "Expert Wisdom                    ",255
+                          db  "Expert Wisdom                    ",254
+                          db  "Your hero is capable of learning ",254
+                          db  "all spells.                      ",255
 
-SkillnecromancyBasic:
-                          db  "basic necromancy       ",255   ;skillnr# 031
-                          db  "basic necromancy       ",254
-                          db  "10% of enemy creatures ",254
-                          db  "killed are resurrected ",255
-SkillnecromancyAdvanced:
-                          db  "advanced necromancy    ",255
-                          db  "advanced necromancy    ",254
-                          db  "20% of enemy creatures ",254
-                          db  "killed are resurrected ",255
-SkillnecromancyExpert:
-                          db  "expert necromancy      ",255
-                          db  "expert necromancy      ",254
-                          db  "30% of enemy creatures ",254
-                          db  "killed are resurrected ",255
+SkillNecromancyBasic:
+                          db  "Basic Necromancy                 ",255   ;skillnr# 031
+                          db  "Basic Necromancy                 ",254
+                          db  "Revives 10% of enemy creatures   ",254
+                          db  "that have fallen in battle.      ",255
+SkillNecromancyAdvanced:
+                          db  "Advanced Necromancy              ",255
+                          db  "Advanced Necromancy              ",254
+                          db  "Revives 20% of enemy creatures   ",254
+                          db  "that have fallen in battle.      ",255
+SkillNecromancyExpert:
+                          db  "Expert Necromancy                ",255
+                          db  "Expert Necromancy                ",254
+                          db  "Revives 30% of enemy creatures   ",254
+                          db  "that have fallen in battle.      ",255
 
 
 SetHeroOverViewFontPage0Y212:           ;set font at (0,212) page 0

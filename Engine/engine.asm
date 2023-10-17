@@ -20,6 +20,7 @@ LevelEngine:
   ld    a,(ix+HeroStatus)
   cp    255
   jr    z,.EndHeroChecks                ;don't check hero, if player has no active heroes
+  call  SetHeroMaxMovementPoints        ;Set heroes maximum movement points
   call  CheckHeroLevelUp                ;Check if hero should level up
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
@@ -65,19 +66,22 @@ LevelEngine:
   cp    2
   call  z,SetScreenOn
 
-call  SetScreenOn
+;call  SetScreenOn
 
 
 
 ;  ld    ix,(plxcurrentheroAddress)    
 ;  ld    l,(ix+HeroXp+0)                 ;current xp
 ;  ld    h,(ix+HeroXp+1)
-;  ld    de,500
+;  ld    de,139
 ;  add   hl,de
 ;  jp    c,LevelEngine
 ;  ld    (ix+HeroXp+0),l                 ;current xp
 ;  ld    (ix+HeroXp+1),h
   
+;ld a,r
+;ld    (framecounter),a
+
 
 
   jp    LevelEngine
@@ -171,6 +175,70 @@ InterruptHandler:
  
   pop   af 
   ei
+  ret
+
+SetHeroMaxMovementPoints:
+  ld    ix,(plxcurrentheroAddress)
+  ld    b,0                             ;movement speed bonus for logistics
+  call  .CheckMovementSpeedBonusForLogistics
+  ld    c,0                             ;movement speed bonus for planeswalkers
+  call  .CheckMovementSpeedBonusForPlanesWalkers
+  ld    d,0                             ;movement speed bonus for gripfast
+  call  .CheckMovementSpeedBonusForGripfast
+
+  ld    a,20
+  add   a,b
+  add   a,c
+  add   a,d
+  ld    (ix+HeroTotalMove),a
+  ret
+
+  .CheckMovementSpeedBonusForPlanesWalkers:
+  ld    a,(ix+HeroInventory+4)          ;boots
+  cp    022                             ;PlanesWalkers (+3 max movement points)
+  ret   nz
+  ld    c,3                             ;movement speed bonus for planesWalkers
+  ret
+
+  .CheckMovementSpeedBonusForGripfast:
+  ld    a,(ix+HeroInventory+5)          ;gloves
+  cp    025                             ;Gripfast (+2 max movement points)
+  ret   nz
+  ld    d,2                             ;movement speed bonus for gripfast
+  ret
+
+  .CheckMovementSpeedBonusForLogistics:
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkil
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkil
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkil
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkil
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkil
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkil
+  ret
+
+  .CheckSkil:
+  cp    19                              ;basic logistics (increases movement range of hero by 10%)  
+  jr    z,.BasicLogisticsFound
+  cp    20                              ;advanced logistics (increases movement range of hero by 20%)  
+  jr    z,.AdvancedLogisticsFound
+  cp    21                              ;expert logistics (increases movement range of hero by 30%)  
+  jr    z,.ExpertLogisticsFound
+  ret
+
+  .BasicLogisticsFound:
+  ld    b,2                             ;movement speed bonus for logistics
+  ret
+  .AdvancedLogisticsFound:
+  ld    b,4                             ;movement speed bonus for logistics
+  ret
+  .ExpertLogisticsFound:
+  ld    b,6                             ;movement speed bonus for logistics
   ret
 
 SetText:                                ;in: b=dx, c=dy, hl->text
@@ -535,6 +603,10 @@ CheckHeroLevelUp:
   ld    a,3
   ld    (HeroLevelUp?),a  
   ret
+
+UpdateHUd:
+  ld    hl,UpdateHudCode
+  jp    EnterSpecificRoutineInCastleOverviewCode
 
 HeroLevelUp?: db  0
 DisplayHeroLevelUp:
@@ -3938,13 +4010,13 @@ PlaceSkillInLevelUpSlot1IntoWhichHeroSlot?: ds  1
 PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?: ds  1
 
  ;-------------------- MIGHT ------------------------------         ------------- ADVENTURE ---------------        ------------------ WIZZARDRY -------------------------------
-;knight   |   barbarian   |   death knight   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
+;knight   |   barbarian   |   Shieldbearer   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
 ;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
-heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol                                                                                                                                                                             ;skill   class
+heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol                                                                                                                                                                             ;skill   heroNR
 HeroAddressesAdol:            db "Adol",255,"             ","Knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
 HeroAddressesGoemon1:         db "Goemon1",255,"          ","Barbarian   ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
-HeroAddressesPixy:            db "Pixy",255,"             ","Death Knight",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
+HeroAddressesPixy:            db "Pixy",255,"             ","Shieldbearer",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
 HeroAddressesDrasle1:         db "Drasle1",255,"          ","Overlord    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 | db 004 |
 HeroAddressesLatok:           db "Latok",255,"            ","Alchemist   ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 | db 005 |
 HeroAddressesDrasle2:         db "Drasle2",255,"          ","Sage        ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
@@ -3956,7 +4028,7 @@ HeroAddressesDrasle4:         db "Drasle4",255,"          ","Scholar     ",255,D
 HeroAddressesAshguine:        db "Ashguine",255,"         ","Necromancer ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
 HeroAddressesUndeadline1:     db "Warrior",255,"          ","Knight      ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
 HeroAddressesPsychoWorld:     db "Psycho",255,"           ","Barbarian   ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
-HeroAddressesUndeadline2:     db "Ninja",255,"            ","Death Knight",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
+HeroAddressesUndeadline2:     db "Ninja",255,"            ","Shieldbearer",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
 HeroAddressesGoemon2:         db "Goemon",255,"           ","Overlord    ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 | db 015 |
 HeroAddressesUndeadline3:     db "Marco",255,"            ","Alchemist   ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 | db 016 |
 
@@ -3969,7 +4041,7 @@ HeroAddressesGillianSeed:     db "Gillian Seed",255,"     ","Necromancer ",255,G
 HeroAddressesSnatcher:        db "Snatcher",255,"         ","Knight      ",255,SnatcherSpriteBlock| dw HeroSYSXSnatcher,HeroPortrait10x18SYSXSnatcher,HeroButton20x11SYSXSnatcher,HeroPortrait16x30SYSXSnatcher                               | db 01 | db 023 |
 HeroAddressesGolvellius:      db "Golvellius",255,"       ","Barbarian   ",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 | db 024 |
 
-HeroAddressesBillRizer:       db "Bill Rizer",255,"       ","Death Knight",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
+HeroAddressesBillRizer:       db "Bill Rizer",255,"       ","Shieldbearer",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
 HeroAddressesPochi:           db "Pochi",255,"            ","Overlord    ",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
 HeroAddressesGreyFox:         db "Grey Fox",255,"         ","Alchemist   ",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
 HeroAddressesTrevorBelmont:   db "Trevor Belmont",255,"   ","Sage        ",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
@@ -4147,16 +4219,16 @@ EmptyHeroRecruitedAtTavern:
 
 pl1hero1y:		db	0
 pl1hero1x:		db	7
-pl1hero1xp: dw 3000 ;999
-pl1hero1move:	db	30,30
+pl1hero1xp: dw 10999 ;65000 ;3000 ;999
+pl1hero1move:	db	20,20
 pl1hero1mana:	db	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 ;31	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
-Pl1Hero1StatAttack:  db 2
-Pl1Hero1StatDefense:  db 3
+Pl1Hero1StatAttack:  db 1
+Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
+Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
@@ -4164,13 +4236,14 @@ Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 .AirSpells:         db  %0000 0001
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+;               swo arm shi hel boo glo rin nec rob
+.Inventory: db  003,005,014,015,045,029,030,037,042,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesAdol
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
  ;-------------------- MIGHT ------------------------------         ------------- ADVENTURE ---------------        ------------------ WIZZARDRY -------------------------------
-;knight   |   barbarian   |   death knight   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
+;knight   |   barbarian   |   Shieldbearer   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
 ;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
@@ -4178,7 +4251,7 @@ Pl1Hero1StatSpellDamage:  db 7  ;amount of spell damage
 pl1hero2y:		db	0
 pl1hero2x:		db	6
 pl1hero2xp: dw 0000
-pl1hero2move:	db	10,20
+pl1hero2move:	db	20,20
 pl1hero2mana:	db	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4495,7 +4568,7 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        19,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        0,        0,              0,            0,            0,        19,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        0,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        0,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        0,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
@@ -4507,7 +4580,7 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  001,002,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer1:        db  011,012,013,014,015,016,017,018,000,000
 db 255 | TavernHeroesPlayer2:        db  006,007,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000

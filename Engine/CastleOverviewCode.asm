@@ -1115,10 +1115,11 @@ SetTradingHeroesInventoryIcons:
                     dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
                     dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
 
-
-
-
-
+UpdateHudCode:
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a  
+  call  SetHeroArmyAndStatusInHud  
+	ret
 
 HudCode:
   call  SetHeroArmyAndStatusInHud  
@@ -1513,37 +1514,315 @@ SetHeroArmyAndStatusInHud:
 ClearHeroStatsAndArmyUnitsAmount:
   ld    hl,$4000 + (122*128) + (202/2) - 128
   ld    de,$0000 + (122*128) + (202/2) - 128
-  ld    bc,$0000 + (075*256) + (050/2)
+  ld    bc,$0000 + (075*256) + (052/2)
   ld    a,HudNewBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroStats:
   ld    ix,(plxcurrentheroAddress)
 
-  ld    l,(ix+HeroStatAttack)           ;attack
-  ld    h,0
+  ld    de,ItemAttackPointsTable
+  call  SetAdditionalStatFromInventoryItemsInHL
+  ld    e,(ix+HeroStatAttack)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,216+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
-  ld    l,(ix+HeroStatDefense)          ;defense
-  ld    h,0
+  ld    de,ItemDefencePointsTable
+  call  SetAdditionalStatFromInventoryItemsInHL
+  ld    e,(ix+HeroStatDefense)          ;defense
+  ld    d,0
+  add   hl,de
   ld    b,225+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
-  ld    l,(ix+HeroStatKnowledge)        ;knowledge
-  ld    h,0
+  ld    de,ItemIntelligencePointsTable
+  call  SetAdditionalStatFromInventoryItemsInHL
+  ld    e,(ix+HeroStatKnowledge)        ;knowledge
+  ld    d,0
+  add   hl,de
   ld    b,234+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
 
-  ld    l,(ix+HeroStatSpelldamage)      ;spell damage
-  ld    h,0
+  ld    de,ItemSpellDamagePointsTable
+  call  SetAdditionalStatFromInventoryItemsInHL
+  ld    e,(ix+HeroStatSpelldamage)      ;spell damage
+  ld    d,0
+  add   hl,de
   ld    b,243+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
   ret
+
+SetAdditionalStatFromInventoryItemsInHL:
+  ld    ix,(plxcurrentheroAddress)
+
+  ld    b,05                            ;total amount of items (per inventory slot)
+  ld    c,0                             ;item number
+  ld    hl,0                            ;stat bonus
+
+  call  .loop                           ;sword
+  call  .loop                           ;armor
+  call  .loop                           ;shield
+  call  .loop                           ;helmet
+  call  .loop                           ;boots
+  call  .loop                           ;gloves
+  call  .loop                           ;ring
+  call  .loop                           ;neclace
+  call  .loop                           ;rober
+  ld    ix,(plxcurrentheroAddress)
+  ret
+
+  .loop:
+  call  .Check
+  inc   de                              ;next item in table
+  inc   c                               ;next item number
+  djnz  .loop
+
+  inc   ix
+  ld    b,05                            ;total amount of items (per inventory slot)
+  ret
+
+  .Check:
+  ld    a,(ix+HeroInventory+0)          ;sword
+  cp    c                               ;item number
+  ret   nz
+  ld    a,(de)                          ;amount of damage this item provides
+  push  bc
+  ld    b,0
+  ld    c,a
+  add   hl,bc
+  pop   bc
+  ret  
+
+ItemSpellDamagePointsTable:
+;sword (0)
+  db    0
+  db    0
+  db    0
+  db    ButterflySpellDamage ;(1)
+  db    0
+;armor (5)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;shield (10)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;helmet (15)
+  db    YattaShiNeSpellDamage ;(2)
+  db    0
+  db    0
+  db    0
+  db    0
+;boots (20)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;gloves (25)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;ring (30)
+  db    SmallRingSpellDamage ;(3)
+  db    0
+  db    ScarletRingSpellPower ;(2)
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    NegligeeOfTeethSpellPower ;(3)
+  db    0
+  db    TheChokerSpellPower ;(6)
+;robe (40)
+  db    0
+  db    0
+  db    EnchantedRobeSpellPower ;(4)
+  db    0
+  db    LabCoatSpellPower ;(7)
+  
+ItemIntelligencePointsTable:
+;sword (0)
+  db    0
+  db    0
+  db    0
+  db    ButterflyIntelligence ;(1)
+  db    0
+;armor (5)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;shield (10)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;helmet (15)
+  db    0
+  db    0
+  db    CerebroIntelligence ;(6)
+  db    0
+  db    0
+;boots (20)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;gloves (25)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    EmeraldGlovesIntelligence ;(3)
+;ring (30)
+  db    0
+  db    CyclopsIntelligence ;(4)
+  db    0
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    NegligeeOfTeethIntelligence ;(3)
+  db    0
+  db    0
+;robe (40)
+  db    0
+  db    PriestsCopeIntelligence ;(1)
+  db    0
+  db    0
+  db    0
+  
+ItemDefencePointsTable:
+;sword (0)
+  db    0
+  db    0
+  db    0
+  db    ButterflyDefence ;(1)
+  db    0
+;armor (5)
+  db    RegaliaDiPlebDefence ;(3)
+  db    YoungBloodsArmorDefence ;(4)
+  db    TheJuggernautDefence ;(4)
+  db    YojumboTheRoninDefence ;(3)
+  db    CeasarsChestplateDefence ;(3)
+;shield (10)
+  db    0
+  db    WoodenShieldDefence ;(4)
+  db    TheBramStokerDefence ;(3)
+  db    0
+  db    TrainingShieldDefence ;(3)
+;helmet (15)
+  db    YattaShiNeDefence ;(2)
+  db    0
+  db    0
+  db    TheViridescentDefence ;(3)
+  db    PikemensHelmetDefence ;(2)
+;boots (20)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;gloves (25)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;ring (30)
+  db    0
+  db    0
+  db    ScarletRingDefence ;(2)
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;robe (40)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+  
+ItemAttackPointsTable:
+;sword (0)
+  db    DaggerTimeAttack ;(4)
+  db    SwordOfBahrainAttack;(5)
+  db    HellSlayerAttack;(7)
+  db    ButterflyAttack;(1)
+  db    SwiftbladeAttack;(3)
+;armor (5)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;shield (10)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;helmet (15)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;boots (20)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;gloves (25)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;ring (30)
+  db    0
+  db    0
+  db    ScarletRingAttack ;(2)
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;robe (40)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+
 
 SetHeroPortrait10x18:
   ld    ix,(plxcurrentheroAddress)
@@ -2093,6 +2372,10 @@ HeroButton20x11SYSXUltrabox:        db  %1100 0011 | dw $4000 + (088*128) + (000
 
 HeroLevelUpCode:
 call ScreenOn
+
+  ld    a,r
+  ld    (framecounter),a                ;sloppy code to randomise framecounter, which then provides us our random Primairy Skill Up
+
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a  
   ld    ix,GenericButtonTable
@@ -2175,10 +2458,12 @@ call ScreenOn
   jr    z,.LeftSkillButton
   
   .RightSkillButton:                    ;right skill button pressed
-  ret
+  ld    a,(SkillInLevelUpSlot2)
+  jp    SetLevelUpHeroSkillsInTable
 
   .LeftSkillButton:
-  ret
+  ld    a,(SkillInLevelUpSlot1)
+  jp    SetLevelUpHeroSkillsInTable
   
   .VButton:
   pop   af                              ;end DisplayLevelUpCode
@@ -2199,6 +2484,68 @@ call ScreenOn
   ld    b,a
   ld    a,(PlaceSkillInLevelUpSlot1IntoWhichHeroSlot?)
   jp    AddThisSkillToHero
+
+SetLevelUpHeroSkillsInTable:
+  ex    af,af'
+  ld    a,HeroOverviewCodeBlock         ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ex    af,af'
+  ld    de,TextSkillsWindowButton1
+  call  .SetheroSkill
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  ld    hl,$4000 + (147*128) + (006/2) - 128
+  ld    de,$0000 + (162*128) + (028/2) - 128
+  ld    bc,$0000 + (020*256) + (148/2)
+  ld    a,LevelUpBlock         ;font graphics block
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    b,030                           ;dx
+  ld    c,162                           ;dy
+  ld    hl,TextSkillsWindowButton1+LenghtTextSkillsDescription
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  call  SwapAndSetPage                  ;swap and set page
+
+  ld    hl,$4000 + (147*128) + (006/2) - 128
+  ld    de,$0000 + (162*128) + (028/2) - 128
+  ld    bc,$0000 + (020*256) + (148/2)
+  ld    a,LevelUpBlock         ;font graphics block
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    b,030                           ;dx
+  ld    c,162                           ;dy
+  ld    hl,TextSkillsWindowButton1+LenghtTextSkillsDescription
+  jp    SetText                         ;in: b=dx, c=dy, hl->text  
+
+  .SetheroSkill:
+  ld    l,a
+  ld    h,0
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  push  hl
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
+  pop   bc
+  add   hl,bc                           ;*136
+  ld    bc,SkillEmpty+$4000
+  add   hl,bc
+  ld    bc,LenghtSkillDescription
+  ldir
+  ret
+
+
+
+
+
+
+
+
 
 AddThisSkillToHero:
   cp    1
@@ -3019,8 +3366,8 @@ SetLevelUpText:
   ld    c,071+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    a,(framecounter)
-  and   3
+  call  SetPrimairySkillLevelUpInA
+  or    a
   ld    hl,TextLevelUp5a                ;attack
   jr    z,.PrimairySkillUpFound
   dec   a
@@ -3200,14 +3547,14 @@ SetLevelUpGraphics:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetPrimairySkillUpIcon:
-  ld    a,(framecounter)
-  and   3
+  call  SetPrimairySkillLevelUpInA
+  or    a                               ;attack
   ld    hl,$4000 + (132*128) + (090/2) - 128 ;attack
   jr    z,.PrimairySkillUpFound
-  dec   a
+  dec   a                               ;defence
   ld    hl,$4000 + (132*128) + (106/2) - 128 ;defense
   jr    z,.PrimairySkillUpFound
-  dec   a
+  dec   a                               ;knowledge
   ld    hl,$4000 + (132*128) + (122/2) - 128 ;knowledge
   jr    z,.PrimairySkillUpFound
   ld    hl,$4000 + (132*128) + (138/2) - 128 ;spell power
@@ -3222,33 +3569,55 @@ IncreasePrimairySkill:
   ld    a,3
  	ld		(SetHeroArmyAndStatusInHud?),a
 
-  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
-
-  ld    a,(framecounter)
-  and   3                         ;attack
+  call  SetPrimairySkillLevelUpInA
+  or    a                               ;attack
   jr    z,.AttackUp
-  dec   a
+  dec   a                               ;defence
   jr    z,.DefenseUp
-  dec   a
+  dec   a                               ;knowledge
   jr    z,.KnowledgeUp
 
-  .SpellDamageUp:
+  .SpellDamageUp:                       ;spell damage
   inc   (ix+HeroStatSpellDamage)
   ret
-
   .KnowledgeUp:
   inc   (ix+HeroStatKnowledge)
   ret
-
   .DefenseUp:
   inc   (ix+HeroStatDefense)
   ret
-
   .AttackUp:
   inc   (ix+HeroStatAttack)
   ret
 
+PrimairySkillLevelUpMight:
+  db    0,1,0,1,0,1,2,3
+PrimairySkillLevelUpAdventure:
+  db    0,1,2,3,0,1,2,3
+PrimairySkillLevelUpWizzardry:
+  db    2,3,2,3,2,3,0,1
 
+SetPrimairySkillLevelUpInA:
+  ld    ix,(plxcurrentheroAddress)      ;
+
+  ld    a,(ix+HeroSkills+0)             ;1-3=knight|4-6=barbarian|7-9=death knight|10-12=overlord       |      13-15=alchemist|16-18=sage|19-21=ranger      |      22-24=wizzard|25-27=battle mage|28-30=scholar|31-33=necromancer       
+  ;the first skill the hero has tells us which class this hero is
+  cp    13
+  ld    hl,PrimairySkillLevelUpMight
+  jp    c,.ClassFound
+  cp    22
+  ld    hl,PrimairySkillLevelUpAdventure
+  jp    c,.ClassFound
+  ld    hl,PrimairySkillLevelUpWizzardry
+  .ClassFound:
+
+  ld    a,(framecounter)
+  and   7
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    a,(hl)
+  ret
 
 
 
@@ -3266,10 +3635,10 @@ call ScreenOn
 
   call  SetChestButtons
   
-  call  SetChestGraphics               ;put gfx
+  call  SetChestGraphics                ;put gfx
   call  SetChestText
   call  SwapAndSetPage                  ;swap and set page
-  call  SetChestGraphics               ;put gfx
+  call  SetChestGraphics                ;put gfx
   call  SetChestText
 
   .engine:  
@@ -7425,10 +7794,51 @@ CastleOverviewTavernCode:
   ld    a,(hl)
   ld    (ix+HeroSkills),a
   
+  ;set hero primairy skills
+  inc   hl                              ;hero number
+  ld    a,(hl)
+  dec   a
+  ld    b,0
+  ld    c,a
+  ld    de,11
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ;there are 11 hero classes, we divide hero number by 11, the rest is then our class
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  ld    de,.HeroSkillPerClassTable
+  add   hl,de
+  ld    a,(hl)
+  ld    (ix+HeroStatAttack),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatDefense),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatKnowledge),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatSpellDamage),a
+  
   ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
   ld    a,(iy+CastleLevel1Units)        ;castle x  
   ld    (ix+HeroUnits),a
   ret
+  
+  .HeroSkillPerClassTable:
+;       A D I S
+  db    2,1,1,1                         ;knight (Archery)
+  db    3,1,1,0                         ;barbarian (Offence)
+  db    1,3,1,0                         ;shieldbearer(Armourer)
+  db    1,2,1,1                         ;overlord (Resistance)
+  
+  db    1,2,1,1                         ;alchemist (Estates)
+  db    1,1,2,1                         ;sage (Learning)
+  db    2,1,1,1                         ;ranger (Logistics)
+  
+  db    0,0,3,2                         ;wizzard (Intelligence)
+  db    1,0,1,3                         ;battle mage (Sorcery)
+  db    0,1,2,2                         ;scholar (Wisdom)
+  db    1,1,2,1                         ;necromancer (Necromancy)
   
   .Reduce2000Gold:
   call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
