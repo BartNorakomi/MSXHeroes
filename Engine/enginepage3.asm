@@ -6,8 +6,9 @@ InitiateGame:
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
 
-  ld    hl,pl1hero1y
+  ld    hl,0
   ld    (plxcurrentheroAddress),hl
+  ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
 
 StartGame:

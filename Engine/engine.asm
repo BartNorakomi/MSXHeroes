@@ -178,6 +178,18 @@ MiniMapSquareIconInteraction:
   ret   m
   ld    (SetMiniMap?),a
 
+  ld    a,(spat+1)                      ;x mouse
+  sub   200
+  ret   c
+  ld    b,a
+  add   a,a                             ;*2
+  add   a,b                             ;*3
+  cp    117
+  jr    c,.EndCheckOverFlowX
+  ld    a,116
+  .EndCheckOverFlowX:
+  ld    (mappointerx),a
+
   ld    a,(spat+0)                      ;y mouse
   sub   9
   jr    nc,.notcarry
@@ -191,17 +203,6 @@ MiniMapSquareIconInteraction:
   ld    a,116
   .EndCheckOverFlowY:
   ld    (mappointery),a
-
-  ld    a,(spat+1)                      ;x mouse
-  sub   200
-  ld    b,a
-  add   a,a                             ;*2
-  add   a,b                             ;*3
-  cp    117
-  jr    c,.EndCheckOverFlowX
-  ld    a,116
-  .EndCheckOverFlowX:
-  ld    (mappointerx),a
   ret
 
 SetMiniMap?: db  0
@@ -1024,11 +1025,11 @@ CheckEnterTradeMenuBetween2FriendlyHeroes:
 ;call ScreenOn
 ;jp    EnterTradeMenuBetween2FriendlyHeroes
 
-  ld    a,(HeroCollidesWithFriendlyHero?)
-  or    a
-  ret   z
-  xor   a
+  ld    a,(HeroCollidesWithFriendlyHero?);
+  dec   a
+  ret   m
   ld    (HeroCollidesWithFriendlyHero?),a
+  jp    nz,DisableScrollScreen
   jp    EnterTradeMenuBetween2FriendlyHeroes
 
 CheckHeroCollidesWithFriendlyHero:      ;out: carry=Hero Collides With Friendly Hero
@@ -1561,7 +1562,8 @@ ActivateFirstActiveHeroForCurrentPlayer:
 ;ld ix,pl1hero2y
   ld    (plxcurrentheroAddress),ix  
 	call	FirstHeroWindowClicked          ;if possible click first window to center screen for this hero. hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.                                      
-
+  xor   a
+  ld    (SetHeroOverViewMenu?),a
 
   InitiatePlayerTurn:
 	ld		a,2							                ;reset all lit hero windows
@@ -1719,7 +1721,8 @@ centrescreenforthishero:
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
-  push  ix
+  ld    hl,(plxcurrentheroAddress)
+  push  hl
   ld    (plxcurrentheroAddress),ix
 
 	ld		a,(mappointery)
@@ -1960,7 +1963,7 @@ movehero:
 	sub		a,c                             ;add x movement
 	ld		(ix+HeroX),a
 
-  ld    a,1
+  ld    a,3
   ld    (HeroCollidesWithFriendlyHero?),a
   ld    a,1
 	ld		(ChangeManaAndMovement?),a  
@@ -4560,13 +4563,13 @@ EmptyHeroRecruitedAtTavern:
 .HeroSpecificInfo: ds 2
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero1y:		db	0
-pl1hero1x:		db	7
+pl1hero1y:		db	3
+pl1hero1x:		db	2
 pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
 pl1hero1mana:	db	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1 ;31	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	254 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1

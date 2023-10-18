@@ -888,15 +888,16 @@ SettavernHeroSkill:
   add   hl,hl                           ;*2
   add   hl,hl                           ;*4
   add   hl,hl                           ;*8
+  push  hl
   add   hl,hl                           ;*16
   add   hl,hl                           ;*32
-  push  hl
   add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
   pop   de
-  add   hl,de                           ;*96
+  add   hl,de                           ;*136
   ld    de,SkillEmpty+$4000
   add   hl,de
-  
+
   call  SetText                         ;in: b=dx, c=dy, hl->text
   pop   ix                              ;tavern hero table
   ret
@@ -1222,6 +1223,7 @@ EndTurn:
   inc   hl
   ld    (Date),hl
   call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
+  call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
   .EndCheckIncreaseDate:  
   
   call  AddCastlesIncomeToPlayer        ;add total income of castles
@@ -1231,6 +1233,36 @@ EndTurn:
   call  ActivateFirstActiveHeroForCurrentPlayer
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
+  ret
+
+RefillManaHeroesInCastles:
+  ld    ix,pl1hero1y
+  call  .RefillThisPlayer
+  ld    ix,pl2hero1y
+  call  .RefillThisPlayer
+  ld    ix,pl3hero1y
+  call  .RefillThisPlayer
+  ld    ix,pl4hero1y
+;  call  .RefillThisPlayer
+
+  .RefillThisPlayer:
+  ld    b,amountofheroesperplayer
+  ld    de,lenghtherotable
+  
+  .loop:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    2
+  jr    z,.Refill
+  cp    254
+  jr    z,.Refill
+  add   ix,de
+  djnz  .loop  
+  ret
+
+  .Refill:
+  ld    a,(ix+HeroTotalMana)
+  ld    (ix+HeroMana),a
+  djnz  .loop  
   ret
 
 SetAndRotateTavernHeroes:               ;At start of player 1's turn, rotate all tavern heroes
@@ -12435,11 +12467,11 @@ TextMagicGuildLevel1:
                           db  "spells to the",254
                           db  "magic guild",254
                           db  " ",254
-                          db  "Visiting heroes",254
-                          db  "can learn these",254
-                          db  "spells if the",254
-                          db  "skill requirements",254
-                          db  "are met",254
+                          db  "An overnight stay",254
+                          db  "at the Castle",254
+                          db  "completely refills",254
+                          db  "heroes' magic",254
+                          db  "points.",254
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",254

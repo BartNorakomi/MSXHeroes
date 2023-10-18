@@ -3350,6 +3350,8 @@ Set16x30HeroIconAtHeroOverviewCode:
 	ret
 
 HeroOverviewCode:
+call screenon
+
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
