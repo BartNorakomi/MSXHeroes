@@ -8,6 +8,7 @@ InitiateGame:
 
   ld    hl,pl1hero1y
   ld    (plxcurrentheroAddress),hl
+  call  SpriteInitialize                ;set color, attr and char addresses
 
 StartGame:
   call  SetScreenOff
@@ -21,12 +22,14 @@ StartGame:
   ld    hl,World1Palette
   call  SetPalette  
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
-  call  SpriteInitialize                ;set color, attr and char addresses
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
   call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
   call  ClearMapPage0AndMapPage1
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+;  call  OneTimeCharAndColorSprites
 
   ld    hl,Castle1
   ld    (WhichCastleIsPointerPointingAt?),hl
@@ -1590,6 +1593,10 @@ EnterHeroOverviewMenu:
   ld    (MenuOptionSelected?Backup),a   ;which inventory slot has been clicked (count from rightbottom to lefttop)
   ld    (MenuOptionSelected?BackupLastFrame),a
 
+  xor   a
+  ld    (SetHeroOverViewMenu?),a
+
+
   call  HeroOverviewCode
 ;  call  HeroOverviewSkillsWindowCode
 ;  call  HeroOverviewSpellBookWindowCode_Earth
@@ -1599,7 +1606,6 @@ EnterHeroOverviewMenu:
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-  ld    (SetHeroOverViewMenu?),a
 
   ld    hl,CursorBoots
   ld    (CurrentCursorSpriteCharacter),hl
@@ -1625,6 +1631,20 @@ EnterHeroOverviewMenu:
 	ld		(ControlsOnInterrupt),a
   ret
 
+SetSpatInCastle:
+  ld    hl,SpatInCastle
+  ld    de,spat + (3*4)
+  ld    bc,13*4
+  ldir
+  ret
+
+SetSpatInGame:
+  ld    hl,SpatInGame
+  ld    de,spat + (3*4)
+  ld    bc,13*4
+  ldir
+  ret
+
 EnterCastle:
   ld    a,2
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
@@ -1640,7 +1660,10 @@ EnterCastle:
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
+  call  SetSpatInCastle
   call  CastleOverviewCode
+  call  SetSpatInGame
+
 ;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
@@ -1670,7 +1693,54 @@ EnterCastle:
 	ld		(ControlsOnInterrupt),a
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
-  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
+
+	ld		a,(mappointery)
+	ld    b,a
+	ld		a,(mappointerx)
+  ld    c,a
+  push  bc  
+  
+  call  SetScreenOff
+  ld    hl,World1Palette
+  call  SetPalette  
+  call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
+  call  SetInterruptHandler             ;set Vblank
+  call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
+  call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
+  call  InitiatePlayerTurn              ;reset herowindowpointer, set hero, center screen
+  call  ClearMapPage0AndMapPage1
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+;  call  OneTimeCharAndColorSprites
+
+
+  ld    hl,0
+  ld    (CurrentCursorSpriteCharacter),hl
+
+  
+  pop   bc  
+  ld    a,b
+	ld		(mappointery),a
+	ld    a,c
+	ld		(mappointerx),a
+
+  jp    LevelEngine
+
+
+;  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SwapAndSetPage:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
@@ -2347,9 +2417,9 @@ freezecontrols?:          db  0
 ;		  F5	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
 PopulateControls:
-;  ld    a,(freezecontrols?)
-;  or    a
-;  jp    nz,.freezecontrols
+  ld    a,(freezecontrols?)
+  or    a
+  jp    nz,.freezecontrols
 
 ;	ld		a,(NewPrContr)
 ;	ld		(NewPrContrOld),a
@@ -2422,11 +2492,11 @@ PopulateControls:
 ;  ld    (DoubleTapCounter),a
 	ret
 
-;.freezecontrols:
-;  xor   a
-;	ld		(Controls),a
-;	ld		(NewPrContr),a
-;  ret
+.freezecontrols:
+  xor   a
+	ld		(Controls),a
+	ld		(NewPrContr),a
+  ret
 
 
 PopulateControlsOnInterrupt:	
@@ -2489,7 +2559,7 @@ PopulateControlsOnInterrupt:
 	ld		a,(hl)
 	xor		b
 	and		b
-	ld		(NewPrContrControlsOnInterrupt),a
+	ld		(NewPrControlsOnInterrupt),a
 	ld		(hl),b
 
 	ld		a,(keys+6)
@@ -2621,7 +2691,7 @@ NewPrContr:	                rb		1
 oldControls: 				        rb    1
 
 ControlsOnInterrupt:	                  rb		1
-NewPrContrControlsOnInterrupt:	        rb		1
+NewPrControlsOnInterrupt:	        rb		1
 
 endenginepage3variables:  equ $+enginepage3length
 org variables

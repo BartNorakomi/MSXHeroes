@@ -9,10 +9,12 @@ LevelEngine:
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
+  call  MiniMapSquareIconInteraction
   call  CheckEnterTradeMenuBetween2FriendlyHeroes
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
+  call  MoveMiniMapSquareIcon
 
   call  CheckEnterCastle                ;check if pointer is on castle, and mouse button is pressed
 
@@ -26,6 +28,9 @@ LevelEngine:
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
   .EndHeroChecks:
+
+;  call  SetSpatInGame
+
 
   call  putbottomobjects
 	call	putbottomcastles
@@ -82,13 +87,15 @@ LevelEngine:
 ;ld a,r
 ;ld    (framecounter),a
 
+;call Backdrop
 
 
   jp    LevelEngine
 
+
+
 PreviousVblankIntFlag:  db  1
 page1bank:  ds  1
-
 vblank:
   push  bc
   push  de
@@ -111,6 +118,7 @@ vblank:
   call  PopulateControlsOnInterrupt     ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
+  call  MiniMapSquareIconInteractionOnInterrupt
 
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
@@ -125,6 +133,7 @@ vblank:
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 	call	checktriggermapscreen           ;this needs to be on the interrupt for accurate readout of keypresses per frame
+  call  checktriggerhud                 ;this needs to be on the interrupt for accurate readout of keypresses per frame
 
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
@@ -159,6 +168,264 @@ vblank:
   pop   af 
   ei
   ret
+
+
+
+; right limit mouse = 235
+MiniMapSquareIconInteraction:
+  ld    a,(SetMiniMap?)
+  dec   a
+  ret   m
+  ld    (SetMiniMap?),a
+
+  ld    a,(spat+0)                      ;y mouse
+  sub   9
+  jr    nc,.notcarry
+  xor   a
+  .notcarry:
+  ld    b,a
+  add   a,a                             ;*2
+  add   a,b                             ;*3
+  cp    117
+  jr    c,.EndCheckOverFlowY
+  ld    a,116
+  .EndCheckOverFlowY:
+  ld    (mappointery),a
+
+  ld    a,(spat+1)                      ;x mouse
+  sub   200
+  ld    b,a
+  add   a,a                             ;*2
+  add   a,b                             ;*3
+  cp    117
+  jr    c,.EndCheckOverFlowX
+  ld    a,116
+  .EndCheckOverFlowX:
+  ld    (mappointerx),a
+  ret
+
+SetMiniMap?: db  0
+LockMiniMapOn?: db  0  
+MiniMapSquareIconInteractionOnInterrupt:
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(ControlsOnInterrupt)
+  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  jr    z,.LockOff
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    48
+  jr    c,.endCheckWithinYRange
+  ld    a,(LockMiniMapOn?)
+  or    a
+  ret   z
+
+  ld    a,48
+  ld    (spat+0),a                      ;y mouse
+  ld    (spat+4),a                      ;y mouse
+  ld    (spat+8),a                      ;y mouse
+  .endCheckWithinYRange:
+
+  ld    a,(spat+1)                      ;x mouse
+  cp    200
+  jr    nc,.endCheckWithinXRange
+  ld    a,(LockMiniMapOn?)
+  or    a
+  ret   z
+
+  ld    a,200
+  ld    (spat+1),a                      ;x mouse
+  ld    (spat+5),a                      ;x mouse
+  ld    (spat+9),a                      ;x mouse
+  .endCheckWithinXRange:
+
+  ld    a,1
+  ld    (LockMiniMapOn?),a
+  ld    (SetMiniMap?),a
+  ret
+
+  .LockOff:
+  xor   a
+  ld    (LockMiniMapOn?),a
+  ret
+
+;mappointer x goes from 0 to 116
+;mappointer y goes from 0 to 116, so a 117x117 grid
+;white square can move 40 pixels horizontally and vertically, so 39x39 grid
+;so if we divide the mappointers by 3, we have the minimapsquare icons movement offsets
+MoveMiniMapSquareIcon:
+  ld    a,(mappointery)
+  ld    e,a
+  ld    c,3
+  call  Div8
+  add   a,004
+  ld    (spat+60),a                     ;y
+
+  ld    a,(mappointerx)
+  ld    e,a
+  ld    c,3
+  call  Div8
+  add   a,196
+  ld    (spat+61),a                     ;x
+  ret
+
+;
+; Divide 8-bit values
+; In: Divide E by divider C
+; Out: A = result, B = rest
+;
+Div8:
+    xor a
+    ld b,8
+Div8_Loop:
+    rl e
+    rla
+    sub c
+    jr nc,Div8_NoAdd
+    add a,c
+Div8_NoAdd:
+    djnz Div8_Loop
+    ld b,a
+    ld a,e
+    rla
+    cpl
+    ret
+
+Backdrop:
+  ld    a,r
+  di
+  out   ($99),a
+  ld    a,7+128
+  ei
+  out   ($99),a	
+  ret
+
+
+
+WhichHudButtonClicked?: db  0
+checktriggerhud:
+
+;  ld    de,CursorHand  
+;  ld    hl,(CurrentCursorSpriteCharacter)
+;  call  CompareHLwithDE
+;  ret   nz
+;	ld		a,(movehero?)                   ;stop hero movement
+;  or    a
+;  ret   nz
+
+  ld    ix,GenericButtonTable3
+  call  .CheckButtonMouseInteractionGenericButtons
+  call  CheckIfHeroButtonShouldRemainLit
+  
+  ret
+
+;  call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
+;  ret
+
+;.CheckButtonClicked:
+;  ret   nc                              ;carry=button pressed, b=which button
+;  ld    a,b
+;  ld    (WhichHudButtonClicked?),a      ;gets handled in the hudcode
+;  ret  
+
+;****************** This is a slightly optimised variant of the one in CastleOverviewCode ***********************
+.CheckButtonMouseInteractionGenericButtons:
+  ld    b,(ix+GenericButtonAmountOfButtons)
+  ld    de,GenericButtonTableLenghtPerButton
+
+  .loop:
+  call  .check
+  add   ix,de
+  djnz  .loop
+  ret
+  
+  .check:
+
+;  bit   7,(ix+GenericButtonStatus)      ;check if button is on/off
+;  ret   z                               ;don't handle button if this button is off
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+GenericButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+  
+  cp    (ix+GenericButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(ControlsOnInterrupt)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+GenericButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrControlsOnInterrupt)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+GenericButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+  pop   af                                ;no need to check the other buttons
+  ld    (ix+GenericButtonStatus),%1010 0011
+;  scf                                     ;button has been clicked
+ 
+  ld    a,b
+  ld    (WhichHudButtonClicked?),a      ;gets handled in the hudcode
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 vblankintflag:  db  0
 ;lineintflag:  db  0
@@ -693,6 +960,7 @@ DisableScrollScreen:
 EnableScrollScreen:
   xor   a
   ld    (DisableScrollScreen?),a
+  ld    (freezecontrols?),a
   ret
 
 HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
@@ -1413,16 +1681,6 @@ ThirdHeroWindowClicked:
 
 	ld		a,3
 	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
-	ld		a,2							                ;reset all lit hero windows
-	ld		(ButtonHeroWindow1+ButtonLit?),a
-	ld		(ButtonHeroWindow2+ButtonLit?),a
-	ld		(ButtonHeroWindow3+ButtonLit?),a
-
-  ld    (plxcurrentheroAddress),ix
-  ld    a,3
-	ld		(SetHeroArmyAndStatusInHud?),a
-
-;	ld		b,2*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
 
 SecondHeroWindowClicked:
@@ -1435,16 +1693,6 @@ SecondHeroWindowClicked:
 
 	ld		a,2
 	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
-	ld		a,2							                ;reset all lit hero windows
-	ld		(ButtonHeroWindow1+ButtonLit?),a
-	ld		(ButtonHeroWindow2+ButtonLit?),a
-	ld		(ButtonHeroWindow3+ButtonLit?),a
-
-  ld    (plxcurrentheroAddress),ix
-  ld    a,3
-	ld		(SetHeroArmyAndStatusInHud?),a
-
-;	ld		b,1*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero
 
 FirstHeroWindowClicked:                        ;hero window 1 is clicked. check status and set hero. lite up button constantly. center screen for this hero.
@@ -1457,16 +1705,6 @@ FirstHeroWindowClicked:                        ;hero window 1 is clicked. check 
 
 	ld		a,1
 	ld		(currentherowindowclicked),a    ;hero window 1 should be lit constantly
-	ld		a,2							                ;reset all lit hero windows
-	ld		(ButtonHeroWindow1+ButtonLit?),a
-	ld		(ButtonHeroWindow2+ButtonLit?),a
-	ld		(ButtonHeroWindow3+ButtonLit?),a
-
-  ld    (plxcurrentheroAddress),ix
-  ld    a,3
-	ld		(SetHeroArmyAndStatusInHud?),a
-
-;	ld		b,0*lenghtherotable		;0*lenghtherotable=pl1hero1, 1*lenghtherotable=pl1hero2
 	jp		centrescreenforthishero;
 
 CenterScreenForCurrentHero:
@@ -1474,14 +1712,53 @@ CenterScreenForCurrentHero:
   jp    centrescreenforthishero.GoCenter
 	
 centrescreenforthishero:
-;a new player is clicked, set new player as current player, and reset movement stars
-;	ld		a,b
-;	ld		(plxcurrenthero),a
+	ld		a,2							                ;reset all lit hero windows
+	ld		(ButtonHeroWindow1+ButtonLit?),a
+	ld		(ButtonHeroWindow2+ButtonLit?),a
+	ld		(ButtonHeroWindow3+ButtonLit?),a
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
 
+  push  ix
+  ld    (plxcurrentheroAddress),ix
+
+	ld		a,(mappointery)
+	ld    b,a
+	ld		a,(mappointerx)
+  ld    c,a
+  push  bc
+
+  call  .GoCenter
+
+  pop   bc
+  
+  ld    hl,(plxcurrentheroAddress)
+  pop   de
+  xor   a
+  sbc   hl,de
+  jr    nz,.AnotherHeroIsSelectedOrMappointerIsDifferent
+
+	ld		a,(mappointery)
+	ld    h,a
+	ld		a,(mappointerx)
+  ld    l,a
+  xor   a
+  sbc   hl,bc
+  jr    nz,.AnotherHeroIsSelectedOrMappointerIsDifferent
+
+  ld    a,2
+  ld    (SetHeroOverViewMenu?),a  
+  xor   a
+  ld    (freezecontrols?),a
+  ret
+
+  .AnotherHeroIsSelectedOrMappointerIsDifferent:
 	xor		a
 	ld		(putmovementstars?),a
 	ld		(movementpathpointer),a
 	ld		(movehero?),a
+  ret
+
 ;/a new player is clicked, set new player as current player, and reset movement stars	
 .GoCenter:
 
@@ -2011,9 +2288,16 @@ CheckEnterHeroOverviewMenu:             ;check if pointer is on hero (hand icon)
 
 GoCheckEnterHeroOverviewMenu:
   ld    a,(SetHeroOverViewMenu?)
-  or    a
-  ret   z
+  dec   a
+  ret   m
+  ld    (SetHeroOverViewMenu?),a
+  jp    nz,DisableScrollScreen  
   jp    EnterHeroOverviewMenu           ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
+
+;  ld    a,(SetHeroOverViewMenu?)
+;  or    a
+;  ret   z
+;  jp    EnterHeroOverviewMenu           ;at this point pointer is on hero, and player clicked mousebutton, so enter hero overview menu
 
 ;mouseposy:		ds	1
 ;mouseposx:		ds	1
@@ -2039,7 +2323,7 @@ checktriggermapscreen:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-	ld		a,(NewPrContrControlsOnInterrupt)
+	ld		a,(NewPrControlsOnInterrupt)
 	bit		4,a						                  ;space pressed ?
 	ret		z
 
@@ -3013,7 +3297,7 @@ ReadOutKeyboardAndMovePointer:
 ycoordinateStartPlayfield:  equ 04
 xcoordinateStartPlayfield:  equ 06
 ycoorspritebottom:	equ	180
-xcoorspriteright:	equ	235 ;-11
+xcoorspriteright:	equ	235+4
 
 GameStatus: db  0                       ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
@@ -3029,15 +3313,17 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .CastleOverview:
   ld    hl,CursorHand
-	jp		.setcharacter
-  ret
+	jp		.CastleEntry
 
   .HeroOverview:
   ld    hl,CursorHand
 	jp		.setcharacter
-  ret
 
   .Ingame:
+  ld    a,(LockMiniMapOn?)
+  or    a
+  ld    hl,CursorHand
+  jp    nz,.setcharacter
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -3418,6 +3704,11 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	jp		.setcharacter
 
 .setcharacter:                    ;in HL-> SpriteCharCursor
+  ld    de,(CurrentCursorSpriteCharacter)
+  call  CompareHLwithDE           ;only set sprite if character has changed
+  ret   z
+  add   hl,de
+  .CastleEntry:
   ld    (CurrentCursorSpriteCharacter),hl
 
 ;character
@@ -3425,10 +3716,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		hl,sprcharaddr	;sprite 0 character table in VRAM
 	call	SetVdp_Write
 
-
   ld    hl,(CurrentCursorSpriteCharacter)
 	ld		c,$98
 	call	outix96			;write sprite character of pointer and hand to vram
+;  ret
 
 ;THIS NEEDS TO BE DONE ONLY ONCE, SINCE ALL CURSOR SPRITES HAVE THE SAME COLORS
 ;color
@@ -3439,6 +3730,26 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
 	ld		hl,SpriteColCursorSprites
 	call	outix48			;write sprite color of pointer and hand to vram
+;  ret
+
+;OneTimeCharAndColorSprites:
+;Map sprites
+	xor		a				;page 0/1
+	ld		hl,sprcharaddr+(3*32)	;sprite 3 character table in VRAM
+	call	SetVdp_Write
+
+  ld    hl,SpriteCharMapSprites
+	ld		c,$98
+	call	outix208			;13sprites *16bytes =416  (write sprite color)
+	call	outix208			;13sprites *16bytes =416  (write sprite color)
+
+	xor		a				;page 0/1
+	ld		hl,sprcoladdr+(3*16)	;sprite 3 color table in VRAM
+	call	SetVdp_Write
+	ld		c,$98
+
+	ld		hl,SpriteColMapSprites
+	call	outix208			;13sprites *8bytes =208  (write sprite color)
 	ret
 
 
@@ -3476,9 +3787,26 @@ SpriteCharCursorSprites:
 	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
 SpriteColCursorSprites:
   ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
+SpriteCharMapSprites:
+	include "../sprites/MapCornerLeftTop.tgs.gen"
+	include "../sprites/MapCornerRightTop.tgs.gen"
+	include "../sprites/MapCornerLeftBottom.tgs.gen"
+	include "../sprites/MapCornerRightBottom.tgs.gen"
+	include "../sprites/MapRightSide.tgs.gen"
+	include "../sprites/MapRightSide.tgs.gen"
+	include "../sprites/MiniMapSquareIcon.tgs.gen"
+SpriteColMapSprites:
+	include "../sprites/MapCornerLeftTop.tcs.gen"
+	include "../sprites/MapCornerRightTop.tcs.gen"
+	include "../sprites/MapCornerLeftBottom.tcs.gen"
+	include "../sprites/MapCornerRightBottom.tcs.gen"
+	include "../sprites/MapRightSide.tcs.gen"
+	include "../sprites/MapRightSide.tcs.gen"
+	include "../sprites/MiniMapSquareIcon.tcs.gen"
+	
+
 
 putsprite:
-;	ld		a,1				;page 2/3
 	xor		a				;page 0/1
 	ld		hl,sprattaddr	;sprite attribute table in VRAM ($17600)
 	call	SetVdp_Write
@@ -3487,15 +3815,30 @@ putsprite:
 	call	outix128		;32 sprites
 	ret
 
-spat:						;sprite attribute table
-	db		100,100,00,0	,100,100,04,0	,100,100,08,0	,230,230,00,0
+
+
+spat:						;sprite attribute table (y,x)
+	db		100,100,00,0	,100,100,04,0	,100,100,08,0	,004,006,12,0
+	db		004,006,16,0	,004,182,20,0	,004,182,24,0	,180,006,28,0
+	db		180,006,32,0	,180,182,36,0	,180,182,40,0	,046,182,44,0
+	db		046,182,48,0	,119,182,52,0	,119,182,56,0	,025,230,60,0
+
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
+
+SpatInCastle:						;sprite attribute table (y,x)
+	db	                                             230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
+
+SpatInGame:						;sprite attribute table (y,x)
+	db		                                           004,006,12,0
+	db		004,006,16,0	,004,182,20,0	,004,182,24,0	,180,006,28,0
+	db		180,006,32,0	,180,182,36,0	,180,182,40,0	,046,182,44,0
+	db		046,182,48,0	,119,182,52,0	,119,182,56,0	,025,230,60,0
 
 DisableScrollScreen?: db  0
 scrollscreen:                           ;you can either scroll the scroll by moving with the mouse pointer to the edges of the screen, or by holding CTRL and let/right/up/down
@@ -4623,3 +4966,4 @@ ystar:				ds	1
 xstar:				ds	1
 
 currentherowindowclicked:	db	1
+

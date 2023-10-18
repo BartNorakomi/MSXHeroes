@@ -1115,6 +1115,11 @@ SetTradingHeroesInventoryIcons:
                     dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
                     dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
 
+
+
+
+
+
 UpdateHudCode:
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a  
@@ -1127,12 +1132,12 @@ HudCode:
   call  SetResources
 
   ;handle all hud buttons
-  ld    ix,GenericButtonTable3
-  call  CheckButtonMouseInteractionGenericButtons
+;  ld    ix,GenericButtonTable3
+;  call  CheckButtonMouseInteractionGenericButtons
   call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
 
 	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
-  call  CheckIfHeroButtonShouldRemainLit
+;  call  CheckIfHeroButtonShouldRemainLit
 	call	SetManaAndMovementBars          ;erase hero mana and movement bars, then set the mana and movement bars of the heroes
 
   ld    ix,GenericButtonTable3
@@ -1140,8 +1145,24 @@ HudCode:
   ;/handle all hud buttons
   ret
 
-.CheckButtonClicked:
-  ret   nc                              ;carry=button pressed, b=which button
+.CheckButtonClicked:  
+  ld    a,(WhichHudButtonClicked?)
+  or    a
+  ret   z
+  ld    b,a
+  xor   a
+  ld    (WhichHudButtonClicked?),a
+
+
+
+
+
+;  ret   nc                              ;carry=button pressed, b=which button
+
+
+
+
+
 
   ld    a,b
   cp    12
@@ -1207,7 +1228,10 @@ EndTurn:
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
-  jp    ActivateFirstActiveHeroForCurrentPlayer
+  call  ActivateFirstActiveHeroForCurrentPlayer
+  xor   a
+  ld    (SetHeroOverViewMenu?),a        ;hackjob
+  ret
 
 SetAndRotateTavernHeroes:               ;At start of player 1's turn, rotate all tavern heroes
   ld    hl,TavernHeroesPlayer1+1
@@ -2254,16 +2278,40 @@ ThirdCastleWindowClicked:
   call  SetCastleUsingCastleWindowPointerInIX
   call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
   call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle  
-  jp    centrescreenforthisCastle
+  jp    GoCenterAndCheckEnter
   
 SecondCastleWindowClicked:
   call  SetCastleUsingCastleWindowPointerInIX
   call  SetCastleUsingCastleWindowPointerInIX.SearchNextCastle
-  jp    centrescreenforthisCastle
+  jp    GoCenterAndCheckEnter
 
 FirstCastleWindowClicked:
   call  SetCastleUsingCastleWindowPointerInIX
-  jp    centrescreenforthisCastle
+;  jp    GoCenterAndCheckEnter
+
+  GoCenterAndCheckEnter:  
+	ld		a,(mappointery)
+	ld    b,a
+	ld		a,(mappointerx)
+  ld    c,a
+  push  bc  
+  
+  call  centrescreenforthisCastle
+
+  pop   bc
+  
+	ld		a,(mappointery)
+	ld    h,a
+	ld		a,(mappointerx)
+  ld    l,a
+  xor   a
+  sbc   hl,bc
+  ret   nz
+
+  ld    (WhichCastleIsPointerPointingAt?),ix
+  ld    a,1
+  ld    (EnterCastle?),a
+  ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -4272,7 +4320,7 @@ PlayerStartTurnVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouch
 
 TradeMenuCode:
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
-	ld		(SetHeroArmyAndStatusInHud?),a
+;	ld		(SetHeroArmyAndStatusInHud?),a
 	ld		(ChangeManaAndMovement?),a  
 
   ld    a,255                           ;reset previous button clicked
@@ -4287,7 +4335,6 @@ TradeMenuCode:
 
   call  SetTradingHeroesArmyButtons
   call  SetTradingHeroesInventoryButtons
-
   call  SetHeroArmyTransferGraphics     ;put gfx at (24,30)
   call  SetTradingHeroesAndArmy
   call  SetTradingHeroesInventoryIcons
@@ -4309,8 +4356,9 @@ TradeMenuCode:
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-
-
+  call  UpdateHUd
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle  
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable2
@@ -6175,59 +6223,53 @@ SetActiveTradingHeroArmyAndAmount:
   ret
 
   .army:
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXDefendingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXDefendingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXDefendingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXDefendingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXDefendingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ld    de,.DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,SetVisitingHeroArmyAndAmount.UnitSYSXTable14x24Portraits
+  ld    de,UnitSYSXTable14x14Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  push  bc
+  pop   hl
+
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
+
 
 .DYDXDefendingHeroUnit1:          equ (044*128) + (056/2) - 128      ;(dy*128 + dx/2) = (204,153)
 .DYDXDefendingHeroUnit2:          equ (044*128) + (076/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -6283,69 +6325,52 @@ SetHeroWhoGetsTradeWithArmyAndAmount:
   ret
 
   .army:
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXVisitingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXVisitingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXVisitingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXVisitingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,.DYDXVisitingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,.DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ld    de,.DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,.UnitSYSXTable14x24Portraits
+  ld    de,UnitSYSXTable14x14Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ret
+  push  bc
+  pop   hl
 
-                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
-.UnitSYSXTable14x24Portraits:  
-                dw $8000+(00*128)+(00/2)-128, $8000+(00*128)+(14/2)-128, $8000+(00*128)+(28/2)-128, $8000+(00*128)+(42/2)-128, $8000+(00*128)+(56/2)-128, $8000+(00*128)+(70/2)-128, $8000+(00*128)+(84/2)-128, $8000+(00*128)+(98/2)-128, $8000+(00*128)+(112/2)-128, $8000+(00*128)+(126/2)-128, $8000+(00*128)+(140/2)-128, $8000+(00*128)+(154/2)-128, $8000+(00*128)+(168/2)-128, $8000+(00*128)+(182/2)-128, $8000+(00*128)+(196/2)-128, $8000+(00*128)+(210/2)-128, $8000+(00*128)+(224/2)-128, $8000+(00*128)+(238/2)-128
-                dw $8000+(14*128)+(00/2)-128, $8000+(14*128)+(14/2)-128, $8000+(14*128)+(28/2)-128, $8000+(14*128)+(42/2)-128, $8000+(14*128)+(56/2)-128, $8000+(14*128)+(70/2)-128, $8000+(14*128)+(84/2)-128, $8000+(14*128)+(98/2)-128, $8000+(14*128)+(112/2)-128, $8000+(14*128)+(126/2)-128, $8000+(14*128)+(140/2)-128, $8000+(14*128)+(154/2)-128, $8000+(14*128)+(168/2)-128, $8000+(14*128)+(182/2)-128, $8000+(14*128)+(196/2)-128, $8000+(14*128)+(210/2)-128, $8000+(14*128)+(224/2)-128, $8000+(14*128)+(238/2)-128
-                dw $8000+(28*128)+(00/2)-128, $8000+(28*128)+(14/2)-128, $8000+(28*128)+(28/2)-128, $8000+(28*128)+(42/2)-128, $8000+(28*128)+(56/2)-128, $8000+(28*128)+(70/2)-128, $8000+(28*128)+(84/2)-128, $8000+(28*128)+(98/2)-128, $8000+(28*128)+(112/2)-128, $8000+(28*128)+(126/2)-128, $8000+(28*128)+(140/2)-128, $8000+(28*128)+(154/2)-128, $8000+(28*128)+(168/2)-128, $8000+(28*128)+(182/2)-128, $8000+(28*128)+(196/2)-128, $8000+(28*128)+(210/2)-128, $8000+(28*128)+(224/2)-128, $8000+(28*128)+(238/2)-128
-                dw $8000+(42*128)+(00/2)-128, $8000+(42*128)+(14/2)-128, $8000+(42*128)+(28/2)-128, $8000+(42*128)+(42/2)-128, $8000+(42*128)+(56/2)-128, $8000+(42*128)+(70/2)-128, $8000+(42*128)+(84/2)-128, $8000+(42*128)+(98/2)-128, $8000+(42*128)+(112/2)-128, $8000+(42*128)+(126/2)-128, $8000+(42*128)+(140/2)-128, $8000+(42*128)+(154/2)-128, $8000+(42*128)+(168/2)-128, $8000+(42*128)+(182/2)-128, $8000+(42*128)+(196/2)-128, $8000+(42*128)+(210/2)-128, $8000+(42*128)+(224/2)-128, $8000+(42*128)+(238/2)-128
-                dw $8000+(56*128)+(00/2)-128, $8000+(56*128)+(14/2)-128, $8000+(56*128)+(28/2)-128, $8000+(56*128)+(42/2)-128, $8000+(56*128)+(56/2)-128, $8000+(56*128)+(70/2)-128, $8000+(56*128)+(84/2)-128, $8000+(56*128)+(98/2)-128, $8000+(56*128)+(112/2)-128, $8000+(56*128)+(126/2)-128, $8000+(56*128)+(140/2)-128, $8000+(56*128)+(154/2)-128, $8000+(56*128)+(168/2)-128, $8000+(56*128)+(182/2)-128, $8000+(56*128)+(196/2)-128, $8000+(56*128)+(210/2)-128, $8000+(56*128)+(224/2)-128, $8000+(56*128)+(238/2)-128
-                dw $8000+(70*128)+(00/2)-128, $8000+(70*128)+(14/2)-128, $8000+(70*128)+(28/2)-128, $8000+(70*128)+(42/2)-128, $8000+(70*128)+(56/2)-128, $8000+(70*128)+(70/2)-128, $8000+(70*128)+(84/2)-128, $8000+(70*128)+(98/2)-128, $8000+(70*128)+(112/2)-128, $8000+(70*128)+(126/2)-128, $8000+(70*128)+(140/2)-128, $8000+(70*128)+(154/2)-128, $8000+(70*128)+(168/2)-128, $8000+(70*128)+(182/2)-128, $8000+(70*128)+(196/2)-128, $8000+(70*128)+(210/2)-128, $8000+(70*128)+(224/2)-128, $8000+(70*128)+(238/2)-128
-                dw $8000+(84*128)+(00/2)-128, $8000+(84*128)+(14/2)-128, $8000+(84*128)+(28/2)-128, $8000+(84*128)+(42/2)-128, $8000+(84*128)+(56/2)-128, $8000+(84*128)+(70/2)-128, $8000+(84*128)+(84/2)-128, $8000+(84*128)+(98/2)-128, $8000+(84*128)+(112/2)-128, $8000+(84*128)+(126/2)-128, $8000+(84*128)+(140/2)-128, $8000+(84*128)+(154/2)-128, $8000+(84*128)+(168/2)-128, $8000+(84*128)+(182/2)-128, $8000+(84*128)+(196/2)-128, $8000+(84*128)+(210/2)-128, $8000+(84*128)+(224/2)-128, $8000+(84*128)+(238/2)-128
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ret
 
 .DYDXVisitingHeroUnit1:          equ (108*128) + (056/2) - 128      ;(dy*128 + dx/2) = (204,153)
 .DYDXVisitingHeroUnit2:          equ (108*128) + (076/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -6354,6 +6379,15 @@ SetHeroWhoGetsTradeWithArmyAndAmount:
 .DYDXVisitingHeroUnit5:          equ (108*128) + (136/2) - 128      ;(dy*128 + dx/2) = (204,153)
 .DYDXVisitingHeroUnit6:          equ (108*128) + (156/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+UnitSYSXTable14x14Portraits:  
+                dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
+                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
+                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
+                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
+                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
+                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
+                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
 
 
 
@@ -8221,58 +8255,51 @@ SetDefendingHeroArmyAndAmount:
   ret
 
   .army:
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXDefendingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXDefendingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXDefendingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXDefendingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXDefendingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ld    de,DYDXDefendingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,SetVisitingHeroArmyAndAmount.UnitSYSXTable14x24Portraits
+  ld    de,UnitSYSXTable14x14Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  push  bc
+  pop   hl
+
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
 
 DYDXDefendingHeroUnit1:          equ (181*128) + (028/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -8330,69 +8357,52 @@ SetVisitingHeroArmyAndAmount:
   ret
 
   .army:
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXVisitingHeroUnit1    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXVisitingHeroUnit2    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXVisitingHeroUnit3    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXVisitingHeroUnit4    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+  ld    de,DYDXVisitingHeroUnit5    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX                        ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)    
-  ld    de,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
-  ld    hl,DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-
-  ld    a,CastleOverviewCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ld    de,DYDXVisitingHeroUnit6    ;(dy*128 + dx/2) = (204,153)
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,.UnitSYSXTable14x24Portraits
+  ld    de,UnitSYSXTable14x14Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
   ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ret
+  push  bc
+  pop   hl
 
-                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
-.UnitSYSXTable14x24Portraits:  
-                dw $8000+(00*128)+(00/2)-128, $8000+(00*128)+(14/2)-128, $8000+(00*128)+(28/2)-128, $8000+(00*128)+(42/2)-128, $8000+(00*128)+(56/2)-128, $8000+(00*128)+(70/2)-128, $8000+(00*128)+(84/2)-128, $8000+(00*128)+(98/2)-128, $8000+(00*128)+(112/2)-128, $8000+(00*128)+(126/2)-128, $8000+(00*128)+(140/2)-128, $8000+(00*128)+(154/2)-128, $8000+(00*128)+(168/2)-128, $8000+(00*128)+(182/2)-128, $8000+(00*128)+(196/2)-128, $8000+(00*128)+(210/2)-128, $8000+(00*128)+(224/2)-128, $8000+(00*128)+(238/2)-128
-                dw $8000+(14*128)+(00/2)-128, $8000+(14*128)+(14/2)-128, $8000+(14*128)+(28/2)-128, $8000+(14*128)+(42/2)-128, $8000+(14*128)+(56/2)-128, $8000+(14*128)+(70/2)-128, $8000+(14*128)+(84/2)-128, $8000+(14*128)+(98/2)-128, $8000+(14*128)+(112/2)-128, $8000+(14*128)+(126/2)-128, $8000+(14*128)+(140/2)-128, $8000+(14*128)+(154/2)-128, $8000+(14*128)+(168/2)-128, $8000+(14*128)+(182/2)-128, $8000+(14*128)+(196/2)-128, $8000+(14*128)+(210/2)-128, $8000+(14*128)+(224/2)-128, $8000+(14*128)+(238/2)-128
-                dw $8000+(28*128)+(00/2)-128, $8000+(28*128)+(14/2)-128, $8000+(28*128)+(28/2)-128, $8000+(28*128)+(42/2)-128, $8000+(28*128)+(56/2)-128, $8000+(28*128)+(70/2)-128, $8000+(28*128)+(84/2)-128, $8000+(28*128)+(98/2)-128, $8000+(28*128)+(112/2)-128, $8000+(28*128)+(126/2)-128, $8000+(28*128)+(140/2)-128, $8000+(28*128)+(154/2)-128, $8000+(28*128)+(168/2)-128, $8000+(28*128)+(182/2)-128, $8000+(28*128)+(196/2)-128, $8000+(28*128)+(210/2)-128, $8000+(28*128)+(224/2)-128, $8000+(28*128)+(238/2)-128
-                dw $8000+(42*128)+(00/2)-128, $8000+(42*128)+(14/2)-128, $8000+(42*128)+(28/2)-128, $8000+(42*128)+(42/2)-128, $8000+(42*128)+(56/2)-128, $8000+(42*128)+(70/2)-128, $8000+(42*128)+(84/2)-128, $8000+(42*128)+(98/2)-128, $8000+(42*128)+(112/2)-128, $8000+(42*128)+(126/2)-128, $8000+(42*128)+(140/2)-128, $8000+(42*128)+(154/2)-128, $8000+(42*128)+(168/2)-128, $8000+(42*128)+(182/2)-128, $8000+(42*128)+(196/2)-128, $8000+(42*128)+(210/2)-128, $8000+(42*128)+(224/2)-128, $8000+(42*128)+(238/2)-128
-                dw $8000+(56*128)+(00/2)-128, $8000+(56*128)+(14/2)-128, $8000+(56*128)+(28/2)-128, $8000+(56*128)+(42/2)-128, $8000+(56*128)+(56/2)-128, $8000+(56*128)+(70/2)-128, $8000+(56*128)+(84/2)-128, $8000+(56*128)+(98/2)-128, $8000+(56*128)+(112/2)-128, $8000+(56*128)+(126/2)-128, $8000+(56*128)+(140/2)-128, $8000+(56*128)+(154/2)-128, $8000+(56*128)+(168/2)-128, $8000+(56*128)+(182/2)-128, $8000+(56*128)+(196/2)-128, $8000+(56*128)+(210/2)-128, $8000+(56*128)+(224/2)-128, $8000+(56*128)+(238/2)-128
-                dw $8000+(70*128)+(00/2)-128, $8000+(70*128)+(14/2)-128, $8000+(70*128)+(28/2)-128, $8000+(70*128)+(42/2)-128, $8000+(70*128)+(56/2)-128, $8000+(70*128)+(70/2)-128, $8000+(70*128)+(84/2)-128, $8000+(70*128)+(98/2)-128, $8000+(70*128)+(112/2)-128, $8000+(70*128)+(126/2)-128, $8000+(70*128)+(140/2)-128, $8000+(70*128)+(154/2)-128, $8000+(70*128)+(168/2)-128, $8000+(70*128)+(182/2)-128, $8000+(70*128)+(196/2)-128, $8000+(70*128)+(210/2)-128, $8000+(70*128)+(224/2)-128, $8000+(70*128)+(238/2)-128
-                dw $8000+(84*128)+(00/2)-128, $8000+(84*128)+(14/2)-128, $8000+(84*128)+(28/2)-128, $8000+(84*128)+(42/2)-128, $8000+(84*128)+(56/2)-128, $8000+(84*128)+(70/2)-128, $8000+(84*128)+(84/2)-128, $8000+(84*128)+(98/2)-128, $8000+(84*128)+(112/2)-128, $8000+(84*128)+(126/2)-128, $8000+(84*128)+(140/2)-128, $8000+(84*128)+(154/2)-128, $8000+(84*128)+(168/2)-128, $8000+(84*128)+(182/2)-128, $8000+(84*128)+(196/2)-128, $8000+(84*128)+(210/2)-128, $8000+(84*128)+(224/2)-128, $8000+(84*128)+(238/2)-128
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ret
 
 DYDXVisitingHeroUnit1:          equ (181*128) + (156/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXVisitingHeroUnit2:          equ (181*128) + (172/2) - 128      ;(dy*128 + dx/2) = (204,153)
@@ -13007,11 +13017,9 @@ SetNameCastleAndDailyIncome:
   call  SetText
   ret
 
-
 CastleOverviewCode:                     ;in: iy-castle
   ld    a,3
 	ld		(SetResources?),a
-
 
 ;What we do here is check if visiting hero and defending hero are the same when entering and leaving castle
 ;if they are not the same, then reset active hero in game
