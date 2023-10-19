@@ -172,15 +172,6 @@ vblank:
 
 DisplayEnemyStatsRightClick?: db  0
 DisplayEnemyStatsRightClick:
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-	ld		a,(NewPrContr)
-	bit		5,a						                  ;trig-b pressed ?
-  jr    nz,.TrigBPressed
-
   ld    a,(DisplayEnemyStatsRightClick?)
   dec   a
   ret   m
@@ -193,11 +184,6 @@ DisplayEnemyStatsRightClick:
 
   ld    hl,ShowEnemyStats
   jp    EnterSpecificRoutineInCastleOverviewCode
-
-  .TrigBPressed:
-  ld    a,3
-  ld    (DisplayEnemyStatsRightClick?),a
-  ret
 
 ; right limit mouse = 235
 MiniMapSquareIconInteraction:
@@ -3581,8 +3567,23 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret   c                               ;tilenr. 128 - 224 are creatures
 
 	pop		af				                      ;pop call
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrControlsOnInterrupt)
+	bit		5,a						                  ;trig-b pressed ?
+  jr    nz,.TrigBPressed
+
   ld    hl,CursorSwords
 	jp		.setcharacter
+
+  .TrigBPressed:
+  ld    a,3
+  ld    (DisplayEnemyStatsRightClick?),a
+  ret
 
   .SetMappositionMousePointsTo:         ;(mouseposy)=mappointery + mouseposy(/16), (mouseposx)=mappointerx + mouseposx(/16)
 	ld		hl,mapdata                      ;set map pointer x

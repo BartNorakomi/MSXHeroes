@@ -939,11 +939,20 @@ call screenon
   .engine:
   call  PopulateControls                ;read out keys
 
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
   ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
-  ret   nz
-;  call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
+  and   %0011 0000
+  jr    nz,.end
   jp  .engine  
+
+  .end:
+  ld    a,%0011 0000
+	ld		(ControlsOnInterrupt),a                  ;reset trigger a
+  ret
 
 SetEnemyStatsWindow:
 
@@ -959,6 +968,8 @@ SetEnemyStatsWindow:
   ld    a,126
   .NoOverFlowRight:
 
+  push  af                              ;store x window
+
 	srl		a				                        ;/2
   ld    h,0
   ld    l,a
@@ -966,6 +977,14 @@ SetEnemyStatsWindow:
   ex    de,hl
   
 	ld		a,(spat+0)			                ;y cursor
+	ld    b,-50
+	cp    70
+	jr    nc,.CursorTopOfScreen
+	ld    b,32
+	.CursorTopOfScreen:
+	add   a,b
+	
+	
   sub   a,24
   jr    nc,.NotCarryY
   xor   a
@@ -974,6 +993,8 @@ SetEnemyStatsWindow:
   jr    c,.NoOverFlowBottom
   ld    a,119
   .NoOverFlowBottom:
+
+  push  af                              ;store y window
 
   ld    h,0
   ld    l,a
@@ -996,13 +1017,49 @@ SetEnemyStatsWindow:
   ld    a,ChestBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    a,4
+  ld    a,4                             ;unit nr
   call  SetArmyUnits.SetSYSX
   pop   de
   call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+
+  pop   af                              ;y window
+  add   a,14
+  ld    c,a
+  pop   af                              ;x window
+  add   a,16
+  ld    b,a
+  ld    a,4                             ;unit nr
+
+  push  bc
+  call  SetAvailableRecruitArmy.SetName
+  pop   bc
+
+  ld    a,c
+  add   a,43
+  ld    c,a  
+  ld    a,b
+  add   a,8
+  ld    b,a  
+
+  ld    hl,TextAHorde
+
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  pop   bc
+
+  ld    a,c
+  add   a,07
+  ld    c,a  
+  ld    a,b
+  add   a,23
+  ld    b,a  
+
+  ld    hl,4
+  call  SetNumber16BitCastle
   ret
 
-
+TextAHorde: db "A Horde",255
 
 
 
