@@ -4,7 +4,8 @@ LevelEngine:
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
-
+  call  DisplayEnemyStatsRightClick     ;when rightclicking on the map on an enemy, show their stats window
+  
   call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
@@ -169,7 +170,34 @@ vblank:
   ei
   ret
 
+DisplayEnemyStatsRightClick?: db  0
+DisplayEnemyStatsRightClick:
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+	bit		5,a						                  ;trig-b pressed ?
+  jr    nz,.TrigBPressed
 
+  ld    a,(DisplayEnemyStatsRightClick?)
+  dec   a
+  ret   m
+  ld    (DisplayEnemyStatsRightClick?),a
+  jp    nz,DisableScrollScreen  
+
+;  ld    a,1
+;  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,ShowEnemyStats
+  jp    EnterSpecificRoutineInCastleOverviewCode
+
+  .TrigBPressed:
+  ld    a,3
+  ld    (DisplayEnemyStatsRightClick?),a
+  ret
 
 ; right limit mouse = 235
 MiniMapSquareIconInteraction:

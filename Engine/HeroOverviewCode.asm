@@ -517,8 +517,6 @@ HeroOverViewArmyIconWindowButtonNX:  equ 018
 
 
 
-
-
 HeroOverviewArmyWindowCode:
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
 	ld		(SetHeroArmyAndStatusInHud?),a

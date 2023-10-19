@@ -11,6 +11,7 @@
 ;  call  DisplayScrollCode
 ;  call  DisplayChestCode
 ;  call  HeroLevelUpCode
+;  call  ShowEnemyStats
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -925,6 +926,82 @@ SetTextBuildingWhenClicked:
 ;;  call  block34                                         ;;
 ;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+ShowEnemyStats:
+call screenon
+  call  SetEnemyStatsWindow             ;show window of enemy stats
+  call  SwapAndSetPage                  ;swap and set page
+;  call  SetEnemyStatsWindow             ;show window of enemy stats
+  
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+;  call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
+  jp  .engine  
+
+SetEnemyStatsWindow:
+
+  ld    de,$0000 + (007*128) + (008/2) - 128
+
+	ld		a,(spat+1)			                ;x cursor
+  sub   32
+  jr    nc,.NotCarryX
+  xor   a
+  .NotCarryX:
+  cp    126
+  jr    c,.NoOverFlowRight
+  ld    a,126
+  .NoOverFlowRight:
+
+	srl		a				                        ;/2
+  ld    h,0
+  ld    l,a
+  add   hl,de
+  ex    de,hl
+  
+	ld		a,(spat+0)			                ;y cursor
+  sub   a,24
+  jr    nc,.NotCarryY
+  xor   a
+  .NotCarryY:
+  cp    119
+  jr    c,.NoOverFlowBottom
+  ld    a,119
+  .NoOverFlowBottom:
+
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
+  add   hl,de
+  ex    de,hl
+
+  ld    hl,24/2 + (24*128)               
+  add   hl,de  
+  push  hl
+    
+  ld    hl,$4000 + (062*128) + (174/2) - 128
+  ld    bc,$0000 + (069*256) + (062/2)
+  ld    a,ChestBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    a,4
+  call  SetArmyUnits.SetSYSX
+  pop   de
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  ret
+
 
 
 
@@ -9642,8 +9719,8 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "SKILLS INVENTORY ARMY SPELL BOOK STATUS",254
-                          db  "Skills Inventory Army Spell Book Status",254
+.DescriptionFire1:        db  "A few Several Numerous Many Lots of",254
+                          db  "A multitude of Countless A horde of",254
                           db  "Explore various building options ",254
                           db  "Take a look at the available building options. ",255
 
