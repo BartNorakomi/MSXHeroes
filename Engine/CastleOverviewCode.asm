@@ -1224,6 +1224,7 @@ EndTurn:
   ld    (Date),hl
   call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
   call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
+  call  ClearAlreadyBuiltThisTurnCastles;At start of player 1's turn, clear all these bytes
   .EndCheckIncreaseDate:  
   
   call  AddCastlesIncomeToPlayer        ;add total income of castles
@@ -1234,6 +1235,15 @@ EndTurn:
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
   ret
+
+ClearAlreadyBuiltThisTurnCastles:
+  xor   a
+  ld    (Castle1+AlreadyBuiltThisTurn?),a
+  ld    (Castle2+AlreadyBuiltThisTurn?),a
+  ld    (Castle3+AlreadyBuiltThisTurn?),a
+  ld    (Castle4+AlreadyBuiltThisTurn?),a
+  ret
+
 
 RefillManaHeroesInCastles:
   ld    ix,pl1hero1y
@@ -9874,8 +9884,82 @@ CheckButtonMouseInteractionGenericButtons:
 
   ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
   ld    (MenuOptionSelected?),a
+  ret
+
+MagicGuildButtonTableGfxBlock:  db  SpellBookGraphicsBlock
+MagicGuildButtonTableAmountOfButtons:  db  8
+MagicGuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+;level 1 spells
+EarthLevel1Button:
+  db  %1100 0011 | dw EarthLevel1Untouched   | dw EarthLevel1Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel1Y ,MagicGuildEarthLevel1Y+16 ,MagicGuildEarthLevel1X ,MagicGuildEarthLevel1X+16  | dw $0000 + (MagicGuildEarthLevel1Y*128)  + (MagicGuildEarthLevel1X/2)  - 128 |
+FireLevel1Button:
+  db  %1100 0011 | dw FireLevel1Untouched    | dw FireLevel1Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel1Y , MagicGuildFireLevel1Y+16 , MagicGuildFireLevel1X , MagicGuildFireLevel1X+16   | dw $0000 + (MagicGuildFireLevel1Y*128)  +  (MagicGuildFireLevel1X/2)  - 128  |
+AirLevel1Button:
+  db  %1100 0011 | dw AirLevel1Untouched     | dw AirLevel1Touched      | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel1Y ,  MagicGuildAirLevel1Y+16 ,  MagicGuildAirLevel1X ,  MagicGuildAirLevel1X+16    | dw $0000 + (MagicGuildAirLevel1Y*128)  +   (MagicGuildAirLevel1X/2)  - 128   |
+WaterLevel1Button:
+  db  %1100 0011 | dw WaterLevel1Untouched   | dw WaterLevel1Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel1Y, MagicGuildWaterLevel1Y+16, MagicGuildWaterLevel1X, MagicGuildWaterLevel1X+16  | dw $0000 + (MagicGuildWaterLevel1Y*128) +  (MagicGuildWaterLevel1X/2) - 128  | 
+
+;level 2 spells
+EarthLevel2Button:
+  db  %1100 0011 | dw EarthLevel2Untouched   | dw EarthLevel2Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel2Y ,MagicGuildEarthLevel2Y+16 ,MagicGuildEarthLevel2X ,MagicGuildEarthLevel2X+16  | dw $0000 + (MagicGuildEarthLevel2Y*128)  + (MagicGuildEarthLevel2X/2)  - 128 |
+FireLevel2Button:
+  db  %1100 0011 | dw FireLevel2Untouched    | dw FireLevel2Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel2Y , MagicGuildFireLevel2Y+16 , MagicGuildFireLevel2X , MagicGuildFireLevel2X+16   | dw $0000 + (MagicGuildFireLevel2Y*128)  +  (MagicGuildFireLevel2X/2)  - 128  |
+AirLevel2Button:
+  db  %1100 0011 | dw AirLevel2Untouched     | dw AirLevel2Touched      | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel2Y ,  MagicGuildAirLevel2Y+16 ,  MagicGuildAirLevel2X ,  MagicGuildAirLevel2X+16    | dw $0000 + (MagicGuildAirLevel2Y*128)  +   (MagicGuildAirLevel2X/2)  - 128   |
+WaterLevel2Button:
+  db  %1100 0011 | dw WaterLevel2Untouched   | dw WaterLevel2Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel2Y, MagicGuildWaterLevel2Y+16, MagicGuildWaterLevel2X, MagicGuildWaterLevel2X+16  | dw $0000 + (MagicGuildWaterLevel2Y*128) +  (MagicGuildWaterLevel2X/2) - 128  | 
+
+;level 3 spells
+EarthLevel3Button:
+  db  %1100 0011 | dw EarthLevel3Untouched   | dw EarthLevel3Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel3Y ,MagicGuildEarthLevel3Y+16 ,MagicGuildEarthLevel3X ,MagicGuildEarthLevel3X+16  | dw $0000 + (MagicGuildEarthLevel3Y*128)  + (MagicGuildEarthLevel3X/2)  - 128 |
+FireLevel3Button:
+  db  %1100 0011 | dw FireLevel3Untouched    | dw FireLevel3Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel3Y , MagicGuildFireLevel3Y+16 , MagicGuildFireLevel3X , MagicGuildFireLevel3X+16   | dw $0000 + (MagicGuildFireLevel3Y*128)  +  (MagicGuildFireLevel3X/2)  - 128  |
+AirLevel3Button:
+  db  %1100 0011 | dw AirLevel3Untouched     | dw AirLevel3Touched      | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel3Y ,  MagicGuildAirLevel3Y+16 ,  MagicGuildAirLevel3X ,  MagicGuildAirLevel3X+16    | dw $0000 + (MagicGuildAirLevel3Y*128)  +   (MagicGuildAirLevel3X/2)  - 128   |
+WaterLevel3Button:
+  db  %1100 0011 | dw WaterLevel3Untouched   | dw WaterLevel3Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel3Y, MagicGuildWaterLevel3Y+16, MagicGuildWaterLevel3X, MagicGuildWaterLevel3X+16  | dw $0000 + (MagicGuildWaterLevel3Y*128) +  (MagicGuildWaterLevel3X/2) - 128  | 
+
+;level 4 spells
+EarthLevel4Button:
+  db  %1100 0011 | dw EarthLevel4Untouched   | dw EarthLevel4Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel4Y ,MagicGuildEarthLevel4Y+16 ,MagicGuildEarthLevel4X ,MagicGuildEarthLevel4X+16  | dw $0000 + (MagicGuildEarthLevel4Y*128)  + (MagicGuildEarthLevel4X/2)  - 128 |
+FireLevel4Button:
+  db  %1100 0011 | dw FireLevel4Untouched    | dw FireLevel4Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel4Y , MagicGuildFireLevel4Y+16 , MagicGuildFireLevel4X , MagicGuildFireLevel4X+16   | dw $0000 + (MagicGuildFireLevel4Y*128)  +  (MagicGuildFireLevel4X/2)  - 128  |
+AirLevel4Button:
+  db  %1100 0011 | dw AirLevel4Untouched     | dw AirLevel4Touched      | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel4Y ,  MagicGuildAirLevel4Y+16 ,  MagicGuildAirLevel4X ,  MagicGuildAirLevel4X+16    | dw $0000 + (MagicGuildAirLevel4Y*128)  +   (MagicGuildAirLevel4X/2)  - 128   |
+WaterLevel4Button:
+  db  %1100 0011 | dw WaterLevel4Untouched   | dw WaterLevel4Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel4Y, MagicGuildWaterLevel4Y+16, MagicGuildWaterLevel4X, MagicGuildWaterLevel4X+16  | dw $0000 + (MagicGuildWaterLevel4Y*128) +  (MagicGuildWaterLevel4X/2) - 128  | 
+
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
 
 
+
+
+SetCastleSpellsInIX:
+  push  iy
+  pop   de
+  ld    hl,Castle1
+  ld    ix,Castle1Spells
+  call  CompareHLwithDE
+  ret   z
+
+  ld    hl,Castle2
+  ld    ix,Castle2Spells
+  call  CompareHLwithDE
+  ret   z
+
+  ld    hl,Castle3
+  ld    ix,Castle3Spells
+  call  CompareHLwithDE
+  ret   z
+
+  ld    hl,Castle4
+  ld    ix,Castle4Spells
+  call  CompareHLwithDE
+  ret   z
   ret
 
 SetMagicGuildButtons:
@@ -9883,6 +9967,62 @@ SetMagicGuildButtons:
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*8)
   ldir
+
+  call  SetCastleSpellsInIX
+  ld    de,GenericButtonTable
+
+  ;set all spells in magic guild
+  ld    hl,EarthLevel1Button
+  bit   0,(ix+0)
+  call  nz,.AddButton
+  ld    hl,FireLevel1Button
+  bit   0,(ix+1)
+  call  nz,.AddButton
+  ld    hl,AirLevel1Button
+  bit   0,(ix+2)
+  call  nz,.AddButton
+  ld    hl,WaterLevel1Button
+  bit   0,(ix+3)
+  call  nz,.AddButton
+
+  ld    hl,EarthLevel2Button
+  bit   1,(ix+0)
+  call  nz,.AddButton
+  ld    hl,FireLevel2Button
+  bit   1,(ix+1)
+  call  nz,.AddButton
+  ld    hl,AirLevel2Button
+  bit   1,(ix+2)
+  call  nz,.AddButton
+  ld    hl,WaterLevel2Button
+  bit   1,(ix+3)
+  call  nz,.AddButton
+
+  ld    hl,EarthLevel3Button
+  bit   2,(ix+0)
+  call  nz,.AddButton
+  ld    hl,FireLevel3Button
+  bit   2,(ix+1)
+  call  nz,.AddButton
+  ld    hl,AirLevel3Button
+  bit   2,(ix+2)
+  call  nz,.AddButton
+  ld    hl,WaterLevel3Button
+  bit   2,(ix+3)
+  call  nz,.AddButton
+
+  ld    hl,EarthLevel4Button
+  bit   3,(ix+0)
+  call  nz,.AddButton
+  ld    hl,FireLevel4Button
+  bit   3,(ix+1)
+  call  nz,.AddButton
+  ld    hl,AirLevel4Button
+  bit   3,(ix+2)
+  call  nz,.AddButton
+  ld    hl,WaterLevel4Button
+  bit   3,(ix+3)
+  call  nz,.AddButton
 
   ld    a,(iy+CastleMageGuildLevel)
   cp    4
@@ -9904,6 +10044,11 @@ SetMagicGuildButtons:
   xor   a
   ld    (GenericButtonTable+2*GenericButtonTableLenghtPerButton),a
   ld    (GenericButtonTable+3*GenericButtonTableLenghtPerButton),a
+  ret
+
+  .AddButton:
+  ld    bc,GenericButtonTableLenghtPerButton
+  ldir
   ret
 
 ;DYDX of icons in the Magic Guild overview screen
@@ -9980,23 +10125,6 @@ WaterLevel3Touched:     equ $4000 + (184*128) + (080/2) - 128
 WaterLevel4Untouched:   equ $4000 + (184*128) + (096/2) - 128
 WaterLevel4Touched:     equ $4000 + (184*128) + (112/2) - 128
 
-MagicGuildButtonTableLenghtPerButton:  equ MagicGuildButtonTable.endlenght-MagicGuildButtonTable
-MagicGuildButtonTableGfxBlock:  db  SpellBookGraphicsBlock
-MagicGuildButtonTableAmountOfButtons:  db  8
-MagicGuildButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
-;level 1 spells
-  db  %1100 0011 | dw FireLevel1Untouched   | dw FireLevel1Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel1Y ,MagicGuildFireLevel1Y+16 ,MagicGuildFireLevel1X ,MagicGuildFireLevel1X+16  | dw $0000 + (MagicGuildFireLevel1Y*128)  + (MagicGuildFireLevel1X/2)  - 128 |
-  .endlenght:
-  db  %1100 0011 | dw WaterLevel1Untouched  | dw WaterLevel1Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel1Y,MagicGuildWaterLevel1Y+16,MagicGuildWaterLevel1X,MagicGuildWaterLevel1X+16 | dw $0000 + (MagicGuildWaterLevel1Y*128) + (MagicGuildWaterLevel1X/2) - 128 | 
-;level 2 spells
-  db  %1100 0011 | dw WaterLevel2Untouched  | dw WaterLevel2Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel2Y,MagicGuildWaterLevel2Y+16,MagicGuildWaterLevel2X,MagicGuildWaterLevel2X+16 | dw $0000 + (MagicGuildWaterLevel2Y*128) + (MagicGuildWaterLevel2X/2) - 128 | 
-  db  %1100 0011 | dw AirLevel2Untouched    | dw AirLevel2Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel2Y  ,MagicGuildAirLevel2Y+16  ,MagicGuildAirLevel2X  ,MagicGuildAirLevel2X+16   | dw $0000 + (MagicGuildAirLevel2Y*128)   + (MagicGuildAirLevel2X/2) - 128   | 
-;level 3 spells
-  db  %1100 0011 | dw FireLevel3Untouched   | dw FireLevel3Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildFireLevel3Y ,MagicGuildFireLevel3Y+16 ,MagicGuildFireLevel3X ,MagicGuildFireLevel3X+16  | dw $0000 + (MagicGuildFireLevel3Y*128)  + (MagicGuildFireLevel3X/2)  - 128 |
-  db  %1100 0011 | dw EarthLevel3Untouched  | dw EarthLevel3Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel3Y,MagicGuildEarthLevel3Y+16,MagicGuildEarthLevel3X,MagicGuildEarthLevel3X+16 | dw $0000 + (MagicGuildEarthLevel3Y*128) + (MagicGuildEarthLevel3X/2) - 128 | 
-;level 4 spells
-  db  %1100 0011 | dw AirLevel4Untouched    | dw AirLevel4Touched     | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel4Y  ,MagicGuildAirLevel4Y+16  ,MagicGuildAirLevel4X  ,MagicGuildAirLevel4X+16   | dw $0000 + (MagicGuildAirLevel4Y*128)   + (MagicGuildAirLevel4X/2) - 128   | 
-  db  %1100 0011 | dw EarthLevel4Untouched  | dw EarthLevel4Touched   | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildEarthLevel4Y,MagicGuildEarthLevel4Y+16,MagicGuildEarthLevel4X,MagicGuildEarthLevel4X+16 | dw $0000 + (MagicGuildEarthLevel4Y*128) + (MagicGuildEarthLevel4X/2) - 128 | 
 
 SetExitButtonHeight:
   ld    (CastleOverviewButtonTable + (5*CastleOverviewButtonTableLenghtPerButton) + CastleOverviewWindowButtonYtop),a
@@ -11588,6 +11716,10 @@ CheckButtonMouseInteractionSingleBuildButton:
   jp    PurchaseBuilding
 
 PurchaseBuilding:
+  if    UnlimitedBuildsPerTurn?=0
+  ld    (iy+AlreadyBuiltThisTurn?),1
+  endif
+
   ;gold
   ld    ix,(CheckRequirementsWhichBuilding?)
   ld    e,(ix+0)
@@ -12561,7 +12693,7 @@ TextMagicGuildLevel4Finished:
                           db  " ",254
                           db  "Visiting heroes",254
                           db  "can learn these",254
-                          db  "spells if the",254
+                          db  "spells if their",254
                           db  "skill requirements",254
                           db  "are met",255
 MagicGuildLevel4Cost:
@@ -13049,7 +13181,154 @@ SetNameCastleAndDailyIncome:
   call  SetText
   ret
 
+HandleAllHeroesLearnMagicGuildSpells:
+  push  iy
+  
+  ld    ix,pl1hero1y
+  ld    b,amountofheroesperplayer
+  call  .loop
+  ld    ix,pl2hero1y
+  ld    b,amountofheroesperplayer
+  call  .loop
+  ld    ix,pl3hero1y
+  ld    b,amountofheroesperplayer
+  call  .loop
+  ld    ix,pl4hero1y
+  ld    b,amountofheroesperplayer
+  call  .loop
+
+  pop   iy
+  ret
+
+  .loop:
+  call  .CheckHero
+  ld    de,lenghtherotable
+  add   ix,de
+  djnz  .loop
+
+
+  .CheckHero:  
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    2
+  jr    z,.CheckWhichCastle
+  cp    254
+  ret   nz
+
+  .CheckWhichCastle:                    ;at this point hero is in castle, find castle and put in IY
+  ld    iy,Castle1
+  call  .FindCastle
+  ld    iy,Castle2
+  call  .FindCastle
+  ld    iy,Castle3
+  call  .FindCastle
+  ld    iy,Castle4
+  call  .FindCastle
+  ld    iy,Castle5
+  call  .FindCastle
+  ret
+
+  .FindCastle:
+  ld    a,(ix+HeroY)                    ;y hero
+  inc   a                               ;y hero + 1
+  cp    (iy+CastleY)
+  ret   nz
+
+  ld    a,(ix+HeroX)                    ;x hero (2)
+  dec   a                               ;a=x hero-1
+  cp    (iy+CastleX)
+  ret   nz
+  ;castle found
+  pop   af                              ;no need to check the other castles
+  push  ix
+  call  SetCastleSpellsInIX             ;ix=castle spells
+  pop   iy                              ;iy=heroy
+
+  ld    c,(ix+0)
+  call  .CheckLevel234SpellsPossibleToLearn
+  ld    a,c
+  or    (iy+HeroEarthSpells)
+  ld    (iy+HeroEarthSpells),a
+  ld    c,(ix+1)
+  call  .CheckLevel234SpellsPossibleToLearn
+  ld    a,c
+  or    (iy+HeroFireSpells)
+  ld    (iy+HeroFireSpells),a
+  ld    c,(ix+2)
+  call  .CheckLevel234SpellsPossibleToLearn
+  ld    a,c
+  or    (iy+HeroAirSpells)
+  ld    (iy+HeroAirSpells),a
+  ld    c,(ix+3)
+  call  .CheckLevel234SpellsPossibleToLearn
+  ld    a,c
+  or    (iy+HeroWaterSpells)
+  ld    (iy+HeroWaterSpells),a
+  
+  push  iy
+  pop   ix                              ;back to heroy in ix, and go check next hero
+  ret
+
+.CheckLevel234SpellsPossibleToLearn:
+  ;CAUTION IY=Heroy
+  ld    a,30                            ;expert wisdom skill
+  cp    (iy+HeroSkills+0)
+  ret   z
+  cp    (iy+HeroSkills+1)
+  ret   z
+  cp    (iy+HeroSkills+2)
+  ret   z
+  cp    (iy+HeroSkills+3)
+  ret   z
+  cp    (iy+HeroSkills+4)
+  ret   z
+  cp    (iy+HeroSkills+5)
+  ret   z
+
+  res   3,c                             ;without expert wisdom level 4 spells are not possible to learn
+
+  ld    a,29                            ;advanced wisdom skill
+  cp    (iy+HeroSkills+0)
+  ret   z
+  cp    (iy+HeroSkills+1)
+  ret   z
+  cp    (iy+HeroSkills+2)
+  ret   z
+  cp    (iy+HeroSkills+3)
+  ret   z
+  cp    (iy+HeroSkills+4)
+  ret   z
+  cp    (iy+HeroSkills+5)
+  ret   z
+
+  res   2,c                             ;without advanced wisdom level 3 spells are not possible to learn
+
+  ld    a,28                            ;basic wisdom skill
+  cp    (iy+HeroSkills+0)
+  ret   z
+  cp    (iy+HeroSkills+1)
+  ret   z
+  cp    (iy+HeroSkills+2)
+  ret   z
+  cp    (iy+HeroSkills+3)
+  ret   z
+  cp    (iy+HeroSkills+4)
+  ret   z
+  cp    (iy+HeroSkills+5)
+  ret   z
+
+  res   1,c                             ;without basic wisdom level 2 spells are not possible to learn
+  ret
+
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+;Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+;Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+;Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+;Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
+
+
 CastleOverviewCode:                     ;in: iy-castle
+  call  HandleAllHeroesLearnMagicGuildSpells
+
   ld    a,3
 	ld		(SetResources?),a
 

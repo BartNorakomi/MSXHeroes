@@ -3461,32 +3461,44 @@ call screenon
 SetStatusTextAttack:
   ld    ix,(plxcurrentheroAddress)
 
-  ld    a,(ix+HeroStatAttack)
+  ld    de,ItemAttackPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  ld    e,(ix+HeroStatAttack)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,HeroOverViewStatusWindowDX + 056 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
-  ld    h,0
-  ld    l,a
   call  SetNumber16BitCastle
 
-  ld    a,(ix+HeroStatDefense)
+  ld    de,ItemDefencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatDefense)
+  ld    d,0
+  add   hl,de
   ld    b,HeroOverViewStatusWindowDX + 067 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
-  ld    h,0
-  ld    l,a
   call  SetNumber16BitCastle
 
-  ld    a,(ix+HeroStatKnowledge)
+  ld    de,ItemIntelligencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatKnowledge)
+  ld    d,0
+  add   hl,de
   ld    b,HeroOverViewStatusWindowDX + 075 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
-  ld    h,0
-  ld    l,a
   call  SetNumber16BitCastle
 
-  ld    a,(ix+HeroStatSpelldamage)
+  ld    de,ItemSpellDamagePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatSpelldamage)
+  ld    d,0
+  add   hl,de
   ld    b,HeroOverViewStatusWindowDX + 084 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
-  ld    h,0
-  ld    l,a
   call  SetNumber16BitCastle
 
   ld    a,(ix+HeroLevel)
@@ -3495,8 +3507,6 @@ SetStatusTextAttack:
   ld    h,0
   ld    l,a
   call  SetNumber16BitCastle
-
-
 
   ld    a,(ix+HeroLevel)                ;current level
   cp    18

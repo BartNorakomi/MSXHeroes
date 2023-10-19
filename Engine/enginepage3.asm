@@ -1,12 +1,14 @@
 phase	$c000
 
-StartOfTurnMessageOn?:  equ 0
+StartOfTurnMessageOn?:    equ 0
+UnlimitedBuildsPerTurn?:  equ 0
 
 InitiateGame:
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
 
   ld    hl,0
+  ld    hl,pl1hero1y
   ld    (plxcurrentheroAddress),hl
   ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
@@ -1662,14 +1664,15 @@ EnterCastle:
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   call  SetSpatInCastle
-  call  CastleOverviewCode
-  call  SetSpatInGame
 
+  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
+
+  call  SetSpatInGame
 
   pop   af
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  

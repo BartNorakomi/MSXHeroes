@@ -410,7 +410,7 @@ phase	$4000
 World1Map:
   incbin "..\maps\world1.map.pck"
 World1ObjectLayerMap:
-  incbin "..\maps\world1ObjectLayer.map.pck"
+  incbin "..\maps\world1objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
