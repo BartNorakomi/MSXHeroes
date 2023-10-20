@@ -3528,7 +3528,7 @@ SetStatusTextAttack:
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
   ld    e,(ix+HeroStatKnowledge)
   ld    d,0
-  add   hl,de
+  add   hl,de                           ;total knowledge
   ld    b,HeroOverViewStatusWindowDX + 075 + 004
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle
@@ -3603,6 +3603,8 @@ SetStatusTextAttack:
   ld    l,a
   call  SetNumber16BitCastle
 
+  call  SetTotalManaHero
+
   ld    a,(ix+HeroTotalMana)
   ld    b,HeroOverViewStatusWindowDX + 116
   ld    c,HeroOverViewStatusWindowDY + 087
@@ -3616,6 +3618,95 @@ SetStatusTextAttack:
   ld    h,0
   ld    l,a
   call  SetNumber16BitCastle
+  ret
+
+SetTotalManaHero:
+;total mana depends on the following
+;per point of intelligence you get +10 max mana
+;Basic Intelligence Boosts your hero's maximum spell points by 25% (skillnr# 022)
+;Advanced Intelligence Boosts your hero's maximum spell points by 50% (skillnr# 023)
+;Expert Intelligence Boosts your hero's maximum spell points by 100% (skillnr# 024)
+  ld    de,ItemIntelligencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatKnowledge)
+  ld    d,0
+  add   hl,de                           ;total knowledge
+
+  ld    a,l
+  add   a,a                             ;*2
+  ld    b,a
+  add   a,a                             ;*4
+  add   a,a                             ;*8
+  add   a,b                             ;*10
+  ld    (ix+HeroTotalMana),a
+  
+  ld    a,022                           ;skillnr# 022 = basic intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasBasicIntelligence
+
+  ld    a,023                           ;skillnr# 023 = advanced intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasAdvancedIntelligence
+
+  ld    a,024                           ;skillnr# 024 = expert intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasExpertIntelligence
+  
+  ret
+
+  ;Basic Intelligence Boosts your hero's maximum spell points by 25% (skillnr# 022)
+  .HeroHasBasicIntelligence:
+  ld    a,(ix+HeroTotalMana)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+  add   a,(ix+HeroTotalMana)            ;Hero's total spell points + 25%
+  ld    (ix+HeroTotalMana),a  
+  ret
+
+  ;Advanced Intelligence Boosts your hero's maximum spell points by 50% (skillnr# 023)
+  .HeroHasAdvancedIntelligence:
+  ld    a,(ix+HeroTotalMana)
+	srl		a				                        ;/2
+  add   a,(ix+HeroTotalMana)            ;Hero's total spell points + 50%
+  ld    (ix+HeroTotalMana),a  
+  ret
+
+  ;Expert Intelligence Boosts your hero's maximum spell points by 100% (skillnr# 024)  
+  .HeroHasExpertIntelligence:
+  ld    a,(ix+HeroTotalMana)
+  add   a,a                             ;Hero's total spell points + 100%
+  ld    (ix+HeroTotalMana),a  
   ret
 
 SetNumber16Bit:                         ;in hl=number (16bit)

@@ -1896,7 +1896,7 @@ ItemIntelligencePointsTable:
 ;ring (30)
   db    0
   db    CyclopsIntelligence ;(4)
-  db    0
+  db    ScarletRingSpellPower ;(2)
   db    0
   db    0
 ;neclace (35)
