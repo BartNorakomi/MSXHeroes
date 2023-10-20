@@ -514,7 +514,51 @@ HeroOverViewArmyIconWindowButtonNX:  equ 018
 
 
 
+DisplayEnemyHeroStatsWindowCode:
+  call  .SetHeroOverViewArmyWindow       ;set overview of hero army
+  call  .Set16x30HeroIcon                ;sets hero icon in the Army Window
+  ld    ix,(EnemyHeroThatPointerIsOn)
+  call  SetArmyIconsAndAmount.army      ;sets hero's army in the Army Window
 
+  call  SwapAndSetPage                  ;swap and set page
+  call  .SetHeroOverViewArmyWindow       ;set overview of hero army
+  call  .Set16x30HeroIcon                ;sets hero icon in the Army Window
+  ld    ix,(EnemyHeroThatPointerIsOn)
+  call  SetArmyIconsAndAmount.army      ;sets hero's army in the Army Window
+  
+  .engine:
+  call  PopulateControls                ;read out keys
+
+  ld    a,(Controls)
+  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
+  ret   nz
+
+  call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
+  halt
+  jp  .engine
+
+.Set16x30HeroIcon:
+  ;SetHeroPortrait16x30:
+  ld    a,Hero16x30PortraitsBlock       ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld    ix,(EnemyHeroThatPointerIsOn)
+
+;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;  ld    b,(ix+HeroPortrait16x30SYSX+1)
+  call  SetAddressHeroPortrait16x30SYSXinBC
+
+  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
+  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+	ret
+
+.SetHeroOverViewArmyWindow:
+  ld    hl,$4000 + (066*128) + (HeroOverViewArmyWindowSX/2) -128
+  ld    de,$0000 + (HeroOverViewArmyWindowDY*128) + (HeroOverViewArmyWindowDX/2)
+  ld    bc,$0000 + (HeroOverViewArmyWindowNY*256) + (HeroOverViewArmyWindowNX/2)
+  ld    a,ArmyGraphicsBlock;Map block
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 HeroOverviewArmyWindowCode:

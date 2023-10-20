@@ -617,7 +617,7 @@ dephase
 ;
 ArmyGraphicsBlock:  equ   $23
 phase	$4000
-  incbin "..\grapx\HeroOverview\Army.SC5",7,130 * 128      ;130 lines
+  incbin "..\grapx\HeroOverview\Army.SC5",7,133 * 128      ;133 lines
 	ds		$c000-$,$ff
 dephase
 

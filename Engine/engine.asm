@@ -5,6 +5,7 @@ LevelEngine:
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  DisplayEnemyStatsRightClick     ;when rightclicking on the map on an enemy, show their stats window
+  call  DisplayEnemyHeroStatsRightClick ;when rightclicking on the map on an enemy hero, show their stats window
   
   call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
   call  PopulateControls                ;read out keys
@@ -170,6 +171,23 @@ vblank:
   ei
   ret
 
+EnemyHeroThatPointerIsOn: ds  2
+DisplayEnemyHeroStatsRightClick?: db  0
+DisplayEnemyHeroStatsRightClick:
+  ld    a,(DisplayEnemyHeroStatsRightClick?)
+  dec   a
+  ret   m
+  ld    (DisplayEnemyHeroStatsRightClick?),a
+  jp    nz,DisableScrollScreen  
+
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  ld    hl,DisplayEnemyHeroStatsWindowCode
+  jp    EnterSpecificRoutineHeroOverviewCode
+
 DisplayEnemyStatsRightClick?: db  0
 DisplayEnemyStatsRightClick:
   ld    a,(DisplayEnemyStatsRightClick?)
@@ -178,8 +196,6 @@ DisplayEnemyStatsRightClick:
   ld    (DisplayEnemyStatsRightClick?),a
   jp    nz,DisableScrollScreen  
 
-;  ld    a,1
-;  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,ShowEnemyStats
@@ -1027,6 +1043,38 @@ EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters:
   out   ($a8),a                         ;restore ram/rom page settings     
   ret
 
+EnterSpecificRoutineHeroOverviewCode:
+  ld    (.SelfModifyingCodeRoutine),hl
+
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+
+	ld		a,(memblocks.1)                 ;save page 1+2 block settings
+	push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+  ld    a,HeroOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  .SelfModifyingCodeRoutine:	equ	$+1
+  call  HudCode
+
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+
+  xor   a
+  ld    (vblankintflag),a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    hl,0
+  ld    (CurrentCursorSpriteCharacter),hl
+  call  EnableScrollScreen
+  ret
+
 EnterSpecificRoutineInCastleOverviewCode:
   ld    (.SelfModifyingCodeRoutine),hl
 
@@ -1436,6 +1484,7 @@ CheckHeroEntersCastle:
   ret   nz
   ld    a,(iy+CastleX)
   inc   a
+  inc   a
   cp    (ix+Herox)
   ret   nz
 
@@ -1454,6 +1503,19 @@ CheckHeroEntersCastle:
   
   pop   af                              ;pop the call to this check
   pop   af                              ;pop the call from the engine to this routine
+
+  ;HeroLooksDown             	
+  ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
+  ld    d,(ix+HeroSpecificInfo+1)
+  push  de
+  pop   ix                              ;hero specific info table in ix
+  
+  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
+  or    a,128 + (064 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
+  xor   8
+  ld    (ix+HeroinfoSYSX+0),a
+
   jp    EnterCastle
  
 .TakeOverCastle:                        ;enemy castle entered with no heroes, take control of it !
@@ -3501,25 +3563,39 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   .CheckPointerOnCastle:
   call  .SetMappositionMousePointsTo    ;check object layer for item
 
-  ld    a,(hl)
+  ld    a,(hl)                          ;check center castle
+  cp    254
+  jr    z,.PointerOnCentreOfCastle
+
+	sbc		hl,de
+  ld    a,(hl)                          ;check castle entrance
   cp    254
   ret   nz
-  ;pointer is on castle. Check if it's a friendly castle
-  call  .SetCastleMousePointsToInIX
+
+  .PointerOnEntranceOfCastle:           ;pointer is castle's entrance. Check if it's a friendly castle
+  call  .SetCastleEntranceMousePointsToInIX
   call  .CheckFriendlyCastle
-  jr    z,.FriendlyCastle
+  jr    z,.FriendlyCastleShowCursorWalkingBoots
 
   .EnemyCastle:
 	pop		af				                      ;pop call
   ld    hl,CursorSwords
 	jp		.setcharacter
 
+  .FriendlyCastleShowCursorWalkingBoots:
+	pop		af				                      ;pop call
+  ld    hl,CursorWalkingBoots
+	jp		.setcharacter
+    
+  .PointerOnCentreOfCastle:             ;pointer is castle's centre. Check if it's a friendly castle
+  call  .SetCastleCentreMousePointsToInIX
+  call  .CheckFriendlyCastle
+  ret   nz                              ;return if its an enemy castle
+
   .FriendlyCastle:
   ld    (WhichCastleIsPointerPointingAt?),ix
 	pop		af				                      ;pop call
   ld    hl,CursorEnterCastle
-
-
 	jp		.setcharacter
 
   .CheckFriendlyCastle:
@@ -3527,7 +3603,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   cp    (ix+CastlePlayer)
   ret
 
-  .SetCastleMousePointsToInIX:
+  .SetCastleCentreMousePointsToInIX:
   ld    ix,Castle1 | call .check | ret z
   ld    ix,Castle2 | call .check | ret z
   ld    ix,Castle3 | call .check | ret z
@@ -3540,6 +3616,24 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret   nz
   ld    a,(mouseposy) ;3
   inc   a
+  cp    (ix+CastleY)
+  ret
+
+  .SetCastleEntranceMousePointsToInIX:
+  ld    ix,Castle1 | call .check2 | ret z
+  ld    ix,Castle2 | call .check2 | ret z
+  ld    ix,Castle3 | call .check2 | ret z
+  ld    ix,Castle4;| call .check2 | ret z
+  ret
+  .check2:
+  ld    a,(mouseposx) ;2
+  dec   a
+  dec   a
+  cp    (ix+CastleX)
+  ret   nz
+  ld    a,(mouseposy) ;3
+  inc   a
+  dec   a
   cp    (ix+CastleY)
   ret
 
@@ -3587,11 +3681,12 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .SetMappositionMousePointsTo:         ;(mouseposy)=mappointery + mouseposy(/16), (mouseposx)=mappointerx + mouseposx(/16)
 	ld		hl,mapdata                      ;set map pointer x
+	ld		de,(maplenght)
+
 	ld		a,(mouseposy)                   ;set map pointer y
 	or		a
   jr    z,.SetX
 	ld		b,a
-	ld		de,(maplenght)
 
   .setypointerloop:	
 	add		hl,de
@@ -3599,9 +3694,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .SetX:
   ld    a,(mouseposx)
-  ld    e,a
-  ld    d,0
-	add		hl,de  
+  ld    c,a
+  ld    b,0
+	add		hl,bc
   ret
 
 .checkpointeronhero:                  ;in: de=lenghtherotable, h=mouseposy (/16), l=mouseposx (/16), ix->plxhero1y
@@ -3633,9 +3728,26 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .pointeronenemyhero:
 	pop		af				;pop call
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrControlsOnInterrupt)
+	bit		5,a						                  ;trig-b pressed ?
+  jr    nz,.TrigBPressedEnemyHero
+
   ld    hl,CursorSwords
 	jp		.setcharacter
   ;/check if pointer is on enemy hero
+
+  .TrigBPressedEnemyHero:
+  ld    a,3
+  ld    (DisplayEnemyHeroStatsRightClick?),a
+  ld    (EnemyHeroThatPointerIsOn),ix
+  ret
+
 
   .checkpointerfriend:                ;in: de=lenghtherotable, h=mouseposy (/16), l=mouseposx (/16), ix->plxhero1y
 	ld		b,amountofheroesperplayer
@@ -4457,43 +4569,43 @@ HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Scholar     ",255,R
 
 HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Necromancer ",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 31 | db 033 |
 
-HeroSYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGoemon1:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXPixy:         equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDrasle1:      equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXLatok:        equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDrasle2:      equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXSnake1:       equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDrasle3:      equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXAdol:         equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGoemon1:      equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPixy:         equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle1:      equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXLatok:        equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle2:      equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSnake1:       equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle3:      equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXSnake2:       equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDrasle4:      equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXAshguine:     equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXUndeadline1:  equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXPsychoWorld:  equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXUndeadline2:  equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGoemon2:      equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXUndeadline3:  equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSnake2:       equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrasle4:      equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXAshguine:     equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline1:  equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPsychoWorld:  equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline2:  equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGoemon2:      equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUndeadline3:  equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXFray:         equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXBlackColor:   equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXWit:          equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXMitchell:     equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXJanJackGibson:equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGillianSeed:  equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXSnatcher:     equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGolvellius:   equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXFray:         equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXBlackColor:   equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXWit:          equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXMitchell:     equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXJanJackGibson:equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGillianSeed:  equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSnatcher:     equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGolvellius:   equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXBillRizer:    equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXPochi:        equ $4000+(000*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGreyFox:      equ $4000+(032*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXTrevorBelmont:equ $4000+(032*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXBigBoss:      equ $4000+(064*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXSimonBelmont: equ $4000+(064*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDrPettrovich: equ $4000+(096*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXRichterBelmont:equ $4000+(096*128)+(128/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXBillRizer:    equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPochi:        equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGreyFox:      equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXTrevorBelmont:equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXBigBoss:      equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSimonBelmont: equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDrPettrovich: equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXRichterBelmont:equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
-HeroSYSXUltrabox:     equ $4000+(000*128)+(000/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXUltrabox:     equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
 ;------------------------------------------------------------------------------------------------------------
 HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2

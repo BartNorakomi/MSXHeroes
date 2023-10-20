@@ -12,6 +12,7 @@
 ;  call  DisplayChestCode
 ;  call  HeroLevelUpCode
 ;  call  ShowEnemyStats
+;  call  ShowEnemyHeroStats
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -927,7 +928,7 @@ SetTextBuildingWhenClicked:
 ;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+ShowEnemyHeroStats:
 
 
 ShowEnemyStats:
@@ -947,7 +948,7 @@ call screenon
   ld    a,(NewPrContr)
   and   %0011 0000
   jr    nz,.end
-  jp  .engine  
+  jr    .engine  
 
   .end:
   ld    a,%0011 0000
@@ -7906,11 +7907,22 @@ CastleOverviewTavernCode:
 .CheckTavernButtonClicked:              ;in: carry=button clicked, b=button number
   ret   nc
 
+  ld    a,002                           ;set recruiting hero as visiting
+  ld    (EmptyHeroRecruitedAtTavern+HeroStatus),a
   ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
   push  bc                              ;store which tavern button was pressed
   call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
   pop   bc                              ;recall which tavern button was pressed
-  ret   nc                              ;unable to recruit hero if there is already a visiting hero here
+  jr    c,.go                           ;unable to recruit hero if there is already a visiting hero here
+
+  ld    a,254                           ;set recruiting hero as defending
+  ld    (EmptyHeroRecruitedAtTavern+HeroStatus),a
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc                              ;store which tavern button was pressed
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  pop   bc                              ;recall which tavern button was pressed
+  ret   nc                              ;unable to recruit hero if there is already a defending hero here
+  .go:
 
   ld    a,b
   cp    3
@@ -8075,6 +8087,7 @@ CastleOverviewTavernCode:
   dec   a
   ld    (ix+HeroY),a                    ;set hero y  
   ld    a,(iy+Castlex)                  ;castle x
+  inc   a
   inc   a
   ld    (ix+HeroX),a                    ;set hero x
   ret
@@ -8611,6 +8624,7 @@ SetVisitingOrDefendingHeroInIX:         ;in: iy->castle, c=002 (check visiting),
   cp    (ix+Heroy)
   ret   nz
   ld    a,(iy+CastleX)
+  inc   a
   inc   a
   cp    (ix+Herox)
   ret   nz
@@ -13368,6 +13382,7 @@ HandleAllHeroesLearnMagicGuildSpells:
   ret   nz
 
   ld    a,(ix+HeroX)                    ;x hero (2)
+  dec   a                               ;a=x hero-1
   dec   a                               ;a=x hero-1
   cp    (iy+CastleX)
   ret   nz
