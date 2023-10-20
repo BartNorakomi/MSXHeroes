@@ -1337,13 +1337,26 @@ EndTurn:
 	ld		b,amountofheroesperplayer 
 	ld		de,lenghtherotable
   .loop:
-	ld		a,(ix+HeroManarec)				;mana recovery
-	add		a,(ix+HeroMana)           ;add current hero mana
-	cp		(ix+HeroTotalMana)				;cp with total mana 
+
+  ld    l,(ix+HeroMana+0)
+  ld    h,(ix+HeroMana+1)
+  ld    d,0
+  ld    e,(ix+HeroManarec+0)
+  add   hl,de                     ;hl=current mana + daily mana recovery points
+  ld    e,(ix+HeroTotalMana+0)
+  ld    d,(ix+HeroTotalMana+1)  
+  sbc   hl,de
 	jp		c,.nooverflowmana
-	ld		a,(ix+HeroTotalMana)
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)  
+  jr    .SetMana
 	.nooverflowmana:
-	ld		(ix+HeroMana),a           ;set mana for next turn
+  add   hl,de
+  .SetMana:
+  ld    (ix+HeroMana+0),l
+  ld    (ix+HeroMana+1),h
+
+
 	ld		a,(ix+HeroTotalMove)		  ;total movement
 	ld		(ix+HeroMove),a		        ;reset total movement
 	add		ix,de				              ;next hero
@@ -1405,8 +1418,10 @@ RefillManaHeroesInCastles:
   ret
 
   .Refill:
-  ld    a,(ix+HeroTotalMana)
-  ld    (ix+HeroMana),a
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)  
+  ld    (ix+HeroMana+0),l
+  ld    (ix+HeroMana+1),h
   djnz  .loop  
   ret
 
@@ -11117,43 +11132,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    (SelectedCastleRecruitLevelUnitTotalCostRubies),hl
   ret
 
-DivideBCbyDE:
-;
-; Divide 16-bit values (with 16-bit result)
-; In: Divide BC by divider DE
-; Out: BC = result, HL = rest
-;
-Div16:
-    ld hl,0
-    ld a,b
-    ld b,8
-Div16_Loop1:
-    rla
-    adc hl,hl
-    sbc hl,de
-    jr nc,Div16_NoAdd1
-    add hl,de
-Div16_NoAdd1:
-    djnz Div16_Loop1
-    rla
-    cpl
-    ld b,a
-    ld a,c
-    ld c,b
-    ld b,8
-Div16_Loop2:
-    rla
-    adc hl,hl
-    sbc hl,de
-    jr nc,Div16_NoAdd2
-    add hl,de
-Div16_NoAdd2:
-    djnz Div16_Loop2
-    rla
-    cpl
-    ld b,c
-    ld c,a
-    ret
+
 
 
 

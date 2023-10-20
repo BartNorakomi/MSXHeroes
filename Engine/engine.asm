@@ -171,6 +171,44 @@ vblank:
   ei
   ret
 
+DivideBCbyDE:
+;
+; Divide 16-bit values (with 16-bit result)
+; In: Divide BC by divider DE
+; Out: BC = result, HL = rest
+;
+Div16:
+    ld hl,0
+    ld a,b
+    ld b,8
+Div16_Loop1:
+    rla
+    adc hl,hl
+    sbc hl,de
+    jr nc,Div16_NoAdd1
+    add hl,de
+Div16_NoAdd1:
+    djnz Div16_Loop1
+    rla
+    cpl
+    ld b,a
+    ld a,c
+    ld c,b
+    ld b,8
+Div16_Loop2:
+    rla
+    adc hl,hl
+    sbc hl,de
+    jr nc,Div16_NoAdd2
+    add hl,de
+Div16_NoAdd2:
+    djnz Div16_Loop2
+    rla
+    cpl
+    ld b,c
+    ld c,a
+    ret
+
 EnemyHeroThatPointerIsOn: ds  2
 DisplayEnemyHeroStatsRightClick?: db  0
 DisplayEnemyHeroStatsRightClick:
@@ -4690,24 +4728,24 @@ HeroXp:                 equ 2
 HeroMove:               equ 4
 HeroTotalMove:          equ 5
 HeroMana:               equ 6
-HeroTotalMana:          equ 7
-HeroManarec:            equ 8
-HeroStatus:             equ 9           ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-HeroUnits:              equ 10          ;unit,amount (6 in total * 3 bytes) 18 bytes in total
-HeroStatAttack:         equ 28
-HeroStatDefense:        equ 29
-HeroStatKnowledge:      equ 30
-HeroStatSpellDamage:    equ 31
-HeroSkills:             equ 32
-HeroLevel:              equ 38
-HeroEarthSpells:        equ 39
-HeroFireSpells:         equ 40
-HeroAirSpells:          equ 41
-HeroWaterSpells:        equ 42
-HeroAllSchoolsSpells:   equ 43
-HeroInventory:          equ 44          ;9 body slots (sword, armor, shield, helmet, boots, gloves,ring, necklace, robe) and 6 open slots (045 = empty slot)
-HeroSpecificInfo:       equ 59
-HeroDYDX:               equ 61          ;all PlxHeroxDYDX (coordinates where sprite is located in page 2)
+HeroTotalMana:          equ 8
+HeroManarec:            equ 10
+HeroStatus:             equ 11           ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+HeroUnits:              equ 12          ;unit,amount (6 in total * 3 bytes) 18 bytes in total
+HeroStatAttack:         equ 30
+HeroStatDefense:        equ 31
+HeroStatKnowledge:      equ 32
+HeroStatSpellDamage:    equ 33
+HeroSkills:             equ 34
+HeroLevel:              equ 40
+HeroEarthSpells:        equ 41
+HeroFireSpells:         equ 42
+HeroAirSpells:          equ 43
+HeroWaterSpells:        equ 44
+HeroAllSchoolsSpells:   equ 45
+HeroInventory:          equ 46          ;9 body slots (sword, armor, shield, helmet, boots, gloves,ring, necklace, robe) and 6 open slots (045 = empty slot)
+HeroSpecificInfo:       equ 61
+HeroDYDX:               equ 63          ;all PlxHeroxDYDX (coordinates where sprite is located in page 2)
 lenghtinventorytable:   equ 9 + 6
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 EmptyHeroRecruitedAtTavern:
@@ -4715,7 +4753,7 @@ EmptyHeroRecruitedAtTavern:
 .herox:		ds  1
 .heroxp: dw 000
 .heromove:	db	20,20
-.heromana:	db	20,20
+.heromana:	dw	20,20
 .heromanarec:db	5		                ;recover x mana every turn
 .herostatus:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 .HeroUnits:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4735,10 +4773,10 @@ EmptyHeroRecruitedAtTavern:
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero1y:		db	3
-pl1hero1x:		db	2
+pl1hero1x:		db	3
 pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
-pl1hero1mana:	db	02,20
+pl1hero1mana:	dw	02,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
@@ -4746,7 +4784,7 @@ Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  1,24,0,30,0,0
+.HeroSkills:  db  1,22,0,30,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -4769,7 +4807,7 @@ pl1hero2y:		db	0
 pl1hero2x:		db	6
 pl1hero2xp: dw 0000
 pl1hero2move:	db	20,20
-pl1hero2mana:	db	16,20
+pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4792,7 +4830,7 @@ pl1hero3y:		db	05	                ;
 pl1hero3x:		db	06
 pl1hero3xp: dw 0000
 pl1hero3move:	db	30,20
-pl1hero3mana:	db	04,20
+pl1hero3mana:	dw	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4815,7 +4853,7 @@ pl1hero4y:		db	00		                ;
 pl1hero4x:		db	00		
 pl1hero4xp: dw 0000
 pl1hero4move:	db	30,20
-pl1hero4mana:	db	10,20
+pl1hero4mana:	dw	10,20
 pl1hero4manarec:db	5		                ;recover x mana every turn
 pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4838,7 +4876,7 @@ pl1hero5y:		db	00		                ;
 pl1hero5x:		db	01		
 pl1hero5xp: dw 0000
 pl1hero5move:	db	30,20
-pl1hero5mana:	db	10,20
+pl1hero5mana:	dw	10,20
 pl1hero5manarec:db	5		                ;recover x mana every turn
 pl1hero5status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4861,7 +4899,7 @@ pl1hero6y:		db	00		                ;
 .pl1hero6x:		db	02		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	30,20
-.pl1hero6mana:	db	10,20
+.pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 .Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4884,7 +4922,7 @@ pl1hero7y:		db	00		                ;
 .pl1hero6x:		db	03		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	30,20
-.pl1hero6mana:	db	10,20
+.pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 .Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4907,7 +4945,7 @@ pl1hero8y:		db	00		                ;
 .pl1hero6x:		db	04		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	30,20
-.pl1hero6mana:	db	10,20
+.pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 .Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4930,7 +4968,7 @@ pl1hero9y:		db	00		                ;
 .pl1hero6x:		db	00		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	00,00
-.pl1hero6mana:	db	00,00
+.pl1hero6mana:	dw	00,00
 .pl1hero6manarec:db	0		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 
@@ -4939,7 +4977,7 @@ pl2hero1y:		db	3
 pl2hero1x:		db	6
 pl2hero1xp: dw 0000
 pl2hero1move:	db	10,20
-pl2hero1mana:	db	10,20
+pl2hero1mana:	dw	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4970,7 +5008,7 @@ pl2hero9y:		db	00		                ;
 .pl1hero6x:		db	00		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	00,00
-.pl1hero6mana:	db	00,00
+.pl1hero6mana:	dw	00,00
 .pl1hero6manarec:db	0		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 
@@ -4979,7 +5017,7 @@ pl3hero1y:		db	100
 pl3hero1x:		db	02
 pl3hero1xp: dw 0000
 pl3hero1move:	db	10,20
-pl3hero1mana:	db	10,20
+pl3hero1mana:	dw	10,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl3Hero1Units:  db 033 | dw 003 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -5010,7 +5048,7 @@ pl3hero9y:		db	00		                ;
 .pl1hero6x:		db	00		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	00,00
-.pl1hero6mana:	db	00,00
+.pl1hero6mana:	dw	00,00
 .pl1hero6manarec:db	0		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 
@@ -5019,7 +5057,7 @@ pl4hero1y:		db	100
 pl4hero1x:		db	100
 pl4hero1xp: dw 0000
 pl4hero1move:	db	10,20
-pl4hero1mana:	db	10,20
+pl4hero1mana:	dw	10,20
 pl4hero1manarec:db	2		                ;recover x mana every turn
 pl4hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -5050,7 +5088,7 @@ pl4hero9y:		db	00		                ;
 .pl1hero6x:		db	00		
 .pl1hero6xp: dw 0000
 .pl1hero6move:	db	00,00
-.pl1hero6mana:	db	00,00
+.pl1hero6mana:	dw	00,00
 .pl1hero6manarec:db	0		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 

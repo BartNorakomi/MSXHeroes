@@ -3596,20 +3596,18 @@ SetStatusTextAttack:
   ld    l,a
   call  SetNumber16BitCastle
 
-  ld    a,(ix+HeroMana)
   ld    b,HeroOverViewStatusWindowDX + 093
   ld    c,HeroOverViewStatusWindowDY + 087
-  ld    h,0
-  ld    l,a
+  ld    l,(ix+HeroMana+0)
+  ld    h,(ix+HeroMana+1)
   call  SetNumber16BitCastle
 
   call  SetTotalManaHero
 
-  ld    a,(ix+HeroTotalMana)
   ld    b,HeroOverViewStatusWindowDX + 116
   ld    c,HeroOverViewStatusWindowDY + 087
-  ld    h,0
-  ld    l,a
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
   call  SetNumber16BitCastle
 
   ld    a,(ix+HeroManarec)
@@ -3633,13 +3631,14 @@ SetTotalManaHero:
   ld    d,0
   add   hl,de                           ;total knowledge
 
-  ld    a,l
-  add   a,a                             ;*2
-  ld    b,a
-  add   a,a                             ;*4
-  add   a,a                             ;*8
-  add   a,b                             ;*10
-  ld    (ix+HeroTotalMana),a
+  add   hl,hl                           ;*2
+  push  hl
+  pop   de
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,de                           ;*10
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
   
   ld    a,022                           ;skillnr# 022 = basic intelligence
   cp    (ix+HeroSkills+0)
@@ -3687,26 +3686,37 @@ SetTotalManaHero:
 
   ;Basic Intelligence Boosts your hero's maximum spell points by 25% (skillnr# 022)
   .HeroHasBasicIntelligence:
-  ld    a,(ix+HeroTotalMana)
-	srl		a				                        ;/2
-	srl		a				                        ;/4
-  add   a,(ix+HeroTotalMana)            ;Hero's total spell points + 25%
-  ld    (ix+HeroTotalMana),a  
+  ld    c,(ix+HeroTotalMana+0)
+  ld    b,(ix+HeroTotalMana+1)
+  ld    de,4
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,bc
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
   ret
 
   ;Advanced Intelligence Boosts your hero's maximum spell points by 50% (skillnr# 023)
   .HeroHasAdvancedIntelligence:
-  ld    a,(ix+HeroTotalMana)
-	srl		a				                        ;/2
-  add   a,(ix+HeroTotalMana)            ;Hero's total spell points + 50%
-  ld    (ix+HeroTotalMana),a  
+  ld    c,(ix+HeroTotalMana+0)
+  ld    b,(ix+HeroTotalMana+1)
+  ld    de,2
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,bc
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
   ret
 
   ;Expert Intelligence Boosts your hero's maximum spell points by 100% (skillnr# 024)  
   .HeroHasExpertIntelligence:
-  ld    a,(ix+HeroTotalMana)
-  add   a,a                             ;Hero's total spell points + 100%
-  ld    (ix+HeroTotalMana),a  
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,hl                           ;Hero's total spell points + 100%
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
   ret
 
 SetNumber16Bit:                         ;in hl=number (16bit)
