@@ -3,10 +3,12 @@ call screenon
   xor   a
 	ld		(activepage),a			
   call  SetBattleFieldSnowGraphics
+  call  BattleMonster1Graphics
   ld    hl,.CopyPage1To2
   call  DoCopy
   call  SwapAndSetPage                  ;swap and set page
   call  SetBattleFieldSnowGraphics
+  call  BattleMonster1Graphics
 
 
   .engine:  
@@ -47,6 +49,14 @@ SetBattleFieldSnowGraphics:
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,BattleFieldSnowBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+BattleMonster1Graphics:
+  ld    hl,$4000 + (048*128) + (000/2) - 128
+  ld    de,$0000 + (100*128) + (100/2) - 128
+  ld    bc,$0000 + (064*256) + (056/2)
+  ld    a,BattleMonsterSpriteSheet1Block           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
 
 
 

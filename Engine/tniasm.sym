@@ -603,7 +603,7 @@ TradingHeroesInventoryButtonTable.Button4XRight: equ 07Ah ; last def. pass 3
 HeroPortrait14x9SYSXJanJackGibson: equ 0440Eh ; last def. pass 3
 heroymirror: equ 02646h ; last def. pass 3
 NameCreature015: equ 0B4FDh ; last def. pass 3
-HeroFled.loop: equ 0408Eh ; last def. pass 3
+HeroFled.loop: equ 040A2h ; last def. pass 3
 SetCastleUsingCastleWindowPointerInIX.SearchLoop: equ 0B7Bh ; last def. pass 3
 CheckHeroCollidesWithEnemyHero.checkpointerenemyloop: equ 0A14h ; last def. pass 3
 amountofplayers: equ 02725h ; last def. pass 3
@@ -976,6 +976,7 @@ IsItPossibleToLevelOrSetWisdom?: equ 059D4h ; last def. pass 3
 SetScrollVButtonTableGfxBlock: equ 063AAh ; last def. pass 3
 SetAvailableRecruitArmy.defense: equ 046D2h ; last def. pass 3
 SetAdditionalStatFromInventoryItemsInHL: equ 04FCFh ; last def. pass 3
+BattleMonster1Graphics: equ 04049h ; last def. pass 3
 DisplayEnemyHeroStatsRightClick: equ 017Eh ; last def. pass 3
 LevelUpButtonTableGfxBlock: equ 05BBDh ; last def. pass 3
 outix8: equ 0D5E6h ; last def. pass 3
@@ -1611,7 +1612,7 @@ HeroOverviewSpellBookButtonTableAmountOfButtons_Water: equ 0C20Ah ; last def. pa
 ClearHeroButtons: equ 0552Dh ; last def. pass 3
 MarketPlaceButton10YBottom: equ 075h ; last def. pass 3
 CheckHeroHasAtLeast2CreatureSlotsFilled.DefendingHeroCreatureSlot4Empty: equ 07E3Eh ; last def. pass 3
-HeroFled.HeroFound: equ 04095h ; last def. pass 3
+HeroFled.HeroFound: equ 040A9h ; last def. pass 3
 HeroOverViewSpellIconButton16MouseOverSY: equ 0B8h ; last def. pass 3
 HeroSYSXWit: equ 04FA0h ; last def. pass 3
 SetButtonStatusAndText4.go: equ 066BAh ; last def. pass 3
@@ -2263,7 +2264,7 @@ InventoryItem05Dx: equ 05Eh ; last def. pass 3
 ChestButtonTable.Button2XRight: equ 05Ah ; last def. pass 3
 HeroOverViewSpellIconButton12OffSX: equ 0E0h ; last def. pass 3
 DescriptionBoots2: equ 04DD8h ; last def. pass 3
-DeactivateHero: equ 04098h ; last def. pass 3
+DeactivateHero: equ 040ACh ; last def. pass 3
 CastleOverviewWindowButtonXright: equ 0Bh ; last def. pass 3
 InventoryItem23MouseOverSY: equ 0B0h ; last def. pass 3
 DescriptionGloves2: equ 04ECDh ; last def. pass 3
@@ -2693,6 +2694,7 @@ InventoryItem07Dx: equ 032h ; last def. pass 3
 setspritecharacter.MousepointInHud: equ 0195Eh ; last def. pass 3
 Pl1Hero3Units.HeroSkills: equ 02D7Eh ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button3YBottom: equ 061h ; last def. pass 3
+BattleMonsterSpriteSheet1Block: equ 052h ; last def. pass 3
 SetChestText.SetAmountOfXp: equ 0631Dh ; last def. pass 3
 CheckHeroCollidesWithEnemyHero.endcheck1: equ 0A2Dh ; last def. pass 3
 outix224: equ 0D436h ; last def. pass 3
@@ -3333,7 +3335,7 @@ Pl1Hero3Units.HeroStatKnowledge: equ 02D7Ch ; last def. pass 3
 SetTavernButtons.BrownButton: equ 082CBh ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.buttonIsStillLit: equ 0926Fh ; last def. pass 3
 SkillTextnecromancyBasic: equ 06054h ; last def. pass 3
-totallenght: equ 0148000h ; last def. pass 3
+totallenght: equ 0150000h ; last def. pass 3
 TextSkillsWindowButton4: equ 0CB04h ; last def. pass 3
 MarketPlaceButton10Ytop: equ 05Fh ; last def. pass 3
 movementpathpointer: equ 03637h ; last def. pass 3
@@ -3569,7 +3571,7 @@ spage: equ 03h ; last def. pass 3
 DYDXUnit5WindowInHud: equ 057EEh ; last def. pass 3
 HeroOverViewSpellIconButton20OffSY: equ 0A8h ; last def. pass 3
 Div8: equ 023Dh ; last def. pass 3
-InitiateBattle.engine: equ 04016h ; last def. pass 3
+InitiateBattle.engine: equ 0401Ch ; last def. pass 3
 GenericButtonTable3.Button3Ytop: equ 04Dh ; last def. pass 3
 MarketPlaceButton13Ytop: equ 08Fh ; last def. pass 3
 TextNumber0: equ 030h ; last def. pass 3
@@ -3652,7 +3654,7 @@ Pl4Hero1Units.HeroStatAttack: equ 03334h ; last def. pass 3
 HeroOverviewCode.MenuOptionSelected: equ 0620Fh ; last def. pass 3
 Pl4Hero1Units: equ 03322h ; last def. pass 3
 GenericButtonTable3.Button9XLeft: equ 0E6h ; last def. pass 3
-SetBattleFieldSnowGraphics: equ 04035h ; last def. pass 3
+SetBattleFieldSnowGraphics: equ 0403Bh ; last def. pass 3
 TextCoordinateTable: equ 068DBh ; last def. pass 3
 pl4hero9y: equ 0351Eh ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button7Ytop: equ 08Dh ; last def. pass 3
@@ -4069,7 +4071,7 @@ checktriggermapscreen.checkvertical: equ 01124h ; last def. pass 3
 outix250: equ 0D416h ; last def. pass 3
 HeroPortrait10x18SYSXTrevorBelmont: equ 0488Ah ; last def. pass 3
 ArmyGraphicsBlock: equ 023h ; last def. pass 3
-InitiateBattle.CopyPage1To2: equ 04026h ; last def. pass 3
+InitiateBattle.CopyPage1To2: equ 0402Ch ; last def. pass 3
 HeroOverViewInventoryIconButton15DX: equ 094h ; last def. pass 3
 InventoryItem40ButtonOffSX: equ 028h ; last def. pass 3
 DescriptionHelmet2: equ 04D0Ch ; last def. pass 3
@@ -4286,7 +4288,7 @@ SetHeroForWindow1DeterminedByHeroWindowPointerInIX: equ 01588h ; last def. pass 
 Pl2Hero1Units.EarthSpells: equ 02F17h ; last def. pass 3
 HeroOverViewSpellBookButton1MouseClickedSX: equ 0D4h ; last def. pass 3
 ReadOutKeyboardAndMovePointer.end: equ 016C0h ; last def. pass 3
-HeroFled: equ 0405Ch ; last def. pass 3
+HeroFled: equ 04070h ; last def. pass 3
 scrollscreen: equ 022FDh ; last def. pass 3
 HeroOverViewSpellIconButton9MouseOverSX: equ 0F0h ; last def. pass 3
 page1bank: equ 0D0h ; last def. pass 3
