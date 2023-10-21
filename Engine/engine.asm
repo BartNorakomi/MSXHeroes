@@ -29,6 +29,7 @@ LevelEngine:
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
+  call  AnimateHeroes                   ;check if a fight should happen, when player runs into enemy monster  
   .EndHeroChecks:
 
 ;  call  SetSpatInGame
@@ -171,6 +172,22 @@ vblank:
   ei
   ret
 
+AnimateHeroes:
+  ld    a,(framecounter)
+  and   3
+  ret   nz
+  ld    ix,(plxcurrentheroAddress)  
+  ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
+  ld    d,(ix+HeroSpecificInfo+1)
+  push  de
+  pop   ix                              ;hero specific info table in ix
+  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+  xor   8
+  ld    (ix+HeroinfoSYSX+0),a  
+	ret
+
+
+
 DivideBCbyDE:
 ;
 ; Divide 16-bit values (with 16-bit result)
@@ -208,6 +225,25 @@ Div16_NoAdd2:
     ld b,c
     ld c,a
     ret
+
+;;;;;;;;;;;;;; WE ALREADY HAVE MultiplyHlWithDE in castleovercode.asm
+;
+; Multiply 16-bit values (with 16-bit result)
+; In: Multiply BC with DE
+; Out: HL = result
+;
+;MultiplyBCwithDE:
+;    ld a,b
+;    ld b,16
+;Mult16_Loop:
+;    add hl,hl
+;    sla c
+;    rla
+;    jr nc,Mult16_NoAdd
+;    add hl,de
+;Mult16_NoAdd:
+;    djnz Mult16_Loop
+;    ret
 
 EnemyHeroThatPointerIsOn: ds  2
 DisplayEnemyHeroStatsRightClick?: db  0
@@ -1732,9 +1768,10 @@ ActivateFirstActiveHeroForCurrentPlayer:
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
 	ld		(SetHeroesInWindows?),a	
 	ld		(SetCastlesInWindows?),a	
-	ld		(ChangeManaAndMovement?),a	
 	ld		(SetHeroArmyAndStatusInHud?),a
 	ld		(SetResources?),a
+  ld    a,4
+	ld		(ChangeManaAndMovement?),a	
 
   call  CheckIfCurrentPlayerIsDisabled  ;if player has no castles and no heroes, he's out of the game
   ret   nc
@@ -2075,13 +2112,20 @@ movehero:
   ld    ix,(plxcurrentheroAddress)
   ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   
-;  call  SetHero1ForCurrentPlayerInIX
-;	call	CheckHeroNearObject	            ;check if hero takes an artifact, or goes in the castle, or meets another hero or creature
-
 	ld		a,(ix+HeroMove)
 	sub		a,1                             ;we reduce the amount of movement steps hero has this turn, when it reaches 0, end movement
 	jr		c,.endmovement
 	ld		(ix+HeroMove),a
+
+;  ld    l,(ix+HeroMana+0)               ;mana
+;  ld    h,(ix+HeroMana+1)               ;mana
+;  ld    de,1
+;  xor   a
+;  sbc   hl,de
+;	jr		c,.endmovement
+;  ld    (ix+HeroMana+0),l               ;mana
+;  ld    (ix+HeroMana+1),h               ;mana
+
 	ld		a,3
 	ld		(ChangeManaAndMovement?),a
 
@@ -3572,12 +3616,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		(mouseposy),a
 ;/set relative mouse position
 
-
-  ld    ix,(plxcurrentheroAddress)
-  ld    a,(ix+HeroStatus)
-  cp    255
-	jp		z,.EndCheckPointerOnHero         ;if player has no active heroes, skip checking if pointer is on enemy hero
-
 	ld		de,lenghtherotable
 	ld		a,(whichplayernowplaying?) | cp 1 | ld ix,pl1hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
 	ld		a,(whichplayernowplaying?) | cp 2 | ld ix,pl2hero1y | call .checkpointeronhero  ;check if pointer is on friendly/enemy hero
@@ -3586,6 +3624,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   .EndCheckPointerOnHero:
 
 	call	.CheckPointerOnCastle           ;check if pointer is on a castle
+	call	.checkpointeroncreature         ;check if pointer is on creature
 
   ld    ix,(plxcurrentheroAddress)
   ld    a,(ix+HeroStatus)
@@ -3593,7 +3632,6 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    hl,CursorHand
 	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
 
-	call	.checkpointeroncreature         ;check if pointer is on creature
 	call	.checkpointeritem               ;check if pointer is on an item
 	jp		.shoe					                  ;pointer on no hero at all, show shoe
 ;	ret
@@ -3617,11 +3655,25 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .EnemyCastle:
 	pop		af				                      ;pop call
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ld    hl,CursorHand
+	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
+
   ld    hl,CursorSwords
 	jp		.setcharacter
 
   .FriendlyCastleShowCursorWalkingBoots:
 	pop		af				                      ;pop call
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ld    hl,CursorHand
+	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
+
   ld    hl,CursorWalkingBoots
 	jp		.setcharacter
     
@@ -3709,6 +3761,12 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	bit		5,a						                  ;trig-b pressed ?
   jr    nz,.TrigBPressed
 
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ld    hl,CursorHand
+	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
+
   ld    hl,CursorSwords
 	jp		.setcharacter
 
@@ -3775,6 +3833,12 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	ld		a,(NewPrControlsOnInterrupt)
 	bit		5,a						                  ;trig-b pressed ?
   jr    nz,.TrigBPressedEnemyHero
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ld    hl,CursorHand
+	jp		z,.setcharacter                  ;if player has no active heroes, just show cursor hand
 
   ld    hl,CursorSwords
 	jp		.setcharacter
@@ -4773,18 +4837,18 @@ EmptyHeroRecruitedAtTavern:
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero1y:		db	3
-pl1hero1x:		db	3
+pl1hero1x:		db	5
 pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
-pl1hero1mana:	dw	02,20
+pl1hero1mana:	dw	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 003 | dw 020 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 001 | dw 710 |      db 080 | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  1,22,0,30,0,0
+.HeroSkills:  db  1,22,21,30,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -4803,10 +4867,10 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
 
-pl1hero2y:		db	0
-pl1hero2x:		db	6
+pl1hero2y:		db	1
+pl1hero2x:		db	3
 pl1hero2xp: dw 0000
-pl1hero2move:	db	20,20
+pl1hero2move:	db	01,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4826,13 +4890,13 @@ Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 | 
 .HeroSpecificInfo: dw HeroAddressesUltraBox
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero3y:		db	05	                ;
-pl1hero3x:		db	06
+pl1hero3y:		db	02	                ;
+pl1hero3x:		db	04
 pl1hero3xp: dw 0000
-pl1hero3move:	db	30,20
+pl1hero3move:	db	20,20
 pl1hero3mana:	dw	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4852,7 +4916,7 @@ Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 pl1hero4y:		db	00		                ;
 pl1hero4x:		db	00		
 pl1hero4xp: dw 0000
-pl1hero4move:	db	30,20
+pl1hero4move:	db	20,20
 pl1hero4mana:	dw	10,20
 pl1hero4manarec:db	5		                ;recover x mana every turn
 pl1hero4status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4875,7 +4939,7 @@ Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 | 
 pl1hero5y:		db	00		                ;
 pl1hero5x:		db	01		
 pl1hero5xp: dw 0000
-pl1hero5move:	db	30,20
+pl1hero5move:	db	20,20
 pl1hero5mana:	dw	10,20
 pl1hero5manarec:db	5		                ;recover x mana every turn
 pl1hero5status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4898,7 +4962,7 @@ Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 pl1hero6y:		db	00		                ;
 .pl1hero6x:		db	02		
 .pl1hero6xp: dw 0000
-.pl1hero6move:	db	30,20
+.pl1hero6move:	db	20,20
 .pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4921,7 +4985,7 @@ pl1hero6y:		db	00		                ;
 pl1hero7y:		db	00		                ;
 .pl1hero6x:		db	03		
 .pl1hero6xp: dw 0000
-.pl1hero6move:	db	30,20
+.pl1hero6move:	db	20,20
 .pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -4944,7 +5008,7 @@ pl1hero7y:		db	00		                ;
 pl1hero8y:		db	00		                ;
 .pl1hero6x:		db	04		
 .pl1hero6xp: dw 0000
-.pl1hero6move:	db	30,20
+.pl1hero6move:	db	20,20
 .pl1hero6mana:	dw	10,20
 .pl1hero6manarec:db	5		                ;recover x mana every turn
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -5016,8 +5080,8 @@ pl2hero9y:		db	00		                ;
 pl3hero1y:		db	100
 pl3hero1x:		db	02
 pl3hero1xp: dw 0000
-pl3hero1move:	db	10,20
-pl3hero1mana:	dw	10,20
+pl3hero1move:	db	20,20
+pl3hero1mana:	dw	20,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl3Hero1Units:  db 033 | dw 003 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount

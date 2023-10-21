@@ -1333,9 +1333,8 @@ EndTurn:
 
   call  SetHero1ForCurrentPlayerInIX
 
-  ;reset all heroes mana and movement for this player
+  ;reset all heroes' mana and movement for this player
 	ld		b,amountofheroesperplayer 
-	ld		de,lenghtherotable
   .loop:
 
   ld    l,(ix+HeroMana+0)
@@ -1356,9 +1355,9 @@ EndTurn:
   ld    (ix+HeroMana+0),l
   ld    (ix+HeroMana+1),h
 
-
 	ld		a,(ix+HeroTotalMove)		  ;total movement
 	ld		(ix+HeroMove),a		        ;reset total movement
+	ld		de,lenghtherotable
 	add		ix,de				              ;next hero
 	djnz	.loop
 
@@ -2238,56 +2237,59 @@ SetManaAndMovementBars:
 
   PutManaBar:
   exx
-  ;multiply current mana by 10
-  ld    h,0
-  ld    l,(ix+HeroMana)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  add   hl,hl                           ;*2
+
+  ;multiply current mana by 10, then divide by the total mana, the result will be percentage per 10
+  ld    l,(ix+HeroMana+0)               ;mana
+  ld    h,(ix+HeroMana+1)               ;mana
+  ld    de,10
+  call  MultiplyHlWithDE                ;In: HL/DE. HL = result
+
   push  hl
-  add   hl,hl                           ;*4
-  add   hl,hl                           ;*8
-  pop   de
-  add   hl,de                           ;*10
+  pop   bc
+  ld    e,(ix+HeroTotalMana+0)          ;total mana
+  ld    d,(ix+HeroTotalMana+1)          ;total mana
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
 
-  ld    e,(ix+HeroTotalMana)            ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    a,c
+  or    a
   ld    bc,$4000 + (107*128) + (042/2) - 128
-  jr    c,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
+  dec   a
   ld    bc,$4000 + (107*128) + (040/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (038/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (036/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (034/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (032/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (030/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (028/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (026/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (024/2) - 128
-  jr    c,.EndSearchPercentageMovement
+  jr    z,.EndSearchPercentageMovement
   ld    bc,$4000 + (107*128) + (022/2) - 128
   jr    .EndSearchPercentageMovement
 
   .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
-  ld    a,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  and   a
+  ld    a,(ix+HeroMana+0)               ;mana
+  ld    h,(ix+HeroMana+1)               ;mana
+  or    h
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + (107*128) + (018/2) - 128
+  ld    bc,$4000 + (107*128) + (040/2) - 128
 
   .EndSearchPercentageMovement:
   push  bc
@@ -2300,48 +2302,49 @@ SetManaAndMovementBars:
 
   PutMovementBar:
   exx
-  ;multiply current move by 10
+  ;multiply current move by 10, then divide by the total move, the result will be percentage per 10
   ld    h,0
-  ld    l,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  add   hl,hl                           ;*2
+  ld    l,(ix+HeroMove)                 ;mana
+  ld    de,10
+  call  MultiplyHlWithDE                ;In: HL/DE. HL = result
+
   push  hl
-  add   hl,hl                           ;*4
-  add   hl,hl                           ;*8
-  pop   de
-  add   hl,de                           ;*10
+  pop   bc
+  ld    d,0
+  ld    e,(ix+HeroTotalMove)            ;total mana
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
 
-  ld    e,(ix+HeroTotalMove)            ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  ld    a,c
+  or    a
   ld    bc,$4000 + (107*128) + (020/2) - 128
-  jr    c,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
+  dec   a
   ld    bc,$4000 + (107*128) + (018/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (016/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (014/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (012/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (010/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (008/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (006/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (004/2) - 128
-  jr    c,.EndSearchPercentageMovement
-  sbc   hl,de                           ;subtract total move max 10x to find percentage value per 10
+  jr    z,.EndSearchPercentageMovement
+  dec   a
   ld    bc,$4000 + (107*128) + (002/2) - 128
-  jr    c,.EndSearchPercentageMovement
+  jr    z,.EndSearchPercentageMovement
   ld    bc,$4000 + (107*128) + (000/2) - 128
   jr    .EndSearchPercentageMovement
 
