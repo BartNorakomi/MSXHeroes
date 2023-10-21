@@ -29,7 +29,8 @@ LevelEngine:
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
-  call  AnimateHeroes                   ;check if a fight should happen, when player runs into enemy monster  
+  call  AnimateHeroes                   ;animate the current active hero
+  call  CheckEnterCombat                ;
   .EndHeroChecks:
 
 ;  call  SetSpatInGame
@@ -171,6 +172,15 @@ vblank:
   pop   af 
   ei
   ret
+
+EnterCombat?: db    0
+CheckEnterCombat:
+  ld    a,(EnterCombat?)
+  dec   a
+  ret   m
+  ld    (EnterCombat?),a
+  jp    EnterCombat
+  
 
 AnimateHeroes:
   ld    a,(framecounter)
@@ -1274,6 +1284,11 @@ CheckHeroCollidesWithMonster:
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
 
+  call  .RemoveMonster
+  jp    EnterCombat
+
+
+  .RemoveMonster:
   call  AddXPToHero
 
   ld    (hl),0                          ;remove monster from object layer map

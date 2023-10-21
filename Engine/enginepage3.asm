@@ -13,12 +13,16 @@ InitiateGame:
   ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
 
+  ld    a,1
+  ld    (EnterCombat?),a
+
 StartGame:
+  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
+  call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
+  .WhenExitingCombat:
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
-  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
-  call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
 
   .WhenExitingHeroOverviewCastleAndBattle:
   call  SetScreenOff
@@ -38,6 +42,7 @@ StartGame:
   ld    (WhichCastleIsPointerPointingAt?),hl
   ld    a,1
 ;  ld    (EnterCastle?),a
+
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -1759,103 +1764,39 @@ SwapButDontSetPage:
   ret
 
 EnterCombat:
-  call  SetTempisr                      ;end the current interrupt handler used in the engine
-
   ld    a,3
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-  ld    a,3
-	ld		(SetResources?),a               ;this piece can be moved to the combat code
 
-	ld		a,(activepage)
-  or    a
-  ld    hl,$8000
-  jr    z,.ActivePageFound
-  ld    hl,$0000
-  .ActivePageFound:
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+	ld		a,(memblocks.1)
+	push  af
 
-  ;load battle field graphics to inactive page
-  ld    d,BattleFieldSnowBlock
-  ld    a,0
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a      
 
-	ld		a,(activepage)                  ;switch page so that battle field graphics will become visible
-	xor		1                               ;now we switch and set our page
-	ld		(activepage),a			
-	call	SetPageSpecial					        ;set page
-  
-  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
-;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
-  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
-;  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
+  ld    a,BattleCodeBlock               ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  call  SetSpatInCastle
+  call  InitiateBattle
+  call  SetSpatInGame
+
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
 
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
   ld    (vblankintflag),a
   ;if there were movement stars before entering Hero Overview, then remove them
 	ld		(putmovementstars?),a
-	ld		(movementpathpointer),a
-	ld		(movehero?),a	
   ld    (framecounter),a
-  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
+	ld		(movehero?),a	
 
-HeroFled:
-  ld    (ix+HeroStatus),254             ;254 = hero fled
-  ld    (ix+Heroy),255
-  ld    (ix+Herox),255
-
-  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
-  ld    h,(ix+HeroSpecificInfo+1)
-  ld    de,HeroInfoNumber
-  add   hl,de
-  ld    b,(hl)                          ;hero number
-
-  ;now start looking at end of table, keep moving left until we found a hero. Then set the stored hero 1 slot right of that hero
-  ld    a,(PlayerThatGetsAttacked)
-  cp    1
-  ld    hl,TavernHeroesPlayer1+TavernHeroTableLenght-2
-  jr    z,.loop
-  cp    2
-  ld    hl,TavernHeroesPlayer2+TavernHeroTableLenght-2
-  jr    z,.loop
-  cp    3
-  ld    hl,TavernHeroesPlayer3+TavernHeroTableLenght-2
-  jr    z,.loop
-  ld    hl,TavernHeroesPlayer4+TavernHeroTableLenght-2
-  .loop:
-  ld    a,(hl)
-  or    a
-  jr    nz,.HeroFound
-  dec   hl
-  jr    .loop
-
-  .HeroFound:
-  inc   hl
-  ld    (hl),b
-  ret
-  
-DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
-  ld    (ix+HeroStatus),255             ;255 = inactive
-
-  push  ix
-  pop   hl
-	ld		de,lenghtherotable
-  add   hl,de                           ;set hero below Deactivated in hl
-
-  push  ix
-  pop   de                              ;set deactivated hero in de
-  
-  ld    bc,(AmountHeroesTimesLenghtHerotableBelowHero) ;amount of heroes we need to move * lenghtherotable
-
-  ld    a,b
-  or    c
-  ret   z                               ;no heroes below this hero (so this hero is hero 8)
-
-  ldir
-
-  ld    iy,(LastHeroForPlayerThatGetsAttacked)
-  ld    (iy+HeroStatus),255             ;255 = inactive
-  ret
+  call  SetTempisr                      ;end the current interrupt handler used in the engine
+  jp    StartGame.WhenExitingCombat
 
 SetAllSpriteCoordinatesInPage2:
   ld    hl,0*128+(000/2) - 128        ;(dy*128 + dx/2) Destination in Vram page 2

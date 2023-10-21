@@ -817,5 +817,13 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+; block $50 - 51
+;
+BattleCodeBlock:  equ   $50
+phase	$4000
+  include "BattleCode.asm"
+	ds		$c000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
