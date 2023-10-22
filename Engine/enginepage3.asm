@@ -157,12 +157,107 @@ CopyRamToVramCorrectedCastleOverview:
   ret
 
 
+CopyRamToVramPag3:
+  ex    af,af'                          ;store rom block
+
+  in    a,($a8)                         ;store current rom/ram settings of page 1+2
+  push  af
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1+2
+  out   ($a8),a      
+
+  ld    a,(BlockToReadFrom)
+  di
+	ld		($6000),a
+	inc   a
+	ld		($7000),a
+	ei
+
+  call  .go                             ;go copy
+
+;now set engine back in page 1+2 in rom
+	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+  ret
+
+.go:
+
+  ld    c,$98                           ;out port
+  ld    de,128                          ;increase 128 bytes to go to the next line
+  di
+
+  .loop:
+  call  .WriteOneLine
+  ld    a,(NXAndNY+1)
+  dec   a
+  ld    (NXAndNY+1),a
+  jp    nz,.loop
+  ei
+  ret
+
+  .WriteOneLine:
+  ld    a,1
+  ld    hl,(AddressToWriteTo)           ;set next line to start writing to
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteTo),hl
+	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
+
+  ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
+  add   hl,de                           ;increase 128 bytes to go to the next line
+  ld    (AddressToWriteFrom),hl
+  ld    a,(NXAndNY)
+  ld    b,a
+  otir
+  ret
+
+BlockToReadFrom:            ds  1
+AddressToWriteTo:           ds  2
+AddressToWriteFrom:         ds  2
+NXAndNY:                    ds  2
+
+TransparantImageBattle:
+	db		000,000,000,3
+	db		100,000,100,255
+	db		000,000,000,0
+	db		0,%0000 1000,$98  ;transfer from down to up
+
+EraseMonster:
+	db		000,000,000,2
+	db		000,000,000,255
+	db		000,000,000,0
+	db		0,%0000 1000,$d0  ;transfer from down to up
+
+CurrentActiveMonster: db  0
+
+MonsterY:             equ 0
+MonsterX:             equ MonsterY+1
+MonsterYPrevious:     equ MonsterX+1
+MonsterXPrevious:     equ MonsterYPrevious+1
+MonsterSYXY:          equ MonsterXPrevious+1
+MonsterNYNY:          equ MonsterSYXY+2
+MonsterBlock:         equ MonsterNYNY+2
+
+Monster0:
+.y: db  080
+.x: db  007
+.yprevious: db  100
+.xprevious: db  10
+.SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
+.NYNX:      dw  $0000 + (064*256) + (056/2)
+.RomBlock:  db  BattleMonsterSpriteSheet1Block
 
 
-
-
-
-
+Monster1:
+.y: db  100-25
+.x: db  164
+.yprevious: db  100
+.xprevious: db  100
+.SYSXinROM: dw  $4000 + (048*128) + (112/2) - 128
+.NYNX:      dw  $0000 + (064*256) + (056/2)
+.RomBlock:  db  BattleMonsterSpriteSheet1Block
 
 
 
@@ -912,8 +1007,6 @@ GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit
 .Button12YBottom:        equ .Button12Ytop + 016
 .Button12XLeft:          equ 232
 .Button12XRight:         equ .Button12XLeft + 016
-
-
 
 
 

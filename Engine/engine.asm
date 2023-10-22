@@ -411,6 +411,7 @@ Div8_NoAdd:
 
 Backdrop:
   ld    a,r
+  .in:
   di
   out   ($99),a
   ld    a,7+128
@@ -1519,12 +1520,6 @@ CheckHeroPicksUpItem:
   ld    (ix+8),l
   ld    (ix+9),h  
   ret
-
-
-
-AddressToWriteTo:           ds  2
-AddressToWriteFrom:         ds  2
-NXAndNY:                    ds  2
 
 NXAndNY10x18HeroPortraits:          equ 018*256 + (010/2)            ;(ny*256 + nx/2) = (10x18)
 NXAndNY14x9HeroPortraits:           equ 009*256 + (014/2)            ;(ny*256 + nx/2) = (14x09)
@@ -3516,6 +3511,12 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   jr    z,.HeroOverview
   dec   a
   jr    z,.CastleOverview
+  dec   a
+  jr    z,.Battle
+
+  .Battle:
+  ld    hl,CursorHand
+	jp		.setcharacter
 
   .CastleOverview:
   ld    hl,CursorHand
