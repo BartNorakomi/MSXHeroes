@@ -222,14 +222,14 @@ TransparantImageBattle:
 	db		000,000,000,3
 	db		100,000,100,255
 	db		000,000,000,0
-	db		0,%0000 1000,$98  ;transfer from down to up
-
+	db		0,%0000 0000,$98
+	
 EraseMonster:
 	db		000,000,000,2
 	db		000,000,000,255
 	db		000,000,000,0
-	db		0,%0000 1000,$d0  ;transfer from down to up
-
+	db		0,%0000 0000,$d0
+	
 CurrentActiveMonster: db  0
 
 MonsterY:             equ 0
@@ -239,28 +239,42 @@ MonsterXPrevious:     equ MonsterYPrevious+1
 MonsterSYXY:          equ MonsterXPrevious+1
 MonsterNYNY:          equ MonsterSYXY+2
 MonsterBlock:         equ MonsterNYNY+2
+MonsterNY:            equ MonsterBlock+1
+MonsterNX:            equ MonsterNY+1
 
 Monster0:
-.y: db  080
-.x: db  007
+.y: db  100
+.x: db  100
 .yprevious: db  100
 .xprevious: db  10
 .SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
 .NYNX:      dw  $0000 + (064*256) + (056/2)
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-
+.ny:  db  64
+.nx:  db  56
 
 Monster1:
-.y: db  100-25
-.x: db  164
+.y: db  100
+.x: db  100-20 ;+63
+.yprevious: db  100
+.xprevious: db  100
+.SYSXinROM: dw  $4000 + (032*128) + (000/2) - 128
+.NYNX:      dw  $0000 + (016*256) + (016/2)
+.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.ny:  db  16
+.nx:  db  16
+
+
+Monster2:
+.y: db  100-18
+.x: db  100-80 ;+63
 .yprevious: db  100
 .xprevious: db  100
 .SYSXinROM: dw  $4000 + (048*128) + (112/2) - 128
 .NYNX:      dw  $0000 + (064*256) + (056/2)
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-
-
-
+.ny:  db  64
+.nx:  db  56
 
 
 

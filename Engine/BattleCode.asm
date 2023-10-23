@@ -29,8 +29,8 @@ call screenon
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
-  call  DoCopy
+;  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+;  call  DoCopy
 
   ld    a,03                ;we can store the previous vblankintflag time and cp the current with that value
   ld    hl,vblankintflag    ;this way we speed up the engine when not scrolling
@@ -48,43 +48,312 @@ call screenon
 	db		0,0,$d0	
 
 HandleMonsters:
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-	ld		a,(NewPrContr)
-  bit   4,a
-  jr    z,.EndCheckSpace
-
-  ld    a,(CurrentActiveMonster)
-  xor   1
-  ld    (CurrentActiveMonster),a
-  .EndCheckSpace:
-
-
   ld    a,(CurrentActiveMonster)
   or    a
   ld    ix,Monster0
   jp    z,HandleMonster
   dec   a
   ld    ix,Monster1
-  jp    z,HandleMonster
+;  jp    z,HandleMonster
+
+  call  HandleMonster
+  call  RecoverOverwrittenMonsters
+  ret
+
+RecoverOverwrittenMonsters:
+  ld    iy,Monster0
+
+
+
+  ;check bottom side active monster surpasses bottom side monster we check
+  ld    a,(iy+MonsterY)                 ;x active monster
+  add   a,(iy+MonsterNY)
+  ld    b,a
+  ld    a,(ix+MonsterY)                 ;x active monster
+  add   a,(ix+MonsterNY)
+  cp    b
+  ret   nc
+
+
+
+  ;check right side active monster surpasses left side monster we check
+  ld    a,(ix+MonsterX)                 ;x active monster
+  add   a,(ix+MonsterNX)
+  sub   (iy+MonsterX)                   ;cp with monster we check
+  ret   c
+
+  ;check left side active monster surpasses right side monster we check
+  ld    a,(iy+MonsterX)                 ;x monster we check
+  add   a,(iy+MonsterNX)
+  sub   (ix+MonsterX)                   ;cp with active monster
+  ret   c
+
+  ;check bottom side active monster surpasses top side monster we check
+  ld    a,(ix+MonsterY)                 ;x active monster
+  add   a,(ix+MonsterNY)
+  sub   (iy+MonsterY)                   ;cp with monster we check
+  ret   c
+
+  ;check top side active monster surpasses bottom side monster we check
+  ld    a,(iy+MonsterY)                 ;x monster we check
+  add   a,(iy+MonsterNY)
+  sub   (ix+MonsterY)                   ;cp with active monster
+  ret   c
+
+
+
+
+
+
+
+  ;check right side active monster surpasses left side monster we check
+  ld    a,(ix+MonsterX)                 ;x active monster
+  add   a,(ix+MonsterNX)
+  sub   (iy+MonsterX)                   ;cp with monster we check
+  ret   c
+  cp    (ix+MonsterNX)
+  jr    c,.NXFoundLeft
+
+  ;check left side active monster surpasses right side monster we check
+  ld    a,(iy+MonsterX)                 ;x monster we check
+  add   a,(iy+MonsterNX)
+  sub   (ix+MonsterX)                   ;cp with active monster
+  ret   c
+  cp    (ix+MonsterNX)
+  jr    c,.NXFoundRight
+
+  .NXFoundMiddle:
+  ld    a,(ix+MonsterNX)                ;x active monster
+	srl		a				                        ;/2
+  ld    c,a                             ;nx monster  
+
+  ld    a,(ix+MonsterX)                 ;x active monster
+  sub   (iy+MonsterX)                   ;cp with monster we check
+	srl		a				                        ;/2
+  ld    e,a                             ;add to sx (/2) of recovery sprite
+  jr    .NxSet
+
+  .NXFoundRight:
+	srl		a				                        ;/2
+  jr    nz,.EndZeroCheckRight
+  ld    a,2
+  .EndZeroCheckRight:
+  ld    c,a                             ;nx (/2) recovery sprite
+
+  ld    a,(iy+MonsterNX)                ;x monster we check with
+	srl		a				                        ;/2
+
+  sub   a,c  
+  ld    e,a                             ;add to sx (/2) of recovery sprite
+  jr    .NxSet
+
+  .NXFoundLeft:
+	srl		a				                        ;/2
+  jr    nz,.EndZeroCheckLeft
+  ld    a,2
+  .EndZeroCheckLeft:
+  ld    c,a                             ;nx (/2) recovery sprite
+  ld    e,00/2                          ;add to sx (/2) of recovery sprite
+  jr    .NxSet
+
+  .NxSet:
+
+
+
+
+
+
+
+
+
+  ;check bottom side active monster surpasses top side monster we check
+  ld    a,(ix+MonsterY)                 ;x active monster
+  add   a,(ix+MonsterNY)
+  sub   (iy+MonsterY)                   ;cp with monster we check
+  ret   c
+  cp    (ix+MonsterNY)
+  jr    c,.NYFoundTop
+
+  ;check top side active monster surpasses bottom side monster we check
+  ld    a,(iy+MonsterY)                 ;x monster we check
+  add   a,(iy+MonsterNY)
+  sub   (ix+MonsterY)                   ;cp with active monster
+  ret   c
+  cp    (ix+MonsterNY)
+  jr    c,.NYFoundBottom
+
+  .NYFoundMiddle:
+  ld    a,(ix+MonsterNY)                ;x active monster
+  inc   a
+  ld    b,a
+
+  ld    a,(ix+MonsterY)                 ;x active monster
+  sub   (iy+MonsterY)                   ;cp with monster we check
+	srl		a				                        ;/2
+  ld    d,a                             ;add to sy (/2) of recovery sprite
+  jr    .NYSet
+
+  .NYFoundBottom:
+  or    a
+  jr    nz,.EndZeroCheckBottom
+  ld    a,1
+  .EndZeroCheckBottom:
+  ld    b,a                             ;nx (/2) recovery sprite
+
+  ld    a,(iy+MonsterNY)                ;x active monster
+
+  sub   a,b  
+	srl		a				                        ;/2
+  ld    d,a                             ;add to sx (/2) of recovery sprite
+  jr    .NYSet
+
+  .NYFoundTop:
+  or    a
+  jr    nz,.EndZeroCheckTop
+  ld    a,1
+  .EndZeroCheckTop:
+  ld    b,a                             ;nx (/2) recovery sprite
+  ld    d,00/2                          ;add to sx (/2) of recovery sprite
+  jr    .NYSet
+
+  .NYSet:
+
+
+
+
+  ld    ix,Monster0
+  
+  ld    a,(framecounter)
+  and   1
+  ld    hl,$4000 + (048*128) + (056/2) - 128
+  jr    z,.set
+  ld    hl,$4000 + (112*128) + (056/2) - 128
+  .set:
+
+  ld    hl,$4000 + (048*128) + (000/2) - 128
+
+
+  ;Sx
+  ld    a,l                             ;SX (/2)
+  add   a,e                             ;add to sx of recovery sprite
+  ld    l,a
+
+  ;SY
+  ld    a,h                             ;SY (/2)
+  add   a,d                             ;add to sy of recovery sprite  
+  ld    h,a
+
+  ld    a,(ix+MonsterBlock+0)           ;Romblock of sprite
+
+  ld    (AddressToWriteFrom),hl
+  ld    (NXAndNY),bc
+  ld    (BlockToReadFrom),a
+
+;PutMonster:
+	ld		a,(activepage)
+  xor   1
+  .SetdPage:
+	ld    (TransparantImageBattle+dPage),a
+
+  ld    a,(ix+MonsterY)
+  
+  add   a,d                           ;add to dy (/2) of recovery sprite
+  add   a,d
+  
+  ld    (TransparantImageBattle+dy),a  
+  ld    a,(ix+MonsterX)
+
+  add   a,e                           ;add to dx (/2) of recovery sprite
+  add   a,e
+
+  ld    (TransparantImageBattle+dx),a
+
+  ld    bc,(NXAndNY)
+  ld    a,c
+  add   a,a
+  ld    (TransparantImageBattle+nx),a
+  ld    a,b
+  ld    (TransparantImageBattle+ny),a
+  xor   a
+  ld    (TransparantImageBattle+sy),a   ;since we copy from the bottom upwards, sy has to be -1
+
+  ld    a,(TransparantImageBattle+sx)
+  add   a,64                            ;address to read from in page 3. every next copy will have it's dx+sx increased by 64
+  ld    (TransparantImageBattle+sx),a
+  ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (064/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (128/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (192/2) - 128  ;dy,dx
+  .DestinationAddressInPage3Set:
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+
+  call  CopyRamToVramPag3          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,TransparantImageBattle
+  call  docopy
+  ret
+
+
+PutMonster:
+	ld		a,(activepage)
+  xor   1
+  .SetdPage:
+	ld    (TransparantImageBattle+dPage),a
+
+  ld    a,(ix+MonsterY)
+  ld    (TransparantImageBattle+dy),a  
+  ld    a,(ix+MonsterX)
+  ld    (TransparantImageBattle+dx),a
+
+  ld    bc,(NXAndNY)
+  ld    a,c
+  add   a,a
+  ld    (TransparantImageBattle+nx),a
+  ld    a,b
+  ld    (TransparantImageBattle+ny),a
+  xor   a
+  ld    (TransparantImageBattle+sy),a   ;since we copy from the bottom upwards, sy has to be -1
+
+  ld    a,(TransparantImageBattle+sx)
+  add   a,64                            ;address to read from in page 3. every next copy will have it's dx+sx increased by 64
+  ld    (TransparantImageBattle+sx),a
+  ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (064/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (128/2) - 128  ;dy,dx
+  jr    z,.DestinationAddressInPage3Set
+  sub   a,64
+  ld    de,$8000 + (000*128) + (192/2) - 128  ;dy,dx
+  .DestinationAddressInPage3Set:
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+
+  call  CopyRamToVramPag3          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,TransparantImageBattle
+  call  docopy
   ret
 
 HandleMonster:
   ld    l,(ix+MonsterSYXY+0)            ;SY SX in rom
   ld    h,(ix+MonsterSYXY+1)
 
-  ld    a,(framecounter)
-  and   7
-  cp    4
-  jr    c,.EndAnimation
-  ld    de,28
-  add   hl,de
-  .EndAnimation:
+;  ld    a,(framecounter)
+;  and   7
+;  cp    4
+;  jr    c,.EndAnimation
+;  ld    de,28
+;  add   hl,de
+;  .EndAnimation:
   
-
   ld    c,(ix+MonsterNYNY+0)            ;NY NX
   ld    b,(ix+MonsterNYNY+1)
   ld    a,(ix+MonsterBlock+0)           ;Romblock of sprite
@@ -96,6 +365,26 @@ HandleMonster:
   call  EraseMonsterPreviousFrame
   call  MoveMonster
   call  PutMonster
+;  call  RecoverOverwrittenMonsters
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+  bit   4,a
+  ret   z
+
+  ;when we switch to another monster, put current monster also in page 2, so it becomes part of the background
+  ld    a,2
+	ld    (TransparantImageBattle+dPage),a  
+  ld    hl,TransparantImageBattle
+  call  docopy
+  
+  ld    a,(CurrentActiveMonster)
+  xor   1
+  ld    (CurrentActiveMonster),a
   ret
   
 MoveMonster:
@@ -122,25 +411,25 @@ MoveMonster:
 
   .up:
   ld    a,(ix+MonsterY)
-  sub   a,9
+  sub   a,4
   ld    (ix+MonsterY),a
   ret
 
   .down:
   ld    a,(ix+MonsterY)
-  add   a,9
+  add   a,4
   ld    (ix+MonsterY),a
   ret
 
   .left:
   ld    a,(ix+MonsterX)
-  sub   a,9
+  sub   a,4
   ld    (ix+MonsterX),a
   ret
 
   .right:
   ld    a,(ix+MonsterX)
-  add   a,9
+  add   a,4
   ld    (ix+MonsterX),a
   ret
 
@@ -169,46 +458,6 @@ EraseMonsterPreviousFrame:
   call  docopy
   ret
 
-PutMonster:
-	ld		a,(activepage)
-  xor   1
-	ld    (TransparantImageBattle+dPage),a
-
-  ld    a,(ix+MonsterY)
-  ld    (TransparantImageBattle+dy),a  
-  ld    a,(ix+MonsterX)
-  ld    (TransparantImageBattle+dx),a
-
-  ld    bc,(NXAndNY)
-  ld    a,c
-  add   a,a
-  ld    (TransparantImageBattle+nx),a
-  ld    a,b
-  ld    (TransparantImageBattle+ny),a
-  dec   a
-  ld    (TransparantImageBattle+sy),a   ;since we copy from the bottom upwards, sy has to be -1
-
-  ld    a,(TransparantImageBattle+sx)
-  add   a,64                            ;address to read from in page 3. every next copy will have it's dx+sx increased by 64
-  ld    (TransparantImageBattle+sx),a
-  ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
-  jr    z,.DestinationAddressInPage3Set
-  sub   a,64
-  ld    de,$8000 + (000*128) + (064/2) - 128  ;dy,dx
-  jr    z,.DestinationAddressInPage3Set
-  sub   a,64
-  ld    de,$8000 + (000*128) + (128/2) - 128  ;dy,dx
-  jr    z,.DestinationAddressInPage3Set
-  sub   a,64
-  ld    de,$8000 + (000*128) + (192/2) - 128  ;dy,dx
-  .DestinationAddressInPage3Set:
-  ld    (AddressToWriteTo),de           ;address to write to in page 3
-
-  call  CopyRamToVramPag3          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  ld    hl,TransparantImageBattle
-  call  docopy
-  ret
 
 
   
