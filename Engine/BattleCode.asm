@@ -88,6 +88,10 @@ BuildUpBattleFieldAndPutMonsters:
   call  .SetAllMonsters                 ;set all monsters in page 0
   call  .CopyAllMonstersToPage1and2
   xor   a
+  
+  
+  
+  ld a,1
   ld    (CurrentActiveMonster),a
   ret
 
@@ -100,7 +104,7 @@ BuildUpBattleFieldAndPutMonsters:
   
   .SetAllMonsters:
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-  ld    a,1                             ;skip monster 0, which is our grid tile
+  ld    a,2                             ;skip monster 0+1, which is our grid tile and first monster
   ld    (CurrentActiveMonster),a
   .loop:
   call  SetCurrentActiveMOnsterInIX
@@ -139,7 +143,52 @@ BuildUpBattleFieldAndPutMonsters:
 
 
 HandleMonsters:
-;  call  AnimateMonster
+  call  AnimateMonster
+  call  CheckSpaceToSwitchToNextMonster
+
+;current monster (erase)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+;  call  MoveMonster
+
+;grid tile (erase)
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+  call  MoveMonster
+
+  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
+
+;current monster (put)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+
+;grid tile (put)
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+
+;current monster (recover damaged background)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+
+;grid tile (recover damaged background)
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+  ret
+
+
+
+
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+
+  call  AnimateMonster
   call  CheckSpaceToSwitchToNextMonster
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
@@ -147,15 +196,21 @@ HandleMonsters:
   call  MoveMonster
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
   call  PutMonster                      ;put monster in inactive page
+  call  Recover
+  ret
 
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
+
+Recover:
   ;recover overwritten monsters. monster0 (grid sprite) gets overwritten hard by all monsters
   push  ix
   pop   hl
   ld    de,Monster0
   call  CompareHLwithDE
   jp    z,RecoverOverwrittenMonstersHard
-  call  RecoverOverwrittenMonsters      ;parts of monsters that are overwritten need to be recovered
-  ret
+  jp    RecoverOverwrittenMonsters      ;parts of monsters that are overwritten need to be recovered
   
 SortMonstersFromHighToLow:
   push  ix
@@ -221,24 +276,7 @@ sortloop:
 
 
 
-
-
-
-
-
-
-
-  
-CheckSpaceToSwitchToNextMonster:
-;animation change happens on frame 0 and frame 2 and they need 2 frames to settle, therefor don't switch monster on the following frames (1+3)
-;  ld    a,(framecounter)
-;  and   3
-;  cp    1
-;  ret   z
-;  cp    3
-;  ret   z
-
-;
+CheckSpace:
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
@@ -247,12 +285,53 @@ CheckSpaceToSwitchToNextMonster:
   bit   4,a
   ret   z
 
-;  ld    a,1
-;  ld    (MoVeMonster?),a
-;  ld    a,(spat)
-;  ld    (MoveMonsterToY),a  
-;  ld    a,(spat+1)
-;  ld    (MoveMonsterToX),a
+  .go:
+  ld    a,1
+  ld    (MoVeMonster?),a
+  ld    a,(spat)
+  ld    (MoveMonsterToY),a  
+  ld    a,(spat+1)
+  ld    (MoveMonsterToX),a
+  ret
+
+AnimateMonster:
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(framecounter)
+  and   7
+  jr    z,.AnimationFrame0
+  cp    4
+  jr    z,.AnimationFrame1
+  ret
+
+  .AnimationFrame0:
+  ld    l,(ix+MonsterAnimationFrame0+0)
+  ld    h,(ix+MonsterAnimationFrame0+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+  .AnimationFrame1:
+  ld    l,(ix+MonsterAnimationFrame1+0)
+  ld    h,(ix+MonsterAnimationFrame1+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+  
+CheckSpaceToSwitchToNextMonster:
+;  call  CheckSpace
+
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+  bit   4,a
+  ret   z
+
+  ld    a,(MoVeMonster?)
+  or    a
+;  ret   z
+  xor   a
+  ld    (MoVeMonster?),a
 
   call  SetCurrentActiveMOnsterInIX
 
@@ -567,7 +646,6 @@ RecoverOverwrittenMonsters:
   ld    (NXAndNY),bc
   ld    (BlockToReadFrom),a
 
-;PutMonster:
 	ld		a,(activepage)
   xor   1
   .SetdPage:
@@ -677,31 +755,6 @@ StoreSYSXNYNXAndBlock:
   ld    (NXAndNY),bc
   ld    (BlockToReadFrom),a
   ret
-
-AnimateMonster:
-  call  SetCurrentActiveMOnsterInIX
-
-  ld    a,(framecounter)
-  and   3
-  cp    2
-  jr    c,.AnimationFrame1
-
-  .AnimationFrame0:
-  ld    l,(ix+MonsterAnimationFrame0+0)
-  ld    h,(ix+MonsterAnimationFrame0+1)
-  ld    (ix+MonsterSYSX+0),l
-  ld    (ix+MonsterSYSX+1),h
-  ret
-  
-  .AnimationFrame1:
-  ld    l,(ix+MonsterAnimationFrame1+0)
-  ld    h,(ix+MonsterAnimationFrame1+1)
-  ld    (ix+MonsterSYSX+0),l
-  ld    (ix+MonsterSYSX+1),h
-  ret
-
-Monster1Animation1: dw  $4000 + (048*128) + (000/2) - 128
-Monster1Animation2: dw  $4000 + (048*128) + (056/2) - 128
   
 MoveMonster:
   ld    a,(ix+MonsterY)

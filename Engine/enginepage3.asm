@@ -256,7 +256,7 @@ OrderOfMonstersFromHighToLow:
 MoVeMonster?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
-CurrentActiveMonster: db  0
+CurrentActiveMonster: db  1
 TotalAmountOfMonsterOnBattleField:  equ 12
 
 MonsterY:               equ 0
@@ -279,16 +279,16 @@ Monster0:
 .xprevious: db  024
 .SYSXinROM: dw  $4000 + (047*128) + (224/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  20
+.ny:  db  20 + 1
 .nx:  db  16
 .animationframe0: dw  $4000 + (047*128) + (224/2) - 128
 .animationframe1: dw  $4000 + (047*128) + (224/2) - 128
 
 Monster1:
 .y: db  070 + (01*16) - 64
-.x: db  016
+.x: db  086
 .yprevious: db  070 + (01*16) - 64
-.xprevious: db  016
+.xprevious: db  086
 .SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
