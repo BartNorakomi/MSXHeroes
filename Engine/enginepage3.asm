@@ -253,141 +253,170 @@ OrderOfMonstersFromHighToLow:
   dw  Monster12  ;0C1B1h
   dw  Monster13  ;0C1B1h
 
+MoVeMonster?: db  0
+MoveMonsterToY: ds  1
+MoveMonsterToX: ds  1
 CurrentActiveMonster: db  0
 TotalAmountOfMonsterOnBattleField:  equ 12
 
-MonsterY:             equ 0
-MonsterX:             equ MonsterY+1
-MonsterYPrevious:     equ MonsterX+1
-MonsterXPrevious:     equ MonsterYPrevious+1
-MonsterSYSX:          equ MonsterXPrevious+1
-MonsterBlock:         equ MonsterSYSX+2
-MonsterNY:            equ MonsterBlock+1
-MonsterNX:            equ MonsterNY+1
+MonsterY:               equ 0
+MonsterX:               equ MonsterY+1
+MonsterYPrevious:       equ MonsterX+1
+MonsterXPrevious:       equ MonsterYPrevious+1
+MonsterSYSX:            equ MonsterXPrevious+1
+MonsterBlock:           equ MonsterSYSX+2
+MonsterNY:              equ MonsterBlock+1
+MonsterNX:              equ MonsterNY+1
+MonsterAnimationFrame0: equ MonsterNX+1
+MonsterAnimationFrame1: equ MonsterAnimationFrame0+2
 
 LenghtMonsterTable: equ Monster1-Monster0
 
 Monster0:
-.y: db  070 + (00*18) - 64
+.y: db  070 + (00*16) - 64
 .x: db  024
-.yprevious: db  070 + (01*18) - 64
-.xprevious: db  016
-.SYSXinROM: dw  $4000 + (112*128) + (000/2) - 128
+.yprevious: db  070 + (00*16) - 64
+.xprevious: db  024
+.SYSXinROM: dw  $4000 + (047*128) + (224/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64
-.nx:  db  64
+.ny:  db  20
+.nx:  db  16
+.animationframe0: dw  $4000 + (047*128) + (224/2) - 128
+.animationframe1: dw  $4000 + (047*128) + (224/2) - 128
 
 Monster1:
-.y: db  070 + (01*18) - 64
+.y: db  070 + (01*16) - 64
 .x: db  016
-.yprevious: db  070 + (0*18) - 64
-.xprevious: db  024
+.yprevious: db  070 + (01*16) - 64
+.xprevious: db  016
 .SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  56
+.animationframe0: dw  $4000 + (048*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (048*128) + (056/2) - 128
 
 Monster2:
-.y: db  070 + (02*18) - 32
+.y: db  070 + (02*16) - 32
 .x: db  024
-.yprevious: db  070 + (02*18) - 32
+.yprevious: db  070 + (02*16) - 32
 .xprevious: db  024
 .SYSXinROM: dw  $4000 + (000*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
+.animationframe0: dw  $4000 + (000*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (016/2) - 128
 
 Monster3:
-.y: db  070 + (03*18) - 32
+.y: db  070 + (03*16) - 32
 .x: db  016
-.yprevious: db  070 + (03*18) - 32
+.yprevious: db  070 + (03*16) - 32
 .xprevious: db  016
 .SYSXinROM: dw  $4000 + (000*128) + (064/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
+.animationframe0: dw  $4000 + (000*128) + (064/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (080/2) - 128
 
 Monster4:
-.y: db  070 + (04*18) - 16
+.y: db  070 + (04*16) - 16
 .x: db  024
-.yprevious: db  070 + (04*18) - 16
+.yprevious: db  070 + (04*16) - 16
 .xprevious: db  024
 .SYSXinROM: dw  $4000 + (032*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  16
 .nx:  db  16
+.animationframe0: dw  $4000 + (032*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (032*128) + (016/2) - 128
 
 Monster5:
-.y: db  070 + (05*18) - 16
+.y: db  070 + (05*16) - 16
 .x: db  016
-.yprevious: db  070 + (05*18) - 16
+.yprevious: db  070 + (05*16) - 16
 .xprevious: db  016
 .SYSXinROM: dw  $4000 + (032*128) + (064/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  16
 .nx:  db  16
+.animationframe0: dw  $4000 + (032*128) + (064/2) - 128
+.animationframe1: dw  $4000 + (032*128) + (080/2) - 128
 
 ;;;;;;;;; player 2 ;;;;;;;;;;;;;
 
 Monster6:
-.y: db  070 + (00*18) - 64
+.y: db  070 + (00*16) - 64
 .x: db  256 - 24 - 64
-.yprevious: db  070 + (00*18) - 64
+.yprevious: db  070 + (00*16) - 64
 .xprevious: db  256 - 24 - 64
 .SYSXinROM: dw  $4000 + (112*128) + (128/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  64
+.animationframe0: dw  $4000 + (112*128) + (128/2) - 128
+.animationframe1: dw  $4000 + (112*128) + (192/2) - 128
 
 Monster7:
-.y: db  070 + (01*18) - 64
+.y: db  070 + (01*16) - 64
 .x: db  256 - 16 - 56
-.yprevious: db  070 + (0*18) - 64
+.yprevious: db  070 + (01*16) - 64
 .xprevious: db  256 - 16 - 56
 .SYSXinROM: dw  $4000 + (048*128) + (112/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  56
+.animationframe0: dw  $4000 + (048*128) + (112/2) - 128
+.animationframe1: dw  $4000 + (048*128) + (168/2) - 128
 
 Monster8:
-.y: db  070 + (02*18) - 32
+.y: db  070 + (02*16) - 32
 .x: db  256 - 16 - 24
-.yprevious: db  070 + (02*18) - 32
+.yprevious: db  070 + (02*16) - 32
 .xprevious: db  256 - 16 - 24
 .SYSXinROM: dw  $4000 + (000*128) + (032/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
+.animationframe0: dw  $4000 + (000*128) + (032/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (048/2) - 128
 
 Monster9:
-.y: db  070 + (03*18) - 32
+.y: db  070 + (03*16) - 32
 .x: db  256 - 16 - 16
-.yprevious: db  070 + (03*18) - 32
+.yprevious: db  070 + (03*16) - 32
 .xprevious: db  256 - 16 - 16
 .SYSXinROM: dw  $4000 + (000*128) + (096/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
+.animationframe0: dw  $4000 + (000*128) + (096/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (112/2) - 128
 
 Monster10:
-.y: db  070 + (04*18) - 16
+.y: db  070 + (04*16) - 16
 .x: db  256 - 16 - 24
-.yprevious: db  070 + (04*18) - 16
+.yprevious: db  070 + (04*16) - 16
 .xprevious: db  256 - 16 - 24
 .SYSXinROM: dw  $4000 + (032*128) + (032/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  16
 .nx:  db  16
+.animationframe0: dw  $4000 + (032*128) + (032/2) - 128
+.animationframe1: dw  $4000 + (032*128) + (048/2) - 128
 
 Monster11:
-.y: db  070 + (05*18) - 16
+.y: db  070 + (05*16) - 16
 .x: db  256 - 16 - 16
-.yprevious: db  070 + (05*18) - 16
+.yprevious: db  070 + (05*16) - 16
 .xprevious: db  256 - 16 - 16
 .SYSXinROM: dw  $4000 + (032*128) + (096/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  16
 .nx:  db  16
+.animationframe0: dw  $4000 + (032*128) + (096/2) - 128
+.animationframe1: dw  $4000 + (032*128) + (112/2) - 128
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
@@ -400,6 +429,8 @@ Monster12:
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  56
+.animationframe0: dw  $4000 + (048*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (048*128) + (056/2) - 128
 
 Monster13:
 .y: db  040
@@ -410,6 +441,8 @@ Monster13:
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  40
+.animationframe0: dw  $4000 + (048*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (048*128) + (056/2) - 128
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0

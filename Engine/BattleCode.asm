@@ -1,14 +1,10 @@
 InitiateBattle:
 call screenon
-  xor   a
-	ld		(activepage),a			
-  call  SetBattleFieldSnowGraphics
-  ld    hl,.CopyPage1To2
-  call  DoCopy
-  call  SwapAndSetPage                  ;swap and set page
-  call  SetBattleFieldSnowGraphics
-  ld    hl,.CopyPage1To3
-  call  DoCopy
+  call  BuildUpBattleFieldAndPutMonsters
+
+;  call  SwapAndSetPage                  ;swap and set page
+
+;.kut: jp .kut
 
   .engine:
 ;  ld    a,(activepage)
@@ -79,19 +75,71 @@ call screenon
   ret   nz  
   jr    .SetPage3
 
+BuildUpBattleFieldAndPutMonsters:  
+  xor   a
+	ld		(activepage),a			            ;page 0
+  call  SetBattleFieldSnowGraphics      ;set battle field in page 1 ram->vram
+  ld    hl,.CopyPage1To2
+  call  DoCopy                          ;copy battle field to page 2 vram->vram
+  call  SwapAndSetPage                  ;swap and set page 1
+  call  SetBattleFieldSnowGraphics      ;set battle field in page 0 ram->vram
+  ld    hl,.CopyPage1To3
+  call  DoCopy                          ;copy battle field to page 3 vram->vram
+  call  .SetAllMonsters                 ;set all monsters in page 0
+  call  .CopyAllMonstersToPage1and2
+  xor   a
+  ld    (CurrentActiveMonster),a
+  ret
+
+  .CopyAllMonstersToPage1and2:
+  ld    hl,.CopyMonstersFromPage0to1
+  call  DoCopy                          ;copy battle field to page 3 vram->vram
+  ld    hl,.CopyMonstersFromPage0to2 
+  call  DoCopy                          ;copy battle field to page 3 vram->vram
+  ret
+  
+  .SetAllMonsters:
+  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
+  ld    a,1                             ;skip monster 0, which is our grid tile
+  ld    (CurrentActiveMonster),a
+  .loop:
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+  ld    a,(CurrentActiveMonster)
+  inc   a                               ;go to next monster
+  cp    TotalAmountOfMonsterOnBattleField
+  ret   z
+  ld    (CurrentActiveMonster),a
+  jr    .loop
+
+.CopyMonstersFromPage0to1:
+	db		0,0,0,0
+	db		0,0,0,1
+	db		0,1,188,0
+	db		0,0,$d0	
+
+.CopyMonstersFromPage0to2:
+	db		0,0,0,0
+	db		0,0,0,2
+	db		0,1,188,0
+	db		0,0,$d0	
+
 .CopyPage1To2:
 	db		0,0,0,1
 	db		0,0,0,2
-	db		0,1,212,0
+	db		0,1,188,0
 	db		0,0,$d0	
 
 .CopyPage1To3:
 	db		0,0,0,1
 	db		0,0,0,3
-	db		0,1,212,0
+	db		0,1,188,0
 	db		0,0,$d0	
 
+
 HandleMonsters:
+;  call  AnimateMonster
   call  CheckSpaceToSwitchToNextMonster
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
@@ -99,21 +147,28 @@ HandleMonsters:
   call  MoveMonster
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
   call  PutMonster                      ;put monster in inactive page
+
+  ;recover overwritten monsters. monster0 (grid sprite) gets overwritten hard by all monsters
+  push  ix
+  pop   hl
+  ld    de,Monster0
+  call  CompareHLwithDE
+  jp    z,RecoverOverwrittenMonstersHard
   call  RecoverOverwrittenMonsters      ;parts of monsters that are overwritten need to be recovered
   ret
   
 SortMonstersFromHighToLow:
   push  ix
-  ld    c,TotalAmountOfMonsterOnBattleField-1  ; load the number of elements
+  ld    c,TotalAmountOfMonsterOnBattleField-1-1  ; load the number of elements
   call sortloop
   pop   ix
   ret
 
 sortloop:
-  ld iy, OrderOfMonstersFromHighToLow   ; load the address of the y coordinates array
+  ld iy, OrderOfMonstersFromHighToLow + 2   ; load the address of the y coordinates array
   ld b,c            ; load the number of elements for this pass
 
-innerloop:
+  .innerloop:
   ld    l,(iy)
   ld    h,(iy+1)      ;set address of Monster data in HL
   push  hl
@@ -130,7 +185,7 @@ innerloop:
   add   a,(ix+MonsterNY)
 
   cp e               ; compare the two y coordinates
-  jr nc,noswap        ; if y[i] <= y[i+1], no swap is needed
+  jr nc,.noswap       ; if y[i] <= y[i+1], no swap is needed
 
   ; swap y[i] and y[i+1]
 
@@ -143,11 +198,11 @@ innerloop:
   ld    (iy+1),d     
   ld    (iy+2),l
   ld    (iy+3),h      
-  noswap:
+  .noswap:
 
   inc iy             ; move to the next element
   inc iy             ; move to the next element
-  djnz innerloop     ; continue until all comparisons are done
+  djnz .innerloop     ; continue until all comparisons are done
 
   ; decrement the number of elements for the next pass
   dec c
@@ -175,6 +230,14 @@ innerloop:
 
   
 CheckSpaceToSwitchToNextMonster:
+;animation change happens on frame 0 and frame 2 and they need 2 frames to settle, therefor don't switch monster on the following frames (1+3)
+;  ld    a,(framecounter)
+;  and   3
+;  cp    1
+;  ret   z
+;  cp    3
+;  ret   z
+
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -183,6 +246,13 @@ CheckSpaceToSwitchToNextMonster:
 	ld		a,(NewPrContr)
   bit   4,a
   ret   z
+
+;  ld    a,1
+;  ld    (MoVeMonster?),a
+;  ld    a,(spat)
+;  ld    (MoveMonsterToY),a  
+;  ld    a,(spat+1)
+;  ld    (MoveMonsterToX),a
 
   call  SetCurrentActiveMOnsterInIX
 
@@ -292,8 +362,8 @@ RecoverOverwrittenMonstersHard:
 
 RecoverOverwrittenMonsters:
   exx
-  ld    hl,OrderOfMonstersFromHighToLow
-  ld    b,TotalAmountOfMonsterOnBattleField
+  ld    hl,OrderOfMonstersFromHighToLow + 2
+  ld    b,TotalAmountOfMonsterOnBattleField - 1 
 
   .loop:
   ld    e,(hl)
@@ -301,7 +371,7 @@ RecoverOverwrittenMonsters:
   ld    d,(hl)
   inc   hl
   push  de
-  pop   iy                              ;monster we are going to recover
+  pop   iy                              ;iy=monster we are going to recover
   
   exx
   call  .GoRecover
@@ -320,6 +390,7 @@ RecoverOverwrittenMonsters:
   ret   nc
   .GoRecoverHard:
 
+  ;check checking active monsters with monster we check if they are the same
   push  ix
   pop   hl
   push  iy
@@ -327,41 +398,41 @@ RecoverOverwrittenMonsters:
   call  CompareHLwithDE
   ret   z
 
+  ;ix=active monster, y=monster we are going to recover
   ;check right side active monster surpasses left side monster we check
   ld    a,(ix+MonsterX)                 ;x active monster
   add   a,(ix+MonsterNX)
   sub   (iy+MonsterX)                   ;cp with monster we check
   ret   c
+  ret   z
 
   ;check left side active monster surpasses right side monster we check
   ld    a,(iy+MonsterX)                 ;x monster we check
   add   a,(iy+MonsterNX)
   sub   (ix+MonsterX)                   ;cp with active monster
   ret   c
+  ret   z
 
   ;check bottom side active monster surpasses top side monster we check
   ld    a,(ix+MonsterY)                 ;x active monster
   add   a,(ix+MonsterNY)
   sub   (iy+MonsterY)                   ;cp with monster we check
   ret   c
+  ret   z
 
   ;check top side active monster surpasses bottom side monster we check
   ld    a,(iy+MonsterY)                 ;x monster we check
   add   a,(iy+MonsterNY)
   sub   (ix+MonsterY)                   ;cp with active monster
   ret   c
+  ret   z
 
-
-
-
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;check right side active monster surpasses left side monster we check
   ld    a,(ix+MonsterX)                 ;x active monster
   add   a,(ix+MonsterNX)
   sub   (iy+MonsterX)                   ;cp with monster we check
-  ret   c
   cp    (ix+MonsterNX)
   jr    c,.NXFoundLeft
 
@@ -369,20 +440,16 @@ RecoverOverwrittenMonsters:
   ld    a,(iy+MonsterX)                 ;x monster we check
   add   a,(iy+MonsterNX)
   sub   (ix+MonsterX)                   ;cp with active monster
-  ret   c
   cp    (ix+MonsterNX)
   jr    c,.NXFoundRight
 
   .NXFoundMiddle:
   ld    a,(ix+MonsterNX)                ;x active monster
-
   cp    (iy+MonsterNX)
   jr    c,.go4
   jr    z,.go4
   ld    a,(iy+MonsterNX)
   .go4:
-
-  
 	srl		a				                        ;/2
   ld    c,a                             ;nx monster  
   ld    a,(ix+MonsterX)                 ;x active monster
@@ -392,18 +459,7 @@ RecoverOverwrittenMonsters:
   jr    .NxSet
 
   .NXFoundRight:
-
-
-
-
-
-
-
 	srl		a				                        ;/2
-  jr    nz,.EndZeroCheckRight
-ret
-  ld    a,2
-  .EndZeroCheckRight:
   ld    c,a                             ;nx (/2) recovery sprite
   ld    a,(iy+MonsterNX)                ;x monster we check with
 	srl		a				                        ;/2
@@ -416,28 +472,16 @@ ret
   jr    c,.go
   jr    z,.go
   ld    a,(iy+MonsterNX)
-  .go:
-  
+  .go:  
 	srl		a				                        ;/2
-  jr    nz,.EndZeroCheckLeft
-ret
-  ld    a,2
-  .EndZeroCheckLeft:
   ld    c,a                             ;nx (/2) recovery sprite
   ld    e,00/2                            ;add to sx (/2) of recovery sprite 
-  jr    .NxSet
-
   .NxSet:
-
-
-
-
 
   ;check bottom side active monster surpasses top side monster we check
   ld    a,(ix+MonsterY)                 ;x active monster
   add   a,(ix+MonsterNY)
   sub   (iy+MonsterY)                   ;cp with monster we check
-  ret   c
   cp    (ix+MonsterNY)
   jr    c,.NYFoundTop
 
@@ -445,43 +489,34 @@ ret
   ld    a,(iy+MonsterY)                 ;x monster we check
   add   a,(iy+MonsterNY)
   sub   (ix+MonsterY)                   ;cp with active monster
-  ret   c
   cp    (ix+MonsterNY)
   jr    c,.NYFoundBottom
 
   .NYFoundMiddle:
   ld    a,(ix+MonsterNY)                ;x active monster
-
   cp    (iy+MonsterNY)
   jr    c,.go5
   jr    z,.go5
-  ld    a,(iy+MonsterNX)
-  dec   a
+  ld    a,(iy+MonsterNY)
+;  dec   a
   .go5:
 
   
-  inc   a
-  ld    b,a
+;  inc   a
+  ld    b,a                             ;ny recovery sprite
 
-  ld    a,(ix+MonsterY)                 ;x active monster
+  ld    a,(ix+MonsterY)                 ;y active monster
   sub   (iy+MonsterY)                   ;cp with monster we check
 	srl		a				                        ;/2
   ld    d,a                             ;add to sy (/2) of recovery sprite
   jr    .NYSet
 
   .NYFoundBottom:
-  or    a
-  jr    nz,.EndZeroCheckBottom
-  ld    a,1
-ret
-  .EndZeroCheckBottom:
-  ld    b,a                             ;nx (/2) recovery sprite
-
+  ld    b,a                             ;ny recovery sprite
   ld    a,(iy+MonsterNY)                ;x active monster
-
   sub   a,b  
 	srl		a				                        ;/2
-  ld    d,a                             ;add to sx (/2) of recovery sprite
+  ld    d,a                             ;add to sy (/2) of recovery sprite
   jr    .NYSet
 
   .NYFoundTop:
@@ -490,16 +525,9 @@ ret
   jr    z,.go2
   ld    a,(iy+MonsterNY)
   .go2:
-
-
-  or    a
-  jr    nz,.EndZeroCheckTop
-  ld    a,1
-ret
-  .EndZeroCheckTop:
   ld    b,a                             ;ny recovery sprite
-  ld    d,00/2                          ;add to sx (/2) of recovery sprite
-  jr    .NYSet
+  ld    d,00/2                          ;add to sy (/2) of recovery sprite
+;  jr    .NYSet
 
   .NYSet:
 
@@ -649,12 +677,85 @@ StoreSYSXNYNXAndBlock:
   ld    (NXAndNY),bc
   ld    (BlockToReadFrom),a
   ret
+
+AnimateMonster:
+  call  SetCurrentActiveMOnsterInIX
+
+  ld    a,(framecounter)
+  and   3
+  cp    2
+  jr    c,.AnimationFrame1
+
+  .AnimationFrame0:
+  ld    l,(ix+MonsterAnimationFrame0+0)
+  ld    h,(ix+MonsterAnimationFrame0+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+  
+  .AnimationFrame1:
+  ld    l,(ix+MonsterAnimationFrame1+0)
+  ld    h,(ix+MonsterAnimationFrame1+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+
+Monster1Animation1: dw  $4000 + (048*128) + (000/2) - 128
+Monster1Animation2: dw  $4000 + (048*128) + (056/2) - 128
   
 MoveMonster:
   ld    a,(ix+MonsterY)
   ld    (ix+MonsterYPrevious),a
   ld    a,(ix+MonsterX)
   ld    (ix+MonsterXPrevious),a
+
+  push  ix
+  pop   hl
+  ld    de,Monster0
+  call  CompareHLwithDE
+  jp    z,MoveGridPointer
+
+
+jp .manualmove
+
+  ld    a,(MoVeMonster?)
+  or    a
+  ret   z
+
+  call  .MoveY
+
+  .MoveX:
+  ld    a,(MoveMonsterToX)
+  and   %1111 1110
+  cp    (ix+MonsterX)
+  ret   z
+  jr    c,.MoveXLeft
+  .MoveXRight:
+  inc   (ix+MonsterX)
+  inc   (ix+MonsterX)
+  ret  
+  .MoveXLeft:
+  dec   (ix+MonsterX)
+  dec   (ix+MonsterX)
+  ret
+  
+  .MoveY:
+  ld    a,(MoveMonsterToY)
+  cp    (ix+MonsterY)
+  ret   z
+  jr    c,.MoveYUp
+  .MoveYDown:
+  inc   (ix+MonsterY)
+  ret  
+  .MoveYUp:
+  dec   (ix+MonsterY)
+  ret
+  
+
+  .manualmove:
+
+
+
 
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
@@ -674,24 +775,54 @@ MoveMonster:
 
   .up:
   ld    a,(ix+MonsterY)
-  sub   a,4
+  sub   a,2
   ld    (ix+MonsterY),a
   ret
 
   .down:
   ld    a,(ix+MonsterY)
-  add   a,4
+  add   a,2
   ld    (ix+MonsterY),a
   ret
 
   .left:
   ld    a,(ix+MonsterX)
-  sub   a,4
+  sub   a,2
   ld    (ix+MonsterX),a
   ret
 
   .right:
   ld    a,(ix+MonsterX)
+  add   a,2
+  ld    (ix+MonsterX),a
+  ret
+
+MoveGridPointer:
+  ld    a,(spat)
+  add   a,8
+  
+  and   %1111 0000
+  bit   4,a
+  jr    nz,.EvenTiles
+
+  sub   a,9
+  ld    (ix+MonsterY),a
+  ld    a,(spat+1)
+  sub   a,8
+  
+  and   %1111 0000
+  add   a,4+8
+  ld    (ix+MonsterX),a
+  ret
+
+
+  .EvenTiles:
+  sub   a,9
+  ld    (ix+MonsterY),a
+  ld    a,(spat+1)
+  sub   a,-4
+
+  and   %1111 0000
   add   a,4
   ld    (ix+MonsterX),a
   ret
