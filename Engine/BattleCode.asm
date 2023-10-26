@@ -2,10 +2,6 @@ InitiateBattle:
 call screenon
   call  BuildUpBattleFieldAndPutMonsters
 
-;  call  SwapAndSetPage                  ;swap and set page
-
-;.kut: jp .kut
-
   .engine:
 ;  ld    a,(activepage)
 ;  call  Backdrop.in
@@ -144,13 +140,15 @@ BuildUpBattleFieldAndPutMonsters:
 
 HandleMonsters:
   call  AnimateMonster
-  call  CheckSpaceToSwitchToNextMonster
+  call  CheckSpaceToMoveMonster
+  call  CheckSwitchToNextMonster
+  call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
 
 ;current monster (erase)
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-;  call  MoveMonster
+  call  MoveMonster
 
 ;grid tile (erase)
   ld    ix,Monster0
@@ -166,9 +164,19 @@ HandleMonsters:
   call  PutMonster                      ;put monster in inactive page
 
 ;grid tile (put)
+  ld    a,(MoVeMonster?)  
+  or    a
+  jr    nz,.EndPutGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndPutGridTile
+
+  call  SetcursorWhenGridTileIsActive
+    
   ld    ix,Monster0
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  PutMonster                      ;put monster in inactive page
+  .EndPutGridTile:
 
 ;current monster (recover damaged background)
   call  SetCurrentActiveMOnsterInIX
@@ -176,9 +184,17 @@ HandleMonsters:
   call  Recover
 
 ;grid tile (recover damaged background)
+  ld    a,(MoVeMonster?)  
+  or    a
+  jr    nz,.EndRecoverGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndRecoverGridTile
+
   ld    ix,Monster0
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  Recover
+  .EndRecoverGridTile:
   ret
 
 
@@ -189,7 +205,8 @@ HandleMonsters:
 ; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
 
   call  AnimateMonster
-  call  CheckSpaceToSwitchToNextMonster
+;  call  CheckSpaceToSwitchToNextMonster
+  call  CheckSwitchToNextMonster
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
@@ -276,7 +293,7 @@ sortloop:
 
 
 
-CheckSpace:
+CheckSpaceToMoveMonster:
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
@@ -288,13 +305,20 @@ CheckSpace:
   .go:
   ld    a,1
   ld    (MoVeMonster?),a
-  ld    a,(spat)
+
+  ld    a,(Monster0+MonsterY)           ;use grid pointer as reference to where we move to
+  sub   a,(ix+MonsterNY)
+  add   a,17
   ld    (MoveMonsterToY),a  
-  ld    a,(spat+1)
+  ld    a,(Monster0+MonsterX)
   ld    (MoveMonsterToX),a
   ret
 
 AnimateMonster:
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  ret   nz                              ;don't animate when we are about to switch monster
+
   call  SetCurrentActiveMOnsterInIX
   ld    a,(framecounter)
   and   7
@@ -316,22 +340,32 @@ AnimateMonster:
   ld    (ix+MonsterSYSX+1),h
   ret
   
-CheckSpaceToSwitchToNextMonster:
+CheckSwitchToNextMonster:
 ;  call  CheckSpace
 
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-	ld		a,(NewPrContr)
-  bit   4,a
-  ret   z
-
-  ld    a,(MoVeMonster?)
-  or    a
+;	ld		a,(NewPrContr)
+;  bit   4,a
 ;  ret   z
+
+;  ld    a,(MoVeMonster?)
+;  or    a
+;  ret   z
+;  xor   a
+;  ld    (MoVeMonster?),a
+
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  ret   z
+  inc   a
+  ld    (SwitchToNextMonster?),a
+  cp    4                               ;we wait 3 frames before switching monster, so that current monster can settle in
+  ret   c
   xor   a
-  ld    (MoVeMonster?),a
+  ld    (SwitchToNextMonster?),a
 
   call  SetCurrentActiveMOnsterInIX
 
@@ -359,9 +393,12 @@ CheckSpaceToSwitchToNextMonster:
   inc   a
   cp    TotalAmountOfMonsterOnBattleField
   jr    nz,.NotZero
-  xor   a
+  ld    a,1
   .NotZero:
   ld    (CurrentActiveMonster),a
+
+  ld    a,1
+  ld    (SetMonsterInBattleFieldGrid?),a
 
   call  SetCurrentActiveMOnsterInIX
 
@@ -405,7 +442,7 @@ CheckSpaceToSwitchToNextMonster:
   call  docopy
 
   ld    a,2
-	ld    (EraseMonster+sPage),a  
+	ld    (EraseMonster+sPage),a  	
   ret
   
 SetCurrentActiveMOnsterInIX:
@@ -768,28 +805,60 @@ MoveMonster:
   call  CompareHLwithDE
   jp    z,MoveGridPointer
 
-
-jp .manualmove
+;jp .manualmove
 
   ld    a,(MoVeMonster?)
   or    a
   ret   z
 
-  call  .MoveY
+  ld    hl,CursorHand
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
 
+  call  .MoveY
+  call  .MoveX
+  
+  ld    a,(MoveMonsterToX)
+  cp    (ix+MonsterX)
+  ret   nz
+  ld    a,(MoveMonsterToY)
+  cp    (ix+MonsterY)
+  ret   nz
+
+  xor   a
+  ld    (MoVeMonster?),a
+  ld    a,1
+  ld    (SwitchToNextMonster?),a
+  ret
+  
   .MoveX:
   ld    a,(MoveMonsterToX)
-  and   %1111 1110
   cp    (ix+MonsterX)
   ret   z
   jr    c,.MoveXLeft
   .MoveXRight:
   inc   (ix+MonsterX)
   inc   (ix+MonsterX)
-  ret  
+  inc   (ix+MonsterX)
+  inc   (ix+MonsterX)
+
+  ld    a,(MoveMonsterToX)
+  cp    (ix+MonsterX)
+  ret   nc
+  ld    a,(MoveMonsterToX)
+  ld    (ix+MonsterX),a
+  ret
+
   .MoveXLeft:
   dec   (ix+MonsterX)
   dec   (ix+MonsterX)
+  dec   (ix+MonsterX)
+  dec   (ix+MonsterX)
+
+  ld    a,(MoveMonsterToX)
+  cp    (ix+MonsterX)
+  ret   c
+  ld    a,(MoveMonsterToX)
+  ld    (ix+MonsterX),a
   ret
   
   .MoveY:
@@ -799,9 +868,28 @@ jp .manualmove
   jr    c,.MoveYUp
   .MoveYDown:
   inc   (ix+MonsterY)
-  ret  
+  inc   (ix+MonsterY)
+  inc   (ix+MonsterY)
+  inc   (ix+MonsterY)
+
+  ld    a,(MoveMonsterToY)
+  cp    (ix+MonsterY)
+  ret   nc
+  ld    a,(MoveMonsterToY)
+  ld    (ix+MonsterY),a
+  ret
+
   .MoveYUp:
   dec   (ix+MonsterY)
+  dec   (ix+MonsterY)
+  dec   (ix+MonsterY)
+  dec   (ix+MonsterY)
+
+  ld    a,(MoveMonsterToy)
+  cp    (ix+Monstery)
+  ret   c
+  ld    a,(MoveMonsterToy)
+  ld    (ix+Monstery),a
   ret
   
 
@@ -868,7 +956,6 @@ MoveGridPointer:
   ld    (ix+MonsterX),a
   ret
 
-
   .EvenTiles:
   sub   a,9
   ld    (ix+MonsterY),a
@@ -879,6 +966,308 @@ MoveGridPointer:
   add   a,4
   ld    (ix+MonsterX),a
   ret
+
+SetCurrentMonsterInBattleFieldGrid:     ;set monster in grid, and fill grid with numbers representing distance to those tiles
+  ld    a,(SetMonsterInBattleFieldGrid?)
+  dec   a
+  ret   m
+  ld    (SetMonsterInBattleFieldGrid?),a
+
+  call  ClearBattleFieldGrid            ;set all except 255 to 000
+  call  SetCurrentActiveMOnsterInIX
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+
+  ;Set number 001 in grid where monster is
+  ld    a,(ix+MonsterNX)
+  ld    (hl),001                        ;set monster in grid
+  cp    17
+  jp    c,SetAllNumbersInGrid
+  ;set another 001 for each addition 16 pixels this monsters is wide
+  inc   hl
+  inc   hl
+  ld    (hl),001                        ;set monster in grid
+  cp    33
+  jp    c,SetAllNumbersInGrid
+  inc   hl
+  inc   hl
+  ld    (hl),001                        ;set monster in grid
+  cp    57
+  jp    c,SetAllNumbersInGrid
+  inc   hl
+  inc   hl
+  ld    (hl),001                        ;set monster in grid
+  jp    SetAllNumbersInGrid
+
+ClearBattleFieldGrid:
+  ld    a,255
+  ld    hl,BattleFieldGrid-1
+  ld    b,LenghtBattleField*HeightBattleField
+  .loop:
+  inc   hl
+  cp    a,(hl)
+  jr    nz,.SetTo000
+  djnz  .loop
+  ret
+  .SetTo000:
+  ld    (hl),000
+  djnz  .loop  
+  ret
+
+SetAllNumbersInGrid:
+  ld    e,000                           ;number we search for
+  ld    a,001                           ;number we put
+  exx
+  ex    af,af'
+
+  ld    b,17                            ;repeat this proces 17x to fill the entire grid
+.loop:
+  push  bc
+  call  .GoNextNumber
+  pop   bc
+  djnz  .loop
+  ret
+
+.GoNextNumber:
+  exx
+  ex    af,af'
+  inc   e                               ;next number we search for
+  inc   a                               ;next number we put
+  exx
+  ex    af,af'
+
+  ld    b,-1                            ;x coordinate on battlefield grid
+  ld    c,0                             ;y coordinate on battlefield grid
+  ld    d,0
+  call  .MainLoop
+  ret
+
+  .MainLoop:
+  call  .GoCheckNextPosition
+  call  .SetBCPositionInHL
+
+  ld    a,(hl)
+  exx
+  cp    e                               ;search for this number
+  exx
+  jp    nz,.MainLoop
+
+  call  .SetNumberIn6Directions         ;number found, now set following number in 6 directions
+  jp    .MainLoop
+
+.GoCheckNextPosition:
+  ld    a,b                             ;x coordinate on battlefield grid
+  inc   a
+  ld    b,a                             ;x coordinate on battlefield grid
+  cp    LenghtBattleField
+  ret   nz
+  ;right edge battlefield reached
+  ld    b,0                             ;x coordinate on battlefield grid
+
+  ld    a,c                             ;y coordinate on battlefield grid
+  add   a,LenghtBattleField
+  ld    c,a                             ;y coordinate on battlefield grid
+  cp    HeightBattleField*LenghtBattleField
+  ret   nz
+
+  pop   af
+  ret
+  
+.SetNumberIn6Directions:
+  ;1 found, now set all 2's. We set 2's in 6 directions
+  ;direction 1: left top
+  push  bc
+  call  .Direction1
+  pop   bc
+  ;direction 2: right top
+  push  bc
+  call  .Direction2
+  pop   bc
+  ;direction 3: left (2x)
+  push  bc
+  call  .Direction3
+  pop   bc
+  ;direction 4: right (2x)
+  push  bc
+  call  .Direction4
+  pop   bc
+  ;direction 5: left bottom
+  push  bc
+  call  .Direction5
+  pop   bc
+  ;direction 6: right bottom
+  push  bc
+  call  .Direction6
+  pop   bc    
+  ret
+
+.SetnumberInHL:
+  call  .SetBCPositionInHL
+  ld    a,(hl)
+  or    a
+  ret   nz
+  ex    af,af'
+  ld    (hl),a
+  ex    af,af'
+  ret
+
+.Direction6:                              ;right bottom
+  inc   b                                 ;x coordinate on battlefield grid
+  ld    a,b
+  cp    LenghtBattleField
+  ret   z
+
+  ld    a,c
+  add   a,LenghtBattleField
+  cp    HeightBattleField*LenghtBattleField
+  ret   z
+  ld    c,a
+  jp    .SetnumberInHL
+
+.Direction5:                              ;left bottom
+  dec   b                                 ;x coordinate on battlefield grid
+  ret   m
+
+  ld    a,c
+  add   a,LenghtBattleField
+  cp    HeightBattleField*LenghtBattleField
+  ret   z
+  ld    c,a
+  jp    .SetnumberInHL
+
+
+.Direction4:                              ;right (2x)
+  inc   b                                 ;x coordinate on battlefield grid
+  ld    a,b
+  cp    LenghtBattleField
+  ret   z
+  inc   b                                 ;x coordinate on battlefield grid
+  ld    a,b
+  cp    LenghtBattleField
+  ret   z
+  jp    .SetnumberInHL
+
+
+.Direction3:                              ;left (2x)
+  dec   b                                 ;x coordinate on battlefield grid
+  ret   m
+  dec   b                                 ;x coordinate on battlefield grid
+  ret   m
+  jp    .SetnumberInHL
+
+
+.Direction2:                              ;right top
+  inc   b                                 ;x coordinate on battlefield grid
+  ld    a,b
+  cp    LenghtBattleField
+  ret   z
+  
+  ld    a,c
+  sub   a,LenghtBattleField
+  ret   c
+  ld    c,a
+  jp    .SetnumberInHL
+
+
+.Direction1:                              ;left top
+  dec   b                                 ;x coordinate on battlefield grid
+  ret   m
+
+  ld    a,c
+  sub   a,LenghtBattleField
+  ret   c
+  ld    c,a
+  jp    .SetnumberInHL
+
+.SetBCPositionInHL:  
+  ld    hl,BattleFieldGrid
+  ld    e,b
+  add   hl,de
+  ld    e,c
+  add   hl,de                           ;jump to (x,y) position in battlefield grid
+  ret
+
+FindMonsterInBattleFieldGrid:  
+  ld    hl,BattleFieldGrid
+
+  ld    a,(ix+MonsterY)
+  sub   056
+  add   (ix+MonsterNY)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  jr    z,.SetX
+  
+  ld    b,a
+  ld    de,LenghtBattleField
+  .loop:
+  add   hl,de
+  djnz  .loop
+    
+  .SetX:
+  ld    a,(ix+MonsterX)
+  sub   a,12
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+  ret   z
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ret
+
+FindCursorInBattleFieldGrid:  
+  ld    hl,BattleFieldGrid
+
+  ld    a,(Monster0+MonsterY)
+  sub   a,39
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  jr    z,.SetX
+  
+  ld    b,a
+  ld    de,LenghtBattleField
+  .loop:
+  add   hl,de
+  djnz  .loop
+    
+  .SetX:
+  ld    a,(Monster0+MonsterX)
+  sub   a,12
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+  ret   z
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ret
+
+SetcursorWhenGridTileIsActive:
+;  ld    a,(Monster0+MonsterY)
+;  cp    71
+;  jr    nz,.SetBoots
+;  ld    a,(Monster0+MonsterX)
+;  cp    36
+;  jr    nz,.SetBoots
+  call  FindCursorInBattleFieldGrid
+  ld    a,(hl)
+  cp    5
+  jr    c,.SetBoots
+  
+  ld    hl,CursorEnterCastle
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ret
+  
+  .SetBoots:
+  ld    hl,CursorBoots
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ret
+
 
 EraseMonsterPreviousFrame:
 	ld		a,(activepage)

@@ -3515,6 +3515,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   jr    z,.Battle
 
   .Battle:
+  .SelfModifyingCodeSpriteCharacterBattle:  Equ $+1
   ld    hl,CursorHand
 	jp		.setcharacter
 
