@@ -232,6 +232,7 @@ CopyRamToVramPag3:
 
 ;$c1a3 = leftbottom = 002
 
+Wait1FrameBeforeWePutGridTile?: db  0
 SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
@@ -344,6 +345,18 @@ Monster1:
 .animationframe1: dw  $4000 + (000*128) + (016/2) - 128
 
 Monster2:
+.y: db  056 + (05*16) - 64
+.x: db  012 + (04*08)
+.yprevious: db  056 + (05*16) - 64
+.xprevious: db  012 + (04*08)
+.SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
+.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.ny:  db  64
+.nx:  db  56
+.animationframe0: dw  $4000 + (048*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (048*128) + (056/2) - 128
+
+Monster3:
 .y: db  056 + (01*16) - 16
 .x: db  012 + (04*08)
 .yprevious: db  056 + (01*16) - 16
@@ -355,7 +368,7 @@ Monster2:
 .animationframe0: dw  $4000 + (032*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (016/2) - 128
 
-Monster3:
+Monster4:
 .y: db  056 + (02*16) - 32
 .x: db  012 + (01*08)
 .yprevious: db  056 + (02*16) - 32
@@ -367,17 +380,7 @@ Monster3:
 .animationframe0: dw  $4000 + (000*128) + (064/2) - 128
 .animationframe1: dw  $4000 + (000*128) + (080/2) - 128
 
-Monster4:
-.y: db  056 + (05*16) - 64
-.x: db  012 + (04*08)
-.yprevious: db  056 + (05*16) - 64
-.xprevious: db  012 + (04*08)
-.SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64
-.nx:  db  56
-.animationframe0: dw  $4000 + (048*128) + (000/2) - 128
-.animationframe1: dw  $4000 + (048*128) + (056/2) - 128
+
 
 
 Monster5:

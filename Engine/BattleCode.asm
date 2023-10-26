@@ -75,19 +75,17 @@ BuildUpBattleFieldAndPutMonsters:
   xor   a
 	ld		(activepage),a			            ;page 0
   call  SetBattleFieldSnowGraphics      ;set battle field in page 1 ram->vram
+  call  .SetRocks
   ld    hl,.CopyPage1To2
   call  DoCopy                          ;copy battle field to page 2 vram->vram
   call  SwapAndSetPage                  ;swap and set page 1
   call  SetBattleFieldSnowGraphics      ;set battle field in page 0 ram->vram
+  call  .SetRocks
   ld    hl,.CopyPage1To3
   call  DoCopy                          ;copy battle field to page 3 vram->vram
   call  .SetAllMonsters                 ;set all monsters in page 0
   call  .CopyAllMonstersToPage1and2
-  xor   a
-  
-  
-  
-  ld a,1
+  ld    a,1
   ld    (CurrentActiveMonster),a
   ret
 
@@ -104,6 +102,7 @@ BuildUpBattleFieldAndPutMonsters:
   ld    (CurrentActiveMonster),a
   .loop:
   call  SetCurrentActiveMOnsterInIX
+  call  Set255WhereMonsterStandsInBattleFieldGrid
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  PutMonster                      ;put monster in inactive page
   ld    a,(CurrentActiveMonster)
@@ -137,6 +136,64 @@ BuildUpBattleFieldAndPutMonsters:
 	db		0,1,188,0
 	db		0,0,$d0	
 
+  .SetRocks:
+  ld    ix,RocksVersion1
+  ld    b,5
+
+  .RockLoop:
+  push  bc
+  ld    e,(ix+0)
+  ld    d,(ix+1)
+  call  .GoSetRock 
+
+  ld    l,(ix+2)
+  ld    h,(ix+3)
+  ld    (hl),255
+
+  inc   ix
+  inc   ix
+  inc   ix
+  inc   ix
+  pop   bc
+  djnz  .RockLoop
+  ret
+
+  .GoSetRock:
+  ld    hl,$4000 + (048*128) + (240/2) - 128
+  ld    bc,$0000 + (016*256) + (016/2)
+  ld    a,BattleMonsterSpriteSheet1Block           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+RocksVersion1:
+  dw    $0000 + ((00*16+040)*128) + ((07*08 + 12)/2) - 128, BattleFieldGrid+007 + 00*LenghtBattleField
+  dw    $0000 + ((01*16+040)*128) + ((08*08 + 12)/2) - 128, BattleFieldGrid+008 + 01*LenghtBattleField
+  dw    $0000 + ((04*16+040)*128) + ((09*08 + 12)/2) - 128, BattleFieldGrid+009 + 04*LenghtBattleField
+  dw    $0000 + ((04*16+040)*128) + ((11*08 + 12)/2) - 128, BattleFieldGrid+011 + 04*LenghtBattleField
+  dw    $0000 + ((05*16+040)*128) + ((10*08 + 12)/2) - 128, BattleFieldGrid+010 + 05*LenghtBattleField
+
+Set255WhereMonsterStandsInBattleFieldGrid:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+
+  ;Set number 001 in grid where monster is
+  ld    a,(ix+MonsterNX)
+  ld    (hl),255                        ;set monster in grid
+  cp    17
+  ret   c
+  ;set another 001 for each addition 16 pixels this monsters is wide
+  inc   hl
+  inc   hl
+  ld    (hl),255                        ;set monster in grid
+  cp    33
+  ret   c
+  inc   hl
+  inc   hl
+  ld    (hl),255                        ;set monster in grid
+  cp    57
+  ret   c
+  inc   hl
+  inc   hl
+  ld    (hl),255                        ;set monster in grid
+  ret
 
 HandleMonsters:
   call  AnimateMonster
@@ -302,6 +359,11 @@ CheckSpaceToMoveMonster:
   bit   4,a
   ret   z
 
+  ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
+  ld    de,CursorBoots
+  call  CompareHLwithDE
+  ret   nz                              ;monster unable to walk if cursor is not boots
+
   .go:
   ld    a,1
   ld    (MoVeMonster?),a
@@ -368,6 +430,7 @@ CheckSwitchToNextMonster:
   ld    (SwitchToNextMonster?),a
 
   call  SetCurrentActiveMOnsterInIX
+  call  Set255WhereMonsterStandsInBattleFieldGrid
 
   ;when we switch to another monster, put current monster also in page 2, so it becomes part of the background
 	ld		a,(activepage)
@@ -1016,34 +1079,35 @@ ClearBattleFieldGrid:
 SetAllNumbersInGrid:
   ld    e,000                           ;number we search for
   ld    a,001                           ;number we put
-  exx
+  ld    b,17                            ;repeat this proces 17x to fill the entire grid
   ex    af,af'
 
-  ld    b,17                            ;repeat this proces 17x to fill the entire grid
-.loop:
-  push  bc
+  .loop:
+  ex    af,af'
+  inc   e                               ;next number we search for
+  inc   a                               ;next number we put
+  ex    af,af'
+
+  exx
   call  .GoNextNumber
-  pop   bc
+  exx
   djnz  .loop
   ret
 
 .GoNextNumber:
-  exx
-  ex    af,af'
-  inc   e                               ;next number we search for
-  inc   a                               ;next number we put
-  exx
-  ex    af,af'
-
   ld    b,-1                            ;x coordinate on battlefield grid
   ld    c,0                             ;y coordinate on battlefield grid
   ld    d,0
-  call  .MainLoop
-  ret
 
   .MainLoop:
   call  .GoCheckNextPosition
-  call  .SetBCPositionInHL
+;  call  .SetBCPositionInHL
+
+  ld    hl,BattleFieldGrid
+  ld    e,b
+  add   hl,de
+  ld    e,c
+  add   hl,de                           ;jump to (x,y) position in battlefield grid
 
   ld    a,(hl)
   exx
@@ -1101,7 +1165,14 @@ SetAllNumbersInGrid:
   ret
 
 .SetnumberInHL:
-  call  .SetBCPositionInHL
+  ld    a,c
+.SetnumberInHLHeightAlreadyInA:
+  add   a,b
+  ld    e,a
+
+  ld    hl,BattleFieldGrid
+  add   hl,de                           ;jump to (x,y) position in battlefield grid
+    
   ld    a,(hl)
   or    a
   ret   nz
@@ -1120,8 +1191,7 @@ SetAllNumbersInGrid:
   add   a,LenghtBattleField
   cp    HeightBattleField*LenghtBattleField
   ret   z
-  ld    c,a
-  jp    .SetnumberInHL
+  jp    .SetnumberInHLHeightAlreadyInA
 
 .Direction5:                              ;left bottom
   dec   b                                 ;x coordinate on battlefield grid
@@ -1131,9 +1201,7 @@ SetAllNumbersInGrid:
   add   a,LenghtBattleField
   cp    HeightBattleField*LenghtBattleField
   ret   z
-  ld    c,a
-  jp    .SetnumberInHL
-
+  jp    .SetnumberInHLHeightAlreadyInA
 
 .Direction4:                              ;right (2x)
   inc   b                                 ;x coordinate on battlefield grid
@@ -1146,14 +1214,12 @@ SetAllNumbersInGrid:
   ret   z
   jp    .SetnumberInHL
 
-
 .Direction3:                              ;left (2x)
   dec   b                                 ;x coordinate on battlefield grid
   ret   m
   dec   b                                 ;x coordinate on battlefield grid
   ret   m
   jp    .SetnumberInHL
-
 
 .Direction2:                              ;right top
   inc   b                                 ;x coordinate on battlefield grid
@@ -1164,9 +1230,7 @@ SetAllNumbersInGrid:
   ld    a,c
   sub   a,LenghtBattleField
   ret   c
-  ld    c,a
-  jp    .SetnumberInHL
-
+  jp    .SetnumberInHLHeightAlreadyInA
 
 .Direction1:                              ;left top
   dec   b                                 ;x coordinate on battlefield grid
@@ -1175,16 +1239,7 @@ SetAllNumbersInGrid:
   ld    a,c
   sub   a,LenghtBattleField
   ret   c
-  ld    c,a
-  jp    .SetnumberInHL
-
-.SetBCPositionInHL:  
-  ld    hl,BattleFieldGrid
-  ld    e,b
-  add   hl,de
-  ld    e,c
-  add   hl,de                           ;jump to (x,y) position in battlefield grid
-  ret
+  jp    .SetnumberInHLHeightAlreadyInA
 
 FindMonsterInBattleFieldGrid:  
   ld    hl,BattleFieldGrid
@@ -1256,9 +1311,12 @@ SetcursorWhenGridTileIsActive:
 ;  jr    nz,.SetBoots
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
-  cp    5
+  cp    1
+  jr    z,.SetArrowDownForNow
+  cp    6                             ;monster can walk 6-1 tiles
   jr    c,.SetBoots
-  
+
+  .SetArrowDownForNow:
   ld    hl,CursorEnterCastle
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ret
