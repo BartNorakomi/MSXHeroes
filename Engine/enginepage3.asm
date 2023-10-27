@@ -232,13 +232,18 @@ CopyRamToVramPag3:
 
 ;$c1a3 = leftbottom = 002
 
+MonsterMovementPathPointer: db  0
+MonsterMovementAmountOfSteps:  db  0
+MonsterMovementPath:  db  3,3,3,3,3, 7,7,7,7,7, 3,3,3,3,3, 7,7,255
+
 Wait1FrameBeforeWePutGridTile?: db  0
 SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
+MovementLenghtMonsters: equ 12
 
   db  255,255,255,255,255,255
-BattleFieldGrid: ;0C14Bh
+BattleFieldGrid: ;0C15Ch
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
   db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
@@ -337,20 +342,20 @@ Monster0:
 
 Monster1:
 .y: db  056 + (00*16) - 32  ;y= 056 + (row *16) - ny
-.x: db  012 + (01*08)       ;x= 012 + (colum*08)
+.x: db  012 + (09*08)       ;x= 012 + (colum*08)
 .yprevious: db  056 + (00*16) - 32
-.xprevious: db  012 + (01*08)
+.xprevious: db  012 + (09*08)
 .SYSXinROM: dw  $4000 + (000*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
-.nx:  db  32
+.nx:  db  16
 .animationframe0: dw  $4000 + (000*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (000*128) + (016/2) - 128
 
 Monster2:
-.y: db  056 + (05*16) - 64
+.y: db  056 + (07*16) - 64
 .x: db  012 + (04*08)
-.yprevious: db  056 + (05*16) - 64
+.yprevious: db  056 + (07*16) - 64
 .xprevious: db  012 + (04*08)
 .SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block

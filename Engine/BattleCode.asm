@@ -33,13 +33,13 @@ call screenon
   call  nz,.SetPage3
 
 
-  ld    a,03                ;we can store the previous vblankintflag time and cp the current with that value
+  ld    a,01                ;we can store the previous vblankintflag time and cp the current with that value
   ld    hl,vblankintflag    ;this way we speed up the engine when not scrolling
   .checkflag:
   cp    (hl)
   jr    nc,.checkflag
   ld    (hl),0
-;  halt
+  halt
   jp  .engine
 
 
@@ -334,12 +334,88 @@ CheckSpaceToMoveMonster:
   ld    a,1
   ld    (MoVeMonster?),a
 
-  ld    a,(Monster0+MonsterY)           ;use grid pointer as reference to where we move to
-  sub   a,(ix+MonsterNY)
-  add   a,17
-  ld    (MoveMonsterToY),a  
-  ld    a,(Monster0+MonsterX)
-  ld    (MoveMonsterToX),a
+  call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
+  ld    a,(hl)                          ;amount of steps till destination is reached
+  dec   a
+
+  ld    iy,MonsterMovementPath
+  ld    d,0
+  ld    e,a
+  add   iy,de
+  ld    (iy),255
+  .loop:
+  call  SearchForTileNumberA
+  
+  dec   iy
+  ld    (iy),b
+  dec   a
+  jr    nz,.loop
+  
+  SearchForTileNumberA:
+  ld    de,LenghtBattleField
+  ;check if A is 1 tile left of current position
+  dec   hl
+  dec   hl
+  cp    (hl)
+  jr    z,.Right
+
+  ;check if A is 1 tile right of current position
+  inc   hl
+  inc   hl
+  inc   hl
+  inc   hl
+  cp    (hl)
+  jr    z,.Left
+
+  ;check if A is 1 tile left and 1 tile up of current position
+  dec   hl
+  dec   hl
+  dec   hl
+  or    a
+  sbc   hl,de
+  cp    (hl)
+  jr    z,.RightDown
+
+  ;check if A is 1 tile right and 1 tile up of current position
+  inc   hl
+  inc   hl
+  cp    (hl)
+  jr    z,.LeftDown
+
+  ;check if A is 1 tile right and 1 tile down of current position
+  add   hl,de
+  add   hl,de
+  cp    (hl)
+  jr    z,.LeftUp
+
+  ;check if A is 1 tile left and 1 tile down of current position
+  dec   hl
+  dec   hl
+  cp    (hl)
+  jr    z,.RightUp
+
+  .RightUp:
+  ld    b,1
+  ret
+
+  .LeftUp:
+  ld    b,8
+  ret
+  
+  .LeftDown:
+  ld    b,6
+  ret
+
+  .RightDown:
+  ld    b,4
+  ret
+
+  .Left:
+  ld    b,7
+  ret
+
+  .Right:
+  ld    b,3
   ret
 
 AnimateMonster:
@@ -369,22 +445,6 @@ AnimateMonster:
   ret
   
 CheckSwitchToNextMonster:
-;  call  CheckSpace
-
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-;	ld		a,(NewPrContr)
-;  bit   4,a
-;  ret   z
-
-;  ld    a,(MoVeMonster?)
-;  or    a
-;  ret   z
-;  xor   a
-;  ld    (MoVeMonster?),a
-
   ld    a,(SwitchToNextMonster?)
   or    a
   ret   z
@@ -853,8 +913,6 @@ MoveMonster:
   call  CompareHLwithDE
   jp    z,MoveGridPointer
 
-;jp .manualmove
-
   ld    a,(MoVeMonster?)
   or    a
   ret   z
@@ -862,128 +920,99 @@ MoveMonster:
   ld    hl,CursorHand
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
 
-  call  .MoveY
-  call  .MoveX
-  
-  ld    a,(MoveMonsterToX)
-  cp    (ix+MonsterX)
-  ret   nz
-  ld    a,(MoveMonsterToY)
-  cp    (ix+MonsterY)
-  ret   nz
+  ld    a,(MonsterMovementPathPointer)
+  ld    e,a
+  ld    d,0
+  ld    hl,MonsterMovementPath
+  add   hl,de
+  ld    a,(hl)
+  cp    255
+  jr    z,.End
 
+  call  .Move
+  ld    a,(MonsterMovementAmountOfSteps)
+  dec   a
+  and   3
+  ld    (MonsterMovementAmountOfSteps),a
+  ret   nz
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  ret
+
+  .End:
   xor   a
   ld    (MoVeMonster?),a
   ld    a,1
   ld    (SwitchToNextMonster?),a
-  ret
-  
-  .MoveX:
-  ld    a,(MoveMonsterToX)
-  cp    (ix+MonsterX)
-  ret   z
-  jr    c,.MoveXLeft
-  .MoveXRight:
-  inc   (ix+MonsterX)
-  inc   (ix+MonsterX)
-  inc   (ix+MonsterX)
-  inc   (ix+MonsterX)
-
-  ld    a,(MoveMonsterToX)
-  cp    (ix+MonsterX)
-  ret   nc
-  ld    a,(MoveMonsterToX)
-  ld    (ix+MonsterX),a
+  xor   a
+  ld    (MonsterMovementPathPointer),a
   ret
 
-  .MoveXLeft:
-  dec   (ix+MonsterX)
-  dec   (ix+MonsterX)
-  dec   (ix+MonsterX)
-  dec   (ix+MonsterX)
+  .Move:
+  cp    1
+  jr    z,.MoveRightUp
+  cp    3
+  jr    z,.MoveRight
+  cp    4
+  jr    z,.MoveRightDown
+  cp    6
+  jr    z,.MoveLeftDown
+  cp    7
+  jr    z,.MoveLeft
+  cp    8
+  jr    z,.MoveLeftUp
 
-  ld    a,(MoveMonsterToX)
-  cp    (ix+MonsterX)
-  ret   c
-  ld    a,(MoveMonsterToX)
-  ld    (ix+MonsterX),a
-  ret
-  
-  .MoveY:
-  ld    a,(MoveMonsterToY)
-  cp    (ix+MonsterY)
-  ret   z
-  jr    c,.MoveYUp
-  .MoveYDown:
-  inc   (ix+MonsterY)
-  inc   (ix+MonsterY)
-  inc   (ix+MonsterY)
-  inc   (ix+MonsterY)
-
-  ld    a,(MoveMonsterToY)
-  cp    (ix+MonsterY)
-  ret   nc
-  ld    a,(MoveMonsterToY)
-  ld    (ix+MonsterY),a
-  ret
-
-  .MoveYUp:
-  dec   (ix+MonsterY)
-  dec   (ix+MonsterY)
-  dec   (ix+MonsterY)
-  dec   (ix+MonsterY)
-
-  ld    a,(MoveMonsterToy)
-  cp    (ix+Monstery)
-  ret   c
-  ld    a,(MoveMonsterToy)
-  ld    (ix+Monstery),a
-  ret
-  
-
-  .manualmove:
-
-
-
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-  ld    a,(controls)
-  bit   0,a
-  jr    nz,.up
-  bit   1,a
-  jr    nz,.down
-  bit   2,a
-  jr    nz,.left
-  bit   3,a
-  jr    nz,.right
-  ret
-
-  .up:
-  ld    a,(ix+MonsterY)
-  sub   a,2
-  ld    (ix+MonsterY),a
-  ret
-
-  .down:
-  ld    a,(ix+MonsterY)
-  add   a,2
-  ld    (ix+MonsterY),a
-  ret
-
-  .left:
-  ld    a,(ix+MonsterX)
-  sub   a,2
-  ld    (ix+MonsterX),a
-  ret
-
-  .right:
+  .MoveRightUp:
   ld    a,(ix+MonsterX)
   add   a,2
   ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  sub   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveRight:
+  ld    a,(ix+MonsterX)
+  add   a,4
+  ld    (ix+MonsterX),a
+  ret
+
+  .MoveRightDown:
+  ld    a,(ix+MonsterX)
+  add   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  add   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveLeftDown:
+  ld    a,(ix+MonsterX)
+  sub   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  add   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveLeft:
+  ld    a,(ix+MonsterX)
+  sub   a,4
+  ld    (ix+MonsterX),a
+  ret
+
+  .MoveLeftUp:
+  ld    a,(ix+MonsterX)
+  sub   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  sub   a,4
+  ld    (ix+MonsterY),a
   ret
 
 MoveGridPointer:
@@ -1390,7 +1419,7 @@ SetcursorWhenGridTileIsActive:
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means monster is already standing there
   jr    z,.ProhibitionSign
-  cp    6                               ;if tile pointer points at =>61, that means monster does not have enough movement points to move there
+  cp    MovementLenghtMonsters          ;if tile pointer points at =>61, that means monster does not have enough movement points to move there
   jr    nc,.ProhibitionSign
 
   ld    a,(ix+MonsterNX)
