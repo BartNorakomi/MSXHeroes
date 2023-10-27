@@ -254,29 +254,6 @@ HandleMonsters:
   .EndRecoverGridTile:
   ret
 
-
-
-
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-
-  call  AnimateMonster
-;  call  CheckSpaceToSwitchToNextMonster
-  call  CheckSwitchToNextMonster
-  call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-  call  MoveMonster
-  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-  call  PutMonster                      ;put monster in inactive page
-  call  Recover
-  ret
-
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-; OLD ROUTINE WHICH WAS WORKING PERFECTLY !!!!!
-
 Recover:
   ;recover overwritten monsters. monster0 (grid sprite) gets overwritten hard by all monsters
   push  ix
@@ -338,17 +315,6 @@ sortloop:
   jr nz,sortloop    ; if not zero, continue sorting
   ret
 ; the y coordinates are now sorted in ascending order
-
-
-
-
-
-
-
-
-
-
-
 
 CheckSpaceToMoveMonster:
 ; bit	7	6	  5		    4		    3		    2		  1		  0
@@ -492,7 +458,7 @@ CheckSwitchToNextMonster:
   call  docopy
 
   ;then recover other monsters that we also erased from inactive page
-  call  RecoverOverwrittenMonstersHard
+  call  RecoverOverwrittenMonstersSkipMonster0
 
   ;then set this new background to page 2 (copy from inactive page to page 2)
 	ld		a,(activepage)
@@ -532,6 +498,25 @@ RecoverOverwrittenMonstersHard:
   inc   hl
   push  de
   pop   iy                              ;monster we are going to recover
+  
+  exx
+  call  RecoverOverwrittenMonsters.GoRecoverHard
+  exx
+  djnz  .loop
+  ret
+
+RecoverOverwrittenMonstersSkipMonster0:
+  exx
+  ld    hl,OrderOfMonstersFromHighToLow + 2
+  ld    b,TotalAmountOfMonsterOnBattleField - 1 
+
+  .loop:
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)
+  inc   hl
+  push  de
+  pop   iy                              ;iy=monster we are going to recover
   
   exx
   call  RecoverOverwrittenMonsters.GoRecoverHard
@@ -1039,27 +1024,52 @@ SetCurrentMonsterInBattleFieldGrid:     ;set monster in grid, and fill grid with
   call  ClearBattleFieldGrid            ;set all except 255 to 000
   call  SetCurrentActiveMOnsterInIX
   call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  call  Set001AtCurrentMonstersLocation
+  call  Set254TilesWHereMonsterCantMoveToDueToItsNX
+  call  SetAllNumbersInGrid
+  jp    FillRemaining000sWith254        ;wherever monster is not able to go, set those tiles to 254
+
+FillRemaining000sWith254:               ;wherever monster is not able to go, set those tiles to 254
+  ld    a,000
+  ld    hl,BattleFieldGrid-1
+  ld    b,LenghtBattleField*HeightBattleField
+  .loop:
+  inc   hl
+  cp    a,(hl)
+  jr    z,.SetTo254
+  djnz  .loop
+  ret
+  .SetTo254:
+  ld    (hl),254
+  djnz  .loop  
+  ret
+
+Set001AtCurrentMonstersLocation:
 
   ;Set number 001 in grid where monster is
   ld    a,(ix+MonsterNX)
   ld    (hl),001                        ;set monster in grid
   cp    17
-  jp    c,SetAllNumbersInGrid
+;  jp    c,SetAllNumbersInGrid
+  ret   c
   ;set another 001 for each addition 16 pixels this monsters is wide
   inc   hl
   inc   hl
-  ld    (hl),001                        ;set monster in grid
+  ld    (hl),000                        ;set monster in grid
   cp    33
-  jp    c,SetAllNumbersInGrid
+  ret   c
+;  jp    c,SetAllNumbersInGrid
   inc   hl
   inc   hl
-  ld    (hl),001                        ;set monster in grid
+  ld    (hl),000                        ;set monster in grid
   cp    57
-  jp    c,SetAllNumbersInGrid
+;  jp    c,SetAllNumbersInGrid
+  ret   c
   inc   hl
   inc   hl
-  ld    (hl),001                        ;set monster in grid
-  jp    SetAllNumbersInGrid
+  ld    (hl),000                        ;set monster in grid
+;  jp    SetAllNumbersInGrid
+  ret
 
 ClearBattleFieldGrid:
   ld    a,255
@@ -1074,6 +1084,79 @@ ClearBattleFieldGrid:
   .SetTo000:
   ld    (hl),000
   djnz  .loop  
+  ret
+
+Set254TilesWHereMonsterCantMoveToDueToItsNX:
+;if a monster's nx is for instance 32, then he cant move to tiles directly left of 255 tiles
+;set those tiles to 254
+
+  ld    b,LenghtBattleField*HeightBattleField - 3
+  ld    hl,BattleFieldGrid+3
+   .loop:
+  ld    a,(hl)
+  cp    255
+  call  z,.Found255
+  inc   hl
+  djnz  .loop
+  ret
+  
+  .Found255:
+  ld    a,(ix+MonsterNX)
+  cp    17  
+  ret   c
+
+  ;now check previous tile for a 000, if we find it, set it into a 254
+  dec   hl
+  dec   hl
+  ld    a,(hl)
+  or    a
+  jr    nz,.EndCheck0
+  ld    (hl),254
+  .EndCheck0:
+  inc   hl
+  inc   hl
+
+  ld    a,(ix+MonsterNX)
+  cp    33  
+  ret   c
+
+  ;now check 2 tiles back for a 000, if we find it, set it into a 254
+  dec   hl
+  dec   hl
+  dec   hl
+  dec   hl
+  ld    a,(hl)
+  or    a
+  jr    nz,.EndCheck0b
+  ld    (hl),254
+  .EndCheck0b:
+  inc   hl
+  inc   hl
+  inc   hl
+  inc   hl
+
+  ld    a,(ix+MonsterNX)
+  cp    57  
+  ret   c  
+
+  ;now check 3 tiles back for a 000, if we find it, set it into a 254
+  dec   hl
+  dec   hl
+  dec   hl
+  dec   hl
+  dec   hl
+  dec   hl
+  ld    a,(hl)
+  or    a
+  jr    nz,.EndCheck0c
+  ld    (hl),254
+  .EndCheck0c:
+  inc   hl
+  inc   hl
+  inc   hl
+  inc   hl
+  inc   hl
+  inc   hl
   ret
 
 SetAllNumbersInGrid:
@@ -1303,20 +1386,61 @@ FindCursorInBattleFieldGrid:
   ret
 
 SetcursorWhenGridTileIsActive:
-;  ld    a,(Monster0+MonsterY)
-;  cp    71
-;  jr    nz,.SetBoots
-;  ld    a,(Monster0+MonsterX)
-;  cp    36
-;  jr    nz,.SetBoots
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
-  cp    1
-  jr    z,.SetArrowDownForNow
-  cp    6                             ;monster can walk 6-1 tiles
-  jr    c,.SetBoots
+  cp    1                               ;if tile pointer points at is "1", that means monster is already standing there
+  jr    z,.ProhibitionSign
+  cp    6                               ;if tile pointer points at =>61, that means monster does not have enough movement points to move there
+  jr    nc,.ProhibitionSign
 
-  .SetArrowDownForNow:
+  ld    a,(ix+MonsterNX)
+  cp    17
+  jr    c,.SetBoots
+  cp    33
+  jr    c,.MonsterIs2TilesWide
+  cp    57
+  jr    c,.MonsterIs3TilesWide
+
+  .MonsterIs4TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  jr    .SetBoots
+
+  .MonsterIs3TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  jr    .SetBoots
+
+  .MonsterIs2TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jr    z,.ProhibitionSign
+  jr    .SetBoots
+
+  .ProhibitionSign:
   ld    hl,CursorEnterCastle
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ret
