@@ -4010,6 +4010,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	call	SetVdp_Write
 
   ld    hl,(CurrentCursorSpriteCharacter)
+    
 	ld		c,$98
 	call	outix96			;write sprite character of pointer and hand to vram
 ;  ret
@@ -4021,7 +4022,12 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	call	SetVdp_Write
 	ld		c,$98
 
+  .SelfModifyingCodeSpriteColors:  equ $+1
 	ld		hl,SpriteColCursorSprites
+	
+;  ld    hl,SpriteProhibitionSignColor
+
+	
 	call	outix48			;write sprite color of pointer and hand to vram
 ;  ret
 
@@ -4062,6 +4068,7 @@ CursorWalkingBoots:     equ SpriteCharCursorSprites + (10 * 32*3)
 CursorHand:             equ SpriteCharCursorSprites + (11 * 32*3)
 CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
 CursorEnterCastle:      equ SpriteCharCursorSprites + (13 * 32*3)
+CursorProhibitionSign:  equ SpriteProhibitionSignChar
 
 colorlightgreen:    equ 01
 colormidgreen:      equ 02
@@ -4078,8 +4085,15 @@ colordarkbrown:     equ 13
 
 SpriteCharCursorSprites:
 	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
+SpriteProhibitionSignChar:
+	include "../sprites/ProhibitionSign.tgs.gen"
+SpriteProhibitionSignColor:
+	include "../sprites/ProhibitionSign.tcs.gen"
+
+
 SpriteColCursorSprites:
   ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
+
 SpriteCharMapSprites:
 	include "../sprites/MapCornerLeftTop.tgs.gen"
 	include "../sprites/MapCornerRightTop.tgs.gen"

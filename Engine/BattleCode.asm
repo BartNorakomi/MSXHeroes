@@ -919,6 +919,8 @@ MoveMonster:
 
   ld    hl,CursorHand
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
 
   ld    a,(MonsterMovementPathPointer)
   ld    e,a
@@ -1017,7 +1019,7 @@ MoveMonster:
 
 MoveGridPointer:
   ld    a,(spat)
-  add   a,8
+  add   a,14; 8
   
   and   %1111 0000
   bit   4,a
@@ -1026,7 +1028,7 @@ MoveGridPointer:
   sub   a,9
   ld    (ix+MonsterY),a
   ld    a,(spat+1)
-  sub   a,8
+  sub   a,6 ;8
   
   and   %1111 0000
   add   a,4+8
@@ -1470,16 +1472,19 @@ SetcursorWhenGridTileIsActive:
   jr    .SetBoots
 
   .ProhibitionSign:
-  ld    hl,CursorEnterCastle
+  ld    hl,CursorProhibitionSign
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteProhibitionSignColor
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
   
   .SetBoots:
   ld    hl,CursorBoots
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
-
-
+  
 EraseMonsterPreviousFrame:
 	ld		a,(activepage)
   xor   1
