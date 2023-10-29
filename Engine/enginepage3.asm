@@ -236,11 +236,14 @@ MonsterMovementPathPointer: db  0
 MonsterMovementAmountOfSteps:  db  0
 MonsterMovementPath:  db  3,3,3,3,3, 7,7,7,7,7, 3,3,3,3,3, 7,7,255
 
+IsCursorOnATile?: db  1
+WasCursorOnATilePreviousFrame?: db  1
+IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
 SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
-MovementLenghtMonsters: equ 12
+MovementLenghtMonsters: equ 8
 
   db  255,255,255,255,255,255
 BattleFieldGrid: ;0C15Ch
@@ -310,7 +313,7 @@ MoVeMonster?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
 CurrentActiveMonster: db  1
-TotalAmountOfMonsterOnBattleField:  equ 12
+TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
 MonsterY:               equ 0
 MonsterX:               equ MonsterY+1
@@ -323,7 +326,12 @@ MonsterNX:              equ MonsterNY+1
 MonsterAnimationFrame0: equ MonsterNX+1
 MonsterAnimationFrame1: equ MonsterAnimationFrame0+2
 
-LenghtMonsterTable: equ Monster1-Monster0
+LenghtMonsterTable:     equ Monster1-Monster0
+
+
+
+
+
 
 ;;;;;;;;;;;;;;;;; GRID SPRITE ;;;;;;;;;;;;;;;;;;;;;;
 Monster0:
@@ -388,9 +396,6 @@ Monster4:
 .animationframe0: dw  $4000 + (000*128) + (064/2) - 128
 .animationframe1: dw  $4000 + (000*128) + (080/2) - 128
 
-
-
-
 Monster5:
 .y: db  056 + (08*16) - 16
 .x: db  012 + (05*08)
@@ -403,19 +408,19 @@ Monster5:
 .animationframe0: dw  $4000 + (032*128) + (064/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (080/2) - 128
 
-;;;;;;;;; player 2 ;;;;;;;;;;;;;
-
 Monster6:
 .y: db  056 + (01*16) - 64
 .x: db  012 + (20*08)
 .yprevious: db  056 + (01*16) - 64
 .xprevious: db  012 + (20*08)
-.SYSXinROM: dw  $4000 + (112*128) + (128/2) - 128
+.SYSXinROM: dw  $4000 + (112*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  64
-.animationframe0: dw  $4000 + (112*128) + (128/2) - 128
-.animationframe1: dw  $4000 + (112*128) + (192/2) - 128
+.animationframe0: dw  $4000 + (112*128) + (000/2) - 128
+.animationframe1: dw  $4000 + (112*128) + (064/2) - 128
+
+;;;;;;;;; player 2 ;;;;;;;;;;;;;
 
 Monster7:
 .y: db  056 + (03*16) - 64
@@ -430,8 +435,8 @@ Monster7:
 .animationframe1: dw  $4000 + (048*128) + (168/2) - 128
 
 Monster8:
-.y: db  056 + (04*16) - 32
-.x: db  012 + (21*08)
+.y: db  056 + (04*16) - 32    
+.x: db  012 + (21*08)         
 .yprevious: db  056 + (04*16) - 32
 .xprevious: db  012 + (21*08)
 .SYSXinROM: dw  $4000 + (000*128) + (032/2) - 128
@@ -477,9 +482,21 @@ Monster11:
 .animationframe0: dw  $4000 + (032*128) + (096/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (112/2) - 128
 
+Monster12:
+.y: db  056 + (08*16) - 16
+.x: db  012 + (19*08)
+.yprevious: db  056 + (08*16) - 16
+.xprevious: db  012 + (19*08)
+.SYSXinROM: dw  $4000 + (032*128) + (096/2) - 128
+.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.ny:  db  16
+.nx:  db  16
+.animationframe0: dw  $4000 + (032*128) + (096/2) - 128
+.animationframe1: dw  $4000 + (032*128) + (112/2) - 128
+
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
-Monster12:
+Monster13:
 .y: db  040
 .x: db  140
 .yprevious: db  100
@@ -491,7 +508,7 @@ Monster12:
 .animationframe0: dw  $4000 + (048*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (048*128) + (056/2) - 128
 
-Monster13:
+Monster14:
 .y: db  040
 .x: db  200
 .yprevious: db  100

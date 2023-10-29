@@ -107,7 +107,7 @@ BuildUpBattleFieldAndPutMonsters:
   call  PutMonster                      ;put monster in inactive page
   ld    a,(CurrentActiveMonster)
   inc   a                               ;go to next monster
-  cp    TotalAmountOfMonsterOnBattleField
+  cp    TotalAmountOfMonstersOnBattleField
   ret   z
   ld    (CurrentActiveMonster),a
   jr    .loop
@@ -210,9 +210,17 @@ HandleMonsters:
 ;grid tile (erase)
   ld    ix,Monster0
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-  call  MoveMonster
 
+  call  CheckWasCursorOnATilePreviousFrame
+  ld    a,(WasCursorOnATilePreviousFrame?)
+  or    a
+  jr    z,.EndEraseGridTile
+
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+
+  .EndEraseGridTile:
+
+  call  MoveMonster
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
 
 ;current monster (put)
@@ -227,8 +235,13 @@ HandleMonsters:
   ld    a,(SwitchToNextMonster?)
   or    a
   jr    nz,.EndPutGridTile
-
+    
+  call  CheckIsCursorOnATileThisFrame
   call  SetcursorWhenGridTileIsActive
+
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndPutGridTile
     
   ld    ix,Monster0
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
@@ -247,6 +260,9 @@ HandleMonsters:
   ld    a,(SwitchToNextMonster?)
   or    a
   jr    nz,.EndRecoverGridTile
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndRecoverGridTile
 
   ld    ix,Monster0
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
@@ -265,7 +281,7 @@ Recover:
   
 SortMonstersFromHighToLow:
   push  ix
-  ld    c,TotalAmountOfMonsterOnBattleField-1-1  ; load the number of elements
+  ld    c,TotalAmountOfMonstersOnBattleField-1-1  ; load the number of elements
   call sortloop
   pop   ix
   ret
@@ -480,7 +496,7 @@ CheckSwitchToNextMonster:
   ;go to next monster
   ld    a,(CurrentActiveMonster)
   inc   a
-  cp    TotalAmountOfMonsterOnBattleField
+  cp    TotalAmountOfMonstersOnBattleField
   jr    nz,.NotZero
   ld    a,1
   .NotZero:
@@ -549,7 +565,7 @@ SetCurrentActiveMOnsterInIX:
 RecoverOverwrittenMonstersHard:
   exx
   ld    hl,OrderOfMonstersFromHighToLow
-  ld    b,TotalAmountOfMonsterOnBattleField
+  ld    b,TotalAmountOfMonstersOnBattleField
 
   .loop:
   ld    e,(hl)
@@ -568,7 +584,7 @@ RecoverOverwrittenMonstersHard:
 RecoverOverwrittenMonstersSkipMonster0:
   exx
   ld    hl,OrderOfMonstersFromHighToLow + 2
-  ld    b,TotalAmountOfMonsterOnBattleField - 1 
+  ld    b,TotalAmountOfMonstersOnBattleField - 1 
 
   .loop:
   ld    e,(hl)
@@ -587,7 +603,7 @@ RecoverOverwrittenMonstersSkipMonster0:
 RecoverOverwrittenMonsters:
   exx
   ld    hl,OrderOfMonstersFromHighToLow + 2
-  ld    b,TotalAmountOfMonsterOnBattleField - 1 
+  ld    b,TotalAmountOfMonstersOnBattleField - 1 
 
   .loop:
   ld    e,(hl)
@@ -1416,7 +1432,83 @@ FindCursorInBattleFieldGrid:
   add   hl,de
   ret
 
+CheckIsCursorOnATileThisFrame:
+  xor   a
+  ld    (IsCursorOnATileThisFrame?),a
+
+  ld    a,(Monster0+MonsterY)
+  cp    $18                             ;check if grid tile is above lowest tile
+  ret   c
+  cp    $b7                             ;check if grid tile is below lowest tile
+  ret   nc
+
+;2 left edges
+  ld    a,(Monster0+MonsterX)
+  cp    $04
+  ret   z
+  cp    $fc
+  ret   z
+;2 right edges
+  cp    $ec
+  ret   z
+  cp    $f4
+  ret   z
+
+  ld    a,(spat+1)
+  cp    $05                             ;check if cursor is beyond left most tile
+  ret   c
+  cp    $ec                             ;check if cursor is beyond right most tile
+  ret   nc
+  ;check edges left even and odd rows
+  ld    a,(Monster0+MonsterY)
+  sub   a,39
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  bit   0,a
+  jr    nz,.EndCheckLeftExceptions
+  ld    a,(spat+1)
+  cp    $0b                             ;check if cursor is beyond left most tile
+  ret   c
+  .EndCheckLeftExceptions:
+  ;check edges right even and odd rows
+  ld    a,(Monster0+MonsterY)
+  sub   a,39
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  bit   0,a
+  jr    z,.EndCheckRightExceptions
+  ld    a,(spat+1)
+  cp    $e6                             ;check if cursor is beyond right most tile
+  ret   nc
+  .EndCheckRightExceptions:
+
+  ld    a,1
+  ld    (IsCursorOnATileThisFrame?),a
+  ret
+  
+CheckWasCursorOnATilePreviousFrame:
+  xor   a
+  ld    (WasCursorOnATilePreviousFrame?),a
+
+  ld    a,(Monster0+MonsterYPrevious)
+  cp    $18                             ;check if grid tile is above lowest tile
+  ret   c
+  cp    $b7                             ;check if grid tile is below lowest tile
+  ret   nc
+
+  ld    a,1
+  ld    (WasCursorOnATilePreviousFrame?),a
+  ret
+
 SetcursorWhenGridTileIsActive:
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jp    z,.SetHand
+
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means monster is already standing there
@@ -1472,6 +1564,8 @@ SetcursorWhenGridTileIsActive:
   jr    .SetBoots
 
   .ProhibitionSign:
+  call  CheckPointerOnEnemy
+  
   ld    hl,CursorProhibitionSign
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ld    hl,SpriteProhibitionSignColor
@@ -1484,7 +1578,198 @@ SetcursorWhenGridTileIsActive:
   ld    hl,SpriteColCursorSprites
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
+
+  .SetHand:
+  ld    hl,CursorHand
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
+CheckPointerOnEnemy:
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  jr    nc,.RightPlayerIsActive
+
+  .LeftPlayerIsActive:
+  ld    ix,Monster7
+  call  .CheckMonster
+  ld    ix,Monster8
+  call  .CheckMonster
+  ld    ix,Monster9
+  call  .CheckMonster
+  ld    ix,Monster10
+  call  .CheckMonster
+  ld    ix,Monster11
+  call  .CheckMonster
+  ld    ix,Monster12
+  call  .CheckMonster
+  ret
+
+  .RightPlayerIsActive:
+  ld    ix,Monster1
+  call  .CheckMonster
+  ld    ix,Monster2
+  call  .CheckMonster
+  ld    ix,Monster3
+  call  .CheckMonster
+  ld    ix,Monster4
+  call  .CheckMonster
+  ld    ix,Monster5
+  call  .CheckMonster
+  ld    ix,Monster6
+  call  .CheckMonster
+  ret
+
+  .CheckMonster:
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  cp    c
+  ret   nz
+
+  ld    a,(ix+MonsterY)
+  ld    c,a
+  ld    a,(ix+MonsterNY)
+  add   a,c
+  ld    c,a
+
+  ld    a,(Monster0+MonsterY)
+  add   a,017
+  cp    c
+  ret   nz
+
+  pop   af
+  pop   af
+
+  ;At this pointer pointer is on an enemy, check if pointer is left, right, above or below monster
+  ;are we on even or odd row?
+  ld    a,(Monster0+MonsterY)
+  sub   a,39
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  bit   0,a
+  jr    z,.EvenRow
   
+  .OddRow:
+;$b6 t/m $c4
+;%1011 0110  $b6
+;%1011 1000  $b8
+;%1011 1010  $ba
+;%1011 1100  $bc
+;%1011 1110  $be
+;%1100 0000  $c0
+;%1100 0010  $c2
+;%1100 0100  $c4
+  ld    a,(spat+1)
+  and   %0000 1111
+  cp    %0000 0110
+  jp    z,.SetSwordRight
+  cp    %0000 1000
+  jp    z,.SetSwordRight
+  cp    %0000 1010
+  jp    z,.SetSwordRight
+  cp    %0000 1100
+  jp    z,.SetSwordRight
+  jp    .SetSwordLeft
+  
+  .EvenRow:
+;$ac t/m $ba
+;%1010 1100  $ac
+;%1010 1110  $ae
+;%1011 0000  $b0
+;%1011 0010  $b2
+;%1011 0100  $b4
+;%1011 0110  $b6
+;%1011 1000  $b8
+;%1011 1010  $ba
+  ld    a,(spat+1)
+  and   %0000 1111
+  cp    %0000 1100
+  jp    z,.SetSwordRight
+  cp    %0000 1110
+  jp    z,.SetSwordRight
+  cp    %0000 0000
+  jp    z,.SetSwordRight
+  cp    %0000 0010
+  jp    z,.SetSwordRight
+  jp    .SetSwordLeft
+
+  .SetSwordLeft:
+;We now divide the tile in 3 rows
+;%1000 0010 ;$82
+;%1000 0100 ;$84
+;%1000 0110 ;$86
+;%1000 1000 ;$88
+;%1000 1010 ;$8a
+;%1000 1100 ;$8c
+;%1000 1110 ;$8e
+;%1001 0000 ;$90
+  ld    a,(spat)
+  and   %0000 1111
+  ld    hl,CursorSwordLeftDown  
+  cp    %0000 0010
+  jp    z,.SetSword
+  cp    %0000 0100
+  jp    z,.SetSword
+  cp    %0000 0110
+  jp    z,.SetSword
+  ld    hl,CursorSwordLeft  
+  cp    %0000 1000
+  jp    z,.SetSword
+  cp    %0000 1010
+  jp    z,.SetSword
+  ld    hl,CursorSwordLeftUp  
+  jp    .SetSword
+;  cp    %0000 1100
+;  jp    z,.SetSword
+;  cp    %0000 1110
+;  jp    z,.SetSword
+;  cp    %0000 0000
+;  jp    z,.SetSword
+  
+  
+  .SetSwordRight:
+;We now divide the tile in 3 rows
+;%1000 0010 ;$82
+;%1000 0100 ;$84
+;%1000 0110 ;$86
+;%1000 1000 ;$88
+;%1000 1010 ;$8a
+;%1000 1100 ;$8c
+;%1000 1110 ;$8e
+;%1001 0000 ;$90
+  ld    a,(spat)
+  and   %0000 1111
+  ld    hl,CursorSwordRightDown  
+  cp    %0000 0010
+  jp    z,.SetSword
+  cp    %0000 0100
+  jp    z,.SetSword
+  cp    %0000 0110
+  jp    z,.SetSword
+  ld    hl,CursorSwordRight  
+  cp    %0000 1000
+  jp    z,.SetSword
+  cp    %0000 1010
+  jp    z,.SetSword
+  ld    hl,CursorSwordRightUp  
+  jp    .SetSword
+;  cp    %0000 1100
+;  jp    z,.SetSword
+;  cp    %0000 1110
+;  jp    z,.SetSword
+;  cp    %0000 0000
+;  jp    z,.SetSword
+
+  .SetSword:
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
 EraseMonsterPreviousFrame:
 	ld		a,(activepage)
   xor   1

@@ -3355,7 +3355,7 @@ movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   cp    2
   ld    d,212-16
   ld    e,000
-  jr    z,.XBorderSet
+  jr    nc,.XBorderSet
   ld    d,ycoorspritebottom
   ld    e,ycoordinateStartPlayfield
   .XBorderSet:
@@ -3392,7 +3392,7 @@ movecursorx:
   cp    2
   ld    d,256-16
   ld    e,000
-  jr    z,.XBorderSet
+  jr    nc,.XBorderSet
   ld    d,xcoorspriteright
   ld    e,xcoordinateStartPlayfield
   .XBorderSet:
@@ -4070,6 +4070,15 @@ CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
 CursorEnterCastle:      equ SpriteCharCursorSprites + (13 * 32*3)
 CursorProhibitionSign:  equ SpriteProhibitionSignChar
 
+CursorSwordLeftUp:      equ SpriteCharSword8DirectionsSprites + (00 * 32*3)
+CursorSwordLeftDown:    equ SpriteCharSword8DirectionsSprites + (01 * 32*3)
+CursorSwordRightUp:     equ SpriteCharSword8DirectionsSprites + (02 * 32*3)
+CursorSwordRightDown:   equ SpriteCharSword8DirectionsSprites + (03 * 32*3)
+CursorSwordRight:       equ SpriteCharSword8DirectionsSprites + (04 * 32*3)
+CursorSwordLeft:        equ SpriteCharSword8DirectionsSprites + (05 * 32*3)
+CursorSwordUp:          equ SpriteCharSword8DirectionsSprites + (06 * 32*3)
+CursorSwordDown:        equ SpriteCharSword8DirectionsSprites + (07 * 32*3)
+
 colorlightgreen:    equ 01
 colormidgreen:      equ 02
 colorblue:          equ 04
@@ -4089,6 +4098,11 @@ SpriteProhibitionSignChar:
 	include "../sprites/ProhibitionSign.tgs.gen"
 SpriteProhibitionSignColor:
 	include "../sprites/ProhibitionSign.tcs.gen"
+SpriteCharSword8DirectionsSprites:
+	include "../sprites/Swords8Directions.tgs.gen"
+
+
+
 
 
 SpriteColCursorSprites:
