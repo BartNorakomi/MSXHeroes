@@ -195,9 +195,33 @@ Set255WhereMonsterStandsInBattleFieldGrid:
   ld    (hl),255                        ;set monster in grid
   ret
 
+
+CheckSpaceToAttackMonster:
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+  bit   4,a
+  ret   z
+
+  ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
+  ld    de,CursorSwordRight
+  call  CompareHLwithDE
+  ret   nz                              ;monster unable to walk if cursor is not boots
+
+  ld    a,1
+  ld    (AttackMonster?),a
+
+  ld    hl,YieArKungFuAttack1
+  ld    de,MonsterMovementPath
+  ld    bc,LenghtYieArKungFuAttack1
+  ldir
+  ret
+
 HandleMonsters:
-  call  AnimateMonster
   call  CheckSpaceToMoveMonster
+  call  CheckSpaceToAttackMonster
   call  CheckSwitchToNextMonster
   call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
 
@@ -206,6 +230,8 @@ HandleMonsters:
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
   call  MoveMonster
+  call  AttackMonster
+  call  AnimateMonster                  ;set animation (idle, moving or attacking)
 
 ;grid tile (erase)
   ld    ix,Monster0
@@ -216,7 +242,7 @@ HandleMonsters:
   or    a
   jr    z,.EndEraseGridTile
 
-  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
 
   .EndEraseGridTile:
 
@@ -434,31 +460,6 @@ CheckSpaceToMoveMonster:
   ld    b,3
   ret
 
-AnimateMonster:
-  ld    a,(SwitchToNextMonster?)
-  or    a
-  ret   nz                              ;don't animate when we are about to switch monster
-
-  call  SetCurrentActiveMOnsterInIX
-  ld    a,(framecounter)
-  and   7
-  jr    z,.AnimationFrame0
-  cp    4
-  jr    z,.AnimationFrame1
-  ret
-
-  .AnimationFrame0:
-  ld    l,(ix+MonsterAnimationFrame0+0)
-  ld    h,(ix+MonsterAnimationFrame0+1)
-  ld    (ix+MonsterSYSX+0),l
-  ld    (ix+MonsterSYSX+1),h
-  ret
-  .AnimationFrame1:
-  ld    l,(ix+MonsterAnimationFrame1+0)
-  ld    h,(ix+MonsterAnimationFrame1+1)
-  ld    (ix+MonsterSYSX+0),l
-  ld    (ix+MonsterSYSX+1),h
-  ret
   
 CheckSwitchToNextMonster:
   ld    a,(SwitchToNextMonster?)
@@ -525,9 +526,9 @@ CheckSwitchToNextMonster:
   ld    (EraseMonster+dx),a
   ld    (EraseMonster+sx),a
 
-  ld    a,(ix+MonsterNX)
+  ld    a,(ix+MonsterNXPrevious)
   ld    (EraseMonster+nx),a
-  ld    a,(ix+MonsterNY)
+  ld    a,(ix+MonsterNYPrevious)
   ld    (EraseMonster+ny),a
 
   ld    hl,EraseMonster
@@ -916,12 +917,126 @@ StoreSYSXNYNXAndBlock:
   ld    (NXAndNY),bc
   ld    (BlockToReadFrom),a
   ret
+
+AttackMonster:
+  ld    a,(AttackMonster?)
+  or    a
+  ret   z
+  ld    (MoVeMonster?),a              ;this is only so pointer turns into a hand and gridtile is removed
+
+  ld    hl,CursorHand
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+  ld    a,(MonsterMovementPathPointer)
+  ld    e,a
+  ld    d,0
+  ld    hl,MonsterMovementPath
+  add   hl,de
+  ld    a,(hl)
+  cp    255                           ;255 = end movement
+  jr    z,.End
+
+  call  MoveMonster.Move
+  ld    a,(MonsterMovementAmountOfSteps)
+  dec   a
+  and   3
+  ld    (MonsterMovementAmountOfSteps),a
+  ret   nz
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  ret
+
+  .End:
+  xor   a
+  ld    (AttackMonster?),a
+  ld    (MoVeMonster?),a
+;  ld    a,1
+;  ld    (SwitchToNextMonster?),a
+  xor   a
+  ld    (MonsterMovementPathPointer),a
+  ret
+
+YieArKungFuAttack1:
+  db    003,003,003,128+48,000,000,000,000,128+32,007,007,007,255
+LenghtYieArKungFuAttack1: equ $-YieArKungFuAttack1
+
+  dw    $4000 + (176*128) + (128/2) - 128
+
+AnimateMonster:
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  ret   nz                              ;don't animate when we are about to switch monster
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(MoVeMonster?)
+  or    a
+  jp    z,.Idle
+  ld    a,(AttackMonster?)
+  or    a
+  jp    z,.Move
+
+  .Attack:
+  ld    a,(MonsterMovementPathPointer)
+  ld    e,a
+  ld    d,0
+  ld    hl,MonsterMovementPath
+  add   hl,de
+  ld    a,(hl)                          ;check for value 0 which we now define as attack animation
+  or    a
+  jp    m,.ChangeNX
+  jr    nz,.Move
+
+  ld    hl,$4000 + (176*128) + (080/2) - 128
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret  
+
+  .ChangeNX:
+  and   %0111 1111
+  ld    (ix+MonsterNX),a
+  ret  
+
+  .Move:
+  ld    a,(framecounter)
+  and   7
+  cp    4
+  jr    c,.AnimationFrame0
+  jr    .AnimationFrame1
+  ret
+
+  .Idle:
+  ld    a,(framecounter)
+  and   7
+  jr    z,.AnimationFrame0
+  cp    4
+  jr    z,.AnimationFrame1
+  ret
+
+  .AnimationFrame0:
+  ld    l,(ix+MonsterAnimationFrame0+0)
+  ld    h,(ix+MonsterAnimationFrame0+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+  .AnimationFrame1:
+  ld    l,(ix+MonsterAnimationFrame1+0)
+  ld    h,(ix+MonsterAnimationFrame1+1)
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
   
 MoveMonster:
   ld    a,(ix+MonsterY)
   ld    (ix+MonsterYPrevious),a
   ld    a,(ix+MonsterX)
   ld    (ix+MonsterXPrevious),a
+  ld    a,(ix+MonsterNY)
+  ld    (ix+MonsterNYPrevious),a
+  ld    a,(ix+MonsterNX)
+  ld    (ix+MonsterNXPrevious),a
 
   push  ix
   pop   hl
@@ -944,7 +1059,7 @@ MoveMonster:
   ld    hl,MonsterMovementPath
   add   hl,de
   ld    a,(hl)
-  cp    255
+  cp    255                           ;255 = end movement
   jr    z,.End
 
   call  .Move
@@ -980,6 +1095,7 @@ MoveMonster:
   jr    z,.MoveLeft
   cp    8
   jr    z,.MoveLeftUp
+  ret
 
   .MoveRightUp:
   ld    a,(ix+MonsterX)
@@ -1787,14 +1903,21 @@ EraseMonsterPreviousFrame:
   ld    a,c
   inc   a  
   add   a,a
+
+
+  ld    a,(ix+MonsterNXPrevious)
+
+
   ld    (EraseMonster+nx),a
   ld    a,b
+
+  ld    a,(ix+MonsterNYPrevious)
+  
   ld    (EraseMonster+ny),a
 
   ld    hl,EraseMonster
   call  docopy
   ret
-
 
 
   
