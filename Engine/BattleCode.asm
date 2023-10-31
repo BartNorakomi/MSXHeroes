@@ -421,6 +421,28 @@ CheckSpaceToMoveMonster:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
   dec   hl
   dec   hl
+
+
+
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterNX)
+  cp    17
+  jp    c,.SwordRightFound
+  dec   hl
+  dec   hl
+  cp    33
+  jp    c,.SwordRightFound
+  dec   hl
+  dec   hl
+  cp    57
+  jp    c,.SwordRightFound
+  dec   hl
+  dec   hl
+  .SwordRightFound:
+
+
+
   ld    c,013                           ;initiate attack right
   jp    .CursorLocationSet
 
@@ -1099,7 +1121,7 @@ Monster001Idle:
   dw    $4000 + (176*128) + (160/2) - 128
   dw    $4000 + (176*128) + (192/2) - 128
 Monster001Attack:
-  db    3                               ;animation speed (x frames per animation frame
+  db    1                               ;animation speed (x frames per animation frame
   db    1                               ;amount of animation frames
   dw    $4000 + (176*128) + (064/2) - 128
   ;facing left
@@ -1137,8 +1159,8 @@ Monster002Idle:
   dw    $4000 + (048*128) + (000/2) - 128
   dw    $4000 + (048*128) + (056/2) - 128
   ;facing left
-  dw    $4000 + (048*128) + (112/2) - 128
   dw    $4000 + (048*128) + (168/2) - 128
+  dw    $4000 + (048*128) + (112/2) - 128
 Monster002Attack:
   db    3                               ;animation speed (x frames per animation frame
   db    1                               ;amount of animation frames
@@ -2148,7 +2170,7 @@ SetcursorWhenGridTileIsActive:
   jr    .SetBoots
 
   .ProhibitionSign:
-  call  CheckPointerOnEnemy
+  call  .CheckPointerOnEnemy
   
   ld    hl,CursorProhibitionSign
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
@@ -2170,7 +2192,7 @@ SetcursorWhenGridTileIsActive:
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
 
-CheckPointerOnEnemy:
+  .CheckPointerOnEnemy:
   ld    a,(CurrentActiveMonster)
   cp    7
   jr    nc,.LeftPlayerIsActive
@@ -2206,9 +2228,60 @@ CheckPointerOnEnemy:
   ret
 
   .CheckMonster:
+
+
+
+
+
+
+
+  call  .Check1TileMonsterStandsOn  
+  ;if monster is at least 16 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
   ld    a,(Monster0+MonsterX)
   ld    c,a
   ld    a,(ix+MonsterX)
+  add   a,16
+  call  .Check
+
+  ;if monster is at least 32 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,32
+  call  .Check
+
+  ;if monster is at least 48 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,48
+  call  .Check
+  ret
+  .Check1TileMonsterStandsOn:
+
+
+
+
+
+
+
+
+
+  
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+
+  .Check:
   cp    c
   ret   nz
 
@@ -2223,6 +2296,7 @@ CheckPointerOnEnemy:
   cp    c
   ret   nz
 
+  pop   af
   pop   af
   pop   af
 
@@ -2425,31 +2499,21 @@ CheckPointerOnEnemy:
 
 
 
-
-
-
-
-
-
-
-
+  call  SetCurrentActiveMOnsterInIX
   ld    a,(ix+MonsterNX)
   cp    17
-  ret   c
-  ;set another 001 for each addition 16 pixels this monsters is wide
-  inc   hl
-  inc   hl
-  ld    (hl),255                        ;set monster in grid
+  jp    c,.CheckTile
+  dec   hl
+  dec   hl
   cp    33
-  ret   c
-  inc   hl
-  inc   hl
-  ld    (hl),255                        ;set monster in grid
+  jp    c,.CheckTile
+  dec   hl
+  dec   hl
   cp    57
-  ret   c
-  inc   hl
-  inc   hl
-  ld    (hl),255                        ;set monster in grid
+  jp    c,.CheckTile
+  dec   hl
+  dec   hl
+
 
 
 
