@@ -236,6 +236,7 @@ MonsterMovementPathPointer: db  0
 MonsterMovementAmountOfSteps:  db  0
 MonsterMovementPath:  db  3,3,3,3,3, 7,7,7,7,7, 3,3,3,3,3, 7,7,255,0,0,0,0,0,0,0,0,0,0,0,0,0
 
+MonsterFacingRightWhileAttacking?:  db  1
 IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
@@ -245,7 +246,7 @@ LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
 MovementLenghtMonsters: equ 8
 
-  db  255,255,255,255,255,255
+  db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 BattleFieldGrid: ;0C15Ch
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
   db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
@@ -256,7 +257,8 @@ BattleFieldGrid: ;0C15Ch
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000 
   db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-  db  255,255
+
+  db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
   
 ;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
 ;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
@@ -310,6 +312,8 @@ OrderOfMonstersFromHighToLow:
 
 SwitchToNextMonster?: db  0
 MoVeMonster?: db  0
+MonsterAnimationSpeed: db  0
+MonsterAnimationStep: db  0
 AttackMonster?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
@@ -349,7 +353,7 @@ Monster0:
 .nx:  db  16
 .animationframe0: dw  $4000 + (047*128) + (224/2) - 128
 .animationframe1: dw  $4000 + (047*128) + (224/2) - 128
-.Number:  db 001
+.Number:  db 000
 .nyprevious:  db 20 + 1
 .nxprevious:  db 16
 
@@ -357,16 +361,16 @@ Monster0:
 
 Monster1:
 .y: db  056 + (02*16) - 32  ;y= 056 + (row *16) - ny
-.x: db  012 + (09*08)       ;x= 012 + (colum*08)
+.x: db  012 + (03*08)       ;x= 012 + (colum*08)
 .yprevious: db  056 + (02*16) - 32
-.xprevious: db  012 + (09*08)
+.xprevious: db  012 + (03*08)
 .SYSXinROM: dw  $4000 + (176*128) + (000/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  32
 .animationframe0: dw  $4000 + (176*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (176*128) + (048/2) - 128
-.Number:  db 001
+.Number:  db 001                        ;yie ar kung fu 
 .nyprevious:  db 32
 .nxprevious:  db 32
 
@@ -381,7 +385,7 @@ Monster2:
 .nx:  db  56
 .animationframe0: dw  $4000 + (048*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (048*128) + (056/2) - 128
-.Number:  db 001
+.Number:  db 002                        ;huge snake (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 56
 
@@ -396,22 +400,22 @@ Monster3:
 .nx:  db  16
 .animationframe0: dw  $4000 + (032*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (016/2) - 128
-.Number:  db 001
+.Number:  db 003                      ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
 
 Monster4:
-.y: db  056 + (02*16) - 32
-.x: db  012 + (01*08)
-.yprevious: db  056 + (02*16) - 32
-.xprevious: db  012 + (01*08)
-.SYSXinROM: dw  $4000 + (000*128) + (064/2) - 128
+.y: db  056 + (00*16) - 32
+.x: db  012 + (11*08)
+.yprevious: db  056 + (00*16) - 32
+.xprevious: db  012 + (11*08)
+.SYSXinROM: dw  $4000 + (000*128) + (128/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
-.animationframe0: dw  $4000 + (000*128) + (064/2) - 128
-.animationframe1: dw  $4000 + (000*128) + (080/2) - 128
-.Number:  db 001
+.animationframe0: dw  $4000 + (000*128) + (128/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (144/2) - 128
+.Number:  db 004                      ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
 
@@ -426,7 +430,7 @@ Monster5:
 .nx:  db  16
 .animationframe0: dw  $4000 + (032*128) + (064/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (080/2) - 128
-.Number:  db 001
+.Number:  db 005                        ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
 
@@ -441,7 +445,7 @@ Monster6:
 .nx:  db  64
 .animationframe0: dw  $4000 + (112*128) + (000/2) - 128
 .animationframe1: dw  $4000 + (112*128) + (064/2) - 128
-.Number:  db 001
+.Number:  db 006                              ;huge boo (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 64
 
@@ -458,7 +462,7 @@ Monster7:
 .nx:  db  56
 .animationframe0: dw  $4000 + (048*128) + (112/2) - 128
 .animationframe1: dw  $4000 + (048*128) + (168/2) - 128
-.Number:  db 001
+.Number:  db 002                                    ;huge snake (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 56
 
@@ -473,22 +477,22 @@ Monster8:
 .nx:  db  16
 .animationframe0: dw  $4000 + (000*128) + (032/2) - 128
 .animationframe1: dw  $4000 + (000*128) + (048/2) - 128
-.Number:  db 001
+.Number:  db 007                                  ;brown flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
 
 Monster9:
 .y: db  056 + (06*16) - 32
-.x: db  012 + (23*08)
+.x: db  012 + (27*08)
 .yprevious: db  056 + (06*16) - 32
-.xprevious: db  012 + (23*08)
-.SYSXinROM: dw  $4000 + (000*128) + (096/2) - 128
+.xprevious: db  012 + (27*08)
+.SYSXinROM: dw  $4000 + (000*128) + (128/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
-.animationframe0: dw  $4000 + (000*128) + (096/2) - 128
-.animationframe1: dw  $4000 + (000*128) + (112/2) - 128
-.Number:  db 001
+.animationframe0: dw  $4000 + (000*128) + (128/2) - 128
+.animationframe1: dw  $4000 + (000*128) + (144/2) - 128
+.Number:  db 004                  ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
 
@@ -503,7 +507,7 @@ Monster10:
 .nx:  db  16
 .animationframe0: dw  $4000 + (032*128) + (032/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (048/2) - 128
-.Number:  db 001
+.Number:  db 003                  ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
 
@@ -518,7 +522,7 @@ Monster11:
 .nx:  db  16
 .animationframe0: dw  $4000 + (032*128) + (096/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (112/2) - 128
-.Number:  db 001
+.Number:  db 005                      ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
 
@@ -533,7 +537,7 @@ Monster12:
 .nx:  db  16
 .animationframe0: dw  $4000 + (032*128) + (096/2) - 128
 .animationframe1: dw  $4000 + (032*128) + (112/2) - 128
-.Number:  db 001
+.Number:  db 005                          ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
 
