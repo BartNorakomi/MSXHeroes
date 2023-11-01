@@ -4084,13 +4084,15 @@ colormidgreen:      equ 02
 colorblue:          equ 04
 colorlightbrown:    equ 05
 colormiddlebrown:   equ 06
-colorlightgrey:     equ 08
-colordarkgrey:      equ 09
+colordarkbrown:     equ 07
+colordarkred:       equ 08
+colorred:           equ 09
 colorsnowishwhite:  equ 10
 colorpink:          equ 11
 colorwhite:         equ 12
 colorblack:         equ 13
-colordarkbrown:     equ 13
+colordarklightgrey: equ 14
+colordarkDarkgrey:  equ 15
 
 SpriteCharCursorSprites:
 	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
@@ -4144,8 +4146,8 @@ spat:						;sprite attribute table (y,x)
 	db		180,006,32,0	,180,182,36,0	,180,182,40,0	,046,182,44,0
 	db		046,182,48,0	,119,182,52,0	,119,182,56,0	,025,230,60,0
 
-	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
-	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
+	db		230,230,64,0	,230,230,68,0	,230,230,72,0	,230,230,76,0
+	db		230,230,80,0	,230,230,84,0	,230,230,88,0	,230,230,92,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 	db		230,230,00,0	,230,230,00,0	,230,230,00,0	,230,230,00,0
 

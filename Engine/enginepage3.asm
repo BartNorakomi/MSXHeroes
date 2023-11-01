@@ -234,7 +234,17 @@ CopyRamToVramPag3:
 
 MonsterMovementPathPointer: db  0
 MonsterMovementAmountOfSteps:  db  0
-MonsterMovementPath:  db  3,3,3,3,3, 7,7,7,7,7, 3,3,3,3,3, 7,7,255,0,0,0,0,0,0,0,0,0,0,0,0,0
+MonsterMovementPath:  ds 100
+
+ShowExplosionSprite?:  db  0
+ExplosionSpriteStep:  ds  1
+
+MonsterThatIsBeingAttacked:  ds  2
+MonsterThatIsBeingAttackedX:  ds  1
+MonsterThatIsBeingAttackedNX:  ds  1
+MonsterThatIsBeingAttackedY:  ds  1
+MonsterThatIsBeingAttackedNY:  ds  1
+
 
 MonsterFacingRightWhileAttacking?:  db  1
 IsCursorOnATile?: db  1
@@ -315,6 +325,7 @@ MoVeMonster?: db  0
 MonsterAnimationSpeed: db  0
 MonsterAnimationStep: db  0
 AttackMonster?: db  0
+MonsterDied?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
 CurrentActiveMonster: db  1
@@ -331,6 +342,8 @@ MonsterNX:              equ MonsterNY+1
 MonsterNumber:          equ MonsterNX+1
 MonsterNYPrevious:      equ MonsterNumber+1
 MonsterNXPrevious:      equ MonsterNYPrevious+1
+MonsterAmount:          equ MonsterNXPrevious+1
+MonsterHP:              equ MonsterAmount+2
 
 LenghtMonsterTable:     equ Monster1-Monster0
 
@@ -352,6 +365,8 @@ Monster0:
 .Number:  db 000
 .nyprevious:  db 20 + 1
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -360,13 +375,15 @@ Monster1:
 .x: db  012 + (16*08)       ;x= 012 + (colum*08)
 .yprevious: db  056 + (05*16) - 32
 .xprevious: db  012 + (16*08)
-.SYSXinROM: dw  $4000 + (176*128) + (000/2) - 128
+.SYSXinROM: dw  $4000 + (176*128) + (032/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  32
 .Number:  db 001                        ;yie ar kung fu 
 .nyprevious:  db 32
 .nxprevious:  db 32
+.amount:  dw 10
+.hp:      db 10
 
 Monster2:
 .y: db  056 + (07*16) - 64
@@ -380,6 +397,8 @@ Monster2:
 .Number:  db 002                        ;huge snake (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 56
+.amount:  dw 10
+.hp:      db 10
 
 Monster3:
 .y: db  056 + (01*16) - 16
@@ -393,6 +412,8 @@ Monster3:
 .Number:  db 003                      ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster4:
 .y: db  056 + (00*16) - 32
@@ -406,6 +427,8 @@ Monster4:
 .Number:  db 004                      ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster5:
 .y: db  056 + (08*16) - 16
@@ -419,6 +442,8 @@ Monster5:
 .Number:  db 005                        ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster6:
 .y: db  056 + (01*16) - 64
@@ -432,34 +457,40 @@ Monster6:
 .Number:  db 006                              ;huge boo (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 64
+.amount:  dw 10
+.hp:      db 10
 
 ;;;;;;;;; player 2 ;;;;;;;;;;;;;
 
 Monster7:
 .y: db  056 + (03*16) - 64
-.x: db  012 + (16*08)
+.x: db  012 + (00*08)
 .yprevious: db  056 + (03*16) - 64
-.xprevious: db  012 + (16*08)
-.SYSXinROM: dw  $4000 + (048*128) + (168/2) - 128
+.xprevious: db  012 + (00*08)
+.SYSXinROM: dw  $4000 + (048*128) + (112/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64
 .nx:  db  56
 .Number:  db 002                                    ;huge snake (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 56
+.amount:  dw 10
+.hp:      db 10
 
 Monster8:
 .y: db  056 + (02*16) - 32    
 .x: db  012 + (13*08)         
 .yprevious: db  056 + (02*16) - 32    
 .xprevious: db  012 + (13*08)         
-.SYSXinROM: dw  $4000 + (000*128) + (032/2) - 128
+.SYSXinROM: dw  $4000 + (000*128) + (064/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
 .Number:  db 007                                  ;brown flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster9:
 .y: db  056 + (06*16) - 32
@@ -473,6 +504,8 @@ Monster9:
 .Number:  db 004                  ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster10:
 .y: db  056 + (07*16) - 16
@@ -486,6 +519,8 @@ Monster10:
 .Number:  db 003                  ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster11:
 .y: db  056 + (08*16) - 16
@@ -499,6 +534,8 @@ Monster11:
 .Number:  db 005                      ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 Monster12:
 .y: db  056 + (08*16) - 16
@@ -512,6 +549,8 @@ Monster12:
 .Number:  db 005                          ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
+.amount:  dw 10
+.hp:      db 10
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
@@ -527,6 +566,8 @@ Monster13:
 .Number:  db 001
 .nyprevious:  db 64
 .nxprevious:  db 56
+.amount:  dw 10
+.hp:      db 10
 
 Monster14:
 .y: db  040
@@ -540,6 +581,8 @@ Monster14:
 .Number:  db 001
 .nyprevious:  db 64
 .nxprevious:  db 40
+.amount:  dw 10
+.hp:      db 10
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0
