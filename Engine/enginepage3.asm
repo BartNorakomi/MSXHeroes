@@ -302,7 +302,18 @@ EraseMonster:
 	db		000,000,000,255
 	db		000,000,000,0
 	db		0,%0000 0000,$d0
-	
+
+PutMonsterAmountOnBattleField:
+	db		000,000,249,255
+	db		000,000,000,255
+	db		000,000,007,000
+	db		0,%0000 0000,$98
+
+ClearnNumber:
+	db	  000,000,000,000
+	db	  000,000,250,000
+	db	  020,000,006,000
+	db	  colorblack+colorblack*16,0,$c0  
 
 OrderOfMonstersFromHighToLow:
   dw  Monster0  ;0C190h
@@ -371,18 +382,18 @@ Monster0:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster1:
-.y: db  056 + (05*16) - 32  ;y= 056 + (row *16) - ny
+.y: db  056 + (05*16) - 32  - 8;y= 056 + (row *16) - ny
 .x: db  012 + (16*08)       ;x= 012 + (colum*08)
-.yprevious: db  056 + (05*16) - 32
+.yprevious: db  056 + (05*16) - 32 - 8
 .xprevious: db  012 + (16*08)
 .SYSXinROM: dw  $4000 + (176*128) + (032/2) - 128
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  32
+.ny:  db  32 + 8
 .nx:  db  32
 .Number:  db 001                        ;yie ar kung fu 
-.nyprevious:  db 32
+.nyprevious:  db 32 + 8
 .nxprevious:  db 32
-.amount:  dw 10
+.amount:  dw 453
 .hp:      db 10
 
 Monster2:
@@ -412,7 +423,7 @@ Monster3:
 .Number:  db 003                      ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 677
 .hp:      db 10
 
 Monster4:
@@ -427,7 +438,7 @@ Monster4:
 .Number:  db 004                      ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 823
 .hp:      db 10
 
 Monster5:
@@ -442,7 +453,7 @@ Monster5:
 .Number:  db 005                        ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 999
 .hp:      db 10
 
 Monster6:
@@ -457,7 +468,7 @@ Monster6:
 .Number:  db 006                              ;huge boo (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 64
-.amount:  dw 10
+.amount:  dw 47
 .hp:      db 10
 
 ;;;;;;;;; player 2 ;;;;;;;;;;;;;
@@ -474,7 +485,7 @@ Monster7:
 .Number:  db 002                                    ;huge snake (golvellius)
 .nyprevious:  db 64
 .nxprevious:  db 56
-.amount:  dw 10
+.amount:  dw 2
 .hp:      db 10
 
 Monster8:
@@ -489,7 +500,7 @@ Monster8:
 .Number:  db 007                                  ;brown flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 11
 .hp:      db 10
 
 Monster9:
@@ -504,7 +515,7 @@ Monster9:
 .Number:  db 004                  ;green flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 555
 .hp:      db 10
 
 Monster10:
@@ -519,7 +530,7 @@ Monster10:
 .Number:  db 003                  ;big spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 333
 .hp:      db 10
 
 Monster11:
@@ -534,7 +545,7 @@ Monster11:
 .Number:  db 005                      ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 823
 .hp:      db 10
 
 Monster12:
@@ -549,7 +560,7 @@ Monster12:
 .Number:  db 005                          ;tiny spider (sd snatcher)
 .nyprevious:  db 16
 .nxprevious:  db 16
-.amount:  dw 10
+.amount:  dw 900
 .hp:      db 10
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals

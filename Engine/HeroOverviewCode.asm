@@ -3404,7 +3404,10 @@ call screenon
   ld    (HeroOverviewFirstWindowButtonTable + 3*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
   ld    (HeroOverviewFirstWindowButtonTable + 4*ButtonTableLenght + HeroOverviewWindowButtonStatus),a
 
-  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+
+;EEEEEEEEEEHHHHHHHHHHH HOW IS THIS POSSIBLE ?
+;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  SetHeroOverViewFirstWindow      ;set First Window in inactive page
   call  Set16x30HeroIconAtHeroOverviewCode

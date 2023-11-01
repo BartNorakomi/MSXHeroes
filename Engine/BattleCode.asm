@@ -1,6 +1,7 @@
 InitiateBattle:
 call screenon
   call  BuildUpBattleFieldAndPutMonsters
+  call  SetFontPage0Y212                ;set font at (0,212) page 0
 
   .engine:
 ;  ld    a,(activepage)
@@ -69,6 +70,13 @@ call screenon
   ret   nz  
   jr    .SetPage3
 
+SetFontPage0Y212:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
 BuildUpBattleFieldAndPutMonsters:  
   xor   a
 	ld		(activepage),a			            ;page 0
@@ -304,9 +312,9 @@ HandleMonsters:
 ;ei
 ;out ($99),a
 
-  call  HandleExplosionSprite
+;  call  HandleExplosionSprite
   call  CheckSpaceToMoveMonster
-  call  CheckMonsterDied                ;if monster died, erase it from the battle
+  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
   call  CheckSwitchToNextMonster
   call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
 
@@ -336,8 +344,8 @@ HandleMonsters:
 ;current monster (put)
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  SetAmountUnderMonster
   call  PutMonster                      ;put monster in inactive page
-
 
 ;grid tile (put)
   ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
@@ -381,6 +389,47 @@ HandleMonsters:
   .EndRecoverGridTile:
   ret
 
+SetAmountUnderMonster:
+	ld		a,(activepage)
+  xor   1
+  ld    (ClearnNumber+dpage),a  
+  ld    hl,ClearnNumber
+  call  docopy
+
+  ld    b,001                           ;dx
+  ld    c,250                           ;dy
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  call  SetNumber16BitCastle
+;  call  Set4PurpleDotsAroundNumber
+
+  ld    a,(PutLetter+dx)                ;dx of last letter put + that letter's nx
+  ld    (PutMonsterAmountOnBattleField+nx),a
+
+  ;if nx=16 add 0 to textbox
+  ;if nx=32 add 8 to textbox
+  ;if nx=48 add 16 to textbox
+  ;if nx=64 add 24 to textbox
+  ld    a,(ix+MonsterNX)
+  sub   a,16
+	srl		a				                        ;/2
+  add   a,(ix+MonsterX)
+  ld    (PutMonsterAmountOnBattleField+dx),a
+
+  ld    a,(ix+MonsterY)
+;  inc   a
+;  add   a,(ix+MonsterNY)
+;  sub   a,10
+  ld    (PutMonsterAmountOnBattleField+dy),a
+
+	ld		a,(activepage)
+  xor   1
+  ld    (PutMonsterAmountOnBattleField+spage),a
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy  
+  ret
 
 SpriteCharExplosion:
 	include "../sprites/explosions.tgs.gen"
@@ -399,8 +448,7 @@ HandleExplosionSprite:
   dec   a
   jp    z,BeingHitSprite
 
-  ld    iy,(MonsterThatIsBeingAttacked)
-  ld    a,(iy+MonsterNX)
+  ld    a,(MonsterThatIsBeingAttackedNX)
   cp    17
   jp    c,SmallExplosionSprite
   jp    BigExplosionSprite
@@ -539,6 +587,7 @@ HandleExplosionSprite:
   ld    a,213                         ;explosion y
   ld    (spat+4*16),a
   ld    (spat+4*17),a
+  ld    (spat+4*18),a
 
   xor   a
   ld    (ShowExplosionSprite?),a  
@@ -954,6 +1003,9 @@ CheckSwitchToNextMonster:
   ld    (TransparantImageBattleRecoverySprite+sx),a
   ld    (TransparantImageBattleRecoverySprite+dx),a
   ld    a,(ix+MonsterNY)
+  
+;  add   a,8                             ;also put the textbox with the amount under the monster
+  
   ld    (TransparantImageBattleRecoverySprite+ny),a
   ld    a,(ix+MonsterNX)
   ld    (TransparantImageBattleRecoverySprite+nx),a
@@ -1000,6 +1052,9 @@ CheckSwitchToNextMonster:
   ld    a,(ix+MonsterNXPrevious)
   ld    (EraseMonster+nx),a
   ld    a,(ix+MonsterNYPrevious)
+  
+;  add   a,8                             ;also erase the textbox with the amount under the monster
+  
   ld    (EraseMonster+ny),a
 
   ld    hl,EraseMonster
@@ -1326,6 +1381,12 @@ RecoverOverwrittenMonsters:
 
   ld    hl,TransparantImageBattle
   call  docopy
+
+  push  ix
+  push  iy
+  pop   ix
+  call  SetAmountUnderMonster
+  pop   ix
   ret
 
 
@@ -1477,13 +1538,13 @@ Monster007Table:                        ;brown flyer (sd snatcher)
   dw    GeneralMonsterAttackPatternRightDown
 
 
-RIdle1Monster000:   equ $4000 + (176*128) + (000/2) - 128
-RIdle2Monster000:   equ $4000 + (176*128) + (032/2) - 128
+RIdle1Monster000:   equ $4000 + (176*128) + (032/2) - 128
+RIdle2Monster000:   equ $4000 + (176*128) + (000/2) - 128
 Rattack1Monster000: equ $4000 + (176*128) + (064/2) - 128
 Rattack2Monster000: equ $4000 + (208*128) + (000/2) - 128
 
-LIdle1Monster000:   equ $4000 + (176*128) + (192/2) - 128
-LIdle2Monster000:   equ $4000 + (176*128) + (160/2) - 128
+LIdle1Monster000:   equ $4000 + (176*128) + (160/2) - 128
+LIdle2Monster000:   equ $4000 + (176*128) + (192/2) - 128
 Lattack1Monster000: equ $4000 + (176*128) + (112/2) - 128
 Lattack2Monster000: equ $4000 + (208*128) + (048/2) - 128
 
@@ -2982,6 +3043,8 @@ EraseMonsterPreviousFrame:
   ld    a,b
 
   ld    a,(ix+MonsterNYPrevious)
+  
+;  add   a,8                             ;also erase the textbox with the amount under the monster
   
   ld    (EraseMonster+ny),a
 

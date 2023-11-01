@@ -3515,6 +3515,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   jr    z,.Battle
 
   .Battle:
+  ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  or    a
+  call  nz,HandleExplosionSprite
+  
   .SelfModifyingCodeSpriteCharacterBattle:  Equ $+1
   ld    hl,CursorHand
 	jp		.setcharacter
@@ -4447,7 +4451,7 @@ buildupscreen:
 	ld		(putbackgroundoverhero+dpage),a
 	ld		(putstar+dpage),a
 	ld		(putstarbehindobject+dpage),a
-	ld		(blackrectangle+dpage),a
+;	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
 	xor		1                               ;now we switch and set our page
 	ld		(activepage),a			
@@ -4639,11 +4643,11 @@ putlettre:
 	db		16,0,5,0
 	db		0,%0000 0000,$98	
 
-blackrectangle:
-	db	0,0,0,0
-	db	255,0,255,0
-	db	255,0,255,0
-	db	colorblack+colorblack*16,1,$c0
+;blackrectangle:
+;	db	0,0,0,0
+;	db	255,0,255,0
+;	db	255,0,255,0
+;	db	colorblack+colorblack*16,1,$c0
 
 mouseposy:		ds	1
 mouseposx:		ds	1
