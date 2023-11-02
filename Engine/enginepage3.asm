@@ -157,7 +157,7 @@ CopyRamToVramCorrectedCastleOverview:
   ret
 
 
-CopyRamToVramPag3ForBattleEngine:
+CopyRamToVramPage3ForBattleEngine:
   ex    af,af'                          ;store rom block
 
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
@@ -313,8 +313,8 @@ PutMonsterAmountOnBattleField:
 
 ClearnNumber:
 	db	  000,000,000,000
-	db	  000,000,250,000
-	db	  020,000,006,000
+	db	  000,000,249,000
+	db	  020,000,007,000
 	db	  colorblack+colorblack*16,0,$c0  
 
 OrderOfMonstersFromHighToLow:
@@ -416,9 +416,9 @@ Monster2:
 .hp:      db 10
 
 Monster3:
-.y: db  056 + (01*16) - 16  - 8
+.y: db  056 + (03*16) - 16  - 8
 .x: db  012 + (04*08)
-.yprevious: db  056 + (01*16) - 16  - 8
+.yprevious: db  056 + (03*16) - 16  - 8
 .xprevious: db  012 + (04*08)
 .SYSXinROM: dw  RIdle1Monster003
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
@@ -479,9 +479,9 @@ Monster6:
 
 Monster7:
 .y: db  056 + (03*16) - 64  - 4
-.x: db  012 + (00*08)
-.yprevious: db  056 + (03*16) - 64  - 4
-.xprevious: db  012 + (00*08)
+.x: db  012 + (10*08)
+.yprevious: db  056 + (0*16) - 64  - 4
+.xprevious: db  012 + (10*08)
 .SYSXinROM: dw  LIdle1Monster002
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  64 + 4
@@ -494,9 +494,9 @@ Monster7:
 
 Monster8:
 .y: db  056 + (02*16) - 32    
-.x: db  012 + (13*08)         
+.x: db  012 + (17*08)         
 .yprevious: db  056 + (02*16) - 32    
-.xprevious: db  012 + (13*08)         
+.xprevious: db  012 + (17*08)         
 .SYSXinROM: dw  LIdle1Monster007
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32

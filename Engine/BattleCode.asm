@@ -2,20 +2,20 @@
 
 
 ListOfMonstersToPut:
-  ;monsternr|amount| x              , y
+  ;monsternr|amount|           x            , y
   db  001 | dw 400 | db 012 + (1*08), 056 + (00*16)
-  db  002 | dw 500 | db 012 + (0*08), 056 + (01*16)
-  db  003 | dw 600 | db 012 + (0*08), 056 + (03*16)
+  db  003 | dw 500 | db 012 + (0*08), 056 + (01*16)
+  db  002 | dw 600 | db 012 + (0*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (0*08), 056 + (05*16)
   db  005 | dw 800 | db 012 + (0*08), 056 + (07*16)
   db  006 | dw 900 | db 012 + (1*08), 056 + (08*16)
 
-  db  007 | dw 410 | db 012 + (27*08), 056 + (00*16)
-  db  002 | dw 510 | db 012 + (20*08), 056 + (01*16)
-  db  004 | dw 610 | db 012 + (26*08), 056 + (03*16)
-  db  004 | dw 710 | db 012 + (26*08), 056 + (05*16)
-  db  005 | dw 810 | db 012 + (26*08), 056 + (07*16)
-  db  005 | dw 910 | db 012 + (27*08), 056 + (08*16)
+  db  001 | dw 410 | db 012 + (25*08), 056 + (00*16)
+  db  005 | dw 510 | db 012 + (24*08), 056 + (01*16)
+  db  004 | dw 610 | db 012 + (24*08), 056 + (03*16)
+  db  004 | dw 710 | db 012 + (24*08), 056 + (05*16)
+  db  003 | dw 810 | db 012 + (24*08), 056 + (07*16)
+  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16)
 
 SetAllMonstersInMonsterTable:
   ld    ix,ListOfMonstersToPut
@@ -89,10 +89,52 @@ SetAllMonstersInMonsterTable:
 
   ld    (iy+MonsterBlock),b
   ld    (iy+MonsterNX),c
+  ld    (iy+MonsterNXPrevious),c
   ld    (iy+MonsterNY),d
+  ld    (iy+MonsterNYPrevious),d
   ld    a,(ix+3)
   ld    (iy+MonsterX),a
   ld    (iy+MonsterXPrevious),a
+
+
+
+
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.EndCheckAdjustXForMonstersOnTheRight
+
+  ld    a,c                             ;nx
+  cp    17
+  jp    c,.EndCheckAdjustXForMonstersOnTheRight
+
+  ld    a,(iy+MonsterX)
+  sub   a,16
+  ld    (iy+MonsterX),a
+  ld    (iy+MonsterXPrevious),a
+
+  ld    a,c                             ;nx
+  cp    33
+  jp    c,.EndCheckAdjustXForMonstersOnTheRight
+
+  ld    a,(iy+MonsterX)
+  sub   a,16
+  ld    (iy+MonsterX),a
+  ld    (iy+MonsterXPrevious),a
+
+  ld    a,c                             ;nx
+  cp    57  
+  jp    c,.EndCheckAdjustXForMonstersOnTheRight
+
+  ld    a,(iy+MonsterX)
+  sub   a,16
+  ld    (iy+MonsterX),a
+  ld    (iy+MonsterXPrevious),a
+
+  .EndCheckAdjustXForMonstersOnTheRight:
+
+
+
+
 
   ld    a,(ix+4)
   sub   a,d
@@ -991,6 +1033,15 @@ SetAmountUnderMonster:
   ld    (ClearnNumber+dpage),a  
   ld    hl,ClearnNumber
   call  docopy
+
+
+;  ld    hl,$4000 + (038*128) + (000/2) - 128
+;  ld    de,$0000 + (009*128) + (072/2) - 128  ;dy,dx
+;  ld    bc,$0000 + (007*256) + (016/2)        ;ny,nx  
+;  ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
+;  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
 
   ld    b,001                           ;dx
   ld    c,250                           ;dy
@@ -1961,7 +2012,7 @@ RecoverOverwrittenMonsters:
   .DestinationAddressInPage3Set:
   ld    (AddressToWriteTo),de           ;address to write to in page 3
 
-  call  CopyRamToVramPag3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 
@@ -2021,7 +2072,7 @@ PutMonster:
   .DestinationAddressInPage3Set:
   ld    (AddressToWriteTo),de           ;address to write to in page 3
 
-  call  CopyRamToVramPag3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,TransparantImageBattle
   call  docopy
