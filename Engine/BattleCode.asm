@@ -1,7 +1,579 @@
+;############################# Code needs to be in $4000-$7fff ################################
+
+
+ListOfMonstersToPut:
+  ;monsternr|amount| x              , y
+  db  001 | dw 400 | db 012 + (1*08), 056 + (00*16)
+  db  002 | dw 500 | db 012 + (0*08), 056 + (01*16)
+  db  003 | dw 600 | db 012 + (0*08), 056 + (03*16)
+  db  004 | dw 700 | db 012 + (0*08), 056 + (05*16)
+  db  005 | dw 800 | db 012 + (0*08), 056 + (07*16)
+  db  006 | dw 900 | db 012 + (1*08), 056 + (08*16)
+
+  db  007 | dw 410 | db 012 + (27*08), 056 + (00*16)
+  db  002 | dw 510 | db 012 + (20*08), 056 + (01*16)
+  db  004 | dw 610 | db 012 + (26*08), 056 + (03*16)
+  db  004 | dw 710 | db 012 + (26*08), 056 + (05*16)
+  db  005 | dw 810 | db 012 + (26*08), 056 + (07*16)
+  db  005 | dw 910 | db 012 + (27*08), 056 + (08*16)
+
+SetAllMonstersInMonsterTable:
+  ld    ix,ListOfMonstersToPut
+  ld    iy,Monster1
+  ld    b,1                             ;monster 1
+
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  call  .SetMonster
+  ret
+
+  .SetMonster:
+  push  bc
+  
+  ld    a,(ix)
+  ld    (iy+MonsterNumber),a
+  ld    a,(ix+1)
+  ld    (iy+MonsterAmount),a
+  ld    a,(ix+2)
+  ld    (iy+MonsterAmount+1),a
+
+  push  ix
+  push  iy
+  ld    a,b
+  ld    (CurrentActiveMonster),a
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    b,(iy+MonsterTableSpriteSheetBlock)
+  ld    c,(iy+MonsterTableNX)
+  ld    d,(iy+MonsterTableNY)
+
+
+
+  ld    l,(iy+0)
+  ld    h,(iy+1)                        ;hl->Monster Idle/move table
+  push  hl
+  pop   iy                              ;iy->Monster Idle/move table
+
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.MonsterIsFacingRight
+
+  .MonsterIsFacingLeft:
+  push  de
+  ld    a,(iy+1)                        ;amount of animation frames
+  add   a,a
+  ld    d,0
+  ld    e,a
+  add   iy,de                           ;if monster faces left, then jump to 'facing left' in the table
+  pop   de
+
+  .MonsterIsFacingRight:
+  ld    l,(iy+3)
+  ld    h,(iy+2)                        ;hl->Monster Idle table
+
+  pop   iy
+  pop   ix
+
+  ld    (iy+MonsterSYSX),h
+  ld    (iy+MonsterSYSX+1),l
+
+  ld    (iy+MonsterBlock),b
+  ld    (iy+MonsterNX),c
+  ld    (iy+MonsterNY),d
+  ld    a,(ix+3)
+  ld    (iy+MonsterX),a
+  ld    (iy+MonsterXPrevious),a
+
+  ld    a,(ix+4)
+  sub   a,d
+  ld    (iy+MonsterY),a
+  ld    (iy+MonsterYPrevious),a
+  
+  ld    de,5
+  add   ix,de
+  
+  ld    de,LenghtMonsterTable
+  add   iy,de
+  
+  pop   bc
+  inc   b
+  ret
+
+SetCurrentActiveMOnsterInIX:
+  ld    a,(CurrentActiveMonster)
+  inc   a
+  ld    b,a
+  ld    ix,Monster0-LenghtMonsterTable
+
+  .loop:
+  ld    de,LenghtMonsterTable
+  add   ix,de
+  djnz  .loop
+  ret
+
+SetMonsterTableInIY:
+  ld    a,MonsterAddressesForBattle1Block               ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
+  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+  ld    h,0
+  ld    l,(ix+MonsterNumber)
+  ld    de,LengthMonsterAddressesTable
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   de
+  add   iy,de                           ;iy->monster table idle
+  ret
+
+AnimateMonster:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  cp    1
+  jr    nz,.EndCheckMoveMonster
+  inc   iy
+  inc   iy                              ;iy->monster table move
+  .EndCheckMoveMonster:
+
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  cp    2
+  jp    z,.MonsterAttacksAnimateOnlyOnGeneralAttackPattern
+
+  .TableFound:
+  ld    l,(iy+0)
+  ld    h,(iy+1)                        ;hl->Monster Idle/move table
+  push  hl
+  pop   iy                              ;iy->Monster Idle/move table
+
+  push  iy
+  call  .animate
+  pop   iy
+
+  ;check if monster needs to change its animation frame
+  ld    a,(MonsterAnimationSpeed)
+  inc   a
+  cp    (iy+0)                          ;animation speed
+  jr    nz,.EndCheckAnimate
+  ld    a,(MonsterAnimationStep)        ;animation frame/step
+  inc   a
+  cp    (iy+1)                          ;amount of animation frames
+  jr    nz,.EndCheckLoop
+  xor   a
+  .EndCheckLoop:
+  ld    (MonsterAnimationStep),a
+  xor   a                               ;animation speed
+  .EndCheckAnimate:
+  ld    (MonsterAnimationSpeed),a
+  ret
+
+  .animate:
+  ;we force direction monster is facing at during attack
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    z,.EndCheckMonsterMoving
+  ld    a,(MonsterMovingRight?)
+  or    a
+  jr    z,.MonsterIsFacingLeft
+  jr    .MonsterIsFacingRight
+  .EndCheckMonsterMoving:
+
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.MonsterIsFacingRight
+
+  .MonsterIsFacingLeft:
+  ld    a,(iy+1)                        ;amount of animation frames
+  add   a,a
+  ld    d,0
+  ld    e,a
+  add   iy,de                           ;if monster faces left, then jump to 'facing left' in the table
+
+  .MonsterIsFacingRight:
+  ld    a,(MonsterAnimationStep)
+  add   a,a
+  add   a,2
+  ld    d,0
+  ld    e,a
+  add   iy,de
+  
+  ld    l,(iy+0)
+  ld    h,(iy+1)                        ;hl->Monster Idle/move table
+
+  ld    (ix+MonsterSYSX+0),l
+  ld    (ix+MonsterSYSX+1),h
+  ret
+
+  .MonsterAttacksAnimateOnlyOnGeneralAttackPattern:
+  ld    l,(iy+4)
+  ld    h,(iy+5)                        ;hl->Monster attack pattern right
+  ld    de,GeneralMonsterAttackPatternRight
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   nz
+
+  ld    l,(iy+0)
+  ld    h,(iy+1)                        ;hl->Monster Idle table
+  push  hl
+  pop   iy                              ;iy->Monster Idle table
+
+  ld    a,(MonsterAttackingRight?)
+  or    a
+  jr    z,.MonsterIsFacingLeft
+  jr    .MonsterIsFacingRight
+
+DisplaceLeft: equ 21
+DisplaceRight: equ 22
+ShowBeingHitSprite: equ 23
+MoveMonster:
+  ld    a,(ix+MonsterY)
+  ld    (ix+MonsterYPrevious),a
+  ld    a,(ix+MonsterX)
+  ld    (ix+MonsterXPrevious),a
+  ld    a,(ix+MonsterNY)
+  ld    (ix+MonsterNYPrevious),a
+  ld    a,(ix+MonsterNX)
+  ld    (ix+MonsterNXPrevious),a
+
+  push  ix
+  pop   hl
+  ld    de,Monster0
+  call  CompareHLwithDE
+  jp    z,MoveGridPointer
+
+  ld    a,(MoVeMonster?)              ;1=move monster, 2=attack monster
+  or    a
+  ret   z
+
+  ld    hl,CursorHand
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+  .HandleMovement:
+  ld    a,(MonsterMovementPathPointer)
+  ld    e,a
+  ld    d,0
+  ld    hl,MonsterMovementPath
+  add   hl,de
+  ld    a,(hl)
+  cp    255                           ;255 = end movement
+  jp    z,.End
+  cp    254                           ;254 = handle attacked monster
+  jp    z,.HandleAttackedMonster
+  cp    128                           ;bit 7 on=change NX (after having checked for end movement)
+  jp    nc,.ChangeNX
+  cp    12
+  jp    z,.InitiateAttackRightUp
+  cp    13
+  jp    z,.InitiateAttackRight
+  cp    14
+  jp    z,.InitiateAttackRightDown
+  cp    16
+  jp    z,.InitiateAttackLeftDown
+  cp    17
+  jp    z,.InitiateAttackLeft
+  cp    18
+  jp    z,.InitiateAttackLeftUp
+  cp    20
+  jp    z,.AnimateAttack
+  cp    DisplaceLeft                    ;cp 21
+  jp    z,.DisplaceLeft
+  cp    DisplaceRight                   ;cp 22
+  jp    z,.DisplaceRight
+  cp    ShowBeingHitSprite              ;cp 23
+  jp    z,.ShowBeingHitSprite
+
+  call  .Move
+
+  ld    a,(MoveMonster?)                ;1=move, 2=attack
+  cp    2
+  ld    c,1                             ;move half as far when attacking
+  jr    z,.SetMovementDuration
+  ld    c,3                             ;normal move. each movement (from tile to tile) is 4 frames
+  .SetMovementDuration:
+  
+  ld    a,(MonsterMovementAmountOfSteps)
+  dec   a
+  and   c
+  ld    (MonsterMovementAmountOfSteps),a
+  ret   nz
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  ret
+
+  .DisplaceLeft:
+  ld    a,(ix+MonsterX)
+  sub   a,16
+  ld    (ix+MonsterX),a
+
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .DisplaceRight:
+  ld    a,(ix+MonsterX)
+  add   a,16
+  ld    (ix+MonsterX),a
+
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .ShowBeingHitSprite:
+  ld    a,1
+  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  xor   a
+  ld    (ExplosionSpriteStep),a
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .AnimateAttack:
+  inc   hl
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)  
+  ld    (ix+MonsterSYSX+0),e
+  ld    (ix+MonsterSYSX+1),d
+
+  ld    a,(MonsterMovementPathPointer)
+  add   a,3
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .InitiateAttackRight:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+4)
+  ld    h,(iy+5)                        ;hl->Attack Pattern Right
+  ld    a,1                             ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttackLeft:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+6)
+  ld    h,(iy+7)                        ;hl->Attack Pattern left
+  Xor   a                               ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttackLeftUp:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+08)
+  ld    h,(iy+09)                       ;hl->Attack Pattern Right
+  Xor   a                               ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttackLeftDown:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+10)
+  ld    h,(iy+11)                       ;hl->Attack Pattern left
+  Xor   a                               ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttackRightUp:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+12)
+  ld    h,(iy+13)                       ;hl->Attack Pattern Right
+  ld    a,1                             ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttackRightDown:
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    l,(iy+14)
+  ld    h,(iy+15)                       ;hl->Attack Pattern left
+  ld    a,1                             ;monster facing right while attacking?
+  jp    .InitiateAttack
+
+  .InitiateAttack:
+;  ld    (MonsterFacingRightWhileAttacking?),a  
+  ld    a,2
+  ld    (MoveMonster?),a                ;1=move, 2=attack
+  xor   a
+  ld    (MonsterMovementPathPointer),a
+  ld    de,MonsterMovementPath
+  ld    c,(hl)
+  ld    b,0
+  inc   hl
+  ldir
+  ;set attack direction (we use this for the animation in case it's a general attack pattern)
+  xor   a
+  ld    (MonsterAttackingRight?),a  
+  ld    a,(MonsterMovementPath+1)
+  cp    5
+  jp    nc,.HandleMovement
+  ld    a,1
+  ld    (MonsterAttackingRight?),a    
+  ;/set attack direction (we use this for the animation in case it's a general attack pattern)
+  jp    .HandleMovement
+
+  .HandleAttackedMonster:
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    (ix+MonsterHP),000            ;this declares monster is completely dead
+  ld    a,3
+  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  xor   a
+  ld    (ExplosionSpriteStep),a  
+  ld    a,1
+  ld    (MonsterDied?),a
+  jr    .End
+
+  .End:
+  xor   a
+  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MonsterMovementPathPointer),a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+  ld    a,1
+  ld    (SwitchToNextMonster?),a
+  ret
+
+  .ChangeNX:
+  and   %0111 1111
+  ld    (ix+MonsterNX),a
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .Move:
+  cp    2
+  jr    z,.MoveRightUp
+  cp    3
+  jr    z,.MoveRight
+  cp    4
+  jr    z,.MoveRightDown
+  cp    6
+  jr    z,.MoveLeftDown
+  cp    7
+  jr    z,.MoveLeft
+  cp    8
+  jr    z,.MoveLeftUp
+  ret
+
+  .MoveRightUp:
+  ld    a,1
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  add   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  sub   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveRight:
+  ld    a,1
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  add   a,4
+  ld    (ix+MonsterX),a
+  ret
+
+  .MoveRightDown:
+  ld    a,1
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  add   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  add   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveLeftDown:
+  xor   a
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  sub   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  add   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+  .MoveLeft:
+  xor   a
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  sub   a,4
+  ld    (ix+MonsterX),a
+  ret
+
+  .MoveLeftUp:
+  xor   a
+  ld    (MonsterMovingRight?),a
+
+  ld    a,(ix+MonsterX)
+  sub   a,2
+  ld    (ix+MonsterX),a
+
+  ld    a,(ix+MonsterY)
+  sub   a,4
+  ld    (ix+MonsterY),a
+  ret
+
+MoveGridPointer:
+  ld    a,(spat)
+  add   a,14; 8
+  
+  and   %1111 0000
+  bit   4,a
+  jr    nz,.EvenTiles
+
+  sub   a,9
+  ld    (ix+MonsterY),a
+  ld    a,(spat+1)
+  sub   a,6 ;8
+  
+  and   %1111 0000
+  add   a,4+8
+  ld    (ix+MonsterX),a
+  ret
+
+  .EvenTiles:
+  sub   a,9
+  ld    (ix+MonsterY),a
+  ld    a,(spat+1)
+  sub   a,-4
+
+  and   %1111 0000
+  add   a,4
+  ld    (ix+MonsterX),a
+  ret
+
+;############################# Code needs to be in $4000-$7fff ################################
+
 InitiateBattle:
 call screenon
-  call  BuildUpBattleFieldAndPutMonsters
   call  SetFontPage0Y212                ;set font at (0,212) page 0
+  call  BuildUpBattleFieldAndPutMonsters
 
   .engine:
 ;  ld    a,(activepage)
@@ -19,8 +591,8 @@ call screenon
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(Controls)
-  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ld    a,(Controls)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
 ;  ret   nz
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
@@ -89,10 +661,14 @@ BuildUpBattleFieldAndPutMonsters:
   call  .SetRocks
   ld    hl,.CopyPage1To3
   call  DoCopy                          ;copy battle field to page 3 vram->vram
-  call  .SetAllMonsters                 ;set all monsters in page 0
+  call  SetAllMonstersInMonsterTable    ;set all monsters in the tables in enginepage3
+  call  .PutAllMonsters                 ;put all monsters in page 0
   call  .CopyAllMonstersToPage1and2
-  ld    a,1
+
+  xor   a
+;ld a,1
   ld    (CurrentActiveMonster),a
+  call  CheckSwitchToNextMonster.GoToNextActiveMonster
   ret
 
   .CopyAllMonstersToPage1and2:
@@ -102,15 +678,35 @@ BuildUpBattleFieldAndPutMonsters:
   call  DoCopy                          ;copy battle field to page 3 vram->vram
   ret
   
-  .SetAllMonsters:
+  .PutAllMonsters:
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-  ld    a,2                             ;skip monster 0+1, which is our grid tile and first monster
+  ld    a,1                             ;skip monster 0+1, which is our grid tile and first monster
   ld    (CurrentActiveMonster),a
   .loop:
   call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterHP)
+  or    a
+;  jr    z,.NextMonster
+
+
+
+;THIS CAN BE REPLACED LATER BY SIMPLY DOING THIS WHEN SETTING MONSTERS
+  jr    nz,.GoPutMonster
+	;remove monster from the playing field
+	ld    (ix+MonsterX),255
+	ld    (ix+MonsterXPrevious),255
+	ld    (ix+MonsterY),212
+	ld    (ix+MonsterYPrevious),212
+  jr    .NextMonster
+  .GoPutMonster:
+;/THIS CAN BE REPLACED LATER BY SIMPLY DOING THIS WHEN SETTING MONSTERS
+
+
   call  Set255WhereMonsterStandsInBattleFieldGrid
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  SetAmountUnderMonster  
   call  PutMonster                      ;put monster in inactive page
+  .NextMonster:
   ld    a,(CurrentActiveMonster)
   inc   a                               ;go to next monster
   cp    TotalAmountOfMonstersOnBattleField
@@ -165,9 +761,9 @@ BuildUpBattleFieldAndPutMonsters:
   ret
 
   .GoSetRock:
-  ld    hl,$4000 + (048*128) + (240/2) - 128
+  ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (016*256) + (016/2)
-  ld    a,BattleMonsterSpriteSheet1Block           ;block to copy graphics from
+  ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 RocksVersion1:
@@ -1013,7 +1609,7 @@ CheckSwitchToNextMonster:
   ld    hl,TransparantImageBattleRecoverySprite
   call  docopy
 
-  .ThisMonsterIsDeadGoNext:
+  .GoToNextActiveMonster:
   ;go to next monster
   ld    a,(CurrentActiveMonster)
   inc   a
@@ -1029,7 +1625,7 @@ CheckSwitchToNextMonster:
 
   ld    a,(ix+MonsterHP)
   or    a
-  jr    z,.ThisMonsterIsDeadGoNext
+  jr    z,.GoToNextActiveMonster
 
   ;erase this monster from inactive page (copy from page 3 to inactive page)
   ;then recover other monsters that we also erased from inactive page
@@ -1077,18 +1673,6 @@ CheckSwitchToNextMonster:
 	ld    (EraseMonster+sPage),a  	
   ret
   
-SetCurrentActiveMOnsterInIX:
-  ld    a,(CurrentActiveMonster)
-  inc   a
-  ld    b,a
-  ld    ix,Monster0-LenghtMonsterTable
-
-  .loop:
-  ld    de,LenghtMonsterTable
-  add   ix,de
-  djnz  .loop
-  ret
-
 RecoverOverwrittenMonstersHard:
   exx
   ld    hl,OrderOfMonstersFromHighToLow
@@ -1377,16 +1961,27 @@ RecoverOverwrittenMonsters:
   .DestinationAddressInPage3Set:
   ld    (AddressToWriteTo),de           ;address to write to in page 3
 
-  call  CopyRamToVramPag3          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramPag3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+  ;Repair Amount under monster, EXCEPT when we are handling grid sprite
+  push  ix
+  pop   hl
+  ld    de,Monster0
+  call  CompareHLwithDE
+  push  ix
+  push  iy
+  pop   ix
+  call  nz,SetAmountUnderMonster
+  pop   ix
+  ;/Repair Amount under monster, EXCEPT when we are handling grid sprite
+
 
   ld    hl,TransparantImageBattle
   call  docopy
 
-  push  ix
-  push  iy
-  pop   ix
-  call  SetAmountUnderMonster
-  pop   ix
+
   ret
 
 
@@ -1426,7 +2021,7 @@ PutMonster:
   .DestinationAddressInPage3Set:
   ld    (AddressToWriteTo),de           ;address to write to in page 3
 
-  call  CopyRamToVramPag3          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramPag3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,TransparantImageBattle
   call  docopy
@@ -1461,684 +2056,6 @@ StoreSYSXNYNXAndBlock:
 
 
 
-
-
-
-
-
-
-Monster001Table:                        ;yie ar kung fu
-  dw    Monster001Idle
-  dw    Monster001Move
-  dw    Monster001AttackPatternRight
-  dw    Monster001AttackPatternLeft
-  dw    Monster001AttackPatternLeftUp
-  dw    Monster001AttackPatternLeftDown
-  dw    Monster001AttackPatternRightUp
-  dw    Monster001AttackPatternRightDown
-  
-Monster002Table:                        ;huge snake (golvellius)
-  dw    Monster002Idle
-  dw    Monster002Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-  
-Monster003Table:                        ;big spider (sd snatcher)
-  dw    Monster003Idle
-  dw    Monster003Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-
-Monster004Table:                        ;green flyer (sd snatcher)
-  dw    Monster004Idle
-  dw    Monster004Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-
-Monster005Table:                        ;tiny spider (sd snatcher)
-  dw    Monster005Idle
-  dw    Monster005Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-
-Monster006Table:                        ;huge boo (golvellius)
-  dw    Monster006Idle
-  dw    Monster006Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-
-Monster007Table:                        ;brown flyer (sd snatcher)
-  dw    Monster007Idle
-  dw    Monster007Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-
-
-RIdle1Monster000:   equ $4000 + (176*128) + (032/2) - 128
-RIdle2Monster000:   equ $4000 + (176*128) + (000/2) - 128
-Rattack1Monster000: equ $4000 + (176*128) + (064/2) - 128
-Rattack2Monster000: equ $4000 + (208*128) + (000/2) - 128
-
-LIdle1Monster000:   equ $4000 + (176*128) + (160/2) - 128
-LIdle2Monster000:   equ $4000 + (176*128) + (192/2) - 128
-Lattack1Monster000: equ $4000 + (176*128) + (112/2) - 128
-Lattack2Monster000: equ $4000 + (208*128) + (048/2) - 128
-
-;yie ar kung fu  
-Monster001Move:
-  db    4                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    RIdle1Monster000
-  dw    RIdle2Monster000
-  ;facing left
-  dw    LIdle1Monster000
-  dw    LIdle2Monster000
-Monster001Idle:
-  db    5                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    RIdle1Monster000
-  dw    RIdle2Monster000
-  ;facing left
-  dw    LIdle1Monster000
-  dw    LIdle2Monster000
-Monster001Attack:
-
-Monster001AttackPatternRight:
-  db    LenghtMonster001AttackPatternRight,020 | dw RIdle1Monster000 | db 003,128+48,020 | dw Rattack1Monster000 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster000 | db 007,254
-LenghtMonster001AttackPatternRight: equ $-Monster001AttackPatternRight-1
-Monster001AttackPatternRightUp:
-  db    LenghtMonster001AttackPatternRightUp,020 | dw RIdle1Monster000 | db 008,128+48,020 | dw Rattack1Monster000 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster000 | db 004,254
-LenghtMonster001AttackPatternRightUp: equ $-Monster001AttackPatternRightUp-1
-Monster001AttackPatternRightDown:
-  db    LenghtMonster001AttackPatternRightDown,020 | dw RIdle1Monster000 | db 006,128+48,020 | dw Rattack2Monster000 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster000 | db 002,254
-LenghtMonster001AttackPatternRightDown: equ $-Monster001AttackPatternRightDown-1
-
-Monster001AttackPatternLeft:
-  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster000 | db 000,007,128+48,020 | dw Lattack1Monster000 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster000 | db DisplaceRight,003,000,254
-LenghtMonster001AttackPatternLeft: equ $-Monster001AttackPatternLeft-1
-Monster001AttackPatternLeftUp:
-  db    LenghtMonster001AttackPatternLeftUp,020 | dw LIdle1Monster000 | db 000,002,128+48,020 | dw Lattack1Monster000 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster000 | db DisplaceRight,006,000,254
-LenghtMonster001AttackPatternLeftUp: equ $-Monster001AttackPatternLeftUp-1
-Monster001AttackPatternLeftDown:
-  db    LenghtMonster001AttackPatternLeftDown,020 | dw LIdle1Monster000 | db 000,004,128+48,020 | dw Lattack2Monster000 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster000 | db DisplaceRight,008,000,254
-LenghtMonster001AttackPatternLeftDown: equ $-Monster001AttackPatternLeftDown-1
-
-
-;######################################################################################
-;huge snake (golvellius)
-Monster002Move:                     
-Monster002Idle:
-  db    2                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    $4000 + (048*128) + (000/2) - 128
-  dw    $4000 + (048*128) + (056/2) - 128
-  ;facing left
-  dw    $4000 + (048*128) + (112/2) - 128
-  dw    $4000 + (048*128) + (168/2) - 128
-Monster002Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (048*128) + (000/2) - 128
-  ;facing left
-  dw    $4000 + (048*128) + (112/2) - 128
-
-GeneralMonsterAttackPatternRight:
-  db    LenghtGeneralMonsterAttackPatternRight,000,003,ShowBeingHitSprite,007,000,254
-LenghtGeneralMonsterAttackPatternRight: equ $-GeneralMonsterAttackPatternRight-1
-
-GeneralMonsterAttackPatternLeft:
-  db    LenghtGeneralMonsterAttackPatternLeft,000,007,ShowBeingHitSprite,003,000,254
-LenghtGeneralMonsterAttackPatternLeft: equ $-GeneralMonsterAttackPatternLeft-1
-
-GeneralMonsterAttackPatternLeftUp:
-  db    LenghtGeneralMonsterAttackPatternLeftUp,000,008,ShowBeingHitSprite,004,000,254
-LenghtGeneralMonsterAttackPatternLeftUp: equ $-GeneralMonsterAttackPatternLeftUp-1
-
-GeneralMonsterAttackPatternLeftDown:
-  db    LenghtGeneralMonsterAttackPatternLeftDown,000,006,ShowBeingHitSprite,002,000,254
-LenghtGeneralMonsterAttackPatternLeftDown: equ $-GeneralMonsterAttackPatternLeftDown-1
-
-GeneralMonsterAttackPatternRightUp:
-  db    LenghtGeneralMonsterAttackPatternRightUp,000,002,ShowBeingHitSprite,006,000,254
-LenghtGeneralMonsterAttackPatternRightUp: equ $-GeneralMonsterAttackPatternRightUp-1
-
-GeneralMonsterAttackPatternRightDown:
-  db    LenghtGeneralMonsterAttackPatternRightDown,000,004,ShowBeingHitSprite,008,000,254
-LenghtGeneralMonsterAttackPatternRightDown: equ $-GeneralMonsterAttackPatternRightDown-1
-;######################################################################################
-;big spider (sd snatcher)
-Monster003Move:                     
-Monster003Idle:
-  db    3                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    $4000 + (032*128) + (000/2) - 128
-  dw    $4000 + (032*128) + (016/2) - 128
-  ;facing left
-  dw    $4000 + (032*128) + (032/2) - 128
-  dw    $4000 + (032*128) + (048/2) - 128
-Monster003Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (032*128) + (016/2) - 128
-  ;facing left
-  dw    $4000 + (032*128) + (032/2) - 128
-;######################################################################################
-;green flyer (sd snatcher)
-Monster004Move:                     
-Monster004Idle:
-  db    3                               ;animation speed (x frames per animation frame)
-  db    6                               ;amount of animation frames
-  dw    $4000 + (000*128) + (128/2) - 128
-  dw    $4000 + (000*128) + (144/2) - 128
-  dw    $4000 + (000*128) + (160/2) - 128
-  dw    $4000 + (000*128) + (176/2) - 128
-  dw    $4000 + (000*128) + (160/2) - 128
-  dw    $4000 + (000*128) + (144/2) - 128
-  ;facing left
-  dw    $4000 + (000*128) + (192/2) - 128
-  dw    $4000 + (000*128) + (208/2) - 128
-  dw    $4000 + (000*128) + (224/2) - 128
-  dw    $4000 + (000*128) + (240/2) - 128
-  dw    $4000 + (000*128) + (224/2) - 128
-  dw    $4000 + (000*128) + (208/2) - 128
-Monster004Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (000*128) + (144/2) - 128
-  ;facing left
-  dw    $4000 + (000*128) + (208/2) - 128
-;######################################################################################
-;tiny spider (sd snatcher)
-Monster005Move:                     
-Monster005Idle:
-  db    4                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    $4000 + (032*128) + (064/2) - 128
-  dw    $4000 + (032*128) + (080/2) - 128
-  ;facing left
-  dw    $4000 + (032*128) + (096/2) - 128
-  dw    $4000 + (032*128) + (112/2) - 128
-Monster005Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (032*128) + (080/2) - 128
-  ;facing left
-  dw    $4000 + (032*128) + (096/2) - 128
-;######################################################################################
-;huge boo (golvellius)
-Monster006Move:                     
-Monster006Idle:
-  db    2                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    $4000 + (112*128) + (000/2) - 128
-  dw    $4000 + (112*128) + (064/2) - 128
-  ;facing left
-  dw    $4000 + (112*128) + (128/2) - 128
-  dw    $4000 + (112*128) + (192/2) - 128
-Monster006Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (112*128) + (064/2) - 128
-  ;facing left
-  dw    $4000 + (112*128) + (128/2) - 128
-;######################################################################################
-;brown flyer (sd snatcher)
-Monster007Move:                     
-Monster007Idle:
-  db    3                               ;animation speed (x frames per animation frame)
-  db    6                               ;amount of animation frames
-  dw    $4000 + (000*128) + (000/2) - 128
-  dw    $4000 + (000*128) + (016/2) - 128
-  dw    $4000 + (000*128) + (032/2) - 128
-  dw    $4000 + (000*128) + (048/2) - 128
-  dw    $4000 + (000*128) + (032/2) - 128
-  dw    $4000 + (000*128) + (016/2) - 128
-  ;facing left
-  dw    $4000 + (000*128) + (064/2) - 128
-  dw    $4000 + (000*128) + (080/2) - 128
-  dw    $4000 + (000*128) + (096/2) - 128
-  dw    $4000 + (000*128) + (112/2) - 128
-  dw    $4000 + (000*128) + (096/2) - 128
-  dw    $4000 + (000*128) + (080/2) - 128
-Monster007Attack:
-  db    3                               ;animation speed (x frames per animation frame
-  db    1                               ;amount of animation frames
-  dw    $4000 + (000*128) + (048/2) - 128
-  ;facing left
-  dw    $4000 + (000*128) + (080/2) - 128
-;######################################################################################
-
-SetMonsterTableInIY:
-  ld    a,(ix+MonsterNumber)
-  ld    iy,Monster001Table-16
-  ld    h,0
-  ld    l,a
-  add   hl,hl
-  push  hl
-  pop   de
-  add   iy,de
-  add   iy,de
-  add   iy,de
-  add   iy,de
-  add   iy,de
-  add   iy,de
-  add   iy,de
-  add   iy,de                           ;iy->monster table idle
-  ret
-
-AnimateMonster:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  cp    1
-  jr    nz,.EndCheckMoveMonster
-  inc   iy
-  inc   iy                              ;iy->monster table move
-  .EndCheckMoveMonster:
-
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  cp    2
-  ret   z
-
-  .TableFound:
-  ld    l,(iy+0)
-  ld    h,(iy+1)                        ;hl->Monster Idle/move/attack table
-  push  hl
-  pop   iy                              ;iy->Monster Idle/move/attack table
-
-  push  iy
-  call  .animate
-  pop   iy
-
-  ;check if monster needs to change its animation frame
-  ld    a,(MonsterAnimationSpeed)
-  inc   a
-  cp    (iy+0)                          ;animation speed
-  jr    nz,.EndCheckAnimate
-  ld    a,(MonsterAnimationStep)        ;animation frame/step
-  inc   a
-  cp    (iy+1)                          ;amount of animation frames
-  jr    nz,.EndCheckLoop
-  xor   a
-  .EndCheckLoop:
-  ld    (MonsterAnimationStep),a
-  xor   a                               ;animation speed
-  .EndCheckAnimate:
-  ld    (MonsterAnimationSpeed),a
-  ret
-
-  .animate:
-  ;we force direction monster is facing at during attack
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  cp    2
-  jr    nz,.EndCheckFaceDirectionWhileAttacking
-  ld    a,(MonsterFacingRightWhileAttacking?)
-  or    a
-  jr    z,.MonsterIsFacingLeft
-  jr    .MonsterIsFacingRight
-  .EndCheckFaceDirectionWhileAttacking:
-
-  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
-  cp    7
-  jr    c,.MonsterIsFacingRight
-
-  .MonsterIsFacingLeft:
-  ld    a,(iy+1)                        ;amount of animation frames
-  add   a,a
-  ld    d,0
-  ld    e,a
-  add   iy,de                           ;if monster faces left, then jump to 'facing left' in the table
-
-  .MonsterIsFacingRight:
-  ld    a,(MonsterAnimationStep)
-  add   a,a
-  add   a,2
-  ld    d,0
-  ld    e,a
-  add   iy,de
-  
-  ld    l,(iy+0)
-  ld    h,(iy+1)                        ;hl->Monster Idle table
-
-  ld    (ix+MonsterSYSX+0),l
-  ld    (ix+MonsterSYSX+1),h
-  ret
-
-DisplaceLeft: equ 21
-DisplaceRight: equ 22
-ShowBeingHitSprite: equ 23
-MoveMonster:
-  ld    a,(ix+MonsterY)
-  ld    (ix+MonsterYPrevious),a
-  ld    a,(ix+MonsterX)
-  ld    (ix+MonsterXPrevious),a
-  ld    a,(ix+MonsterNY)
-  ld    (ix+MonsterNYPrevious),a
-  ld    a,(ix+MonsterNX)
-  ld    (ix+MonsterNXPrevious),a
-
-  push  ix
-  pop   hl
-  ld    de,Monster0
-  call  CompareHLwithDE
-  jp    z,MoveGridPointer
-
-  ld    a,(MoVeMonster?)              ;1=move monster, 2=attack monster
-  or    a
-  ret   z
-
-  ld    hl,CursorHand
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
-  ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
-
-  .HandleMovement:
-  ld    a,(MonsterMovementPathPointer)
-  ld    e,a
-  ld    d,0
-  ld    hl,MonsterMovementPath
-  add   hl,de
-  ld    a,(hl)
-  cp    255                           ;255 = end movement
-  jp    z,.End
-  cp    254                           ;254 = handle attacked monster
-  jp    z,.HandleAttackedMonster
-  cp    128                           ;bit 7 on=change NX (after having checked for end movement)
-  jp    nc,.ChangeNX
-  cp    12
-  jp    z,.InitiateAttackRightUp
-  cp    13
-  jp    z,.InitiateAttackRight
-  cp    14
-  jp    z,.InitiateAttackRightDown
-  cp    16
-  jp    z,.InitiateAttackLeftDown
-  cp    17
-  jp    z,.InitiateAttackLeft
-  cp    18
-  jp    z,.InitiateAttackLeftUp
-  cp    20
-  jp    z,.AnimateAttack
-  cp    DisplaceLeft                    ;cp 21
-  jp    z,.DisplaceLeft
-  cp    DisplaceRight                   ;cp 22
-  jp    z,.DisplaceRight
-  cp    ShowBeingHitSprite              ;cp 23
-  jp    z,.ShowBeingHitSprite
-
-  call  .Move
-
-  ld    a,(MoveMonster?)                ;1=move, 2=attack
-  cp    2
-  ld    c,1                             ;move half as far when attacking
-  jr    z,.SetMovementDuration
-  ld    c,3                             ;normal move. each movement (from tile to tile) is 4 frames
-  .SetMovementDuration:
-  
-  ld    a,(MonsterMovementAmountOfSteps)
-  dec   a
-  and   c
-  ld    (MonsterMovementAmountOfSteps),a
-  ret   nz
-  ld    a,(MonsterMovementPathPointer)
-  inc   a
-  ld    (MonsterMovementPathPointer),a
-  ret
-
-  .DisplaceLeft:
-  ld    a,(ix+MonsterX)
-  sub   a,16
-  ld    (ix+MonsterX),a
-
-  ld    a,(MonsterMovementPathPointer)
-  inc   a
-  ld    (MonsterMovementPathPointer),a
-  jp    .HandleMovement
-
-  .DisplaceRight:
-  ld    a,(ix+MonsterX)
-  add   a,16
-  ld    (ix+MonsterX),a
-
-  ld    a,(MonsterMovementPathPointer)
-  inc   a
-  ld    (MonsterMovementPathPointer),a
-  jp    .HandleMovement
-
-  .ShowBeingHitSprite:
-  ld    a,1
-  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
-  xor   a
-  ld    (ExplosionSpriteStep),a
-  ld    a,(MonsterMovementPathPointer)
-  inc   a
-  ld    (MonsterMovementPathPointer),a
-  jp    .HandleMovement
-
-  .AnimateAttack:
-  inc   hl
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)  
-  ld    (ix+MonsterSYSX+0),e
-  ld    (ix+MonsterSYSX+1),d
-
-  ld    a,(MonsterMovementPathPointer)
-  add   a,3
-  ld    (MonsterMovementPathPointer),a
-    
-  jp    .HandleMovement
-
-  .InitiateAttackRight:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+4)
-  ld    h,(iy+5)                        ;hl->Attack Pattern Right
-  ld    a,1                             ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttackLeft:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+6)
-  ld    h,(iy+7)                        ;hl->Attack Pattern left
-  Xor   a                               ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttackLeftUp:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+08)
-  ld    h,(iy+09)                       ;hl->Attack Pattern Right
-  Xor   a                               ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttackLeftDown:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+10)
-  ld    h,(iy+11)                       ;hl->Attack Pattern left
-  Xor   a                               ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttackRightUp:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+12)
-  ld    h,(iy+13)                       ;hl->Attack Pattern Right
-  ld    a,1                             ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttackRightDown:
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    l,(iy+14)
-  ld    h,(iy+15)                       ;hl->Attack Pattern left
-  ld    a,1                             ;monster facing right while attacking?
-  jp    .InitiateAttack
-
-  .InitiateAttack:
-  ld    (MonsterFacingRightWhileAttacking?),a  
-  ld    a,2
-  ld    (MoveMonster?),a                ;1=move, 2=attack
-  xor   a
-  ld    (MonsterMovementPathPointer),a
-  ld    de,MonsterMovementPath
-  ld    c,(hl)
-  ld    b,0
-  inc   hl
-  ldir  
-  jp    .HandleMovement
-
-  .HandleAttackedMonster:
-  ld    ix,(MonsterThatIsBeingAttacked)
-  ld    (ix+MonsterHP),000            ;this declares monster is completely dead
-  ld    a,3
-  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
-  xor   a
-  ld    (ExplosionSpriteStep),a  
-  ld    a,1
-  ld    (MonsterDied?),a
-  jr    .End
-
-  .End:
-  xor   a
-  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
-  ld    (MonsterMovementPathPointer),a
-  ld    (MonsterAnimationSpeed),a
-  ld    (MonsterAnimationStep),a
-  ld    a,1
-  ld    (SwitchToNextMonster?),a
-  ret
-
-  .ChangeNX:
-  and   %0111 1111
-  ld    (ix+MonsterNX),a
-  ld    a,(MonsterMovementPathPointer)
-  inc   a
-  ld    (MonsterMovementPathPointer),a
-  jp    .HandleMovement
-
-  .Move:
-  cp    2
-  jr    z,.MoveRightUp
-  cp    3
-  jr    z,.MoveRight
-  cp    4
-  jr    z,.MoveRightDown
-  cp    6
-  jr    z,.MoveLeftDown
-  cp    7
-  jr    z,.MoveLeft
-  cp    8
-  jr    z,.MoveLeftUp
-  ret
-
-  .MoveRightUp:
-  ld    a,(ix+MonsterX)
-  add   a,2
-  ld    (ix+MonsterX),a
-
-  ld    a,(ix+MonsterY)
-  sub   a,4
-  ld    (ix+MonsterY),a
-  ret
-
-  .MoveRight:
-  ld    a,(ix+MonsterX)
-  add   a,4
-  ld    (ix+MonsterX),a
-  ret
-
-  .MoveRightDown:
-  ld    a,(ix+MonsterX)
-  add   a,2
-  ld    (ix+MonsterX),a
-
-  ld    a,(ix+MonsterY)
-  add   a,4
-  ld    (ix+MonsterY),a
-  ret
-
-  .MoveLeftDown:
-  ld    a,(ix+MonsterX)
-  sub   a,2
-  ld    (ix+MonsterX),a
-
-  ld    a,(ix+MonsterY)
-  add   a,4
-  ld    (ix+MonsterY),a
-  ret
-
-  .MoveLeft:
-  ld    a,(ix+MonsterX)
-  sub   a,4
-  ld    (ix+MonsterX),a
-  ret
-
-  .MoveLeftUp:
-  ld    a,(ix+MonsterX)
-  sub   a,2
-  ld    (ix+MonsterX),a
-
-  ld    a,(ix+MonsterY)
-  sub   a,4
-  ld    (ix+MonsterY),a
-  ret
-
-MoveGridPointer:
-  ld    a,(spat)
-  add   a,14; 8
-  
-  and   %1111 0000
-  bit   4,a
-  jr    nz,.EvenTiles
-
-  sub   a,9
-  ld    (ix+MonsterY),a
-  ld    a,(spat+1)
-  sub   a,6 ;8
-  
-  and   %1111 0000
-  add   a,4+8
-  ld    (ix+MonsterX),a
-  ret
-
-  .EvenTiles:
-  sub   a,9
-  ld    (ix+MonsterY),a
-  ld    a,(spat+1)
-  sub   a,-4
-
-  and   %1111 0000
-  add   a,4
-  ld    (ix+MonsterX),a
-  ret
 
 SetCurrentMonsterInBattleFieldGrid:     ;set monster in grid, and fill grid with numbers representing distance to those tiles
   ld    a,(SetMonsterInBattleFieldGrid?)

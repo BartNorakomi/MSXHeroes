@@ -236,24 +236,26 @@ Div16_NoAdd2:
     ld c,a
     ret
 
-;;;;;;;;;;;;;; WE ALREADY HAVE MultiplyHlWithDE in castleovercode.asm
+MultiplyHlWithDE:
+  push  hl
+  pop   bc
 ;
 ; Multiply 16-bit values (with 16-bit result)
 ; In: Multiply BC with DE
 ; Out: HL = result
 ;
-;MultiplyBCwithDE:
-;    ld a,b
-;    ld b,16
-;Mult16_Loop:
-;    add hl,hl
-;    sla c
-;    rla
-;    jr nc,Mult16_NoAdd
-;    add hl,de
-;Mult16_NoAdd:
-;    djnz Mult16_Loop
-;    ret
+Mult16:
+    ld a,b
+    ld b,16
+Mult16_Loop:
+    add hl,hl
+    sla c
+    rla
+    jr nc,Mult16_NoAdd
+    add hl,de
+Mult16_NoAdd:
+    djnz Mult16_Loop
+    ret
 
 EnemyHeroThatPointerIsOn: ds  2
 DisplayEnemyHeroStatsRightClick?: db  0

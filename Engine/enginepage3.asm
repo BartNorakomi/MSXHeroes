@@ -157,21 +157,22 @@ CopyRamToVramCorrectedCastleOverview:
   ret
 
 
-CopyRamToVramPag3:
+CopyRamToVramPag3ForBattleEngine:
   ex    af,af'                          ;store rom block
 
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
   push  af
 
+  di
   ld    a,(slot.page12rom)              ;all RAM except page 1+2
   out   ($a8),a      
 
   ld    a,(BlockToReadFrom)
-  di
+;  di
 	ld		($6000),a
 	inc   a
 	ld		($7000),a
-	ei
+;	ei
 
   call  .go                             ;go copy
 
@@ -181,13 +182,14 @@ CopyRamToVramPag3:
 
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
+  ei
   ret
 
 .go:
 
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
-  di
+;  di
 
   .loop:
   call  .WriteOneLine
@@ -195,7 +197,7 @@ CopyRamToVramPag3:
   dec   a
   ld    (NXAndNY+1),a
   jp    nz,.loop
-  ei
+;  ei
   ret
 
   .WriteOneLine:
@@ -246,7 +248,7 @@ MonsterThatIsBeingAttackedY:  ds  1
 MonsterThatIsBeingAttackedNY:  ds  1
 
 
-MonsterFacingRightWhileAttacking?:  db  1
+;MonsterFacingRightWhileAttacking?:  db  1
 IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
@@ -333,6 +335,8 @@ OrderOfMonstersFromHighToLow:
 
 SwitchToNextMonster?: db  0
 MoVeMonster?: db  0
+MonsterMovingRight?: db  0
+MonsterAttackingRight?: db  0
 MonsterAnimationSpeed: db  0
 MonsterAnimationStep: db  0
 AttackMonster?: db  0
@@ -369,8 +373,8 @@ Monster0:
 .x: db  024
 .yprevious: db  070 + (00*16) - 64
 .xprevious: db  024
-.SYSXinROM: dw  $4000 + (047*128) + (224/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  $4000 + (017*128) + (000/2) - 128
+.RomBlock:  db  BattleFieldObjectsBlock
 .ny:  db  20 + 1
 .nx:  db  16
 .Number:  db 000
@@ -386,8 +390,8 @@ Monster1:
 .x: db  012 + (16*08)       ;x= 012 + (colum*08)
 .yprevious: db  056 + (05*16) - 32 - 8
 .xprevious: db  012 + (16*08)
-.SYSXinROM: dw  $4000 + (176*128) + (032/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  RIdle1Monster001
+.RomBlock:  db  BattleMonsterSpriteSheet2Block
 .ny:  db  32 + 8
 .nx:  db  32
 .Number:  db 001                        ;yie ar kung fu 
@@ -397,31 +401,31 @@ Monster1:
 .hp:      db 10
 
 Monster2:
-.y: db  056 + (07*16) - 64
+.y: db  056 + (07*16) - 64  - 4
 .x: db  012 + (04*08)
-.yprevious: db  056 + (07*16) - 64
+.yprevious: db  056 + (07*16) - 64  - 4
 .xprevious: db  012 + (04*08)
-.SYSXinROM: dw  $4000 + (048*128) + (000/2) - 128
+.SYSXinROM: dw  RIdle1Monster002
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64
+.ny:  db  64 + 4
 .nx:  db  56
 .Number:  db 002                        ;huge snake (golvellius)
-.nyprevious:  db 64
+.nyprevious:  db 64 + 4
 .nxprevious:  db 56
 .amount:  dw 10
 .hp:      db 10
 
 Monster3:
-.y: db  056 + (01*16) - 16
+.y: db  056 + (01*16) - 16  - 8
 .x: db  012 + (04*08)
-.yprevious: db  056 + (01*16) - 16
+.yprevious: db  056 + (01*16) - 16  - 8
 .xprevious: db  012 + (04*08)
-.SYSXinROM: dw  $4000 + (032*128) + (000/2) - 128
+.SYSXinROM: dw  RIdle1Monster003
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  16
+.ny:  db  16 + 8
 .nx:  db  16
 .Number:  db 003                      ;big spider (sd snatcher)
-.nyprevious:  db 16
+.nyprevious:  db 16 + 8
 .nxprevious:  db 16
 .amount:  dw 677
 .hp:      db 10
@@ -431,7 +435,7 @@ Monster4:
 .x: db  012 + (11*08)
 .yprevious: db  056 + (00*16) - 32
 .xprevious: db  012 + (11*08)
-.SYSXinROM: dw  $4000 + (000*128) + (128/2) - 128
+.SYSXinROM: dw  RIdle1Monster004
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
@@ -442,48 +446,48 @@ Monster4:
 .hp:      db 10
 
 Monster5:
-.y: db  056 + (08*16) - 16
-.x: db  012 + (05*08)
-.yprevious: db  056 + (08*16) - 16
-.xprevious: db  012 + (05*08)
-.SYSXinROM: dw  $4000 + (032*128) + (064/2) - 128
+.y: db  056 + (08*16) - 16  - 4
+.x: db  012 + (01*08)
+.yprevious: db  056 + (08*16) - 16  - 4
+.xprevious: db  012 + (01*08)
+.SYSXinROM: dw  RIdle1Monster005
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  16
+.ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                        ;tiny spider (sd snatcher)
-.nyprevious:  db 16
+.nyprevious:  db 16 + 4
 .nxprevious:  db 16
 .amount:  dw 999
 .hp:      db 10
 
 Monster6:
-.y: db  056 + (01*16) - 64
+.y: db  056 + (01*16) - 64  - 4
 .x: db  012 + (20*08)
-.yprevious: db  056 + (01*16) - 64
+.yprevious: db  056 + (01*16) - 64  - 4
 .xprevious: db  012 + (20*08)
-.SYSXinROM: dw  $4000 + (112*128) + (000/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64
+.SYSXinROM: dw  RIdle1Monster006
+.RomBlock:  db  BattleMonsterSpriteSheet2Block
+.ny:  db  64 + 4
 .nx:  db  64
 .Number:  db 006                              ;huge boo (golvellius)
-.nyprevious:  db 64
+.nyprevious:  db 64 + 4
 .nxprevious:  db 64
 .amount:  dw 47
-.hp:      db 10
+.hp:      db 01
 
-;;;;;;;;; player 2 ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; player 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster7:
-.y: db  056 + (03*16) - 64
+.y: db  056 + (03*16) - 64  - 4
 .x: db  012 + (00*08)
-.yprevious: db  056 + (03*16) - 64
+.yprevious: db  056 + (03*16) - 64  - 4
 .xprevious: db  012 + (00*08)
-.SYSXinROM: dw  $4000 + (048*128) + (112/2) - 128
+.SYSXinROM: dw  LIdle1Monster002
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64
+.ny:  db  64 + 4
 .nx:  db  56
 .Number:  db 002                                    ;huge snake (golvellius)
-.nyprevious:  db 64
+.nyprevious:  db 64 + 4
 .nxprevious:  db 56
 .amount:  dw 2
 .hp:      db 10
@@ -493,14 +497,14 @@ Monster8:
 .x: db  012 + (13*08)         
 .yprevious: db  056 + (02*16) - 32    
 .xprevious: db  012 + (13*08)         
-.SYSXinROM: dw  $4000 + (000*128) + (064/2) - 128
+.SYSXinROM: dw  LIdle1Monster007
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
 .Number:  db 007                                  ;brown flyer (sd snatcher)
 .nyprevious:  db 32
 .nxprevious:  db 16
-.amount:  dw 11
+.amount:  dw 980
 .hp:      db 10
 
 Monster9:
@@ -508,7 +512,7 @@ Monster9:
 .x: db  012 + (27*08)
 .yprevious: db  056 + (06*16) - 32
 .xprevious: db  012 + (27*08)
-.SYSXinROM: dw  $4000 + (000*128) + (128/2) - 128
+.SYSXinROM: dw  LIdle1Monster004
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
 .ny:  db  32
 .nx:  db  16
@@ -519,46 +523,46 @@ Monster9:
 .hp:      db 10
 
 Monster10:
-.y: db  056 + (07*16) - 16
+.y: db  056 + (07*16) - 16  - 8
 .x: db  012 + (22*08)
-.yprevious: db  056 + (07*16) - 16
+.yprevious: db  056 + (07*16) - 16  - 8
 .xprevious: db  012 + (22*08)
-.SYSXinROM: dw  $4000 + (032*128) + (032/2) - 128
+.SYSXinROM: dw  LIdle1Monster003
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  16
+.ny:  db  16 + 8
 .nx:  db  16
 .Number:  db 003                  ;big spider (sd snatcher)
-.nyprevious:  db 16
+.nyprevious:  db 16 + 8
 .nxprevious:  db 16
 .amount:  dw 333
 .hp:      db 10
 
 Monster11:
-.y: db  056 + (08*16) - 16
+.y: db  056 + (08*16) - 16  - 4
 .x: db  012 + (21*08)
-.yprevious: db  056 + (08*16) - 16
+.yprevious: db  056 + (08*16) - 16  - 4
 .xprevious: db  012 + (21*08)
-.SYSXinROM: dw  $4000 + (032*128) + (096/2) - 128
+.SYSXinROM: dw  LIdle1Monster005
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  16
+.ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                      ;tiny spider (sd snatcher)
-.nyprevious:  db 16
+.nyprevious:  db 16 + 4
 .nxprevious:  db 16
 .amount:  dw 823
 .hp:      db 10
 
 Monster12:
-.y: db  056 + (08*16) - 16
-.x: db  012 + (19*08)
-.yprevious: db  056 + (08*16) - 16
-.xprevious: db  012 + (19*08)
-.SYSXinROM: dw  $4000 + (032*128) + (096/2) - 128
+.y: db  056 + (07*16) - 16  - 4
+.x: db  012 + (10*08)
+.yprevious: db  056 + (07*16) - 16  - 4
+.xprevious: db  012 + (10*08)
+.SYSXinROM: dw  LIdle1Monster005
 .RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  16
+.ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                          ;tiny spider (sd snatcher)
-.nyprevious:  db 16
+.nyprevious:  db 16 + 4
 .nxprevious:  db 16
 .amount:  dw 900
 .hp:      db 10
