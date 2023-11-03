@@ -1,6 +1,15 @@
 MonsterTableSpriteSheetBlock: equ 16
 MonsterTableNX:               equ MonsterTableSpriteSheetBlock+1
 MonsterTableNY:               equ MonsterTableNX+1
+MonsterTableCostGold:         equ MonsterTableNY+1
+MonsterTableCostGems:         equ MonsterTableCostGold+1
+MonsterTableCostRubies:       equ MonsterTableCostGems+1
+MonsterTableHp:               equ MonsterTableCostRubies+1
+MonsterTableSpeed:            equ MonsterTableHp+1
+MonsterTableAttack:           equ MonsterTableSpeed+1
+MonsterTableDefense:          equ MonsterTableAttack+1
+MonsterTableGrowth:           equ MonsterTableDefense+1
+MonsterTableSpecialAbility:   equ MonsterTableGrowth+1
 
 LengthMonsterAddressesTable: equ Monster002Table-Monster001Table
 Monster001Table:                        ;yie ar kung fu
@@ -15,6 +24,15 @@ Monster001Table:                        ;yie ar kung fu
   db    BattleMonsterSpriteSheet2Block
   db    32                              ;nx  
   db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    001                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
   
 Monster002Table:                        ;huge snake (golvellius)
   dw    Monster002Idle
@@ -28,6 +46,15 @@ Monster002Table:                        ;huge snake (golvellius)
   db    BattleMonsterSpriteSheet1Block
   db    56                              ;nx  
   db    64+04                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    002                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
   
 Monster003Table:                        ;big spider (sd snatcher)
   dw    Monster003Idle
@@ -41,6 +68,15 @@ Monster003Table:                        ;big spider (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    003                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
 
 Monster004Table:                        ;green flyer (sd snatcher)
   dw    Monster004Idle
@@ -54,6 +90,15 @@ Monster004Table:                        ;green flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    004                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
 
 Monster005Table:                        ;tiny spider (sd snatcher)
   dw    Monster005Idle
@@ -67,6 +112,15 @@ Monster005Table:                        ;tiny spider (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    16+04                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    005                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
 
 Monster006Table:                        ;huge boo (golvellius)
   dw    Monster006Idle
@@ -80,6 +134,15 @@ Monster006Table:                        ;huge boo (golvellius)
   db    BattleMonsterSpriteSheet2Block
   db    64                              ;nx  
   db    64+04                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    006                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
 
 Monster007Table:                        ;brown flyer (sd snatcher)
   dw    Monster007Idle
@@ -93,6 +156,15 @@ Monster007Table:                        ;brown flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    007                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
 
 ;######################################################################################
 GeneralMonsterAttackPatternRight:

@@ -3,18 +3,18 @@
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
-  db  001 | dw 400 | db 012 + (1*08), 056 + (00*16)
-  db  003 | dw 500 | db 012 + (0*08), 056 + (01*16)
-  db  002 | dw 600 | db 012 + (0*08), 056 + (03*16)
-  db  004 | dw 700 | db 012 + (0*08), 056 + (05*16)
-  db  005 | dw 800 | db 012 + (0*08), 056 + (07*16)
-  db  006 | dw 900 | db 012 + (1*08), 056 + (08*16)
+  db  001 | dw 400 | db 012 + (15*08), 056 + (00*16)
+  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
+  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
+  db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
+  db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
+  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
 
-  db  001 | dw 410 | db 012 + (25*08), 056 + (00*16)
-  db  005 | dw 510 | db 012 + (24*08), 056 + (01*16)
-  db  004 | dw 610 | db 012 + (24*08), 056 + (03*16)
-  db  004 | dw 710 | db 012 + (24*08), 056 + (05*16)
-  db  003 | dw 810 | db 012 + (24*08), 056 + (07*16)
+  db  007 | dw 410 | db 012 + (25*08), 056 + (00*16)
+  db  007 | dw 510 | db 012 + (24*08), 056 + (01*16)
+  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16)
+  db  007 | dw 710 | db 012 + (24*08), 056 + (05*16)
+  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16)
   db  007 | dw 910 | db 012 + (25*08), 056 + (08*16)
 
 SetAllMonstersInMonsterTable:
@@ -616,6 +616,7 @@ InitiateBattle:
 call screenon
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
+  call  SortMonstersOnTheirSpeed
 
   .engine:
 ;  ld    a,(activepage)
@@ -690,6 +691,106 @@ SetFontPage0Y212:                       ;set font at (0,212) page 0
   ld    bc,$0000 + (006*256) + (256/2)
   ld    a,CastleOverviewFontBlock         ;font graphics block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+;SetMonsterTableInIY:
+;  ld    a,MonsterAddressesForBattle1Block               ;Map block
+;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
+;  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+;  ld    h,0
+;  ld    l,(ix+MonsterNumber)
+;  ld    de,LengthMonsterAddressesTable
+;  call  MultiplyHlWithDE                ;Out: HL = result
+;  push  hl
+;  pop   de
+;  add   iy,de                           ;iy->monster table idle
+;  ret
+
+SortMonstersOnTheirSpeed:
+  ld    c,TotalAmountOfMonstersOnBattleField-1-1  ; load the number of elements
+  call .sortloop
+  ret
+
+  .sortloop:
+  ld iy, MonstersSortedOnSpeed    ; load the address of the y coordinates array
+  ld b,c            ; load the number of elements for this pass
+
+  .innerloop:
+  ld    l,(iy)
+  ld    h,(iy+1)      ;set address of Monster data in HL
+  push  hl
+  pop   ix
+
+
+
+  push  iy
+  push  bc
+  call  SetMonsterTableInIY
+  
+
+  
+  ld    e,(iy+MonsterTableSpeed)
+  pop   bc
+  pop   iy
+  push  de
+  
+  ld    l,(iy+2)
+  ld    h,(iy+3)      ;set address of next Monster data in HL
+  push  hl
+  pop   ix
+  
+  push  iy
+  push  bc  
+  call  SetMonsterTableInIY
+
+  ld    a,(iy+MonsterTableSpeed)
+  pop   bc
+  pop   iy
+  pop   de
+
+
+
+  
+  cp e               ; compare the two y coordinates
+  jr nc,.noswap       ; if y[i] <= y[i+1], no swap is needed
+
+  ; swap y[i] and y[i+1]
+
+  ld    l,(iy)
+  ld    h,(iy+1)    
+  ld    e,(iy+2)
+  ld    d,(iy+3)      
+
+  ld    (iy),e
+  ld    (iy+1),d     
+  ld    (iy+2),l
+  ld    (iy+3),h      
+  .noswap:
+
+  inc iy             ; move to the next element
+  inc iy             ; move to the next element
+  djnz .innerloop     ; continue until all comparisons are done
+
+  ; decrement the number of elements for the next pass
+  dec c
+  jr nz,.sortloop    ; if not zero, continue sorting
+  ret
+; the y coordinates are now sorted in ascending order
+
+
+
+
+
+  .SetSpeed:
+  ld    h,0
+  ld    l,a
+  ld    de,SpeedCreatureTable
+  add   hl,de
+  ld    l,(hl)
+  ld    h,0
+  call  SetNumber16BitCastle
+  ret
+
   
 BuildUpBattleFieldAndPutMonsters:  
   xor   a
@@ -745,8 +846,8 @@ BuildUpBattleFieldAndPutMonsters:
 
 
   call  Set255WhereMonsterStandsInBattleFieldGrid
+  call  SetAmountUnderMonster
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  SetAmountUnderMonster  
   call  PutMonster                      ;put monster in inactive page
   .NextMonster:
   ld    a,(CurrentActiveMonster)
@@ -981,8 +1082,8 @@ HandleMonsters:
 
 ;current monster (put)
   call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  SetAmountUnderMonster
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  PutMonster                      ;put monster in inactive page
 
 ;grid tile (put)
@@ -1028,18 +1129,18 @@ HandleMonsters:
   ret
 
 SetAmountUnderMonster:
-	ld		a,(activepage)
-  xor   1
-  ld    (ClearnNumber+dpage),a  
-  ld    hl,ClearnNumber
-  call  docopy
+;	ld		a,(activepage)
+;  xor   1
+;  ld    (ClearnNumber+dpage),a  
+;  ld    hl,ClearnNumber
+;  call  docopy
 
 
-;  ld    hl,$4000 + (038*128) + (000/2) - 128
-;  ld    de,$0000 + (009*128) + (072/2) - 128  ;dy,dx
-;  ld    bc,$0000 + (007*256) + (016/2)        ;ny,nx  
-;  ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
-;  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    hl,$4000 + (038*128) + (000/2) - 128
+  ld    de,$0000 + (249*128) + (000/2) - 128  ;dy,dx
+  ld    bc,$0000 + (007*256) + (016/2)        ;ny,nx  
+  ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 
@@ -1073,6 +1174,15 @@ SetAmountUnderMonster:
   xor   1
   ld    (PutMonsterAmountOnBattleField+spage),a
   ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    (SmoothCornerPutMonsterAmount+spage),a
+  ld    (SmoothCornerPutMonsterAmount+dpage),a
+
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  dec   a
+  ld    (SmoothCornerPutMonsterAmount+dx),a
+  
+  ld    hl,SmoothCornerPutMonsterAmount
+  call  docopy  
 
   ld    hl,PutMonsterAmountOnBattleField
   call  docopy  

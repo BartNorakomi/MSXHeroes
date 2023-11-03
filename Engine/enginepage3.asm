@@ -91,6 +91,7 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
 CopyRamToVramCorrectedCastleOverview:
   ex    af,af'                          ;store rom block
 
+  di
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
   push  af
 
@@ -98,11 +99,11 @@ CopyRamToVramCorrectedCastleOverview:
   out   ($a8),a      
 
   ex    af,af'
-  di
+;  di
 	ld		($6000),a
 	inc   a
 	ld		($7000),a
-	ei
+;	ei
 
   call  .go                             ;go copy
 
@@ -112,6 +113,7 @@ CopyRamToVramCorrectedCastleOverview:
 
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
+ei
   ret
 
 .go:
@@ -138,7 +140,7 @@ CopyRamToVramCorrectedCastleOverview:
   dec   a
   ld    (NXAndNY+1),a
   jp    nz,.loop
-  ei
+;  ei
   ret
 
   .WriteOneLine:
@@ -155,7 +157,6 @@ CopyRamToVramCorrectedCastleOverview:
   ld    b,a
   otir
   ret
-
 
 CopyRamToVramPage3ForBattleEngine:
   ex    af,af'                          ;store rom block
@@ -311,11 +312,25 @@ PutMonsterAmountOnBattleField:
 	db		000,000,007,000
 	db		0,%0000 0000,$98
 
-ClearnNumber:
-	db	  000,000,000,000
+SmoothCornerPutMonsterAmount:
 	db	  000,000,249,000
-	db	  020,000,007,000
-	db	  colorblack+colorblack*16,0,$c0  
+	db	  001,000,249,000
+	db	  001,000,007,000
+	db		0,%0000 0000,$90
+
+MonstersSortedOnSpeed:
+  dw  Monster1  ;0C392h
+  dw  Monster2  ;0C3A2h
+  dw  Monster3  ;0C3B2h
+  dw  Monster4  ;0C3c2h
+  dw  Monster5  ;0C3d2h
+  dw  Monster6  ;0C3e2h
+  dw  Monster7  ;0C3f2h
+  dw  Monster8  ;0C402h
+  dw  Monster9  ;0C412h
+  dw  Monster10  ;0C422h
+  dw  Monster11  ;0C432h
+  dw  Monster12  ;0C442h
 
 OrderOfMonstersFromHighToLow:
   dw  Monster0  ;0C190h
@@ -359,6 +374,7 @@ MonsterNYPrevious:      equ MonsterNumber+1
 MonsterNXPrevious:      equ MonsterNYPrevious+1
 MonsterAmount:          equ MonsterNXPrevious+1
 MonsterHP:              equ MonsterAmount+2
+MonsterStatus:          equ MonsterHP+1
 
 LenghtMonsterTable:     equ Monster1-Monster0
 
@@ -382,38 +398,41 @@ Monster0:
 .nxprevious:  db 16
 .amount:  dw 10
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster1:
-.y: db  056 + (05*16) - 32  - 8;y= 056 + (row *16) - ny
-.x: db  012 + (16*08)       ;x= 012 + (colum*08)
-.yprevious: db  056 + (05*16) - 32 - 8
-.xprevious: db  012 + (16*08)
-.SYSXinROM: dw  RIdle1Monster001
-.RomBlock:  db  BattleMonsterSpriteSheet2Block
-.ny:  db  32 + 8
-.nx:  db  32
-.Number:  db 001                        ;yie ar kung fu 
-.nyprevious:  db 32 + 8
-.nxprevious:  db 32
-.amount:  dw 453
+.y: ds 1
+.x: ds 1
+.yprevious: ds 1
+.xprevious: ds 1
+.SYSXinROM: ds 2
+.RomBlock:  ds 1
+.ny:  ds 1
+.nx:  ds 1
+.Number:  ds 1
+.nyprevious:  ds 1
+.nxprevious:  ds 1
+.amount:  ds 2
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster2:
-.y: db  056 + (07*16) - 64  - 4
-.x: db  012 + (04*08)
-.yprevious: db  056 + (07*16) - 64  - 4
-.xprevious: db  012 + (04*08)
-.SYSXinROM: dw  RIdle1Monster002
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
-.ny:  db  64 + 4
-.nx:  db  56
-.Number:  db 002                        ;huge snake (golvellius)
-.nyprevious:  db 64 + 4
-.nxprevious:  db 56
-.amount:  dw 10
+.y: ds 1
+.x: ds 1
+.yprevious: ds 1
+.xprevious: ds 1
+.SYSXinROM: ds 2
+.RomBlock:  ds 1
+.ny:  ds 1
+.nx:  ds 1
+.Number:  ds 1
+.nyprevious:  ds 1
+.nxprevious:  ds 1
+.amount:  ds 2
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster3:
 .y: db  056 + (03*16) - 16  - 8
@@ -429,6 +448,7 @@ Monster3:
 .nxprevious:  db 16
 .amount:  dw 677
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster4:
 .y: db  056 + (00*16) - 32
@@ -444,6 +464,7 @@ Monster4:
 .nxprevious:  db 16
 .amount:  dw 823
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster5:
 .y: db  056 + (08*16) - 16  - 4
@@ -459,6 +480,7 @@ Monster5:
 .nxprevious:  db 16
 .amount:  dw 999
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster6:
 .y: db  056 + (01*16) - 64  - 4
@@ -474,6 +496,7 @@ Monster6:
 .nxprevious:  db 64
 .amount:  dw 47
 .hp:      db 01
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; player 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -491,6 +514,7 @@ Monster7:
 .nxprevious:  db 56
 .amount:  dw 2
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster8:
 .y: db  056 + (02*16) - 32    
@@ -506,6 +530,7 @@ Monster8:
 .nxprevious:  db 16
 .amount:  dw 980
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster9:
 .y: db  056 + (06*16) - 32
@@ -521,6 +546,7 @@ Monster9:
 .nxprevious:  db 16
 .amount:  dw 555
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster10:
 .y: db  056 + (07*16) - 16  - 8
@@ -536,6 +562,7 @@ Monster10:
 .nxprevious:  db 16
 .amount:  dw 333
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster11:
 .y: db  056 + (08*16) - 16  - 4
@@ -551,6 +578,7 @@ Monster11:
 .nxprevious:  db 16
 .amount:  dw 823
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster12:
 .y: db  056 + (07*16) - 16  - 4
@@ -566,6 +594,7 @@ Monster12:
 .nxprevious:  db 16
 .amount:  dw 900
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
@@ -583,6 +612,7 @@ Monster13:
 .nxprevious:  db 56
 .amount:  dw 10
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster14:
 .y: db  040
@@ -598,6 +628,7 @@ Monster14:
 .nxprevious:  db 40
 .amount:  dw 10
 .hp:      db 10
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0
