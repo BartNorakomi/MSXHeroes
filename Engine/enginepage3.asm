@@ -330,6 +330,7 @@ MonstersSortedOnSpeed:
   dw  Monster9  ;0C412h
   dw  Monster10  ;0C422h
   dw  Monster11  ;0C432h
+  .LastMonster:
   dw  Monster12  ;0C442h
 
 OrderOfMonstersFromHighToLow:
@@ -379,7 +380,10 @@ MonsterStatus:          equ MonsterHP+1
 LenghtMonsterTable:     equ Monster1-Monster0
 
 
-
+MonsterStatusEnabled:   equ 0
+MonsterStatusWaiting:   equ 1
+MonsterStatusDefending: equ 2
+MonsterStatusTurnEnded: equ 3
 
 
 
@@ -399,7 +403,6 @@ Monster0:
 .amount:  dw 10
 .hp:      db 10
 .status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster1:
@@ -415,7 +418,7 @@ Monster1:
 .nyprevious:  ds 1
 .nxprevious:  ds 1
 .amount:  ds 2
-.hp:      db 10
+.hp:      ds  1
 .status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster2:
@@ -431,7 +434,7 @@ Monster2:
 .nyprevious:  ds 1
 .nxprevious:  ds 1
 .amount:  ds 2
-.hp:      db 10
+.hp:      ds  1
 .status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
 
 Monster3:

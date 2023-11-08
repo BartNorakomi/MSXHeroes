@@ -28,8 +28,8 @@ Monster001Table:                        ;yie ar kung fu
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
-  db    001                             ;speed
-  db    004                             ;attack
+  db    011                             ;speed
+  db    005                             ;attack
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
@@ -161,7 +161,7 @@ Monster007Table:                        ;brown flyer (sd snatcher)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    007                             ;speed
-  db    004                             ;attack
+  db    001                             ;attack
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability

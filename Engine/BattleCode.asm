@@ -1,3 +1,220 @@
+InitiateBattle:
+call screenon
+  call  SetFontPage0Y212                ;set font at (0,212) page 0
+  call  BuildUpBattleFieldAndPutMonsters
+
+  .engine:
+;  ld    a,(activepage)
+;  call  Backdrop.in
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+  call  HandleMonsters
+  
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+;  ld    a,(Controls)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ret   nz
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed 
+;  call  nz,.SetPage2
+
+
+;  ld    a,(NewPrContr)
+;  bit   6,a                             ;check ontrols to see if f1 is pressed 
+;  call  nz,.SetPage3
+
+  ld    a,01                ;we can store the previous vblankintflag time and cp the current with that value
+  ld    hl,vblankintflag    ;this way we speed up the engine when not scrolling
+  .checkflag:
+  cp    (hl)
+  jr    nc,.checkflag
+  ld    (hl),0
+  halt
+  jp  .engine
+
+
+  
+
+.SetPage2:
+  ld    a,2*32+31
+  di
+  out   ($99),a
+  ld    a,2+128
+  ei
+  out   ($99),a
+  call  PopulateControls                ;read out keys
+
+  ld    a,(NewPrContr)
+  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+  jr    .SetPage2
+
+.SetPage3:
+  ld    a,3*32+31
+  di
+  out   ($99),a
+  ld    a,2+128
+  ei
+  out   ($99),a
+  call  PopulateControls                ;read out keys
+
+  ld    a,(NewPrContr)
+  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz  
+  jr    .SetPage3
+
+
+HandleMonsters:
+;ld a,8 ; 20 is the max
+;di
+;out ($99),a
+;ld a,23+128
+;ei
+;out ($99),a
+
+;  call  HandleExplosionSprite
+  call  CheckSpaceToMoveMonster
+  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
+  call  CheckSwitchToNextMonster
+  call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
+
+;current monster (erase)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+  call  MoveMonster                     ;current active monster move
+  call  CheckWaitButtonPressed
+  call  CheckDefendButtonPressed
+  call  AnimateMonster                  ;set animation (idle, moving or attacking)
+
+;grid tile (erase)
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+
+  call  CheckWasCursorOnATilePreviousFrame
+  ld    a,(WasCursorOnATilePreviousFrame?)
+  or    a
+  jr    z,.EndEraseGridTile
+
+  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+
+  .EndEraseGridTile:
+
+  call  MoveMonster                     ;grid tile move
+  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
+
+;current monster (put)
+  call  SetCurrentActiveMOnsterInIX
+  call  SetAmountUnderMonster
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+
+;grid tile (put)
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    nz,.EndPutGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndPutGridTile
+    
+  call  CheckIsCursorOnATileThisFrame
+  call  SetcursorWhenGridTileIsActive
+
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndPutGridTile
+    
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+  .EndPutGridTile:
+
+;current monster (recover damaged background)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+
+;grid tile (recover damaged background)
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    nz,.EndRecoverGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndRecoverGridTile
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndRecoverGridTile
+
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+  .EndRecoverGridTile:
+  ret
+
+CheckWaitButtonPressed:
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  ret   z
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterStatus)
+  cp    MonsterStatusWaiting
+  ret   z                               ;can't wait if monster has already waited this turn
+
+  ld    (ix+MonsterStatus),MonsterStatusWaiting
+
+  xor   a
+  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MonsterMovementPathPointer),a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+
+  ld    a,1
+  ld    (SwitchToNextMonster?),a
+  ret
+
+CheckDefendButtonPressed:
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   6,a                             ;check ontrols to see if f1 is pressed 
+  ret   z
+
+;  call  SetCurrentActiveMOnsterInIX
+;  ld    a,(ix+MonsterStatus)
+;  cp    MonsterStatusWaiting
+;  ret   z                               ;can't wait if monster has already waited this turn
+
+  ld    (ix+MonsterStatus),MonsterStatusDefending
+
+  xor   a
+  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MonsterMovementPathPointer),a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+
+  ld    a,1
+  ld    (SwitchToNextMonster?),a
+  ret
+
 ;############################# Code needs to be in $4000-$7fff ################################
 
 
@@ -56,7 +273,8 @@ SetAllMonstersInMonsterTable:
   ld    b,(iy+MonsterTableSpriteSheetBlock)
   ld    c,(iy+MonsterTableNX)
   ld    d,(iy+MonsterTableNY)
-
+  ld    e,(iy+MonsterTableHp)
+  ld    (ix+MonsterHP),e
 
 
   ld    l,(iy+0)
@@ -142,10 +360,10 @@ SetAllMonstersInMonsterTable:
   ld    (iy+MonsterYPrevious),a
   
   ld    de,5
-  add   ix,de
+  add   ix,de                           ;lenght of 1 monster in ListOfMonstersToPut
   
   ld    de,LenghtMonsterTable
-  add   iy,de
+  add   iy,de                           ;next monster
   
   pop   bc
   inc   b
@@ -309,7 +527,7 @@ MoveMonster:
   add   hl,de
   ld    a,(hl)
   cp    255                           ;255 = end movement
-  jp    z,.End
+  jp    z,.EndMovement
   cp    254                           ;254 = handle attacked monster
   jp    z,.HandleAttackedMonster
   cp    128                           ;bit 7 on=change NX (after having checked for end movement)
@@ -468,7 +686,75 @@ MoveMonster:
   jp    .HandleMovement
 
   .HandleAttackedMonster:
+  
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle  
+  ld    d,0
+  ld    e,(iy+MonsterTableAttack)       ;attacking monster damage per unit
+  push  de
+  call  SetCurrentActiveMOnsterInIX
+  pop   de
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ;Now we have total damage in HL
+
+  ;an attacked monster loses life with this formula:
+  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
+  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+  
+;  call  ApplyDamageModifiers
+
+  ld    de,0
+  ex    de,hl
+  or    a
+  sbc   hl,de                           ;negative total damage
+  push  hl
+
   ld    ix,(MonsterThatIsBeingAttacked)
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    c,(iy+MonsterTableHp)           ;total hp of a unit of this type
+
+  pop   hl                              ;negative total damage
+
+  ld    ix,(MonsterThatIsBeingAttacked)
+  .loop:
+  ld    d,0
+  ld    e,(ix+MonsterHP)
+  add   hl,de
+  jr    c,.NoUnitsOrExactly1UnitLost
+
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  dec   de                              ;reduce the amount by 1
+  ld    (ix+MonsterAmount),e
+  ld    (ix+MonsterAmount+1),d
+  ld    a,d
+  or    e
+
+  jr    z,.MonsterDied
+  ld    (ix+MonsterHP),c                ;total hp of a unit of this type
+  jp    .loop
+
+  .NoUnitsOrExactly1UnitLost:
+  ld    (ix+MonsterHP),l
+  ld    a,l
+  or    a
+  jr    nz,.EndMovement
+
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  dec   de                              ;reduce the amount by 1
+  ld    (ix+MonsterAmount),e
+  ld    (ix+MonsterAmount+1),d
+  ld    a,d
+  or    e
+
+  jr    z,.MonsterDied
+  ld    (ix+MonsterHP),c                ;total hp of a unit of this type
+  jr    .EndMovement
+  
+  .MonsterDied:
   ld    (ix+MonsterHP),000            ;this declares monster is completely dead
   ld    a,3
   ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
@@ -476,9 +762,12 @@ MoveMonster:
   ld    (ExplosionSpriteStep),a  
   ld    a,1
   ld    (MonsterDied?),a
-  jr    .End
+  jr    .EndMovement
 
-  .End:
+  .EndMovement:
+  call  SetCurrentActiveMOnsterInIX
+  ld    (ix+MonsterStatus),MonsterStatusTurnEnded
+  
   xor   a
   ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
   ld    (MonsterMovementPathPointer),a
@@ -612,78 +901,6 @@ MoveGridPointer:
 
 ;############################# Code needs to be in $4000-$7fff ################################
 
-InitiateBattle:
-call screenon
-  call  SetFontPage0Y212                ;set font at (0,212) page 0
-  call  BuildUpBattleFieldAndPutMonsters
-  call  SortMonstersOnTheirSpeed
-
-  .engine:
-;  ld    a,(activepage)
-;  call  Backdrop.in
-  ld    a,(framecounter)
-  inc   a
-  ld    (framecounter),a
-
-  call  SwapAndSetPage                  ;swap and set page
-  call  PopulateControls                ;read out keys
-  call  HandleMonsters
-  
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-;  ld    a,(Controls)
-;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-;  ret   nz
-
-  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
-  call  DoCopy
-
-  ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  call  nz,.SetPage2
-  ld    a,(NewPrContr)
-  bit   6,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  call  nz,.SetPage3
-
-  ld    a,01                ;we can store the previous vblankintflag time and cp the current with that value
-  ld    hl,vblankintflag    ;this way we speed up the engine when not scrolling
-  .checkflag:
-  cp    (hl)
-  jr    nc,.checkflag
-  ld    (hl),0
-  halt
-  jp  .engine
-
-.SetPage2:
-  ld    a,2*32+31
-  di
-  out   ($99),a
-  ld    a,2+128
-  ei
-  out   ($99),a
-  call  PopulateControls                ;read out keys
-
-  ld    a,(NewPrContr)
-  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
-  jr    .SetPage2
-
-.SetPage3:
-  ld    a,3*32+31
-  di
-  out   ($99),a
-  ld    a,2+128
-  ei
-  out   ($99),a
-  call  PopulateControls                ;read out keys
-
-  ld    a,(NewPrContr)
-  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz  
-  jr    .SetPage3
 
 SetFontPage0Y212:                       ;set font at (0,212) page 0
   ld    hl,$4000 + (000*128) + (000/2) - 128
@@ -1042,91 +1259,6 @@ CheckMonsterDied:
 	ld    (ix+MonsterY),212
 	ld    (ix+MonsterYPrevious),212
   ret  
-
-HandleMonsters:
-;ld a,8 ; 20 is the max
-;di
-;out ($99),a
-;ld a,23+128
-;ei
-;out ($99),a
-
-;  call  HandleExplosionSprite
-  call  CheckSpaceToMoveMonster
-  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
-  call  CheckSwitchToNextMonster
-  call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
-
-;current monster (erase)
-  call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-  call  MoveMonster                     ;current active monster move
-  call  AnimateMonster                  ;set animation (idle, moving or attacking)
-
-;grid tile (erase)
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-
-  call  CheckWasCursorOnATilePreviousFrame
-  ld    a,(WasCursorOnATilePreviousFrame?)
-  or    a
-  jr    z,.EndEraseGridTile
-
-  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-
-  .EndEraseGridTile:
-
-  call  MoveMonster                     ;grid tile move
-  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-
-;current monster (put)
-  call  SetCurrentActiveMOnsterInIX
-  call  SetAmountUnderMonster
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  PutMonster                      ;put monster in inactive page
-
-;grid tile (put)
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  or    a
-  jr    nz,.EndPutGridTile
-  ld    a,(SwitchToNextMonster?)
-  or    a
-  jr    nz,.EndPutGridTile
-    
-  call  CheckIsCursorOnATileThisFrame
-  call  SetcursorWhenGridTileIsActive
-
-  ld    a,(IsCursorOnATileThisFrame?)
-  or    a
-  jr    z,.EndPutGridTile
-    
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  PutMonster                      ;put monster in inactive page
-  .EndPutGridTile:
-
-;current monster (recover damaged background)
-  call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  Recover
-
-;grid tile (recover damaged background)
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  or    a
-  jr    nz,.EndRecoverGridTile
-  ld    a,(SwitchToNextMonster?)
-  or    a
-  jr    nz,.EndRecoverGridTile
-  ld    a,(IsCursorOnATileThisFrame?)
-  or    a
-  jr    z,.EndRecoverGridTile
-
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  Recover
-  .EndRecoverGridTile:
-  ret
 
 SetAmountUnderMonster:
 ;	ld		a,(activepage)
@@ -1771,22 +1903,10 @@ CheckSwitchToNextMonster:
   call  docopy
 
   .GoToNextActiveMonster:
-  ;go to next monster
-  ld    a,(CurrentActiveMonster)
-  inc   a
-  cp    TotalAmountOfMonstersOnBattleField
-  jr    nz,.NotZero
-  ld    a,1
-  .NotZero:
-  ld    (CurrentActiveMonster),a
+  call  FindNextActiveMonster
 
-  ld    a,1
-  ld    (SetMonsterInBattleFieldGrid?),a
-  call  SetCurrentActiveMOnsterInIX
 
-  ld    a,(ix+MonsterHP)
-  or    a
-  jr    z,.GoToNextActiveMonster
+
 
   ;erase this monster from inactive page (copy from page 3 to inactive page)
   ;then recover other monsters that we also erased from inactive page
@@ -1833,6 +1953,112 @@ CheckSwitchToNextMonster:
   ld    a,2
 	ld    (EraseMonster+sPage),a  	
   ret
+  
+FindNextActiveMonster:
+  call  SortMonstersOnTheirSpeed
+
+;search through the list MonstersSortedOnSpeed for the next enabled
+;monster
+
+  ld    ix,MonstersSortedOnSpeed.LastMonster
+  ld    b,TotalAmountOfMonstersOnBattleField - 1 
+
+  .LoopUp:
+  ld    l,(ix)
+  ld    h,(ix+1)
+  
+  push  hl
+  pop   iy                              ;start with last monster in table, since this is the monster with the highest speed
+  ld    a,(iy+MonsterHP)
+  or    a
+  jr    z,.FindNext
+  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+  or    a
+  jr    z,.MonsterFound
+
+  .FindNext:
+  dec   ix
+  dec   ix
+  djnz  .LoopUp
+
+  ;phase 2, no enabled monster found, lets go back down the list to find a monster which is waiting
+  inc   ix
+  inc   ix
+  ld    b,TotalAmountOfMonstersOnBattleField - 1 
+
+  .LoopDown:
+  ld    l,(ix)
+  ld    h,(ix+1)
+  
+  push  hl
+  pop   iy                              ;start with last monster in table, since this is the monster with the highest speed
+  ld    a,(iy+MonsterHP)
+  or    a
+  jr    z,.FindNext2
+  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+  dec   a
+  jr    z,.MonsterFound
+
+  .FindNext2:
+  inc   ix
+  inc   ix
+  djnz  .LoopDown
+
+  ;No enabled or waiting monsters found, so let's go next turn !
+  ;Set all monsters enabled
+  ld    a,MonsterStatusEnabled
+  ld    (Monster1+MonsterStatus),a
+  ld    (Monster2+MonsterStatus),a
+  ld    (Monster3+MonsterStatus),a
+  ld    (Monster4+MonsterStatus),a
+  ld    (Monster5+MonsterStatus),a
+  ld    (Monster6+MonsterStatus),a
+  ld    (Monster7+MonsterStatus),a
+  ld    (Monster8+MonsterStatus),a
+  ld    (Monster9+MonsterStatus),a
+  ld    (Monster10+MonsterStatus),a
+  ld    (Monster11+MonsterStatus),a
+  ld    (Monster12+MonsterStatus),a
+  jp    FindNextActiveMonster
+
+  .MonsterFound:
+  ;we have found our monster in iy, e.g. "Monster4", now translate this to a number from 1-12
+  push  iy
+  pop   de                              ;monster in de
+  
+  ld    hl,Monster1 | call CompareHLwithDE | ld  a,01 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster2 | call CompareHLwithDE | ld  a,02 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster3 | call CompareHLwithDE | ld  a,03 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster4 | call CompareHLwithDE | ld  a,04 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster5 | call CompareHLwithDE | ld  a,05 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster6 | call CompareHLwithDE | ld  a,06 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster7 | call CompareHLwithDE | ld  a,07 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster8 | call CompareHLwithDE | ld  a,08 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster9 | call CompareHLwithDE | ld  a,09 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster10 | call CompareHLwithDE | ld  a,10 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster11 | call CompareHLwithDE | ld  a,11 | jr z,.CurrentActiveMonsterFound
+  ld    hl,Monster12 | call CompareHLwithDE | ld  a,12 | jr z,.CurrentActiveMonsterFound
+
+  .CurrentActiveMonsterFound:
+
+  ;go to next monster
+;  ld    a,(CurrentActiveMonster)
+;  inc   a
+;  cp    TotalAmountOfMonstersOnBattleField
+;  jr    nz,.NotZero
+;  ld    a,1
+;  .NotZero:
+  ld    (CurrentActiveMonster),a
+
+  ld    a,1
+  ld    (SetMonsterInBattleFieldGrid?),a
+  call  SetCurrentActiveMOnsterInIX
+
+;  ld    a,(ix+MonsterHP)
+;  or    a
+;  jr    z,.GoToNextActiveMonster
+  ret
+  
   
 RecoverOverwrittenMonstersHard:
   exx
