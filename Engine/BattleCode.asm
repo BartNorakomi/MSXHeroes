@@ -3798,6 +3798,8 @@ RangedHeroCheck:
   call  .Check
   ;/Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
   ld    iy,(MonsterThatIsBeingAttacked)
+  xor   a
+  ld    (MayRangedAttackBeRetaliated?),a ;a ranged attack in melee range, may be retaliated
   jr    .Check
 
   .LeftPlayerIsActive:
@@ -3816,7 +3818,6 @@ RangedHeroCheck:
   call  .Check
   ;/Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
   ld    iy,(MonsterThatIsBeingAttacked)
-
   xor   a
   ld    (MayRangedAttackBeRetaliated?),a ;a ranged attack in melee range, may be retaliated
 
