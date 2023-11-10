@@ -250,10 +250,14 @@ MonsterThatIsBeingAttackedNY:  ds  1
 
 
 ;MonsterFacingRightWhileAttacking?:  db  1
+ActiveMonsterAttackingDirection: ds  1
 IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
+ShootProjectile?: db  0
+IsThereAnyEnemyRightNextToActiveMonster?: db  0
+MayRangedAttackBeRetaliated?: ds  1
 SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
@@ -272,7 +276,8 @@ BattleFieldGrid: ;0C15Ch
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
 
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
-  
+
+;BattleFieldGridForDistanceCalculation:
 ;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
 ;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
 ;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
@@ -356,6 +361,7 @@ MonsterAttackingRight?: db  0
 MonsterAnimationSpeed: db  0
 MonsterAnimationStep: db  0
 AttackMonster?: db  0
+HandleRetaliation?: db  0
 MonsterDied?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
@@ -402,7 +408,7 @@ Monster0:
 .nxprevious:  db 16
 .amount:  dw 10
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster1:
@@ -419,7 +425,7 @@ Monster1:
 .nxprevious:  ds 1
 .amount:  ds 2
 .hp:      ds  1
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster2:
 .y: ds 1
@@ -435,7 +441,7 @@ Monster2:
 .nxprevious:  ds 1
 .amount:  ds 2
 .hp:      ds  1
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster3:
 .y: db  056 + (03*16) - 16  - 8
@@ -451,7 +457,7 @@ Monster3:
 .nxprevious:  db 16
 .amount:  dw 677
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster4:
 .y: db  056 + (00*16) - 32
@@ -467,7 +473,7 @@ Monster4:
 .nxprevious:  db 16
 .amount:  dw 823
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster5:
 .y: db  056 + (08*16) - 16  - 4
@@ -483,7 +489,7 @@ Monster5:
 .nxprevious:  db 16
 .amount:  dw 999
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster6:
 .y: db  056 + (01*16) - 64  - 4
@@ -499,7 +505,7 @@ Monster6:
 .nxprevious:  db 64
 .amount:  dw 47
 .hp:      db 01
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; player 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -517,7 +523,7 @@ Monster7:
 .nxprevious:  db 56
 .amount:  dw 2
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster8:
 .y: db  056 + (02*16) - 32    
@@ -533,7 +539,7 @@ Monster8:
 .nxprevious:  db 16
 .amount:  dw 980
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster9:
 .y: db  056 + (06*16) - 32
@@ -549,7 +555,7 @@ Monster9:
 .nxprevious:  db 16
 .amount:  dw 555
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster10:
 .y: db  056 + (07*16) - 16  - 8
@@ -565,7 +571,7 @@ Monster10:
 .nxprevious:  db 16
 .amount:  dw 333
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster11:
 .y: db  056 + (08*16) - 16  - 4
@@ -581,7 +587,7 @@ Monster11:
 .nxprevious:  db 16
 .amount:  dw 823
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster12:
 .y: db  056 + (07*16) - 16  - 4
@@ -597,7 +603,7 @@ Monster12:
 .nxprevious:  db 16
 .amount:  dw 900
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
@@ -615,7 +621,7 @@ Monster13:
 .nxprevious:  db 56
 .amount:  dw 10
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 Monster14:
 .y: db  040
@@ -631,7 +637,7 @@ Monster14:
 .nxprevious:  db 40
 .amount:  dw 10
 .hp:      db 10
-.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended
+.status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0

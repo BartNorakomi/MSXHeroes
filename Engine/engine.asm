@@ -3520,6 +3520,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   or    a
   call  nz,HandleExplosionSprite
+
+  ld    a,(ShootProjectile?)
+  or    a
+  call  nz,HandleProjectileSprite
   
   .SelfModifyingCodeSpriteCharacterBattle:  Equ $+1
   ld    hl,CursorHand
@@ -4075,6 +4079,8 @@ CursorHand:             equ SpriteCharCursorSprites + (11 * 32*3)
 CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
 CursorEnterCastle:      equ SpriteCharCursorSprites + (13 * 32*3)
 CursorProhibitionSign:  equ SpriteProhibitionSignChar
+CursorBowAndArrow:      equ SpriteBowAndArrowChar
+CursorBrokenArrow:      equ SpriteBowAndArrowChar + (01 * 32*3)
 
 CursorSwordLeftUp:      equ SpriteCharSword8DirectionsSprites + (00 * 32*3)
 CursorSwordLeftDown:    equ SpriteCharSword8DirectionsSprites + (01 * 32*3)
@@ -4108,6 +4114,8 @@ SpriteProhibitionSignColor:
 	include "../sprites/ProhibitionSign.tcs.gen"
 SpriteCharSword8DirectionsSprites:
 	include "../sprites/Swords8Directions.tgs.gen"
+SpriteBowAndArrowChar:
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/BowAndArrow.spr",0,32*3 * 03
 
 
 

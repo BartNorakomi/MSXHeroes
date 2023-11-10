@@ -84,6 +84,7 @@ HandleMonsters:
 ;ei
 ;out ($99),a
 
+;  call  HandleProjectileSprite
 ;  call  HandleExplosionSprite
   call  CheckSpaceToMoveMonster
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
@@ -173,11 +174,15 @@ CheckWaitButtonPressed:
   ret   z
 
   call  SetCurrentActiveMOnsterInIX
-  ld    a,(ix+MonsterStatus)
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %0111 1111
   cp    MonsterStatusWaiting
   ret   z                               ;can't wait if monster has already waited this turn
 
-  ld    (ix+MonsterStatus),MonsterStatusWaiting
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %1000 000
+  or    a,MonsterStatusWaiting
+  ld    (ix+MonsterStatus),a
 
   xor   a
   ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
@@ -203,7 +208,10 @@ CheckDefendButtonPressed:
 ;  cp    MonsterStatusWaiting
 ;  ret   z                               ;can't wait if monster has already waited this turn
 
-  ld    (ix+MonsterStatus),MonsterStatusDefending
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %1000 000
+  or    a,MonsterStatusDefending
+  ld    (ix+MonsterStatus),a
 
   xor   a
   ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
@@ -220,7 +228,7 @@ CheckDefendButtonPressed:
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
-  db  001 | dw 400 | db 012 + (15*08), 056 + (00*16)
+  db  001 | dw 100 | db 012 + (15*08), 056 + (00*16)
   db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
@@ -494,6 +502,10 @@ AnimateMonster:
 DisplaceLeft: equ 21
 DisplaceRight: equ 22
 ShowBeingHitSprite: equ 23
+ShootProjectile: equ 24
+InitiateAttack: equ 254
+EndMovement: equ 255
+WaitImpactProjectile: equ 25
 MoveMonster:
   ld    a,(ix+MonsterY)
   ld    (ix+MonsterYPrevious),a
@@ -526,9 +538,9 @@ MoveMonster:
   ld    hl,MonsterMovementPath
   add   hl,de
   ld    a,(hl)
-  cp    255                           ;255 = end movement
+  cp    EndMovement                   ;255 = end movement
   jp    z,.EndMovement
-  cp    254                           ;254 = handle attacked monster
+  cp    InitiateAttack                ;254 = handle attacked monster
   jp    z,.HandleAttackedMonster
   cp    128                           ;bit 7 on=change NX (after having checked for end movement)
   jp    nc,.ChangeNX
@@ -552,6 +564,10 @@ MoveMonster:
   jp    z,.DisplaceRight
   cp    ShowBeingHitSprite              ;cp 23
   jp    z,.ShowBeingHitSprite
+  cp    ShootProjectile                 ;cp 24
+  jp    z,.ShootProjectile
+  cp    WaitImpactProjectile            ;cp 25
+  jp    z,.WaitImpactProjectile
 
   call  .Move
 
@@ -602,6 +618,24 @@ MoveMonster:
   ld    (MonsterMovementPathPointer),a
   jp    .HandleMovement
 
+  .ShootProjectile:
+  ld    a,1
+  ld    (ShootProjectile?),a
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .WaitImpactProjectile:
+  ld    a,(ShootProjectile?)
+  or    a
+  ret   nz
+  ld    a,1
+  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  xor   a
+  ld    (ExplosionSpriteStep),a
+  jp    .HandleAttackedMonster
+  
   .AnimateAttack:
   inc   hl
   ld    e,(hl)
@@ -616,6 +650,7 @@ MoveMonster:
   jp    .HandleMovement
 
   .InitiateAttackRight:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+4)
@@ -624,6 +659,7 @@ MoveMonster:
   jp    .InitiateAttack
 
   .InitiateAttackLeft:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+6)
@@ -632,6 +668,7 @@ MoveMonster:
   jp    .InitiateAttack
 
   .InitiateAttackLeftUp:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+08)
@@ -640,6 +677,7 @@ MoveMonster:
   jp    .InitiateAttack
 
   .InitiateAttackLeftDown:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+10)
@@ -648,6 +686,7 @@ MoveMonster:
   jp    .InitiateAttack
 
   .InitiateAttackRightUp:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+12)
@@ -656,6 +695,7 @@ MoveMonster:
   jp    .InitiateAttack
 
   .InitiateAttackRightDown:
+  ld    (ActiveMonsterAttackingDirection),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    l,(iy+14)
@@ -740,7 +780,7 @@ MoveMonster:
   ld    (ix+MonsterHP),l
   ld    a,l
   or    a
-  jr    nz,.EndMovement
+  jr    nz,.CheckRetaliate
 
   ld    e,(ix+MonsterAmount)
   ld    d,(ix+MonsterAmount+1)
@@ -752,12 +792,49 @@ MoveMonster:
 
   jr    z,.MonsterDied
   ld    (ix+MonsterHP),c                ;total hp of a unit of this type
-  jr    .EndMovement
+;  jr    .CheckRetaliate
   
+  .CheckRetaliate:                      ;at this point monster is hit, but didn't die, check if monster can retaliate
+
+  call  SetAmountUnderMonsterIn3Pages
+
+  ld    a,(HandleRetaliation?)          ;check if current attack already is a retaliation
+  or    a                               ;in which case we don't need to retaliate again, otherwise endless loop
+  jr    z,.Go
+  xor   a
+  ld    (HandleRetaliation?),a
+  jr    .EndSetStatusOnEndMovement
+  .Go:
+
+
+
+  ;no retaliation for ranged attacking monsters
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedHero
+  jp    nz,.EndCheckRangedHero
+  ld    a,(MayRangedAttackBeRetaliated?)
+  or    a
+  jp    z,.EndMovement
+  .EndCheckRangedHero:
+
+
+
+
+
+  ld    ix,(MonsterThatIsBeingAttacked)
+  bit   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
+  jr    nz,.EndMovement
+  set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
+  ld    a,1
+  ld    (HandleRetaliation?),a
+  jr    .EndMovement
+    
   .MonsterDied:
-  ld    (ix+MonsterHP),000            ;this declares monster is completely dead
+  ld    (ix+MonsterHP),000              ;this declares monster is completely dead
   ld    a,3
-  ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  ld    (ShowExplosionSprite?),a        ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   xor   a
   ld    (ExplosionSpriteStep),a  
   ld    a,1
@@ -766,10 +843,15 @@ MoveMonster:
 
   .EndMovement:
   call  SetCurrentActiveMOnsterInIX
-  ld    (ix+MonsterStatus),MonsterStatusTurnEnded
   
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %1000 000
+  or    a,MonsterStatusTurnEnded
+  ld    (ix+MonsterStatus),a
+  .EndSetStatusOnEndMovement:
+
   xor   a
-  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
   ld    (MonsterMovementPathPointer),a
   ld    (MonsterAnimationSpeed),a
   ld    (MonsterAnimationStep),a
@@ -1320,6 +1402,263 @@ SetAmountUnderMonster:
   call  docopy  
   ret
 
+SetAmountUnderMonsterIn3Pages:
+;to do: when amount goes from 3 digits to 2 digits, 3d digit isnt erased
+;to do: when amount goes from 2 digits to 1 digit, 2d digit isnt erased
+;to do: when a huge monster is blocking the number, we should proceed the hard way
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  SetAmountUnderMonster
+
+	ld		a,(activepage)
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy  
+  
+	ld		a,2
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy  
+  ret
+
+HandleProjectileSprite:
+;  ld    a,(ShootProjectile?)          ;1=initiate, 2=handle projectile
+  dec   a
+  jr    nz,.HandleProjectile
+    
+  ;initiate
+  ld    a,2
+  ld    (ShootProjectile?),a          ;1=initiate, 2=handle projectile
+  
+  ;set starting coordinates
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterY)
+  add   a,(ix+MonsterNY)
+  sub   a,16
+  ld    (spat+4*16),a
+  ld    (spat+4*17),a
+  ld    (spat+4*18),a
+
+  ld    a,(ix+MonsterNX)
+  sub   a,16
+  srl   a
+  add   a,(ix+MonsterX)
+  ld    (spat+4*16+1),a
+  ld    (spat+4*17+1),a
+  ld    (spat+4*18+1),a  
+;  ret
+
+  .HandleProjectile:
+  ld    a,(spat+4*16+1)
+  ld    e,a                           ;x1
+  ld    a,(spat+4*16)
+  ld    d,a                           ;y1
+
+  ld    a,(MonsterThatIsBeingAttackedX)
+  ld    b,a
+  ld    a,(MonsterThatIsBeingAttackedNX)
+  sub   a,16
+	srl		a				                      ;/2
+  add   a,b                           ;explosion x
+  ld    l,a                           ;x2
+
+  ld    a,(MonsterThatIsBeingAttackedY)
+  ld    b,a
+  ld    a,(MonsterThatIsBeingAttackedNY)
+  add   a,b
+  sub   a,16
+  ld    h,a                           ;y2
+
+  ;check if endpoint is reached
+  ld    a,d                           ;y1
+  cp    h                             ;y2
+  jr    nz,.EndCheckEndPointReached
+  ld    a,e                           ;x1
+  cp    l                             ;x2
+  jp    z,.EndProjectile
+  .EndCheckEndPointReached:
+
+
+  ;(x1(e), y1(d)) are in DE, (x2(l), y2(h)) are in HL
+  ld    a,h
+  sub   a,d                           ;y2-y1
+  jr    nc,.notcarry1
+  neg
+  .notcarry1:
+  ld    c,a                           ;c is change in y-coordinate
+  
+  ld    a,l
+  sub   a,e                           ;x2-x1
+  jr    nc,.notcarry2
+  neg
+  .notcarry2:
+  ld    b,a                           ;b is change in x-coordinate
+
+  ; Check if the line is more horizontal or vertical
+  cp    c
+  jr    c,.MoreVertical
+
+  .MoreHorizontal:
+  ;we move more horizontal than vertical. 
+  ;if b/c=1 its Movex 2x, Movey 2y
+  ;if b/c=2 its Movex 3x, Movey 2y
+  ;if b/c=3 its Movex 3x, Movey 1y
+  ;if b/c=4 its Movex 4x, Movey 1y
+
+  push  bc
+  push  de
+  ld    e,b
+  call  Div8                          ;In: Divide E by divider C,  Out: A = result, B = rest
+  pop   de
+  pop   bc
+  cp    2
+  jr    c,.Move2x2y
+  cp    3
+  jr    c,.Move3x2y
+  cp    4
+  jr    c,.Move3x1y
+  cp    5
+  jr    c,.Move4x1y
+
+  .Move4x1y:  
+  call  .MoveX
+  call  .MoveX
+  call  .MoveX
+  call  .MoveX
+  call  .MoveY
+  jp    .SetCoordinates
+
+  .Move3x1y:  
+  call  .MoveX
+  call  .MoveX
+  call  .MoveX
+  call  .MoveY
+  jp    .SetCoordinates
+
+  .Move3x2y:  
+  call  .MoveX
+  call  .MoveX
+  call  .MoveX
+  call  .MoveY
+  call  .MoveY
+  jp    .SetCoordinates
+
+  .Move2x2y:  
+  call  .MoveX
+  call  .MoveX
+  call  .MoveY
+  call  .MoveY
+  jp    .SetCoordinates
+
+  .MoreVertical:
+  ;we move more vertical than horizontal. 
+  ;if c/b=1 its Movey 2x, Movex 2y
+  ;if c/b=2 its Movey 3x, Movex 2y
+  ;if c/b=3 its Movey 3x, Movex 1y
+  ;if c/b=4 its Movey 4x, Movex 1y
+
+  push  bc
+  push  de
+  ld    e,c
+  ld    c,b
+  call  Div8                          ;In: Divide E by divider C,  Out: A = result, B = rest
+  pop   de
+  pop   bc
+  cp    2
+  jr    c,.Move2y2x
+  cp    3
+  jr    c,.Move3y2x
+  cp    4
+  jr    c,.Move3y1x
+  cp    5
+  jr    c,.Move4y1x
+
+  .Move4y1x:  
+  call  .MoveY
+  call  .MoveY
+  call  .MoveY
+  call  .MoveY
+  call  .MoveX
+  jr    .SetCoordinates
+
+  .Move3y1x:  
+  call  .MoveY
+  call  .MoveY
+  call  .MoveY
+  call  .MoveX
+  jr    .SetCoordinates
+
+  .Move3y2x:  
+  call  .MoveY
+  call  .MoveY
+  call  .MoveY
+  call  .MoveX
+  call  .MoveX
+  jr    .SetCoordinates
+
+  .Move2y2x:  
+  call  .MoveY
+  call  .MoveY
+  call  .MoveX
+  call  .MoveX
+  jr    .SetCoordinates
+
+  .SetCoordinates:
+  ld    a,e                           ;x1
+  ld    (spat+4*16+1),a
+  ld    (spat+4*17+1),a
+  ld    (spat+4*18+1),a
+  ld    a,d                           ;y1
+  ld    (spat+4*16),a
+  ld    (spat+4*17),a
+  ld    (spat+4*18),a
+
+	xor		a				;page 0/1
+	ld		hl,sprcharaddr+(16*32)	;sprite 16 character table in VRAM
+	call	SetVdp_Write
+
+  ld    hl,SpriteCharBeingHit + 0*96
+	ld		c,$98
+	call	outix96			;write sprite character of explosion
+
+	xor		a				;page 0/1
+	ld		hl,sprcoladdr+(16*16)	;sprite 3 color table in VRAM
+	call	SetVdp_Write
+
+  ld    hl,SpriteColorBeingHit
+	ld		c,$98
+	call	outix48			;write sprite color of pointer and hand to vram
+  ret
+
+  .MoveY:
+  ld    a,d                           ;y1
+  cp    h                             ;y2
+  ret   z
+  inc   d
+  ret   c
+  dec   d
+  dec   d
+  ret
+
+  .MoveX:
+  ld    a,e                           ;x1
+  cp    l                             ;x2
+  ret   z
+  inc   e
+  ret   c
+  dec   e
+  dec   e
+  ret
+
+.EndProjectile:
+  ld    a,213                         ;explosion y
+  ld    (spat+4*16),a
+  ld    (spat+4*17),a
+  ld    (spat+4*18),a
+
+  xor   a
+  ld    (ShootProjectile?),a  
+  ret  
+  
 SpriteCharExplosion:
 	include "../sprites/explosions.tgs.gen"
 SpriteColorExplosion:
@@ -1331,9 +1670,9 @@ SpriteColorBeingHit:
   ds 16,colorred| ds 16,colorsnowishwhite+64 | ds 16,colorwhite+64
 
 HandleExplosionSprite:
-  ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
-  or    a
-  ret   z
+;  ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+;  or    a
+;  ret   z
   dec   a
   jp    z,BeingHitSprite
 
@@ -1656,7 +1995,7 @@ CheckSpaceToMoveMonster:
   ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
   ld    de,CursorBoots
   call  CompareHLwithDE
-  ld    c,255                           ;255=end movement (dont attack at end of movement)
+  ld    c,EndMovement                  ;255=end movement (dont attack at end of movement)
   jp    z,.BootsFoundSetMovementPath
 
   ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
@@ -1688,7 +2027,42 @@ CheckSpaceToMoveMonster:
   ld    de,CursorSwordRightDown
   call  CompareHLwithDE
   jp    z,.SwordRightDownFoundSetMovementPath   
+
+  ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
+  ld    de,CursorBowAndArrow
+  call  CompareHLwithDE
+  jp    z,.BowAndArrowFoundSetMovementPath
+
+  ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
+  ld    de,CursorBrokenArrow
+  call  CompareHLwithDE
+  jp    z,.BrokenArrowFoundSetMovementPath
   ret
+
+  .BowAndArrowFoundSetMovementPath:
+  .BrokenArrowFoundSetMovementPath:
+
+  ld    c,013                           ;initiate attack right
+  ld    a,1
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  xor   a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+  ld    iy,MonsterMovementPath
+  ld    (iy),c                          ;255=end movement(normal walk), 10=attack right, 
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
 
   .SwordLeftUpFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -1903,10 +2277,56 @@ CheckSwitchToNextMonster:
   call  docopy
 
   .GoToNextActiveMonster:
+  ld    a,(HandleRetaliation?)
+  or    a
+  jr    z,.EndHandleRetaliation
+
+  ld    iy,(MonsterThatIsBeingAttacked)
+  ld    (MonsterThatIsBeingAttacked),ix ;monster that was attacking previous frame, is not being attacked/retaliated
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+  
+  call  SetMonsterInIYAsActiveMonsterAndSetInIX
+
+  ld    a,1
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  xor   a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+
+  ld    a,(ActiveMonsterAttackingDirection)
+  cp    12                              ;right up
+  ld    c,16                            ;left down
+  jr    z,.SetCounterAttackdirection
+  cp    13                              ;right
+  ld    c,17                            ;left
+  jr    z,.SetCounterAttackdirection
+  cp    14                              ;right down
+  ld    c,18                            ;left up
+  jr    z,.SetCounterAttackdirection
+  cp    16                              ;left down
+  ld    c,12                            ;right up
+  jr    z,.SetCounterAttackdirection
+  cp    17                              ;left
+  ld    c,13                            ;right 
+  jr    z,.SetCounterAttackdirection
+  cp    18                              ;left up
+  ld    c,14                            ;right down
+  jr    z,.SetCounterAttackdirection
+
+  .SetCounterAttackdirection:
+  ld    iy,MonsterMovementPath
+  ld    (iy),c                          ;255=end movement(normal walk), 10=attack right, 
+  jr    .EndFindNextActiveMonster
+  .EndHandleRetaliation:
   call  FindNextActiveMonster
-
-
-
+  .EndFindNextActiveMonster:
 
   ;erase this monster from inactive page (copy from page 3 to inactive page)
   ;then recover other monsters that we also erased from inactive page
@@ -1972,8 +2392,8 @@ FindNextActiveMonster:
   ld    a,(iy+MonsterHP)
   or    a
   jr    z,.FindNext
-  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended
-  or    a
+  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %0111 1111                     ;check enabled
   jr    z,.MonsterFound
 
   .FindNext:
@@ -1995,8 +2415,9 @@ FindNextActiveMonster:
   ld    a,(iy+MonsterHP)
   or    a
   jr    z,.FindNext2
-  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended
-  dec   a
+  ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %0111 1111
+  cp    1                               ;check waiting
   jr    z,.MonsterFound
 
   .FindNext2:
@@ -2022,6 +2443,7 @@ FindNextActiveMonster:
   jp    FindNextActiveMonster
 
   .MonsterFound:
+  SetMonsterInIYAsActiveMonsterAndSetInIX:
   ;we have found our monster in iy, e.g. "Monster4", now translate this to a number from 1-12
   push  iy
   pop   de                              ;monster in de
@@ -2895,7 +3317,7 @@ SetcursorWhenGridTileIsActive:
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means current monster is standing there
   jr    z,.ProhibitionSign
-  cp    MovementLenghtMonsters          ;if tile pointer points at =>61, that means monster does not have enough movement points to move there
+  cp    MovementLenghtMonsters          ;if tile pointer points at =>x, that means monster does not have enough movement points to move there
   jr    nc,.ProhibitionSign
 
   ld    a,(ix+MonsterNX)
@@ -3085,6 +3507,13 @@ SetcursorWhenGridTileIsActive:
   ld    (MonsterThatIsBeingAttackedY),a
   ld    a,(ix+MonsterNY)
   ld    (MonsterThatIsBeingAttackedNY),a
+
+  ;At this pointer pointer is on an enemy, check if current monster is ranged
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedHero
+  jp    z,RangedHeroCheck
 
   ;At this pointer pointer is on an enemy, check if pointer is left, right, above or below monster
   ;are we on even or odd row?
@@ -3313,11 +3742,283 @@ SetcursorWhenGridTileIsActive:
   cp    MovementLenghtMonsters-1         ;if tile pointer points at =>6, that means monster does not have enough movement points to move there
   ret   c
   
+  .SetProhibitionSign:
   ld    hl,CursorProhibitionSign
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ld    hl,SpriteProhibitionSignColor
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
+
+
+
+
+
+
+
+
+RangedHeroCheck:
+  xor   a
+  ld    (IsThereAnyEnemyRightNextToActiveMonster?),a
+
+  ;check if enemy is out of range, if so -> broken arrow
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterY)
+  sub   056
+  add   (ix+MonsterNY)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  ld    e,a                             ;active monster y relative to battlefield
+
+  ld    a,(ix+MonsterX)
+  sub   a,12
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+  ld    d,a                             ;active monster x relative to battlefield
+
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  jr    nc,.LeftPlayerIsActive
+
+  .RightPlayerIsActive:
+  ;Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
+  ld    iy,Monster7
+  call  .Check
+  ld    iy,Monster8
+  call  .Check
+  ld    iy,Monster9
+  call  .Check
+  ld    iy,Monster10
+  call  .Check
+  ld    iy,Monster11
+  call  .Check
+  ld    iy,Monster12
+  call  .Check
+  ;/Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
+  ld    iy,(MonsterThatIsBeingAttacked)
+  jr    .Check
+
+  .LeftPlayerIsActive:
+  ;Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
+  ld    iy,Monster1
+  call  .Check
+  ld    iy,Monster2
+  call  .Check
+  ld    iy,Monster3
+  call  .Check
+  ld    iy,Monster4
+  call  .Check
+  ld    iy,Monster5
+  call  .Check
+  ld    iy,Monster6
+  call  .Check
+  ;/Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
+  ld    iy,(MonsterThatIsBeingAttacked)
+
+  xor   a
+  ld    (MayRangedAttackBeRetaliated?),a ;a ranged attack in melee range, may be retaliated
+
+  .Check:
+  ld    a,(iy+MonsterY)
+  sub   056
+  add   (ix+MonsterNY)
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+	srl		a				                        ;/16
+  ld    l,a                             ;monster that gets attack y relative to battlefield
+
+  ld    a,(iy+MonsterX)
+  sub   a,12
+	srl		a				                        ;/2
+	srl		a				                        ;/4
+	srl		a				                        ;/8
+  ld    h,a                             ;monster that gets attack x relative to battlefield
+
+  ;we now have both coordinates x1(d),y1(e) and x2(h),y2(l)
+  ;we can now 'simply' move tile by tile until we reach out Monster0 tile
+  ;moving ONLY horizontally means we decrease/increase x by 2
+  ;moving both horizontally and vertically mean we decrease/increase x and y by 1
+  
+  ;so compare y2(l) with y1(e), if they are the same move only x1(d) by 2, otherwise move both x1(d) and y1(e) by 1
+
+  ;also we do two different comparisons:
+  ;1 compare right side of active monster with left side of checking monster
+  ;2 compare left side of active monster with right side of checking monster
+
+  ;1 compare right side of active monster with left side of checking monster
+  push  de
+  push  hl
+
+  ld    a,(ix+MonsterNX)
+  cp    17
+  jr    c,.RightSideActiveMonsterFound
+  inc   d
+  inc   d                               ;active monster x relative to battlefield
+  cp    33
+  jr    c,.RightSideActiveMonsterFound
+  inc   d
+  inc   d                               ;active monster x relative to battlefield
+  cp    57
+  jr    c,.RightSideActiveMonsterFound
+  inc   d
+  inc   d                               ;active monster x relative to battlefield
+  .RightSideActiveMonsterFound:
+
+  ld    b,0                             ;amount of tiles we moved to reach our destination
+  ld    c,0                             ;First check is in range?
+
+  .loop:
+  inc   b
+  
+  ld    a,e                             ;y1
+  cp    l                               ;y2
+  jr    z,.SameY_MoveOnlyX
+  inc   e                               ;y1 (active monster y relative to battlefield)
+  jr    c,.ymovedNowMoveX
+  dec   e
+  dec   e                               ;y1 (active monster y relative to battlefield)
+  .ymovedNowMoveX:
+  ld    a,d                             ;x1
+  cp    h                               ;x2
+  inc   d                               ;x1 (active monster x relative to battlefield)
+  jr    c,.loop  
+  dec   d
+  dec   d                               ;x1 (active monster x relative to battlefield)
+  jr    .loop
+
+  .SameY_MoveOnlyX:                     ;y coordinates are the same, now only move x (by steps of 2)
+  ld    a,d                             ;x1
+  cp    h                               ;x2
+  jr    z,.End                          ;coordinates are the same, we are done
+  inc   d
+  inc   d                               ;x1 (active monster x relative to battlefield)
+  jr    c,.loop  
+  dec   d
+  dec   d
+  dec   d
+  dec   d                               ;x1 (active monster x relative to battlefield)
+  jr    .loop
+  .End:
+
+  pop   hl
+  pop   de
+
+  ld    a,b
+  cp    2
+  jp    z,.EnemyIsRightNextToActiveMonsterSoBrokenArrow
+  
+  cp    6
+  jr    nc,.OutOfrange
+  ld    c,1                             ;First check is IN RANGE !
+  .OutOfrange:
+
+  ;2 compare left side of active monster with right side of checking monster
+  push  de
+
+  ld    a,(iy+MonsterNX)
+  cp    17
+  jr    c,.RightSideCheckingMonsterFound
+  inc   h
+  inc   h                               ;x2 (checking monster x relative to battlefield)
+  cp    33
+  jr    c,.RightSideCheckingMonsterFound
+  inc   h
+  inc   h                               ;x2 (checking monster x relative to battlefield)
+  cp    57
+  jr    c,.RightSideCheckingMonsterFound
+  inc   h
+  inc   h                               ;x2 (checking monster x relative to battlefield)
+  .RightSideCheckingMonsterFound:
+
+  ld    b,0                             ;amount of tiles we moved to reach our destination
+
+  .loop2:
+  inc   b
+  
+  ld    a,e                             ;y1
+  cp    l                               ;y2
+  jr    z,.SameY_MoveOnlyX2
+  inc   e                               ;y1 (active monster y relative to battlefield)
+  jr    c,.ymovedNowMoveX2
+  dec   e
+  dec   e                               ;y1 (active monster y relative to battlefield)
+  .ymovedNowMoveX2:
+  ld    a,d                             ;x1
+  cp    h                               ;x2
+  inc   d                               ;x1 (active monster x relative to battlefield)
+  jr    c,.loop2
+  dec   d
+  dec   d                               ;x1 (active monster x relative to battlefield)
+  jr    .loop2
+
+  .SameY_MoveOnlyX2:                    ;y coordinates are the same, now only move x (by steps of 2)
+  ld    a,d                             ;x1
+  cp    h                               ;x2
+  jr    z,.End2                         ;coordinates are the same, we are done
+  inc   d
+  inc   d                               ;x1 (active monster x relative to battlefield)
+  jr    c,.loop2
+  dec   d
+  dec   d
+  dec   d
+  dec   d                               ;x1 (active monster x relative to battlefield)
+  jr    .loop2
+  .End2:
+
+  pop   de
+
+  ld    a,b
+  cp    2
+  jp    z,.EnemyIsRightNextToActiveMonsterSoBrokenArrow
+    
+  ;if there is any enemy right next to active monster, we can not attack monsters out of melee range at all
+  ld    a,(IsThereAnyEnemyRightNextToActiveMonster?)
+  or    a
+  jp    nz,SetcursorWhenGridTileIsActive.SetProhibitionSign
+    
+  ld    a,b
+  cp    6
+  jr    c,.BowAndArrow                  ;in range!
+
+  bit   0,c                             ;First check is in range?
+  jr    nz,.BowAndArrow                 ;in range!
+
+  .BrokenArrow:                         ;at this point enemy is out of range
+  ld    hl,CursorBrokenArrow
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
+  .EnemyIsRightNextToActiveMonsterSoBrokenArrow:
+  ld    a,1
+  ld    (IsThereAnyEnemyRightNextToActiveMonster?),a
+  ld    (MayRangedAttackBeRetaliated?),a
+  jr    .BrokenArrow
+
+  .BowAndArrow:
+  ld    hl,CursorBowAndArrow
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

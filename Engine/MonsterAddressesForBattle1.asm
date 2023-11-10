@@ -10,6 +10,7 @@ MonsterTableAttack:           equ MonsterTableSpeed+1
 MonsterTableDefense:          equ MonsterTableAttack+1
 MonsterTableGrowth:           equ MonsterTableDefense+1
 MonsterTableSpecialAbility:   equ MonsterTableGrowth+1
+RangedHero:                   equ 128
 
 LengthMonsterAddressesTable: equ Monster002Table-Monster001Table
 Monster001Table:                        ;yie ar kung fu
@@ -27,12 +28,13 @@ Monster001Table:                        ;yie ar kung fu
   db    004                             ;cost (gold)
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
-  db    003                             ;hp
+  db    053                             ;hp
   db    011                             ;speed
-  db    005                             ;attack
+  db    001                             ;attack
   db    012                             ;defense
   db    012                             ;growth
-  db    000                             ;special ability
+;  db    000                             ;special ability
+  db    RangedHero                      ;special ability, 128=ranged hero
   
 Monster002Table:                        ;huge snake (golvellius)
   dw    Monster002Idle
@@ -168,27 +170,27 @@ Monster007Table:                        ;brown flyer (sd snatcher)
 
 ;######################################################################################
 GeneralMonsterAttackPatternRight:
-  db    LenghtGeneralMonsterAttackPatternRight,000,003,ShowBeingHitSprite,007,000,254
+  db    LenghtGeneralMonsterAttackPatternRight,000,003,ShowBeingHitSprite,007,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternRight: equ $-GeneralMonsterAttackPatternRight-1
 
 GeneralMonsterAttackPatternLeft:
-  db    LenghtGeneralMonsterAttackPatternLeft,000,007,ShowBeingHitSprite,003,000,254
+  db    LenghtGeneralMonsterAttackPatternLeft,000,007,ShowBeingHitSprite,003,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternLeft: equ $-GeneralMonsterAttackPatternLeft-1
 
 GeneralMonsterAttackPatternLeftUp:
-  db    LenghtGeneralMonsterAttackPatternLeftUp,000,008,ShowBeingHitSprite,004,000,254
+  db    LenghtGeneralMonsterAttackPatternLeftUp,000,008,ShowBeingHitSprite,004,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternLeftUp: equ $-GeneralMonsterAttackPatternLeftUp-1
 
 GeneralMonsterAttackPatternLeftDown:
-  db    LenghtGeneralMonsterAttackPatternLeftDown,000,006,ShowBeingHitSprite,002,000,254
+  db    LenghtGeneralMonsterAttackPatternLeftDown,000,006,ShowBeingHitSprite,002,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternLeftDown: equ $-GeneralMonsterAttackPatternLeftDown-1
 
 GeneralMonsterAttackPatternRightUp:
-  db    LenghtGeneralMonsterAttackPatternRightUp,000,002,ShowBeingHitSprite,006,000,254
+  db    LenghtGeneralMonsterAttackPatternRightUp,000,002,ShowBeingHitSprite,006,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternRightUp: equ $-GeneralMonsterAttackPatternRightUp-1
 
 GeneralMonsterAttackPatternRightDown:
-  db    LenghtGeneralMonsterAttackPatternRightDown,000,004,ShowBeingHitSprite,008,000,254
+  db    LenghtGeneralMonsterAttackPatternRightDown,000,004,ShowBeingHitSprite,008,000,InitiateAttack
 LenghtGeneralMonsterAttackPatternRightDown: equ $-GeneralMonsterAttackPatternRightDown-1
 ;######################################################################################
 ;yie ar kung fu  
@@ -220,23 +222,24 @@ Monster001Idle:
   dw    LIdle1Monster001
   dw    LIdle2Monster001
 Monster001AttackPatternRight:
-  db    LenghtMonster001AttackPatternRight,020 | dw RIdle1Monster001 | db 003,128+48,020 | dw Rattack1Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 007,254
+  db    LenghtMonster001AttackPatternRight,020 | dw RIdle1Monster001 | db 003,128+48,020 | dw Rattack1Monster001 | db 000,ShootProjectile,000,128+32,020 | dw RIdle2Monster001 | db 007,WaitImpactProjectile
+;  db    LenghtMonster001AttackPatternRight,020 | dw RIdle1Monster001 | db 003,128+48,020 | dw Rattack1Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 007,InitiateAttack
 LenghtMonster001AttackPatternRight: equ $-Monster001AttackPatternRight-1
 Monster001AttackPatternRightUp:
-  db    LenghtMonster001AttackPatternRightUp,020 | dw RIdle1Monster001 | db 008,128+48,020 | dw Rattack1Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 004,254
+  db    LenghtMonster001AttackPatternRightUp,020 | dw RIdle1Monster001 | db 008,128+48,020 | dw Rattack1Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 004,InitiateAttack
 LenghtMonster001AttackPatternRightUp: equ $-Monster001AttackPatternRightUp-1
 Monster001AttackPatternRightDown:
-  db    LenghtMonster001AttackPatternRightDown,020 | dw RIdle1Monster001 | db 006,128+48,020 | dw Rattack2Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 002,254
+  db    LenghtMonster001AttackPatternRightDown,020 | dw RIdle1Monster001 | db 006,128+48,020 | dw Rattack2Monster001 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster001 | db 002,InitiateAttack
 LenghtMonster001AttackPatternRightDown: equ $-Monster001AttackPatternRightDown-1
 
 Monster001AttackPatternLeft:
-  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster001 | db 000,007,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,003,000,254
+  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster001 | db 000,007,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,003,000,InitiateAttack
 LenghtMonster001AttackPatternLeft: equ $-Monster001AttackPatternLeft-1
 Monster001AttackPatternLeftUp:
-  db    LenghtMonster001AttackPatternLeftUp,020 | dw LIdle1Monster001 | db 000,002,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,006,000,254
+  db    LenghtMonster001AttackPatternLeftUp,020 | dw LIdle1Monster001 | db 000,002,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,006,000,InitiateAttack
 LenghtMonster001AttackPatternLeftUp: equ $-Monster001AttackPatternLeftUp-1
 Monster001AttackPatternLeftDown:
-  db    LenghtMonster001AttackPatternLeftDown,020 | dw LIdle1Monster001 | db 000,004,128+48,020 | dw Lattack2Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,008,000,254
+  db    LenghtMonster001AttackPatternLeftDown,020 | dw LIdle1Monster001 | db 000,004,128+48,020 | dw Lattack2Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,008,000,InitiateAttack
 LenghtMonster001AttackPatternLeftDown: equ $-Monster001AttackPatternLeftDown-1
 ;######################################################################################
 ;huge snake (golvellius)
