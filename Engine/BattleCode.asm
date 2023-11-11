@@ -2041,8 +2041,14 @@ CheckSpaceToMoveMonster:
 
   .BowAndArrowFoundSetMovementPath:
   .BrokenArrowFoundSetMovementPath:
-
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterX)
+  ld    iy,(MonsterThatIsBeingAttacked)
+  cp    (iy+MonsterX)
   ld    c,013                           ;initiate attack right
+  jr    c,.DirectionFound
+  ld    c,017                           ;initiate attack left
+  .DirectionFound:
   ld    a,1
   ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
   xor   a

@@ -233,7 +233,8 @@ Monster001AttackPatternRightDown:
 LenghtMonster001AttackPatternRightDown: equ $-Monster001AttackPatternRightDown-1
 
 Monster001AttackPatternLeft:
-  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster001 | db 000,007,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,003,000,InitiateAttack
+  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster001 | db 000,007,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShootProjectile,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,003,000,WaitImpactProjectile
+;  db    LenghtMonster001AttackPatternLeft,020 | dw LIdle1Monster001 | db 000,007,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,003,000,InitiateAttack
 LenghtMonster001AttackPatternLeft: equ $-Monster001AttackPatternLeft-1
 Monster001AttackPatternLeftUp:
   db    LenghtMonster001AttackPatternLeftUp,020 | dw LIdle1Monster001 | db 000,002,128+48,020 | dw Lattack1Monster001 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster001 | db DisplaceRight,006,000,InitiateAttack
