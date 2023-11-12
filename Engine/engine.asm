@@ -1655,6 +1655,7 @@ CheckHeroCollidesWithEnemyHero:
 LastHeroForPlayerThatGetsAttacked: ds  2
 PlayerThatGetsAttacked: ds  1
 HeroThatGetsAttacked: ds  2
+HeroThatAttacks: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
 CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a button, but button should remain lit

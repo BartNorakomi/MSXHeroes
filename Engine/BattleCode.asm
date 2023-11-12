@@ -1,5 +1,11 @@
 InitiateBattle:
 call screenon
+
+  ld    hl,pl1hero1y
+  ld    (HeroThatAttacks),hl       ;y hero that gets attacked
+  ld    hl,pl2hero1y
+  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
+
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
 
@@ -43,6 +49,18 @@ call screenon
   ld    (hl),0
   halt
   jp  .engine
+
+
+
+
+;;;;####################################;;;;;;;
+  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
+;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
+;  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
+  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
+;;;;####################################;;;;;;;
+
 
 
   
@@ -204,6 +222,9 @@ CheckRightClickToDisplayInfo:
   call  .CheckMonster
   ld    ix,Monster12
   call  .CheckMonster
+
+  call  CheckPointerOnAttackingHero
+  call  CheckPointerOnDefendingHero
   ret
 
   .CheckMonster:
@@ -260,14 +281,8 @@ CheckRightClickToDisplayInfo:
 
   pop   af
   pop   af
-
   
   ld    de,$0000 + (000*128) + (000/2) - 128
-
-
-
-
-
 
 	ld		a,(spat+1)			                ;x cursor
   sub   32
@@ -322,7 +337,6 @@ CheckRightClickToDisplayInfo:
   ld    hl,10/2 + (26*128)               
   add   hl,de  
   push  hl
-
 
   ld    hl,$4000 + (000*128) + (162/2) - 128
   ld    bc,$0000 + (061*256) + (086/2)
@@ -445,6 +459,223 @@ CheckRightClickToDisplayInfo:
                 dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
                 dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
                 dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
+
+
+
+
+
+
+
+
+
+CheckPointerOnDefendingHero:
+  ld    a,(spat)
+  cp    38
+  ret   nc
+  cp    06
+  ret   c
+  ld    a,(spat+1)
+  cp    236
+  ret   c
+
+  ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
+  ld    a,l
+  or    h
+  ret   z
+
+  ld    hl,$4000 + (060*128) + (162/2) - 128
+  ld    de,$0000 + (040*128) + ((18+134)/2) - 128
+  ld    bc,$0000 + (062*256) + (086/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;left hero
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + ((040+021)*128) + ((018+10+134)/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set attack
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    h,0
+  ld    l,(ix+HeroStatAttack)
+  ld    b,060+134                           ;dx
+  ld    c,060                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set defense
+  ld    h,0
+  ld    l,(ix+HeroStatDefense)
+  ld    b,060+134                           ;dx
+  ld    c,069                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set mana
+  ld    l,(ix+HeroMana)
+  ld    h,(ix+HeroMana+1)
+  ld    b,060+134                           ;dx
+  ld    c,078                           ;dy  
+  call  SetNumber16BitCastle
+ 
+  ;set "/"
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+  ld    hl,CheckPointerOnAttackingHero.TextSlash
+  call  SetText
+
+  ;set total mana
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+  ld    l,(ix+HeroTotalMana)
+  ld    h,(ix+HeroTotalMana+1)
+  call  SetNumber16BitCastle
+
+  ;set spell damage
+  ld    h,0
+  ld    l,(ix+HeroStatSpellDamage)
+  ld    b,060+134                           ;dx
+  ld    c,088                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set name
+  ld    b,064+134                           ;dx
+  ld    c,047                           ;dy
+
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  jp    WaitKeyPressToGoBackToGame
+
+CheckPointerOnAttackingHero:
+  ld    a,(spat)
+  cp    38
+  ret   nc
+  cp    06
+  ret   c
+  ld    a,(spat+1)
+  cp    10
+  ret   nc
+
+  ld    hl,$4000 + (060*128) + (162/2) - 128
+  ld    de,$0000 + (040*128) + (018/2) - 128
+  ld    bc,$0000 + (062*256) + (086/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;left hero
+  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + ((040+021)*128) + ((018+10)/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set attack
+  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    h,0
+  ld    l,(ix+HeroStatAttack)
+  ld    b,060                           ;dx
+  ld    c,060                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set defense
+  ld    h,0
+  ld    l,(ix+HeroStatDefense)
+  ld    b,060                           ;dx
+  ld    c,069                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set mana
+  ld    l,(ix+HeroMana)
+  ld    h,(ix+HeroMana+1)
+  ld    b,060                           ;dx
+  ld    c,078                           ;dy  
+  call  SetNumber16BitCastle
+ 
+  ;set "/"
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+  ld    hl,.TextSlash
+  call  SetText
+
+  ;set total mana
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+  ld    l,(ix+HeroTotalMana)
+  ld    h,(ix+HeroTotalMana+1)
+  call  SetNumber16BitCastle
+
+  ;set spell damage
+  ld    h,0
+  ld    l,(ix+HeroStatSpellDamage)
+  ld    b,060                           ;dx
+  ld    c,088                           ;dy  
+  call  SetNumber16BitCastle
+
+  ;set name
+  ld    b,064                           ;dx
+  ld    c,047                           ;dy
+
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  .CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  jp    WaitKeyPressToGoBackToGame
+
+  .TextSlash: db "/",255
+  .CenterHeroNameHasGainedALevel:
+  ld    d,0                             ;amount of letters of hero name
+  push  hl
+  .loop:
+  ld    a,(hl)
+  cp    255
+  jr    z,.EndNameFound
+  inc   d
+  inc   hl
+  dec   b
+  dec   b
+  jr    .loop
+  .EndNameFound:
+  pop   hl
+  ret
+
+
+
+
+
+
+
+
+
 
 WaitKeyPressToGoBackToGame:
   ld    hl,CursorHand
@@ -1421,11 +1652,13 @@ BuildUpBattleFieldAndPutMonsters:
 	ld		(activepage),a			            ;page 0
   call  SetBattleFieldSnowGraphics      ;set battle field in page 1 ram->vram
   call  .SetRocks
+  call  .SetHeroes
   ld    hl,.CopyPage1To2
   call  DoCopy                          ;copy battle field to page 2 vram->vram
   call  SwapAndSetPage                  ;swap and set page 1
   call  SetBattleFieldSnowGraphics      ;set battle field in page 0 ram->vram
   call  .SetRocks
+  call  .SetHeroes
   ld    hl,.CopyPage1To3
   call  DoCopy                          ;copy battle field to page 3 vram->vram
   call  SetAllMonstersInMonsterTable    ;set all monsters in the tables in enginepage3
@@ -1437,6 +1670,123 @@ BuildUpBattleFieldAndPutMonsters:
   ld    (CurrentActiveMonster),a
   call  CheckSwitchToNextMonster.GoToNextActiveMonster
   ret
+
+  .SetHeroes:
+  ;left hero
+  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+
+  .XLeftHero: equ 0
+  .YLeftHero: equ 12
+
+  exx
+  ld    de,256*(.YLeftHero) + (.XLeftHero)
+  exx
+  sbc   hl,bc
+  ld    de,$0000 + (.YLeftHero*128) + (.XLeftHero/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
+  call  .CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;right hero
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+
+  push  ix                              ;000=no hero
+  pop   hl
+  ld    a,l
+  or    h
+  ret   z
+
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+
+
+  .XRightHero: equ 256-16
+  .YRightHero: equ 12
+
+  exx
+  ld    de,256*(.YRightHero) + (.XRightHero)
+  exx
+  sbc   hl,bc
+  ld    de,$0000 + (.YRightHero*128) + (.XRightHero/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
+  jp    .CopyTransparantImage          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
+
+
+
+
+
+
+;  Example of input:
+;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
+;  exx
+;  ld    hl,$4000 + (114*128) + (200/2) - 128  ;y,x
+;  ld    de,$0000 + ((042+YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
+;  ld    bc,$0000 + (017*256) + (018/2)        ;ny,nx
+;  ld    a,ButtonsBuildBlock      ;font graphics block
+.CopyTransparantImage:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  push  af
+  ld    a,b
+  ld    (CopyCastleButton2+ny),a
+  ld    a,c
+  add   a,a
+  ld    (CopyCastleButton2+nx),a
+  pop   af
+
+  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  exx
+  ld    a,d
+  ld    (CopyCastleButton2+dy),a
+  ld    a,e
+  ld    (CopyCastleButton2+dx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   .CopyAllMonstersToPage1and2:
   ld    hl,.CopyMonstersFromPage0to1
@@ -4389,39 +4739,12 @@ EraseMonsterPreviousFrame:
   call  docopy
   ret
 
-
-  
-;Battle Screen Map (25x8)
-;O.O.O.O.O.O.O.O.O.O.O.O.O
-;.O.O.O.O.O.O.O.O.O.O.O.O.
-;O.O.O.O.O.O.O.O.O.O.O.O.O
-;.O.O.O.O.O.O.O.O.O.O.O.O.
-;O.O.O.O.O.O.O.O.O.O.O.O.O
-;.O.O.O.O.O.O.O.O.O.O.O.O.
-;O.O.O.O.O.O.O.O.O.O.O.O.O
-;.O.O.O.O.O.O.O.O.O.O.O.O.
-
 SetBattleFieldSnowGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,BattleFieldSnowBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-
-
-
-
-
-
-
-  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
-;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
-  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
-;  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
-
-
 
 HeroFled:
   ld    (ix+HeroStatus),254             ;254 = hero fled
