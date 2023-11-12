@@ -86,6 +86,7 @@ HandleMonsters:
 
 ;  call  HandleProjectileSprite
 ;  call  HandleExplosionSprite
+  call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
   call  CheckSpaceToMoveMonster
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
   call  CheckSwitchToNextMonster
@@ -163,6 +164,330 @@ HandleMonsters:
   call  Recover
   .EndRecoverGridTile:
   ret
+
+CheckRightClickToDisplayInfo:
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  ret   z
+
+  ;CAN BE REMOVED LATER, USED NOW SO WE DONT OVERLAP 'M' WITH DEFEND
+  and   %1101 1111
+  ld    (NewPrContr),a
+  ;/CAN BE REMOVED LATER, USED NOW SO WE DONT OVERLAP 'M' WITH DEFEND
+
+
+  ld    ix,Monster1
+  call  .CheckMonster
+  ld    ix,Monster2
+  call  .CheckMonster
+  ld    ix,Monster3
+  call  .CheckMonster
+  ld    ix,Monster4
+  call  .CheckMonster
+  ld    ix,Monster5
+  call  .CheckMonster
+  ld    ix,Monster6
+  call  .CheckMonster
+  ld    ix,Monster7
+  call  .CheckMonster
+  ld    ix,Monster8
+  call  .CheckMonster
+  ld    ix,Monster9
+  call  .CheckMonster
+  ld    ix,Monster10
+  call  .CheckMonster
+  ld    ix,Monster11
+  call  .CheckMonster
+  ld    ix,Monster12
+  call  .CheckMonster
+  ret
+
+  .CheckMonster:
+  call  .Check1TileMonsterStandsOn  
+  ;if monster is at least 16 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,16
+  call  .Check
+
+  ;if monster is at least 32 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,32
+  call  .Check
+
+  ;if monster is at least 48 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,48
+  call  .Check
+  ret
+  .Check1TileMonsterStandsOn:  
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+
+  .Check:
+  cp    c
+  ret   nz
+
+  ld    a,(ix+MonsterY)
+  ld    c,a
+  ld    a,(ix+MonsterNY)
+  add   a,c
+  ld    c,a
+
+  ld    a,(Monster0+MonsterY)
+  add   a,017
+  cp    c
+  ret   nz
+
+  pop   af
+  pop   af
+
+  
+  ld    de,$0000 + (000*128) + (000/2) - 128
+
+
+
+
+
+
+	ld		a,(spat+1)			                ;x cursor
+  sub   32
+  jr    nc,.NotCarryX
+  xor   a
+  .NotCarryX:
+  cp    126
+  jr    c,.NoOverFlowRight
+  ld    a,126
+  .NoOverFlowRight:
+
+  push  af                              ;store x window
+
+	srl		a				                        ;/2
+  ld    h,0
+  ld    l,a
+  add   hl,de
+  ex    de,hl
+  
+	ld		a,(spat+0)			                ;y cursor
+	ld    b,-50
+	cp    70
+	jr    nc,.CursorTopOfScreen
+	ld    b,32
+	.CursorTopOfScreen:
+	add   a,b
+	
+	
+  sub   a,24
+  jr    nc,.NotCarryY
+  xor   a
+  .NotCarryY:
+  cp    119
+  jr    c,.NoOverFlowBottom
+  ld    a,119
+  .NoOverFlowBottom:
+
+  push  af                              ;store y window
+
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
+  add   hl,de
+  ex    de,hl
+
+  ld    hl,10/2 + (26*128)               
+  add   hl,de  
+  push  hl
+
+
+  ld    hl,$4000 + (000*128) + (162/2) - 128
+  ld    bc,$0000 + (061*256) + (086/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    a,(ix+MonsterNumber)
+  call  .SetSYSX
+  pop   de
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  ;set hp
+  pop   af                              ;y window
+  add   a,47
+  ld    c,a                             ;dy
+  pop   af                              ;x window
+  add   a,41
+  ld    b,a                             ;dx
+  push  bc
+
+  ld    h,0
+  ld    l,(ix+MonsterHP)
+  call  SetNumber16BitCastle
+
+  ;set "/"
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+
+  ld    hl,.TextSlash
+  call  SetText
+
+  call  SetMonsterTableInIY
+
+  ;set total hp
+  ld    a,(PutLetter+dy)                ;dx of letter we just put
+  ld    c,a                             ;dy
+  ld    a,(PutLetter+dx)                ;dx of letter we just put
+  ld    b,a                             ;dx
+
+  ld    h,0
+  ld    l,(iy+MonsterTableHp)
+  call  SetNumber16BitCastle
+
+  ;set speed
+  pop   bc
+  ld    a,c                             ;dy
+  sub   a,9
+  ld    c,a                             ;dy
+  push  bc
+
+  ld    hl,0
+  ld    l,(iy+MonsterTableSpeed)
+  call  SetNumber16BitCastle
+
+  ;set defense
+  pop   bc
+  ld    a,c                             ;dy
+  sub   a,10
+  ld    c,a                             ;dy
+  push  bc
+
+  ld    hl,0
+  ld    l,(iy+MonsterTableDefense)
+  call  SetNumber16BitCastle
+
+  ;set attack
+  pop   bc
+  ld    a,c                             ;dy
+  sub   a,9
+  ld    c,a                             ;dy
+  push  bc
+
+  ld    hl,0
+  ld    l,(iy+MonsterTableAttack)
+  call  SetNumber16BitCastle
+
+  ;set name
+  pop   bc
+  ld    a,c                             ;dy
+  sub   a,13
+  ld    c,a                             ;dy
+
+  ld    a,b                             ;dx
+  sub   a,20
+  ld    b,a                             ;dx
+  
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  call  SetText
+
+  jp    WaitKeyPressToGoBackToGame
+
+  .TextSlash: db "/",255
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,.Creatures14x14SYSXTable
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  push  bc
+  pop   hl
+
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ret
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+.Creatures14x14SYSXTable:  
+                dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
+                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
+                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
+                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
+                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
+                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
+                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
+
+WaitKeyPressToGoBackToGame:
+  ld    hl,CursorHand
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+  call  SwapAndSetPage                  ;swap and set page 1
+  .loop:
+  call  PopulateControls                ;read out keys
+  
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed
+  jr    nz,.End
+  ld    a,(NewPrContr)
+  bit   4,a                             ;check ontrols to see if space is pressed
+  jr    z,.loop
+
+  .End:
+  xor   a
+  ld    (NewPrContr),a
+
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    hl,.RestorePage0
+  jp    z,docopy
+  ld    hl,.RestorePage1
+  jp    docopy
+
+.RestorePage0:
+	db		000,000,000,001
+	db		000,000,000,000
+	db		000,001,191,000
+	db		000,000,$d0	
+.RestorePage1:
+	db		000,000,000,000
+	db		000,000,000,001
+	db		000,001,191,000
+	db		000,000,$d0	
 
 CheckWaitButtonPressed:
 ; bit	7	6	  5		    4		    3		    2		  1		  0

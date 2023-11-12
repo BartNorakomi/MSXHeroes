@@ -10,6 +10,7 @@ MonsterTableAttack:           equ MonsterTableSpeed+1
 MonsterTableDefense:          equ MonsterTableAttack+1
 MonsterTableGrowth:           equ MonsterTableDefense+1
 MonsterTableSpecialAbility:   equ MonsterTableGrowth+1
+MonsterTableName:             equ MonsterTableSpecialAbility+1
 RangedHero:                   equ 128
 
 LengthMonsterAddressesTable: equ Monster002Table-Monster001Table
@@ -35,6 +36,7 @@ Monster001Table:                        ;yie ar kung fu
   db    012                             ;growth
 ;  db    000                             ;special ability
   db    RangedHero                      ;special ability, 128=ranged hero
+  db    "Yie Ar Kung",255
   
 Monster002Table:                        ;huge snake (golvellius)
   dw    Monster002Idle
@@ -57,6 +59,7 @@ Monster002Table:                        ;huge snake (golvellius)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Huge Snake",255," "
   
 Monster003Table:                        ;big spider (sd snatcher)
   dw    Monster003Idle
@@ -79,6 +82,7 @@ Monster003Table:                        ;big spider (sd snatcher)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Big Spider",255," "
 
 Monster004Table:                        ;green flyer (sd snatcher)
   dw    Monster004Idle
@@ -101,6 +105,7 @@ Monster004Table:                        ;green flyer (sd snatcher)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Green Flyer",255
 
 Monster005Table:                        ;tiny spider (sd snatcher)
   dw    Monster005Idle
@@ -123,6 +128,7 @@ Monster005Table:                        ;tiny spider (sd snatcher)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Tiny Spider",255
 
 Monster006Table:                        ;huge boo (golvellius)
   dw    Monster006Idle
@@ -145,6 +151,7 @@ Monster006Table:                        ;huge boo (golvellius)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Boo",255,"        "
 
 Monster007Table:                        ;brown flyer (sd snatcher)
   dw    Monster007Idle
@@ -167,6 +174,7 @@ Monster007Table:                        ;brown flyer (sd snatcher)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
+  db    "Brown Flyer",255
 
 ;######################################################################################
 GeneralMonsterAttackPatternRight:
