@@ -2,12 +2,16 @@ InitiateBattle:
 call screenon
 
   ld    hl,pl1hero1y
+  
+  ld    hl,(plxcurrentheroAddress)
   ld    (HeroThatAttacks),hl       ;y hero that gets attacked
   ld    hl,pl2hero1y
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
 
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
+
+  call  SetBattleButtons
 
   .engine:
 ;  ld    a,(activepage)
@@ -19,6 +23,16 @@ call screenon
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
   call  HandleMonsters
+  call  CheckVictoryOrDefeat            ;if one side has lost their entire army, battle ends
+
+  ;battle buttons
+  ld    ix,GenericButtonTable
+  call  .CheckButtonMouseInteractionGenericButtons
+  call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  .SetGenericButtons              ;copies button state from rom -> vram
+  ;/battle buttons
   
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
@@ -26,23 +40,23 @@ call screenon
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
 ;  ld    a,(Controls)
-;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  bit   5,a                            ;check ontrols to see if m is pressed (M to exit castle overview)
 ;  ret   nz
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  DoCopy
 
 ;  ld    a,(NewPrContr)
-;  bit   5,a                             ;check ontrols to see if m is pressed 
+;  bit   5,a                            ;check ontrols to see if m is pressed 
 ;  call  nz,.SetPage2
 
 
 ;  ld    a,(NewPrContr)
-;  bit   6,a                             ;check ontrols to see if f1 is pressed 
+;  bit   6,a                            ;check ontrols to see if f1 is pressed 
 ;  call  nz,.SetPage3
-
-  ld    a,01                ;we can store the previous vblankintflag time and cp the current with that value
-  ld    hl,vblankintflag    ;this way we speed up the engine when not scrolling
+  
+  ld    a,01                            ;we can store the previous vblankintflag time and cp the current with that value
+  ld    hl,vblankintflag                ;this way we speed up the engine when not scrolling
   .checkflag:
   cp    (hl)
   jr    nc,.checkflag
@@ -50,16 +64,247 @@ call screenon
   halt
   jp  .engine
 
+.CheckBattleButtonClicked:               ;in: carry=button clicked, b=button number
+  ret   nc
+
+  ld    a,b
+  cp    7
+  jr    z,.DiskOptionsButtonPressed
+  cp    6
+  jr    z,.RetreatButtonPressed
+  cp    5
+  jr    z,.SurrenderButtonPressed
+  cp    4
+  jr    z,.DefendButtonPressed
+  cp    3
+  jr    z,.SpellBookButtonPressed
+  cp    2
+  jr    z,.WaitButtonPressed
+  cp    1
+  jr    z,.AutoCombatButtonPressed
+  
+.AutoCombatButtonPressed:
+  ret
+
+.WaitButtonPressed:
+  ld    a,1
+  ld    (WaitButtonPressed?),a
+  ret
+
+.SpellBookButtonPressed:
+  ret
+
+.DefendButtonPressed:
+  ld    a,1
+  ld    (DefendButtonPressed?),a
+  ret
+
+.SurrenderButtonPressed:
+  ret
+
+.RetreatButtonPressed:
+  ret
+
+.DiskOptionsButtonPressed:
+  ret
 
 
 
-;;;;####################################;;;;;;;
-  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
-;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
-  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
-;  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
-;;;;####################################;;;;;;;
+
+
+
+
+
+.SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    a,(ix+GenericButtonGfxBlock)
+  ld    (ButtonGfxBlockCopy),a
+
+  ld    b,(ix+GenericButtonAmountOfButtons)
+  .loop:
+  push  bc
+  call  .Setbutton
+  pop   bc
+  ld    de,GenericButtonTableLenghtPerButton
+  add   ix,de
+
+  djnz  .loop
+  ret
+
+  .Setbutton:
+  bit   7,(ix+GenericButtonStatus)
+  ret   z                               ;check on/off bit
+
+  bit   0,(ix+GenericButtonStatus)        ;bit 0 and bit 1 represent the 2 frames in which we copy the button
+  res   0,(ix+GenericButtonStatus)  
+  jr    nz,.goCopyButton
+  bit   1,(ix+GenericButtonStatus)
+  res   1,(ix+GenericButtonStatus)
+  ret   z  
+  .goCopyButton:
+
+  ld    l,(ix+GenericButton_SYSX_Ontouched)
+  ld    h,(ix+GenericButton_SYSX_Ontouched+1)
+  bit   6,(ix+GenericButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+GenericButton_SYSX_MovedOver)
+  ld    h,(ix+GenericButton_SYSX_MovedOver+1)
+  bit   5,(ix+GenericButtonStatus)
+  jr    nz,.go                          ;(bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+
+  ld    l,(ix+GenericButton_SYSX_Clicked)
+  ld    h,(ix+GenericButton_SYSX_Clicked+1)
+  .go:
+
+  ;put button 
+  ld    e,(ix+GenericButton_DYDX)
+  ld    d,(ix+GenericButton_DYDX+1)
+
+  ld    a,(ix+GenericButtonYbottom)
+  sub   a,(ix+GenericButtonYtop)
+  ld    b,a                             ;ny
+  ld    a,(ix+GenericButtonXright)
+  sub   a,(ix+GenericButtonXleft)
+  srl   a                               ;/2
+  ld    c,a                             ;nx / 2
+;  ld    bc,$0000 + (016*256) + (016/2)        ;ny,nx
+
+  ld    a,(ButtonGfxBlockCopy)
+
+
+
+;  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  .CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
+;  halt
+
+
+  ret
+
+.CopyTransparantButtons:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  ld    a,(ix+GenericButtonXleft)
+  ld    (CopyCastleButton2+dx),a
+  ld    a,(ix+GenericButtonYtop)
+  ld    (CopyCastleButton2+dy),a
+
+  ld    a,(ix+GenericButtonYbottom)
+  sub   a,(ix+GenericButtonYtop)
+  ld    (CopyCastleButton2+ny),a
+
+  ld    a,(ix+GenericButtonXright)
+  sub   a,(ix+GenericButtonXleft)
+  ld    (CopyCastleButton2+nx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+;  halt
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+  ret
+
+.CheckButtonMouseInteractionGenericButtons:
+  ld    b,(ix+GenericButtonAmountOfButtons)
+  ld    de,GenericButtonTableLenghtPerButton
+
+  .loop2:
+  call  .check
+  add   ix,de
+  djnz  .loop2
+  ret
+  
+  .check:
+  bit   7,(ix+GenericButtonStatus)        ;check if button is on/off
+  ret   z                               ;don't handle button if this button is off
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+GenericButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+  
+  cp    (ix+GenericButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+GenericButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  ld    (ix+GenericButtonStatus),%1010 0011
+  ret
+
+  .MouseOverButtonAndSpacePressed:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+GenericButtonStatus),%1001 0011
+  ret
+
+  .NotOverButton:
+  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+GenericButtonStatus),%1100 0011
+  ret
+
+  .MenuOptionSelected:
+  pop   af                                ;no need to check the other buttons
+  ld    (ix+GenericButtonStatus),%1010 0011
+  scf                                     ;button has been clicked
+
+
+  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    (MenuOptionSelected?),a
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -92,6 +337,64 @@ call screenon
   bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz  
   jr    .SetPage3
+
+SetBattleButtons:
+  ld    hl,BattleButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ldir
+  ret
+
+BattleButton1Ytop:           equ 193
+BattleButton1YBottom:        equ BattleButton1Ytop + 018
+BattleButton1XLeft:          equ 002
+BattleButton1XRight:         equ BattleButton1XLeft + 018
+
+BattleButton2Ytop:           equ 193
+BattleButton2YBottom:        equ BattleButton2Ytop + 018
+BattleButton2XLeft:          equ 020
+BattleButton2XRight:         equ BattleButton2XLeft + 018
+
+BattleButton3Ytop:           equ 193
+BattleButton3YBottom:        equ BattleButton3Ytop + 018
+BattleButton3XLeft:          equ 038
+BattleButton3XRight:         equ BattleButton3XLeft + 018
+
+BattleButton4Ytop:           equ 193
+BattleButton4YBottom:        equ BattleButton4Ytop + 018
+BattleButton4XLeft:          equ 180
+BattleButton4XRight:         equ BattleButton4XLeft + 018
+
+BattleButton5Ytop:           equ 193
+BattleButton5YBottom:        equ BattleButton5Ytop + 018
+BattleButton5XLeft:          equ 198
+BattleButton5XRight:         equ BattleButton5XLeft + 018
+
+BattleButton6Ytop:           equ 193
+BattleButton6YBottom:        equ BattleButton6Ytop + 018
+BattleButton6XLeft:          equ 218
+BattleButton6XRight:         equ BattleButton6XLeft + 018
+
+BattleButton7Ytop:           equ 193
+BattleButton7YBottom:        equ BattleButton7Ytop + 018
+BattleButton7XLeft:          equ 236
+BattleButton7XRight:         equ BattleButton7XLeft + 018
+
+BattleButtonTableGfxBlock:  db  LevelUpBlock
+BattleButtonTableAmountOfButtons:  db  7
+BattleButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (000*128) + (178/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db BattleButton1Ytop,BattleButton1YBottom,BattleButton1XLeft,BattleButton1XRight | dw $0000 + (BattleButton1Ytop*128) + (BattleButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (214/2) - 128 | dw $4000 + (000*128) + (232/2) - 128 | dw $4000 + (018*128) + (160/2) - 128 | db BattleButton2Ytop,BattleButton2YBottom,BattleButton2XLeft,BattleButton2XRight | dw $0000 + (BattleButton2Ytop*128) + (BattleButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (018*128) + (178/2) - 128 | dw $4000 + (018*128) + (196/2) - 128 | dw $4000 + (018*128) + (214/2) - 128 | db BattleButton3Ytop,BattleButton3YBottom,BattleButton3XLeft,BattleButton3XRight | dw $0000 + (BattleButton3Ytop*128) + (BattleButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (018*128) + (232/2) - 128 | dw $4000 + (036*128) + (160/2) - 128 | dw $4000 + (036*128) + (178/2) - 128 | db BattleButton4Ytop,BattleButton4YBottom,BattleButton4XLeft,BattleButton4XRight | dw $0000 + (BattleButton4Ytop*128) + (BattleButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton5Ytop,BattleButton5YBottom,BattleButton5XLeft,BattleButton5XRight | dw $0000 + (BattleButton5Ytop*128) + (BattleButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (054*128) + (160/2) - 128 | dw $4000 + (054*128) + (178/2) - 128 | dw $4000 + (054*128) + (196/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (054*128) + (214/2) - 128 | dw $4000 + (054*128) + (232/2) - 128 | dw $4000 + (072*128) + (160/2) - 128 | db BattleButton7Ytop,BattleButton7YBottom,BattleButton7XLeft,BattleButton7XRight | dw $0000 + (BattleButton7Ytop*128) + (BattleButton7XLeft/2) - 128
+
+
+
+
+
 
 
 HandleMonsters:
@@ -182,6 +485,245 @@ HandleMonsters:
   call  Recover
   .EndRecoverGridTile:
   ret
+
+CheckVictoryOrDefeat:
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz
+
+  call  .CheckLeftPlayerLostEntireArmy
+  call  .CheckRightPlayerLostEntireArmy
+  ret
+
+  .CheckLeftPlayerLostEntireArmy:
+  ld    a,(Monster1+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster2+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster3+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster4+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster5+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster6+MonsterHP)
+  or    a
+  ret   nz
+  ;left player has lost their entire army
+
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (002*128) + (024/2) - 128
+  ld    bc,$0000 + (207*256) + (210/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;left hero
+  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + ((040+021)*128) + ((018+10)/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set name
+  ld    b,064                           ;dx
+  ld    c,047                           ;dy
+
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  jp    WaitKeyPressToGoBackToGame
+
+
+
+
+
+
+
+
+
+
+  
+
+  .CheckRightPlayerLostEntireArmy:
+;  ld    a,(NewPrContr)
+;  bit   6,a                             ;check ontrols to see if f1 is pressed 
+;  ret   z
+  
+;  ld    ix,(plxcurrentheroAddress)
+;  dec   (ix+HeroX)
+  
+;  pop   de
+;  pop   de
+;  ret  
+  
+  
+  ld    a,(Monster7+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster8+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster9+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster10+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster11+MonsterHP)
+  or    a
+  ret   nz
+  ld    a,(Monster12+MonsterHP)
+  or    a
+  ret   nz
+  ;right player has lost their entire army
+
+
+  
+
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (002*128) + (024/2) - 128
+  ld    bc,$0000 + (207*256) + (210/2)
+  ld    a,VictoryBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;left hero
+  ld    ix,(HeroThatAttacks)            ;attacking hero
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + (011*128) + (032/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set name
+  ld    b,090                           ;dx
+  ld    c,013                           ;dy
+  ld    ix,(HeroThatAttacks)            ;attacking hero
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,121                           ;dx
+  ld    c,109                           ;dy
+  ld    ix,(HeroThatAttacks)            ;attacking hero
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ;right hero
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + (011*128) + (210/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set name
+  ld    b,166                           ;dx
+  ld    c,013                           ;dy
+  ld    ix,(HeroThatGetsAttacked)       ;attacking hero
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,112                           ;dx
+  ld    c,116                           ;dy
+  ld    hl,5490
+  call  SetNumber16BitCastle
+
+  call  SwapAndSetPage                  ;swap and set page 1
+  call  .CopyActivePageToInactivePage
+
+  .engine:
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+  ;battle buttons
+;  ld    ix,GenericButtonTable
+;  call  .CheckButtonMouseInteractionGenericButtons
+;  call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
+
+;  ld    ix,GenericButtonTable
+;  call  .SetGenericButtons              ;copies button state from rom -> vram
+  ;/battle buttons
+
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  jp    z,.engine  
+
+;;;;####################################;;;;;;;
+  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
+;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
+  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
+;  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
+;;;;####################################;;;;;;;
+  
+  pop   de
+  pop   de
+  ret
+
+
+
+
+
+
+  .CopyActivePageToInactivePage:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    hl,.CopyPage0toPage1
+  jp    z,docopy
+  ld    hl,.CopyPage1toPage0
+  jp    docopy
+
+.CopyPage1toPage0:
+	db		000,000,000,001
+	db		000,000,000,000
+	db		000,001,212,000
+	db		000,000,$d0	
+.CopyPage0toPage1:
+	db		000,000,000,000
+	db		000,000,000,001
+	db		000,001,212,000
+	db		000,000,$d0	
+
 
 CheckRightClickToDisplayInfo:
 ; bit	7	6	  5		    4		    3		    2		  1		  0
@@ -725,10 +1267,19 @@ CheckWaitButtonPressed:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed 
-  ret   z
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed 
+;  ret   z
 
+  ld    a,(WaitButtonPressed?)
+  dec   a
+  ret   m
+  ld    (WaitButtonPressed?),a
+
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz                              ;we cant wait when moving/attacking
+  
   call  SetCurrentActiveMOnsterInIX
   ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
   and   %0111 1111
@@ -755,14 +1306,18 @@ CheckDefendButtonPressed:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(NewPrContr)
-  bit   6,a                             ;check ontrols to see if f1 is pressed 
-  ret   z
+;  ld    a,(NewPrContr)
+;  bit   6,a                             ;check ontrols to see if f1 is pressed 
+;  ret   z
 
-;  call  SetCurrentActiveMOnsterInIX
-;  ld    a,(ix+MonsterStatus)
-;  cp    MonsterStatusWaiting
-;  ret   z                               ;can't wait if monster has already waited this turn
+  ld    a,(DefendButtonPressed?)
+  dec   a
+  ret   m
+  ld    (DefendButtonPressed?),a
+
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz                              ;we cant defend when moving/attacking
 
   ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
   and   %1000 000
@@ -770,7 +1325,7 @@ CheckDefendButtonPressed:
   ld    (ix+MonsterStatus),a
 
   xor   a
-  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
   ld    (MonsterMovementPathPointer),a
   ld    (MonsterAnimationSpeed),a
   ld    (MonsterAnimationStep),a
@@ -782,23 +1337,87 @@ CheckDefendButtonPressed:
 ;############################# Code needs to be in $4000-$7fff ################################
 
 
-ListOfMonstersToPut:
-  ;monsternr|amount|           x            , y
-  db  001 | dw 100 | db 012 + (15*08), 056 + (00*16)
-  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
-  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
-  db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
-  db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
-  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
 
-  db  007 | dw 410 | db 012 + (25*08), 056 + (00*16)
-  db  007 | dw 510 | db 012 + (24*08), 056 + (01*16)
-  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16)
-  db  007 | dw 710 | db 012 + (24*08), 056 + (05*16)
-  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16)
-  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16)
 
 SetAllMonstersInMonsterTable:
+;jp .skip
+
+  ld    ix,(HeroThatAttacks)
+  ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
+  ld    (ListOfMonstersToPut+00),a
+  ld    l,(ix+HeroUnits+01)              ;monster 1 amount
+  ld    h,(ix+HeroUnits+02)              ;monster 1 amount
+  ld    (ListOfMonstersToPut+01),hl
+
+  ld    a,(ix+HeroUnits+03)              ;monster 2 nr
+  ld    (ListOfMonstersToPut+05),a
+  ld    l,(ix+HeroUnits+04)              ;monster 2 amount
+  ld    h,(ix+HeroUnits+05)              ;monster 2 amount
+  ld    (ListOfMonstersToPut+06),hl
+
+  ld    a,(ix+HeroUnits+06)              ;monster 3 nr
+  ld    (ListOfMonstersToPut+10),a
+  ld    l,(ix+HeroUnits+07)              ;monster 3 amount
+  ld    h,(ix+HeroUnits+08)              ;monster 3 amount
+  ld    (ListOfMonstersToPut+11),hl
+
+  ld    a,(ix+HeroUnits+09)              ;monster 4 nr
+  ld    (ListOfMonstersToPut+15),a
+  ld    l,(ix+HeroUnits+10)              ;monster 4 amount
+  ld    h,(ix+HeroUnits+11)              ;monster 4 amount
+  ld    (ListOfMonstersToPut+16),hl
+
+  ld    a,(ix+HeroUnits+12)              ;monster 5 nr
+  ld    (ListOfMonstersToPut+20),a
+  ld    l,(ix+HeroUnits+13)              ;monster 5 amount
+  ld    h,(ix+HeroUnits+14)              ;monster 5 amount
+  ld    (ListOfMonstersToPut+21),hl
+
+  ld    a,(ix+HeroUnits+15)              ;monster 6 nr
+  ld    (ListOfMonstersToPut+25),a
+  ld    l,(ix+HeroUnits+16)              ;monster 6 amount
+  ld    h,(ix+HeroUnits+17)              ;monster 6 amount
+  ld    (ListOfMonstersToPut+26),hl
+
+  ld    ix,(HeroThatGetsAttacked)
+  ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
+  ld    (ListOfMonstersToPut+30),a
+  ld    l,(ix+HeroUnits+01)              ;monster 1 amount
+  ld    h,(ix+HeroUnits+02)              ;monster 1 amount
+  ld    (ListOfMonstersToPut+31),hl
+
+  ld    a,(ix+HeroUnits+03)              ;monster 2 nr
+  ld    (ListOfMonstersToPut+35),a
+  ld    l,(ix+HeroUnits+04)              ;monster 2 amount
+  ld    h,(ix+HeroUnits+05)              ;monster 2 amount
+  ld    (ListOfMonstersToPut+36),hl
+
+  ld    a,(ix+HeroUnits+06)              ;monster 3 nr
+  ld    (ListOfMonstersToPut+40),a
+  ld    l,(ix+HeroUnits+07)              ;monster 3 amount
+  ld    h,(ix+HeroUnits+08)              ;monster 3 amount
+  ld    (ListOfMonstersToPut+41),hl
+
+  ld    a,(ix+HeroUnits+09)              ;monster 4 nr
+  ld    (ListOfMonstersToPut+45),a
+  ld    l,(ix+HeroUnits+10)              ;monster 4 amount
+  ld    h,(ix+HeroUnits+11)              ;monster 4 amount
+  ld    (ListOfMonstersToPut+46),hl
+
+  ld    a,(ix+HeroUnits+12)              ;monster 5 nr
+  ld    (ListOfMonstersToPut+50),a
+  ld    l,(ix+HeroUnits+13)              ;monster 5 amount
+  ld    h,(ix+HeroUnits+14)              ;monster 5 amount
+  ld    (ListOfMonstersToPut+51),hl
+
+  ld    a,(ix+HeroUnits+15)              ;monster 6 nr
+  ld    (ListOfMonstersToPut+55),a
+  ld    l,(ix+HeroUnits+16)              ;monster 6 amount
+  ld    h,(ix+HeroUnits+17)              ;monster 6 amount
+  ld    (ListOfMonstersToPut+56),hl
+
+;.skip:
+
   ld    ix,ListOfMonstersToPut
   ld    iy,Monster1
   ld    b,1                             ;monster 1
@@ -821,15 +1440,17 @@ SetAllMonstersInMonsterTable:
   .SetMonster:
   push  bc
   
-  ld    a,(ix)
-  ld    (iy+MonsterNumber),a
   ld    a,(ix+1)
   ld    (iy+MonsterAmount),a
   ld    a,(ix+2)
   ld    (iy+MonsterAmount+1),a
+  ld    a,(ix)
+  ld    (iy+MonsterNumber),a
 
   push  ix
   push  iy
+  push  af                              ;monster number
+
   ld    a,b
   ld    (CurrentActiveMonster),a
   call  SetCurrentActiveMOnsterInIX
@@ -838,8 +1459,13 @@ SetAllMonstersInMonsterTable:
   ld    c,(iy+MonsterTableNX)
   ld    d,(iy+MonsterTableNY)
   ld    e,(iy+MonsterTableHp)
-  ld    (ix+MonsterHP),e
 
+  pop   af                              ;monster number
+  or    a
+  jr    nz,.Not0
+  ld    e,0
+  .Not0:
+  ld    (ix+MonsterHP),e
 
   ld    l,(iy+0)
   ld    h,(iy+1)                        ;hl->Monster Idle/move table
@@ -922,6 +1548,18 @@ SetAllMonstersInMonsterTable:
   sub   a,d
   ld    (iy+MonsterY),a
   ld    (iy+MonsterYPrevious),a
+
+  ld    a,(iy+MonsterHP)
+  or    a
+  jr    nz,.NotZero
+
+	;remove monster from the playing field
+	ld    (iy+MonsterX),255
+	ld    (iy+MonsterXPrevious),255
+	ld    (iy+MonsterY),212
+	ld    (iy+MonsterYPrevious),212
+  .NotZero:
+
   
   ld    de,5
   add   ix,de                           ;lenght of 1 monster in ListOfMonstersToPut
@@ -1368,12 +2006,12 @@ MoveMonster:
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    a,(iy+MonsterTableSpecialAbility)
-  cp    RangedHero
-  jp    nz,.EndCheckRangedHero
+  cp    RangedMonster
+  jp    nz,.EndCheckRangedMonster
   ld    a,(MayRangedAttackBeRetaliated?)
   or    a
   jp    z,.EndMovement
-  .EndCheckRangedHero:
+  .EndCheckRangedMonster:
 
 
 
@@ -4189,12 +4827,12 @@ SetcursorWhenGridTileIsActive:
   ld    a,(ix+MonsterNY)
   ld    (MonsterThatIsBeingAttackedNY),a
 
-  ;At this pointer pointer is on an enemy, check if current monster is ranged
+  ;At this point pointer is on an enemy, check if current monster is ranged
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   ld    a,(iy+MonsterTableSpecialAbility)
-  cp    RangedHero
-  jp    z,RangedHeroCheck
+  cp    RangedMonster
+  jp    z,RangedMonsterCheck
 
   ;At this pointer pointer is on an enemy, check if pointer is left, right, above or below monster
   ;are we on even or odd row?
@@ -4437,7 +5075,7 @@ SetcursorWhenGridTileIsActive:
 
 
 
-RangedHeroCheck:
+RangedMonsterCheck:
   xor   a
   ld    (IsThereAnyEnemyRightNextToActiveMonster?),a
 
@@ -4503,6 +5141,10 @@ RangedHeroCheck:
   ld    (MayRangedAttackBeRetaliated?),a ;a ranged attack in melee range, may be retaliated
 
   .Check:
+  ld    a,(iy+MonsterHP)
+  or    a
+  ret   z                               ;don't check if monster is dead
+  
   ld    a,(iy+MonsterY)
   sub   056
   add   (ix+MonsterNY)

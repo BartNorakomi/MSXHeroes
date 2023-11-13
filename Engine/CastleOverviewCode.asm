@@ -9808,9 +9808,9 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "A few Several Numerous Many Lots of",254
-                          db  "A multitude of Countless A horde of",254
-                          db  "Explore various building options ",254
+.DescriptionFire1:        db  "Your forces suffer a bitter defeat,",254
+                          db  "and abandons your cause Defeated Victorious",254
+                          db  "Battlefield Casualties Attacker Defender ",254
                           db  "Take a look at the available building options. ",255
 
 ;.AncientScroll:           db  "Unearthing an ancient scroll you",254

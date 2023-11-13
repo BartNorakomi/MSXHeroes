@@ -14,7 +14,7 @@ InitiateGame:
   call  SpriteInitialize                ;set color, attr and char addresses
 
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -255,6 +255,8 @@ IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
+WaitButtonPressed?: db  0
+DefendButtonPressed?: db  0
 ShootProjectile?: db  0
 IsThereAnyEnemyRightNextToActiveMonster?: db  0
 MayRangedAttackBeRetaliated?: ds  1
@@ -262,6 +264,22 @@ SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
 MovementLenghtMonsters: equ 8
+
+ListOfMonstersToPut:
+  ;monsternr|amount|           x            , y
+  db  001 | dw 100 | db 012 + (15*08), 056 + (00*16)
+  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
+  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
+  db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
+  db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
+  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
+
+  db  001 | dw 001 | db 012 + (25*08), 056 + (00*16)
+  db  000 | dw 000 | db 012 + (24*08), 056 + (01*16)
+  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16)
+  db  007 | dw 001 | db 012 + (24*08), 056 + (05*16)
+  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16)
+  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16)
 
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 BattleFieldGrid: ;0C15Ch

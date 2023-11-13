@@ -926,6 +926,24 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $67 - 68
+;
+VictoryBlock:  equ   $67
+phase	$4000
+  incbin "..\grapx\Battlefield\Victory.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $69 - 6a
+;
+DefeatBlock:  equ   $69
+phase	$4000
+  incbin "..\grapx\Battlefield\Defeat.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

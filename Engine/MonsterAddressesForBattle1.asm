@@ -11,7 +11,7 @@ MonsterTableDefense:          equ MonsterTableAttack+1
 MonsterTableGrowth:           equ MonsterTableDefense+1
 MonsterTableSpecialAbility:   equ MonsterTableGrowth+1
 MonsterTableName:             equ MonsterTableSpecialAbility+1
-RangedHero:                   equ 128
+RangedMonster:                equ 128
 
 LengthMonsterAddressesTable: equ Monster002Table-Monster001Table
 Monster001Table:                        ;yie ar kung fu
@@ -35,7 +35,7 @@ Monster001Table:                        ;yie ar kung fu
   db    012                             ;defense
   db    012                             ;growth
 ;  db    000                             ;special ability
-  db    RangedHero                      ;special ability, 128=ranged hero
+  db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Yie Ar Kung",255
   
 Monster002Table:                        ;huge snake (golvellius)
