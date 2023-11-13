@@ -1,12 +1,12 @@
 InitiateBattle:
 call screenon
 
-  ld    hl,pl1hero1y
+;  ld    hl,pl1hero1y
   
-  ld    hl,(plxcurrentheroAddress)
-  ld    (HeroThatAttacks),hl       ;y hero that gets attacked
-  ld    hl,pl2hero1y
-  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
+;  ld    hl,(plxcurrentheroAddress)
+;  ld    (plxcurrentheroAddress),hl       ;y hero that gets attacked
+;  ld    hl,pl2hero1y
+;  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
 
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
@@ -523,31 +523,49 @@ CheckVictoryOrDefeat:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
-  ld    ix,(HeroThatAttacks)            ;lets call this defending
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  push  hl
-  pop   ix
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    bc,$4000
-  xor   a
-  sbc   hl,bc
-  ld    de,$0000 + ((040+021)*128) + ((018+10)/2) - 128
-  ld    bc,NXAndNY16x30HeroIcon
-  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  call  .SetLeftHero
 
-  ;set name
-  ld    b,064                           ;dx
-  ld    c,047                           ;dy
+  ;right hero
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  call  .SetRightHero
 
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
-  call  SetText                         ;in: b=dx, c=dy, hl->text
+  call  SwapAndSetPage                  ;swap and set page 1
+  call  .CopyActivePageToInactivePage
 
-  jp    WaitKeyPressToGoBackToGame
+  .engine2:
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+  ;battle buttons
+;  ld    ix,GenericButtonTable
+;  call  .CheckButtonMouseInteractionGenericButtons
+;  call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
+
+;  ld    ix,GenericButtonTable
+;  call  .SetGenericButtons              ;copies button state from rom -> vram
+  ;/battle buttons
+
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  jp    z,.engine2
+
+;;;;####################################;;;;;;;
+  ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
+  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
+;  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
+;;;;####################################;;;;;;;
+  
+  pop   de
+  pop   de
+  ret
+  
+  
+  
 
 
 
@@ -593,9 +611,6 @@ CheckVictoryOrDefeat:
   ret   nz
   ;right player has lost their entire army
 
-
-  
-
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (002*128) + (024/2) - 128
   ld    bc,$0000 + (207*256) + (210/2)
@@ -603,63 +618,14 @@ CheckVictoryOrDefeat:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
-  ld    ix,(HeroThatAttacks)            ;attacking hero
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  push  hl
-  pop   ix
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    bc,$4000
-  xor   a
-  sbc   hl,bc
-  ld    de,$0000 + (011*128) + (032/2) - 128
-  ld    bc,NXAndNY16x30HeroIcon
-  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  ;set name
-  ld    b,090                           ;dx
-  ld    c,013                           ;dy
-  ld    ix,(HeroThatAttacks)            ;attacking hero
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
-  call  SetText                         ;in: b=dx, c=dy, hl->text
-
-  ld    b,121                           ;dx
-  ld    c,109                           ;dy
-  ld    ix,(HeroThatAttacks)            ;attacking hero
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
-  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  call  .SetLeftHero
 
   ;right hero
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  push  hl
-  pop   ix
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    bc,$4000
-  xor   a
-  sbc   hl,bc
-  ld    de,$0000 + (011*128) + (210/2) - 128
-  ld    bc,NXAndNY16x30HeroIcon
-  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  .SetRightHero
 
-  ;set name
-  ld    b,166                           ;dx
-  ld    c,013                           ;dy
-  ld    ix,(HeroThatGetsAttacked)       ;attacking hero
-  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
-  ld    h,(ix+HeroSpecificInfo+1)
-  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
-  call  SetText                         ;in: b=dx, c=dy, hl->text
-
+  ;set xp gained
   ld    b,112                           ;dx
   ld    c,116                           ;dy
   ld    hl,5490
@@ -689,21 +655,75 @@ CheckVictoryOrDefeat:
   jp    z,.engine  
 
 ;;;;####################################;;;;;;;
-  ;at the end of combat we have 4 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled
-;  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+  ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
   ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
   call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
 ;  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
 ;;;;####################################;;;;;;;
+
   
   pop   de
   pop   de
   ret
 
+.SetLeftHero:
+  push  ix
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + (011*128) + (032/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+  ;set name
+  pop   ix
+  ld    b,090                           ;dx
+  ld    c,013                           ;dy
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    b,121                           ;dx
+  ld    c,109                           ;dy
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
 
+  .SetRightHero:
+  push  ix
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+  ld    de,$0000 + (011*128) + (210/2) - 128
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+  ;set name
+  pop   ix
+  ld    b,166                           ;dx
+  ld    c,013                           ;dy
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
 
   .CopyActivePageToInactivePage:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
@@ -1121,7 +1141,7 @@ CheckPointerOnAttackingHero:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
-  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
@@ -1137,7 +1157,7 @@ CheckPointerOnAttackingHero:
   call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;set attack
-  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
   ld    h,0
   ld    l,(ix+HeroStatAttack)
   ld    b,060                           ;dx
@@ -1342,7 +1362,7 @@ CheckDefendButtonPressed:
 SetAllMonstersInMonsterTable:
 ;jp .skip
 
-  ld    ix,(HeroThatAttacks)
+  ld    ix,(plxcurrentheroAddress)
   ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
   ld    (ListOfMonstersToPut+00),a
   ld    l,(ix+HeroUnits+01)              ;monster 1 amount
@@ -2311,7 +2331,7 @@ BuildUpBattleFieldAndPutMonsters:
 
   .SetHeroes:
   ;left hero
-  ld    ix,(HeroThatAttacks)            ;lets call this defending
+  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl

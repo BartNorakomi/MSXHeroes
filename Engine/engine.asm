@@ -428,6 +428,9 @@ Backdrop:
 
 WhichHudButtonClicked?: db  0
 checktriggerhud:
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  or    a
+  ret   nz
 
 ;  ld    de,CursorHand  
 ;  ld    hl,(CurrentCursorSpriteCharacter)
@@ -1658,7 +1661,7 @@ CheckHeroCollidesWithEnemyHero:
 LastHeroForPlayerThatGetsAttacked: ds  2
 PlayerThatGetsAttacked: ds  1
 HeroThatGetsAttacked: ds  2
-HeroThatAttacks: ds  2
+;HeroThatAttacks: ds  2
 AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
 
 CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a button, but button should remain lit
@@ -4908,7 +4911,7 @@ pl1hero1move:	db	20,20
 pl1hero1mana:	dw	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 001 | dw 020 |      db 000 | dw 000 |      db 001 | dw 101 |      db 000 | dw 000 |      db 004 | dw 710 |      db 007 | dw 010 ;unit,amount
+Pl1Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5109,7 +5112,7 @@ pl2hero1move:	db	10,20
 pl2hero1mana:	dw	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 007 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)

@@ -31,7 +31,7 @@ Monster001Table:                        ;yie ar kung fu
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
-  db    001                             ;attack
+  db    060                             ;attack
   db    012                             ;defense
   db    012                             ;growth
 ;  db    000                             ;special ability
