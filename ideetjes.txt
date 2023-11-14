@@ -10,3 +10,9 @@ bijv. die kleine sd snather critter, of pixie
 zodra het spel uit is zet je een promo versie online en geef je aan
 dat mensen die doneren het spel krijgen op 1 january (bijvoorbeeld)
 en voor de rest is het spel beschikbaar op 1 february.
+
+als je int equiped via een item, en dan healed in base,
+en dan de beurt erop die int unequiped heb je meer mana
+dan je max mana
+aan het begin van de beurt is dit gereset.
+waarschijnlijk niet doen ?

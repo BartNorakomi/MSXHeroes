@@ -1293,20 +1293,29 @@ CheckHeroCollidesWithMonster:
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
 
-  call  .RemoveMonster
+  ld    a,(NeutralEnemyDied?)
+  or    a
+  jr    nz,.ThisEnemyJustDied
+
+  ld    hl,0
+  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   jp    EnterCombat
 
 
-  .RemoveMonster:
+  .ThisEnemyJustDied:
+  push  de
   call  AddXPToHero
+  pop   de
 
-  ld    (hl),0                          ;remove monster from object layer map
-  or    a
+  xor   a
+  ld    (NeutralEnemyDied?),a
+  ld    (hl),a                          ;remove monster from object layer map
+;  or    a
   sbc   hl,de                           ;check if monster has a top part
   ld    a,(hl)
   cp    192
   ret   c
-  ld    (hl),0                          ;remove top part monster from object layer map  
+  ld    (hl),a                          ;remove top part monster from object layer map  
   ret
 
 AddXPToHero:
@@ -1653,7 +1662,7 @@ CheckHeroCollidesWithEnemyHero:
 
   .HeroTouchesEnemyHero:
   ld    (HeroThatGetsAttacked),iy       ;y hero that gets attacked
-  ld    (AmountHeroesTimesLenghtHerotableBelowHero),hl
+  ld    (AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked),hl
   pop   af
   pop   af                              ;pop the calls from the engine to this routine
 	jp		EnterCombat
@@ -1662,7 +1671,7 @@ LastHeroForPlayerThatGetsAttacked: ds  2
 PlayerThatGetsAttacked: ds  1
 HeroThatGetsAttacked: ds  2
 ;HeroThatAttacks: ds  2
-AmountHeroesTimesLenghtHerotableBelowHero:  ds  2
+AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked:  ds  2
 
 CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a button, but button should remain lit
 	ld		a,(currentherowindowclicked)
@@ -4911,7 +4920,7 @@ pl1hero1move:	db	20,20
 pl1hero1mana:	dw	20,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 001 | dw 001 |      db 003 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -4935,14 +4944,14 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
 
-pl1hero2y:		db	1
-pl1hero2x:		db	3
+pl1hero2y:		db	2
+pl1hero2x:		db	4
 pl1hero2xp: dw 0000
-pl1hero2move:	db	01,20
+pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -4958,14 +4967,14 @@ Pl1Hero2Units:  db 023 | dw 022 |      db 022 | dw 033 |      db 022 | dw 555 | 
 .HeroSpecificInfo: dw HeroAddressesUltraBox
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl1hero3y:		db	02	                ;
-pl1hero3x:		db	04
+pl1hero3y:		db	01	                ;
+pl1hero3x:		db	03
 pl1hero3xp: dw 0000
 pl1hero3move:	db	20,20
 pl1hero3mana:	dw	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero3Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5112,7 +5121,7 @@ pl2hero1move:	db	10,20
 pl2hero1mana:	dw	10,20
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 003 | dw 001 |      db 003 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)

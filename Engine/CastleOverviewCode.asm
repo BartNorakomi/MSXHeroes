@@ -8136,8 +8136,17 @@ CastleOverviewTavernCode:
   ret
 
   .HeroFound:
+  ;if the hero retreated, give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
+  ;if the hero surrendered, we don't need to give the hero any units, since all units are saved at surrendering
+  ld    a,(ix+HeroUnits)
+  cp    UnitWhenRetreated
+  jr    nz,.EndCheckRetreated
+  ld    a,(iy+CastleLevel1Units)        ;castle x  
+  ld    (ix+HeroUnits),a
+  ld    (ix+HeroUnits+1),1
+  .EndCheckRetreated:
+  
   pop   af                              ;pop the call to this routine
-
   ld    (ix+heroStatus),2               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   call  .SetYX
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
@@ -9808,9 +9817,9 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "Your forces suffer a bitter defeat,",254
-                          db  "and abandons your cause Defeated Victorious",254
-                          db  "Battlefield Casualties Attacker Defender ",254
+.DescriptionFire1:        db  "lose your entire army. ",254
+                          db  "by paying John a fee of 1000 Gold Surrender ?",254
+                          db  "Are you sure about retreating? Just remember, you'll ",254
                           db  "Take a look at the available building options. ",255
 
 ;.AncientScroll:           db  "Unearthing an ancient scroll you",254

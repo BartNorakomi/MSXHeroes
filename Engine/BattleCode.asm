@@ -1,3 +1,92 @@
+HandleMonsters:
+;ld a,8 ; 20 is the max
+;di
+;out ($99),a
+;ld a,23+128
+;ei
+;out ($99),a
+
+;  call  HandleProjectileSprite
+;  call  HandleExplosionSprite
+  call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
+  call  CheckSpaceToMoveMonster
+  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
+  call  CheckSwitchToNextMonster
+  call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
+
+;current monster (erase)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+  call  MoveMonster                     ;current active monster move
+  call  CheckWaitButtonPressed
+  call  CheckDefendButtonPressed
+  call  AnimateMonster                  ;set animation (idle, moving or attacking)
+
+;grid tile (erase)
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+
+  call  CheckWasCursorOnATilePreviousFrame
+  ld    a,(WasCursorOnATilePreviousFrame?)
+  or    a
+  jr    z,.EndEraseGridTile
+
+  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+
+  .EndEraseGridTile:
+
+  call  MoveMonster                     ;grid tile move
+  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
+
+;current monster (put)
+  call  SetCurrentActiveMOnsterInIX
+  call  SetAmountUnderMonster
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+
+;grid tile (put)
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    nz,.EndPutGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndPutGridTile
+    
+  call  CheckIsCursorOnATileThisFrame
+  call  SetcursorWhenGridTileIsActive
+
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndPutGridTile
+    
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  PutMonster                      ;put monster in inactive page
+  .EndPutGridTile:
+
+;current monster (recover damaged background)
+  call  SetCurrentActiveMOnsterInIX
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+
+;grid tile (recover damaged background)
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    nz,.EndRecoverGridTile
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.EndRecoverGridTile
+  ld    a,(IsCursorOnATileThisFrame?)
+  or    a
+  jr    z,.EndRecoverGridTile
+
+  ld    ix,Monster0
+  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
+  call  Recover
+  .EndRecoverGridTile:
+  ret
+
 InitiateBattle:
 call screenon
 
@@ -7,6 +96,14 @@ call screenon
 ;  ld    (plxcurrentheroAddress),hl       ;y hero that gets attacked
 ;  ld    hl,pl2hero1y
 ;  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
+
+  xor   a
+  ld    (MonsterDied?),a                ;reset this properly (since this is not done after previous fight)
+  ld    (SurrenderButtonPressed?),a     ;reset this properly (since this is not done after previous fight)
+  ld    (RetreatButtonPressed?),a       ;reset this properly (since this is not done after previous fight)
+  ld    (MonsterAnimationStep),a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MoVeMonster?),a
 
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
@@ -24,6 +121,7 @@ call screenon
   call  PopulateControls                ;read out keys
   call  HandleMonsters
   call  CheckVictoryOrDefeat            ;if one side has lost their entire army, battle ends
+  call  CheckRetreatOrSurrender         ;check if current active player wants to retreat or surrender
 
   ;battle buttons
   ld    ix,GenericButtonTable
@@ -100,9 +198,13 @@ call screenon
   ret
 
 .SurrenderButtonPressed:
+  ld    a,1
+  ld    (SurrenderButtonPressed?),a
   ret
 
 .RetreatButtonPressed:
+  ld    a,1
+  ld    (RetreatButtonPressed?),a
   ret
 
 .DiskOptionsButtonPressed:
@@ -343,6 +445,15 @@ SetBattleButtons:
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*7)
   ldir
+
+  ;turn retreat button off, when fighting vs neutral monsters (monsters without hero)
+  ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
+  ld    a,l
+  or    h
+  ret   nz
+
+  xor   a
+  ld    (GenericButtonTable+2*GenericButtonTableLenghtPerButton),a
   ret
 
 BattleButton1Ytop:           equ 193
@@ -394,97 +505,265 @@ BattleButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5
 
 
 
-
-
-
-HandleMonsters:
-;ld a,8 ; 20 is the max
-;di
-;out ($99),a
-;ld a,23+128
-;ei
-;out ($99),a
-
-;  call  HandleProjectileSprite
-;  call  HandleExplosionSprite
-  call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
-  call  CheckSpaceToMoveMonster
-  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
-  call  CheckSwitchToNextMonster
-  call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
-
-;current monster (erase)
-  call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-  call  MoveMonster                     ;current active monster move
-  call  CheckWaitButtonPressed
-  call  CheckDefendButtonPressed
-  call  AnimateMonster                  ;set animation (idle, moving or attacking)
-
-;grid tile (erase)
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-
-  call  CheckWasCursorOnATilePreviousFrame
-  ld    a,(WasCursorOnATilePreviousFrame?)
-  or    a
-  jr    z,.EndEraseGridTile
-
-  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
-
-  .EndEraseGridTile:
-
-  call  MoveMonster                     ;grid tile move
-  call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-
-;current monster (put)
-  call  SetCurrentActiveMOnsterInIX
-  call  SetAmountUnderMonster
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  PutMonster                      ;put monster in inactive page
-
-;grid tile (put)
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  or    a
-  jr    nz,.EndPutGridTile
-  ld    a,(SwitchToNextMonster?)
-  or    a
-  jr    nz,.EndPutGridTile
-    
-  call  CheckIsCursorOnATileThisFrame
-  call  SetcursorWhenGridTileIsActive
-
-  ld    a,(IsCursorOnATileThisFrame?)
-  or    a
-  jr    z,.EndPutGridTile
-    
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  PutMonster                      ;put monster in inactive page
-  .EndPutGridTile:
-
-;current monster (recover damaged background)
-  call  SetCurrentActiveMOnsterInIX
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  Recover
-
-;grid tile (recover damaged background)
-  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
-  or    a
-  jr    nz,.EndRecoverGridTile
-  ld    a,(SwitchToNextMonster?)
-  or    a
-  jr    nz,.EndRecoverGridTile
-  ld    a,(IsCursorOnATileThisFrame?)
-  or    a
-  jr    z,.EndRecoverGridTile
-
-  ld    ix,Monster0
-  call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
-  call  Recover
-  .EndRecoverGridTile:
+CheckRetreatOrSurrender:
+  ld    a,(SurrenderButtonPressed?)
+  or    a  
+  jp    nz,SurrenderButtonPressed
+  ld    a,(RetreatButtonPressed?)
+  or    a  
+  jp    nz,RetreatButtonPressed
   ret
+
+SurrenderButtonPressed:
+  xor   a
+  ld    (SurrenderButtonPressed?),a
+
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz                              ;don't surrender when monster is moving
+
+  call  .BackupBackGround
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (120*128) + (014/2) - 128
+  ld    bc,$0000 + (059*256) + (228/2)
+  ld    a,RetreatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set fee for surrendering
+  ld    b,127                           ;dx
+  ld    c,142                           ;dy
+  ld    hl,5490
+  call  SetNumber16BitCastle
+  
+  ;set hero name we surrender to
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  ld    ix,(HeroThatGetsAttacked)       ;000=no hero, hero that gets attacked
+  jr    c,.CurrentActiveHeroFound
+  ld    ix,(plxcurrentheroAddress)
+  .CurrentActiveHeroFound:
+  ld    b,123                           ;dx
+  ld    c,135                           ;dy
+  ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
+  ld    h,(ix+HeroSpecificInfo+1)
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  
+  
+  call  SwapAndSetPage                  ;swap and set page
+  call  CheckVictoryOrDefeat.CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  call  SetSurrenderButtons
+
+  .engine:
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+  ;surrender buttons
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  .CheckSurrenderButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+  ;/surrender buttons
+
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  call  nz,.NoPressed
+  jp    .engine
+
+.CheckSurrenderButtonClicked:               ;in: carry=button clicked, b=button number
+  ret   nc
+
+  ld    a,b
+  cp    2
+  jr    z,.YesPressed
+;  cp    1
+;  jr    z,.NoPressed
+  
+  .NoPressed:
+  call  .RestoreBackGround
+  pop   af                                ;pop the call to this routine
+  ret
+
+  .YesPressed:
+  ;set hero name we surrender to
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  ld    ix,(plxcurrentheroAddress)
+  jr    c,.CurrentActiveHeroFound1
+  ld    ix,(HeroThatGetsAttacked)       ;000=no hero, hero that gets attacked
+  .CurrentActiveHeroFound1:
+
+  call  HeroFledSurrendering
+  pop   af                                ;pop the call to this routine
+  pop   af                                ;back to game
+  ret
+
+.RestoreBackGround:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  jr    z,.ActivePageIs0
+  
+  .ActivePageIs1:
+  ld    hl,.RestorePage3toPage0
+  call  docopy
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy 
+  call  SwapAndSetPage                  ;swap and set page
+  ld    hl,.RestorePage3toPage1
+  call  docopy
+  ret
+  .ActivePageIs0:  
+  ld    hl,.RestorePage3toPage1
+  call  docopy
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy 
+  call  SwapAndSetPage                  ;swap and set page
+  ld    hl,.RestorePage3toPage0
+  call  docopy
+  ret
+
+.BackupBackGround:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    hl,.BackupPage1toPage3
+  jp    z,docopy
+  ld    hl,.BackupPage0toPage3
+  jp    docopy
+
+.BackupPage1toPage3:
+	db		014,000,120,001
+	db		000,000,256-59,003
+	db		228,000,059,000
+	db		000,000,$d0	
+.BackupPage0toPage3:
+	db		014,000,120,000
+	db		000,000,256-59,003
+	db		228,000,059,000
+	db		000,000,$d0	
+
+.RestorePage3toPage0:
+	db		000,000,256-59,003
+	db		014,000,120,000
+	db		228,000,059,000
+	db		000,000,$d0	
+.RestorePage3toPage1:
+	db		000,000,256-59,003
+	db		014,000,120,001
+	db		228,000,059,000
+	db		000,000,$d0	
+
+
+SetSurrenderButtons:
+  ld    hl,SurrenderButtonTable-2
+  ld    de,GenericButtonTable2-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ldir
+  ret
+
+SurrenderButton1Ytop:           equ 153
+SurrenderButton1YBottom:        equ SurrenderButton1Ytop + 019
+SurrenderButton1XLeft:          equ 062
+SurrenderButton1XRight:         equ SurrenderButton1XLeft + 020
+
+SurrenderButton2Ytop:           equ 154
+SurrenderButton2YBottom:        equ SurrenderButton2Ytop + 018
+SurrenderButton2XLeft:          equ 174
+SurrenderButton2XRight:         equ SurrenderButton2XLeft + 020
+
+SurrenderButtonTableGfxBlock:  db  RetreatBlock
+SurrenderButtonTableAmountOfButtons:  db  2
+SurrenderButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db SurrenderButton1Ytop,SurrenderButton1YBottom,SurrenderButton1XLeft,SurrenderButton1XRight | dw $0000 + (SurrenderButton1Ytop*128) + (SurrenderButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (057*128) + (228/2) - 128 | dw $4000 + (075*128) + (228/2) - 128 | dw $4000 + (093*128) + (228/2) - 128 | db SurrenderButton2Ytop,SurrenderButton2YBottom,SurrenderButton2XLeft,SurrenderButton2XRight | dw $0000 + (SurrenderButton2Ytop*128) + (SurrenderButton2XLeft/2) - 128 
+
+RetreatButtonPressed:
+  xor   a
+  ld    (RetreatButtonPressed?),a
+
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz                              ;don't retreat when monster is moving
+
+  call  SurrenderButtonPressed.BackupBackGround
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  ld    hl,$4000 + (058*128) + (000/2) - 128
+  ld    de,$0000 + (120*128) + (014/2) - 128
+  ld    bc,$0000 + (059*256) + (228/2)
+  ld    a,RetreatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  CheckVictoryOrDefeat.CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  call  SetRetreatButtons
+
+  .engine:
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+  ;retreat buttons
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  .CheckRetreatButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+  ;/retreat buttons
+
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  call  nz,SurrenderButtonPressed.NoPressed
+  jp    .engine
+
+.CheckRetreatButtonClicked:               ;in: carry=button clicked, b=button number
+  ret   nc
+
+  ld    a,b
+  cp    2
+  jr    z,.YesPressed
+;  cp    1
+;  jr    z,.NoPressed
+  
+  .NoPressed:
+  call  SurrenderButtonPressed.RestoreBackGround
+
+  pop   af                                ;pop the call to this routine
+  ret
+
+  .YesPressed:
+  ;set hero name we surrender to
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  ld    ix,(plxcurrentheroAddress)
+  jr    c,.CurrentActiveHeroFound
+  ld    ix,(HeroThatGetsAttacked)       ;000=no hero, hero that gets attacked
+  .CurrentActiveHeroFound:
+
+  call  HeroFledRetreating
+  pop   af                                ;pop the call to this routine
+  pop   af                                ;back to game
+  ret
+
+
+SetRetreatButtons:
+  ld    hl,SurrenderButtonTable-2
+  ld    de,GenericButtonTable2-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ldir
+  ret
+
 
 CheckVictoryOrDefeat:
   ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
@@ -553,12 +832,8 @@ CheckVictoryOrDefeat:
   bit   5,a                             ;check ontrols to see if m is pressed 
   jp    z,.engine2
 
-;;;;####################################;;;;;;;
   ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
-  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
-  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-;  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
-;;;;####################################;;;;;;;
+  call  DeactivateHeroThatAttacks       ;sets Status to 255 and moves all heros below this one, one position up 
   
   pop   de
   pop   de
@@ -654,13 +929,8 @@ CheckVictoryOrDefeat:
   bit   5,a                             ;check ontrols to see if m is pressed 
   jp    z,.engine  
 
-;;;;####################################;;;;;;;
   ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
-  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
-  call  DeactivateHero                  ;sets Status to 255 and moves all heros below this one, one position up 
-;  call  HeroFled                        ;sets Status to 254, x+y to 255 and put hero in tavern table, so player can buy back
-;;;;####################################;;;;;;;
-
+  call  DeactivateHeroThatGetsAttacked   ;sets Status to 255 and moves all heros below this one, one position up 
   
   pop   de
   pop   de
@@ -701,6 +971,12 @@ CheckVictoryOrDefeat:
 
   .SetRightHero:
   push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jr    z,.RightHeroIsANeutralMonster
+  
+  push  ix
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
@@ -723,6 +999,53 @@ CheckVictoryOrDefeat:
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
   call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+  .RightHeroIsANeutralMonster:
+  ld    a,1 ;(ix+MonsterNumber)
+  call  CheckRightClickToDisplayInfo.SetSYSX
+;  ld    de,$0000 + (015*128) + (210/2) - 128
+;  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+
+
+  exx
+  ld    de,256*(015) + (211)
+  exx
+;  sbc   hl,bc
+  ld    de,$0000 + (015*128) + (210/2) - 128
+  call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
+
+  call  .SetMonsterTableInIY
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+
+  ;set name
+  ld    b,166                           ;dx
+  ld    c,013                           ;dy
+
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText
+  ret
+
+.SetMonsterTableInIY:
+  ld    a,MonsterAddressesForBattle1Block               ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
+  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+  ld    h,0
+  ld    l,1 ;(ix+MonsterNumber)
+  ld    de,LengthMonsterAddressesTable
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   de
+  add   iy,de                           ;iy->monster table idle
   ret
 
   .CopyActivePageToInactivePage:
@@ -896,7 +1219,7 @@ CheckRightClickToDisplayInfo:
   add   hl,de
   ex    de,hl
 
-  ld    hl,10/2 + (26*128)               
+  ld    hl,10/2 + (22*128)               
   add   hl,de  
   push  hl
 
@@ -1001,7 +1324,7 @@ CheckRightClickToDisplayInfo:
   ld    h,0
   ld    l,a
   add   hl,hl                           ;Unit*2
-  ld    de,.Creatures14x14SYSXTable
+  ld    de,.UnitSYSXTable14x24Portraits
   add   hl,de
   ld    c,(hl)
   inc   hl
@@ -1009,19 +1332,19 @@ CheckRightClickToDisplayInfo:
   push  bc
   pop   hl
 
-  ld    a,Enemy14x14PortraitsBlock      ;Map block
-  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ld    a,Enemy14x24PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
                         ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
-.Creatures14x14SYSXTable:  
-                dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
-                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
-                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
-                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
-                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
-                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
-                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
 
+.UnitSYSXTable14x24Portraits:  
+                dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
+                dw $4000+(24*128)+(00/2)-128, $4000+(24*128)+(14/2)-128, $4000+(24*128)+(28/2)-128, $4000+(24*128)+(42/2)-128, $4000+(24*128)+(56/2)-128, $4000+(24*128)+(70/2)-128, $4000+(24*128)+(84/2)-128, $4000+(24*128)+(98/2)-128, $4000+(24*128)+(112/2)-128, $4000+(24*128)+(126/2)-128, $4000+(24*128)+(140/2)-128, $4000+(24*128)+(154/2)-128, $4000+(24*128)+(168/2)-128, $4000+(24*128)+(182/2)-128, $4000+(24*128)+(196/2)-128, $4000+(24*128)+(210/2)-128, $4000+(24*128)+(224/2)-128, $4000+(24*128)+(238/2)-128
+                dw $4000+(48*128)+(00/2)-128, $4000+(48*128)+(14/2)-128, $4000+(48*128)+(28/2)-128, $4000+(48*128)+(42/2)-128, $4000+(48*128)+(56/2)-128, $4000+(48*128)+(70/2)-128, $4000+(48*128)+(84/2)-128, $4000+(48*128)+(98/2)-128, $4000+(48*128)+(112/2)-128, $4000+(48*128)+(126/2)-128, $4000+(48*128)+(140/2)-128, $4000+(48*128)+(154/2)-128, $4000+(48*128)+(168/2)-128, $4000+(48*128)+(182/2)-128, $4000+(48*128)+(196/2)-128, $4000+(48*128)+(210/2)-128, $4000+(48*128)+(224/2)-128, $4000+(48*128)+(238/2)-128
+                dw $4000+(72*128)+(00/2)-128, $4000+(72*128)+(14/2)-128, $4000+(72*128)+(28/2)-128, $4000+(72*128)+(42/2)-128, $4000+(72*128)+(56/2)-128, $4000+(72*128)+(70/2)-128, $4000+(72*128)+(84/2)-128, $4000+(72*128)+(98/2)-128, $4000+(72*128)+(112/2)-128, $4000+(72*128)+(126/2)-128, $4000+(72*128)+(140/2)-128, $4000+(72*128)+(154/2)-128, $4000+(72*128)+(168/2)-128, $4000+(72*128)+(182/2)-128, $4000+(72*128)+(196/2)-128, $4000+(72*128)+(210/2)-128, $4000+(72*128)+(224/2)-128, $4000+(72*128)+(238/2)-128
+                dw $4000+(96*128)+(00/2)-128, $4000+(96*128)+(14/2)-128, $4000+(96*128)+(28/2)-128, $4000+(96*128)+(42/2)-128, $4000+(96*128)+(56/2)-128, $4000+(96*128)+(70/2)-128, $4000+(96*128)+(84/2)-128, $4000+(96*128)+(98/2)-128, $4000+(96*128)+(112/2)-128, $4000+(96*128)+(126/2)-128, $4000+(96*128)+(140/2)-128, $4000+(96*128)+(154/2)-128, $4000+(96*128)+(168/2)-128, $4000+(96*128)+(182/2)-128, $4000+(96*128)+(196/2)-128, $4000+(96*128)+(210/2)-128, $4000+(96*128)+(224/2)-128, $4000+(96*128)+(238/2)-128
+                dw $4000+(120*128)+(00/2)-128, $4000+(120*128)+(14/2)-128, $4000+(120*128)+(28/2)-128, $4000+(120*128)+(42/2)-128, $4000+(120*128)+(56/2)-128, $4000+(120*128)+(70/2)-128, $4000+(120*128)+(84/2)-128, $4000+(120*128)+(98/2)-128, $4000+(120*128)+(112/2)-128, $4000+(120*128)+(126/2)-128, $4000+(120*128)+(140/2)-128, $4000+(120*128)+(154/2)-128, $4000+(120*128)+(168/2)-128, $4000+(120*128)+(182/2)-128, $4000+(120*128)+(196/2)-128, $4000+(120*128)+(210/2)-128, $4000+(120*128)+(224/2)-128, $4000+(120*128)+(238/2)-128
+                dw $4000+(144*128)+(00/2)-128, $4000+(144*128)+(14/2)-128, $4000+(144*128)+(28/2)-128, $4000+(144*128)+(42/2)-128, $4000+(144*128)+(56/2)-128, $4000+(144*128)+(70/2)-128, $4000+(144*128)+(84/2)-128, $4000+(144*128)+(98/2)-128, $4000+(144*128)+(112/2)-128, $4000+(144*128)+(126/2)-128, $4000+(144*128)+(140/2)-128, $4000+(144*128)+(154/2)-128, $4000+(144*128)+(168/2)-128, $4000+(144*128)+(182/2)-128, $4000+(144*128)+(196/2)-128, $4000+(144*128)+(210/2)-128, $4000+(144*128)+(224/2)-128, $4000+(144*128)+(238/2)-128
 
 
 
@@ -1312,7 +1635,7 @@ CheckWaitButtonPressed:
   ld    (ix+MonsterStatus),a
 
   xor   a
-  ld    (MoVeMonster?),a              ;1=move monster, 2=attack monster
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
   ld    (MonsterMovementPathPointer),a
   ld    (MonsterAnimationSpeed),a
   ld    (MonsterAnimationStep),a
@@ -1327,7 +1650,7 @@ CheckDefendButtonPressed:
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
 ;  ld    a,(NewPrContr)
-;  bit   6,a                             ;check ontrols to see if f1 is pressed 
+;  bit   6,a                            ;check ontrols to see if f1 is pressed 
 ;  ret   z
 
   ld    a,(DefendButtonPressed?)
@@ -1360,8 +1683,6 @@ CheckDefendButtonPressed:
 
 
 SetAllMonstersInMonsterTable:
-;jp .skip
-
   ld    ix,(plxcurrentheroAddress)
   ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
   ld    (ListOfMonstersToPut+00),a
@@ -1399,6 +1720,33 @@ SetAllMonstersInMonsterTable:
   ld    h,(ix+HeroUnits+17)              ;monster 6 amount
   ld    (ListOfMonstersToPut+26),hl
 
+
+
+  ld    hl,(HeroThatGetsAttacked)         ;check if we fight against a hero or a neutral monster
+  ld    a,l
+  or    h
+  jr    nz,.DefenderHasAHero
+
+  ld    a,1
+  ld    (ListOfMonstersToPut+30),a
+  ld    hl,1                             ;monster 1 amount
+  ld    (ListOfMonstersToPut+31),hl
+
+  xor   a
+  ld    hl,0
+  ld    (ListOfMonstersToPut+35),a
+  ld    (ListOfMonstersToPut+36),hl
+  ld    (ListOfMonstersToPut+40),a
+  ld    (ListOfMonstersToPut+41),hl
+  ld    (ListOfMonstersToPut+45),a
+  ld    (ListOfMonstersToPut+46),hl
+  ld    (ListOfMonstersToPut+50),a
+  ld    (ListOfMonstersToPut+51),hl
+  ld    (ListOfMonstersToPut+55),a
+  ld    (ListOfMonstersToPut+56),hl
+  jr    .EndSetAllMonsters
+
+  .DefenderHasAHero:
   ld    ix,(HeroThatGetsAttacked)
   ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
   ld    (ListOfMonstersToPut+30),a
@@ -1436,8 +1784,7 @@ SetAllMonstersInMonsterTable:
   ld    h,(ix+HeroUnits+17)              ;monster 6 amount
   ld    (ListOfMonstersToPut+56),hl
 
-;.skip:
-
+  .EndSetAllMonsters:
   ld    ix,ListOfMonstersToPut
   ld    iy,Monster1
   ld    b,1                             ;monster 1
@@ -1459,6 +1806,8 @@ SetAllMonstersInMonsterTable:
 
   .SetMonster:
   push  bc
+
+  ld    (iy+MonsterStatus),0            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
   
   ld    a,(ix+1)
   ld    (iy+MonsterAmount),a
@@ -2051,6 +2400,7 @@ MoveMonster:
   ld    (ShowExplosionSprite?),a        ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   xor   a
   ld    (ExplosionSpriteStep),a  
+  ld    (HandleRetaliation?),a          ;retaliation ends, when monster dies
   ld    a,1
   ld    (MonsterDied?),a
   jr    .EndMovement
@@ -5119,12 +5469,12 @@ RangedMonsterCheck:
 
   ld    a,(CurrentActiveMonster)
   cp    7
-  jr    nc,.LeftPlayerIsActive
+  jr    nc,.RightPlayerIsActive
 
-  .RightPlayerIsActive:
+  .LeftPlayerIsActive:
   ;Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
   ld    iy,Monster7
-  call  .Check
+  call  .Check  
   ld    iy,Monster8
   call  .Check
   ld    iy,Monster9
@@ -5141,7 +5491,7 @@ RangedMonsterCheck:
   ld    (MayRangedAttackBeRetaliated?),a ;a ranged attack in melee range, may be retaliated
   jr    .Check
 
-  .LeftPlayerIsActive:
+  .RightPlayerIsActive:
   ;Check if ANY monster is next to current active monster, if so set "IsThereAnyEnemyRightNextToActiveMonster"
   ld    iy,Monster1
   call  .Check
@@ -5167,7 +5517,7 @@ RangedMonsterCheck:
   
   ld    a,(iy+MonsterY)
   sub   056
-  add   (ix+MonsterNY)
+  add   (iy+MonsterNY)
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
@@ -5408,6 +5758,33 @@ SetBattleFieldSnowGraphics:
   ld    a,BattleFieldSnowBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+HeroFledRetreating:                     ;retreating is free, but entire army is lost
+  xor   a
+  ld    (ix+HeroUnits+00),UnitWhenRetreated | UnitWhenRetreated: equ 255
+  ld    (ix+HeroUnits+01),a
+  ld    (ix+HeroUnits+02),a
+
+  ld    (ix+HeroUnits+03),a
+  ld    (ix+HeroUnits+04),a
+  ld    (ix+HeroUnits+05),a
+
+  ld    (ix+HeroUnits+06),a
+  ld    (ix+HeroUnits+07),a
+  ld    (ix+HeroUnits+08),a
+
+  ld    (ix+HeroUnits+09),a
+  ld    (ix+HeroUnits+10),a
+  ld    (ix+HeroUnits+11),a
+
+  ld    (ix+HeroUnits+12),a
+  ld    (ix+HeroUnits+13),a
+  ld    (ix+HeroUnits+14),a
+
+  ld    (ix+HeroUnits+15),a
+  ld    (ix+HeroUnits+16),a
+  ld    (ix+HeroUnits+17),a
+  
+HeroFledSurrendering:                   ;surrendering costs gold, but entire army is kept
 HeroFled:
   ld    (ix+HeroStatus),254             ;254 = hero fled
   ld    (ix+Heroy),255
@@ -5419,8 +5796,14 @@ HeroFled:
   add   hl,de
   ld    b,(hl)                          ;hero number
 
-  ;now start looking at end of table, keep moving left until we found a hero. Then set the stored hero 1 slot right of that hero
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+	ld		a,(whichplayernowplaying?)  
+  jr    c,.FleeingPlayerFound
   ld    a,(PlayerThatGetsAttacked)
+  .FleeingPlayerFound:
+
+  ;now start looking at end of table, keep moving left until we found a hero. Then set the stored hero 1 slot right of that hero
   cp    1
   ld    hl,TavernHeroesPlayer1+TavernHeroTableLenght-2
   jr    z,.loop
@@ -5443,7 +5826,52 @@ HeroFled:
   ld    (hl),b
   ret
   
-DeactivateHero:                         ;sets Status to 255 and moves all heros below this one, one position up 
+DeactivateHeroThatAttacks:
+
+
+
+ ;we are going to find how many heroes are below the hero that attacks
+	ld		de,lenghtherotable
+	ld		hl,lenghtherotable*(amountofheroesperplayer-1)
+
+  call  SetHero1ForCurrentPlayerInIX
+  push  ix
+  pop   iy                              ;hero 1 for current player in iy
+  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
+ 
+	ld		b,amountofheroesperplayer
+  .loop:
+	ld		a,(iy+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  inc   a                               ;check if status is inactive
+  jp    z,.endcheck1                    ;hero is inactive
+
+	ld		a,(ix+HeroY)
+	cp		(iy+HeroY)
+	jp		nz,.endcheck1
+
+	ld		a,(ix+HeroX)
+	cp		(iy+HeroX)
+	jp		z,.HeroTouchesEnemyHero
+  .endcheck1:
+	add   iy,de
+  or    a
+  sbc   hl,de                           ;amount of heroes (*lenghtherotable) below hero we are checking
+	djnz	.loop
+	ret
+
+  .HeroTouchesEnemyHero:
+  ld    (AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked),hl
+
+
+
+
+
+
+
+
+
+
+  ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
   ld    (ix+HeroStatus),255             ;255 = inactive
 
   push  ix
@@ -5454,7 +5882,50 @@ DeactivateHero:                         ;sets Status to 255 and moves all heros 
   push  ix
   pop   de                              ;set deactivated hero in de
   
-  ld    bc,(AmountHeroesTimesLenghtHerotableBelowHero) ;amount of heroes we need to move * lenghtherotable
+  ld    bc,(AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked) ;amount of heroes we need to move * lenghtherotable
+
+  ld    a,b
+  or    c
+  ret   z                               ;no heroes below this hero (so this hero is hero 8)
+
+  ldir
+
+  ;set last hero for hero that attacks
+	ld		a,(whichplayernowplaying?)
+	dec		a
+	ld		hl,pl1hero8y
+  jr    z,.LastHeroFound
+	dec		a
+	ld		hl,pl2hero8y
+  jr    z,.LastHeroFound
+	dec		a
+	ld		hl,pl3hero8y
+  jr    z,.LastHeroFound
+	ld		hl,pl4hero8y
+  .LastHeroFound:
+  ld    (hl),255                        ;255 = inactive
+  ret
+  
+DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros below this one, one position up 
+  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
+
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jr    z,.NeutralEnemyDied
+
+  ld    (ix+HeroStatus),255             ;255 = inactive
+
+  push  ix
+  pop   hl
+	ld		de,lenghtherotable
+  add   hl,de                           ;set hero below Deactivated in hl
+
+  push  ix
+  pop   de                              ;set deactivated hero in de
+  
+  ld    bc,(AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked) ;amount of heroes we need to move * lenghtherotable
 
   ld    a,b
   or    c
@@ -5466,6 +5937,10 @@ DeactivateHero:                         ;sets Status to 255 and moves all heros 
   ld    (iy+HeroStatus),255             ;255 = inactive
   ret
 
+  .NeutralEnemyDied:
+  ld    a,1
+  ld    (NeutralEnemyDied?),a
+  ret
 
 
 

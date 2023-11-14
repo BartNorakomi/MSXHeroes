@@ -7,14 +7,18 @@ InitiateGame:
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
 
-  ld    hl,0
+;  ld    hl,0
   ld    hl,pl1hero1y
   ld    (plxcurrentheroAddress),hl
   ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
 
+
+  ld    hl,pl2hero1y
+;ld hl,0
+  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -257,6 +261,8 @@ IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
 WaitButtonPressed?: db  0
 DefendButtonPressed?: db  0
+RetreatButtonPressed?: db  0
+SurrenderButtonPressed?: db  0
 ShootProjectile?: db  0
 IsThereAnyEnemyRightNextToActiveMonster?: db  0
 MayRangedAttackBeRetaliated?: ds  1
@@ -372,6 +378,7 @@ OrderOfMonstersFromHighToLow:
   dw  Monster12  ;0C1B1h
   dw  Monster13  ;0C1B1h
 
+NeutralEnemyDied?: db  0
 SwitchToNextMonster?: db  0
 MoVeMonster?: db  0
 MonsterMovingRight?: db  0

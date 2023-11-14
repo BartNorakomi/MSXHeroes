@@ -30,7 +30,7 @@ Monster001Table:                        ;yie ar kung fu
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
-  db    011                             ;speed
+  db    001                             ;speed
   db    060                             ;attack
   db    012                             ;defense
   db    012                             ;growth
@@ -76,7 +76,7 @@ Monster003Table:                        ;big spider (sd snatcher)
   db    004                             ;cost (gold)
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
-  db    003                             ;hp
+  db    008                             ;hp
   db    003                             ;speed
   db    004                             ;attack
   db    012                             ;defense
