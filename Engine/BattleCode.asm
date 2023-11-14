@@ -6,8 +6,11 @@ HandleMonsters:
 ;ei
 ;out ($99),a
 
-;  call  HandleProjectileSprite
-;  call  HandleExplosionSprite
+;  call  HandleProjectileSprite         ;done on int
+;  call  HandleExplosionSprite          ;done on int
+
+
+
   call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
   call  CheckSpaceToMoveMonster
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
@@ -38,6 +41,12 @@ HandleMonsters:
 
   call  MoveMonster                     ;grid tile move
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
+
+
+
+
+
+
 
 ;current monster (put)
   call  SetCurrentActiveMOnsterInIX
@@ -274,11 +283,7 @@ call screenon
   ld    a,(ButtonGfxBlockCopy)
 
 
-
-;  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   call  .CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-
 
 
 ;  halt
@@ -552,7 +557,6 @@ SurrenderButtonPressed:
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
   call  SetText                         ;in: b=dx, c=dy, hl->text
   
-  
   call  SwapAndSetPage                  ;swap and set page
   call  CheckVictoryOrDefeat.CopyActivePageToInactivePage
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
@@ -593,7 +597,36 @@ SurrenderButtonPressed:
   ret
 
   .YesPressed:
-  ;set hero name we surrender to
+  ;add xp to victorious hero
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.LeftPlayerSurrendered
+  .RightPlayerSurrendered:
+  call  CalculateXpGainedLeftPlayer  ;out: hl=xp gained
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow1
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow1:
+  jr    .EndCheckOverflow2
+
+  .LeftPlayerSurrendered:
+  call  CalculateXpGainedRightPlayer  ;out: hl=xp gained
+  ld    ix,(HeroThatGetsAttacked)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow2
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow2:  
+
+  ;set hero we surrender to
   ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
   cp    7
   ld    ix,(plxcurrentheroAddress)
@@ -743,7 +776,36 @@ RetreatButtonPressed:
   ret
 
   .YesPressed:
-  ;set hero name we surrender to
+  ;add xp to victorious hero
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.LeftPlayerRetreated
+  .RightPlayerRetreated:
+  call  CalculateXpGainedLeftPlayer  ;out: hl=xp gained
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow1
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow1:
+  jr    .EndCheckOverflow2
+
+  .LeftPlayerRetreated:
+  call  CalculateXpGainedRightPlayer  ;out: hl=xp gained
+  ld    ix,(HeroThatGetsAttacked)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow2
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow2:    
+  
+  ;set retreating hero
   ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
   cp    7
   ld    ix,(plxcurrentheroAddress)
@@ -756,7 +818,6 @@ RetreatButtonPressed:
   pop   af                                ;back to game
   ret
 
-
 SetRetreatButtons:
   ld    hl,SurrenderButtonTable-2
   ld    de,GenericButtonTable2-2
@@ -764,6 +825,370 @@ SetRetreatButtons:
   ldir
   ret
 
+
+
+
+
+
+
+SetBattlefieldCasualtiesDefender:
+  ld    a,173
+  ld    (CasualtiesOverviewCopy+dy),a
+
+  ld    hl,$4000 + (142*128) + (044/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (022*256) + (138/2)
+  ld    a,VictoryBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  ld    b,004                           ;dx number
+  ld    c,0                             ;amount of slots with casualties
+  ld    de,$0000 + (214*128) + (004/2) - 128 ;dx 14x14 unit portrait
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+0)              ;monster type/nr
+  ld    l,(iy+HeroUnits+1)
+  ld    h,(iy+HeroUnits+2)              ;amount units slot 1
+  ld    ix,Monster7
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+3)              ;monster type/nr
+  ld    l,(iy+HeroUnits+4)
+  ld    h,(iy+HeroUnits+5)              ;amount units slot 1
+  ld    ix,Monster8
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+6)              ;monster type/nr
+  ld    l,(iy+HeroUnits+7)
+  ld    h,(iy+HeroUnits+8)              ;amount units slot 1
+  ld    ix,Monster9
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+9)              ;monster type/nr
+  ld    l,(iy+HeroUnits+10)
+  ld    h,(iy+HeroUnits+11)             ;amount units slot 1
+  ld    ix,Monster10
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+12)             ;monster type/nr
+  ld    l,(iy+HeroUnits+13)
+  ld    h,(iy+HeroUnits+14)             ;amount units slot 1
+  ld    ix,Monster11
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+  ld    a,(iy+HeroUnits+15)             ;monster type/nr
+  ld    l,(iy+HeroUnits+16)
+  ld    h,(iy+HeroUnits+17)             ;amount units slot 1
+  ld    ix,Monster12
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+  jp    SetBattlefieldCasualtiesAttacker.AllSlotsChecked
+
+SetBattlefieldCasualtiesAttacker:
+  ld    a,144
+  ld    (CasualtiesOverviewCopy+dy),a
+
+  ld    hl,$4000 + (142*128) + (044/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (022*256) + (138/2)
+  ld    a,VictoryBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  ld    b,004                           ;dx number
+  ld    c,0                             ;amount of slots with casualties
+  ld    de,$0000 + (214*128) + (004/2) - 128 ;dx 14x14 unit portrait
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+0)              ;monster type/nr
+  ld    l,(iy+HeroUnits+1)
+  ld    h,(iy+HeroUnits+2)              ;amount units slot 1
+  ld    ix,Monster1
+  call  .CheckAmountOfMonstersSlotDied
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+3)              ;monster type/nr
+  ld    l,(iy+HeroUnits+4)
+  ld    h,(iy+HeroUnits+5)              ;amount units slot 1
+  ld    ix,Monster2
+  call  .CheckAmountOfMonstersSlotDied
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+6)              ;monster type/nr
+  ld    l,(iy+HeroUnits+7)
+  ld    h,(iy+HeroUnits+8)              ;amount units slot 1
+  ld    ix,Monster3
+  call  .CheckAmountOfMonstersSlotDied
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+9)              ;monster type/nr
+  ld    l,(iy+HeroUnits+10)
+  ld    h,(iy+HeroUnits+11)             ;amount units slot 1
+  ld    ix,Monster4
+  call  .CheckAmountOfMonstersSlotDied
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+12)             ;monster type/nr
+  ld    l,(iy+HeroUnits+13)
+  ld    h,(iy+HeroUnits+14)             ;amount units slot 1
+  ld    ix,Monster5
+  call  .CheckAmountOfMonstersSlotDied
+
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    a,(iy+HeroUnits+15)             ;monster type/nr
+  ld    l,(iy+HeroUnits+16)
+  ld    h,(iy+HeroUnits+17)             ;amount units slot 1
+  ld    ix,Monster6
+  call  .CheckAmountOfMonstersSlotDied
+  .AllSlotsChecked:
+
+  ld    a,c                             ;amount of slots with casualties
+  or    a
+  ret   z
+  dec   a
+  ld    b,1*22                          ;nx
+  ld    c,068+ 5*11                     ;dx
+  jr    z,.AmountOfSlotsWithCasualtiesFound
+  dec   a
+  ld    b,2*22                          ;nx
+  ld    c,068+ 4*11                     ;dx
+  jr    z,.AmountOfSlotsWithCasualtiesFound
+  dec   a
+  ld    b,3*22                          ;nx
+  ld    c,068+ 3*11                     ;dx
+  jr    z,.AmountOfSlotsWithCasualtiesFound
+  dec   a
+  ld    b,4*22                          ;nx
+  ld    c,068+ 2*11                     ;dx
+  jr    z,.AmountOfSlotsWithCasualtiesFound
+  dec   a
+  ld    b,5*22                          ;nx
+  ld    c,068+ 1*11                     ;dx
+  jr    z,.AmountOfSlotsWithCasualtiesFound
+  ld    b,6*22                          ;nx
+  ld    c,068+ 0*11                     ;dx
+
+  .AmountOfSlotsWithCasualtiesFound:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    a,1
+  jr    z,.ActivePageFound
+  xor   a
+  .ActivePageFound:
+  ld    (CasualtiesOverviewCopy+sPage),a
+  ld    (CasualtiesOverviewCopy+dPage),a
+  
+  ld    a,b
+  ld    (CasualtiesOverviewCopy+nx),a
+  ld    a,c
+  ld    (CasualtiesOverviewCopy+dx),a
+  
+  ld    hl,CasualtiesOverviewCopy
+  call  docopy
+  ret
+
+  .CheckAmountOfMonstersSlotDied:
+  ex    af,af'
+  ;left hero
+  call  .CalculateAmountOfUnitsLost
+  ret   z
+
+  ;set amount
+  push  bc
+  ld    c,212+17                           ;dy
+  push  de
+  call  SetNumber16BitCastle
+  
+  ex    af,af'
+  call  .SetSYSX
+  pop   de
+  push  de
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  pop   de
+  pop   bc
+
+  inc   c                            ;amount of slots with casualties
+
+  ld    a,b
+  add   a,22
+  ld    b,a
+
+  ld    hl,22/2
+  add   hl,de
+  ex    de,hl
+  ret
+
+  .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;Unit*2
+  ld    de,.UnitSYSXTable14x14Portraits
+  add   hl,de
+  ld    c,(hl)
+  inc   hl
+  ld    b,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
+  push  bc
+  pop   hl
+
+  ld    a,Enemy14x14PortraitsBlock      ;Map block
+  ld    bc,NXAndNY14x14CharaterPortraits;(ny*256 + nx/2) = (14x14)
+  ret
+
+                        ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
+.UnitSYSXTable14x14Portraits:  
+                dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
+                dw $4000+(14*128)+(00/2)-128, $4000+(14*128)+(14/2)-128, $4000+(14*128)+(28/2)-128, $4000+(14*128)+(42/2)-128, $4000+(14*128)+(56/2)-128, $4000+(14*128)+(70/2)-128, $4000+(14*128)+(84/2)-128, $4000+(14*128)+(98/2)-128, $4000+(14*128)+(112/2)-128, $4000+(14*128)+(126/2)-128, $4000+(14*128)+(140/2)-128, $4000+(14*128)+(154/2)-128, $4000+(14*128)+(168/2)-128, $4000+(14*128)+(182/2)-128, $4000+(14*128)+(196/2)-128, $4000+(14*128)+(210/2)-128, $4000+(14*128)+(224/2)-128, $4000+(14*128)+(238/2)-128
+                dw $4000+(28*128)+(00/2)-128, $4000+(28*128)+(14/2)-128, $4000+(28*128)+(28/2)-128, $4000+(28*128)+(42/2)-128, $4000+(28*128)+(56/2)-128, $4000+(28*128)+(70/2)-128, $4000+(28*128)+(84/2)-128, $4000+(28*128)+(98/2)-128, $4000+(28*128)+(112/2)-128, $4000+(28*128)+(126/2)-128, $4000+(28*128)+(140/2)-128, $4000+(28*128)+(154/2)-128, $4000+(28*128)+(168/2)-128, $4000+(28*128)+(182/2)-128, $4000+(28*128)+(196/2)-128, $4000+(28*128)+(210/2)-128, $4000+(28*128)+(224/2)-128, $4000+(28*128)+(238/2)-128
+                dw $4000+(42*128)+(00/2)-128, $4000+(42*128)+(14/2)-128, $4000+(42*128)+(28/2)-128, $4000+(42*128)+(42/2)-128, $4000+(42*128)+(56/2)-128, $4000+(42*128)+(70/2)-128, $4000+(42*128)+(84/2)-128, $4000+(42*128)+(98/2)-128, $4000+(42*128)+(112/2)-128, $4000+(42*128)+(126/2)-128, $4000+(42*128)+(140/2)-128, $4000+(42*128)+(154/2)-128, $4000+(42*128)+(168/2)-128, $4000+(42*128)+(182/2)-128, $4000+(42*128)+(196/2)-128, $4000+(42*128)+(210/2)-128, $4000+(42*128)+(224/2)-128, $4000+(42*128)+(238/2)-128
+                dw $4000+(56*128)+(00/2)-128, $4000+(56*128)+(14/2)-128, $4000+(56*128)+(28/2)-128, $4000+(56*128)+(42/2)-128, $4000+(56*128)+(56/2)-128, $4000+(56*128)+(70/2)-128, $4000+(56*128)+(84/2)-128, $4000+(56*128)+(98/2)-128, $4000+(56*128)+(112/2)-128, $4000+(56*128)+(126/2)-128, $4000+(56*128)+(140/2)-128, $4000+(56*128)+(154/2)-128, $4000+(56*128)+(168/2)-128, $4000+(56*128)+(182/2)-128, $4000+(56*128)+(196/2)-128, $4000+(56*128)+(210/2)-128, $4000+(56*128)+(224/2)-128, $4000+(56*128)+(238/2)-128
+                dw $4000+(70*128)+(00/2)-128, $4000+(70*128)+(14/2)-128, $4000+(70*128)+(28/2)-128, $4000+(70*128)+(42/2)-128, $4000+(70*128)+(56/2)-128, $4000+(70*128)+(70/2)-128, $4000+(70*128)+(84/2)-128, $4000+(70*128)+(98/2)-128, $4000+(70*128)+(112/2)-128, $4000+(70*128)+(126/2)-128, $4000+(70*128)+(140/2)-128, $4000+(70*128)+(154/2)-128, $4000+(70*128)+(168/2)-128, $4000+(70*128)+(182/2)-128, $4000+(70*128)+(196/2)-128, $4000+(70*128)+(210/2)-128, $4000+(70*128)+(224/2)-128, $4000+(70*128)+(238/2)-128
+                dw $4000+(84*128)+(00/2)-128, $4000+(84*128)+(14/2)-128, $4000+(84*128)+(28/2)-128, $4000+(84*128)+(42/2)-128, $4000+(84*128)+(56/2)-128, $4000+(84*128)+(70/2)-128, $4000+(84*128)+(84/2)-128, $4000+(84*128)+(98/2)-128, $4000+(84*128)+(112/2)-128, $4000+(84*128)+(126/2)-128, $4000+(84*128)+(140/2)-128, $4000+(84*128)+(154/2)-128, $4000+(84*128)+(168/2)-128, $4000+(84*128)+(182/2)-128, $4000+(84*128)+(196/2)-128, $4000+(84*128)+(210/2)-128, $4000+(84*128)+(224/2)-128, $4000+(84*128)+(238/2)-128
+
+
+
+
+
+
+  .CalculateAmountOfUnitsLost:
+  push  de
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+
+  or    a
+  sbc   hl,de                           ;sub monster at start of fight - monsters at end
+  pop   de
+  ret
+
+
+
+CalculateXpGainedRightPlayer:
+  ;left hero
+  ld    iy,(plxcurrentheroAddress)      ;defending hero
+  ld    l,(iy+HeroUnits+1)
+  ld    h,(iy+HeroUnits+2)              ;amount units slot 1
+  ld    ix,Monster1
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  push  hl
+
+  ld    iy,(plxcurrentheroAddress)       ;defending hero
+  ld    l,(iy+HeroUnits+4)
+  ld    h,(iy+HeroUnits+5)              ;amount units slot 2
+  ld    ix,Monster2
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(plxcurrentheroAddress)       ;defending hero
+  ld    l,(iy+HeroUnits+7)
+  ld    h,(iy+HeroUnits+8)              ;amount units slot 2
+  ld    ix,Monster3
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(plxcurrentheroAddress)       ;defending hero
+  ld    l,(iy+HeroUnits+10)
+  ld    h,(iy+HeroUnits+11)             ;amount units slot 2
+  ld    ix,Monster4
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(plxcurrentheroAddress)       ;defending hero
+  ld    l,(iy+HeroUnits+13)
+  ld    h,(iy+HeroUnits+14)             ;amount units slot 2
+  ld    ix,Monster5
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(plxcurrentheroAddress)       ;defending hero
+  ld    l,(iy+HeroUnits+16)
+  ld    h,(iy+HeroUnits+17)             ;amount units slot 2
+  ld    ix,Monster6
+  call  CalculateXpGainedLeftPlayer.CalculateXpGained
+  pop   de
+  add   hl,de
+  ret
+
+CalculateXpGainedLeftPlayer:
+  ;right hero
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+1)
+  ld    h,(iy+HeroUnits+2)              ;amount units slot 1
+  ld    ix,Monster7
+  call  .CalculateXpGained
+  push  hl
+
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+4)
+  ld    h,(iy+HeroUnits+5)              ;amount units slot 2
+  ld    ix,Monster8
+  call  .CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+7)
+  ld    h,(iy+HeroUnits+8)              ;amount units slot 2
+  ld    ix,Monster9
+  call  .CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+10)
+  ld    h,(iy+HeroUnits+11)             ;amount units slot 2
+  ld    ix,Monster10
+  call  .CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+13)
+  ld    h,(iy+HeroUnits+14)             ;amount units slot 2
+  ld    ix,Monster11
+  call  .CalculateXpGained
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  ld    l,(iy+HeroUnits+16)
+  ld    h,(iy+HeroUnits+17)             ;amount units slot 2
+  ld    ix,Monster12
+  call  .CalculateXpGained
+  pop   de
+  add   hl,de
+  ret
+
+
+  .CalculateXpGained:
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+
+  or    a
+  sbc   hl,de                           ;sub monster at start of fight - monsters at end
+  ret   z                               ;no change, no xp gained
+
+  push  hl                              ;hl->amount of units died
+  call  SetMonsterTableInIY             ;in x->Monster1.. table, out: 
+  ld    d,0
+  ld    e,(iy+MonsterTableHp)           ;de->hp per unit
+  pop   hl
+
+  call  MultiplyHlWithDE                ;Out: HL = result  
+  ret
 
 CheckVictoryOrDefeat:
   ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
@@ -808,6 +1233,21 @@ CheckVictoryOrDefeat:
   ;right hero
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
   call  .SetRightHero
+
+  call  CalculateXpGainedRightPlayer     ;out: hl=xp gained
+
+  ld    ix,(HeroThatGetsAttacked)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow2
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow2:
+
+  call  SetBattlefieldCasualtiesAttacker
+  call  SetBattlefieldCasualtiesDefender
 
   call  SwapAndSetPage                  ;swap and set page 1
   call  .CopyActivePageToInactivePage
@@ -854,18 +1294,6 @@ CheckVictoryOrDefeat:
   
 
   .CheckRightPlayerLostEntireArmy:
-;  ld    a,(NewPrContr)
-;  bit   6,a                             ;check ontrols to see if f1 is pressed 
-;  ret   z
-  
-;  ld    ix,(plxcurrentheroAddress)
-;  dec   (ix+HeroX)
-  
-;  pop   de
-;  pop   de
-;  ret  
-  
-  
   ld    a,(Monster7+MonsterHP)
   or    a
   ret   nz
@@ -888,8 +1316,14 @@ CheckVictoryOrDefeat:
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (002*128) + (024/2) - 128
-  ld    bc,$0000 + (207*256) + (210/2)
+  ld    bc,$0000 + (127*256) + (210/2)
   ld    a,VictoryBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (127*128) + (000/2) - 128
+  ld    de,$0000 + ((002+127)*128) + (024/2) - 128
+  ld    bc,$0000 + ((207-127)*256) + (210/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
@@ -900,11 +1334,27 @@ CheckVictoryOrDefeat:
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
   call  .SetRightHero
 
+  call  CalculateXpGainedLeftPlayer     ;out: hl=xp gained
+
+  push  hl
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jr    c,.EndCheckOverflow
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  .EndCheckOverflow:
+  pop   hl
+
   ;set xp gained
   ld    b,112                           ;dx
   ld    c,116                           ;dy
-  ld    hl,5490
   call  SetNumber16BitCastle
+
+  call  SetBattlefieldCasualtiesAttacker
+  call  SetBattlefieldCasualtiesDefender
 
   call  SwapAndSetPage                  ;swap and set page 1
   call  .CopyActivePageToInactivePage
@@ -1004,21 +1454,11 @@ CheckVictoryOrDefeat:
   .RightHeroIsANeutralMonster:
   ld    a,1 ;(ix+MonsterNumber)
   call  CheckRightClickToDisplayInfo.SetSYSX
-;  ld    de,$0000 + (015*128) + (210/2) - 128
-;  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
-
-
-
   exx
   ld    de,256*(015) + (211)
   exx
-;  sbc   hl,bc
   ld    de,$0000 + (015*128) + (210/2) - 128
   call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-
-
-
 
   call  .SetMonsterTableInIY
   push  iy

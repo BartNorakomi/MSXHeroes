@@ -3973,6 +3973,7 @@ call ScreenOn
   ld    l,(ix+HeroXp+0)
   ld    h,(ix+HeroXp+1)
   add   hl,de
+  ret   c
   ld    (ix+HeroXp+0),l
   ld    (ix+HeroXp+1),h
   ret

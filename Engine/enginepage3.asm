@@ -393,6 +393,12 @@ MoveMonsterToX: ds  1
 CurrentActiveMonster: db  1
 TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
+CasualtiesOverviewCopy:
+	db		000,000,212,000
+	db		068,000,144,000
+	db		132,000,022,000
+	db		000,000,$d0	
+
 MonsterY:               equ 0
 MonsterX:               equ MonsterY+1
 MonsterYPrevious:       equ MonsterX+1
