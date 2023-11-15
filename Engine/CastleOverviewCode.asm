@@ -1337,6 +1337,15 @@ EndTurn:
 	ld		b,amountofheroesperplayer 
   .loop:
 
+  ;if hero has more mana than total mana, skip this entire process
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)  
+  ld    e,(ix+HeroMana+0)
+  ld    d,(ix+HeroMana+1)
+  or    a
+  sbc   hl,de
+  jr    c,.EndSetMana
+  ;/if hero has more mana than total mana, skip this entire process
   ld    l,(ix+HeroMana+0)
   ld    h,(ix+HeroMana+1)
   ld    d,0
@@ -1354,6 +1363,7 @@ EndTurn:
   .SetMana:
   ld    (ix+HeroMana+0),l
   ld    (ix+HeroMana+1),h
+  .EndSetMana:
 
 	ld		a,(ix+HeroTotalMove)		  ;total movement
 	ld		(ix+HeroMove),a		        ;reset total movement
@@ -1381,6 +1391,22 @@ EndTurn:
   call  ActivateFirstActiveHeroForCurrentPlayer
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
+  ret
+
+SetManaAndMovementToMax:
+  call  SetHeroMaxMovementPoints.IxAlreadySet
+	ld		(ix+HeroMove),a		        ;reset total movement
+
+  ld    de,ItemIntelligencePointsTable
+  push  ix
+  call  SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet    
+  pop   ix
+  call  SetTotalManaHero.SetAdditionalStatFromInventoryItemsInHLDone
+
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  ld    (ix+HeroMana+0),l
+  ld    (ix+HeroMana+1),h
   ret
 
 ClearAlreadyBuiltThisTurnCastles:
@@ -1485,15 +1511,17 @@ AddEstatesIncomeToPlayer:
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    255
   ret   z                               ;dont add estates gold if hero is inactive/died/retreated
+  cp    254
+  ret   z                               ;dont add estates gold if hero is inactive/died/retreated
 
   ld    a,(ix+HeroSkills)
-  cp    16
+  cp    13
   ld    de,125
   jr    z,.EstatesFound                 ;basic estates (125 gold per day)
-  cp    17
+  cp    14
   ld    de,250
   jr    z,.EstatesFound                 ;advanced estates (250 gold per day)
-  cp    18
+  cp    15
   ld    de,500
   jr    z,.EstatesFound                 ;expert estates (500 gold per day)
 
@@ -1775,6 +1803,7 @@ SetHeroStats:
 
 SetAdditionalStatFromInventoryItemsInHL:
   ld    ix,(plxcurrentheroAddress)
+  .IxAlreadySet:
 
   ld    b,05                            ;total amount of items (per inventory slot)
   ld    c,0                             ;item number
@@ -8063,6 +8092,9 @@ CastleOverviewTavernCode:
   ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
   ld    a,(iy+CastleLevel1Units)        ;castle x  
   ld    (ix+HeroUnits),a
+
+  ;when a surrendered or retreated hero is purchased from tavern, reset it's stats
+  call  SetManaAndMovementToMax         ;in: ix->hero
   ret
   
   .HeroSkillPerClassTable:
@@ -8146,12 +8178,19 @@ CastleOverviewTavernCode:
   ld    (ix+HeroUnits),a
   ld    (ix+HeroUnits+1),1
   .EndCheckRetreated:
-  
+  ;
   pop   af                              ;pop the call to this routine
-  ld    (ix+heroStatus),2               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  ;check which slot is empty (visiting or defending)
+  ld    a,(EmptyHeroRecruitedAtTavern+HeroStatus)
+  ld    (ix+heroStatus),a               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+  ;when a surrendered or retreated hero is purchased from tavern, reset it's stats
+  call  SetManaAndMovementToMax         ;in: ix->hero
+
   call  .SetYX
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
   pop   af
+  
   ret
 
 

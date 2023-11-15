@@ -13,7 +13,8 @@ InitiateGame:
   ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
 
-
+;  ld    a,2
+;  ld    (PlayerThatGetsAttacked),a
   ld    hl,pl2hero1y
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
@@ -298,7 +299,7 @@ BattleFieldGrid: ;0C15Ch
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000 
   db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-
+EndBattleFieldGrid:
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 
 ;BattleFieldGridForDistanceCalculation:
@@ -390,6 +391,7 @@ HandleRetaliation?: db  0
 MonsterDied?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
+CurrentActiveMonsterSpeed: ds  1
 CurrentActiveMonster: db  1
 TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
@@ -479,8 +481,8 @@ Monster3:
 .x: db  012 + (04*08)
 .yprevious: db  056 + (03*16) - 16  - 8
 .xprevious: db  012 + (04*08)
-.SYSXinROM: dw  RIdle1Monster003
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  16 + 8
 .nx:  db  16
 .Number:  db 003                      ;big spider (sd snatcher)
@@ -495,8 +497,8 @@ Monster4:
 .x: db  012 + (11*08)
 .yprevious: db  056 + (00*16) - 32
 .xprevious: db  012 + (11*08)
-.SYSXinROM: dw  RIdle1Monster004
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  32
 .nx:  db  16
 .Number:  db 004                      ;green flyer (sd snatcher)
@@ -511,8 +513,8 @@ Monster5:
 .x: db  012 + (01*08)
 .yprevious: db  056 + (08*16) - 16  - 4
 .xprevious: db  012 + (01*08)
-.SYSXinROM: dw  RIdle1Monster005
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                        ;tiny spider (sd snatcher)
@@ -527,8 +529,8 @@ Monster6:
 .x: db  012 + (20*08)
 .yprevious: db  056 + (01*16) - 64  - 4
 .xprevious: db  012 + (20*08)
-.SYSXinROM: dw  RIdle1Monster006
-.RomBlock:  db  BattleMonsterSpriteSheet2Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  64 + 4
 .nx:  db  64
 .Number:  db 006                              ;huge boo (golvellius)
@@ -545,8 +547,8 @@ Monster7:
 .x: db  012 + (10*08)
 .yprevious: db  056 + (0*16) - 64  - 4
 .xprevious: db  012 + (10*08)
-.SYSXinROM: dw  LIdle1Monster002
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  64 + 4
 .nx:  db  56
 .Number:  db 002                                    ;huge snake (golvellius)
@@ -561,8 +563,8 @@ Monster8:
 .x: db  012 + (17*08)         
 .yprevious: db  056 + (02*16) - 32    
 .xprevious: db  012 + (17*08)         
-.SYSXinROM: dw  LIdle1Monster007
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  32
 .nx:  db  16
 .Number:  db 007                                  ;brown flyer (sd snatcher)
@@ -577,8 +579,8 @@ Monster9:
 .x: db  012 + (27*08)
 .yprevious: db  056 + (06*16) - 32
 .xprevious: db  012 + (27*08)
-.SYSXinROM: dw  LIdle1Monster004
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  32
 .nx:  db  16
 .Number:  db 004                  ;green flyer (sd snatcher)
@@ -593,8 +595,8 @@ Monster10:
 .x: db  012 + (22*08)
 .yprevious: db  056 + (07*16) - 16  - 8
 .xprevious: db  012 + (22*08)
-.SYSXinROM: dw  LIdle1Monster003
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  16 + 8
 .nx:  db  16
 .Number:  db 003                  ;big spider (sd snatcher)
@@ -609,8 +611,8 @@ Monster11:
 .x: db  012 + (21*08)
 .yprevious: db  056 + (08*16) - 16  - 4
 .xprevious: db  012 + (21*08)
-.SYSXinROM: dw  LIdle1Monster005
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                      ;tiny spider (sd snatcher)
@@ -625,8 +627,8 @@ Monster12:
 .x: db  012 + (10*08)
 .yprevious: db  056 + (07*16) - 16  - 4
 .xprevious: db  012 + (10*08)
-.SYSXinROM: dw  LIdle1Monster005
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  16 + 4
 .nx:  db  16
 .Number:  db 005                          ;tiny spider (sd snatcher)
@@ -643,8 +645,8 @@ Monster13:
 .x: db  140
 .yprevious: db  100
 .xprevious: db  140
-.SYSXinROM: dw  $4000 + (112*128) + (000/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  64
 .nx:  db  56
 .Number:  db 001
@@ -659,8 +661,8 @@ Monster14:
 .x: db  200
 .yprevious: db  100
 .xprevious: db  200
-.SYSXinROM: dw  $4000 + (112*128) + (056/2) - 128
-.RomBlock:  db  BattleMonsterSpriteSheet1Block
+.SYSXinROM: dw  000
+.RomBlock:  db  000
 .ny:  db  64
 .nx:  db  40
 .Number:  db 001

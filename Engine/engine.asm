@@ -568,8 +568,110 @@ InterruptHandler:
   ei
   ret
 
+SetTotalManaHero:
+;total mana depends on the following
+;per point of intelligence you get +10 max mana
+;Basic Intelligence Boosts your hero's maximum spell points by 25% (skillnr# 022)
+;Advanced Intelligence Boosts your hero's maximum spell points by 50% (skillnr# 023)
+;Expert Intelligence Boosts your hero's maximum spell points by 100% (skillnr# 024)
+  ld    de,ItemIntelligencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL  
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  .SetAdditionalStatFromInventoryItemsInHLDone:
+  ld    e,(ix+HeroStatKnowledge)
+  ld    d,0
+  add   hl,de                           ;total knowledge
+
+  add   hl,hl                           ;*2
+  push  hl
+  pop   de
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,de                           ;*10
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
+  
+  ld    a,022                           ;skillnr# 022 = basic intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasBasicIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasBasicIntelligence
+
+  ld    a,023                           ;skillnr# 023 = advanced intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasAdvancedIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasAdvancedIntelligence
+
+  ld    a,024                           ;skillnr# 024 = expert intelligence
+  cp    (ix+HeroSkills+0)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+1)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+2)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+3)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+4)
+  jr    z,.HeroHasExpertIntelligence
+  cp    (ix+HeroSkills+5)
+  jr    z,.HeroHasExpertIntelligence
+  ret
+
+  ;Basic Intelligence Boosts your hero's maximum spell points by 25% (skillnr# 022)
+  .HeroHasBasicIntelligence:
+  ld    c,(ix+HeroTotalMana+0)
+  ld    b,(ix+HeroTotalMana+1)
+  ld    de,4
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,bc
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
+  ret
+
+  ;Advanced Intelligence Boosts your hero's maximum spell points by 50% (skillnr# 023)
+  .HeroHasAdvancedIntelligence:
+  ld    c,(ix+HeroTotalMana+0)
+  ld    b,(ix+HeroTotalMana+1)
+  ld    de,2
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,bc
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
+  ret
+
+  ;Expert Intelligence Boosts your hero's maximum spell points by 100% (skillnr# 024)  
+  .HeroHasExpertIntelligence:
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  add   hl,hl                           ;Hero's total spell points + 100%
+  ld    (ix+HeroTotalMana+0),l
+  ld    (ix+HeroTotalMana+1),h
+  ret
+
 SetHeroMaxMovementPoints:
   ld    ix,(plxcurrentheroAddress)
+  .IxAlreadySet:
   ld    b,0                             ;movement speed bonus for logistics
   call  .CheckMovementSpeedBonusForLogistics
   ld    c,0                             ;movement speed bonus for planeswalkers
@@ -1323,6 +1425,7 @@ AddXPToHero:
 
 SetResourcesCurrentPlayerinIX:
 	ld		a,(whichplayernowplaying?)
+  .PlayerAlreadySetInA:
   ld    ix,ResourcesPlayer1
   cp    1
   ret   z
@@ -4894,7 +4997,7 @@ EmptyHeroRecruitedAtTavern:
 .herox:		ds  1
 .heroxp: dw 000
 .heromove:	db	20,20
-.heromana:	dw	20,20
+.heromana:	dw	10,10
 .heromanarec:db	5		                ;recover x mana every turn
 .herostatus:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 .HeroUnits:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -4917,10 +5020,10 @@ pl1hero1y:		db	3
 pl1hero1x:		db	5
 pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
-pl1hero1mana:	dw	20,20
+pl1hero1mana:	dw	99,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 001 | dw 001 |      db 007 | dw 002 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 001 | dw 201 |      db 002 | dw 202 |      db 003 | dw 303 |      db 004 | dw 404 |      db 005 | dw 505 |      db 006 | dw 606 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5117,11 +5220,11 @@ pl1hero9y:		db	00		                ;
 pl2hero1y:		db	3
 pl2hero1x:		db	6
 pl2hero1xp: dw 0000
-pl2hero1move:	db	10,20
-pl2hero1mana:	dw	10,20
+pl2hero1move:	db	03,20
+pl2hero1mana:	dw	03,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 001 | dw 010 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5277,7 +5380,7 @@ TempVariableCastleX:	ds	1
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
 db 255 | TavernHeroesPlayer1:        db  011,012,013,014,015,016,017,018,000,000
-db 255 | TavernHeroesPlayer2:        db  006,007,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer2:        db  007,008,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
 

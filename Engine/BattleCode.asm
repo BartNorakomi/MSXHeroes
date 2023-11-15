@@ -8,9 +8,6 @@ HandleMonsters:
 
 ;  call  HandleProjectileSprite         ;done on int
 ;  call  HandleExplosionSprite          ;done on int
-
-
-
   call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
   call  CheckSpaceToMoveMonster
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
@@ -41,12 +38,6 @@ HandleMonsters:
 
   call  MoveMonster                     ;grid tile move
   call  SortMonstersFromHighToLow       ;sort monsters by y coordinate, since the monsters with the lowest y have to be put first (so they appear in the back)
-
-
-
-
-
-
 
 ;current monster (put)
   call  SetCurrentActiveMOnsterInIX
@@ -114,6 +105,7 @@ call screenon
   ld    (MonsterAnimationSpeed),a
   ld    (MoVeMonster?),a
 
+  call  ClearBattleFieldGridStartOfBattle
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  BuildUpBattleFieldAndPutMonsters
 
@@ -445,6 +437,24 @@ call screenon
   ret   nz  
   jr    .SetPage3
 
+ClearBattleFieldGridStartOfBattle:
+  ld    hl,.BattleFieldGrid
+  ld    de,BattleFieldGrid
+  ld    bc,EndBattleFieldGrid-BattleFieldGrid
+  ldir
+  ret
+
+.BattleFieldGrid: ;0C15Ch
+  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
+  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
+  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
+  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
+  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
+  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
+  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000 
+  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
+  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
+
 SetBattleButtons:
   ld    hl,BattleButtonTable-2
   ld    de,GenericButtonTable-2
@@ -519,6 +529,108 @@ CheckRetreatOrSurrender:
   jp    nz,RetreatButtonPressed
   ret
 
+CalculateCostToSurrender:               ;out: hl->cost
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  jr    c,.LeftPlayerSurrendered
+
+  .RightPlayerSurrendered:
+  ld    ix,Monster7
+  call  .CalculateCostMonsters
+  push  hl
+
+  ld    ix,Monster8
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster9
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster10
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster11
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster12
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  
+  ;divide total cost by 2. Total cost is half the purhcasing price of current monsters
+  push  hl
+  pop   bc
+  ld    de,2
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl 
+  ret
+
+  .LeftPlayerSurrendered:
+  ld    ix,Monster1
+  call  .CalculateCostMonsters
+  push  hl
+
+  ld    ix,Monster2
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster3
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster4
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster5
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+  push  hl
+
+  ld    ix,Monster6
+  call  .CalculateCostMonsters
+  pop   de
+  add   hl,de
+
+  ;divide total cost by 2. Total cost is half the purhcasing price of current monsters
+  push  hl
+  pop   bc
+  ld    de,2
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl 
+  ret
+
+  .CalculateCostMonsters:
+  push  ix
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    d,0
+  ld    e,(iy+MonsterTableCostGold)
+  pop   ix
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  call  MultiplyHlWithDE                ;Out: HL = result  
+  ret
+
 SurrenderButtonPressed:
   xor   a
   ld    (SurrenderButtonPressed?),a
@@ -537,10 +649,12 @@ SurrenderButtonPressed:
   ld    a,RetreatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+  call  CalculateCostToSurrender        ;out: hl->cost
+
   ;set fee for surrendering
   ld    b,127                           ;dx
   ld    c,142                           ;dy
-  ld    hl,5490
+;  ld    hl,5490
   call  SetNumber16BitCastle
   
   ;set hero name we surrender to
@@ -626,6 +740,10 @@ SurrenderButtonPressed:
   ld    (ix+HeroXp+1),h
   .EndCheckOverflow2:  
 
+  call  ExchangeSurrenderGoldBetweenHeroes
+  call  RemoveDeadMonstersAttacker
+  call  RemoveDeadMonstersDefender
+
   ;set hero we surrender to
   ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
   cp    7
@@ -694,11 +812,81 @@ SurrenderButtonPressed:
 	db		000,000,$d0	
 
 
+
+
+
+
+
+
+ExchangeSurrenderGoldBetweenHeroes:
+  call  CalculateCostToSurrender        ;out: hl->cost
+  push  hl
+  pop   de
+
+  ;remove gold from hero that surrenders
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+	ld		a,(whichplayernowplaying?)  
+  jr    c,.SurrenderingPlayerFound
+  ld    a,(PlayerThatGetsAttacked)
+  .SurrenderingPlayerFound:
+
+  call  SetResourcesCurrentPlayerinIX.PlayerAlreadySetInA
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;hl->current player's gold
+  or    a
+  sbc   hl,de                           ;subtract gold
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;hl->current player's gold
+
+  ;add gold to hero that wins
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  ld    a,(PlayerThatGetsAttacked)
+  jr    c,.VictoriousPlayerFound
+	ld		a,(whichplayernowplaying?)  
+  .VictoriousPlayerFound:
+
+  call  SetResourcesCurrentPlayerinIX.PlayerAlreadySetInA
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;hl->current player's gold
+  add   hl,de                           ;add gold
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;hl->current player's gold
+  ret
+
+
+
+
+
+
 SetSurrenderButtons:
   ld    hl,SurrenderButtonTable-2
   ld    de,GenericButtonTable2-2
-  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ld    bc,2+(GenericButtonTableLenghtPerButton*2)
   ldir
+
+  call  CalculateCostToSurrender        ;out: hl->cost
+  push  hl
+  pop   de
+
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+	ld		a,(whichplayernowplaying?)  
+  jr    c,.SurrenderingPlayerFound
+  ld    a,(PlayerThatGetsAttacked)
+  .SurrenderingPlayerFound:
+
+  call  SetResourcesCurrentPlayerinIX.PlayerAlreadySetInA
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;hl->current player's gold
+  or    a
+  sbc   hl,de                           ;check if player has enough gold to surrender
+  ret   nc
+
+  xor   a
+  ld    (GenericButtonTable2),a  
   ret
 
 SurrenderButton1Ytop:           equ 153
@@ -804,6 +992,9 @@ RetreatButtonPressed:
   ld    (ix+HeroXp+0),l
   ld    (ix+HeroXp+1),h
   .EndCheckOverflow2:    
+
+  call  RemoveDeadMonstersAttacker
+  call  RemoveDeadMonstersDefender
   
   ;set retreating hero
   ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
@@ -821,17 +1012,147 @@ RetreatButtonPressed:
 SetRetreatButtons:
   ld    hl,SurrenderButtonTable-2
   ld    de,GenericButtonTable2-2
-  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ld    bc,2+(GenericButtonTableLenghtPerButton*2)
   ldir
   ret
 
 
 
+RemoveDeadMonstersAttacker:
+  ;at the end of battle remove the monsters that died from the hero's army
+  ld    iy,(plxcurrentheroAddress)            ;attacking hero
 
+  ld    a,(Monster1+MonsterAmount)
+  ld    (iy+HeroUnits+1),a
+  ld    a,(Monster1+MonsterAmount+1)
+  ld    (iy+HeroUnits+2),a              ;amount units slot 1
+  or    (iy+HeroUnits+1)
+  jr    nz,.EndCheck0UnitsLeftSlot1
+  ld    (iy+HeroUnits+0),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot1:
 
+  ld    a,(Monster2+MonsterAmount)
+  ld    (iy+HeroUnits+4),a
+  ld    a,(Monster2+MonsterAmount+1)
+  ld    (iy+HeroUnits+5),a              ;amount units slot 1
+  or    (iy+HeroUnits+4)
+  jr    nz,.EndCheck0UnitsLeftSlot2
+  ld    (iy+HeroUnits+3),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot2:
 
+  ld    a,(Monster3+MonsterAmount)
+  ld    (iy+HeroUnits+7),a
+  ld    a,(Monster3+MonsterAmount+1)
+  ld    (iy+HeroUnits+8),a              ;amount units slot 1
+  or    (iy+HeroUnits+7)
+  jr    nz,.EndCheck0UnitsLeftSlot3
+  ld    (iy+HeroUnits+6),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot3:
+
+  ld    a,(Monster4+MonsterAmount)
+  ld    (iy+HeroUnits+10),a
+  ld    a,(Monster4+MonsterAmount+1)
+  ld    (iy+HeroUnits+11),a              ;amount units slot 1
+  or    (iy+HeroUnits+10)
+  jr    nz,.EndCheck0UnitsLeftSlot4
+  ld    (iy+HeroUnits+9),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot4:
+
+  ld    a,(Monster5+MonsterAmount)
+  ld    (iy+HeroUnits+13),a
+  ld    a,(Monster5+MonsterAmount+1)
+  ld    (iy+HeroUnits+14),a              ;amount units slot 1
+  or    (iy+HeroUnits+13)
+  jr    nz,.EndCheck0UnitsLeftSlot5
+  ld    (iy+HeroUnits+12),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot5:
+
+  ld    a,(Monster6+MonsterAmount)
+  ld    (iy+HeroUnits+16),a
+  ld    a,(Monster6+MonsterAmount+1)
+  ld    (iy+HeroUnits+17),a              ;amount units slot 1
+  or    (iy+HeroUnits+16)
+  jr    nz,.EndCheck0UnitsLeftSlot6
+  ld    (iy+HeroUnits+15),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot6:
+  ret
+
+RemoveDeadMonstersDefender:
+  ;at the end of battle remove the monsters that died from the hero's army
+  ld    iy,(HeroThatGetsAttacked)      ;defending hero
+
+  push  iy
+  pop   hl
+  ld    a,l
+  or    h
+  ret   z                               ;no need to remove monsters if enemy is a neutral monster
+
+  ld    a,(Monster7+MonsterAmount)
+  ld    (iy+HeroUnits+1),a
+  ld    a,(Monster7+MonsterAmount+1)
+  ld    (iy+HeroUnits+2),a              ;amount units slot 1
+  or    (iy+HeroUnits+1)
+  jr    nz,.EndCheck0UnitsLeftSlot1
+  ld    (iy+HeroUnits+0),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot1:
+
+  ld    a,(Monster8+MonsterAmount)
+  ld    (iy+HeroUnits+4),a
+  ld    a,(Monster8+MonsterAmount+1)
+  ld    (iy+HeroUnits+5),a              ;amount units slot 1
+  or    (iy+HeroUnits+4)
+  jr    nz,.EndCheck0UnitsLeftSlot2
+  ld    (iy+HeroUnits+3),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot2:
+
+  ld    a,(Monster9+MonsterAmount)
+  ld    (iy+HeroUnits+7),a
+  ld    a,(Monster9+MonsterAmount+1)
+  ld    (iy+HeroUnits+8),a              ;amount units slot 1
+  or    (iy+HeroUnits+7)
+  jr    nz,.EndCheck0UnitsLeftSlot3
+  ld    (iy+HeroUnits+6),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot3:
+
+  ld    a,(Monster10+MonsterAmount)
+  ld    (iy+HeroUnits+10),a
+  ld    a,(Monster10+MonsterAmount+1)
+  ld    (iy+HeroUnits+11),a              ;amount units slot 1
+  or    (iy+HeroUnits+10)
+  jr    nz,.EndCheck0UnitsLeftSlot4
+  ld    (iy+HeroUnits+9),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot4:
+
+  ld    a,(Monster11+MonsterAmount)
+  ld    (iy+HeroUnits+13),a
+  ld    a,(Monster11+MonsterAmount+1)
+  ld    (iy+HeroUnits+14),a              ;amount units slot 1
+  or    (iy+HeroUnits+13)
+  jr    nz,.EndCheck0UnitsLeftSlot5
+  ld    (iy+HeroUnits+12),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot5:
+
+  ld    a,(Monster12+MonsterAmount)
+  ld    (iy+HeroUnits+16),a
+  ld    a,(Monster12+MonsterAmount+1)
+  ld    (iy+HeroUnits+17),a              ;amount units slot 1
+  or    (iy+HeroUnits+16)
+  jr    nz,.EndCheck0UnitsLeftSlot6
+  ld    (iy+HeroUnits+15),0              ;set unit type to 0 when no units left
+  .EndCheck0UnitsLeftSlot6:
+  ret
+
+  
 
 SetBattlefieldCasualtiesDefender:
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  ret   z                               ;don't add xp if right player is a neutral monster
+;  jp    z,.SetBattlefieldCasualtiesDefenderNeutralMonster
+
   ld    a,173
   ld    (CasualtiesOverviewCopy+dy),a
 
@@ -1119,6 +1440,15 @@ CalculateXpGainedRightPlayer:
   ret
 
 CalculateXpGainedLeftPlayer:
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  ret   z
+;  jr    z,.EndAddXpToRightPlayer        ;don't add xp if right player is a neutral monster
+  
+
   ;right hero
   ld    iy,(HeroThatGetsAttacked)       ;defending hero
   ld    l,(iy+HeroUnits+1)
@@ -1220,6 +1550,10 @@ CheckVictoryOrDefeat:
   ret   nz
   ;left player has lost their entire army
 
+	ld    a,1                             ;now we switch and set our page
+	ld		(activepage),a		
+  call  SwapAndSetPage                  ;swap and set page 1  
+
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (002*128) + (024/2) - 128
   ld    bc,$0000 + (207*256) + (210/2)
@@ -1234,23 +1568,31 @@ CheckVictoryOrDefeat:
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
   call  .SetRightHero
 
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jr    z,.EndAddXpToRightPlayer        ;don't add xp if right player is a neutral monster
+  
   call  CalculateXpGainedRightPlayer     ;out: hl=xp gained
-
   ld    ix,(HeroThatGetsAttacked)            ;attacking hero
   ;add xp
   ld    e,(ix+HeroXp+0)
   ld    d,(ix+HeroXp+1)
   add   hl,de
-  jr    c,.EndCheckOverflow2
+  jr    c,.EndAddXpToRightPlayer
   ld    (ix+HeroXp+0),l
   ld    (ix+HeroXp+1),h
-  .EndCheckOverflow2:
+  .EndAddXpToRightPlayer:
 
   call  SetBattlefieldCasualtiesAttacker
   call  SetBattlefieldCasualtiesDefender
-
+  call  RemoveDeadMonstersDefender
+  
   call  SwapAndSetPage                  ;swap and set page 1
   call  .CopyActivePageToInactivePage
+  call  SetVictoryOrDefeatButton
 
   .engine2:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
@@ -1259,14 +1601,14 @@ CheckVictoryOrDefeat:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
-  ;battle buttons
-;  ld    ix,GenericButtonTable
-;  call  .CheckButtonMouseInteractionGenericButtons
-;  call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
+  ;victory or defeat button
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  .CheckVictoryOrDefeatButtonClicked       ;in: carry=button clicked, b=button number
 
-;  ld    ix,GenericButtonTable
-;  call  .SetGenericButtons              ;copies button state from rom -> vram
-  ;/battle buttons
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+  ;/victory or defeat button
 
   ld    a,(NewPrContr)
   bit   5,a                             ;check ontrols to see if m is pressed 
@@ -1279,9 +1621,16 @@ CheckVictoryOrDefeat:
   pop   de
   ret
   
+.CheckVictoryOrDefeatButtonClicked:
+  ret   nc
   
+  ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
+  call  DeactivateHeroThatAttacks       ;sets Status to 255 and moves all heros below this one, one position up 
   
-
+  pop   de
+  pop   de
+  pop   de
+  ret
 
 
 
@@ -1313,6 +1662,10 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
   ;right player has lost their entire army
+
+	ld    a,1                             ;now we switch and set our page
+	ld		(activepage),a		
+  call  SwapAndSetPage                  ;swap and set page 1  
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (002*128) + (024/2) - 128
@@ -1355,9 +1708,11 @@ CheckVictoryOrDefeat:
 
   call  SetBattlefieldCasualtiesAttacker
   call  SetBattlefieldCasualtiesDefender
+  call  RemoveDeadMonstersAttacker
 
   call  SwapAndSetPage                  ;swap and set page 1
   call  .CopyActivePageToInactivePage
+  call  SetVictoryOrDefeatButton
 
   .engine:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
@@ -1366,14 +1721,14 @@ CheckVictoryOrDefeat:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
-  ;battle buttons
-;  ld    ix,GenericButtonTable
-;  call  .CheckButtonMouseInteractionGenericButtons
-;  call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
+  ;victory or defeat button
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  .CheckVictoryOrDefeatButtonClicked2       ;in: carry=button clicked, b=button number
 
-;  ld    ix,GenericButtonTable
-;  call  .SetGenericButtons              ;copies button state from rom -> vram
-  ;/battle buttons
+  ld    ix,GenericButtonTable2
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+  ;/victory or defeat button
 
   ld    a,(NewPrContr)
   bit   5,a                             ;check ontrols to see if m is pressed 
@@ -1385,6 +1740,30 @@ CheckVictoryOrDefeat:
   pop   de
   pop   de
   ret
+  
+.CheckVictoryOrDefeatButtonClicked2:
+  ret   nc
+  
+  ;at the end of combat we have 6 situations: 1. attacking hero died, 2.defending hero died, 3. attacking hero fled, 4. defending hero fled, 5. attacking hero retreated, 6. defending hero retreated
+  call  DeactivateHeroThatGetsAttacked   ;sets Status to 255 and moves all heros below this one, one position up 
+  
+  pop   de
+  pop   de
+  pop   de
+  ret
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .SetLeftHero:
   push  ix
@@ -1506,6 +1885,23 @@ CheckVictoryOrDefeat:
 	db		000,000,000,001
 	db		000,001,212,000
 	db		000,000,$d0	
+
+SetVictoryOrDefeatButton:
+  ld    hl,VictoryOrDefeatButtonTable-2
+  ld    de,GenericButtonTable2-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*1)
+  ldir
+  ret
+
+VictoryOrDefeatButton1Ytop:           equ 183
+VictoryOrDefeatButton1YBottom:        equ VictoryOrDefeatButton1Ytop + 019
+VictoryOrDefeatButton1XLeft:          equ 208
+VictoryOrDefeatButton1XRight:         equ VictoryOrDefeatButton1XLeft + 020
+
+VictoryOrDefeatButtonTableGfxBlock:  db  RetreatBlock
+VictoryOrDefeatButtonTableAmountOfButtons:  db  1
+VictoryOrDefeatButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db VictoryOrDefeatButton1Ytop,VictoryOrDefeatButton1YBottom,VictoryOrDefeatButton1XLeft,VictoryOrDefeatButton1XRight | dw $0000 + (VictoryOrDefeatButton1Ytop*128) + (VictoryOrDefeatButton1XLeft/2) - 128 
 
 
 CheckRightClickToDisplayInfo:
@@ -2396,6 +2792,7 @@ SetMonsterTableInIY:
   ld    a,MonsterAddressesForBattle1Block               ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
   ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
+.skipSetBlock:
   ld    iy,Monster001Table-LengthMonsterAddressesTable           
   ld    h,0
   ld    l,(ix+MonsterNumber)
@@ -4500,7 +4897,12 @@ CheckSwitchToNextMonster:
   call  docopy
 
   ld    a,2
-	ld    (EraseMonster+sPage),a  	
+	ld    (EraseMonster+sPage),a
+
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    a,(iy+MonsterTableSpeed)
+	ld    (CurrentActiveMonsterSpeed),a
   ret
   
 FindNextActiveMonster:
@@ -5442,12 +5844,19 @@ SetcursorWhenGridTileIsActive:
   or    a
   jp    z,.SetHand
 
+	ld    a,(CurrentActiveMonsterSpeed)
+  ld    c,a
+
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means current monster is standing there
   jr    z,.ProhibitionSign
-  cp    MovementLenghtMonsters          ;if tile pointer points at =>x, that means monster does not have enough movement points to move there
+  cp    c                               ;if tile pointer points at =>x, that means monster does not have enough movement points to move there
   jr    nc,.ProhibitionSign
+
+
+
+
 
   ld    a,(ix+MonsterNX)
   cp    17
@@ -5867,8 +6276,12 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckTile:
+
+	ld    a,(CurrentActiveMonsterSpeed)
+  ld    c,a
+
   ld    a,(hl)
-  cp    MovementLenghtMonsters-1         ;if tile pointer points at =>6, that means monster does not have enough movement points to move there
+  cp    c ;MovementLenghtMonsters-1         ;if tile pointer points at =>6, that means monster does not have enough movement points to move there
   ret   c
   
   .SetProhibitionSign:
@@ -5884,7 +6297,7 @@ SetcursorWhenGridTileIsActive:
 
 
 
-
+RangedMonstersRange:  equ 7
 RangedMonsterCheck:
   xor   a
   ld    (IsThereAnyEnemyRightNextToActiveMonster?),a
@@ -6043,8 +6456,8 @@ RangedMonsterCheck:
   ld    a,b
   cp    2
   jp    z,.EnemyIsRightNextToActiveMonsterSoBrokenArrow
-  
-  cp    6
+    
+  cp    RangedMonstersRange
   jr    nc,.OutOfrange
   ld    c,1                             ;First check is IN RANGE !
   .OutOfrange:
@@ -6225,7 +6638,7 @@ HeroFledRetreating:                     ;retreating is free, but entire army is 
   ld    (ix+HeroUnits+17),a
   
 HeroFledSurrendering:                   ;surrendering costs gold, but entire army is kept
-HeroFled:
+;HeroFled:
   ld    (ix+HeroStatus),254             ;254 = hero fled
   ld    (ix+Heroy),255
   ld    (ix+Herox),255
