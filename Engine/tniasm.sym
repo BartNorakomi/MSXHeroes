@@ -57,6 +57,7 @@ BuildButton2Ytop: equ 02Ah ; last def. pass 3
 SurrenderButton1YBottom: equ 0ACh ; last def. pass 3
 GenericButtonTable3.Button3XRight: equ 0E2h ; last def. pass 3
 IsItPossibleToLevelOrSetNecromancy?: equ 059F8h ; last def. pass 3
+RIdle1Monster009: equ 06BA0h ; last def. pass 3
 doputstar.behindtree: equ 0106Dh ; last def. pass 3
 pl1hero8y.HeroStatDefense: equ 0344Ah ; last def. pass 3
 CastleOverviewMarketPlaceCode.EntryPointWhenClickedOnWhichResourceDoYouNeed: equ 085A8h ; last def. pass 3
@@ -112,7 +113,7 @@ SortMonstersOnTheirSpeed: equ 0594Ah ; last def. pass 3
 SetHeroMaxMovementPoints.CheckMovementSpeedBonusForGripfast: equ 03D8h ; last def. pass 3
 GenericButtonTable3.Button6XLeft: equ 0E6h ; last def. pass 3
 Spell08IconSX: equ 0E0h ; last def. pass 3
-Monster102Idle: equ 0829Ah ; last def. pass 3
+Monster102Idle: equ 084E8h ; last def. pass 3
 HeroOverViewSpellIconButton7MouseOverSX: equ 0F0h ; last def. pass 3
 SetSpellExplanation_Water.TextCost: equ 05C6Ah ; last def. pass 3
 HeroPortrait10x18SYSXSnake2: equ 03FA8h ; last def. pass 3
@@ -196,7 +197,7 @@ DefendingAndVisitingHeroButtonTable.Button1YBottom: equ 0D0h ; last def. pass 3
 EndTurn: equ 04C84h ; last def. pass 3
 HeroButton20x11SYSXGoemon2: equ 055ECh ; last def. pass 3
 EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters: equ 0759h ; last def. pass 3
-Monster106Idle: equ 082A4h ; last def. pass 3
+Monster106Idle: equ 084F2h ; last def. pass 3
 CheckSpaceToMoveMonster.CursorLocationSet: equ 06C26h ; last def. pass 3
 SetChestText.SetAmountOfGold: equ 0633Fh ; last def. pass 3
 Monster13.SYSXinROM: equ 0C4AFh ; last def. pass 3
@@ -424,6 +425,7 @@ HeroOverViewSkillsButtonMouseOverSY: equ 095h ; last def. pass 3
 RecruitButton6XRight: equ 0FAh ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.check: equ 09DBBh ; last def. pass 3
 HeroPortrait16x30SYSXLatok: equ 07FA0h ; last def. pass 3
+RIdle3Monster013: equ 077B0h ; last def. pass 3
 InventoryItem08MouseOverSY: equ 03Ch ; last def. pass 3
 HeroOverViewArmyIconButton6OffSY: equ 015h ; last def. pass 3
 CastleX: equ 01h ; last def. pass 3
@@ -438,11 +440,11 @@ HeroOverViewSpell1backdropDY: equ 035h ; last def. pass 3
 pl2hero9y.pl1hero6status: equ 0368Bh ; last def. pass 3
 SetSpellExplanation_Water.CostAmountFound: equ 05C4Fh ; last def. pass 3
 HeroLevelUpCode.VButton: equ 056FFh ; last def. pass 3
-Monster006Idle: equ 08204h ; last def. pass 3
+Monster006Idle: equ 083BCh ; last def. pass 3
 setspritecharacter.check: equ 01937h ; last def. pass 3
 HeroOverViewSpellIconButton15OffSX: equ 040h ; last def. pass 3
 InventoryItem10Dx: equ 026h ; last def. pass 3
-Monster002Move: equ 081ACh ; last def. pass 3
+Monster002Move: equ 08364h ; last def. pass 3
 TradeMenuCode.CheckButtonClickedTradingHeroesInventory: equ 0694Ah ; last def. pass 3
 CheckSpaceToMoveMonster.BrokenArrowFoundSetMovementPath: equ 06B95h ; last def. pass 3
 SetButtonMight: equ 05AC9h ; last def. pass 3
@@ -455,6 +457,7 @@ Monster14.x: equ 0C4BCh ; last def. pass 3
 BuildButtonTable.endlenght: equ 0C724h ; last def. pass 3
 InventoryItem13DY: equ 07Dh ; last def. pass 3
 HeroOverViewInventoryIconButton8MouseOverSX: equ 092h ; last def. pass 3
+Monster008Idle: equ 083E0h ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button6XLeft: equ 092h ; last def. pass 3
 InventoryItem24ButtonOffSX: equ 0B4h ; last def. pass 3
 CastleOverviewWindowButton4XRight: equ 0A8h ; last def. pass 3
@@ -463,6 +466,7 @@ NameCreature017: equ 0B568h ; last def. pass 3
 memblocks.2: equ 0D9CDh ; last def. pass 3
 MarketPlaceCost.Rubies: equ 0A28Eh ; last def. pass 3
 MoveMonster.SetMovementDuration: equ 05682h ; last def. pass 3
+Lattack1Monster008: equ 06B88h ; last def. pass 3
 ButtonTableSpellIconsEarthSYSX: equ 0CC28h ; last def. pass 3
 SetButtonStatusAndText3: equ 0660Fh ; last def. pass 3
 HeroOverViewSpellBookButton1OffSY: equ 00h ; last def. pass 3
@@ -485,6 +489,7 @@ BattleFieldGrid: equ 0C21Fh ; last def. pass 3
 StartOfTurnMessageOn?: equ 00h ; last def. pass 3
 SnatcherSpriteBlock: equ 08h ; last def. pass 3
 Monster2.Number: equ 0C404h ; last def. pass 3
+Rattack1Monster008: equ 06B80h ; last def. pass 3
 HeroOverviewStatusWindowCode.engine: equ 060C9h ; last def. pass 3
 PreviousButton2ClickedIX: equ 0CD3Bh ; last def. pass 3
 MoveMonster.InitiateAttackLeftDown: equ 05739h ; last def. pass 3
@@ -567,6 +572,7 @@ TheJuggernautDefence: equ 07h ; last def. pass 3
 SetHeroSkillsInTable: equ 064EDh ; last def. pass 3
 CopyRamToVramCorrectedCastleOverview.WriteOneLine: equ 0C0E3h ; last def. pass 3
 centrescreenforthishero.AnotherHeroIsSelectedOrMappointerIsDifferent: equ 0CF6h ; last def. pass 3
+RIdle2Monster017: equ 083A0h ; last def. pass 3
 copyfont: equ 0C4D9h ; last def. pass 3
 HeroPortrait16x30SYSXGillianSeed: equ 08EA8h ; last def. pass 3
 CastleOverviewMarketPlaceCode.TextCostRequireWoodTradeStone: equ 08612h ; last def. pass 3
@@ -638,11 +644,11 @@ WaterLevel1Button: equ 08ECBh ; last def. pass 3
 InventoryItem35MouseOverSY: equ 0D8h ; last def. pass 3
 InventoryItem31MouseOverSY: equ 0D8h ; last def. pass 3
 copyGraphicsToScreen2: equ 0400Bh ; last def. pass 3
-Monster002Idle: equ 081ACh ; last def. pass 3
+Monster002Idle: equ 08364h ; last def. pass 3
 CastleLevel6UnitsAvail: equ 01Ah ; last def. pass 3
 Spell7DX: equ 074h ; last def. pass 3
 SetVisitingHeroArmyAndAmount.SetSYSX: equ 08170h ; last def. pass 3
-Monster003Move: equ 081C6h ; last def. pass 3
+Monster003Move: equ 0837Eh ; last def. pass 3
 SurrenderButtonPressed.EndCheckOverflow1: equ 04537h ; last def. pass 3
 SetMarketPlaceButtons: equ 0876Fh ; last def. pass 3
 CursorArrowLeftUp: equ 01DB0h ; last def. pass 3
@@ -704,6 +710,7 @@ TextChest3: equ 062EFh ; last def. pass 3
 HandleProjectileSprite.Move3y1x: equ 05D65h ; last def. pass 3
 HeroOverviewSpellBookWindowCode_Earth.engine: equ 0583Ch ; last def. pass 3
 MonsterStatusWaiting: equ 01h ; last def. pass 3
+RIdle2Monster011: equ 06BE8h ; last def. pass 3
 SX_Hud: equ 0C4h ; last def. pass 3
 pl1hero6y.HeroStatKnowledge: equ 033C9h ; last def. pass 3
 RIdle1Monster006: equ 061A0h ; last def. pass 3
@@ -719,6 +726,7 @@ Pl1Hero1StatSpellDamage.HeroDYDX: equ 032A3h ; last def. pass 3
 HellSlayerAttack: equ 07h ; last def. pass 3
 NameCreature054: equ 0B749h ; last def. pass 3
 SetSpellExplanation_Water.DamageAmountFound: equ 05C13h ; last def. pass 3
+RIdle1Monster014: equ 077D0h ; last def. pass 3
 HeroThatGetsAttacked: equ 0B19h ; last def. pass 3
 RemoveDeadMonstersAttacker.EndCheck0UnitsLeftSlot3: equ 04774h ; last def. pass 3
 SkillLearningAdvanced: equ 0717Eh ; last def. pass 3
@@ -808,6 +816,7 @@ Pl1Hero4Units.HeroLevel: equ 0334Fh ; last def. pass 3
 buildupscreenXoffset: equ 06h ; last def. pass 3
 ConvertToDecimal.EndSet100Fold: equ 06411h ; last def. pass 3
 BarracksLevel1Cost.Gems: equ 0A909h ; last def. pass 3
+LIdle1Monster007: equ 05FE8h ; last def. pass 3
 HeroOverViewArmyIconButton3MouseOverSY: equ 015h ; last def. pass 3
 Monster6.y: equ 0C43Bh ; last def. pass 3
 putrow.loop: equ 02B6Ah ; last def. pass 3
@@ -849,6 +858,7 @@ InventoryItem16ButtonOffSX: equ 014h ; last def. pass 3
 TradeMenuCode.EndCheck10WithPopIXandBC: equ 06CEAh ; last def. pass 3
 SetHeroWhoGetsTradeWithArmyAndAmount.DYDXVisitingHeroUnit2: equ 035A6h ; last def. pass 3
 SettavernHeroIcons.loop: equ 07FF3h ; last def. pass 3
+LIdle2Monster017: equ 083B0h ; last def. pass 3
 SetTavernHeroes: equ 07ED8h ; last def. pass 3
 HeroAddressesUndeadline2: equ 02EDBh ; last def. pass 3
 CenterHeroNameHasGainedALevel: equ 05C94h ; last def. pass 3
@@ -869,6 +879,7 @@ InventoryItem33ButtonOffSX: equ 078h ; last def. pass 3
 SetSpellExplanation_Fire.SetDamage: equ 05E33h ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.Tavern: equ 09A04h ; last def. pass 3
 TradeMenuCode.EndCheck6: equ 06B03h ; last def. pass 3
+Monster008Move: equ 083E0h ; last def. pass 3
 BeingHitSprite.CharFound: equ 06937h ; last def. pass 3
 CursorArrowRightUp: equ 01B70h ; last def. pass 3
 InitiateBattle.checkflag: equ 040E5h ; last def. pass 3
@@ -913,6 +924,7 @@ Monster6.hp: equ 0C449h ; last def. pass 3
 HeroOverviewWindowButtonXleft: equ 05h ; last def. pass 3
 AnimateMonster.MonsterIsFacingRight: equ 055B3h ; last def. pass 3
 Spell10IconSX: equ 0E0h ; last def. pass 3
+Monster017Table: equ 08280h ; last def. pass 3
 MarkLastPressedButtonArmy.EndCheck1: equ 045B4h ; last def. pass 3
 CastleOverviewMarketPlaceCode.TextGems: equ 086C9h ; last def. pass 3
 buildupscreenYoffset: equ 05h ; last def. pass 3
@@ -960,7 +972,7 @@ NameCreature034: equ 0B645h ; last def. pass 3
 HeroOverViewInventoryIconButton10MouseOverSX: equ 00h ; last def. pass 3
 RangedMonsterCheck.SameY_MoveOnlyX2: equ 07694h ; last def. pass 3
 SetNumber16BitCastle.DoSet10Fold: equ 0639h ; last def. pass 3
-Monster101Table: equ 080F0h ; last def. pass 3
+Monster101Table: equ 082A8h ; last def. pass 3
 xcoordinateStartPlayfield: equ 06h ; last def. pass 3
 checktriggermapscreen.notcarry2: equ 011A2h ; last def. pass 3
 VictoryOrDefeatButton1XLeft: equ 0D0h ; last def. pass 3
@@ -1034,8 +1046,9 @@ DescriptionGloves3: equ 04F03h ; last def. pass 3
 RetreatButtonPressed.CurrentActiveHeroFound: equ 0471Fh ; last def. pass 3
 SetButtonStatusAndText.loop: equ 066DAh ; last def. pass 3
 WaterLevel4Untouched: equ 09BB0h ; last def. pass 3
-GeneralMonsterAttackPatternRightDown: equ 0818Bh ; last def. pass 3
+GeneralMonsterAttackPatternRightDown: equ 08343h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button14Ytop: equ 0B0h ; last def. pass 3
+RIdle1Monster017: equ 08390h ; last def. pass 3
 pl1hero7y.Inventory: equ 03418h ; last def. pass 3
 MagicGuildLevel2Cost.Gold: equ 0A493h ; last def. pass 3
 CheckVictoryOrDefeat.CheckVictoryOrDefeatButtonClicked: equ 04CADh ; last def. pass 3
@@ -1043,6 +1056,7 @@ BigExplosionSprite.ColorFound: equ 06A90h ; last def. pass 3
 ResourcesPlayer1: equ 03B99h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button8Ytop: equ 0AEh ; last def. pass 3
 HeroOverviewArmyWindowCode: equ 04489h ; last def. pass 3
+Monster015Move: equ 0843Eh ; last def. pass 3
 Monster11.status: equ 0C49Ah ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.Tavern: equ 09E60h ; last def. pass 3
 InventoryItem21ButtonOffSY: equ 09Ch ; last def. pass 3
@@ -1055,10 +1069,12 @@ SetNumber16Bit.Check100Folds: equ 06386h ; last def. pass 3
 SkillOffenceAdvanced: equ 06B1Eh ; last def. pass 3
 MonsterTableCostRubies: equ 015h ; last def. pass 3
 HeroSYSXSnake2: equ 03FA0h ; last def. pass 3
+RIdle2Monster012: equ 07788h ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.BuyButtonPressed: equ 0932Fh ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.MarketPlace: equ 099FDh ; last def. pass 3
 TradingHeroesButtonTable.Button1XLeft: equ 020h ; last def. pass 3
 ButtonLit?: equ 00h ; last def. pass 3
+Monster009Move: equ 083FAh ; last def. pass 3
 NXAndNY16x32HeroSprites: equ 02008h ; last def. pass 3
 SetAvailableRecruitArmy.SetGemscost: equ 0466Eh ; last def. pass 3
 SetActiveTradingHeroArmyAndAmount.DYDXDefendingHeroUnit5: equ 015C4h ; last def. pass 3
@@ -1071,12 +1087,13 @@ CastleButtonGrassLand: equ 0549Bh ; last def. pass 3
 TextCityWalls: equ 0AD05h ; last def. pass 3
 BuildButton8XLeft: equ 040h ; last def. pass 3
 setspritecharacter: equ 017C2h ; last def. pass 3
+LIdle2Monster012: equ 07790h ; last def. pass 3
 SetHeroOverViewStatusWindow: equ 07AB0h ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.EndCheckUnitLevel1: equ 0948Eh ; last def. pass 3
 HeroOverViewSpellBookButton1DX: equ 016h ; last def. pass 3
 SetSpatInCastle: equ 0D0CFh ; last def. pass 3
 MagicGuildLevel4Cost.Ore: equ 0A668h ; last def. pass 3
-Monster101AttackPatternLeftUp: equ 0826Eh ; last def. pass 3
+Monster101AttackPatternLeftUp: equ 084BCh ; last def. pass 3
 SetScrollVButtonTable: equ 063E1h ; last def. pass 3
 pl1hero6y.HeroSpecificInfo: equ 033E6h ; last def. pass 3
 SpellDescriptionsMagicGuild.DescriptionEarth1: equ 089DFh ; last def. pass 3
@@ -1121,6 +1138,7 @@ SetTradingHeroesInventoryButtons: equ 070F6h ; last def. pass 3
 ButterflyIntelligence: equ 01h ; last def. pass 3
 CastleLevel4Cost.Gems: equ 0A101h ; last def. pass 3
 pl2hero9y: equ 03680h ; last def. pass 3
+LIdle2Monster007: equ 05FE0h ; last def. pass 3
 ExchangeSurrenderGoldBetweenHeroes.VictoriousPlayerFound: equ 0461Ch ; last def. pass 3
 HeroPortrait10x18SYSXGoemon1: equ 03F85h ; last def. pass 3
 SetQuickTipsText.setQuickTip: equ 06785h ; last def. pass 3
@@ -1134,6 +1152,8 @@ PutMovementBar.EndSearchPercentageMovementSmallExceptionWhenAlmost0: equ 053DDh 
 CheckRightClickToDisplayInfo.Check1TileMonsterStandsOn: equ 04F10h ; last def. pass 3
 SetNumber16BitCastle.Check1Fold: equ 0640h ; last def. pass 3
 HeroOverViewInventoryWindowNX: equ 092h ; last def. pass 3
+LenghtMonster008AttackPatternLeft: equ 07h ; last def. pass 3
+LIdle1Monster008: equ 06B98h ; last def. pass 3
 Depack.output_match1: equ 0D69Eh ; last def. pass 3
 MonstersSortedOnSpeed: equ 0C38Ah ; last def. pass 3
 Monster4.xprevious: equ 0C41Eh ; last def. pass 3
@@ -1146,6 +1166,7 @@ HeroOverviewSpellBookButtonTable_Earth: equ 0C588h ; last def. pass 3
 putstar: equ 02C7Eh ; last def. pass 3
 CastleOverviewWindowButton5XLeft: equ 0A8h ; last def. pass 3
 CastleOverviewMagicGuildCode.SpellFound: equ 089CAh ; last def. pass 3
+Monster007Move: equ 083C6h ; last def. pass 3
 MagicGuildLevel2Cost.Wood: equ 0A495h ; last def. pass 3
 colorlightbrown: equ 05h ; last def. pass 3
 HeroPortrait10x18SYSXGreyFox: equ 04885h ; last def. pass 3
@@ -1175,7 +1196,7 @@ WitSpriteBlock: equ 08h ; last def. pass 3
 putbottomcastles.putthreepieces: equ 012DAh ; last def. pass 3
 MarketPlaceButton4Ytop: equ 034h ; last def. pass 3
 IsItPossibleToLevelOrSetWisdom?: equ 05A08h ; last def. pass 3
-Monster101Idle: equ 08218h ; last def. pass 3
+Monster101Idle: equ 08466h ; last def. pass 3
 SetScrollVButtonTableGfxBlock: equ 063DFh ; last def. pass 3
 SetAvailableRecruitArmy.defense: equ 046D2h ; last def. pass 3
 SetAdditionalStatFromInventoryItemsInHL: equ 05003h ; last def. pass 3
@@ -1242,7 +1263,7 @@ LoadWorldTiles: equ 0D394h ; last def. pass 3
 CastleOverviewTavernCode.SwapVisitingHeroWithDefendingHero: equ 076BBh ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button10YBottom: equ 0A1h ; last def. pass 3
 MagicGuildEarthLevel4X: equ 048h ; last def. pass 3
-Monster102Table: equ 08118h ; last def. pass 3
+Monster102Table: equ 082D0h ; last def. pass 3
 CastleOverviewTavernCode.CheckVisitingHero: equ 07653h ; last def. pass 3
 CheckSwitchToNextMonster.SetCounterAttackdirection: equ 06D3Ah ; last def. pass 3
 SetTradingHeroesAndArmy: equ 072A9h ; last def. pass 3
@@ -1319,6 +1340,7 @@ SetResources?: equ 0A18h ; last def. pass 3
 whichplayernowplaying?: equ 02CB4h ; last def. pass 3
 HeroOverViewArmyIconWindowButtonNX: equ 012h ; last def. pass 3
 EndTurn.loop: equ 04C8Eh ; last def. pass 3
+RIdle1Monster011: equ 06BE0h ; last def. pass 3
 heroxmirror: equ 02BE0h ; last def. pass 3
 SetHeroWhoGetsTradeWithArmyAndAmount: equ 0737Fh ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.NotOverButton: equ 099ADh ; last def. pass 3
@@ -1327,7 +1349,7 @@ LevelUpButtonTable.Button2Ytop: equ 06Fh ; last def. pass 3
 HeroOverViewSpellIconButton18OffSX: equ 0A0h ; last def. pass 3
 HeroOverViewArmyIconButton4DY: equ 043h ; last def. pass 3
 RecruitButtonXleft: equ 09h ; last def. pass 3
-Monster001Move: equ 08192h ; last def. pass 3
+Monster001Move: equ 0834Ah ; last def. pass 3
 TradeMenuCode.EndCheck1b: equ 0695Ch ; last def. pass 3
 CastleOverviewMarketPlaceCode.SetTextResourceInHL: equ 08696h ; last def. pass 3
 RIdle2Monster001: equ 03F88h ; last def. pass 3
@@ -1361,6 +1383,7 @@ EraseManaandMovementBars: equ 053F2h ; last def. pass 3
 Monster0.nx: equ 0C3E3h ; last def. pass 3
 BuildButton4YBottom: equ 082h ; last def. pass 3
 CheckHeroPicksUpItem.WaterWell: equ 0957h ; last def. pass 3
+Monster007Idle: equ 083C6h ; last def. pass 3
 InventoryItemNY: equ 014h ; last def. pass 3
 RecruitButton6Ytop: equ 078h ; last def. pass 3
 DYDXVisitingHeroUnit5: equ 05A6Eh ; last def. pass 3
@@ -1378,10 +1401,10 @@ TradingHeroesInventoryButtonTable.Button8XLeft: equ 03Ah ; last def. pass 3
 SetNumber8Bit: equ 063E1h ; last def. pass 3
 Monster2.ny: equ 0C402h ; last def. pass 3
 HeroOverViewInventoryIconButton11MouseOverSY: equ 014h ; last def. pass 3
-Monster005Move: equ 081FAh ; last def. pass 3
+Monster005Move: equ 083B2h ; last def. pass 3
 ButtonTableSpellBookSYSX_Water: equ 0CD1Eh ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button11Ytop: equ 08Dh ; last def. pass 3
-Monster005Idle: equ 081FAh ; last def. pass 3
+Monster005Idle: equ 083B2h ; last def. pass 3
 scrollscreen.EndCheckCTRLAndUp: equ 028C4h ; last def. pass 3
 ThirdCastleWindowClicked: equ 054D9h ; last def. pass 3
 CastleOverviewCode.Same: equ 0B04Ah ; last def. pass 3
@@ -1462,6 +1485,7 @@ SetButtonWizzardry.Necromancy: equ 058A7h ; last def. pass 3
 Set9BuildButtons.MagicGuild: equ 09B9Ch ; last def. pass 3
 Monster3.nx: equ 0C413h ; last def. pass 3
 pl4hero1y: equ 038A0h ; last def. pass 3
+Monster008Table: equ 08118h ; last def. pass 3
 CenterScreenForCurrentHero: equ 0CAAh ; last def. pass 3
 TextBarracksLevel4: equ 0AA52h ; last def. pass 3
 SetAvailableRecruitArmy.names: equ 047ACh ; last def. pass 3
@@ -1477,7 +1501,7 @@ InitiateBattle.goCopyButton: equ 04155h ; last def. pass 3
 SetText.TextQuestionMarkSymbol: equ 04DAh ; last def. pass 3
 AddThisSkillToHero.HeroSlot2: equ 057BCh ; last def. pass 3
 MarketPlaceButton12XRight: equ 08Eh ; last def. pass 3
-Monster001Idle: equ 08192h ; last def. pass 3
+Monster001Idle: equ 0834Ah ; last def. pass 3
 Spell2DY: equ 03Fh ; last def. pass 3
 AddCastlesIncomeToPlayer.CastleLevelFound: equ 04F0Fh ; last def. pass 3
 MoveMonster.InitiateAttack: equ 05774h ; last def. pass 3
@@ -1496,6 +1520,7 @@ DisplaceRight: equ 016h ; last def. pass 3
 GoCenterAndCheckEnter: equ 054F1h ; last def. pass 3
 DYDXUnit6Window: equ 02ED8h ; last def. pass 3
 AirLevel2Button: equ 08EF2h ; last def. pass 3
+LIdle2Monster014: equ 077E0h ; last def. pass 3
 CastleOverviewWindowButton2XLeft: equ 030h ; last def. pass 3
 CheckButtonMouseInteractionRecruitButtons.MouseOverButtonAndSpacePressed: equ 096F0h ; last def. pass 3
 SetNumber16BitCastle.Check10000Folds: equ 05B9h ; last def. pass 3
@@ -1605,6 +1630,7 @@ ConvertToDecimal.EndSet10Fold: equ 06428h ; last def. pass 3
 SpellDescriptions.DescriptionFire1: equ 0598Ch ; last def. pass 3
 RecruitButton5XLeft: equ 05Ah ; last def. pass 3
 HandleProjectileSprite.Move4x1y: equ 05CF9h ; last def. pass 3
+LIdle2Monster011: equ 06BF8h ; last def. pass 3
 HeroOverViewInventoryIconButton1OffSX: equ 092h ; last def. pass 3
 MarketPlaceButton6YBottom: equ 075h ; last def. pass 3
 CityWallsCost: equ 0AE28h ; last def. pass 3
@@ -1616,7 +1642,7 @@ SearchForTileNumberA.Right: equ 06C8Eh ; last def. pass 3
 BuildButton9YBottom: equ 0B4h ; last def. pass 3
 HeroPortrait10x18SYSXUltrabox: equ 048A3h ; last def. pass 3
 MarketPlaceButton1XLeft: equ 01Eh ; last def. pass 3
-GeneralMonsterAttackPatternLeft: equ 0816Fh ; last def. pass 3
+GeneralMonsterAttackPatternLeft: equ 08327h ; last def. pass 3
 RecoverOverwrittenMonstersSkipMonster0.loop: equ 06EB3h ; last def. pass 3
 ReadOutKeyboardAndMovePointer.endcheckshift: equ 017A3h ; last def. pass 3
 MarketPlaceButton7XRight: equ 064h ; last def. pass 3
@@ -1625,6 +1651,7 @@ TradingHeroesInventoryButtonTable.Button12Ytop: equ 08Dh ; last def. pass 3
 spritecharacter: equ 017C1h ; last def. pass 3
 colordarklightgrey: equ 0Eh ; last def. pass 3
 SetCastlesInWindows.EndCheckTerrain: equ 0548Eh ; last def. pass 3
+Monster017Idle: equ 08452h ; last def. pass 3
 CheckButtonMouseInteractionGenericButtons.MenuOptionSelected: equ 08E97h ; last def. pass 3
 HeroOverViewArmyIconButton2OffSX: equ 09Ch ; last def. pass 3
 GenericButtonTable3.Button3YBottom: equ 058h ; last def. pass 3
@@ -1726,6 +1753,7 @@ TextMagicGuildLevel1: equ 0A349h ; last def. pass 3
 HeroOverViewSpell2backdropDX: equ 046h ; last def. pass 3
 SurrenderButtonPressed.engine: equ 044EDh ; last def. pass 3
 checktriggermapscreen.loop: equ 010D4h ; last def. pass 3
+RIdle2Monster009: equ 06BA8h ; last def. pass 3
 Monster13.amount: equ 0C4B7h ; last def. pass 3
 Monster8.Number: equ 0C464h ; last def. pass 3
 HeroInfoPortrait10x18SYSX: equ 022h ; last def. pass 3
@@ -1795,6 +1823,7 @@ HeroY: equ 00h ; last def. pass 3
 HeroAddressesGoemon1: equ 02CE3h ; last def. pass 3
 InventoryItem08ButtonOffSY: equ 028h ; last def. pass 3
 MoveMonster.DisplaceRight: equ 056A5h ; last def. pass 3
+LIdle3Monster013: equ 077B8h ; last def. pass 3
 CastleOverviewTavernCode.HeroRecruited: equ 07D27h ; last def. pass 3
 RIdle2Monster005: equ 05F88h ; last def. pass 3
 SetAvailableRecruitArmy.SetRubiescost: equ 04608h ; last def. pass 3
@@ -1831,6 +1860,7 @@ pl1hero2move: equ 032A9h ; last def. pass 3
 DescriptionArmor1: equ 04B2Ah ; last def. pass 3
 sprcoladdr: equ 07400h ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.MouseOverButtonAndSpacePressed: equ 092ADh ; last def. pass 3
+Monster017Move: equ 08452h ; last def. pass 3
 SetAvailableRecruitArmy.Level3UnitsUnavailable: equ 04570h ; last def. pass 3
 HeroOverViewInventoryIconButton6OffSY: equ 00h ; last def. pass 3
 SetVisitingOrDefendingHeroInIX.DoCheckHero: equ 081B6h ; last def. pass 3
@@ -1854,12 +1884,14 @@ HeroPortrait16x30SYSXBillRizer: equ 08EC0h ; last def. pass 3
 enlength: equ 03BCAh ; last def. pass 3
 CastleOverviewTavernCode.EndCheck10: equ 078FAh ; last def. pass 3
 SkillWisdomExpert: equ 07866h ; last def. pass 3
+LenghtMonster007AttackPatternLeft: equ 07h ; last def. pass 3
 TavernCost.Rubies: equ 0A347h ; last def. pass 3
 SetLevelUpHeroIcon: equ 05C1Ah ; last def. pass 3
 ShowRecruitWindowForSelectedUnit.Zero: equ 043A7h ; last def. pass 3
 CheckSpaceToMoveMonster.SwordRightDownFoundSetMovementPath: equ 06BE5h ; last def. pass 3
 SawmillLevel2Cost: equ 0A6ECh ; last def. pass 3
 MoveMonster.CheckRetaliate: equ 05804h ; last def. pass 3
+LIdle1Monster011: equ 06BF0h ; last def. pass 3
 movecursory.outofscreenbottom: equ 01722h ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.Mine: equ 09A17h ; last def. pass 3
 HeroOverViewSpellIconButton8OffSY: equ 070h ; last def. pass 3
@@ -1964,7 +1996,7 @@ AnimateMonster.animate: equ 05595h ; last def. pass 3
 HeroOverviewSpellBookButtonTableAmountOfButtons_Water: equ 0C5DBh ; last def. pass 3
 DeactivateHeroThatGetsAttacked: equ 0780Bh ; last def. pass 3
 ClearHeroButtons: equ 05561h ; last def. pass 3
-Monster004Move: equ 081E0h ; last def. pass 3
+Monster004Move: equ 08398h ; last def. pass 3
 MarketPlaceButton10YBottom: equ 075h ; last def. pass 3
 SetAllNumbersInGrid.SetNumberIn6Directions: equ 0719Bh ; last def. pass 3
 CheckHeroHasAtLeast2CreatureSlotsFilled.DefendingHeroCreatureSlot4Empty: equ 07E8Ch ; last def. pass 3
@@ -1976,7 +2008,9 @@ InventoryItem21ButtonOffSX: equ 078h ; last def. pass 3
 MarkLastPressedButton.NotEmpty: equ 048FAh ; last def. pass 3
 SetPage: equ 0D522h ; last def. pass 3
 Depack: equ 0D672h ; last def. pass 3
+LIdle1Monster009: equ 06BB0h ; last def. pass 3
 SkillTextArmourerExpert: equ 05E4Ch ; last def. pass 3
+Monster016Move: equ 08448h ; last def. pass 3
 TilesPerColumn: equ 0Ch ; last def. pass 3
 pl2hero9y.pl1hero6x: equ 03681h ; last def. pass 3
 CopyMageGuild: equ 0B408h ; last def. pass 3
@@ -1992,6 +2026,7 @@ NameCreature014: equ 0B541h ; last def. pass 3
 SetLevelUpHeroSkillsInTable: equ 05723h ; last def. pass 3
 HeroAddressesPochi: equ 030D3h ; last def. pass 3
 Monster11.ny: equ 0C492h ; last def. pass 3
+Monster014Move: equ 08434h ; last def. pass 3
 SpellDescriptions.Descriptionair1: equ 05A4Ch ; last def. pass 3
 HeroSYSXGoemon2: equ 06FA0h ; last def. pass 3
 Monster7.ny: equ 0C452h ; last def. pass 3
@@ -2018,6 +2053,7 @@ HeroOverviewSpellBookWindowCode_Water.SpellIconPressed: equ 05702h ; last def. p
 CastleOverviewTavernCode: equ 0754Eh ; last def. pass 3
 TavernHeroTableLenght: equ 0Ah ; last def. pass 3
 SetTextInButton.TextMinusSymbol: equ 067B7h ; last def. pass 3
+Monster015Table: equ 08230h ; last def. pass 3
 HeroPortrait16x30SYSXGreyFox: equ 08ED0h ; last def. pass 3
 SetText.TextDotSymbol: equ 04E4h ; last def. pass 3
 buildupscreen.loop: equ 02B4Eh ; last def. pass 3
@@ -2103,6 +2139,7 @@ HeroOverViewStatusWindowDY: equ 028h ; last def. pass 3
 NameCreature010: equ 0B50Dh ; last def. pass 3
 Pl1Hero1StatSpellDamage.WaterSpells: equ 03290h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable: equ 08226h ; last def. pass 3
+Monster011Idle: equ 0840Eh ; last def. pass 3
 CastleOverviewMarketPlaceCode.IXPointsToResourceNeeded: equ 084F8h ; last def. pass 3
 SetAvailableRecruitArmy.Level4Units0Available: equ 0450Fh ; last def. pass 3
 pl2hero9y.pl1hero6xp: equ 03682h ; last def. pass 3
@@ -2196,6 +2233,7 @@ RocksVersion1: equ 05B24h ; last def. pass 3
 Monster12.y: equ 0C49Bh ; last def. pass 3
 PlaceFireSpellsInSpellBook.EndPlaceFireSpell2: equ 05480h ; last def. pass 3
 NameCreature058: equ 0B77Dh ; last def. pass 3
+Rattack1Monster007: equ 05FD0h ; last def. pass 3
 HeroPortrait16x30SYSXSnake1: equ 07FB0h ; last def. pass 3
 BarracksLevel5Cost.Rubies: equ 0ABEFh ; last def. pass 3
 TheChokerSpellPower: equ 06h ; last def. pass 3
@@ -2248,6 +2286,7 @@ HeroOverviewCode.SpellBookSelected: equ 0623Ah ; last def. pass 3
 HeroOverViewStatusWindowNY: equ 074h ; last def. pass 3
 Spell8DY: equ 068h ; last def. pass 3
 InventoryItem14Dx: equ 07Eh ; last def. pass 3
+LIdle2Monster008: equ 06B90h ; last def. pass 3
 InventoryItem33MouseOverSX: equ 078h ; last def. pass 3
 HeroPortrait14x9SYSXMitchell: equ 04407h ; last def. pass 3
 SpellIconNY: equ 010h ; last def. pass 3
@@ -2289,6 +2328,7 @@ World1TilesBlock: equ 03h ; last def. pass 3
 HeroOverViewSpellIconButton5DX: equ 072h ; last def. pass 3
 SetEnemyStatsWindow.NoOverFlowRight: equ 04A50h ; last def. pass 3
 ResourcesPlayer4.Gold: equ 03BB7h ; last def. pass 3
+Monster010Move: equ 08404h ; last def. pass 3
 SpellDescriptionsMagicGuild.Descriptionair4: equ 08C9Ch ; last def. pass 3
 SetSpellExplanation_Earth.TextCost: equ 05FC6h ; last def. pass 3
 CheckButtonMouseInteractionCastle.MouseOverButtonAndSpacePressedOverButtonNotYetLit: equ 0B240h ; last def. pass 3
@@ -2318,6 +2358,7 @@ CursorArrowRightDown: equ 01C30h ; last def. pass 3
 TradeMenuCode: equ 0689Fh ; last def. pass 3
 SawmillLevel2Cost.Gold: equ 0A6ECh ; last def. pass 3
 BuildUpBattleFieldAndPutMonsters.XLeftHero: equ 00h ; last def. pass 3
+Monster016Table: equ 08258h ; last def. pass 3
 setspritecharacter.ShowScrollArrowTopAndLeft: equ 01AB6h ; last def. pass 3
 SetActiveTradingHeroArmyAndAmount.DYDXDefendingHeroUnit1: equ 0159Ch ; last def. pass 3
 TextSkillsWindowButton3: equ 0CE4Dh ; last def. pass 3
@@ -2370,6 +2411,7 @@ CheckEndHeroOverviewStatus: equ 06490h ; last def. pass 3
 EnterSpecificRoutineHeroOverviewCode: equ 0778h ; last def. pass 3
 HeroOverViewSpellIconButton18OffSY: equ 0B8h ; last def. pass 3
 MarkLastPressedButtonArmy.EndCheckZero: equ 04592h ; last def. pass 3
+Monster009Table: equ 08140h ; last def. pass 3
 CastleOverviewTavernCode.TavernButton1Pressed: equ 07D0Ch ; last def. pass 3
 SetBattlefieldCasualtiesAttacker.AllSlotsChecked: equ 0496Eh ; last def. pass 3
 Monster13.hp: equ 0C4B9h ; last def. pass 3
@@ -2409,6 +2451,7 @@ TradingHeroesButtonTable.Button2Ytop: equ 028h ; last def. pass 3
 LenghtGeneralMonsterAttackPatternRightDown: equ 06h ; last def. pass 3
 CheckVictoryOrDefeat.CheckVictoryOrDefeatButtonClicked2: equ 04D61h ; last def. pass 3
 HeroOverViewFirstWindowButton1DY: equ 054h ; last def. pass 3
+Monster007AttackPatternRight: equ 083D0h ; last def. pass 3
 InventoryItem07DY: equ 066h ; last def. pass 3
 CheckDefendButtonPressed: equ 052F7h ; last def. pass 3
 HeroOverViewArmyIconButton2MouseOverSY: equ 015h ; last def. pass 3
@@ -2433,6 +2476,7 @@ TradingHeroesButtonTable.Button6YBottom: equ 046h ; last def. pass 3
 setspritecharacter.ShowScrollArrowBottomAndRight: equ 01A8Ch ; last def. pass 3
 CopyRamToVramCorrectedCastleOverview.AddressesSet: equ 0C0CFh ; last def. pass 3
 AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked: equ 0B1Bh ; last def. pass 3
+Monster010Table: equ 08168h ; last def. pass 3
 DisplayHeroLevelUp: equ 06A4h ; last def. pass 3
 MonsterYPrevious: equ 02h ; last def. pass 3
 PlaceEarthSpellsInSpellBook.EndPlaceEarthSpell3: equ 05563h ; last def. pass 3
@@ -2466,7 +2510,7 @@ SkillTextestatesAdvanced: equ 05ECEh ; last def. pass 3
 TavernButtonTable.endlenght: equ 0834Ah ; last def. pass 3
 Monster8.amount: equ 0C467h ; last def. pass 3
 VictoryOrDefeatButtonTable: equ 04E63h ; last def. pass 3
-Monster101AttackPatternRight: equ 08222h ; last def. pass 3
+Monster101AttackPatternRight: equ 08470h ; last def. pass 3
 HeroOverviewSkillsWindowCode.engine: equ 06107h ; last def. pass 3
 CheckButtonMouseInteractionCastleMainScreen.MouseHoverOverButton: equ 0B195h ; last def. pass 3
 CheckButtonMouseInteractionCastleMainScreen.buttonIsStillLit: equ 0B1BCh ; last def. pass 3
@@ -2520,6 +2564,7 @@ HeroButton20x11SYSXPsychoWorld: equ 055DEh ; last def. pass 3
 SurrenderButtonPressed.YesPressed: equ 0451Ah ; last def. pass 3
 CityWallsCost.Ore: equ 0AE2Ch ; last def. pass 3
 ExchangeSurrenderGoldBetweenHeroes.SurrenderingPlayerFound: equ 045FDh ; last def. pass 3
+LIdle2Monster016: equ 061E0h ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.MenuOptionSelected: equ 099BDh ; last def. pass 3
 BuildButton7Ytop: equ 08Eh ; last def. pass 3
 HeroOverViewSpellIconButton7DY: equ 06Ch ; last def. pass 3
@@ -2532,6 +2577,7 @@ HeroOverViewSpellIconButton4DY: equ 06Ch ; last def. pass 3
 CopyBarracks: equ 0B3CCh ; last def. pass 3
 ClearCastleButtons: equ 054B7h ; last def. pass 3
 SetSingleBuildButtonColor.red: equ 09D75h ; last def. pass 3
+Monster011Move: equ 0840Eh ; last def. pass 3
 CompareHLwithDE: equ 0B4Bh ; last def. pass 3
 Mult16: equ 0175h ; last def. pass 3
 doputheros: equ 01370h ; last def. pass 3
@@ -2551,6 +2597,7 @@ HandleProjectileSprite.EndProjectile: equ 05DD5h ; last def. pass 3
 LenghtGeneralMonsterAttackPatternRightUp: equ 06h ; last def. pass 3
 DescriptionShield5: equ 04CCAh ; last def. pass 3
 Set9BuildButtons.BlueButton: equ 09C45h ; last def. pass 3
+RIdle1Monster007: equ 05FC0h ; last def. pass 3
 SetSingleBuildButton.go: equ 09AEDh ; last def. pass 3
 CastleOverviewWindowButton5YBottom: equ 0D2h ; last def. pass 3
 BattleButton1YBottom: equ 0D3h ; last def. pass 3
@@ -2766,10 +2813,12 @@ HeroOverViewInventoryIconButton4MouseOverSY: equ 0B0h ; last def. pass 3
 subyfrommouse: equ 04h ; last def. pass 3
 Monster12.status: equ 0C4AAh ; last def. pass 3
 SkillOffenceBasic: equ 06A96h ; last def. pass 3
+RIdle1Monster012: equ 07780h ; last def. pass 3
 ConvertToDecimal.Check100Folds: equ 063FDh ; last def. pass 3
 InventoryItem35ButtonOffSY: equ 0C4h ; last def. pass 3
 HeroPortrait10x18SYSXBigBoss: equ 0488Fh ; last def. pass 3
 TavernButton2YBottom: equ 07Fh ; last def. pass 3
+LIdle1Monster017: equ 083C0h ; last def. pass 3
 doputstar.setypointerloop: equ 01057h ; last def. pass 3
 CheckHeroHasAtLeast2CreatureSlotsFilled.DefendingHeroCreatureSlot6Empty: equ 07E9Eh ; last def. pass 3
 HeroOverViewFirstWindowButtonMouseOverSY: equ 085h ; last def. pass 3
@@ -2781,7 +2830,7 @@ BarracksLevel4Cost.Gold: equ 0AACCh ; last def. pass 3
 TextBarracksTower: equ 0ABF1h ; last def. pass 3
 Monster6.Number: equ 0C444h ; last def. pass 3
 SpellIconNX: equ 010h ; last def. pass 3
-Monster101Move: equ 0820Eh ; last def. pass 3
+Monster101Move: equ 0845Ch ; last def. pass 3
 AirSelected: equ 0606Bh ; last def. pass 3
 InventoryItem02ButtonOffSY: equ 00h ; last def. pass 3
 Monster11.SYSXinROM: equ 0C48Fh ; last def. pass 3
@@ -2801,6 +2850,7 @@ MagicGuildLevel3Cost.Gems: equ 0A53Dh ; last def. pass 3
 SortMonstersOnTheirSpeed.SetSpeed: equ 059A6h ; last def. pass 3
 Div16: equ 014Dh ; last def. pass 3
 Spell05IconSX: equ 0E0h ; last def. pass 3
+Monster008AttackPatternRight: equ 083EAh ; last def. pass 3
 HeroOverViewSpell6backdropDX: equ 08Ah ; last def. pass 3
 SetActiveCastleOverviewButtons.EndCheckBarracks: equ 0B0CBh ; last def. pass 3
 HeroesSpritesBlock2: equ 07h ; last def. pass 3
@@ -2990,6 +3040,7 @@ MarketPlaceButton3YBottom: equ 04Ah ; last def. pass 3
 RecruitButton3Ytop: equ 040h ; last def. pass 3
 RIdle2Monster101: equ 06390h ; last def. pass 3
 HeroStatSpellDamage: equ 021h ; last def. pass 3
+RIdle1Monster015: equ 077F0h ; last def. pass 3
 MagicGuildLevel3Cost.Gold: equ 0A537h ; last def. pass 3
 Monster14.RomBlock: equ 0C4C1h ; last def. pass 3
 InventoryItem20ButtonOffSY: equ 09Ch ; last def. pass 3
@@ -3052,6 +3103,7 @@ SetAndRotateTavernHeroes.loop: equ 04DA4h ; last def. pass 3
 DisplayChestCode.AddMoney: equ 061FCh ; last def. pass 3
 CastleOverviewBlock: equ 0Ch ; last def. pass 3
 CalculateCostToSurrender: equ 043F0h ; last def. pass 3
+AnimateAttack: equ 014h ; last def. pass 3
 RecruitButton1Ytop: equ 040h ; last def. pass 3
 ButtonTableSpellBookSYSX_Fire: equ 0CCFAh ; last def. pass 3
 Pl1Hero5Units.HeroSkills: equ 0338Ah ; last def. pass 3
@@ -3084,11 +3136,12 @@ TextLevelUp2: equ 05C3Eh ; last def. pass 3
 HeroOverViewArmyIconButton5MouseOverSX: equ 0AEh ; last def. pass 3
 MarketPlaceButtonTableGfxBlock: equ 0877Bh ; last def. pass 3
 SkillLogisticsExpert: equ 0739Eh ; last def. pass 3
+RIdle2Monster014: equ 077D8h ; last def. pass 3
 UnitWhenRetreated: equ 0FFh ; last def. pass 3
 SetCastleButtons.loop: equ 0B0EFh ; last def. pass 3
 pl1hero2y: equ 032A5h ; last def. pass 3
 LevelUpButtonTable.Button1YBottom: equ 09Ch ; last def. pass 3
-Monster106Table: equ 08140h ; last def. pass 3
+Monster106Table: equ 082F8h ; last def. pass 3
 HeroPortrait10x18SYSXGolvellius: equ 03FF3h ; last def. pass 3
 InventoryItem31ButtonOffSY: equ 0C4h ; last def. pass 3
 DescriptionArmor2: equ 04B5Ch ; last def. pass 3
@@ -3250,6 +3303,7 @@ DYDXDefendingHeroUnit4: equ 05A26h ; last def. pass 3
 RIdle4Monster002: equ 03FD8h ; last def. pass 3
 GenericButtonTable3GfxBlock: equ 0C973h ; last def. pass 3
 SortMonstersFromHighToLow: equ 06ACDh ; last def. pass 3
+Monster008AttackPatternLeft: equ 083F2h ; last def. pass 3
 TavernButtonTableWhenNotEnoughCash: equ 08364h ; last def. pass 3
 CastleLevel3Units: equ 0Ch ; last def. pass 3
 SetBuildButtons: equ 0AE32h ; last def. pass 3
@@ -3359,6 +3413,7 @@ HeroOverViewInventoryIconButton3DY: equ 034h ; last def. pass 3
 colorwhite: equ 0Ch ; last def. pass 3
 Monster6.amount: equ 0C447h ; last def. pass 3
 ScreenOff: equ 02BBFh ; last def. pass 3
+Monster013Idle: equ 08422h ; last def. pass 3
 CastleLevel5Units: equ 0Eh ; last def. pass 3
 World1ObjectsBlock: equ 018h ; last def. pass 3
 BattleMonsterSpriteSheet2Block: equ 057h ; last def. pass 3
@@ -3404,6 +3459,7 @@ HeroPortrait14x9SYSXDrasle1: equ 03F95h ; last def. pass 3
 GenericButtonTable3.Button1XRight: equ 0E2h ; last def. pass 3
 SetPrimairySkillUpIcon: equ 060E4h ; last def. pass 3
 NameCreature037: equ 0B66Ch ; last def. pass 3
+Monster014Idle: equ 08434h ; last def. pass 3
 InitiateBattle.NotOverButton: equ 04221h ; last def. pass 3
 HeroOverViewInventoryIconButton7MouseOverSX: equ 092h ; last def. pass 3
 InventoryItem06ButtonOffSY: equ 028h ; last def. pass 3
@@ -3441,7 +3497,7 @@ scrollscreen.endcheck: equ 028F6h ; last def. pass 3
 DescriptionSword5: equ 04AFDh ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.buttonIsStillLit: equ 09E10h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button5Ytop: equ 0B0h ; last def. pass 3
-Monster101AttackPatternLeft: equ 08258h ; last def. pass 3
+Monster101AttackPatternLeft: equ 084A6h ; last def. pass 3
 CheckButtonMouseInteractionCastle: equ 0B1F3h ; last def. pass 3
 TextTavern: equ 0A290h ; last def. pass 3
 ConvertToDecimal.Check10Folds: equ 06414h ; last def. pass 3
@@ -3478,6 +3534,7 @@ HeroOverViewSpellIconButton4OffSX: equ 0E0h ; last def. pass 3
 SkillTextwisdomBasic: equ 0603Ah ; last def. pass 3
 Monster9.nxprevious: equ 0C476h ; last def. pass 3
 SetNoHeroVisitingOrDefendingCastle: equ 081F0h ; last def. pass 3
+Monster012Table: equ 081B8h ; last def. pass 3
 SetSpellExplanation_Earth: equ 05F40h ; last def. pass 3
 CastleLevel3UnitsAvail: equ 014h ; last def. pass 3
 Monster4.hp: equ 0C429h ; last def. pass 3
@@ -3515,6 +3572,7 @@ copytype: equ 0Eh ; last def. pass 3
 HeroOverViewSpellBookWindowDX: equ 06h ; last def. pass 3
 ResourcesPlayer1.Gems: equ 03B9Fh ; last def. pass 3
 SetManaAndMovementBars.PutManaAndMovement: equ 052F2h ; last def. pass 3
+RIdle2Monster015: equ 077F8h ; last def. pass 3
 Pl1Hero1StatSpellDamage: equ 03285h ; last def. pass 3
 MarketPlaceButton10XLeft: equ 0C6h ; last def. pass 3
 SetNameCastleAndDailyIncome.CastleLevelFound: equ 0AF09h ; last def. pass 3
@@ -3575,7 +3633,7 @@ NameCreature009: equ 0B500h ; last def. pass 3
 SetGenericButtons.Setbutton: equ 08DA3h ; last def. pass 3
 SetcursorWhenGridTileIsActive.SetSwordLeft: equ 07472h ; last def. pass 3
 HeroOverviewCode.SkillsSelected: equ 06241h ; last def. pass 3
-Monster106Move: equ 082A4h ; last def. pass 3
+Monster106Move: equ 084F2h ; last def. pass 3
 Monster5.x: equ 0C42Ch ; last def. pass 3
 Monster7.nyprevious: equ 0C455h ; last def. pass 3
 HeroButton20x11SYSXGolvellius: equ 0562Bh ; last def. pass 3
@@ -3671,6 +3729,7 @@ SkillTextintelligenceAdvanced: equ 05FB8h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button2XRight: equ 02Bh ; last def. pass 3
 InventoryItem30ButtonOffSX: equ 03Ch ; last def. pass 3
 HeroButton20x11SYSX: equ 024h ; last def. pass 3
+Monster007AttackPatternLeft: equ 083D8h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button6Ytop: equ 0B0h ; last def. pass 3
 HeroOverviewSpellBookButtonTable_Fire: equ 0C5A4h ; last def. pass 3
 MagicGuildLevel1Cost.Ore: equ 0A3F5h ; last def. pass 3
@@ -3786,6 +3845,7 @@ MagicGuildLevel2Cost: equ 0A493h ; last def. pass 3
 HeroOverViewSpell7backdropDY: equ 066h ; last def. pass 3
 SwapInventoryItems: equ 049B2h ; last def. pass 3
 movecursorx.XBorderSet: equ 0173Fh ; last def. pass 3
+Monster016Idle: equ 08448h ; last def. pass 3
 CalculateCostToSurrender.CalculateCostMonsters: equ 0447Fh ; last def. pass 3
 HeroOverViewInventoryIconButton5OffSX: equ 092h ; last def. pass 3
 MagicGuildButtonTable: equ 08EA4h ; last def. pass 3
@@ -3856,8 +3916,9 @@ Monster9.amount: equ 0C477h ; last def. pass 3
 DisplayChestCode.CheckButtonClicked: equ 061BDh ; last def. pass 3
 CursorSwordLeftUp: equ 020E0h ; last def. pass 3
 SwitchToNextMonster?: equ 0C3BFh ; last def. pass 3
+LIdle1Monster014: equ 077E8h ; last def. pass 3
 GenericButtonTable3.Button12XLeft: equ 0E8h ; last def. pass 3
-GeneralMonsterAttackPatternRightUp: equ 08184h ; last def. pass 3
+GeneralMonsterAttackPatternRightUp: equ 0833Ch ; last def. pass 3
 InventoryItem14MouseOverSY: equ 064h ; last def. pass 3
 HeroPortrait10x18SYSXUndeadline2: equ 03FC1h ; last def. pass 3
 spratttableaddress: equ 0D60Ch ; last def. pass 3
@@ -3869,6 +3930,7 @@ RecoverOverwrittenMonsters.NYSet: equ 06FBAh ; last def. pass 3
 HeroOverViewInventoryIconButton11DX: equ 03Ch ; last def. pass 3
 HeroPortrait10x18SYSXDrasle2: equ 03F99h ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.Slot4SameUnit: equ 0940Eh ; last def. pass 3
+Monster007Table: equ 080F0h ; last def. pass 3
 CastleOverviewTavernCode.EndCheck9: equ 077DCh ; last def. pass 3
 CastleOverviewWindowButton1XRight: equ 030h ; last def. pass 3
 GenericButtonTable3.Button8YBottom: equ 058h ; last def. pass 3
@@ -3892,6 +3954,7 @@ HeroAddressesGreyFox: equ 030FDh ; last def. pass 3
 HeroOverViewInventoryIconButton1MouseOverSY: equ 014h ; last def. pass 3
 pl1hero9y: equ 0346Ch ; last def. pass 3
 TradeMenuCode.CheckVisitingHero: equ 06A3Ah ; last def. pass 3
+LIdle2Monster009: equ 06BB8h ; last def. pass 3
 SetSingleBuildButtonColor.blue: equ 09D8Dh ; last def. pass 3
 Spell14IconSX: equ 020h ; last def. pass 3
 EarthLevel1Button: equ 08EA4h ; last def. pass 3
@@ -3899,13 +3962,14 @@ HeroSYSXDrasle3: equ 06FE0h ; last def. pass 3
 Set9BuildButtons: equ 09AF9h ; last def. pass 3
 RIdle1Monster003: equ 04F80h ; last def. pass 3
 BuildUpBattleFieldAndPutMonsters.GoSetRock: equ 05B19h ; last def. pass 3
-Monster102Move: equ 0829Ah ; last def. pass 3
+Monster102Move: equ 084E8h ; last def. pass 3
 SetLevelUpButtons.SetLeftButtonWizzardryRightButtonMightOrAdventure: equ 0580Ah ; last def. pass 3
 MagicGuildFireLevel3Y: equ 080h ; last def. pass 3
 SetActiveTradingHeroArmyAndAmount.DYDXDefendingHeroUnit3: equ 015B0h ; last def. pass 3
 SetNumber16Bit.Loop10Fold: equ 063B0h ; last def. pass 3
 SurrenderButtonPressed.BackupPage1toPage3: equ 045AFh ; last def. pass 3
 SetAvailableRecruitArmy.attack: equ 04687h ; last def. pass 3
+Monster009Idle: equ 083FAh ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.MarketPlace: equ 09E4Dh ; last def. pass 3
 Monster3.nyprevious: equ 0C415h ; last def. pass 3
 SkillTextArmourerBasic: equ 05E18h ; last def. pass 3
@@ -3993,6 +4057,7 @@ SetTradingHeroesInventoryIcons.SetIconHLBCandA: equ 04B4Ah ; last def. pass 3
 CastleOverviewMarketPlaceCode.WhichResourceDoYouNeedClicked: equ 08732h ; last def. pass 3
 TradingHeroesButtonTable.Button4Ytop: equ 028h ; last def. pass 3
 SettavernHeroClass: equ 07F39h ; last def. pass 3
+Monster015Idle: equ 0843Eh ; last def. pass 3
 CastleOverviewMarketPlaceCode.SetTextResourceToTrade: equ 08689h ; last def. pass 3
 HeroOverViewSpellBookButton4MouseOverSX: equ 0CAh ; last def. pass 3
 Monster7.yprevious: equ 0C44Dh ; last def. pass 3
@@ -4023,9 +4088,11 @@ TradeMenuCode.EndMarkButton: equ 06934h ; last def. pass 3
 slot: equ 0D9C8h ; last def. pass 3
 ShowRecruitWindowForSelectedUnit.army: equ 043F5h ; last def. pass 3
 BarracksLevel5Cost.Wood: equ 0ABE9h ; last def. pass 3
+LIdle1Monster012: equ 07798h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button14XRight: equ 0FBh ; last def. pass 3
 DYDXUnit1WindowInHud14x24: equ 0229Ch ; last def. pass 3
 PutTopObjects.loop: equ 02ABFh ; last def. pass 3
+Monster012Move: equ 08418h ; last def. pass 3
 pl1hero8y.FireSpells: equ 03455h ; last def. pass 3
 freezecontrols?: equ 0D6CFh ; last def. pass 3
 Monster6.SYSXinROM: equ 0C43Fh ; last def. pass 3
@@ -4040,6 +4107,7 @@ HeroPortrait10x18SYSXAdol: equ 03F80h ; last def. pass 3
 CastleOverviewWindowButtonStatus: equ 00h ; last def. pass 3
 InventoryItem18MouseOverSX: equ 03Ch ; last def. pass 3
 InventoryItem27MouseOverSX: equ 00h ; last def. pass 3
+RIdle1Monster008: equ 05FF0h ; last def. pass 3
 DYDX16x30HeroIconArmyWindow: equ 02191h ; last def. pass 3
 SetSpellExplanation_Fire: equ 05E1Eh ; last def. pass 3
 SetcursorWhenGridTileIsActive.CheckSetSwordLeftUp: equ 074DCh ; last def. pass 3
@@ -4132,6 +4200,7 @@ TradingHeroesButtonTable.Button6XRight: equ 098h ; last def. pass 3
 HeroPortrait14x9SYSXSnake1: equ 03FAAh ; last def. pass 3
 Spell10IconSY: equ 090h ; last def. pass 3
 initMem.enaRam: equ 0C0B9h ; last def. pass 3
+RIdle2Monster008: equ 05FF8h ; last def. pass 3
 SetArmyUnits.Creatures14x14SYSXTable: equ 05176h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button12XRight: equ 0DBh ; last def. pass 3
 MarketPlaceButtonTableLenghtPerButton: equ 0Dh ; last def. pass 3
@@ -4317,6 +4386,7 @@ MiniMapSquareIconInteractionOnInterrupt.endCheckWithinXRange: equ 021Eh ; last d
 SkillArcheryAdvanced: equ 06986h ; last def. pass 3
 pl2hero1mana: equ 0347Eh ; last def. pass 3
 ChangeManaAndMovement?: equ 0167Eh ; last def. pass 3
+Monster014Table: equ 08208h ; last def. pass 3
 centrescreenforthishero.notoutofscreenright: equ 0D39h ; last def. pass 3
 WaitKeyPressToGoBackToGame.RestorePage1: equ 052B3h ; last def. pass 3
 pl1hero3move: equ 032EAh ; last def. pass 3
@@ -4358,6 +4428,7 @@ SetTextNameHeroAndLevel: equ 0614Fh ; last def. pass 3
 LevelUpButtonTable.Button3XLeft: equ 070h ; last def. pass 3
 colordarkred: equ 08h ; last def. pass 3
 CastleCodeSetAdditionalStatFromInventoryItemsInHL: equ 06F2h ; last def. pass 3
+Monster012Idle: equ 08418h ; last def. pass 3
 SpellDescriptions.Descriptionair2: equ 05A7Ch ; last def. pass 3
 CurrentCursorSpriteCharacter: equ 01B0Eh ; last def. pass 3
 CastleOverviewWindowButton3YBottom: equ 0D2h ; last def. pass 3
@@ -4411,6 +4482,7 @@ TradingHeroesButtonTable.Button10XRight: equ 05Ch ; last def. pass 3
 MonsterThatIsBeingAttacked: equ 0C1B3h ; last def. pass 3
 SetAvailableRecruitArmy.SetCost: equ 047A5h ; last def. pass 3
 HeroOverViewSpellIconButtonMouseClickedSY: equ 096h ; last def. pass 3
+Monster010Idle: equ 08404h ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button8XRight: equ 04Eh ; last def. pass 3
 HeroPortrait16x30SYSXUndeadline2: equ 07FE8h ; last def. pass 3
 Monster6.status: equ 0C44Ah ; last def. pass 3
@@ -4446,6 +4518,7 @@ SetBattleFieldSnowGraphics: equ 07712h ; last def. pass 3
 TextCoordinateTable: equ 0681Ah ; last def. pass 3
 pl4hero9y: equ 03AA8h ; last def. pass 3
 TradingHeroesInventoryButtonTable.Button7Ytop: equ 08Dh ; last def. pass 3
+LIdle1Monster015: equ 08380h ; last def. pass 3
 SetNumber16BitCastle.Set10000Fold: equ 05C6h ; last def. pass 3
 CastleLevel4UnitsAvail: equ 016h ; last def. pass 3
 SetAvailableRecruitArmy.Level2UnitsUnavailable: equ 0455Eh ; last def. pass 3
@@ -4485,7 +4558,7 @@ MonsterAttackingRight?: equ 0C3C2h ; last def. pass 3
 HeroPortrait10x18SYSXGoemon2: equ 03FC6h ; last def. pass 3
 findRam.secondary: equ 0C102h ; last def. pass 3
 ResourcesPlayer3.Rubies: equ 03BB5h ; last def. pass 3
-GeneralMonsterAttackPatternLeftDown: equ 0817Dh ; last def. pass 3
+GeneralMonsterAttackPatternLeftDown: equ 08335h ; last def. pass 3
 WaitKeyPressToGoBackToGame.loop: equ 0527Fh ; last def. pass 3
 HeroOverViewSpellBookWindowNY: equ 0B8h ; last def. pass 3
 SpellDescriptions.DescriptionFire4: equ 05A1Dh ; last def. pass 3
@@ -4513,6 +4586,7 @@ CurrentActiveMonsterSpeed: equ 0C3CAh ; last def. pass 3
 CheckButtonMouseInteraction: equ 0653Fh ; last def. pass 3
 BattleButton2Ytop: equ 0C1h ; last def. pass 3
 buildupscreen: equ 02B1Ah ; last def. pass 3
+RIdle1Monster016: equ 06180h ; last def. pass 3
 Monster0.RomBlock: equ 0C3E1h ; last def. pass 3
 InventoryItem37MouseOverSX: equ 0C8h ; last def. pass 3
 PlaceFireSpellsInSpellBook.EndPlaceFireSpell1: equ 05454h ; last def. pass 3
@@ -4521,6 +4595,7 @@ CheckButtonMouseInteractionGenericButtons: equ 08E2Fh ; last def. pass 3
 SkillTextestatesExpert: equ 05EE8h ; last def. pass 3
 InitiateBattle.SetGenericButtons: equ 04127h ; last def. pass 3
 LenghtGeneralMonsterAttackPatternLeftDown: equ 06h ; last def. pass 3
+RIdle2Monster010: equ 06BC8h ; last def. pass 3
 Castle3Spells: equ 08F7Ch ; last def. pass 3
 HeroMana: equ 06h ; last def. pass 3
 SetAddressHeroPortrait16x30SYSXinBC: equ 04692h ; last def. pass 3
@@ -4609,17 +4684,19 @@ HeroOverviewCode.ArmySelected: equ 06233h ; last def. pass 3
 SkillEstatesAdvanced: equ 06FE6h ; last def. pass 3
 CastleLevel4Cost.Wood: equ 0A0FDh ; last def. pass 3
 setspritecharacter.CheckPointerOnCastle: equ 018BFh ; last def. pass 3
+LenghtMonster007AttackPatternRight: equ 07h ; last def. pass 3
 InventoryItem06DY: equ 04Dh ; last def. pass 3
 RecruitButtonXright: equ 0Ah ; last def. pass 3
 LenghtMonster101AttackPatternLeft: equ 015h ; last def. pass 3
 ShowEnemyHeroStats: equ 04A24h ; last def. pass 3
 TradeMenuCode.HighlightNewButton: equ 07073h ; last def. pass 3
 Pl3Hero1Units.FireSpells: equ 036B6h ; last def. pass 3
+RIdle1Monster010: equ 06BC0h ; last def. pass 3
 TransparantImageBattle: equ 0C33Fh ; last def. pass 3
 HeroSYSXDrasle4: equ 03FE0h ; last def. pass 3
 HeroOverViewInventoryIconButton5MouseOverSX: equ 092h ; last def. pass 3
 BuildButton5Ytop: equ 05Ch ; last def. pass 3
-Monster101AttackPatternRightUp: equ 08234h ; last def. pass 3
+Monster101AttackPatternRightUp: equ 08482h ; last def. pass 3
 VictoryOrDefeatButton1Ytop: equ 0B7h ; last def. pass 3
 TradeMenuCode.engine: equ 068D7h ; last def. pass 3
 movehero.GoMove: equ 0DD9h ; last def. pass 3
@@ -4650,6 +4727,7 @@ pl1hero7y.HeroStatKnowledge: equ 0340Ah ; last def. pass 3
 ClearWhiteWindow: equ 058A7h ; last def. pass 3
 MarketPlaceButton4XLeft: equ 09Ch ; last def. pass 3
 BuildButtonTableLenghtPerButton: equ 0Dh ; last def. pass 3
+Lattack1Monster007: equ 05FD8h ; last def. pass 3
 FindMonsterInBattleFieldGrid.SetX: equ 07226h ; last def. pass 3
 Monster14.Number: equ 0C4C4h ; last def. pass 3
 GenericButtonTable3.Button11YBottom: equ 07Eh ; last def. pass 3
@@ -4690,6 +4768,7 @@ TradingHeroesButtonTable.Button4YBottom: equ 046h ; last def. pass 3
 VictoryOrDefeatButtonTableAmountOfButtons: equ 04E62h ; last def. pass 3
 HeroOverViewSpellBookButton5DX: equ 0Eh ; last def. pass 3
 SetAvailableRecruitArmy.SetInactiveWindowIfUnavailable: equ 04548h ; last def. pass 3
+LIdle1Monster016: equ 061C0h ; last def. pass 3
 HeroSYSXDrasle2: equ 05FE0h ; last def. pass 3
 LIdle4Monster004: equ 04FE0h ; last def. pass 3
 ExplosionSpriteStep: equ 0C1B2h ; last def. pass 3
@@ -4717,9 +4796,11 @@ TradeMenuCode.SetInventorySlotOfHeroInIX: equ 069C4h ; last def. pass 3
 HeroSYSXUndeadline2: equ 05FE0h ; last def. pass 3
 HeroOverViewStatusWindowNX: equ 096h ; last def. pass 3
 outix256: equ 0D7C7h ; last def. pass 3
+LIdle2Monster013: equ 077C0h ; last def. pass 3
 SetMonsterInIYAsActiveMonsterAndSetInIX: equ 06E11h ; last def. pass 3
 Monster006Table: equ 080C8h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button11XLeft: equ 0BBh ; last def. pass 3
+Monster013Table: equ 081E0h ; last def. pass 3
 HeroOverviewSpellBookWindowCode_Air: equ 05715h ; last def. pass 3
 BlockToReadFrom: equ 0C338h ; last def. pass 3
 Monster4.y: equ 0C41Bh ; last def. pass 3
@@ -4754,6 +4835,7 @@ Spell06IconSX: equ 0E0h ; last def. pass 3
 InventoryItem04MouseOverSX: equ 0E2h ; last def. pass 3
 HeroOverViewInventoryIconButton1DX: equ 032h ; last def. pass 3
 Monster001Table: equ 08000h ; last def. pass 3
+LenghtMonster008AttackPatternRight: equ 07h ; last def. pass 3
 MovePointer: equ 01696h ; last def. pass 3
 colordarkbrown: equ 07h ; last def. pass 3
 SetIndividualBuildings.EndCheckMageGuild: equ 0B2E2h ; last def. pass 3
@@ -4765,7 +4847,7 @@ HeroPortrait16x30SYSXDrPettrovich: equ 08EF0h ; last def. pass 3
 Monster2.y: equ 0C3FBh ; last def. pass 3
 RetreatButtonPressed?: equ 0C1C0h ; last def. pass 3
 setspritecharacter.HeroOverview: equ 017EBh ; last def. pass 3
-GeneralMonsterAttackPatternLeftUp: equ 08176h ; last def. pass 3
+GeneralMonsterAttackPatternLeftUp: equ 0832Eh ; last def. pass 3
 MonsterMovementAmountOfSteps: equ 0C14Ch ; last def. pass 3
 CheckSkill: equ 05AA8h ; last def. pass 3
 CheckSpaceToMoveMonster.SwordLeftUpFoundSetMovementPath: equ 06BBCh ; last def. pass 3
@@ -4773,7 +4855,7 @@ Monster8.ny: equ 0C462h ; last def. pass 3
 TavernButton3XRight: equ 0FCh ; last def. pass 3
 setspritecharacter.EndCheckShowScrollArrowLeft: equ 0180Ah ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button1Ytop: equ 0AEh ; last def. pass 3
-Monster004Idle: equ 081E0h ; last def. pass 3
+Monster004Idle: equ 08398h ; last def. pass 3
 InventoryItem16ButtonOffSY: equ 09Ch ; last def. pass 3
 HeroOverViewArmyIconButton3OffSY: equ 015h ; last def. pass 3
 TradingHeroesButtonTable.Button1Ytop: equ 026h ; last def. pass 3
@@ -4857,6 +4939,7 @@ movehero.domovehero: equ 0DF5h ; last def. pass 3
 CastleOverviewMarketPlaceCode.TextCostRequireGemTradeStone: equ 0861Eh ; last def. pass 3
 MagicGuildEarthLevel4Y: equ 045h ; last def. pass 3
 pl1hero8y.pl1hero6status: equ 03436h ; last def. pass 3
+LIdle1Monster010: equ 06BD8h ; last def. pass 3
 TextDidYouKnow: equ 064FFh ; last def. pass 3
 HeroOverViewArmyIconButton1OffSX: equ 09Ch ; last def. pass 3
 SkillInLevelUpSlot1: equ 02CB5h ; last def. pass 3
@@ -4913,6 +4996,7 @@ RemoveDeadMonstersAttacker: equ 04731h ; last def. pass 3
 NameCreature029: equ 0B604h ; last def. pass 3
 PlaceEarthSpellsInSpellBook.EndPlaceEarthSpell4: equ 0558Fh ; last def. pass 3
 MagicGuildLevel3Cost.Ore: equ 0A53Bh ; last def. pass 3
+RIdle2Monster007: equ 05FC8h ; last def. pass 3
 HeroOverViewSpellBookWindowSX: equ 00h ; last def. pass 3
 SetTextInventoryItem.SetText: equ 04A20h ; last def. pass 3
 HeroOverViewSpellBookWindowButton1NX: equ 0Ah ; last def. pass 3
@@ -4947,7 +5031,9 @@ CastleOverviewMagicGuildCode.SetText: equ 088C6h ; last def. pass 3
 HeroOverViewInventoryIconButton4OffSY: equ 09Ch ; last def. pass 3
 SkillTextsorceryAdvanced: equ 06006h ; last def. pass 3
 outix352: equ 0D7B5h ; last def. pass 3
+LIdle2Monster010: equ 06BD0h ; last def. pass 3
 DeactivateHeroThatGetsAttacked.NeutralEnemyDied: equ 07836h ; last def. pass 3
+RIdle2Monster016: equ 061A0h ; last def. pass 3
 mouseclickx: equ 02CAEh ; last def. pass 3
 QuickTipsButtonTableAmountOfButtons: equ 067B0h ; last def. pass 3
 HeroOverViewSpellIconButton5OffSX: equ 0E0h ; last def. pass 3
@@ -4997,7 +5083,7 @@ DYDXUnit5WindowInHud14x24: equ 022C4h ; last def. pass 3
 ChestButtonTable.Button2XLeft: equ 03Ah ; last def. pass 3
 HeroOverViewSkillsButtonMouseClickedSY: equ 0A0h ; last def. pass 3
 SetVisitingOrDefendingHeroInIX.CheckHeroVisitingOrDefendingCastle: equ 081A6h ; last def. pass 3
-Monster006Move: equ 08204h ; last def. pass 3
+Monster006Move: equ 083BCh ; last def. pass 3
 DisplayEnemyHeroStatsWindowCode: equ 04438h ; last def. pass 3
 PutRowBottomObjects.loop: equ 02A7Bh ; last def. pass 3
 SetArmyIconsAndAmount.SetSYSX: equ 04758h ; last def. pass 3
@@ -5024,6 +5110,7 @@ SetSingleBuildButtonColor.putblue: equ 09DA7h ; last def. pass 3
 TextBarracksLevel2: equ 0A90Dh ; last def. pass 3
 SkillTextArcheryAdvanced: equ 05D96h ; last def. pass 3
 RecruitButtonMINUSYtop: equ 054h ; last def. pass 3
+Monster013Move: equ 08422h ; last def. pass 3
 Monster003Table: equ 08050h ; last def. pass 3
 ResourcesPlayer3.Wood: equ 03BAFh ; last def. pass 3
 BarracksLevel3Cost.Ore: equ 0AA4Ch ; last def. pass 3
@@ -5039,6 +5126,7 @@ TrainingShieldDefence: equ 03h ; last def. pass 3
 HeroOverViewSkillsWindowNX: equ 096h ; last def. pass 3
 TextAddresspointer: equ 0D07Bh ; last def. pass 3
 HeroOverviewArmyIconButtonTable.endlenght: equ 0C63Dh ; last def. pass 3
+Monster011Table: equ 08190h ; last def. pass 3
 HeroButton20x11SYSXAshguine: equ 055D0h ; last def. pass 3
 Monster4.status: equ 0C42Ah ; last def. pass 3
 CityWallsCost.Gems: equ 0AE2Eh ; last def. pass 3
@@ -5062,7 +5150,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons.Slot6IsEmpty: equ 0946Ah ; last 
 DescriptionRobe4: equ 05198h ; last def. pass 3
 CastleOverviewTavernCode.DefendingHero: equ 07C83h ; last def. pass 3
 NameCreature031: equ 0B61Eh ; last def. pass 3
-GeneralMonsterAttackPatternRight: equ 08168h ; last def. pass 3
+GeneralMonsterAttackPatternRight: equ 08320h ; last def. pass 3
 MonsterMovementPath: equ 0C14Dh ; last def. pass 3
 HeroInfoSpriteBlock: equ 01Fh ; last def. pass 3
 DYDXVisitingHeroUnit3: equ 05A5Eh ; last def. pass 3
@@ -5070,7 +5158,7 @@ MonsterTableGrowth: equ 01Ah ; last def. pass 3
 HeroPortrait14x9SYSXGreyFox: equ 04438h ; last def. pass 3
 BarracksTowerCost.Rubies: equ 0AD03h ; last def. pass 3
 Pl2Hero1Units.HeroSkills: equ 0349Ah ; last def. pass 3
-Monster101AttackPatternRightDown: equ 08246h ; last def. pass 3
+Monster101AttackPatternRightDown: equ 08494h ; last def. pass 3
 CastleOverviewWindowButton_dx: equ 01h ; last def. pass 3
 NameCreature047: equ 0B6EEh ; last def. pass 3
 SetTavernHeroesTablePlayerinIX: equ 07EEBh ; last def. pass 3
@@ -5087,6 +5175,7 @@ HeroOverviewSpellBookButtonTable_Earth_Activated: equ 0C5F7h ; last def. pass 3
 InitiateBattle: equ 04091h ; last def. pass 3
 searchSlot: equ 0C0BCh ; last def. pass 3
 GenericButtonTable3.Button4XRight: equ 0E2h ; last def. pass 3
+RIdle2Monster013: equ 077A8h ; last def. pass 3
 GenericButtonTable3.Button7Ytop: equ 042h ; last def. pass 3
 ButtonGfxBlockCopy: equ 0C81Ch ; last def. pass 3
 CastleOverviewTavernCode.go: equ 07CCDh ; last def. pass 3
@@ -5102,18 +5191,20 @@ Spell5DX: equ 072h ; last def. pass 3
 BattleFieldSnowBlock: equ 0Eh ; last def. pass 3
 putcastle: equ 02C6Fh ; last def. pass 3
 SpellDescriptionsMagicGuild.Descriptionwater1: equ 08CCAh ; last def. pass 3
-Monster003Idle: equ 081C6h ; last def. pass 3
+Monster003Idle: equ 0837Eh ; last def. pass 3
 pl1hero8y.EarthSpells: equ 03454h ; last def. pass 3
 GenericButtonTable3.Button5YBottom: equ 06Eh ; last def. pass 3
 SetcursorWhenGridTileIsActive.SetBoots: equ 07332h ; last def. pass 3
 Monster3.Number: equ 0C414h ; last def. pass 3
 SetSpellExplanation_Air.GoSetText: equ 05DD9h ; last def. pass 3
+LIdle2Monster015: equ 08388h ; last def. pass 3
 SetLevelUpText.PrimairySkillUpFound: equ 05D0Dh ; last def. pass 3
 TextCityWallsFinished: equ 0ADB4h ; last def. pass 3
 HeroOverViewSpellIconButton9MouseOverSY: equ 080h ; last def. pass 3
 CastleOverviewTavernCode.VisitingHero: equ 07C9Ah ; last def. pass 3
 LenghtMonster101AttackPatternLeftDown: equ 015h ; last def. pass 3
 player3human?: equ 02CB2h ; last def. pass 3
+RIdle1Monster013: equ 077A0h ; last def. pass 3
 putrow: equ 02B68h ; last def. pass 3
 SetcursorWhenGridTileIsActive.EvenRow: equ 07456h ; last def. pass 3
 HeroOverViewSpellBookButton1OffSX: equ 0C0h ; last def. pass 3
@@ -5173,6 +5264,7 @@ CursorHand: equ 01F30h ; last def. pass 3
 QuickTipsButtonTableGfxBlock: equ 067AFh ; last def. pass 3
 SetBattlefieldCasualtiesAttacker.AmountOfSlotsWithCasualtiesFound: equ 04998h ; last def. pass 3
 HeroOverviewSpellBookWindowCode_Fire.SpellIconPressed: equ 0580Eh ; last def. pass 3
+LIdle1Monster013: equ 077C8h ; last def. pass 3
 Monster4.SYSXinROM: equ 0C41Fh ; last def. pass 3
 ChestButtonTable.Button1Ytop: equ 09Dh ; last def. pass 3
 HeroButton20x11SYSXDrasle1: equ 0559Fh ; last def. pass 3
@@ -5236,7 +5328,7 @@ LevelUpButtonTable.Button2YBottom: equ 090h ; last def. pass 3
 Set9BuildButtons.Mine: equ 09B66h ; last def. pass 3
 pl1hero8y.HeroDYDX: equ 0346Ah ; last def. pass 3
 Pl1Hero2Units.FireSpells: equ 032CFh ; last def. pass 3
-Monster101AttackPatternLeftDown: equ 08284h ; last def. pass 3
+Monster101AttackPatternLeftDown: equ 084D2h ; last def. pass 3
 CheckSkillAvailable: equ 05B6Eh ; last def. pass 3
 RecoverOverwrittenMonsters.go4: equ 06F45h ; last def. pass 3
 HandleMonsters.EndPutGridTile: equ 0406Bh ; last def. pass 3

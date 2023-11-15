@@ -2899,6 +2899,7 @@ AnimateMonster:
   jr    z,.MonsterIsFacingLeft
   jr    .MonsterIsFacingRight
 
+AnimateAttack:  equ 20
 DisplaceLeft: equ 21
 DisplaceRight: equ 22
 ShowBeingHitSprite: equ 23
@@ -2956,7 +2957,7 @@ MoveMonster:
   jp    z,.InitiateAttackLeft
   cp    18
   jp    z,.InitiateAttackLeftUp
-  cp    20
+  cp    AnimateAttack
   jp    z,.AnimateAttack
   cp    DisplaceLeft                    ;cp 21
   jp    z,.DisplaceLeft
