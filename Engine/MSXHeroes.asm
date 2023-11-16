@@ -848,9 +848,8 @@ dephase
 ;
 BattleMonsterSpriteSheet1Block:  equ   $55
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,(256-48) * 128           ;208 lines
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1bottom48pixels.SC5",7,48 * 128   ;48 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1Bottom48Lines.SC5",7,048 * 128 
 	ds		$c000-$,$ff
 dephase
 
@@ -859,7 +858,8 @@ dephase
 ;
 BattleMonsterSpriteSheet2Block:  equ   $57
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet2.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet2.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet2Bottom48Lines.SC5",7,048 * 128 
 	ds		$c000-$,$ff
 dephase
 
@@ -868,7 +868,8 @@ dephase
 ;
 BattleMonsterSpriteSheet3Block:  equ   $59
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet3.SC5",7,208 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet3Bottom48Lines.SC5",7,048 * 128 
 	ds		$c000-$,$ff
 dephase
 
@@ -877,7 +878,7 @@ dephase
 ;
 BattleMonsterSpriteSheet4Block:  equ   $5b
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -886,7 +887,7 @@ dephase
 ;
 BattleMonsterSpriteSheet5Block:  equ   $5d
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -895,7 +896,7 @@ dephase
 ;
 BattleMonsterSpriteSheet6Block:  equ   $5f
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -904,7 +905,7 @@ dephase
 ;
 BattleMonsterSpriteSheet7Block:  equ   $61
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -913,7 +914,8 @@ dephase
 ;
 BattleMonsterSpriteSheet8Block:  equ   $63
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1Bottom48Lines.SC5",7,048 * 128      ;208 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -923,6 +925,7 @@ dephase
 Hero16x30TransparantPortraitsBlock:  equ   $65
 phase	$4000
   incbin "..\grapx\HeroesSprites\16x30PortraitsTransparant.SC5",7,212 * 128      ;212 lines
+
 	ds		$c000-$,$ff
 dephase
 

@@ -146,7 +146,7 @@ Monster006Table:                        ;tiny spider (sd snatcher)
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
-  db    009                             ;speed
+  db    005                             ;speed
   db    004                             ;attack
   db    012                             ;defense
   db    012                             ;growth
@@ -406,6 +406,235 @@ Monster017Table:                        ;super mighta ghoul (bubble bobble)
   db    000                             ;special ability
   db    "SuperMighta",255
 
+Monster018Table:                        ;Fish Man (Castlevania)
+  dw    Monster018Idle
+  dw    Monster018Move
+  dw    Monster018AttackPatternRight
+  dw    Monster018AttackPatternLeft
+  dw    Monster018AttackPatternLeftUp
+  dw    Monster018AttackPatternLeftDown
+  dw    Monster018AttackPatternRightUp
+  dw    Monster018AttackPatternRightDown
+  db    BattleMonsterSpriteSheet1Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Fish Man",255,"   "
+
+Monster019Table:                        ;Zombie (Castlevania)
+  dw    Monster019Idle
+  dw    Monster019Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet1Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Zombie",255,"     "
+
+Monster020Table:                        ;Mummy Man (Castlevania)
+  dw    Monster020Idle
+  dw    Monster020Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    16                              ;nx  
+  db    40+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Mummy Man",255,"  "
+
+Monster021Table:                        ;Spear Guard (Castlevania)
+  dw    Monster021Idle
+  dw    Monster021Move
+  dw    Monster021AttackPatternRight
+  dw    Monster021AttackPatternLeft
+  dw    Monster021AttackPatternLeftUp
+  dw    Monster021AttackPatternLeftDown
+  dw    Monster021AttackPatternRightUp
+  dw    Monster021AttackPatternRightDown
+  db    BattleMonsterSpriteSheet1Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Spear Guard",255
+
+Monster022Table:                        ;Medusa Head (Castlevania)
+  dw    Monster022Idle
+  dw    Monster022Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Medusa Head",255
+  
+Monster023Table:                        ;Flea Man (Castlevania)
+  dw    Monster023Idle
+  dw    Monster023Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Flea Man",255,"   "
+
+Monster024Table:                        ;Grim Reaper (Castlevania)
+  dw    Monster024Idle
+  dw    Monster024Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    48                              ;nx  
+  db    48+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Grim Reaper",255
+  
+Monster025Table:                        ;Skeleton (Castlevania)
+  dw    Monster025Idle
+  dw    Monster025Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Skeleton",255,"   "
+
+Monster026Table:                        ;Axe man (Castlevania)
+  dw    Monster026Idle
+  dw    Monster026Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Axe man",255,"    "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -479,6 +708,14 @@ Monster106Table:                        ;huge boo (golvellius)
   db    012                             ;growth
   db    000                             ;special ability
   db    "Boo",255,"        "
+
+
+
+
+
+
+
+
 
 
 ;######################################################################################
@@ -896,6 +1133,260 @@ Monster017Idle:
 
 
 
+;Fish Man (Castlevania)
+
+RIdle1Monster018:   equ $4000 + (136*128) + (160/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster018:   equ $4000 + (136*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster018:   equ $4000 + (136*128) + (224/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster018: equ $4000 + (176*128) + (000/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster018:   equ $4000 + (176*128) + (128/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster018:   equ $4000 + (176*128) + (096/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster018:   equ $4000 + (176*128) + (064/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster018: equ $4000 + (176*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+Monster018Move:                     
+Monster018Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster018
+  dw    RIdle2Monster018
+  dw    RIdle3Monster018
+  ;facing left
+  dw    LIdle1Monster018
+  dw    LIdle2Monster018
+  dw    LIdle3Monster018
+
+Monster018AttackPatternRight:
+  db    LenghtMonster018AttackPatternRight,000,003,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,007,InitiateAttack
+LenghtMonster018AttackPatternRight: equ $-Monster018AttackPatternRight-1
+Monster018AttackPatternRightUp:
+  db    LenghtMonster018AttackPatternRightUp,000,008,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,004,InitiateAttack
+LenghtMonster018AttackPatternRightUp: equ $-Monster018AttackPatternRightUp-1
+Monster018AttackPatternRightDown:
+  db    LenghtMonster018AttackPatternRightDown,000,006,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,002,InitiateAttack
+LenghtMonster018AttackPatternRightDown: equ $-Monster018AttackPatternRightDown-1
+
+Monster018AttackPatternLeft:
+  db    LenghtMonster018AttackPatternLeft,000,007,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,003,InitiateAttack
+LenghtMonster018AttackPatternLeft: equ $-Monster018AttackPatternLeft-1
+Monster018AttackPatternLeftUp:
+  db    LenghtMonster018AttackPatternLeftUp,000,002,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,006,InitiateAttack
+LenghtMonster018AttackPatternLeftUp: equ $-Monster018AttackPatternLeftUp-1
+Monster018AttackPatternLeftDown:
+  db    LenghtMonster018AttackPatternLeftDown,000,004,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,008,InitiateAttack
+LenghtMonster018AttackPatternLeftDown: equ $-Monster018AttackPatternLeftDown-1
+;######################################################################################
+;Zombie (Castlevania)
+
+RIdle1Monster019:   equ $4000 + (176*128) + (160/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster019:   equ $4000 + (176*128) + (176/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster019:   equ $4000 + (176*128) + (208/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster019:   equ $4000 + (176*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster019Move:                     
+Monster019Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster019
+  dw    RIdle2Monster019
+  ;facing left
+  dw    LIdle1Monster019
+  dw    LIdle2Monster019
+;######################################################################################
+;Mummy Man (Castlevania)
+
+RIdle1Monster020:   equ $4000 + (136*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster020:   equ $4000 + (136*128) + (016/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster020:   equ $4000 + (136*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster020:   equ $4000 + (136*128) + (180/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster020:   equ $4000 + (136*128) + (064/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster020:   equ $4000 + (136*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+Monster020Move:                     
+Monster020Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster020
+  dw    RIdle2Monster020
+  dw    RIdle3Monster020
+  dw    RIdle2Monster020
+  ;facing left
+  dw    LIdle1Monster020
+  dw    LIdle2Monster020
+  dw    LIdle3Monster020
+  dw    LIdle2Monster020
+;######################################################################################
+;Spear Guard (Castlevania)
+
+RIdle1Monster021:   equ $4000 + (176*128) + (224/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster021:   equ $4000 + (176*128) + (240/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster021:   equ $4000 + (216*128) + (000/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster021: equ $4000 + (216*128) + (016/2) - 128 ;(y*128) + (x/2)
+RAttack2Monster021: equ $4000 + (216*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster021:   equ $4000 + (216*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster021:   equ $4000 + (216*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster021:   equ $4000 + (216*128) + (144/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster021: equ $4000 + (216*128) + (112/2) - 128 ;(y*128) + (x/2)
+LAttack2Monster021: equ $4000 + (216*128) + (080/2) - 128 ;(y*128) + (x/2)
+
+Monster021Move:                     
+Monster021Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster021
+  dw    RIdle2Monster021
+  dw    RIdle3Monster021
+  dw    RIdle2Monster021
+  ;facing left
+  dw    LIdle1Monster021
+  dw    LIdle2Monster021
+  dw    LIdle3Monster021
+  dw    LIdle2Monster021
+
+Monster021AttackPatternRight:
+  db    LenghtMonster021AttackPatternRight,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 003,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 007,128+16,AnimateAttack | dw RIdle1Monster021 | db 000,InitiateAttack
+LenghtMonster021AttackPatternRight: equ $-Monster021AttackPatternRight-1
+Monster021AttackPatternRightUp:
+  db    LenghtMonster021AttackPatternRightUp,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 008,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 004,InitiateAttack
+LenghtMonster021AttackPatternRightUp: equ $-Monster021AttackPatternRightUp-1
+Monster021AttackPatternRightDown:
+  db    LenghtMonster021AttackPatternRightDown,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 006,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 002,InitiateAttack
+LenghtMonster021AttackPatternRightDown: equ $-Monster021AttackPatternRightDown-1
+
+Monster021AttackPatternLeft:
+  db    LenghtMonster021AttackPatternLeft,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,000,AnimateAttack | dw Lattack2Monster021 | db 007,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 003,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,000,InitiateAttack
+LenghtMonster021AttackPatternLeft: equ $-Monster021AttackPatternLeft-1
+Monster021AttackPatternLeftUp:
+  db    LenghtMonster021AttackPatternLeftUp,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,002,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,006,InitiateAttack
+LenghtMonster021AttackPatternLeftUp: equ $-Monster021AttackPatternLeftUp-1
+Monster021AttackPatternLeftDown:
+  db    LenghtMonster021AttackPatternLeftDown,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,004,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,008,InitiateAttack
+LenghtMonster021AttackPatternLeftDown: equ $-Monster021AttackPatternLeftDown-1
+;######################################################################################
+;Medusa Head (Castlevania)
+
+RIdle1Monster022:   equ $4000 + (024*128) + (240/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster022:   equ $4000 + (080*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster022:   equ $4000 + (080*128) + (080/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster022:   equ $4000 + (080*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster022Move:                     
+Monster022Idle:
+  db    6                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster022
+  dw    RIdle2Monster022
+  ;facing left
+  dw    LIdle1Monster022
+  dw    LIdle2Monster022
+;######################################################################################
+;Flea Man (Castlevania)
+
+RIdle1Monster023:   equ $4000 + (000*128) + (240/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster023:   equ $4000 + (056*128) + (048/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster023: equ $4000 + (056*128) + (064/2) - 128 ;(y*128) + (x/2)
+RAttack2Monster023: equ $4000 + (056*128) + (080/2) - 128 ;(y*128) + (x/2)
+RAttack3Monster023: equ $4000 + (056*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster023:   equ $4000 + (056*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster023:   equ $4000 + (056*128) + (160/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster023: equ $4000 + (056*128) + (144/2) - 128 ;(y*128) + (x/2)
+LAttack2Monster023: equ $4000 + (056*128) + (128/2) - 128 ;(y*128) + (x/2)
+LAttack3Monster023: equ $4000 + (056*128) + (112/2) - 128 ;(y*128) + (x/2)
+
+Monster023Move:                     
+Monster023Idle:
+  db    6                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster023
+  dw    RIdle2Monster023
+  ;facing left
+  dw    LIdle1Monster023
+  dw    LIdle2Monster023
+;######################################################################################
+;Grim Reaper (Castlevania)
+
+RIdle1Monster024:   equ $4000 + (000*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster024:   equ $4000 + (000*128) + (048/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster024:   equ $4000 + (000*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster024:   equ $4000 + (056*128) + (000/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster024:   equ $4000 + (000*128) + (192/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster024:   equ $4000 + (000*128) + (144/2) - 128 ;(y*128) + (x/2)
+
+Monster024Move:                     
+Monster024Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster024
+  dw    RIdle2Monster024
+  dw    RIdle3Monster024
+  dw    RIdle2Monster024
+  ;facing left
+  dw    LIdle1Monster024
+  dw    LIdle2Monster024
+  dw    LIdle3Monster024
+  dw    LIdle2Monster024
+;######################################################################################
+;Skeleton (Castlevania)
+
+RIdle1Monster025:   equ $4000 + (112*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster025:   equ $4000 + (112*128) + (016/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster025: equ $4000 + (112*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster025:   equ $4000 + (112*128) + (080/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster025:   equ $4000 + (112*128) + (064/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster025: equ $4000 + (112*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+Monster025Move:                     
+Monster025Idle:
+  db    8                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster025
+  dw    RIdle2Monster025
+  ;facing left
+  dw    LIdle1Monster025
+  dw    LIdle2Monster025
+;######################################################################################
+;Axe man (Castlevania)
+
+RIdle1Monster026:   equ $4000 + (184*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster026:   equ $4000 + (184*128) + (016/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster026: equ $4000 + (184*128) + (032/2) - 128 ;(y*128) + (x/2)
+RAttack2Monster026: equ $4000 + (184*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster026:   equ $4000 + (184*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster026:   equ $4000 + (184*128) + (160/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster026: equ $4000 + (184*128) + (128/2) - 128 ;(y*128) + (x/2)
+LAttack2Monster026: equ $4000 + (184*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster026Move:                     
+Monster026Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster026
+  dw    RIdle2Monster026
+  ;facing left
+  dw    LIdle1Monster026
+  dw    LIdle2Monster026
+;######################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1003,4 +1494,4 @@ Monster106Idle:
   dw    LIdle2Monster106
 ;######################################################################################
 
-
+kut:

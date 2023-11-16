@@ -5023,7 +5023,7 @@ pl1hero1move:	db	20,20
 pl1hero1mana:	dw	99,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 001 | dw 201 |      db 017 | dw 202 |      db 001 | dw 303 |      db 016 | dw 404 |      db 005 | dw 505 |      db 006 | dw 606 ;unit,amount
+Pl1Hero1Units:  db 001 | dw 201 |      db 001 | dw 202 |      db 001 | dw 303 |      db 001 | dw 404 |      db 005 | dw 505 |      db 006 | dw 606 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5224,7 +5224,7 @@ pl2hero1move:	db	03,20
 pl2hero1mana:	dw	03,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 001 | dw 010 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 000 | dw 000 |      db 021 | dw 001 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
