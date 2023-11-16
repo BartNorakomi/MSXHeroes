@@ -524,12 +524,12 @@ Monster022Table:                        ;Medusa Head (Castlevania)
 Monster023Table:                        ;Flea Man (Castlevania)
   dw    Monster023Idle
   dw    Monster023Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
+  dw    Monster023AttackPatternRight
+  dw    Monster023AttackPatternLeft
+  dw    Monster023AttackPatternLeftUp
+  dw    Monster023AttackPatternLeftDown
+  dw    Monster023AttackPatternRightUp
+  dw    Monster023AttackPatternRightDown
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
@@ -570,12 +570,12 @@ Monster024Table:                        ;Grim Reaper (Castlevania)
 Monster025Table:                        ;Skeleton (Castlevania)
   dw    Monster025Idle
   dw    Monster025Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
+  dw    Monster025AttackPatternRight
+  dw    Monster025AttackPatternLeft
+  dw    Monster025AttackPatternLeft
+  dw    Monster025AttackPatternLeft
+  dw    Monster025AttackPatternRight
+  dw    Monster025AttackPatternRight
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    32+08                           ;ny
@@ -587,18 +587,18 @@ Monster025Table:                        ;Skeleton (Castlevania)
   db    004                             ;attack
   db    012                             ;defense
   db    012                             ;growth
-  db    000                             ;special ability
+  db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Skeleton",255,"   "
 
 Monster026Table:                        ;Axe man (Castlevania)
   dw    Monster026Idle
   dw    Monster026Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
+  dw    Monster026AttackPatternRight
+  dw    Monster026AttackPatternLeft
+  dw    Monster026AttackPatternLeft
+  dw    Monster026AttackPatternLeft
+  dw    Monster026AttackPatternRight
+  dw    Monster026AttackPatternRight
   db    BattleMonsterSpriteSheet2Block
   db    16                              ;nx  
   db    32+08                           ;ny
@@ -610,13 +610,220 @@ Monster026Table:                        ;Axe man (Castlevania)
   db    004                             ;attack
   db    012                             ;defense
   db    012                             ;growth
-  db    000                             ;special ability
+  db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Axe man",255,"    "
 
 
 
 
 
+Monster027Table:                        ;Scorpii (Dragon Slayer IV)
+  dw    Monster027Idle
+  dw    Monster027Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Scorpii",255,"    "
+
+
+Monster028Table:                        ;Porgi (Dragon Slayer IV)
+  dw    Monster028Idle
+  dw    Monster028Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Porgi",255,"      "
+
+Monster029Table:                        ;Rock man (Dragon Slayer IV)
+  dw    Monster029Idle
+  dw    Monster029Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Rock Man",255,"   "
+
+Monster030Table:                        ;Piglet (Dragon Slayer IV)
+  dw    Monster030Idle
+  dw    Monster030Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Piglet",255,"     "
+
+Monster031Table:                        ;Gers (Dragon Slayer IV)
+  dw    Monster031Idle
+  dw    Monster031Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Gers",255,"       "
+
+Monster032Table:                        ;Yashinotkin (Dragon Slayer IV)
+  dw    Monster032Idle
+  dw    Monster032Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Yashinotkin",255
+
+Monster033Table:                        ;King Mu (Dragon Slayer IV)
+  dw    Monster033Idle
+  dw    Monster033Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "King Mu",255,"    "
+
+Monster034Table:                        ;Crawler (Dragon Slayer IV)
+  dw    Monster034Idle
+  dw    Monster034Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Crawler",255,"    "
+
+Monster035Table:                        ;Octo (Dragon Slayer IV)
+  dw    Monster035Idle
+  dw    Monster035Move
+  dw    Monster035AttackPatternRight
+  dw    Monster035AttackPatternLeft
+  dw    Monster035AttackPatternLeft
+  dw    Monster035AttackPatternLeft
+  dw    Monster035AttackPatternRight
+  dw    Monster035AttackPatternRight
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Octo",255,"       "
 
 
 
@@ -720,28 +927,17 @@ Monster106Table:                        ;huge boo (golvellius)
 
 ;######################################################################################
 GeneralMonsterAttackPatternRight:
-  db    LenghtGeneralMonsterAttackPatternRight,000,003,ShowBeingHitSprite,007,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternRight: equ $-GeneralMonsterAttackPatternRight-1
-
+  db    000,003,ShowBeingHitSprite,007,000,InitiateAttack
 GeneralMonsterAttackPatternLeft:
-  db    LenghtGeneralMonsterAttackPatternLeft,000,007,ShowBeingHitSprite,003,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternLeft: equ $-GeneralMonsterAttackPatternLeft-1
-
+  db    000,007,ShowBeingHitSprite,003,000,InitiateAttack
 GeneralMonsterAttackPatternLeftUp:
-  db    LenghtGeneralMonsterAttackPatternLeftUp,000,008,ShowBeingHitSprite,004,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternLeftUp: equ $-GeneralMonsterAttackPatternLeftUp-1
-
+  db    000,008,ShowBeingHitSprite,004,000,InitiateAttack
 GeneralMonsterAttackPatternLeftDown:
-  db    LenghtGeneralMonsterAttackPatternLeftDown,000,006,ShowBeingHitSprite,002,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternLeftDown: equ $-GeneralMonsterAttackPatternLeftDown-1
-
+  db    000,006,ShowBeingHitSprite,002,000,InitiateAttack
 GeneralMonsterAttackPatternRightUp:
-  db    LenghtGeneralMonsterAttackPatternRightUp,000,002,ShowBeingHitSprite,006,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternRightUp: equ $-GeneralMonsterAttackPatternRightUp-1
-
+  db    000,002,ShowBeingHitSprite,006,000,InitiateAttack
 GeneralMonsterAttackPatternRightDown:
-  db    LenghtGeneralMonsterAttackPatternRightDown,000,004,ShowBeingHitSprite,008,000,InitiateAttack
-LenghtGeneralMonsterAttackPatternRightDown: equ $-GeneralMonsterAttackPatternRightDown-1
+  db    000,004,ShowBeingHitSprite,008,000,InitiateAttack
 ;######################################################################################
 ;brown flyer (sd snatcher)
 
@@ -917,12 +1113,9 @@ Monster007Idle:
   dw    LIdle2Monster007
 
 Monster007AttackPatternRight:
-  db    LenghtMonster007AttackPatternRight,AnimateAttack | dw Rattack1Monster007 | db 000,ShootProjectile,000,WaitImpactProjectile
-LenghtMonster007AttackPatternRight: equ $-Monster007AttackPatternRight-1
-
+  db    AnimateAttack | dw Rattack1Monster007 | db 000,ShootProjectile,000,WaitImpactProjectile
 Monster007AttackPatternLeft:
-  db    LenghtMonster007AttackPatternLeft,AnimateAttack | dw Lattack1Monster007 | db 000,ShootProjectile,000,WaitImpactProjectile
-LenghtMonster007AttackPatternLeft: equ $-Monster007AttackPatternLeft-1
+  db    AnimateAttack | dw Lattack1Monster007 | db 000,ShootProjectile,000,WaitImpactProjectile
 ;######################################################################################
 ;Bubblun green (bubble bobble)
 
@@ -945,12 +1138,9 @@ Monster008Idle:
   dw    LIdle2Monster008
 
 Monster008AttackPatternRight:
-  db    LenghtMonster008AttackPatternRight,AnimateAttack | dw Rattack1Monster008 | db 000,ShootProjectile,000,WaitImpactProjectile
-LenghtMonster008AttackPatternRight: equ $-Monster008AttackPatternRight-1
-
+  db    AnimateAttack | dw Rattack1Monster008 | db 000,ShootProjectile,000,WaitImpactProjectile
 Monster008AttackPatternLeft:
-  db    LenghtMonster008AttackPatternLeft,AnimateAttack | dw Lattack1Monster008 | db 000,ShootProjectile,000,WaitImpactProjectile
-LenghtMonster008AttackPatternLeft: equ $-Monster008AttackPatternLeft-1
+  db    AnimateAttack | dw Lattack1Monster008 | db 000,ShootProjectile,000,WaitImpactProjectile
 ;######################################################################################
 ;zen chan blue robotic (bubble bobble)
 
@@ -1120,21 +1310,7 @@ Monster017Idle:
   dw    LIdle1Monster017
   dw    LIdle2Monster017
 ;######################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
 ;Fish Man (Castlevania)
-
 RIdle1Monster018:   equ $4000 + (136*128) + (160/2) - 128 ;(y*128) + (x/2)
 RIdle2Monster018:   equ $4000 + (136*128) + (192/2) - 128 ;(y*128) + (x/2)
 RIdle3Monster018:   equ $4000 + (136*128) + (224/2) - 128 ;(y*128) + (x/2)
@@ -1158,24 +1334,18 @@ Monster018Idle:
   dw    LIdle3Monster018
 
 Monster018AttackPatternRight:
-  db    LenghtMonster018AttackPatternRight,000,003,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,007,InitiateAttack
-LenghtMonster018AttackPatternRight: equ $-Monster018AttackPatternRight-1
+  db    000,003,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,007,InitiateAttack
 Monster018AttackPatternRightUp:
-  db    LenghtMonster018AttackPatternRightUp,000,008,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,004,InitiateAttack
-LenghtMonster018AttackPatternRightUp: equ $-Monster018AttackPatternRightUp-1
+  db    000,008,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,004,InitiateAttack
 Monster018AttackPatternRightDown:
-  db    LenghtMonster018AttackPatternRightDown,000,006,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,002,InitiateAttack
-LenghtMonster018AttackPatternRightDown: equ $-Monster018AttackPatternRightDown-1
+  db    000,006,000,AnimateAttack | dw Rattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster018 | db 000,002,InitiateAttack
 
 Monster018AttackPatternLeft:
-  db    LenghtMonster018AttackPatternLeft,000,007,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,003,InitiateAttack
-LenghtMonster018AttackPatternLeft: equ $-Monster018AttackPatternLeft-1
+  db    000,007,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,003,InitiateAttack
 Monster018AttackPatternLeftUp:
-  db    LenghtMonster018AttackPatternLeftUp,000,002,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,006,InitiateAttack
-LenghtMonster018AttackPatternLeftUp: equ $-Monster018AttackPatternLeftUp-1
+  db    000,002,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,006,InitiateAttack
 Monster018AttackPatternLeftDown:
-  db    LenghtMonster018AttackPatternLeftDown,000,004,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,008,InitiateAttack
-LenghtMonster018AttackPatternLeftDown: equ $-Monster018AttackPatternLeftDown-1
+  db    000,004,000,AnimateAttack | dw Lattack1Monster018 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster018 | db 000,008,InitiateAttack
 ;######################################################################################
 ;Zombie (Castlevania)
 
@@ -1248,24 +1418,18 @@ Monster021Idle:
   dw    LIdle2Monster021
 
 Monster021AttackPatternRight:
-  db    LenghtMonster021AttackPatternRight,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 003,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 007,128+16,AnimateAttack | dw RIdle1Monster021 | db 000,InitiateAttack
-LenghtMonster021AttackPatternRight: equ $-Monster021AttackPatternRight-1
+  db    000,128+32,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 003,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 007,128+16,AnimateAttack | dw RIdle1Monster021 | db 000,InitiateAttack
 Monster021AttackPatternRightUp:
-  db    LenghtMonster021AttackPatternRightUp,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 008,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 004,InitiateAttack
-LenghtMonster021AttackPatternRightUp: equ $-Monster021AttackPatternRightUp-1
+  db    000,128+32,AnimateAttack | dw Rattack1Monster021 | db 008,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 004,InitiateAttack
 Monster021AttackPatternRightDown:
-  db    LenghtMonster021AttackPatternRightDown,000,128+32,AnimateAttack | dw Rattack1Monster021 | db 006,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 002,InitiateAttack
-LenghtMonster021AttackPatternRightDown: equ $-Monster021AttackPatternRightDown-1
+  db    000,128+32,AnimateAttack | dw Rattack1Monster021 | db 006,AnimateAttack | dw Rattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack1Monster021 | db 000,AnimateAttack | dw Rattack2Monster021 | db 000,128+16,AnimateAttack | dw RIdle1Monster021 | db 002,InitiateAttack
 
 Monster021AttackPatternLeft:
-  db    LenghtMonster021AttackPatternLeft,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,000,AnimateAttack | dw Lattack2Monster021 | db 007,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 003,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,000,InitiateAttack
-LenghtMonster021AttackPatternLeft: equ $-Monster021AttackPatternLeft-1
+  db    000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,000,AnimateAttack | dw Lattack2Monster021 | db 007,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 003,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,000,InitiateAttack
 Monster021AttackPatternLeftUp:
-  db    LenghtMonster021AttackPatternLeftUp,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,002,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,006,InitiateAttack
-LenghtMonster021AttackPatternLeftUp: equ $-Monster021AttackPatternLeftUp-1
+  db    000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,002,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,006,InitiateAttack
 Monster021AttackPatternLeftDown:
-  db    LenghtMonster021AttackPatternLeftDown,000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,004,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,008,InitiateAttack
-LenghtMonster021AttackPatternLeftDown: equ $-Monster021AttackPatternLeftDown-1
+  db    000,128+32,AnimateAttack | dw Lattack1Monster021 | db DisplaceLeft,004,AnimateAttack | dw Lattack2Monster021 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack1Monster021 | db 000,AnimateAttack | dw Lattack2Monster021 | db 000,128+16,AnimateAttack | dw LIdle1Monster021 | db DisplaceRight,008,InitiateAttack
 ;######################################################################################
 ;Medusa Head (Castlevania)
 
@@ -1308,6 +1472,19 @@ Monster023Idle:
   ;facing left
   dw    LIdle1Monster023
   dw    LIdle2Monster023
+
+Monster023AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster023 | db 000,000,AnimateAttack | dw Rattack2Monster023 | db 000,003,ShowBeingHitSprite,AnimateAttack | dw Rattack3Monster023 | db 000,007,AnimateAttack | dw Rattack1Monster023 | db 000,000,InitiateAttack
+Monster023AttackPatternRightUp:
+  db    000,AnimateAttack | dw Rattack1Monster023 | db 000,000,AnimateAttack | dw Rattack2Monster023 | db 000,002,ShowBeingHitSprite,AnimateAttack | dw Rattack3Monster023 | db 000,006,AnimateAttack | dw Rattack1Monster023 | db 000,000,InitiateAttack
+Monster023AttackPatternRightDown:
+  db    000,AnimateAttack | dw Rattack1Monster023 | db 000,000,AnimateAttack | dw Rattack2Monster023 | db 000,004,ShowBeingHitSprite,AnimateAttack | dw Rattack3Monster023 | db 000,008,AnimateAttack | dw Rattack1Monster023 | db 000,000,InitiateAttack
+Monster023AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster023 | db 000,000,AnimateAttack | dw Lattack2Monster023 | db 000,007,ShowBeingHitSprite,AnimateAttack | dw Lattack3Monster023 | db 000,003,AnimateAttack | dw Lattack1Monster023 | db 000,000,InitiateAttack
+Monster023AttackPatternLeftUp:
+  db    000,AnimateAttack | dw Lattack1Monster023 | db 000,000,AnimateAttack | dw Lattack2Monster023 | db 000,008,ShowBeingHitSprite,AnimateAttack | dw Lattack3Monster023 | db 000,004,AnimateAttack | dw Lattack1Monster023 | db 000,000,InitiateAttack
+Monster023AttackPatternLeftDown:
+  db    000,AnimateAttack | dw Lattack1Monster023 | db 000,000,AnimateAttack | dw Lattack2Monster023 | db 000,006,ShowBeingHitSprite,AnimateAttack | dw Lattack3Monster023 | db 000,002,AnimateAttack | dw Lattack1Monster023 | db 000,000,InitiateAttack
 ;######################################################################################
 ;Grim Reaper (Castlevania)
 
@@ -1352,6 +1529,11 @@ Monster025Idle:
   ;facing left
   dw    LIdle1Monster025
   dw    LIdle2Monster025
+
+Monster025AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster025 | db 000,000,000,000,000,AnimateAttack | dw RIdle1Monster025 | db ShootProjectile,WaitImpactProjectile
+Monster025AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster025 | db 000,000,000,000,000,AnimateAttack | dw LIdle1Monster025 | db ShootProjectile,WaitImpactProjectile
 ;######################################################################################
 ;Axe man (Castlevania)
 
@@ -1374,6 +1556,175 @@ Monster026Idle:
   ;facing left
   dw    LIdle1Monster026
   dw    LIdle2Monster026
+Monster026AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster026 | db 128+32,000,000,AnimateAttack | dw Rattack2Monster026 | db ShootProjectile,000,000,000,AnimateAttack | dw RIdle1Monster026 | db 128+16,WaitImpactProjectile
+Monster026AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster026 | db 128+32,DisplaceLeft,000,000,AnimateAttack | dw Lattack2Monster026 | db ShootProjectile,000,000,000,AnimateAttack | dw LIdle1Monster026 | db 128+16,DisplaceRight,WaitImpactProjectile  
+;######################################################################################
+;Scorpii (Dragon Slayer IV)
+
+RIdle1Monster027:   equ $4000 + (056*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster027:   equ $4000 + (056*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster027:   equ $4000 + (056*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster027:   equ $4000 + (056*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster027Move:                     
+Monster027Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster027
+  dw    RIdle2Monster027
+  ;facing left
+  dw    LIdle1Monster027
+  dw    LIdle2Monster027
+;######################################################################################
+;Porgi (Dragon Slayer IV)
+
+RIdle1Monster028:   equ $4000 + (080*128) + (096/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster028:   equ $4000 + (080*128) + (112/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster028:   equ $4000 + (080*128) + (144/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster028:   equ $4000 + (080*128) + (128/2) - 128 ;(y*128) + (x/2)
+
+Monster028Move:                     
+Monster028Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster028
+  dw    RIdle2Monster028
+  ;facing left
+  dw    LIdle1Monster028
+  dw    LIdle2Monster028
+;######################################################################################
+;Rock man (Dragon Slayer IV)
+
+RIdle1Monster029:   equ $4000 + (080*128) + (160/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster029:   equ $4000 + (080*128) + (176/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster029:   equ $4000 + (080*128) + (208/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster029:   equ $4000 + (080*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster029Move:                     
+Monster029Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster029
+  dw    RIdle2Monster029
+  ;facing left
+  dw    LIdle1Monster029
+  dw    LIdle2Monster029
+;######################################################################################
+;Piglet (Dragon Slayer IV)
+
+RIdle1Monster030:   equ $4000 + (080*128) + (224/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster030:   equ $4000 + (080*128) + (240/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster030:   equ $4000 + (104*128) + (112/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster030:   equ $4000 + (104*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster030Move:                     
+Monster030Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster030
+  dw    RIdle2Monster030
+  ;facing left
+  dw    LIdle1Monster030
+  dw    LIdle2Monster030
+;######################################################################################
+;Gers (Dragon Slayer IV)
+
+RIdle1Monster031:   equ $4000 + (104*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster031:   equ $4000 + (104*128) + (144/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster031:   equ $4000 + (104*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster031:   equ $4000 + (104*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+Monster031Move:                     
+Monster031Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster031
+  dw    RIdle2Monster031
+  ;facing left
+  dw    LIdle1Monster031
+  dw    LIdle2Monster031
+;######################################################################################
+;Yashinotkin (Dragon Slayer IV)
+
+RIdle1Monster032:   equ $4000 + (104*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster032:   equ $4000 + (104*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster032:   equ $4000 + (104*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster032:   equ $4000 + (104*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster032Move:                     
+Monster032Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster032
+  dw    RIdle2Monster032
+  ;facing left
+  dw    LIdle1Monster032
+  dw    LIdle2Monster032
+;######################################################################################
+;King Mu (Dragon Slayer IV)
+
+RIdle1Monster033:   equ $4000 + (128*128) + (096/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster033:   equ $4000 + (128*128) + (112/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster033:   equ $4000 + (128*128) + (144/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster033:   equ $4000 + (128*128) + (128/2) - 128 ;(y*128) + (x/2)
+
+Monster033Move:                     
+Monster033Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster033
+  dw    RIdle2Monster033
+  ;facing left
+  dw    LIdle1Monster033
+  dw    LIdle2Monster033
+;######################################################################################
+;Crawler (Dragon Slayer IV)
+
+RIdle1Monster034:   equ $4000 + (128*128) + (160/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster034:   equ $4000 + (128*128) + (176/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster034:   equ $4000 + (128*128) + (208/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster034:   equ $4000 + (128*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster034Move:                     
+Monster034Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster034
+  dw    RIdle2Monster034
+  ;facing left
+  dw    LIdle1Monster034
+  dw    LIdle2Monster034
+;######################################################################################
+;Octo (Dragon Slayer IV)
+
+RIdle1Monster035:   equ $4000 + (128*128) + (224/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster035:   equ $4000 + (128*128) + (240/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster035:   equ $4000 + (152*128) + (000/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster035:   equ $4000 + (152*128) + (016/2) - 128 ;(y*128) + (x/2)
+
+Monster035Move:                     
+Monster035Idle:
+  db    7                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster035
+  dw    RIdle2Monster035
+  ;facing left
+  dw    LIdle1Monster035
+  dw    LIdle2Monster035
+Monster035AttackPatternLeft:
+Monster035AttackPatternRight:
+  db    ShootProjectile,WaitImpactProjectile
 ;######################################################################################
 
 

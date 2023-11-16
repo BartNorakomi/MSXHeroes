@@ -3111,9 +3111,12 @@ MoveMonster:
   xor   a
   ld    (MonsterMovementPathPointer),a
   ld    de,MonsterMovementPath
-  ld    c,(hl)
-  ld    b,0
-  inc   hl
+;  ld    c,(hl)
+;  ld    b,0
+;  inc   hl
+
+  ld    bc,LenghtMonsterMovementPathTable
+
   ldir
   ;set attack direction (we use this for the animation in case it's a general attack pattern)
   xor   a

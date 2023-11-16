@@ -242,7 +242,8 @@ CopyRamToVramPage3ForBattleEngine:
 
 MonsterMovementPathPointer: db  0
 MonsterMovementAmountOfSteps:  db  0
-MonsterMovementPath:  ds 100
+MonsterMovementPath:  ds LenghtMonsterMovementPathTable
+LenghtMonsterMovementPathTable: equ 50
 
 ShowExplosionSprite?:  db  0
 ExplosionSpriteStep:  ds  1
@@ -274,7 +275,7 @@ MovementLenghtMonsters: equ 8
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
-  db  001 | dw 100 | db 012 + (00*08), 056 + (00*16)
+  db  001 | dw 100 | db 012 + (01*08), 056 + (00*16)
   db  002 | dw 500 | db 012 + (16*08), 056 + (01*16)
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
