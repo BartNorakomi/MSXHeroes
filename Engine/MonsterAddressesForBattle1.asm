@@ -829,6 +829,626 @@ Monster035Table:                        ;Octo (Dragon Slayer IV)
 
 
 
+Monster036Table:                        ;Sarge green (Contra)
+  dw    Monster036Idle
+  dw    Monster036Move
+  dw    Monster036AttackPatternRight
+  dw    Monster036AttackPatternLeft
+  dw    Monster036AttackPatternLeft
+  dw    Monster036AttackPatternLeft
+  dw    Monster036AttackPatternRight
+  dw    Monster036AttackPatternRight
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Sarge",255,"      "
+
+Monster037Table:                        ;Lieutenant red (Contra)
+  dw    Monster037Idle
+  dw    Monster037Move
+  dw    Monster037AttackPatternRight
+  dw    Monster037AttackPatternLeft
+  dw    Monster037AttackPatternLeft
+  dw    Monster037AttackPatternLeft
+  dw    Monster037AttackPatternRight
+  dw    Monster037AttackPatternRight
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Lieutenant",255," "
+
+Monster038Table:                        ;FootSoldier (Contra)
+  dw    Monster038Idle
+  dw    Monster038Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet1Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "FootSoldier",255
+
+Monster039Table:                        ;Grenadier (Contra)
+  dw    Monster039Idle
+  dw    Monster039Move
+  dw    Monster039AttackPatternRight
+  dw    Monster039AttackPatternLeft
+  dw    Monster039AttackPatternLeft
+  dw    Monster039AttackPatternLeft
+  dw    Monster039AttackPatternRight
+  dw    Monster039AttackPatternRight
+  db    BattleMonsterSpriteSheet4Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Grenadier",255,"  "
+
+Monster040Table:                        ;Sniper (Contra)
+  dw    Monster040Idle
+  dw    Monster040Move
+  dw    Monster040AttackPatternRight
+  dw    Monster040AttackPatternLeft
+  dw    Monster040AttackPatternLeft
+  dw    Monster040AttackPatternLeft
+  dw    Monster040AttackPatternRight
+  dw    Monster040AttackPatternRight
+  db    BattleMonsterSpriteSheet4Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Sniper",255,"     "
+
+Monster041Table:                        ;Gigafly (Contra)
+  dw    Monster041Idle
+  dw    Monster041Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Gigafly",255,"    "
+
+Monster042Table:                        ;Alien Grunt (Contra)
+  dw    Monster042Idle
+  dw    Monster042Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Alien Grunt",255
+
+Monster043Table:                        ;Infiltrant (Contra)
+  dw    Monster043Idle
+  dw    Monster043Move
+  dw    Monster043AttackPatternRight
+  dw    Monster043AttackPatternLeft
+  dw    Monster043AttackPatternLeft
+  dw    Monster043AttackPatternLeft
+  dw    Monster043AttackPatternRight
+  dw    Monster043AttackPatternRight
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Infiltrant",255," "
+
+Monster044Table:                        ;Red Soldier (Contra)
+  dw    Monster044Idle
+  dw    Monster044Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Red Soldier",255
+  
+Monster045Table:                        ;Face Hugger (Contra)
+  dw    Monster045Idle
+  dw    Monster045Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Face Hugger",255
+
+Monster046Table:                        ;Gorudea (Contra)
+  dw    Monster046Idle
+  dw    Monster046Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    32                              ;nx  
+  db    56+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Gorudea",255,"    "
+
+Monster047Table:                        ;Turret (Contra)
+  dw    Monster047Idle
+  dw    Monster047Move
+  dw    Monster047AttackPatternRight
+  dw    Monster047AttackPatternLeft
+  dw    Monster047AttackPatternLeft
+  dw    Monster047AttackPatternLeft
+  dw    Monster047AttackPatternRight
+  dw    Monster047AttackPatternRight
+  db    BattleMonsterSpriteSheet3Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    002                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Turret",255,"     "
+
+Monster048Table:                        ;GraveWing (Usas)
+  dw    Monster048Idle
+  dw    Monster048Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    16                              ;nx  
+  db    40+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "GraveWing",255,"  "
+
+Monster049Table:                        ;Vanguard (Usas)
+  dw    Monster049Idle
+  dw    Monster049Move
+  dw    Monster049AttackPatternRight
+  dw    Monster049AttackPatternLeft
+  dw    Monster049AttackPatternLeft
+  dw    Monster049AttackPatternLeft
+  dw    Monster049AttackPatternRight
+  dw    Monster049AttackPatternRight
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Vanguard",255,"   "
+
+Monster050Table:                        ;Aerial Luna (Usas)
+  dw    Monster050Idle
+  dw    Monster050Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Aerial Luna",255
+  
+Monster051Table:                        ;Mini Phanto (Usas)
+  dw    Monster051Idle
+  dw    Monster051Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Mini Phanto",255
+  
+Monster052Table:                        ;Thicket Tot (Usas)
+  dw    Monster052Idle
+  dw    Monster052Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Thicket Tot",255
+  
+Monster053Table:                        ;Bonefin (Usas)
+  dw    Monster053Idle
+  dw    Monster053Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Bonefin",255,"    "
+
+Monster054Table:                        ;Zomblet (Usas)
+  dw    Monster054Idle
+  dw    Monster054Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Zomblet",255,"    "
+
+Monster055Table:                        ;Cheek (Goemon)
+  dw    Monster055Idle
+  dw    Monster055Move
+  dw    Monster055AttackPatternRight
+  dw    Monster055AttackPatternLeft
+  dw    Monster055AttackPatternLeftUp
+  dw    Monster055AttackPatternLeftDown
+  dw    Monster055AttackPatternRightUp
+  dw    Monster055AttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Cheek",255,"      "
+
+Monster056Table:                        ;Official (Goemon)
+  dw    Monster056Idle
+  dw    Monster056Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Official",255,"   "
+
+Monster057Table:                        ;Kasa-obake (Goemon)
+  dw    Monster057Idle
+  dw    Monster057Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Kasa Obake",255," "
+
+Monster058Table:                        ;Fishmonger (Goemon)
+  dw    Monster058Idle
+  dw    Monster058Move
+  dw    Monster058AttackPatternRight
+  dw    Monster058AttackPatternLeft
+  dw    Monster058AttackPatternLeftUp
+  dw    Monster058AttackPatternLeftDown
+  dw    Monster058AttackPatternRightUp
+  dw    Monster058AttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Fishmonger",255," "
+
+Monster059Table:                        ;Ronin (Goemon)
+  dw    Monster059Idle
+  dw    Monster059Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Ronin",255,"      "
+
+Monster060Table:                        ;Bucket Head (Goemon)
+  dw    Monster060Idle
+  dw    Monster060Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Bucket Head",255
+
+Monster061Table:                        ;Headmaster (Goemon)
+  dw    Monster061Idle
+  dw    Monster061Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    48                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Headmaster",255," "
+
+Monster062Table:                        ;Granola (Goemon)
+  dw    Monster062Idle
+  dw    Monster062Move
+  dw    Monster062AttackPatternRight
+  dw    Monster062AttackPatternLeft
+  dw    Monster062AttackPatternLeftUp
+  dw    Monster062AttackPatternLeftDown
+  dw    Monster062AttackPatternRightUp
+  dw    Monster062AttackPatternRightDown
+  db    BattleMonsterSpriteSheet5Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Granola",255,"    "
 
 
 
@@ -836,6 +1456,217 @@ Monster035Table:                        ;Octo (Dragon Slayer IV)
 
 
 
+
+
+
+
+
+Monster063Table:                        ;Rouge Gazer (Psycho World)
+  dw    Monster063Idle
+  dw    Monster063Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Rouge Gazer",255
+
+Monster064Table:                        ;Glacierling (Psycho World)
+  dw    Monster064Idle
+  dw    Monster064Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Glacierling",255
+
+Monster065Table:                        ;Floatwing (Psycho World)
+  dw    Monster065Idle
+  dw    Monster065Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Floatwing",255,"  "
+
+Monster066Table:                        ;CrimsonPeek (Psycho World)
+  dw    Monster066Idle
+  dw    Monster066Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet3Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "CrimsonPeek",255
+
+Monster067Table:                        ;Fernling (Psycho World)
+  dw    Monster067Idle
+  dw    Monster067Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Fernling",255,"   "
+
+Monster068Table:                        ;Bladezilla (Psycho World)
+  dw    Monster068Idle
+  dw    Monster068Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Bladezilla",255," "
+
+Monster069Table:                        ;Spitvine (Psycho World)
+  dw    Monster069Idle
+  dw    Monster069Move
+  dw    Monster069AttackPatternRight
+  dw    Monster069AttackPatternLeft
+  dw    Monster069AttackPatternLeft
+  dw    Monster069AttackPatternLeft
+  dw    Monster069AttackPatternRight
+  dw    Monster069AttackPatternRight
+  db    BattleMonsterSpriteSheet6Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Spitvine",255,"   "
+
+Monster070Table:                        ;OptiLeaper (Psycho World)
+  dw    Monster070Idle
+  dw    Monster070Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet4Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    009                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "OptiLeaper",255," "
+
+Monster071Table:                        ;huge boo (golvellius)
+  dw    Monster071Idle
+  dw    Monster071Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet2Block
+  db    64                              ;nx  
+  db    64+04                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    003                             ;hp
+  db    006                             ;speed
+  db    004                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Boo",255,"        "
 
 
 
@@ -892,29 +1723,6 @@ Monster102Table:                        ;huge snake (golvellius)
   db    012                             ;growth
   db    000                             ;special ability
   db    "Huge Snake",255," " 
-
-Monster106Table:                        ;huge boo (golvellius)
-  dw    Monster006Idle
-  dw    Monster006Move
-  dw    GeneralMonsterAttackPatternRight
-  dw    GeneralMonsterAttackPatternLeft
-  dw    GeneralMonsterAttackPatternLeftUp
-  dw    GeneralMonsterAttackPatternLeftDown
-  dw    GeneralMonsterAttackPatternRightUp
-  dw    GeneralMonsterAttackPatternRightDown
-  db    BattleMonsterSpriteSheet2Block
-  db    64                              ;nx  
-  db    64+04                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    006                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
-  db    000                             ;special ability
-  db    "Boo",255,"        "
 
 
 
@@ -1726,6 +2534,646 @@ Monster035AttackPatternLeft:
 Monster035AttackPatternRight:
   db    ShootProjectile,WaitImpactProjectile
 ;######################################################################################
+;Sarge green (Contra)
+
+RIdle1Monster036:   equ $4000 + (216*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster036:   equ $4000 + (216*128) + (016/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster036:   equ $4000 + (216*128) + (032/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster036: equ $4000 + (216*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster036:   equ $4000 + (216*128) + (144/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster036:   equ $4000 + (216*128) + (128/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster036:   equ $4000 + (216*128) + (112/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster036: equ $4000 + (216*128) + (080/2) - 128 ;(y*128) + (x/2)
+
+Monster036Move:                     
+Monster036Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster036
+  dw    RIdle2Monster036
+  dw    RIdle3Monster036
+  dw    RIdle2Monster036
+  ;facing left
+  dw    LIdle1Monster036
+  dw    LIdle2Monster036
+  dw    LIdle3Monster036
+  dw    LIdle2Monster036
+Monster036AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster036 | db 128+32,000,ShootProjectile,000,000,000,000,AnimateAttack | dw RIdle1Monster036 | db 128+16,WaitImpactProjectile
+Monster036AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster036 | db 128+32,DisplaceLeft,000,ShootProjectile,000,000,000,000,AnimateAttack | dw LIdle1Monster036 | db DisplaceRight,128+16,WaitImpactProjectile
+;######################################################################################
+;Lieutenant red (Contra)
+
+RIdle1Monster037:   equ $4000 + (000*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster037:   equ $4000 + (000*128) + (016/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster037:   equ $4000 + (000*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle4Monster037:   equ $4000 + (000*128) + (048/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster037: equ $4000 + (000*128) + (064/2) - 128 ;(y*128) + (x/2)
+RAttack2Monster037: equ $4000 + (000*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster037:   equ $4000 + (000*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster037:   equ $4000 + (000*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster037:   equ $4000 + (000*128) + (208/2) - 128 ;(y*128) + (x/2)
+LIdle4Monster037:   equ $4000 + (000*128) + (192/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster037: equ $4000 + (000*128) + (160/2) - 128 ;(y*128) + (x/2)
+LAttack2Monster037: equ $4000 + (000*128) + (128/2) - 128 ;(y*128) + (x/2)
+
+Monster037Move:                     
+Monster037Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster037
+  dw    RIdle2Monster037
+  dw    RIdle3Monster037
+  dw    RIdle4Monster037
+  ;facing left
+  dw    LIdle1Monster037
+  dw    LIdle2Monster037
+  dw    LIdle3Monster037
+  dw    LIdle4Monster037
+Monster037AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster037 | db 128+32,000,000,000,AnimateAttack | dw Rattack2Monster037 | db 000,ShootProjectile,000,000,000,AnimateAttack | dw RIdle1Monster037 | db 128+16,WaitImpactProjectile
+Monster037AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster037 | db 128+32,DisplaceLeft,000,000,000,AnimateAttack | dw Lattack2Monster037 | db 000,ShootProjectile,000,000,000,AnimateAttack | dw LIdle1Monster037 | db DisplaceRight,128+16,WaitImpactProjectile
+;######################################################################################
+;FootSoldier (Contra)
+
+RIdle1Monster038:   equ $4000 + (216*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster038:   equ $4000 + (216*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster038:   equ $4000 + (216*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster038:   equ $4000 + (216*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster038Move:                     
+Monster038Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster038
+  dw    RIdle2Monster038
+  ;facing left
+  dw    LIdle1Monster038
+  dw    LIdle2Monster038
+;######################################################################################
+;Grenadier (Contra)
+
+RIdle1Monster039:   equ $4000 + (040*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster039:   equ $4000 + (040*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster039:   equ $4000 + (040*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster039:   equ $4000 + (040*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster039:   equ $4000 + (040*128) + (128/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster039:   equ $4000 + (040*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster039Move:                     
+Monster039Idle:
+  db    3                               ;animation speed (x frames per animation frame)
+  db    5                               ;amount of animation frames
+  dw    RIdle1Monster039
+  dw    RIdle2Monster039
+  dw    RIdle2Monster039
+  dw    RIdle3Monster039
+  dw    RIdle3Monster039
+  ;facing left
+  dw    LIdle1Monster039
+  dw    LIdle2Monster039
+  dw    LIdle2Monster039
+  dw    LIdle3Monster039
+  dw    LIdle3Monster039
+Monster039AttackPatternRight:
+  db    000,AnimateAttack | dw RIdle1Monster039 | db ShootProjectile,WaitImpactProjectile
+Monster039AttackPatternLeft:
+  db    000,AnimateAttack | dw LIdle1Monster039 | db ShootProjectile,WaitImpactProjectile
+;######################################################################################
+;Sniper (Contra)
+
+RIdle1Monster040:   equ $4000 + (080*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster040:   equ $4000 + (080*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster040:   equ $4000 + (080*128) + (064/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster040: equ $4000 + (080*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster040:   equ $4000 + (080*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster040:   equ $4000 + (080*128) + (192/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster040:   equ $4000 + (080*128) + (160/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster040: equ $4000 + (080*128) + (128/2) - 128 ;(y*128) + (x/2)
+
+Monster040Move:                     
+Monster040Idle:
+  db    6                               ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster040
+  dw    RIdle2Monster040
+  dw    RIdle3Monster040
+  ;facing left
+  dw    LIdle1Monster040
+  dw    LIdle2Monster040
+  dw    LIdle3Monster040
+Monster040AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster040 | db 000,ShootProjectile,000,000,000,000,AnimateAttack | dw RIdle1Monster040 | db WaitImpactProjectile
+Monster040AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster040 | db 000,ShootProjectile,000,000,000,000,AnimateAttack | dw LIdle1Monster040 | db WaitImpactProjectile
+;######################################################################################
+;Gigafly (Contra)
+
+RIdle1Monster041:   equ $4000 + (224*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster041:   equ $4000 + (224*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster041:   equ $4000 + (224*128) + (192/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster041:   equ $4000 + (224*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster041Move:                     
+Monster041Idle:
+  db    1                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster041
+  dw    RIdle2Monster041
+  ;facing left
+  dw    LIdle1Monster041
+  dw    LIdle2Monster041
+;######################################################################################
+;Alien Grunt (Contra)
+
+RIdle1Monster042:   equ $4000 + (120*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster042:   equ $4000 + (120*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster042:   equ $4000 + (120*128) + (064/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster042:   equ $4000 + (120*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster042Move:                     
+Monster042Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster042
+  dw    RIdle2Monster042
+  ;facing left
+  dw    LIdle1Monster042
+  dw    LIdle2Monster042
+;######################################################################################
+;Infiltrant (Contra)
+
+RIdle1Monster043:   equ $4000 + (216*128) + (160/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster043:   equ $4000 + (216*128) + (176/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster043:   equ $4000 + (216*128) + (192/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster043: equ $4000 + (176*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster043:   equ $4000 + (216*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster043:   equ $4000 + (216*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster043:   equ $4000 + (216*128) + (208/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster043: equ $4000 + (176*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster043Move:                     
+Monster043Idle:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster043
+  dw    RIdle2Monster043
+  dw    RIdle3Monster043
+  ;facing left
+  dw    LIdle1Monster043
+  dw    LIdle2Monster043
+  dw    LIdle3Monster043
+Monster043AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster043 | db 128+32,000,ShootProjectile,000,000,000,000,AnimateAttack | dw RIdle1Monster043 | db 128+16,WaitImpactProjectile
+Monster043AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster043 | db 128+32,DisplaceLeft,000,ShootProjectile,000,000,000,000,AnimateAttack | dw LIdle1Monster043 | db DisplaceRight,128+16,WaitImpactProjectile
+;######################################################################################
+;Red Soldier (Contra)
+
+RIdle1Monster044:   equ $4000 + (120*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster044:   equ $4000 + (120*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster044:   equ $4000 + (120*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster044:   equ $4000 + (120*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster044Move:                     
+Monster044Idle:
+  db    6                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster044
+  dw    RIdle2Monster044
+  ;facing left
+  dw    LIdle1Monster044
+  dw    LIdle2Monster044
+;######################################################################################
+;Face Hugger (Contra)
+
+RIdle1Monster045:   equ $4000 + (224*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster045:   equ $4000 + (224*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster045:   equ $4000 + (224*128) + (096/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster045:   equ $4000 + (224*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster045Move:                     
+Monster045Idle:
+  db    9                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster045
+  dw    RIdle2Monster045
+  ;facing left
+  dw    LIdle1Monster045
+  dw    LIdle2Monster045
+;######################################################################################
+;Gorudea (Contra)
+
+RIdle1Monster046:   equ $4000 + (160*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster046:   equ $4000 + (160*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster046:   equ $4000 + (160*128) + (096/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster046:   equ $4000 + (160*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster046Move:                     
+Monster046Idle:
+  db    9                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster046
+  dw    RIdle2Monster046
+  ;facing left
+  dw    LIdle1Monster046
+  dw    LIdle2Monster046
+;######################################################################################
+;Turret (Contra)
+
+RIdle1Monster047:   equ $4000 + (176*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster047:   equ $4000 + (176*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster047:   equ $4000 + (176*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster047:   equ $4000 + (176*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster047:   equ $4000 + (176*128) + (128/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster047:   equ $4000 + (176*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster047Move:                     
+Monster047Idle:
+  db    13                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster047
+  dw    RIdle2Monster047
+  dw    RIdle1Monster047
+  dw    RIdle3Monster047
+  ;facing left
+  dw    LIdle1Monster047
+  dw    LIdle2Monster047
+  dw    LIdle1Monster047
+  dw    LIdle3Monster047
+Monster047AttackPatternRight:
+  db    000,AnimateAttack | dw RIdle1Monster047 | db 000,ShootProjectile,WaitImpactProjectile
+Monster047AttackPatternLeft:
+  db    000,AnimateAttack | dw LIdle1Monster047 | db 000,ShootProjectile,WaitImpactProjectile
+;######################################################################################
+;GraveWing (Usas)
+
+RIdle1Monster048:   equ $4000 + (136*128) + (096/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster048:   equ $4000 + (136*128) + (112/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster048:   equ $4000 + (136*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle4Monster048:   equ $4000 + (136*128) + (144/2) - 128 ;(y*128) + (x/2)
+RIdle5Monster048:   equ $4000 + (136*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster048:   equ $4000 + (136*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster048:   equ $4000 + (136*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster048:   equ $4000 + (136*128) + (208/2) - 128 ;(y*128) + (x/2)
+LIdle4Monster048:   equ $4000 + (136*128) + (192/2) - 128 ;(y*128) + (x/2)
+LIdle5Monster048:   equ $4000 + (136*128) + (176/2) - 128 ;(y*128) + (x/2)
+
+Monster048Move:                     
+Monster048Idle:
+  db    05                              ;animation speed (x frames per animation frame)
+  db    8                               ;amount of animation frames
+  dw    RIdle1Monster048
+  dw    RIdle2Monster048
+  dw    RIdle3Monster048
+  dw    RIdle4Monster048
+  dw    RIdle5Monster048
+  dw    RIdle4Monster048
+  dw    RIdle3Monster048
+  dw    RIdle2Monster048
+  ;facing left
+  dw    LIdle1Monster048
+  dw    LIdle2Monster048
+  dw    LIdle3Monster048
+  dw    LIdle4Monster048
+  dw    LIdle5Monster048
+  dw    LIdle4Monster048
+  dw    LIdle3Monster048
+  dw    LIdle2Monster048
+;######################################################################################
+;Vanguard (Usas)
+
+RIdle1Monster049:   equ $4000 + (224*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster049:   equ $4000 + (224*128) + (016/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster049: equ $4000 + (224*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster049:   equ $4000 + (224*128) + (080/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster049:   equ $4000 + (224*128) + (064/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster049: equ $4000 + (224*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+Monster049Move:                     
+Monster049Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster049
+  dw    RIdle2Monster049
+  ;facing left
+  dw    LIdle1Monster049
+  dw    LIdle2Monster049
+Monster049AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster049 | db 000,ShootProjectile,WaitImpactProjectile
+Monster049AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster049 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Aerial Luna (Usas)
+
+RIdle1Monster050:   equ $4000 + (184*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster050:   equ $4000 + (184*128) + (144/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster050:   equ $4000 + (184*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster050:   equ $4000 + (184*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+Monster050Move:                     
+Monster050Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster050
+  dw    RIdle2Monster050
+  ;facing left
+  dw    LIdle1Monster050
+  dw    LIdle2Monster050
+;######################################################################################
+;Mini Phanto (Usas)
+
+RIdle1Monster051:   equ $4000 + (160*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster051:   equ $4000 + (160*128) + (144/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster051:   equ $4000 + (160*128) + (176/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster051:   equ $4000 + (160*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+Monster051Move:                     
+Monster051Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster051
+  dw    RIdle2Monster051
+  ;facing left
+  dw    LIdle1Monster051
+  dw    LIdle2Monster051
+;######################################################################################
+;Thicket Tot (Usas)
+
+RIdle1Monster052:   equ $4000 + (160*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster052:   equ $4000 + (160*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster052:   equ $4000 + (160*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster052:   equ $4000 + (160*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster052Move:                     
+Monster052Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster052
+  dw    RIdle2Monster052
+  ;facing left
+  dw    LIdle1Monster052
+  dw    LIdle2Monster052
+;######################################################################################
+;Bonefin (Usas)
+
+RIdle1Monster053:   equ $4000 + (152*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster053:   equ $4000 + (152*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster053:   equ $4000 + (152*128) + (080/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster053:   equ $4000 + (152*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster053Move:                     
+Monster053Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster053
+  dw    RIdle2Monster053
+  ;facing left
+  dw    LIdle1Monster053
+  dw    LIdle2Monster053
+;######################################################################################
+;Zomblet (Usas)
+
+RIdle1Monster054:   equ $4000 + (184*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster054:   equ $4000 + (184*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster054:   equ $4000 + (184*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster054:   equ $4000 + (184*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster054Move:                     
+Monster054Idle:
+  db    08                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster054
+  dw    RIdle2Monster054
+  ;facing left
+  dw    LIdle1Monster054
+  dw    LIdle2Monster054
+;######################################################################################
+;Cheek (Goemon)
+
+RIdle1Monster055:   equ $4000 + (000*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster055:   equ $4000 + (000*128) + (032/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster055: equ $4000 + (000*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster055:   equ $4000 + (000*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster055:   equ $4000 + (000*128) + (128/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster055: equ $4000 + (000*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster055Move:                     
+Monster055Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster055
+  dw    RIdle2Monster055
+  ;facing left
+  dw    LIdle1Monster055
+  dw    LIdle2Monster055
+Monster055AttackPatternRight:
+  db    000,AnimateAttack | dw RAttack1Monster055 | db 003,000,ShowBeingHitSprite,007,000,InitiateAttack
+Monster055AttackPatternLeft:
+  db    000,AnimateAttack | dw LAttack1Monster055 | db 007,000,ShowBeingHitSprite,003,000,InitiateAttack
+Monster055AttackPatternLeftUp:
+  db    000,AnimateAttack | dw LAttack1Monster055 | db 008,000,ShowBeingHitSprite,004,000,InitiateAttack
+Monster055AttackPatternLeftDown:
+  db    000,AnimateAttack | dw LAttack1Monster055 | db 006,000,ShowBeingHitSprite,002,000,InitiateAttack
+Monster055AttackPatternRightUp:
+  db    000,AnimateAttack | dw RAttack1Monster055 | db 002,000,ShowBeingHitSprite,006,000,InitiateAttack
+Monster055AttackPatternRightDown:
+  db    000,AnimateAttack | dw RAttack1Monster055 | db 004,000,ShowBeingHitSprite,008,000,InitiateAttack
+;######################################################################################
+;Official (Goemon)
+
+RIdle1Monster056:   equ $4000 + (000*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster056:   equ $4000 + (000*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster056:   equ $4000 + (040*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster056:   equ $4000 + (040*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster056Move:                     
+Monster056Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster056
+  dw    RIdle2Monster056
+  ;facing left
+  dw    LIdle1Monster056
+  dw    LIdle2Monster056
+;######################################################################################
+;Kasa-obake (Goemon)
+
+RIdle1Monster057:   equ $4000 + (040*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster057:   equ $4000 + (040*128) + (032/2) - 128 ;(y*128) + (x/2)
+RIdle3Monster057:   equ $4000 + (040*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster057:   equ $4000 + (040*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster057:   equ $4000 + (040*128) + (128/2) - 128 ;(y*128) + (x/2)
+LIdle3Monster057:   equ $4000 + (040*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster057Move:                     
+Monster057Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster057
+  dw    RIdle2Monster057
+  dw    RIdle3Monster057
+  dw    RIdle2Monster057
+  ;facing left
+  dw    LIdle1Monster057
+  dw    LIdle2Monster057
+  dw    LIdle3Monster057
+  dw    LIdle2Monster057
+;######################################################################################
+;Fishmonger (Goemon)
+
+RIdle1Monster058:   equ $4000 + (080*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster058:   equ $4000 + (080*128) + (032/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster058: equ $4000 + (080*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster058:   equ $4000 + (080*128) + (160/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster058:   equ $4000 + (080*128) + (128/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster058: equ $4000 + (080*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster058Move:                     
+Monster058Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster058
+  dw    RIdle2Monster058
+  ;facing left
+  dw    LIdle1Monster058
+  dw    LIdle2Monster058
+Monster058AttackPatternRight:
+  db    000,AnimateAttack | dw RAttack1Monster058 | db 003,000,ShowBeingHitSprite,007,000,InitiateAttack
+Monster058AttackPatternLeft:
+  db    000,AnimateAttack | dw LAttack1Monster058 | db 007,000,ShowBeingHitSprite,003,000,InitiateAttack
+Monster058AttackPatternLeftUp:
+  db    000,AnimateAttack | dw LAttack1Monster058 | db 008,000,ShowBeingHitSprite,004,000,InitiateAttack
+Monster058AttackPatternLeftDown:
+  db    000,AnimateAttack | dw LAttack1Monster058 | db 006,000,ShowBeingHitSprite,002,000,InitiateAttack
+Monster058AttackPatternRightUp:
+  db    000,AnimateAttack | dw RAttack1Monster058 | db 002,000,ShowBeingHitSprite,006,000,InitiateAttack
+Monster058AttackPatternRightDown:
+  db    000,AnimateAttack | dw RAttack1Monster058 | db 004,000,ShowBeingHitSprite,008,000,InitiateAttack
+;######################################################################################
+;Ronin (Goemon)
+
+RIdle1Monster059:   equ $4000 + (120*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster059:   equ $4000 + (120*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster059:   equ $4000 + (120*128) + (096/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster059:   equ $4000 + (120*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster059Move:                     
+Monster059Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster059
+  dw    RIdle2Monster059
+  ;facing left
+  dw    LIdle1Monster059
+  dw    LIdle2Monster059
+;######################################################################################
+;Bucket Head (Goemon)
+
+RIdle1Monster060:   equ $4000 + (120*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster060:   equ $4000 + (120*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster060:   equ $4000 + (120*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster060:   equ $4000 + (120*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster060Move:                     
+Monster060Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster060
+  dw    RIdle2Monster060
+  ;facing left
+  dw    LIdle1Monster060
+  dw    LIdle2Monster060
+;######################################################################################
+;Headmaster (Goemon)
+
+RIdle1Monster061:   equ $4000 + (160*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster061:   equ $4000 + (160*128) + (048/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster061:   equ $4000 + (160*128) + (144/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster061:   equ $4000 + (160*128) + (096/2) - 128 ;(y*128) + (x/2)
+
+Monster061Move:                     
+Monster061Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster061
+  dw    RIdle2Monster061
+  ;facing left
+  dw    LIdle1Monster061
+  dw    LIdle2Monster061
+;######################################################################################
+;Granola (Goemon)
+
+RIdle1Monster062:   equ $4000 + (200*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster062:   equ $4000 + (200*128) + (032/2) - 128 ;(y*128) + (x/2)
+RMove1Monster062:   equ $4000 + (200*128) + (064/2) - 128 ;(y*128) + (x/2)
+RMove2Monster062:   equ $4000 + (200*128) + (096/2) - 128 ;(y*128) + (x/2)
+RAttack1Monster062: equ $4000 + (080*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster062:   equ $4000 + (200*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster062:   equ $4000 + (200*128) + (192/2) - 128 ;(y*128) + (x/2)
+LMove1Monster062:   equ $4000 + (200*128) + (160/2) - 128 ;(y*128) + (x/2)
+LMove2Monster062:   equ $4000 + (200*128) + (128/2) - 128 ;(y*128) + (x/2)
+LAttack1Monster062: equ $4000 + (160*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster062Move:                     
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RMove1Monster062
+  dw    RMove2Monster062
+  ;facing left
+  dw    LMove1Monster062
+  dw    LMove2Monster062
+Monster062Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster062
+  dw    RIdle2Monster062
+  ;facing left
+  dw    LIdle1Monster062
+  dw    LIdle2Monster062
+Monster062AttackPatternRight:
+  db    000,AnimateAttack | dw RAttack1Monster062 | db 128+48,003,000,ShowBeingHitSprite,007,000,AnimateAttack | dw RIdle1Monster062 | db 128+32,InitiateAttack
+Monster062AttackPatternLeft:
+  db    000,AnimateAttack | dw LAttack1Monster062 | db 128+48,DisplaceLeft,007,000,ShowBeingHitSprite,003,000,AnimateAttack | dw LIdle1Monster062 | db 128+32,DisplaceRight,InitiateAttack
+Monster062AttackPatternLeftUp:
+  db    000,AnimateAttack | dw LAttack1Monster062 | db 128+48,DisplaceLeft,002,000,ShowBeingHitSprite,006,000,AnimateAttack | dw LIdle1Monster062 | db 128+32,DisplaceRight,InitiateAttack
+Monster062AttackPatternLeftDown:
+  db    000,AnimateAttack | dw LAttack1Monster062 | db 128+48,DisplaceLeft,004,000,ShowBeingHitSprite,008,000,AnimateAttack | dw LIdle1Monster062 | db 128+32,DisplaceRight,InitiateAttack
+Monster062AttackPatternRightUp:
+  db    000,AnimateAttack | dw RAttack1Monster062 | db 128+48,008,000,ShowBeingHitSprite,004,000,AnimateAttack | dw RIdle1Monster062 | db 128+32,InitiateAttack
+Monster062AttackPatternRightDown:
+  db    000,AnimateAttack | dw RAttack1Monster062 | db 128+48,006,000,ShowBeingHitSprite,002,000,AnimateAttack | dw RIdle1Monster062 | db 128+32,InitiateAttack 
+;######################################################################################
 
 
 
@@ -1733,21 +3181,172 @@ Monster035AttackPatternRight:
 
 
 
+;Rouge Gazer (Psycho World)
 
+RIdle1Monster063:   equ $4000 + (208*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster063:   equ $4000 + (208*128) + (208/2) - 128 ;(y*128) + (x/2)
 
+LIdle1Monster063:   equ $4000 + (208*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster063:   equ $4000 + (208*128) + (224/2) - 128 ;(y*128) + (x/2)
 
+Monster063Move:                     
+Monster063Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster063
+  dw    RIdle2Monster063
+  ;facing left
+  dw    LIdle1Monster063
+  dw    LIdle2Monster063
+;######################################################################################
+;Glacierling (Psycho World)
 
+RIdle1Monster064:   equ $4000 + (232*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster064:   equ $4000 + (232*128) + (208/2) - 128 ;(y*128) + (x/2)
 
+LIdle1Monster064:   equ $4000 + (232*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster064:   equ $4000 + (232*128) + (224/2) - 128 ;(y*128) + (x/2)
 
+Monster064Move:                     
+Monster064Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster064
+  dw    RIdle2Monster064
+  ;facing left
+  dw    LIdle1Monster064
+  dw    LIdle2Monster064
+;######################################################################################
+;Floatwing (Psycho World)
 
+RIdle1Monster065:   equ $4000 + (000*128) + (064/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster065:   equ $4000 + (000*128) + (080/2) - 128 ;(y*128) + (x/2)
 
+LIdle1Monster065:   equ $4000 + (000*128) + (112/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster065:   equ $4000 + (000*128) + (096/2) - 128 ;(y*128) + (x/2)
 
+Monster065Move:                     
+Monster065Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster065
+  dw    RIdle2Monster065
+  ;facing left
+  dw    LIdle1Monster065
+  dw    LIdle2Monster065
+;######################################################################################
+;CrimsonPeek (Psycho World)
 
+RIdle1Monster066:   equ $4000 + (152*128) + (096/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster066:   equ $4000 + (152*128) + (112/2) - 128 ;(y*128) + (x/2)
 
+LIdle1Monster066:   equ $4000 + (152*128) + (144/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster066:   equ $4000 + (152*128) + (128/2) - 128 ;(y*128) + (x/2)
 
+Monster066Move:                     
+Monster066Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster066
+  dw    RIdle2Monster066
+  ;facing left
+  dw    LIdle1Monster066
+  dw    LIdle2Monster066
+;######################################################################################
+;Fernling (Psycho World)
 
+RIdle1Monster067:   equ $4000 + (000*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster067:   equ $4000 + (000*128) + (016/2) - 128 ;(y*128) + (x/2)
 
+LIdle1Monster067:   equ $4000 + (000*128) + (048/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster067:   equ $4000 + (000*128) + (032/2) - 128 ;(y*128) + (x/2)
 
+Monster067Move:                     
+Monster067Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster067
+  dw    RIdle2Monster067
+  ;facing left
+  dw    LIdle1Monster067
+  dw    LIdle2Monster067
+;######################################################################################
+;Bladezilla (Psycho World)
+
+RIdle1Monster068:   equ $4000 + (024*128) + (000/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster068:   equ $4000 + (024*128) + (032/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster068:   equ $4000 + (024*128) + (096/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster068:   equ $4000 + (024*128) + (064/2) - 128 ;(y*128) + (x/2)
+
+Monster068Move:                     
+Monster068Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster068
+  dw    RIdle2Monster068
+  ;facing left
+  dw    LIdle1Monster068
+  dw    LIdle2Monster068
+;######################################################################################
+;Spitvine (Psycho World)
+
+RIdle1Monster069:   equ $4000 + (024*128) + (128/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster069:   equ $4000 + (024*128) + (160/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster069:   equ $4000 + (024*128) + (224/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster069:   equ $4000 + (024*128) + (192/2) - 128 ;(y*128) + (x/2)
+
+Monster069Move:                     
+Monster069Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster069
+  dw    RIdle2Monster069
+  ;facing left
+  dw    LIdle1Monster069
+  dw    LIdle2Monster069
+Monster069AttackPatternRight:
+  db    000,AnimateAttack | dw RIdle1Monster069 | db 000,ShootProjectile,WaitImpactProjectile
+Monster069AttackPatternLeft:
+  db    000,AnimateAttack | dw LIdle1Monster069 | db 000,ShootProjectile,WaitImpactProjectile
+;######################################################################################
+;OptiLeaper (Psycho World)
+
+RIdle1Monster070:   equ $4000 + (184*128) + (192/2) - 128 ;(y*128) + (x/2)
+RIdle2Monster070:   equ $4000 + (184*128) + (208/2) - 128 ;(y*128) + (x/2)
+
+LIdle1Monster070:   equ $4000 + (184*128) + (240/2) - 128 ;(y*128) + (x/2)
+LIdle2Monster070:   equ $4000 + (184*128) + (224/2) - 128 ;(y*128) + (x/2)
+
+Monster070Move:                     
+Monster070Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster070
+  dw    RIdle2Monster070
+  ;facing left
+  dw    LIdle1Monster070
+  dw    LIdle2Monster070
+;######################################################################################
+;huge boo (golvellius)
+
+RIdle1Monster071:   equ $4000 + (000*128) + (000/2) - 128
+RIdle2Monster071:   equ $4000 + (000*128) + (064/2) - 128
+
+LIdle1Monster071:   equ $4000 + (000*128) + (192/2) - 128
+LIdle2Monster071:   equ $4000 + (000*128) + (128/2) - 128
+
+Monster071Move:                     
+Monster071Idle:
+  db    3                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster071
+  dw    RIdle2Monster071
+  ;facing left
+  dw    LIdle1Monster071
+  dw    LIdle2Monster071
+;######################################################################################
 
 
 
@@ -1825,24 +3424,5 @@ Monster102Idle:
   ;facing left
   dw    LIdle1Monster102
   dw    LIdle2Monster102
-;######################################################################################
-;huge boo (golvellius)
 
-RIdle1Monster106:   equ $4000 + (000*128) + (000/2) - 128
-RIdle2Monster106:   equ $4000 + (000*128) + (064/2) - 128
 
-LIdle1Monster106:   equ $4000 + (000*128) + (192/2) - 128
-LIdle2Monster106:   equ $4000 + (000*128) + (128/2) - 128
-
-Monster106Move:                     
-Monster106Idle:
-  db    3                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    RIdle1Monster106
-  dw    RIdle2Monster106
-  ;facing left
-  dw    LIdle1Monster106
-  dw    LIdle2Monster106
-;######################################################################################
-
-kut:

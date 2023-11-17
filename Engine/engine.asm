@@ -4826,7 +4826,7 @@ HeroAddressesSnake2:          db "Snake2",255,"           ","Battle Mage ",255,S
 HeroAddressesDrasle4:         db "Xemn Worzen",255,"      ","Scholar     ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
 HeroAddressesAshguine:        db "Ashguine",255,"         ","Necromancer ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
 HeroAddressesUndeadline1:     db "Leon",255,"             ","Knight      ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
-HeroAddressesPsychoWorld:     db "Yuko Ahso",255,"        ","Barbarian   ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
+HeroAddressesPsychoWorld:     db "Lucia",255,"            ","Barbarian   ",255,PsychoWorldSpriteBlock| dw HeroSYSXPsychoWorld,HeroPortrait10x18SYSXPsychoWorld,HeroButton20x11SYSXPsychoWorld,HeroPortrait16x30SYSXPsychoWorld                | db 04 | db 013 |
 HeroAddressesUndeadline2:     db "Ruika",255,"            ","Shieldbearer",255,Undeadline2SpriteBlock| dw HeroSYSXUndeadline2,HeroPortrait10x18SYSXUndeadline2,HeroButton20x11SYSXUndeadline2,HeroPortrait16x30SYSXUndeadline2                | db 07 | db 014 |
 HeroAddressesGoemon2:         db "Ebisumaru",255,"        ","Overlord    ",255,Goemon2SpriteBlock| dw HeroSYSXGoemon2,HeroPortrait10x18SYSXGoemon2,HeroButton20x11SYSXGoemon2,HeroPortrait16x30SYSXGoemon2                                    | db 10 | db 015 |
 HeroAddressesUndeadline3:     db "Dino",255,"             ","Alchemist   ",255,Undeadline3SpriteBlock| dw HeroSYSXUndeadline3,HeroPortrait10x18SYSXUndeadline3,HeroButton20x11SYSXUndeadline3,HeroPortrait16x30SYSXUndeadline3                | db 13 | db 016 |
@@ -5224,7 +5224,7 @@ pl2hero1move:	db	03,20
 pl2hero1mana:	dw	03,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 000 | dw 000 |      db 026 | dw 001 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 000 | dw 000 |      db 071 | dw 001 |      db 070 | dw 888 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
