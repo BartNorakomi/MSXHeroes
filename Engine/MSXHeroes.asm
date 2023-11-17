@@ -908,7 +908,8 @@ dephase
 ;
 BattleMonsterSpriteSheet7Block:  equ   $61
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet7.SC5",7,208 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet7Bottom48Lines.SC5",7,048 * 128 
 	ds		$c000-$,$ff
 dephase
 
@@ -917,8 +918,8 @@ dephase
 ;
 BattleMonsterSpriteSheet8Block:  equ   $63
 phase	$4000
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1.SC5",7,208 * 128      ;208 lines
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet1Bottom48Lines.SC5",7,048 * 128      ;208 lines
+;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
 	ds		$c000-$,$ff
 dephase
 
