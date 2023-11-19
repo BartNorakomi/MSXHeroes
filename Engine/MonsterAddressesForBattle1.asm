@@ -2554,13 +2554,13 @@ Monster110Table:                        ;Li Yen (final boss) (yie ar kung fu)
   dw    Monster110Move
   dw    Monster110AttackPatternRight
   dw    Monster110AttackPatternLeft
-  dw    Monster110AttackPatternLeftUp
-  dw    Monster110AttackPatternLeftDown
-  dw    Monster110AttackPatternRightUp
-  dw    Monster110AttackPatternRightDown
+  dw    Monster110AttackPatternLeft
+  dw    Monster110AttackPatternLeft
+  dw    Monster110AttackPatternRight
+  dw    Monster110AttackPatternRight
   db    BattleMonsterSpriteSheet10Block
   db    32                              ;nx  
-  db    32+08                           ;ny
+  db    40+08                           ;ny
   db    004                             ;cost (gold)
   db    001                             ;cost (gems)
   db    000                             ;cost (rubies)
@@ -2571,6 +2571,271 @@ Monster110Table:                        ;Li Yen (final boss) (yie ar kung fu)
   db    012                             ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Li Yen",255,"     "
+
+
+
+
+
+
+
+
+
+
+
+
+
+Monster111Table:                        ;Queen Sora (akanbe dragon)
+  dw    Monster111Idle
+  dw    Monster111Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet8Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Queen Sora",255," "
+
+Monster112Table:                        ;King Mori (akanbe dragon)
+  dw    Monster112Idle
+  dw    Monster112Move
+  dw    Monster112AttackPatternRight
+  dw    Monster112AttackPatternLeft
+  dw    Monster112AttackPatternLeft
+  dw    Monster112AttackPatternLeft
+  dw    Monster112AttackPatternRight
+  dw    Monster112AttackPatternRight
+  db    BattleMonsterSpriteSheet8Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "King Mori",255,"  "
+
+Monster113Table:                        ;Knight Yama (mongolface) (akanbe dragon)
+  dw    Monster113Idle
+  dw    Monster113Move
+  dw    Monster113AttackPatternRight
+  dw    Monster113AttackPatternLeft
+  dw    Monster113AttackPatternLeft
+  dw    Monster113AttackPatternLeft
+  dw    Monster113AttackPatternRight
+  dw    Monster113AttackPatternRight
+  db    BattleMonsterSpriteSheet8Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Knight Yama",255
+  
+Monster114Table:                        ;Bishop Mori (monkey) (akanbe dragon)
+  dw    Monster114Idle
+  dw    Monster114Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet8Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Bishop Mori",255
+
+Monster115Table:                        ;B. Heichi (rhino) (akanbe dragon)
+  dw    Monster115Idle
+  dw    Monster115Move
+  dw    Monster115AttackPatternRight
+  dw    Monster115AttackPatternLeft
+  dw    Monster115AttackPatternLeft
+  dw    Monster115AttackPatternLeft
+  dw    Monster115AttackPatternRight
+  dw    Monster115AttackPatternRight
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "B. Heichi",255,"  "
+
+Monster116Table:                        ;Roke Mizu (zebra) (akanbe dragon)
+  dw    Monster116Idle
+  dw    Monster116Move
+  dw    Monster116AttackPatternRight
+  dw    Monster116AttackPatternLeft
+  dw    Monster116AttackPatternLeftUp
+  dw    Monster116AttackPatternLeftDown
+  dw    Monster116AttackPatternRightUp
+  dw    Monster116AttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Roke Mizu",255,"  "
+
+Monster117Table:                        ;Porn Mizu (akanbe dragon)
+  dw    Monster117Idle
+  dw    Monster117Move
+  dw    Monster117AttackPatternRight
+  dw    Monster117AttackPatternLeft
+  dw    Monster117AttackPatternLeftUp
+  dw    Monster117AttackPatternLeftDown
+  dw    Monster117AttackPatternRightUp
+  dw    Monster117AttackPatternRightDown
+  db    BattleMonsterSpriteSheet11Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Porn Mizu",255,"  "
+
+Monster118Table:                        ;Roke Yama (kangaroo) (akanbe dragon)
+  dw    Monster118Idle
+  dw    Monster118Move
+  dw    Monster118AttackPatternRight
+  dw    Monster118AttackPatternLeft
+  dw    Monster118AttackPatternLeftUp
+  dw    Monster118AttackPatternLeftDown
+  dw    Monster118AttackPatternRightUp
+  dw    Monster118AttackPatternRightDown
+  db    BattleMonsterSpriteSheet11Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Roke Yama",255,"  "
+
+Monster119Table:                        ;Porn Heichi (eliphant) (akanbe dragon)
+  dw    Monster119Idle
+  dw    Monster119Move
+  dw    Monster119AttackPatternRight
+  dw    Monster119AttackPatternLeft
+  dw    Monster119AttackPatternLeft
+  dw    Monster119AttackPatternLeft
+  dw    Monster119AttackPatternRight
+  dw    Monster119AttackPatternRight
+  db    BattleMonsterSpriteSheet11Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Porn Heichi",255
+  
+Monster120Table:                        ;Yama Knight (bushman) (akanbe dragon)
+  dw    Monster120Idle
+  dw    Monster120Move
+  dw    Monster120AttackPatternRight
+  dw    Monster120AttackPatternLeft
+  dw    Monster120AttackPatternLeft
+  dw    Monster120AttackPatternLeft
+  dw    Monster120AttackPatternRight
+  dw    Monster120AttackPatternRight
+  db    BattleMonsterSpriteSheet11Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Yama Knight",255
+
+Monster121Table:                        ;Queen (endboss) (akanbe dragon)
+  dw    Monster121Idle
+  dw    Monster121Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet11Block
+  db    48                              ;nx  
+  db    56+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Queen",255,"      "
 
 
 
@@ -5096,26 +5361,20 @@ Monster109AttackPatternLeft:
 ;######################################################################################
 ;Li Yen (final boss) (yie ar kung fu)
 
-RIdle1Monster110:   equ $4000 + (072*128) + (000/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster110:   equ $4000 + (072*128) + (032/2) - 128  ;(y*128) + (x/2)
-Rattack1Monster110: equ $4000 + (072*128) + (064/2) - 128  ;(y*128) + (x/2)
-Rattack2Monster110: equ $4000 + (112*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle1Monster110:   equ $4000 + (200*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster110:   equ $4000 + (200*128) + (032/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster110:   equ $4000 + (072*128) + (192/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster110:   equ $4000 + (072*128) + (160/2) - 128  ;(y*128) + (x/2)
-Lattack1Monster110: equ $4000 + (072*128) + (112/2) - 128  ;(y*128) + (x/2)
-Lattack2Monster110: equ $4000 + (112*128) + (048/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster110:   equ $4000 + (200*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster110:   equ $4000 + (200*128) + (064/2) - 128  ;(y*128) + (x/2)
 
 Monster110Move:
   db    4                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    RIdle1Monster110
+  db    1                               ;amount of animation frames
   dw    RIdle2Monster110
   ;facing left
-  dw    LIdle1Monster110
   dw    LIdle2Monster110
 Monster110Idle:
-  db    5                               ;animation speed (x frames per animation frame)
+  db    12                              ;animation speed (x frames per animation frame)
   db    2                               ;amount of animation frames
   dw    RIdle1Monster110
   dw    RIdle2Monster110
@@ -5123,28 +5382,311 @@ Monster110Idle:
   dw    LIdle1Monster110
   dw    LIdle2Monster110
 Monster110AttackPatternRight:
-  db    LenghtMonster110AttackPatternRight,020 | dw RIdle1Monster110 | db 003,128+48,020 | dw Rattack1Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 007,InitiateAttack
-LenghtMonster110AttackPatternRight: equ $-Monster110AttackPatternRight-1
-Monster110AttackPatternRightUp:
-  db    LenghtMonster110AttackPatternRightUp,020 | dw RIdle1Monster110 | db 008,128+48,020 | dw Rattack1Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 004,InitiateAttack
-LenghtMonster110AttackPatternRightUp: equ $-Monster110AttackPatternRightUp-1
-Monster110AttackPatternRightDown:
-  db    LenghtMonster110AttackPatternRightDown,020 | dw RIdle1Monster110 | db 006,128+48,020 | dw Rattack2Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 002,InitiateAttack
-LenghtMonster110AttackPatternRightDown: equ $-Monster110AttackPatternRightDown-1
-
+  db    AnimateAttack | dw RIdle2Monster110 | db 000,AnimateAttack | dw RIdle1Monster110 | db 000,ShootProjectile,WaitImpactProjectile
 Monster110AttackPatternLeft:
-  db    LenghtMonster110AttackPatternLeft,020 | dw LIdle1Monster110 | db 000,007,128+48,020 | dw Lattack1Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,003,000,InitiateAttack
-LenghtMonster110AttackPatternLeft: equ $-Monster110AttackPatternLeft-1
-Monster110AttackPatternLeftUp:
-  db    LenghtMonster110AttackPatternLeftUp,020 | dw LIdle1Monster110 | db 000,002,128+48,020 | dw Lattack1Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,006,000,InitiateAttack
-LenghtMonster110AttackPatternLeftUp: equ $-Monster110AttackPatternLeftUp-1
-Monster110AttackPatternLeftDown:
-  db    LenghtMonster110AttackPatternLeftDown,020 | dw LIdle1Monster110 | db 000,004,128+48,020 | dw Lattack2Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,008,000,InitiateAttack
-LenghtMonster110AttackPatternLeftDown: equ $-Monster110AttackPatternLeftDown-1
+  db    AnimateAttack | dw LIdle2Monster110 | db 000,AnimateAttack | dw LIdle1Monster110 | db 000,ShootProjectile,WaitImpactProjectile
+
 ;######################################################################################
 
 
 
+;Queen Sora (akanbe dragon)
+
+RIdle1Monster111:   equ $4000 + (160*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster111:   equ $4000 + (160*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster111:   equ $4000 + (160*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster111:   equ $4000 + (160*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster111:   equ $4000 + (160*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster111:   equ $4000 + (160*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster111Move:
+Monster111Idle:
+  db    05                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster111
+  dw    RIdle2Monster111
+  dw    RIdle3Monster111
+  ;facing left
+  dw    LIdle1Monster111
+  dw    LIdle2Monster111
+  dw    LIdle3Monster111
+
+;######################################################################################
+;King Mori (akanbe dragon)
+
+RIdle1Monster112:   equ $4000 + (192*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster112:   equ $4000 + (192*128) + (096/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster112: equ $4000 + (192*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster112:   equ $4000 + (192*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster112:   equ $4000 + (192*128) + (192/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster112: equ $4000 + (192*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster112Move:
+Monster112Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster112
+  dw    RIdle2Monster112
+  ;facing left
+  dw    LIdle1Monster112
+  dw    LIdle2Monster112
+Monster112AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster112 | db 000,ShootProjectile,WaitImpactProjectile
+Monster112AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster112 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Knight Yama (mongolface) (akanbe dragon)
+
+RIdle1Monster113:   equ $4000 + (224*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster113:   equ $4000 + (224*128) + (096/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster113: equ $4000 + (224*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster113:   equ $4000 + (224*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster113:   equ $4000 + (224*128) + (192/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster113: equ $4000 + (224*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster113Move:
+Monster113Idle:
+  db    09                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster113
+  dw    RIdle2Monster113
+  ;facing left
+  dw    LIdle1Monster113
+  dw    LIdle2Monster113
+Monster113AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster113 | db 000,ShootProjectile,WaitImpactProjectile
+Monster113AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster113 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Bishop Mori (monkey) (akanbe dragon)
+
+RIdle1Monster114:   equ $4000 + (176*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster114:   equ $4000 + (176*128) + (032/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster114:   equ $4000 + (208*128) + (032/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster114:   equ $4000 + (208*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster114Move:
+Monster114Idle:
+  db    08                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster114
+  dw    RIdle2Monster114
+  ;facing left
+  dw    LIdle1Monster114
+  dw    LIdle2Monster114
+
+;######################################################################################
+;B. Heichi (rhino) (akanbe dragon)
+
+RIdle1Monster115:   equ $4000 + (120*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster115:   equ $4000 + (120*128) + (128/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster115: equ $4000 + (184*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster115:   equ $4000 + (152*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster115:   equ $4000 + (152*128) + (096/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster115: equ $4000 + (216*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster115Move:
+Monster115Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster115
+  dw    RIdle2Monster115
+  ;facing left
+  dw    LIdle1Monster115
+  dw    LIdle2Monster115
+Monster115AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster115 | db 000,ShootProjectile,WaitImpactProjectile
+Monster115AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster115 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Roke Mizu (zebra) (akanbe dragon)
+
+RIdle1Monster116:   equ $4000 + (160*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster116:   equ $4000 + (160*128) + (192/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster116: equ $4000 + (160*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster116:   equ $4000 + (192*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster116:   equ $4000 + (192*128) + (192/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster116: equ $4000 + (192*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster116Move:
+Monster116Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster116
+  dw    RIdle2Monster116
+  ;facing left
+  dw    LIdle1Monster116
+  dw    LIdle2Monster116
+Monster116AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster116 | db 003 | db ShowBeingHitSprite,000,000,000,000,007,InitiateAttack
+Monster116AttackPatternRightUp:
+  db    AnimateAttack | dw RAttack1Monster116 | db 002 | db ShowBeingHitSprite,000,000,000,000,006,InitiateAttack
+Monster116AttackPatternRightDown:
+  db    AnimateAttack | dw RAttack1Monster116 | db 004 | db ShowBeingHitSprite,000,000,000,000,008,InitiateAttack
+Monster116AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster116 | db 007 | db ShowBeingHitSprite,000,000,000,000,003,InitiateAttack
+Monster116AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster116 | db 008 | db ShowBeingHitSprite,000,000,000,000,004,InitiateAttack
+Monster116AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster116 | db 006 | db ShowBeingHitSprite,000,000,000,000,002,InitiateAttack
+
+;######################################################################################
+;Porn Mizu (akanbe dragon)
+
+RIdle1Monster117:   equ $4000 + (000*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster117:   equ $4000 + (000*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster117:   equ $4000 + (000*128) + (064/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster117: equ $4000 + (000*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster117:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster117:   equ $4000 + (000*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster117:   equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster117: equ $4000 + (000*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster117Move:
+Monster117Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster117
+  dw    RIdle2Monster117
+  dw    RIdle3Monster117
+  ;facing left
+  dw    LIdle1Monster117
+  dw    LIdle2Monster117
+  dw    LIdle3Monster117
+Monster117AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster117 | db 003 | db ShowBeingHitSprite,000,000,000,000,007,InitiateAttack
+Monster117AttackPatternRightUp:
+  db    AnimateAttack | dw RAttack1Monster117 | db 002 | db ShowBeingHitSprite,000,000,000,000,006,InitiateAttack
+Monster117AttackPatternRightDown:
+  db    AnimateAttack | dw RAttack1Monster117 | db 004 | db ShowBeingHitSprite,000,000,000,000,008,InitiateAttack
+Monster117AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster117 | db 007 | db ShowBeingHitSprite,000,000,000,000,003,InitiateAttack
+Monster117AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster117 | db 008 | db ShowBeingHitSprite,000,000,000,000,004,InitiateAttack
+Monster117AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster117 | db 006 | db ShowBeingHitSprite,000,000,000,000,002,InitiateAttack
+
+;######################################################################################
+;Roke Yama (kangaroo) (akanbe dragon)
+
+RIdle1Monster118:   equ $4000 + (064*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster118:   equ $4000 + (064*128) + (032/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster118: equ $4000 + (064*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster118:   equ $4000 + (064*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster118:   equ $4000 + (064*128) + (128/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster118: equ $4000 + (064*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster118Move:
+Monster118Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster118
+  dw    RIdle2Monster118
+  ;facing left
+  dw    LIdle1Monster118
+  dw    LIdle2Monster118
+Monster118AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster118 | db 003 | db ShowBeingHitSprite,000,000,000,007,InitiateAttack
+Monster118AttackPatternRightUp:
+  db    AnimateAttack | dw RAttack1Monster118 | db 002 | db ShowBeingHitSprite,000,000,000,006,InitiateAttack
+Monster118AttackPatternRightDown:
+  db    AnimateAttack | dw RAttack1Monster118 | db 004 | db ShowBeingHitSprite,000,000,000,008,InitiateAttack
+Monster118AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster118 | db 007 | db ShowBeingHitSprite,000,000,000,003,InitiateAttack
+Monster118AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster118 | db 008 | db ShowBeingHitSprite,000,000,000,004,InitiateAttack
+Monster118AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster118 | db 006 | db ShowBeingHitSprite,000,000,000,002,InitiateAttack
+
+;######################################################################################
+;Porn Heichi (eliphant) (akanbe dragon)
+
+RIdle1Monster119:   equ $4000 + (032*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster119:   equ $4000 + (032*128) + (032/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster119: equ $4000 + (032*128) + (064/2) - 128  ;(y*128) + (x/2)
+RAttack2Monster119: equ $4000 + (032*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster119:   equ $4000 + (032*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster119:   equ $4000 + (032*128) + (192/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster119: equ $4000 + (032*128) + (160/2) - 128  ;(y*128) + (x/2)
+LAttack2Monster119: equ $4000 + (032*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster119Move:
+Monster119Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster119
+  dw    RIdle2Monster119
+  ;facing left
+  dw    LIdle1Monster119
+  dw    LIdle2Monster119
+Monster119AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster119 | db 000,000,000,AnimateAttack | dw RAttack2Monster119 | db 000,ShootProjectile,WaitImpactProjectile
+Monster119AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster119 | db 000,000,000,AnimateAttack | dw LAttack2Monster119 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Yama Knight (bushman) (akanbe dragon)
+
+RIdle1Monster120:   equ $4000 + (064*128) + (192/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster120:   equ $4000 + (064*128) + (224/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster120: equ $4000 + (096*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster120:   equ $4000 + (096*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster120:   equ $4000 + (096*128) + (064/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster120: equ $4000 + (096*128) + (032/2) - 128  ;(y*128) + (x/2)
+
+Monster120Move:
+Monster120Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster120
+  dw    RIdle2Monster120
+  ;facing left
+  dw    LIdle1Monster120
+  dw    LIdle2Monster120
+Monster120AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster120 | db 000,ShootProjectile,WaitImpactProjectile
+Monster120AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster120 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Queen (endboss) (akanbe dragon)
+
+RIdle1Monster121:   equ $4000 + (128*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster121:   equ $4000 + (128*128) + (048/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster121:   equ $4000 + (128*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster121:   equ $4000 + (192*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster121:   equ $4000 + (192*128) + (048/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster121:   equ $4000 + (192*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster121Move:
+Monster121Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster121
+  dw    RIdle2Monster121
+  dw    RIdle1Monster121
+  dw    RIdle3Monster121
+  ;facing left
+  dw    LIdle1Monster121
+  dw    LIdle2Monster121
+  dw    LIdle1Monster121
+  dw    LIdle3Monster121
+
+;######################################################################################
 
 
 
