@@ -2365,22 +2365,62 @@ Monster101Table:                        ;Sabre Wolf (Ys 3)
 
 
 
-
-
-
-
-
-
-Monster201Table:                        ;yie ar kung fu
-  dw    Monster201Idle
-  dw    Monster201Move
-  dw    Monster201AttackPatternRight
-  dw    Monster201AttackPatternLeft
-  dw    Monster201AttackPatternLeftUp
-  dw    Monster201AttackPatternLeftDown
-  dw    Monster201AttackPatternRightUp
-  dw    Monster201AttackPatternRightDown
-  db    BattleMonsterSpriteSheet2Block
+Monster102Table:                        ;Lee Young (yie ar kung fu)
+  dw    Monster102Idle
+  dw    Monster102Move
+  dw    Monster102AttackPatternRight
+  dw    Monster102AttackPatternLeft
+  dw    Monster102AttackPatternLeftUp
+  dw    Monster102AttackPatternLeftDown
+  dw    Monster102AttackPatternRightUp
+  dw    Monster102AttackPatternRightDown
+  db    BattleMonsterSpriteSheet9Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Lee Young",255,"  "
+  
+Monster103Table:                        ;Yen Pei (braid hair) (yie ar kung fu)
+  dw    Monster103Idle
+  dw    Monster103Move
+  dw    Monster103AttackPatternRight
+  dw    Monster103AttackPatternLeft
+  dw    Monster103AttackPatternLeftUp
+  dw    Monster103AttackPatternLeftDown
+  dw    Monster103AttackPatternRightUp
+  dw    Monster103AttackPatternRightDown
+  db    BattleMonsterSpriteSheet9Block
+  db    48                              ;nx  
+  db    40+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Yen Pei",255,"    "
+  
+Monster104Table:                        ;Lan Fang (fan thrower) (yie ar kung fu)
+  dw    Monster104Idle
+  dw    Monster104Move
+  dw    Monster104AttackPatternRight
+  dw    Monster104AttackPatternLeft
+  dw    Monster104AttackPatternLeft
+  dw    Monster104AttackPatternLeft
+  dw    Monster104AttackPatternRight
+  dw    Monster104AttackPatternRight
+  db    BattleMonsterSpriteSheet9Block
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
@@ -2392,10 +2432,145 @@ Monster201Table:                        ;yie ar kung fu
   db    012                             ;defense
   db    012                             ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
-  db    "Yie Ar Kung",255
-  
+  db    "Lan Fang",255,"   "
 
+Monster105Table:                        ;Po Chin (fatty) (yie ar kung fu)
+  dw    Monster105Idle
+  dw    Monster105Move
+  dw    Monster105AttackPatternRight
+  dw    Monster105AttackPatternLeft
+  dw    Monster105AttackPatternLeftUp
+  dw    Monster105AttackPatternLeftDown
+  dw    Monster105AttackPatternRightUp
+  dw    Monster105AttackPatternRightDown
+  db    BattleMonsterSpriteSheet9Block
+  db    48                              ;nx  
+  db    40+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Po Chin",255,"    "
 
+Monster106Table:                        ;Wen Hu (yie ar kung fu)
+  dw    Monster106Idle
+  dw    Monster106Move
+  dw    Monster106AttackPatternRight
+  dw    Monster106AttackPatternLeft
+  dw    Monster106AttackPatternLeftUp
+  dw    Monster106AttackPatternLeftDown
+  dw    Monster106AttackPatternRightUp
+  dw    Monster106AttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    48                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Wen Hu",255,"     "
+
+Monster107Table:                        ;Wei Chin (yie ar kung fu)
+  dw    Monster107Idle
+  dw    Monster107Move
+  dw    Monster107AttackPatternRight
+  dw    Monster107AttackPatternLeft
+  dw    Monster107AttackPatternLeftUp
+  dw    Monster107AttackPatternLeftDown
+  dw    Monster107AttackPatternRightUp
+  dw    Monster107AttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    48                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Wei Chin",255,"   "
+
+Monster108Table:                        ;Mei Ling (yie ar kung fu)
+  dw    Monster108Idle
+  dw    Monster108Move
+  dw    Monster108AttackPatternRight
+  dw    Monster108AttackPatternLeft
+  dw    Monster108AttackPatternLeftUp
+  dw    Monster108AttackPatternLeftDown
+  dw    Monster108AttackPatternRightUp
+  dw    Monster108AttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Mei Ling",255,"   "
+
+Monster109Table:                        ;Han Chen (bomb thrower) (yie ar kung fu)
+  dw    Monster109Idle
+  dw    Monster109Move
+  dw    Monster109AttackPatternRight
+  dw    Monster109AttackPatternLeft
+  dw    Monster109AttackPatternLeft
+  dw    Monster109AttackPatternLeft
+  dw    Monster109AttackPatternRight
+  dw    Monster109AttackPatternRight
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Han Chen",255,"   "
+
+Monster110Table:                        ;Li Yen (final boss) (yie ar kung fu)
+  dw    Monster110Idle
+  dw    Monster110Move
+  dw    Monster110AttackPatternRight
+  dw    Monster110AttackPatternLeft
+  dw    Monster110AttackPatternLeftUp
+  dw    Monster110AttackPatternLeftDown
+  dw    Monster110AttackPatternRightUp
+  dw    Monster110AttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Li Yen",255,"     "
 
 
 
@@ -4670,53 +4845,310 @@ Monster101AttackPatternRightDown:
 
 
 ;######################################################################################
-;yie ar kung fu  
+;Lee Young (yie ar kung fu)
 
-RIdle1Monster201:   equ $4000 + (072*128) + (000/2) - 128
-RIdle2Monster201:   equ $4000 + (072*128) + (032/2) - 128
-Rattack1Monster201: equ $4000 + (072*128) + (064/2) - 128
-Rattack2Monster201: equ $4000 + (112*128) + (000/2) - 128
+RIdle1Monster102:   equ $4000 + (000*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster102:   equ $4000 + (000*128) + (032/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster102: equ $4000 + (000*128) + (064/2) - 128  ;(y*128) + (x/2)
+Rattack2Monster102: equ $4000 + (000*128) + (112/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster201:   equ $4000 + (072*128) + (192/2) - 128
-LIdle2Monster201:   equ $4000 + (072*128) + (160/2) - 128
-Lattack1Monster201: equ $4000 + (072*128) + (112/2) - 128
-Lattack2Monster201: equ $4000 + (112*128) + (048/2) - 128
+LIdle1Monster102:   equ $4000 + (040*128) + (032/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster102:   equ $4000 + (040*128) + (000/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster102: equ $4000 + (000*128) + (208/2) - 128  ;(y*128) + (x/2)
+Lattack2Monster102: equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
 
-Monster201Move:
-  db    4                               ;animation speed (x frames per animation frame)
-  db    2                               ;amount of animation frames
-  dw    RIdle1Monster201
-  dw    RIdle2Monster201
-  ;facing left
-  dw    LIdle1Monster201
-  dw    LIdle2Monster201
-Monster201Idle:
+Monster102Move:
+Monster102Idle:
   db    5                               ;animation speed (x frames per animation frame)
   db    2                               ;amount of animation frames
-  dw    RIdle1Monster201
-  dw    RIdle2Monster201
+  dw    RIdle1Monster102
+  dw    RIdle2Monster102
   ;facing left
-  dw    LIdle1Monster201
-  dw    LIdle2Monster201
-Monster201AttackPatternRight:
-  db    LenghtMonster201AttackPatternRight,020 | dw RIdle1Monster201 | db 003,128+48,020 | dw Rattack1Monster201 | db 000,ShootProjectile,000,128+32,020 | dw RIdle2Monster201 | db 007,WaitImpactProjectile
-;  db    LenghtMonster201AttackPatternRight,020 | dw RIdle1Monster201 | db 003,128+48,020 | dw Rattack1Monster201 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster201 | db 007,InitiateAttack
-LenghtMonster201AttackPatternRight: equ $-Monster201AttackPatternRight-1
-Monster201AttackPatternRightUp:
-  db    LenghtMonster201AttackPatternRightUp,020 | dw RIdle1Monster201 | db 008,128+48,020 | dw Rattack1Monster201 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster201 | db 004,InitiateAttack
-LenghtMonster201AttackPatternRightUp: equ $-Monster201AttackPatternRightUp-1
-Monster201AttackPatternRightDown:
-  db    LenghtMonster201AttackPatternRightDown,020 | dw RIdle1Monster201 | db 006,128+48,020 | dw Rattack2Monster201 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster201 | db 002,InitiateAttack
-LenghtMonster201AttackPatternRightDown: equ $-Monster201AttackPatternRightDown-1
-
-Monster201AttackPatternLeft:
-  db    LenghtMonster201AttackPatternLeft,020 | dw LIdle1Monster201 | db 000,007,128+48,020 | dw Lattack1Monster201 | db DisplaceLeft,000,ShootProjectile,000,128+32,020 | dw LIdle2Monster201 | db DisplaceRight,003,000,WaitImpactProjectile
-;  db    LenghtMonster201AttackPatternLeft,020 | dw LIdle1Monster201 | db 000,007,128+48,020 | dw Lattack1Monster201 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster201 | db DisplaceRight,003,000,InitiateAttack
-LenghtMonster201AttackPatternLeft: equ $-Monster201AttackPatternLeft-1
-Monster201AttackPatternLeftUp:
-  db    LenghtMonster201AttackPatternLeftUp,020 | dw LIdle1Monster201 | db 000,002,128+48,020 | dw Lattack1Monster201 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster201 | db DisplaceRight,006,000,InitiateAttack
-LenghtMonster201AttackPatternLeftUp: equ $-Monster201AttackPatternLeftUp-1
-Monster201AttackPatternLeftDown:
-  db    LenghtMonster201AttackPatternLeftDown,020 | dw LIdle1Monster201 | db 000,004,128+48,020 | dw Lattack2Monster201 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster201 | db DisplaceRight,008,000,InitiateAttack
-LenghtMonster201AttackPatternLeftDown: equ $-Monster201AttackPatternLeftDown-1
+  dw    LIdle1Monster102
+  dw    LIdle2Monster102
+Monster102AttackPatternRight:
+  db    AnimateAttack | dw RIdle1Monster102 | db 003,128+48,AnimateAttack | dw Rattack1Monster102 | db 000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw RIdle2Monster102 | db 007,InitiateAttack
+Monster102AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle1Monster102 | db 008,128+48,AnimateAttack | dw Rattack1Monster102 | db 000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw RIdle2Monster102 | db 004,InitiateAttack
+Monster102AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle1Monster102 | db 006,128+48,AnimateAttack | dw Rattack2Monster102 | db 000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw RIdle2Monster102 | db 002,InitiateAttack
+Monster102AttackPatternLeft:
+  db    AnimateAttack | dw LIdle1Monster102 | db 000,007,128+48,AnimateAttack | dw Lattack1Monster102 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw LIdle2Monster102 | db DisplaceRight,003,000,InitiateAttack
+Monster102AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle1Monster102 | db 000,002,128+48,AnimateAttack | dw Lattack1Monster102 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw LIdle2Monster102 | db DisplaceRight,006,000,InitiateAttack
+Monster102AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle1Monster102 | db 000,004,128+48,AnimateAttack | dw Lattack2Monster102 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,AnimateAttack | dw LIdle2Monster102 | db DisplaceRight,008,000,InitiateAttack
 ;######################################################################################
+;Yen Pei (braid hair) (yie ar kung fu)
+
+RIdle1Monster103:   equ $4000 + (080*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster103:   equ $4000 + (080*128) + (048/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster103: equ $4000 + (080*128) + (096/2) - 128  ;(y*128) + (x/2)
+Rattack2Monster103: equ $4000 + (080*128) + (144/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster103:   equ $4000 + (128*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster103:   equ $4000 + (128*128) + (112/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster103: equ $4000 + (128*128) + (064/2) - 128  ;(y*128) + (x/2)
+Lattack2Monster103: equ $4000 + (128*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster103Move:
+Monster103Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster103
+  dw    RIdle2Monster103
+  ;facing left
+  dw    LIdle1Monster103
+  dw    LIdle2Monster103
+Monster103AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster103 | db 000,000,AnimateAttack | dw Rattack2Monster103 | db 128+64,DisplaceRight,000,ShowBeingHitSprite,000,AnimateAttack | dw Rattack1Monster103 | db 128+48,DisplaceLeft,InitiateAttack
+Monster103AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster103 | db 008,AnimateAttack | dw Rattack1Monster103 | db 000,000,AnimateAttack | dw Rattack2Monster103 | db 128+64,DisplaceRight,000,ShowBeingHitSprite,000,AnimateAttack | dw Rattack1Monster103 | db 128+48,DisplaceLeft,000,000,AnimateAttack | dw RIdle2Monster103 | db 004,InitiateAttack
+Monster103AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster103 | db 006,AnimateAttack | dw Rattack1Monster103 | db 000,000,AnimateAttack | dw Rattack2Monster103 | db 128+64,DisplaceRight,000,ShowBeingHitSprite,000,AnimateAttack | dw Rattack1Monster103 | db 128+48,DisplaceLeft,000,000,AnimateAttack | dw RIdle2Monster103 | db 002,InitiateAttack
+Monster103AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster103 | db 000,000,AnimateAttack | dw Lattack2Monster103 | db 128+64,DisplaceLeft,DisplaceLeft,000,ShowBeingHitSprite,000,AnimateAttack | dw Lattack1Monster103 | db 128+48,DisplaceRight,DisplaceRight,InitiateAttack
+Monster103AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster103 | db 002,AnimateAttack | dw Lattack1Monster103 | db 000,000,AnimateAttack | dw Lattack2Monster103 | db 128+64,DisplaceLeft,DisplaceLeft,000,ShowBeingHitSprite,000,AnimateAttack | dw Lattack1Monster103 | db 128+48,DisplaceRight,DisplaceRight,000,000,AnimateAttack | dw LIdle2Monster103 | db 006,InitiateAttack
+Monster103AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster103 | db 004,AnimateAttack | dw Lattack1Monster103 | db 000,000,AnimateAttack | dw Lattack2Monster103 | db 128+64,DisplaceLeft,DisplaceLeft,000,ShowBeingHitSprite,000,AnimateAttack | dw Lattack1Monster103 | db 128+48,DisplaceRight,DisplaceRight,000,000,AnimateAttack | dw LIdle2Monster103 | db 008,InitiateAttack
+;######################################################################################
+;Lan Fang (fan thrower) (yie ar kung fu)
+
+RIdle1Monster104:   equ $4000 + (040*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster104:   equ $4000 + (040*128) + (096/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster104: equ $4000 + (040*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster104:   equ $4000 + (040*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster104:   equ $4000 + (040*128) + (192/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster104: equ $4000 + (040*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster104Move:
+Monster104Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster104
+  dw    RIdle2Monster104
+  ;facing left
+  dw    LIdle1Monster104
+  dw    LIdle2Monster104
+Monster104AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster104 | db 000,ShootProjectile,000,000,000,000,AnimateAttack | dw RIdle1Monster104 | db WaitImpactProjectile
+Monster104AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster104 | db 000,ShootProjectile,000,000,000,000,AnimateAttack | dw LIdle1Monster104 | db WaitImpactProjectile
+
+;######################################################################################
+;Po Chin (fatty) (yie ar kung fu)
+
+RIdle1Monster105:   equ $4000 + (176*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster105:   equ $4000 + (176*128) + (048/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster105: equ $4000 + (080*128) + (208/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster105:   equ $4000 + (176*128) + (144/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster105:   equ $4000 + (176*128) + (096/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster105: equ $4000 + (128*128) + (208/2) - 128  ;(y*128) + (x/2)
+
+Monster105Move:
+Monster105Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster105
+  dw    RIdle2Monster105
+  ;facing left
+  dw    LIdle1Monster105
+  dw    LIdle2Monster105
+Monster105AttackPatternRight:
+  db    AnimateAttack | dw RIdle2Monster105 | db 003,AnimateAttack | dw Rattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster105 | db 007,InitiateAttack
+Monster105AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster105 | db 008,AnimateAttack | dw Rattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster105 | db 004,InitiateAttack
+Monster105AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster105 | db 006,AnimateAttack | dw Rattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster105 | db 002,InitiateAttack
+Monster105AttackPatternLeft:
+  db    AnimateAttack | dw LIdle2Monster105 | db 007,AnimateAttack | dw Lattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster105 | db 003,InitiateAttack
+Monster105AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster105 | db 002,AnimateAttack | dw Lattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster105 | db 006,InitiateAttack
+Monster105AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster105 | db 004,AnimateAttack | dw Lattack1Monster105 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster105 | db 008,InitiateAttack
+;######################################################################################
+;Wen Hu (yie ar kung fu)
+
+RIdle1Monster106:   equ $4000 + (040*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster106:   equ $4000 + (040*128) + (048/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster106: equ $4000 + (120*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster106:   equ $4000 + (040*128) + (208/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster106:   equ $4000 + (040*128) + (160/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster106: equ $4000 + (120*128) + (208/2) - 128  ;(y*128) + (x/2)
+
+Monster106Move:
+Monster106Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster106
+  dw    RIdle2Monster106
+  ;facing left
+  dw    LIdle1Monster106
+  dw    LIdle2Monster106
+Monster106AttackPatternRight:
+  db    AnimateAttack | dw RIdle2Monster106 | db 003,AnimateAttack | dw Rattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster106 | db 007,InitiateAttack
+Monster106AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster106 | db 008,AnimateAttack | dw Rattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster106 | db 004,InitiateAttack
+Monster106AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster106 | db 006,AnimateAttack | dw Rattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster106 | db 002,InitiateAttack
+Monster106AttackPatternLeft:
+  db    AnimateAttack | dw LIdle2Monster106 | db 007,AnimateAttack | dw Lattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster106 | db 003,InitiateAttack
+Monster106AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster106 | db 002,AnimateAttack | dw Lattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster106 | db 006,InitiateAttack
+Monster106AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster106 | db 004,AnimateAttack | dw Lattack1Monster106 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster106 | db 008,InitiateAttack
+;######################################################################################
+;Wei Chin (yie ar kung fu)
+
+
+RIdle1Monster107:   equ $4000 + (080*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster107:   equ $4000 + (080*128) + (048/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster107: equ $4000 + (120*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster107:   equ $4000 + (080*128) + (208/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster107:   equ $4000 + (080*128) + (160/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster107: equ $4000 + (120*128) + (048/2) - 128  ;(y*128) + (x/2)
+
+Monster107Move:
+Monster107Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster107
+  dw    RIdle2Monster107
+  ;facing left
+  dw    LIdle1Monster107
+  dw    LIdle2Monster107
+Monster107AttackPatternRight:
+  db    AnimateAttack | dw RIdle2Monster107 | db 003,AnimateAttack | dw Rattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster107 | db 007,InitiateAttack
+Monster107AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster107 | db 008,AnimateAttack | dw Rattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster107 | db 004,InitiateAttack
+Monster107AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster107 | db 006,AnimateAttack | dw Rattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster107 | db 002,InitiateAttack
+Monster107AttackPatternLeft:
+  db    AnimateAttack | dw LIdle2Monster107 | db 007,AnimateAttack | dw Lattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster107 | db 003,InitiateAttack
+Monster107AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster107 | db 002,AnimateAttack | dw Lattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster107 | db 006,InitiateAttack
+Monster107AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster107 | db 004,AnimateAttack | dw Lattack1Monster107 | db 000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster107 | db 008,InitiateAttack
+;######################################################################################
+;Mei Ling (yie ar kung fu)
+
+RIdle1Monster108:   equ $4000 + (040*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster108:   equ $4000 + (080*128) + (096/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster108: equ $4000 + (160*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster108:   equ $4000 + (040*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster108:   equ $4000 + (080*128) + (128/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster108: equ $4000 + (160*128) + (048/2) - 128  ;(y*128) + (x/2)
+
+Monster108Move:
+Monster108Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster108
+  dw    RIdle2Monster108
+  ;facing left
+  dw    LIdle1Monster108
+  dw    LIdle2Monster108
+Monster108AttackPatternRight:
+  db    AnimateAttack | dw RIdle2Monster108 | db 003,AnimateAttack | dw Rattack1Monster108 | db 128+48,000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster108 | db 128+32,007,InitiateAttack
+Monster108AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster108 | db 008,AnimateAttack | dw Rattack1Monster108 | db 128+48,000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster108 | db 128+32,004,InitiateAttack
+Monster108AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster108 | db 006,AnimateAttack | dw Rattack1Monster108 | db 128+48,000,ShowBeingHitSprite,000,000,AnimateAttack | dw RIdle2Monster108 | db 128+32,002,InitiateAttack
+Monster108AttackPatternLeft:
+  db    AnimateAttack | dw LIdle2Monster108 | db 007,AnimateAttack | dw Lattack1Monster108 | db 128+48,DisplaceLeft,000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster108 | db 128+32,DisplaceRight,003,InitiateAttack
+Monster108AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster108 | db 002,AnimateAttack | dw Lattack1Monster108 | db 128+48,DisplaceLeft,000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster108 | db 128+32,DisplaceRight,006,InitiateAttack
+Monster108AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster108 | db 004,AnimateAttack | dw Lattack1Monster108 | db 128+48,DisplaceLeft,000,ShowBeingHitSprite,000,000,AnimateAttack | dw LIdle2Monster108 | db 128+32,DisplaceRight,008,InitiateAttack
+;######################################################################################
+;Han Chen (bomb thrower) (yie ar kung fu)
+
+RIdle1Monster109:   equ $4000 + (000*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster109:   equ $4000 + (000*128) + (032/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster109: equ $4000 + (000*128) + (064/2) - 128  ;(y*128) + (x/2)
+Rattack2Monster109: equ $4000 + (000*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster109:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster109:   equ $4000 + (000*128) + (192/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster109: equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
+Lattack2Monster109: equ $4000 + (000*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster109Move:
+Monster109Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster109
+  dw    RIdle2Monster109
+  ;facing left
+  dw    LIdle1Monster109
+  dw    LIdle2Monster109
+Monster109AttackPatternRight:
+  db    000,AnimateAttack | dw Rattack1Monster109 | db 000,000,AnimateAttack | dw Rattack2Monster109 | db 000,ShootProjectile,000,000,AnimateAttack | dw RIdle1Monster109 | db WaitImpactProjectile
+Monster109AttackPatternLeft:
+  db    000,AnimateAttack | dw Lattack1Monster109 | db 000,000,AnimateAttack | dw Lattack2Monster109 | db 000,ShootProjectile,000,000,AnimateAttack | dw LIdle1Monster109 | db WaitImpactProjectile
+
+;######################################################################################
+;Li Yen (final boss) (yie ar kung fu)
+
+RIdle1Monster110:   equ $4000 + (072*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster110:   equ $4000 + (072*128) + (032/2) - 128  ;(y*128) + (x/2)
+Rattack1Monster110: equ $4000 + (072*128) + (064/2) - 128  ;(y*128) + (x/2)
+Rattack2Monster110: equ $4000 + (112*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster110:   equ $4000 + (072*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster110:   equ $4000 + (072*128) + (160/2) - 128  ;(y*128) + (x/2)
+Lattack1Monster110: equ $4000 + (072*128) + (112/2) - 128  ;(y*128) + (x/2)
+Lattack2Monster110: equ $4000 + (112*128) + (048/2) - 128  ;(y*128) + (x/2)
+
+Monster110Move:
+  db    4                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster110
+  dw    RIdle2Monster110
+  ;facing left
+  dw    LIdle1Monster110
+  dw    LIdle2Monster110
+Monster110Idle:
+  db    5                               ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster110
+  dw    RIdle2Monster110
+  ;facing left
+  dw    LIdle1Monster110
+  dw    LIdle2Monster110
+Monster110AttackPatternRight:
+  db    LenghtMonster110AttackPatternRight,020 | dw RIdle1Monster110 | db 003,128+48,020 | dw Rattack1Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 007,InitiateAttack
+LenghtMonster110AttackPatternRight: equ $-Monster110AttackPatternRight-1
+Monster110AttackPatternRightUp:
+  db    LenghtMonster110AttackPatternRightUp,020 | dw RIdle1Monster110 | db 008,128+48,020 | dw Rattack1Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 004,InitiateAttack
+LenghtMonster110AttackPatternRightUp: equ $-Monster110AttackPatternRightUp-1
+Monster110AttackPatternRightDown:
+  db    LenghtMonster110AttackPatternRightDown,020 | dw RIdle1Monster110 | db 006,128+48,020 | dw Rattack2Monster110 | db 000,ShowBeingHitSprite,000,128+32,020 | dw RIdle2Monster110 | db 002,InitiateAttack
+LenghtMonster110AttackPatternRightDown: equ $-Monster110AttackPatternRightDown-1
+
+Monster110AttackPatternLeft:
+  db    LenghtMonster110AttackPatternLeft,020 | dw LIdle1Monster110 | db 000,007,128+48,020 | dw Lattack1Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,003,000,InitiateAttack
+LenghtMonster110AttackPatternLeft: equ $-Monster110AttackPatternLeft-1
+Monster110AttackPatternLeftUp:
+  db    LenghtMonster110AttackPatternLeftUp,020 | dw LIdle1Monster110 | db 000,002,128+48,020 | dw Lattack1Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,006,000,InitiateAttack
+LenghtMonster110AttackPatternLeftUp: equ $-Monster110AttackPatternLeftUp-1
+Monster110AttackPatternLeftDown:
+  db    LenghtMonster110AttackPatternLeftDown,020 | dw LIdle1Monster110 | db 000,004,128+48,020 | dw Lattack2Monster110 | db DisplaceLeft,000,ShowBeingHitSprite,000,128+32,020 | dw LIdle2Monster110 | db DisplaceRight,008,000,InitiateAttack
+LenghtMonster110AttackPatternLeftDown: equ $-Monster110AttackPatternLeftDown-1
+;######################################################################################
+
+
+
+
+
+
+
+
+
+

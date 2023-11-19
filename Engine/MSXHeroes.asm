@@ -960,5 +960,105 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $6d - 6e
+;
+BattleMonsterSpriteSheet9Block:  equ   $6d
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet9.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet9Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $6f - 70
+;
+BattleMonsterSpriteSheet10Block:  equ   $6f
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet10.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet10Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $71 - 72
+;
+BattleMonsterSpriteSheet11Block:  equ   $71
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $73 - 74
+;
+BattleMonsterSpriteSheet12Block:  equ   $73
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $75 - 76
+;
+BattleMonsterSpriteSheet13Block:  equ   $75
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $77 - 78
+;
+BattleMonsterSpriteSheet14Block:  equ   $77
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $79 - 7a
+;
+BattleMonsterSpriteSheet15Block:  equ   $79
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $7b - 7c
+;
+BattleMonsterSpriteSheet16Block:  equ   $7b
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $7d - 7e
+;
+BattleMonsterSpriteSheet17Block:  equ   $7d
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $7f - 80
+;
+BattleMonsterSpriteSheet18Block:  equ   $7f
+phase	$4000
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
