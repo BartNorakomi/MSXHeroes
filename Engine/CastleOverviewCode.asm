@@ -2119,6 +2119,27 @@ HeroPortrait10x18SYSXDrPettrovich: equ $4000+(018*128)+(050/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXRichterBelmont:equ $4000+(018*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 HeroPortrait10x18SYSXUltrabox:     equ $4000+(018*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXLoganSerios:  equ $4000+(018*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXHollyWhite:   equ $4000+(018*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXMercies:      equ $4000+(018*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXNatashaRomanenko:  equ $4000+(018*128)+(110/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXRuth:         equ $4000+(018*128)+(120/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXGeera:        equ $4000+(018*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXYoungNoble:   equ $4000+(018*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait10x18SYSXDawel:        equ $4000+(018*128)+(150/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPocky:        equ $4000+(018*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXKelesisTheCook:  equ $4000+(018*128)+(170/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXLolo:         equ $4000+(018*128)+(180/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPippols:      equ $4000+(018*128)+(190/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXRandar:       equ $4000+(018*128)+(200/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXCles:         equ $4000+(018*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+
+
+
 
 SetArmyUnits:
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
@@ -2641,6 +2662,24 @@ HeroButton20x11SYSXDrPettrovich:    db  %1100 0011 | dw $4000 + (077*128) + (120
 HeroButton20x11SYSXRichterBelmont:  db  %1100 0011 | dw $4000 + (077*128) + (180/2) - 128 | dw $4000 + (077*128) + (200/2) - 128 | dw $4000 + (077*128) + (220/2) - 128
 
 HeroButton20x11SYSXUltrabox:        db  %1100 0011 | dw $4000 + (088*128) + (000/2) - 128 | dw $4000 + (088*128) + (020/2) - 128 | dw $4000 + (088*128) + (040/2) - 128
+HeroButton20x11SYSXLoganSerios:     db  %1100 0011 | dw $4000 + (088*128) + (060/2) - 128 | dw $4000 + (088*128) + (080/2) - 128 | dw $4000 + (088*128) + (100/2) - 128
+HeroButton20x11SYSXHollyWhite:      db  %1100 0011 | dw $4000 + (088*128) + (120/2) - 128 | dw $4000 + (088*128) + (140/2) - 128 | dw $4000 + (088*128) + (160/2) - 128
+HeroButton20x11SYSXMercies:         db  %1100 0011 | dw $4000 + (088*128) + (180/2) - 128 | dw $4000 + (088*128) + (200/2) - 128 | dw $4000 + (088*128) + (220/2) - 128
+
+HeroButton20x11SYSXNatashaRomanenko:db  %1100 0011 | dw $4000 + (099*128) + (000/2) - 128 | dw $4000 + (099*128) + (020/2) - 128 | dw $4000 + (099*128) + (040/2) - 128
+HeroButton20x11SYSXRuth:            db  %1100 0011 | dw $4000 + (099*128) + (060/2) - 128 | dw $4000 + (099*128) + (080/2) - 128 | dw $4000 + (099*128) + (100/2) - 128
+HeroButton20x11SYSXGeera:           db  %1100 0011 | dw $4000 + (099*128) + (120/2) - 128 | dw $4000 + (099*128) + (140/2) - 128 | dw $4000 + (099*128) + (160/2) - 128
+HeroButton20x11SYSXYoungNoble:      db  %1100 0011 | dw $4000 + (099*128) + (180/2) - 128 | dw $4000 + (099*128) + (200/2) - 128 | dw $4000 + (099*128) + (220/2) - 128
+
+HeroButton20x11SYSXDawel:           db  %1100 0011 | dw $4000 + (110*128) + (000/2) - 128 | dw $4000 + (110*128) + (020/2) - 128 | dw $4000 + (110*128) + (040/2) - 128
+HeroButton20x11SYSXPocky:           db  %1100 0011 | dw $4000 + (110*128) + (060/2) - 128 | dw $4000 + (110*128) + (080/2) - 128 | dw $4000 + (110*128) + (100/2) - 128
+HeroButton20x11SYSXKelesisTheCook:  db  %1100 0011 | dw $4000 + (110*128) + (120/2) - 128 | dw $4000 + (110*128) + (140/2) - 128 | dw $4000 + (110*128) + (160/2) - 128
+HeroButton20x11SYSXLolo:            db  %1100 0011 | dw $4000 + (110*128) + (180/2) - 128 | dw $4000 + (110*128) + (200/2) - 128 | dw $4000 + (110*128) + (220/2) - 128
+
+HeroButton20x11SYSXPippols:         db  %1100 0011 | dw $4000 + (121*128) + (000/2) - 128 | dw $4000 + (121*128) + (020/2) - 128 | dw $4000 + (121*128) + (040/2) - 128
+HeroButton20x11SYSXRandar:          db  %1100 0011 | dw $4000 + (121*128) + (060/2) - 128 | dw $4000 + (121*128) + (080/2) - 128 | dw $4000 + (121*128) + (100/2) - 128
+HeroButton20x11SYSXCles:            db  %1100 0011 | dw $4000 + (121*128) + (120/2) - 128 | dw $4000 + (121*128) + (140/2) - 128 | dw $4000 + (121*128) + (160/2) - 128
+
 
 HeroLevelUpCode:
 call ScreenOn

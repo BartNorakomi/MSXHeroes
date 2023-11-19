@@ -459,6 +459,24 @@ DrPettrovichSpriteBlock:      equ HeroesSpritesBlock4
 RichterBelmontSpriteBlock:    equ HeroesSpritesBlock4
 
 UltraBoxSpriteBlock:          equ HeroesSpritesBlock5
+LoganSeriosSpriteBlock:       equ HeroesSpritesBlock5
+HollyWhiteSpriteBlock:        equ HeroesSpritesBlock5
+MerciesSpriteBlock:           equ HeroesSpritesBlock5
+NatashaRomanenkoSpriteBlock:  equ HeroesSpritesBlock5
+RuthSpriteBlock:              equ HeroesSpritesBlock5
+GeeraSpriteBlock:             equ HeroesSpritesBlock5
+YoungNobleSpriteBlock:        equ HeroesSpritesBlock5
+
+DawelSpriteBlock:             equ HeroesSpritesBlock5
+PockySpriteBlock:             equ HeroesSpritesBlock5
+KelesisTheCookSpriteBlock:    equ HeroesSpritesBlock5
+LoloSpriteBlock:              equ HeroesSpritesBlock5
+PippolsSpriteBlock:           equ HeroesSpritesBlock5
+RandarSpriteBlock:            equ HeroesSpritesBlock5
+ClesSpriteBlock:              equ HeroesSpritesBlock5
+
+
+
 ;
 ; block $06 - 07
 ;
