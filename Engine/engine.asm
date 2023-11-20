@@ -4906,21 +4906,17 @@ HeroSYSXUltrabox:     equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Sour
 HeroSYSXLoganSerios:  equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXHollyWhite:   equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXMercies:      equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXNatashaRomanenko:  equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXRuth:         equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXGeera:        equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXYoungNoble:   equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXDawel:        equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXPocky:        equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXKelesisTheCook:  equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXLolo:         equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXPippols:      equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXRandar:       equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-HeroSYSXCles:         equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
-
-
-
-
+HeroSYSXNatashaRomanenko:  equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXRuth:         equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXGeera:        equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXYoungNoble:   equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXDawel:        equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPocky:        equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXKelesisTheCook:  equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXLolo:         equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPippols:      equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXRandar:       equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXCles:         equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 
 ;------------------------------------------------------------------------------------------------------------
 HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -5099,7 +5095,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
 .Inventory: db  003,005,014,015,045,029,030,037,042,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesAdol
+.HeroSpecificInfo: dw HeroAddressesCles
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -5129,7 +5125,7 @@ Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesUltraBox
+.HeroSpecificInfo: dw HeroAddressesDrPettrovich
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero3y:		db	01	                ;
@@ -5152,7 +5148,7 @@ Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesPixy
+.HeroSpecificInfo: dw HeroAddressesMercies
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero4y:		db	00		                ;
@@ -5441,7 +5437,7 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  011,012,013,014,015,016,017,018,000,000
+db 255 | TavernHeroesPlayer1:        db  037,012,013,014,015,016,017,018,000,000
 db 255 | TavernHeroesPlayer2:        db  007,008,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000

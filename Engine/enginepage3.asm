@@ -19,7 +19,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -1336,21 +1336,21 @@ GenericButtonTable3GfxBlock:         db Hero20x11PortraitsBlock
 GenericButtonTable3AmountOfButtons:  db 12
 GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, Button_DYDX
   ;arrow up, 3 hero buttons, arrow down
-  db  %1100 0011 | dw $4000 + (128*128) + (000/2) - 128 | dw $4000 + (128*128) + (020/2) - 128 | dw $4000 + (128*128) + (040/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + ((128+25)*128) + (000/2) - 128 | dw $4000 + ((128+25)*128) + (020/2) - 128 | dw $4000 + ((128+25)*128) + (040/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + (018*128) + (000/2) - 128 | dw $4000 + (018*128) + (020/2) - 128 | dw $4000 + (018*128) + (040/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + (018*128) + (060/2) - 128 | dw $4000 + (018*128) + (080/2) - 128 | dw $4000 + (018*128) + (100/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (139*128) + (096/2) - 128 | dw $4000 + (139*128) + (116/2) - 128 | dw $4000 + (139*128) + (136/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (128*128) + (060/2) - 128 | dw $4000 + (128*128) + (080/2) - 128 | dw $4000 + (128*128) + (100/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((128+25)*128) + (060/2) - 128 | dw $4000 + ((128+25)*128) + (080/2) - 128 | dw $4000 + ((128+25)*128) + (100/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128
   ;arrow up, 3 castle buttons, arrow down
-  db  %1100 0011 | dw $4000 + (128*128) + (120/2) - 128 | dw $4000 + (128*128) + (140/2) - 128 | dw $4000 + (128*128) + (160/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((128+25)*128) + (120/2) - 128 | dw $4000 + ((128+25)*128) + (140/2) - 128 | dw $4000 + ((128+25)*128) + (160/2) - 128 | db .Button6Ytop,.Button6YBottom,.Button6XLeft,.Button6XRight | dw $0000 + (.Button6Ytop*128) + (.Button6XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button7Ytop,.Button7YBottom,.Button7XLeft,.Button7XRight | dw $0000 + (.Button7Ytop*128) + (.Button7XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (128*128) + (180/2) - 128 | dw $4000 + (128*128) + (200/2) - 128 | dw $4000 + (128*128) + (220/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((128+25)*128) + (180/2) - 128 | dw $4000 + ((128+25)*128) + (200/2) - 128 | dw $4000 + ((128+25)*128) + (220/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
   ;system/options
-  db  %1100 0011 | dw $4000 + (139*128) + (000/2) - 128 | dw $4000 + (139*128) + (016/2) - 128 | dw $4000 + (139*128) + (032/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((139+25)*128) + (000/2) - 128 | dw $4000 + ((139+25)*128) + (016/2) - 128 | dw $4000 + ((139+25)*128) + (032/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
   ;end turn
-  db  %1100 0011 | dw $4000 + (139*128) + (048/2) - 128 | dw $4000 + (139*128) + (064/2) - 128 | dw $4000 + (139*128) + (080/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((139+25)*128) + (048/2) - 128 | dw $4000 + ((139+25)*128) + (064/2) - 128 | dw $4000 + ((139+25)*128) + (080/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
 
   ;arrow up, 3 hero buttons, arrow down
 .Button1Ytop:           equ 055

@@ -467,13 +467,13 @@ RuthSpriteBlock:              equ HeroesSpritesBlock5
 GeeraSpriteBlock:             equ HeroesSpritesBlock5
 YoungNobleSpriteBlock:        equ HeroesSpritesBlock5
 
-DawelSpriteBlock:             equ HeroesSpritesBlock5
-PockySpriteBlock:             equ HeroesSpritesBlock5
-KelesisTheCookSpriteBlock:    equ HeroesSpritesBlock5
-LoloSpriteBlock:              equ HeroesSpritesBlock5
-PippolsSpriteBlock:           equ HeroesSpritesBlock5
-RandarSpriteBlock:            equ HeroesSpritesBlock5
-ClesSpriteBlock:              equ HeroesSpritesBlock5
+DawelSpriteBlock:             equ HeroesSpritesBlock6
+PockySpriteBlock:             equ HeroesSpritesBlock6
+KelesisTheCookSpriteBlock:    equ HeroesSpritesBlock6
+LoloSpriteBlock:              equ HeroesSpritesBlock6
+PippolsSpriteBlock:           equ HeroesSpritesBlock6
+RandarSpriteBlock:            equ HeroesSpritesBlock6
+ClesSpriteBlock:              equ HeroesSpritesBlock6
 
 
 

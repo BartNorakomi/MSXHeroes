@@ -2302,36 +2302,36 @@ SetManaAndMovementBars:
 
   ld    a,c
   or    a
-  ld    bc,$4000 + (107*128) + (042/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (042/2) - 128
   jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
   dec   a
-  ld    bc,$4000 + (107*128) + (040/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (040/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (038/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (038/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (036/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (036/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (034/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (034/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (032/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (032/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (030/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (030/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (028/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (028/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (026/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (026/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (024/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (024/2) - 128
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + (107*128) + (022/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (022/2) - 128
   jr    .EndSearchPercentageMovement
 
   .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
@@ -2339,7 +2339,7 @@ SetManaAndMovementBars:
   ld    h,(ix+HeroMana+1)               ;mana
   or    h
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + (107*128) + (040/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (040/2) - 128
 
   .EndSearchPercentageMovement:
   push  bc
@@ -2366,43 +2366,43 @@ SetManaAndMovementBars:
 
   ld    a,c
   or    a
-  ld    bc,$4000 + (107*128) + (020/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (020/2) - 128
   jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
   dec   a
-  ld    bc,$4000 + (107*128) + (018/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (018/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (016/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (016/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (014/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (014/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (012/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (012/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (010/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (010/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (008/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (008/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (006/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (006/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (004/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (004/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + (107*128) + (002/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (002/2) - 128
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + (107*128) + (000/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (000/2) - 128
   jr    .EndSearchPercentageMovement
 
   .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
   ld    a,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   and   a
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + (107*128) + (018/2) - 128
+  ld    bc,$4000 + ((107+25)*128) + (018/2) - 128
 
   .EndSearchPercentageMovement:
   push  bc
@@ -2414,37 +2414,37 @@ SetManaAndMovementBars:
 	ret
 
 EraseManaandMovementBars:
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + (107*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
@@ -2495,11 +2495,11 @@ SetCastlesInWindows:                    ;erase castle windows, then put the cast
   ldir
 	ret
 
-CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128
-CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + (117*128) + (000/2) - 128 | dw $4000 + (117*128) + (020/2) - 128 | dw $4000 + (117*128) + (040/2) - 128
-CastleButtonSwamp:          db  %1100 0011 | dw $4000 + (117*128) + (060/2) - 128 | dw $4000 + (117*128) + (080/2) - 128 | dw $4000 + (117*128) + (100/2) - 128
-CastleButtonHell:           db  %1100 0011 | dw $4000 + (117*128) + (120/2) - 128 | dw $4000 + (117*128) + (140/2) - 128 | dw $4000 + (117*128) + (160/2) - 128
-CastleButtonSnow:           db  %1100 0011 | dw $4000 + (117*128) + (180/2) - 128 | dw $4000 + (117*128) + (200/2) - 128 | dw $4000 + (117*128) + (220/2) - 128
+CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + ((139+025)*128) + (156/2) - 128 | dw $4000 + ((139+025)*128) + (176/2) - 128 | dw $4000 + ((139+025)*128) + (196/2) - 128
+CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + ((117+025)*128) + (000/2) - 128 | dw $4000 + ((117+025)*128) + (020/2) - 128 | dw $4000 + ((117+025)*128) + (040/2) - 128
+CastleButtonSwamp:          db  %1100 0011 | dw $4000 + ((117+025)*128) + (060/2) - 128 | dw $4000 + ((117+025)*128) + (080/2) - 128 | dw $4000 + ((117+025)*128) + (100/2) - 128
+CastleButtonHell:           db  %1100 0011 | dw $4000 + ((117+025)*128) + (120/2) - 128 | dw $4000 + ((117+025)*128) + (140/2) - 128 | dw $4000 + ((117+025)*128) + (160/2) - 128
+CastleButtonSnow:           db  %1100 0011 | dw $4000 + ((117+025)*128) + (180/2) - 128 | dw $4000 + ((117+025)*128) + (200/2) - 128 | dw $4000 + ((117+025)*128) + (220/2) - 128
 
 ClearCastleButtons:
   ld    hl,CastleButton20x11SYSXEmpty
@@ -2619,7 +2619,7 @@ ClearHeroButtons:
   ldir
   ret
 
-HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + (139*128) + (096/2) - 128 | dw $4000 + (139*128) + (116/2) - 128 | dw $4000 + (139*128) + (136/2) - 128
+HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + ((139+25)*128) + (096/2) - 128 | dw $4000 + ((139+25)*128) + (116/2) - 128 | dw $4000 + ((139+25)*128) + (136/2) - 128
 
 HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (020/2) - 128 | dw $4000 + (000*128) + (040/2) - 128
 HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (000*128) + (060/2) - 128 | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (000*128) + (100/2) - 128
