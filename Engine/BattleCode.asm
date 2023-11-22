@@ -2907,6 +2907,8 @@ ShootProjectile: equ 24
 InitiateAttack: equ 254
 EndMovement: equ 255
 WaitImpactProjectile: equ 25
+DisplaceLeft8: equ 26
+DisplaceRight8: equ 27
 MoveMonster:
   ld    a,(ix+MonsterY)
   ld    (ix+MonsterYPrevious),a
@@ -2969,6 +2971,10 @@ MoveMonster:
   jp    z,.ShootProjectile
   cp    WaitImpactProjectile            ;cp 25
   jp    z,.WaitImpactProjectile
+  cp    DisplaceLeft8                   ;cp 26
+  jp    z,.DisplaceLeft8
+  cp    DisplaceRight8                  ;cp 27
+  jp    z,.DisplaceRight8
 
   call  .Move
 
@@ -3008,6 +3014,27 @@ MoveMonster:
   inc   a
   ld    (MonsterMovementPathPointer),a
   jp    .HandleMovement
+
+  .DisplaceLeft8:
+  ld    a,(ix+MonsterX)
+  sub   a,8
+  ld    (ix+MonsterX),a
+
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
+  .DisplaceRight8:
+  ld    a,(ix+MonsterX)
+  add   a,8
+  ld    (ix+MonsterX),a
+
+  ld    a,(MonsterMovementPathPointer)
+  inc   a
+  ld    (MonsterMovementPathPointer),a
+  jp    .HandleMovement
+
 
   .ShowBeingHitSprite:
   ld    a,1

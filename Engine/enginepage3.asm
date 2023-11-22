@@ -19,7 +19,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
