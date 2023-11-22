@@ -248,6 +248,7 @@ LenghtMonsterMovementPathTable: equ 50
 ShowExplosionSprite?:  db  0
 ExplosionSpriteStep:  ds  1
 
+MonsterThatIsRetaliating:  ds  2
 MonsterThatIsBeingAttacked:  ds  2
 MonsterThatIsBeingAttackedX:  ds  1
 MonsterThatIsBeingAttackedNX:  ds  1

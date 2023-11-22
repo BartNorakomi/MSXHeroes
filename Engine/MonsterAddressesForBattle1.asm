@@ -3071,16 +3071,6 @@ Monster131Table:                        ;Jon Sparkle (malaya no hihou)
   db    012                             ;growth
   db    000                             ;special ability
   db    "Jon Sparkle",255
-  
-
-
-
-
-
-
-
-
-
 
 Monster132Table:                        ;Monmon (mon mon monster)
   dw    Monster132Idle
@@ -3266,6 +3256,308 @@ Monster139Table:                        ;Emir Mystic (usas2)
   db    000                             ;special ability
   db    "Emir Mystic",255
   
+Monster140Table:                        ;duncan seven (core dump)
+  dw    Monster140Idle
+  dw    Monster140Move
+  dw    Monster140AttackPatternRight
+  dw    Monster140AttackPatternLeft
+  dw    Monster140AttackPatternLeftUp
+  dw    Monster140AttackPatternLeftDown
+  dw    Monster140AttackPatternRightUp
+  dw    Monster140AttackPatternRightDown
+  db    BattleMonsterSpriteSheet14Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Duncan 7",255,"   "
+
+Monster141Table:                        ;Monstrilla (core dump)
+  dw    Monster141Idle
+  dw    Monster141Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet7Block
+  db    64                              ;nx  
+  db    64+04                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Monstrilla",255," "
+
+Monster142Table:                        ;Biolumia (core dump)
+  dw    Monster142Idle
+  dw    Monster142Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet7Block
+  db    32                              ;nx  
+  db    40+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Biolumia",255,"   "
+
+Monster143Table:                        ;Anna Lee (cabage patch kids)
+  dw    Monster143Idle
+  dw    Monster143Move
+  dw    Monster143AttackPatternRight
+  dw    Monster143AttackPatternLeft
+  dw    Monster143AttackPatternLeftUp
+  dw    Monster143AttackPatternLeftDown
+  dw    Monster143AttackPatternRightUp
+  dw    Monster143AttackPatternRightDown
+  db    BattleMonsterSpriteSheet14Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Anna Lee",255,"   "
+
+Monster144Table:                        ;Pastry Chef (comic bakery)
+  dw    Monster144Idle
+  dw    Monster144Move
+  dw    Monster144AttackPatternRight
+  dw    Monster144AttackPatternLeft
+  dw    Monster144AttackPatternLeft
+  dw    Monster144AttackPatternLeft
+  dw    Monster144AttackPatternRight
+  dw    Monster144AttackPatternRight
+  db    BattleMonsterSpriteSheet14Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Pastry Chef",255
+
+Monster145Table:                        ;Indy Brave (magical tree)
+  dw    Monster145Idle
+  dw    Monster145Move
+  dw    Monster145AttackPatternRight
+  dw    Monster145AttackPatternLeft
+  dw    Monster145AttackPatternLeftUp
+  dw    Monster145AttackPatternLeftDown
+  dw    Monster145AttackPatternRightUp
+  dw    Monster145AttackPatternRightDown
+  db    BattleMonsterSpriteSheet14Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Indy Brave",255," "
+
+
+  
+  
+Monster146Table:                        ;Red Lupin (arsene lupin)
+  dw    Monster146Idle
+  dw    Monster146Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet14Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Red Lupin",255,"  "
+
+Monster147Table:                        ;Green Lupin (arsene lupin)
+  dw    Monster147Idle
+  dw    Monster147Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet13Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Green Lupin",255
+  
+Monster148Table:                        ;Major Mirth (arsene lupin)
+  dw    Monster148Idle
+  dw    Monster148Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet14Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Major Mirth",255
+  
+Monster149Table:                        ;Vic Viper (kings valley 2)
+  dw    Monster149Idle
+  dw    Monster149Move
+  dw    Monster149AttackPatternRight
+  dw    Monster149AttackPatternLeft
+  dw    Monster149AttackPatternLeft
+  dw    Monster149AttackPatternLeft
+  dw    Monster149AttackPatternRight
+  dw    Monster149AttackPatternRight
+  db    BattleMonsterSpriteSheet13Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Vic Viper",255,"  "
+
+Monster150Table:                        ;Rock Roll (kings valley 2)
+  dw    Monster150Idle
+  dw    Monster150Move
+  dw    Monster150AttackPatternRight
+  dw    Monster150AttackPatternLeft
+  dw    Monster150AttackPatternLeftUp
+  dw    Monster150AttackPatternLeftDown
+  dw    Monster150AttackPatternRightUp
+  dw    Monster150AttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Rock Roll",255,"  "
+
+Monster151Table:                        ;Slouman (kings valley 2)
+  dw    Monster151Idle
+  dw    Monster151Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Slouman",255,"    "
+
+Monster152Table:                        ;Pyoncy (kings valley 2)
+  dw    Monster152Idle
+  dw    Monster152Move
+  dw    Monster152AttackPatternRight
+  dw    Monster152AttackPatternLeft
+  dw    Monster152AttackPatternLeftUp
+  dw    Monster152AttackPatternLeftDown
+  dw    Monster152AttackPatternRightUp
+  dw    Monster152AttackPatternRightDown
+  db    BattleMonsterSpriteSheet6Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001                             ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    050                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Pyoncy",255,"     "
+
 
 
 
@@ -6763,5 +7055,388 @@ Monster139AttackPatternLeftUp:
   db    000,AnimateAttack | dw Lattack1Monster139 | db 128+48,DisplaceLeft,000,008,000,ShowBeingHitSprite,004,000,AnimateAttack | dw LIdle1Monster139 | db 128+32,DisplaceRight,InitiateAttack
 Monster139AttackPatternLeftDown:
   db    000,AnimateAttack | dw Lattack1Monster139 | db 128+48,DisplaceLeft,000,006,000,ShowBeingHitSprite,002,000,AnimateAttack | dw LIdle1Monster139 | db 128+32,DisplaceRight,InitiateAttack
+;######################################################################################
+;duncan seven (core dump)
+
+RIdle1Monster140:   equ $4000 + (000*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster140:   equ $4000 + (000*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster140:   equ $4000 + (000*128) + (064/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster140: equ $4000 + (000*128) + (096/2) - 128  ;(y*128) + (x/2)
+RAttack2Monster140: equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster140:   equ $4000 + (040*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster140:   equ $4000 + (040*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster140:   equ $4000 + (040*128) + (128/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster140: equ $4000 + (040*128) + (064/2) - 128  ;(y*128) + (x/2)
+LAttack2Monster140: equ $4000 + (040*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster140Move:
+Monster140Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster140
+  dw    RIdle3Monster140
+  dw    RIdle2Monster140
+  dw    RIdle3Monster140
+  ;facing left
+  dw    LIdle1Monster140
+  dw    LIdle3Monster140
+  dw    LIdle2Monster140
+  dw    LIdle3Monster140
+Monster140AttackPatternRight:
+  db    AnimateAttack | dw RIdle1Monster140 | db 000,AnimateAttack | dw RAttack1Monster140 | db 128+64,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RIdle1Monster140 | db 128+32,000,InitiateAttack
+Monster140AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle1Monster140 | db 008,AnimateAttack | dw RAttack1Monster140 | db 128+64,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RIdle1Monster140 | db 128+32,004,InitiateAttack
+Monster140AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle1Monster140 | db 006,AnimateAttack | dw RAttack1Monster140 | db 128+64,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw RAttack2Monster140 | db 000,AnimateAttack | dw RIdle1Monster140 | db 128+32,002,InitiateAttack
+Monster140AttackPatternLeft:
+  db    AnimateAttack | dw LIdle1Monster140 | db 000,AnimateAttack | dw LAttack1Monster140 | db 128+64,DisplaceLeft,DisplaceLeft,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LIdle1Monster140 | db 128+32,DisplaceRight,DisplaceRight,000,InitiateAttack
+Monster140AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle1Monster140 | db 002,AnimateAttack | dw LAttack1Monster140 | db 128+64,DisplaceLeft,DisplaceLeft,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LIdle1Monster140 | db 128+32,DisplaceRight,DisplaceRight,006,InitiateAttack
+Monster140AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle1Monster140 | db 004,AnimateAttack | dw LAttack1Monster140 | db 128+64,DisplaceLeft,DisplaceLeft,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LAttack1Monster140 | db ShowBeingHitSprite,000,AnimateAttack | dw LAttack2Monster140 | db 000,AnimateAttack | dw LIdle1Monster140 | db 128+32,DisplaceRight,DisplaceRight,008,InitiateAttack
+
+;######################################################################################
+;Monstrilla (core dump)
+
+RIdle1Monster141:   equ $4000 + (068*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster141:   equ $4000 + (068*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster141:   equ $4000 + (068*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster141:   equ $4000 + (068*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster141Move:
+Monster141Idle:
+  db    08                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster141
+  dw    RIdle2Monster141
+  ;facing left
+  dw    LIdle1Monster141
+  dw    LIdle2Monster141
+
+;######################################################################################
+;Biolumia (core dump)
+
+RIdle1Monster142:   equ $4000 + (136*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster142:   equ $4000 + (136*128) + (192/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster142:   equ $4000 + (136*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster142:   equ $4000 + (136*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster142:   equ $4000 + (136*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster142:   equ $4000 + (136*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+Monster142Move:
+Monster142Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster142
+  dw    RIdle2Monster142
+  dw    RIdle3Monster142
+  ;facing left
+  dw    LIdle1Monster142
+  dw    LIdle2Monster142
+  dw    LIdle3Monster142
+
+;######################################################################################
+;Anna Lee (cabage patch kids)
+
+RIdle1Monster143:   equ $4000 + (176*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster143:   equ $4000 + (176*128) + (016/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster143:   equ $4000 + (176*128) + (032/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster143: equ $4000 + (176*128) + (048/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster143:   equ $4000 + (176*128) + (112/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster143:   equ $4000 + (176*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster143:   equ $4000 + (176*128) + (080/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster143: equ $4000 + (176*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+Monster143Move:
+Monster143Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster143
+  dw    RIdle2Monster143
+  dw    RIdle1Monster143
+  dw    RIdle3Monster143
+  ;facing left
+  dw    LIdle1Monster143
+  dw    LIdle2Monster143
+  dw    LIdle1Monster143
+  dw    LIdle3Monster143
+Monster143AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster143 | db 003,000,ShowBeingHitSprite,000,007,InitiateAttack
+Monster143AttackPatternRightUp:
+  db    AnimateAttack | dw RAttack1Monster143 | db 002,000,ShowBeingHitSprite,000,006,InitiateAttack
+Monster143AttackPatternRightDown:
+  db    AnimateAttack | dw RAttack1Monster143 | db 004,000,ShowBeingHitSprite,000,008,InitiateAttack
+Monster143AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster143 | db 007,000,ShowBeingHitSprite,000,003,InitiateAttack
+Monster143AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster143 | db 008,000,ShowBeingHitSprite,000,004,InitiateAttack
+Monster143AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster143 | db 006,000,ShowBeingHitSprite,000,002,InitiateAttack
+
+;######################################################################################
+;Pastry Chef (comic bakery)
+
+RIdle1Monster144:   equ $4000 + (216*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster144:   equ $4000 + (216*128) + (048/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster144: equ $4000 + (216*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster144:   equ $4000 + (216*128) + (112/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster144:   equ $4000 + (216*128) + (096/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster144: equ $4000 + (216*128) + (080/2) - 128  ;(y*128) + (x/2)
+
+Monster144Move:
+Monster144Idle:
+  db    08                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster144
+  dw    RIdle2Monster144
+  ;facing left
+  dw    LIdle1Monster144
+  dw    LIdle2Monster144
+Monster144AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster144 | db 000,ShootProjectile,000,WaitImpactProjectile
+Monster144AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster144 | db 000,ShootProjectile,000,WaitImpactProjectile
+
+;######################################################################################
+;Indy Brave (magical tree)
+
+RIdle1Monster145:   equ $4000 + (216*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster145:   equ $4000 + (216*128) + (144/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster145:   equ $4000 + (216*128) + (160/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster145: equ $4000 + (216*128) + (176/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster145:   equ $4000 + (216*128) + (240/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster145:   equ $4000 + (216*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster145:   equ $4000 + (216*128) + (208/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster145: equ $4000 + (216*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+Monster145Move:
+Monster145Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster145
+  dw    RIdle2Monster145
+  dw    RIdle3Monster145
+  ;facing left
+  dw    LIdle1Monster145
+  dw    LIdle2Monster145
+  dw    LIdle3Monster145
+Monster145AttackPatternRight:
+  db    AnimateAttack | dw RAttack1Monster145 | db 003,000,ShowBeingHitSprite,000,007,InitiateAttack
+Monster145AttackPatternRightUp:
+  db    AnimateAttack | dw RAttack1Monster145 | db 002,000,ShowBeingHitSprite,000,006,InitiateAttack
+Monster145AttackPatternRightDown:
+  db    AnimateAttack | dw RAttack1Monster145 | db 004,000,ShowBeingHitSprite,000,008,InitiateAttack
+Monster145AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster145 | db 007,000,ShowBeingHitSprite,000,003,InitiateAttack
+Monster145AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster145 | db 008,000,ShowBeingHitSprite,000,004,InitiateAttack
+Monster145AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster145 | db 006,000,ShowBeingHitSprite,000,002,InitiateAttack
 
 
+
+;######################################################################################
+;Red Lupin (arsene lupin)
+
+RIdle1Monster146:   equ $4000 + (176*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster146:   equ $4000 + (176*128) + (144/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster146:   equ $4000 + (176*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster146:   equ $4000 + (176*128) + (208/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster146:   equ $4000 + (176*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster146:   equ $4000 + (176*128) + (176/2) - 128  ;(y*128) + (x/2)
+
+Monster146Move:
+Monster146Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster146
+  dw    RIdle2Monster146
+  dw    RIdle3Monster146
+  ;facing left
+  dw    LIdle1Monster146
+  dw    LIdle2Monster146
+  dw    LIdle3Monster146
+
+;######################################################################################
+;Green Lupin (arsene lupin)
+
+RIdle1Monster147:   equ $4000 + (216*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster147:   equ $4000 + (216*128) + (176/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster147:   equ $4000 + (216*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster147:   equ $4000 + (216*128) + (240/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster147:   equ $4000 + (216*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster147:   equ $4000 + (216*128) + (208/2) - 128  ;(y*128) + (x/2)
+
+Monster147Move:
+Monster147Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster147
+  dw    RIdle2Monster147
+  dw    RIdle3Monster147
+  ;facing left
+  dw    LIdle1Monster147
+  dw    LIdle2Monster147
+  dw    LIdle3Monster147
+
+;######################################################################################
+;Major Mirth (arsene lupin)
+
+RIdle1Monster148:   equ $4000 + (176*128) + (224/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster148:   equ $4000 + (176*128) + (240/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster148:   equ $4000 + (216*128) + (000/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster148:   equ $4000 + (216*128) + (016/2) - 128  ;(y*128) + (x/2)
+
+Monster148Move:
+Monster148Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster148
+  dw    RIdle2Monster148
+  ;facing left
+  dw    LIdle1Monster148
+  dw    LIdle2Monster148
+
+;######################################################################################
+;Vic Viper (kings valley 2)
+
+RIdle1Monster149:   equ $4000 + (048*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster149:   equ $4000 + (048*128) + (176/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster149:   equ $4000 + (048*128) + (192/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster149: equ $4000 + (048*128) + (208/2) - 128  ;(y*128) + (x/2)
+RAttack2Monster149: equ $4000 + (048*128) + (224/2) - 128  ;(y*128) + (x/2)
+RAttack3Monster149: equ $4000 + (048*128) + (240/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster149:   equ $4000 + (072*128) + (240/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster149:   equ $4000 + (072*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster149:   equ $4000 + (072*128) + (208/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster149: equ $4000 + (072*128) + (192/2) - 128  ;(y*128) + (x/2)
+LAttack2Monster149: equ $4000 + (072*128) + (176/2) - 128  ;(y*128) + (x/2)
+LAttack3Monster149: equ $4000 + (072*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster149Move:
+Monster149Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster149
+  dw    RIdle2Monster149
+  dw    RIdle3Monster149
+  ;facing left
+  dw    LIdle1Monster149
+  dw    LIdle2Monster149
+  dw    LIdle3Monster149
+
+Monster149AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster149 | db 000,000,000,AnimateAttack | dw Rattack2Monster149 | db 000,000,000,AnimateAttack | dw Rattack3Monster149 | db 000,ShootProjectile,WaitImpactProjectile
+Monster149AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster149 | db 000,000,000,AnimateAttack | dw Lattack2Monster149 | db 000,000,000,AnimateAttack | dw Lattack3Monster149 | db 000,ShootProjectile,WaitImpactProjectile
+
+;######################################################################################
+;Rock Roll (kings valley 2)
+
+RIdle1Monster150:   equ $4000 + (208*128) + (128/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster150: equ $4000 + (208*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster150:   equ $4000 + (208*128) + (144/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster150: equ $4000 + (208*128) + (176/2) - 128  ;(y*128) + (x/2)
+
+Monster150Move:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RAttack1Monster150
+  dw    LAttack1Monster150
+  ;facing left
+  dw    LAttack1Monster150
+  dw    RAttack1Monster150
+
+Monster150Idle:
+  db    10                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster150
+  dw    LIdle1Monster150
+  ;facing left
+  dw    LIdle1Monster150
+  dw    RIdle1Monster150
+
+Monster150AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster150 | db 000,003,ShowBeingHitSprite,007,000,InitiateAttack
+Monster150AttackPatternLeft:
+  db    AnimateAttack | dw LAttack1Monster150 | db 000,007,ShowBeingHitSprite,003,000,InitiateAttack
+Monster150AttackPatternLeftUp:
+  db    AnimateAttack | dw LAttack1Monster150 | db 000,008,ShowBeingHitSprite,004,000,InitiateAttack
+Monster150AttackPatternLeftDown:
+  db    AnimateAttack | dw LAttack1Monster150 | db 000,006,ShowBeingHitSprite,002,000,InitiateAttack
+Monster150AttackPatternRightUp:
+  db    AnimateAttack | dw Rattack1Monster150 | db 000,002,ShowBeingHitSprite,006,000,InitiateAttack
+Monster150AttackPatternRightDown:
+  db    AnimateAttack | dw Rattack1Monster150 | db 000,004,ShowBeingHitSprite,008,000,InitiateAttack
+
+;######################################################################################
+;Slouman (kings valley 2)
+
+RIdle1Monster151:   equ $4000 + (232*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster151:   equ $4000 + (232*128) + (144/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster151:   equ $4000 + (232*128) + (176/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster151:   equ $4000 + (232*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster151Move:
+Monster151Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster151
+  dw    RIdle2Monster151
+  ;facing left
+  dw    LIdle1Monster151
+  dw    LIdle2Monster151
+
+;######################################################################################
+;Pyoncy (kings valley 2)
+
+RIdle1Monster152:   equ $4000 + (208*128) + (192/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster152:   equ $4000 + (208*128) + (208/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster152:   equ $4000 + (208*128) + (240/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster152:   equ $4000 + (208*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+Monster152Move:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster152
+  dw    RIdle2Monster152
+  ;facing left
+  dw    LIdle1Monster152
+  dw    LIdle2Monster152
+
+Monster152Idle:
+  db    08                              ;animation speed (x frames per animation frame)
+  db    3                               ;amount of animation frames
+  dw    RIdle1Monster152
+  dw    RIdle1Monster152
+  dw    RIdle2Monster152
+  ;facing left
+  dw    LIdle1Monster152
+  dw    LIdle1Monster152
+  dw    LIdle2Monster152
+
+Monster152AttackPatternRight:
+  db    AnimateAttack | dw RIdle2Monster152 | db 000,003,ShowBeingHitSprite,007,000,InitiateAttack
+Monster152AttackPatternLeft:
+  db    AnimateAttack | dw LIdle2Monster152 | db 000,007,ShowBeingHitSprite,003,000,InitiateAttack
+Monster152AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle2Monster152 | db 000,008,ShowBeingHitSprite,004,000,InitiateAttack
+Monster152AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle2Monster152 | db 000,006,ShowBeingHitSprite,002,000,InitiateAttack
+Monster152AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle2Monster152 | db 000,002,ShowBeingHitSprite,006,000,InitiateAttack
+Monster152AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle2Monster152 | db 000,004,ShowBeingHitSprite,008,000,InitiateAttack

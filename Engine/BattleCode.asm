@@ -3234,6 +3234,7 @@ MoveMonster:
   jr    z,.Go
   xor   a
   ld    (HandleRetaliation?),a
+  .kut:
   jr    .EndSetStatusOnEndMovement
   .Go:
 
@@ -3250,15 +3251,12 @@ MoveMonster:
   jp    z,.EndMovement
   .EndCheckRangedMonster:
 
-
-
-
-
   ld    ix,(MonsterThatIsBeingAttacked)
   bit   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   jr    nz,.EndMovement
   set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   ld    a,1
+  ld    (MonsterThatIsRetaliating),ix
   ld    (HandleRetaliation?),a
   jr    .EndMovement
     
@@ -3268,7 +3266,63 @@ MoveMonster:
   ld    (ShowExplosionSprite?),a        ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   xor   a
   ld    (ExplosionSpriteStep),a  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;check if monster that died is monster that is retaliating
+;  push  ix
+;  pop   de
+;  ld    hl,(MonsterThatIsRetaliating)
+;  call  CompareHLwithDE
+;  jr    nz,.EndTurnOffRetaliation
+;  xor   a
+
+
+
+
+
+
   ld    (HandleRetaliation?),a          ;retaliation ends, when monster dies
+
+
+
+;  .EndTurnOffRetaliation:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   ld    a,1
   ld    (MonsterDied?),a
   jr    .EndMovement
@@ -4986,6 +5040,7 @@ FindNextActiveMonster:
   inc   ix
   inc   ix
   djnz  .LoopDown
+
 
   ;No enabled or waiting monsters found, so let's go next turn !
   ;Set all monsters enabled
