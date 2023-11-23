@@ -662,7 +662,8 @@ dephase
 ;
 Enemy14x24PortraitsBlock:  equ   $29
 phase	$4000
-  incbin "..\grapx\MonsterSprites\14x24Portraits.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\MonsterSprites\14x24Portraits.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\MonsterSprites\14x24PortraitsBottom48lines.SC5",7,048 * 128      ;048 lines
 	ds		$c000-$,$ff
 dephase
 
