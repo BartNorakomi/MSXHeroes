@@ -19,7 +19,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -46,7 +46,7 @@ StartGame:
   ld    hl,Castle1
   ld    (WhichCastleIsPointerPointingAt?),hl
   ld    a,1
-;  ld    (EnterCastle?),a
+  ld    (EnterCastle?),a
 
 
 ;jp SetHeroOverviewMenuInPage1ROM
@@ -92,6 +92,8 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
   ret
+
+
 
 CopyRamToVramCorrectedCastleOverview:
   ex    af,af'                          ;store rom block
@@ -2172,9 +2174,9 @@ EnterCastle:
 
   call  SetSpatInCastle
 
-  call  CastleOverviewCode
+;  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-;  call  CastleOverviewRecruitCode
+  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode

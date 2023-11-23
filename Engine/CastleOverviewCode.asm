@@ -722,15 +722,41 @@ SetAvailableRecruitArmy:
 
   .SetName:
   ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,CreatureNameTable
+  ld    l,a                             ;creature nr in hl
+  
+  ld    a,MonsterAddressesForBattle1Block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  call  SetMonsterTableInIXCastleOverview ;pushes and pops bc
+
+  push  ix
+  pop   hl
+  ld    de,MonsterTableName
   add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-  jp    SetText
+
+  push  bc
+  call  SetText
+  pop   bc
+
+  ld    a,(PutLetter+dx)                ;dx of text that was just put
+  ld    b,a
+  
+  ld    hl,.TextSemiColon
+  call  SetText
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+.TextSemiColon: db ":",255
+
+
+
+
+
+
+
 
   .amount:
   ld    l,(iy+CastleLevel1UnitsAvail+00)
@@ -848,10 +874,16 @@ DYDXUnit4Window:               equ 094*128 + (008/2) - 128      ;(dy*128 + dx/2)
 DYDXUnit5Window:               equ 094*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
-
-
-
-
+SetMonsterTableInIXCastleOverview:
+  push  bc
+  ld    ix,Monster001Table-LengthMonsterAddressesTable           
+  ld    de,LengthMonsterAddressesTable
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   de
+  add   ix,de                           ;iy->monster table idle
+  pop   bc
+  ret
 
 SettavernHeroSkill:
   ld    a,HeroOverviewCodeBlock         ;Map block

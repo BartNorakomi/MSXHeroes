@@ -2929,11 +2929,6 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "GooGoo",255,"     "
 
-
-
-
-
-
 Monster126Table:                        ;sofia
   dw    Monster126Idle
   dw    Monster126Move
@@ -7695,5 +7690,4 @@ Monster157AttackPatternRightUp:
 Monster157AttackPatternRightDown:
   db    AnimateAttack | dw RAttack1Monster157 | db 000,004,ShowBeingHitSprite,008,000,InitiateAttack
 
-  
-  
+ 
