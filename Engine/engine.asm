@@ -5075,12 +5075,12 @@ EmptyHeroRecruitedAtTavern:
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero1y:		db	3
-pl1hero1x:		db	5
+pl1hero1x:		db	3
 pl1hero1xp: dw 999 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
 pl1hero1mana:	dw	99,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero1status:	db	254 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero1Units:  db 033 | dw 201 |      db 034 | dw 202 |      db 000 | dw 000 |      db 001 | dw 404 |      db 005 | dw 505 |      db 006 | dw 606 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
@@ -5425,7 +5425,7 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        1,                20,         21,         22,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        1,                2,         3,         157,         23,         24   | dw   1,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255

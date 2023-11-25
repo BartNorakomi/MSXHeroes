@@ -131,14 +131,14 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
 .Rubiescost:
   ld    a,(SelectedCastleRecruitLevelUnit)
-  ld    b,063                           ;dx
+  ld    b,063+6                           ;dx
   ld    c,083                           ;dy
   ld    de,$0000 + (078*128) + (052/2) - 128  
   call  SetAvailableRecruitArmy.SetRubiescost
 
 .Gemscost:
   ld    a,(SelectedCastleRecruitLevelUnit)
-  ld    b,063                           ;dx
+  ld    b,063+6                           ;dx
   ld    c,083                           ;dy
   ld    de,$0000 + (078*128) + (052/2) - 128  
   jp    SetAvailableRecruitArmy.SetGemscost
@@ -147,13 +147,28 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   ld    a,(SelectedCastleRecruitLevelUnit)
   ld    b,072                           ;dx
   ld    c,071                           ;dy
-  jp    SetAvailableRecruitArmy.SetCost
 
+  call  SetCostSelectedCreatureInHL     ;in: a=creature nr. pushes and pops bc
+  call  SetNumber16BitCastle
+  ret
+    
 .name:
   ld    a,(SelectedCastleRecruitLevelUnit)
   ld    b,125                           ;dx
   ld    c,038                           ;dy
-  jp    SetAvailableRecruitArmy.SetName
+
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+
+  push  ix
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  call  SetText
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
 
 .recruitamount:
   ld    hl,(SelectedCastleRecruitLevelUnitRecruitAmount)
@@ -250,8 +265,7 @@ SetAvailableRecruitArmy:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
   call  .army
-  call  .amount
-  call  .names
+  call  .NamesAndAmount
   call  .cost
   call  .Gemscost
   call  .Rubiescost
@@ -558,12 +572,7 @@ SetAvailableRecruitArmy:
   ret
 
   .SetAttack:
-  ld    h,0
-  ld    l,a
-  ld    de,AttackCreatureTable
-  add   hl,de
-  ld    l,(hl)
-  ld    h,0
+  call  SetAttackSelectedCreatureInHL   ;in: a=creature nr. pushes and pops bc
   call  SetNumber16BitCastle
   ret
   
@@ -600,12 +609,7 @@ SetAvailableRecruitArmy:
   ret
 
   .SetDefense:
-  ld    h,0
-  ld    l,a
-  ld    de,DefenseCreatureTable
-  add   hl,de
-  ld    l,(hl)
-  ld    h,0
+  call  SetDefenseSelectedCreatureInHL  ;in: a=creature nr. pushes and pops bc
   call  SetNumber16BitCastle
   ret
 
@@ -642,12 +646,7 @@ SetAvailableRecruitArmy:
   ret
 
   .SetSpeed:
-  ld    h,0
-  ld    l,a
-  ld    de,SpeedCreatureTable
-  add   hl,de
-  ld    l,(hl)
-  ld    h,0
+  call  SetSpeedSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   call  SetNumber16BitCastle
   ret
   
@@ -684,50 +683,61 @@ SetAvailableRecruitArmy:
   ret
 
   .SetCost:
-  call  SetCostSelectedCreatureInHL
+  call  SetCostSelectedCreatureInHL     ;in: a=creature nr. pushes and pops bc
   call  SetNumber16BitCastle
   ret
   
-  .names:
+  .setname:
+  ret
+  
+  .NamesAndAmount:
   ld    a,(iy+CastleLevel1Units+00)
   ld    b,007                           ;dx
   ld    c,027                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+00);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+01)  
+  call  .SetNameAndAmount
 
   ld    a,(iy+CastleLevel1Units+01)
   ld    b,091                           ;dx
   ld    c,027                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+02);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+03)  
+  call  .SetNameAndAmount
 
   ld    a,(iy+CastleLevel1Units+02)
   ld    b,175                           ;dx
   ld    c,027                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+04);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+05)  
+  call  .SetNameAndAmount
 
   ld    a,(iy+CastleLevel1Units+03)
   ld    b,007                           ;dx
   ld    c,083                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+06);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+07)
+  call  .SetNameAndAmount
 
   ld    a,(iy+CastleLevel1Units+04)
   ld    b,091                           ;dx
   ld    c,083                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+08);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+09)
+  call  .SetNameAndAmount
 
   ld    a,(iy+CastleLevel1Units+05)
   ld    b,175                           ;dx
   ld    c,083                           ;dy
-  call  .SetName
+  ld    l,(iy+CastleLevel1UnitsAvail+10);amount
+  ld    h,(iy+CastleLevel1UnitsAvail+11)
+  call  .SetNameAndAmount
   ret
 
-  .SetName:
-  ld    h,0
-  ld    l,a                             ;creature nr in hl
-  
-  ld    a,MonsterAddressesForBattle1Block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+  .SetNameAndAmount:
+  push  hl                              ;push amount
 
-  call  SetMonsterTableInIXCastleOverview ;pushes and pops bc
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
 
   push  ix
   pop   hl
@@ -742,7 +752,14 @@ SetAvailableRecruitArmy:
   ld    b,a
   
   ld    hl,.TextSemiColon
+  push  bc
   call  SetText
+  pop   bc
+
+  ld    a,(PutLetter+dx)                ;dx of text that was just put
+  ld    b,a
+  pop   hl                              ;pop amount
+  call  SetNumber16BitCastle
 
   ;now set engine back in page 1+2 in rom
   ld    a,CastleOverviewCodeBlock       ;Map block
@@ -750,51 +767,6 @@ SetAvailableRecruitArmy:
   ret
 
 .TextSemiColon: db ":",255
-
-
-
-
-
-
-
-
-  .amount:
-  ld    l,(iy+CastleLevel1UnitsAvail+00)
-  ld    h,(iy+CastleLevel1UnitsAvail+01)
-  ld    b,081 - 25
-  ld    c,027 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-
-  ld    l,(iy+CastleLevel1UnitsAvail+02)
-  ld    h,(iy+CastleLevel1UnitsAvail+03)
-  ld    b,166 - 25
-  ld    c,027 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-
-  ld    l,(iy+CastleLevel1UnitsAvail+04)
-  ld    h,(iy+CastleLevel1UnitsAvail+05)
-  ld    b,251 - 25
-  ld    c,027 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-
-  ld    l,(iy+CastleLevel1UnitsAvail+06)
-  ld    h,(iy+CastleLevel1UnitsAvail+07)
-  ld    b,081 - 25
-  ld    c,083 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-
-  ld    l,(iy+CastleLevel1UnitsAvail+08)
-  ld    h,(iy+CastleLevel1UnitsAvail+09)
-  ld    b,166 - 25
-  ld    c,083 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-
-  ld    l,(iy+CastleLevel1UnitsAvail+10)
-  ld    h,(iy+CastleLevel1UnitsAvail+11)
-  ld    b,251 - 25
-  ld    c,083 ;HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastle
-  ret
   
 .army:
   ld    a,Enemy14x14PortraitsBlock      ;Map block
@@ -874,7 +846,74 @@ DYDXUnit4Window:               equ 094*128 + (008/2) - 128      ;(dy*128 + dx/2)
 DYDXUnit5Window:               equ 094*128 + (092/2) - 128      ;(dy*128 + dx/2) = (204,153)
 DYDXUnit6Window:               equ 094*128 + (176/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
-SetMonsterTableInIXCastleOverview:
+SetCostSelectedCreatureInHL:            ;in: a=creature nr. pushes and pops bc
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableCostGold)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+SetGemsCostSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableCostGems)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+SetRubiesCostSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableCostRubies)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+SetSpeedSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableSpeed)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+SetAttackSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableAttack)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+SetDefenseSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableDefense)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+
+SetMonsterTableInIXCastleOverview:      ;in: a=creature nr
+  ld    h,0
+  ld    l,a                             ;creature nr in hl
+  
+  ld    a,MonsterAddressesForBattle1Block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
   push  bc
   ld    ix,Monster001Table-LengthMonsterAddressesTable           
   ld    de,LengthMonsterAddressesTable
@@ -5096,8 +5135,7 @@ TradeMenuCode:
   cp    07                              ;hero slot visiting hero
   jp    z,.ResetButtons
 
-;9. Both creature slots clicked belong to the same hero. Second slot clicked is 
-  ;empty, move (and split if possible) 1 unit
+;9. Both creature slots clicked belong to the same hero. Second slot clicked is empty, move (and split if possible) 1 unit
   ;check if 2nd slot clicked is an empty creature slot for visiting hero
   ld    a,b                             ;both buttons pressed belong to visiting hero?
   cp    8
@@ -5625,6 +5663,11 @@ TradeMenuCode:
   .EndCheck11:
 
 ;11b same as 11 but then for opposite hero
+
+
+
+
+
   ;check if defending hero has AT LEAST 2 creature slots filled
   ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
   push  bc
@@ -5728,7 +5771,7 @@ TradeMenuCode:
   ;/move all selected units from visiting hero to defending hero
   .EndCheck11b:
 
-;12. Both creature slots clicked belong to different heroes. second slot clicked  has the same unit type, combine them is possible 
+;12. Both creature slots clicked belong to different heroes. second slot clicked  has the same unit type, combine them if possible 
 
   ;check if visiting hero has AT LEAST 2 creature slots filled
   ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
@@ -5978,6 +6021,7 @@ TradeMenuCode:
   .EndCheck12b:
 
 ;13. both slots have different units, swap them
+
   ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to defending hero
   ld    a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
   call  .SetHeroUnitsInIX
@@ -7923,7 +7967,49 @@ CastleOverviewTavernCode:
   .EndCheck12b:
 
 ;13. both slots have different units, swap them
-  ;at this point both buttons pressed always belong to different heros. Check first if last button pressed belongs to defending hero
+
+
+  ;check if both slots clicked belong to defending hero
+  ld    a,b                             ;both buttons pressed belong to visiting hero?
+  cp    8                               ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  jp    c,.EndCheckbothSlotsClickedBelongToDefendingHero
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    nc,.Swap
+  .EndCheckbothSlotsClickedBelongToDefendingHero:
+
+  ;check if both slots clicked belong to visiting hero
+  ld    a,b                             ;both buttons pressed belong to visiting hero?
+  cp    8                               ;def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
+  jp    nc,.EndCheckbothSlotsClickedBelongToVisitingHero
+  ld    a,(PreviousButtonClicked)
+  cp    8
+  jp    c,.Swap
+  .EndCheckbothSlotsClickedBelongToVisitingHero:
+
+  ;at this point both buttons pressed belong to different heros. Check if there is a defending AND a visiting hero
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  de
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no visiting/defending hero found / ix-> hero
+  pop   de
+  pop   bc
+  jp    c,.ResetButtons                 ;carry=no defending/visiting hero found
+  
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  push  bc
+  push  de
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no visiting/defending hero found / ix-> hero
+  pop   de
+  pop   bc
+  jp    c,.ResetButtons                 ;carry=no defending/visiting hero found
+
+
+
+
+
+
+  .Swap:
   ld    a,b                             ;b= def: 14 13 12 11 10 9 8  vis: 7 6 5 4 3 2 1  
   call  .SetHeroUnitsInIX
 
@@ -11269,42 +11355,6 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
 
 
-SetCostSelectedCreatureInHL:
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,CostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-  ret
-
-SetGemsCostSelectedCreatureInHL:
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,GemsCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-  ret
-
-SetRubiesCostSelectedCreatureInHL:
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;Unit*2
-  ld    de,RubiesCostCreatureTable
-  add   hl,de
-  ld    e,(hl)
-  inc   hl
-  ld    d,(hl)                          ;bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ex    de,hl
-  ret
-
 SetRecruitButtons:                        ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   ld    b,6
   .loop:
@@ -14236,116 +14286,6 @@ SetResourcesPlayer:
 
 
 
-
-
-
-NameCreature000:  db  "Empty:",255
-NameCreature001:  db  "Green Ghoul:",255
-NameCreature002:  db  "Drollie:",255
-NameCreature003:  db  "Wappie:",255
-NameCreature004:  db  "Green Ghoul:",255
-NameCreature005:  db  "Green Ghoul:",255
-NameCreature006:  db  "Green Ghoul:",255
-NameCreature007:  db  "Green Ghoul:",255
-NameCreature008:  db  "Green Ghoul:",255
-NameCreature009:  db  "Green Ghoul:",255
-NameCreature010:  db  "Green Ghoul:",255
-NameCreature011:  db  "Green Ghoul:",255
-NameCreature012:  db  "Green Ghoul:",255
-NameCreature013:  db  "Green Ghoul:",255
-NameCreature014:  db  "Green Ghoul:",255
-NameCreature015:  db  "Green Ghoul:",255
-NameCreature016:  db  "Green Ghoul:",255
-NameCreature017:  db  "Green Ghoul:",255
-NameCreature018:  db  "Green Ghoul:",255
-NameCreature019:  db  "Green Ghoul:",255
-NameCreature020:  db  "Green Ghoul:",255
-NameCreature021:  db  "Green Ghoul:",255
-NameCreature022:  db  "Green Ghoul:",255
-NameCreature023:  db  "Green Ghoul:",255
-NameCreature024:  db  "Green Ghoul:",255
-NameCreature025:  db  "Green Ghoul:",255
-NameCreature026:  db  "Green Ghoul:",255
-NameCreature027:  db  "Green Ghoul:",255
-NameCreature028:  db  "Green Ghoul:",255
-NameCreature029:  db  "Green Ghoul:",255
-NameCreature030:  db  "Green Ghoul:",255
-NameCreature031:  db  "Green Ghoul:",255
-NameCreature032:  db  "Green Ghoul:",255
-NameCreature033:  db  "Green Ghoul:",255
-NameCreature034:  db  "Green Ghoul:",255
-NameCreature035:  db  "Green Ghoul:",255
-NameCreature036:  db  "Green Ghoul:",255
-NameCreature037:  db  "Green Ghoul:",255
-NameCreature038:  db  "Green Ghoul:",255
-NameCreature039:  db  "Green Ghoul:",255
-NameCreature040:  db  "Green Ghoul:",255
-NameCreature041:  db  "Green Ghoul:",255
-NameCreature042:  db  "Green Ghoul:",255
-NameCreature043:  db  "Green Ghoul:",255
-NameCreature044:  db  "Green Ghoul:",255
-NameCreature045:  db  "Green Ghoul:",255
-NameCreature046:  db  "Green Ghoul:",255
-NameCreature047:  db  "Green Ghoul:",255
-NameCreature048:  db  "Green Ghoul:",255
-NameCreature049:  db  "Green Ghoul:",255
-NameCreature050:  db  "Green Ghoul:",255
-NameCreature051:  db  "Green Ghoul:",255
-NameCreature052:  db  "Green Ghoul:",255
-NameCreature053:  db  "Green Ghoul:",255
-NameCreature054:  db  "Green Ghoul:",255
-NameCreature055:  db  "Green Ghoul:",255
-NameCreature056:  db  "Green Ghoul:",255
-NameCreature057:  db  "Green Ghoul:",255
-NameCreature058:  db  "Green Ghoul:",255
-NameCreature059:  db  "Green Ghoul:",255
-NameCreature060:  db  "Green Ghoul:",255
-NameCreature061:  db  "Green Ghoul:",255
-NameCreature062:  db  "Green Ghoul:",255
-NameCreature063:  db  "Green Ghoul:",255
-
-
-CostCreatureTable:  
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-GemsCostCreatureTable:  
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-RubiesCostCreatureTable:  
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  dw  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-SpeedCreatureTable:  
-  db  0003,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-DefenseCreatureTable:  
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-AttackCreatureTable:  
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-  db  0000,0001,0002,0003,0004,0005,0006,0007,0008,0009,0010,0011,0012,0013,0014,0015
-
-CreatureNameTable:  
-  dw NameCreature000,NameCreature001,NameCreature002,NameCreature003,NameCreature004,NameCreature005,NameCreature006,NameCreature007,NameCreature008,NameCreature009,NameCreature010,NameCreature011,NameCreature012,NameCreature013,NameCreature014,NameCreature015
-  dw NameCreature016,NameCreature017,NameCreature018,NameCreature019,NameCreature020,NameCreature021,NameCreature022,NameCreature023,NameCreature024,NameCreature025,NameCreature026,NameCreature027,NameCreature028,NameCreature029,NameCreature030,NameCreature031
-  dw NameCreature032,NameCreature033,NameCreature034,NameCreature035,NameCreature036,NameCreature037,NameCreature038,NameCreature039,NameCreature040,NameCreature041,NameCreature042,NameCreature043,NameCreature044,NameCreature045,NameCreature046,NameCreature047
-  dw NameCreature048,NameCreature049,NameCreature050,NameCreature051,NameCreature052,NameCreature053,NameCreature054,NameCreature055,NameCreature056,NameCreature057,NameCreature058,NameCreature059,NameCreature060,NameCreature061,NameCreature062,NameCreature063
 
 
 

@@ -46,7 +46,7 @@ StartGame:
   ld    hl,Castle1
   ld    (WhichCastleIsPointerPointingAt?),hl
   ld    a,1
-  ld    (EnterCastle?),a
+;  ld    (EnterCastle?),a
 
 
 ;jp SetHeroOverviewMenuInPage1ROM
@@ -2174,9 +2174,9 @@ EnterCastle:
 
   call  SetSpatInCastle
 
-;  call  CastleOverviewCode
+  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-  call  CastleOverviewRecruitCode
+;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode

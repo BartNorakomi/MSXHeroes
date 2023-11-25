@@ -3528,17 +3528,6 @@ SortMonstersOnTheirSpeed:
 
 
 
-
-  .SetSpeed:
-  ld    h,0
-  ld    l,a
-  ld    de,SpeedCreatureTable
-  add   hl,de
-  ld    l,(hl)
-  ld    h,0
-  call  SetNumber16BitCastle
-  ret
-
   
 BuildUpBattleFieldAndPutMonsters:  
   xor   a

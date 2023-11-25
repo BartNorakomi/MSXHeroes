@@ -51,8 +51,8 @@ Monster002Table:                        ;green flyer (sd snatcher)
   db    16                              ;nx  
   db    32+00                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
+  db    000                             ;cost (gems)
+  db    004                             ;cost (rubies)
   db    003                             ;hp
   db    006                             ;speed
   db    004                             ;attack
@@ -73,8 +73,8 @@ Monster003Table:                        ;Dark grey flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    003                             ;cost (gold)
+  db    003                             ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    006                             ;speed
