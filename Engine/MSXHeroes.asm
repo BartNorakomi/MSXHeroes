@@ -474,6 +474,22 @@ LoloSpriteBlock:              equ HeroesSpritesBlock6
 PippolsSpriteBlock:           equ HeroesSpritesBlock6
 RandarSpriteBlock:            equ HeroesSpritesBlock6
 ClesSpriteBlock:              equ HeroesSpritesBlock6
+LuiceSpriteBlock:              equ HeroesSpritesBlock6
+
+DickSpriteBlock:              equ HeroesSpritesBlock7
+AphroditeSpriteBlock:         equ HeroesSpritesBlock7
+TienRenSpriteBlock:           equ HeroesSpritesBlock7
+PopolonSpriteBlock:           equ HeroesSpritesBlock7
+HoMeiSpriteBlock:             equ HeroesSpritesBlock7
+PriestessKiSpriteBlock:       equ HeroesSpritesBlock7
+MeiHongSpriteBlock:           equ HeroesSpritesBlock7
+PrinceGilgameshSpriteBlock:   equ HeroesSpritesBlock7
+
+RandomHajileSpriteBlock:      equ HeroesSpritesBlock8
+BensonCunninghamSpriteBlock:  equ HeroesSpritesBlock8
+JamieSeedSpriteBlock:         equ HeroesSpritesBlock8
+ArmoredSnatcherSpriteBlock:   equ HeroesSpritesBlock8
+DruidSpriteBlock:             equ HeroesSpritesBlock8
 
 
 
@@ -500,7 +516,7 @@ phase	$4000
 dephase
 
 ;
-; block $9a - 9b
+; block $0a - 0b
 ;
 HeroesSpritesBlock5:  equ   HeroesSpritesBlock1 + 4
 HeroesSpritesBlock6:  equ   HeroesSpritesBlock1 + 5
@@ -513,17 +529,13 @@ dephase
 ;
 ; block $0c - 0d
 ;
-CastleOverviewBlock:  equ   $0c
+HeroesSpritesBlock7:  equ   HeroesSpritesBlock1 + 6
+HeroesSpritesBlock8:  equ   HeroesSpritesBlock1 + 7
 phase	$4000
-  incbin "..\grapx\CastleOverview\CastleOverview.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\chamberofcommerce4.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\tavernoriginal.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\magicguild.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\chamberofcommerce.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet4.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet4Bottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
-
 
 ;
 ; block $0e - 0f
@@ -557,7 +569,8 @@ dephase
 ;
 Hero20x11PortraitsBlock:  equ   $14
 phase	$4000
-  incbin "..\grapx\HeroesSprites\20x11Portraits.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\20x11Portraits.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\20x11PortraitsBottom48lines.SC5",7,048 * 128      ;048 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1076,6 +1089,20 @@ BattleMonsterSpriteSheet18Block:  equ   $7f
 phase	$4000
   incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
   incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $81 - 82
+;
+CastleOverviewBlock:  equ   $81
+phase	$4000
+  incbin "..\grapx\CastleOverview\CastleOverview.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\chamberofcommerce4.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\tavernoriginal.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\magicguild.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\chamberofcommerce.SC5",7,212 * 128      ;212 lines
+;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

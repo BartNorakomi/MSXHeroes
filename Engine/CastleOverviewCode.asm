@@ -2211,6 +2211,21 @@ HeroPortrait10x18SYSXLolo:         equ $4000+(018*128)+(180/2)-128 ;(dy*128 + dx
 HeroPortrait10x18SYSXPippols:      equ $4000+(018*128)+(190/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXRandar:       equ $4000+(018*128)+(200/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXCles:         equ $4000+(018*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXLuice:        equ $4000+(018*128)+(220/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait10x18SYSXDick:              equ $4000+(018*128)+(230/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXAphrodite:         equ $4000+(018*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXTienRen:           equ $4000+(036*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPopolon:           equ $4000+(036*128)+(010/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXHoMei:             equ $4000+(036*128)+(020/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPriestessKi:       equ $4000+(036*128)+(030/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXMeiHong:           equ $4000+(036*128)+(040/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPrinceGilgamesh:   equ $4000+(036*128)+(050/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXRandomHajile:      equ $4000+(036*128)+(060/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXBensonCunningham:  equ $4000+(036*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXJamieSeed:         equ $4000+(036*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXArmoredSnatcher:   equ $4000+(036*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXDruid:             equ $4000+(036*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 
 
@@ -2370,36 +2385,36 @@ SetManaAndMovementBars:
 
   ld    a,c
   or    a
-  ld    bc,$4000 + ((107+25)*128) + (042/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (042/2) - 128
   jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (040/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (040/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (038/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (038/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (036/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (036/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (034/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (034/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (032/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (032/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (030/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (030/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (028/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (028/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (026/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (026/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (024/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (024/2) - 128
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + ((107+25)*128) + (022/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (022/2) - 128
   jr    .EndSearchPercentageMovement
 
   .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
@@ -2407,7 +2422,7 @@ SetManaAndMovementBars:
   ld    h,(ix+HeroMana+1)               ;mana
   or    h
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + ((107+25)*128) + (040/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (040/2) - 128
 
   .EndSearchPercentageMovement:
   push  bc
@@ -2434,43 +2449,43 @@ SetManaAndMovementBars:
 
   ld    a,c
   or    a
-  ld    bc,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (020/2) - 128
   jr    z,.EndSearchPercentageMovementSmallExceptionWhenAlmost0
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (018/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (018/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (016/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (016/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (014/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (014/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (012/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (012/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (010/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (010/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (008/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (008/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (006/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (006/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (004/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (004/2) - 128
   jr    z,.EndSearchPercentageMovement
   dec   a
-  ld    bc,$4000 + ((107+25)*128) + (002/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (002/2) - 128
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + ((107+25)*128) + (000/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (000/2) - 128
   jr    .EndSearchPercentageMovement
 
   .EndSearchPercentageMovementSmallExceptionWhenAlmost0:
   ld    a,(ix+HeroMove)                 ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   and   a
   jr    z,.EndSearchPercentageMovement
-  ld    bc,$4000 + ((107+25)*128) + (018/2) - 128
+  ld    bc,$4000 + ((107+25+76)*128) + (018/2) - 128
 
   .EndSearchPercentageMovement:
   push  bc
@@ -2482,37 +2497,37 @@ SetManaAndMovementBars:
 	ret
 
 EraseManaandMovementBars:
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (204/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (067*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (078*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  ld    hl,$4000 + ((107+25)*128) + (020/2) - 128
+  ld    hl,$4000 + ((107+25+76)*128) + (020/2) - 128
   ld    de,$0000 + (089*128) + (226/2) - 128
   ld    bc,$0000 + (010*256) + (002/2)
   ld    a,Hero20x11PortraitsBlock          ;block to copy graphics from
@@ -2563,11 +2578,11 @@ SetCastlesInWindows:                    ;erase castle windows, then put the cast
   ldir
 	ret
 
-CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + ((139+025)*128) + (156/2) - 128 | dw $4000 + ((139+025)*128) + (176/2) - 128 | dw $4000 + ((139+025)*128) + (196/2) - 128
-CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + ((117+025)*128) + (000/2) - 128 | dw $4000 + ((117+025)*128) + (020/2) - 128 | dw $4000 + ((117+025)*128) + (040/2) - 128
-CastleButtonSwamp:          db  %1100 0011 | dw $4000 + ((117+025)*128) + (060/2) - 128 | dw $4000 + ((117+025)*128) + (080/2) - 128 | dw $4000 + ((117+025)*128) + (100/2) - 128
-CastleButtonHell:           db  %1100 0011 | dw $4000 + ((117+025)*128) + (120/2) - 128 | dw $4000 + ((117+025)*128) + (140/2) - 128 | dw $4000 + ((117+025)*128) + (160/2) - 128
-CastleButtonSnow:           db  %1100 0011 | dw $4000 + ((117+025)*128) + (180/2) - 128 | dw $4000 + ((117+025)*128) + (200/2) - 128 | dw $4000 + ((117+025)*128) + (220/2) - 128
+CastleButton20x11SYSXEmpty: db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (156/2) - 128 | dw $4000 + ((139+25+76)*128) + (176/2) - 128 | dw $4000 + ((139+25+76)*128) + (196/2) - 128
+CastleButtonGrassLand:      db  %1100 0011 | dw $4000 + ((117+25+76)*128) + (000/2) - 128 | dw $4000 + ((117+25+76)*128) + (020/2) - 128 | dw $4000 + ((117+25+76)*128) + (040/2) - 128
+CastleButtonSwamp:          db  %1100 0011 | dw $4000 + ((117+25+76)*128) + (060/2) - 128 | dw $4000 + ((117+25+76)*128) + (080/2) - 128 | dw $4000 + ((117+25+76)*128) + (100/2) - 128
+CastleButtonHell:           db  %1100 0011 | dw $4000 + ((117+25+76)*128) + (120/2) - 128 | dw $4000 + ((117+25+76)*128) + (140/2) - 128 | dw $4000 + ((117+25+76)*128) + (160/2) - 128
+CastleButtonSnow:           db  %1100 0011 | dw $4000 + ((117+25+76)*128) + (180/2) - 128 | dw $4000 + ((117+25+76)*128) + (200/2) - 128 | dw $4000 + ((117+25+76)*128) + (220/2) - 128
 
 ClearCastleButtons:
   ld    hl,CastleButton20x11SYSXEmpty
@@ -2687,7 +2702,7 @@ ClearHeroButtons:
   ldir
   ret
 
-HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + ((139+25)*128) + (096/2) - 128 | dw $4000 + ((139+25)*128) + (116/2) - 128 | dw $4000 + ((139+25)*128) + (136/2) - 128
+HeroButton20x11SYSXEmpty:           db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (096/2) - 128 | dw $4000 + ((139+25+76)*128) + (116/2) - 128 | dw $4000 + ((139+25+76)*128) + (136/2) - 128
 
 HeroButton20x11SYSXAdol:            db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (020/2) - 128 | dw $4000 + (000*128) + (040/2) - 128
 HeroButton20x11SYSXGoemon1:         db  %1100 0011 | dw $4000 + (000*128) + (060/2) - 128 | dw $4000 + (000*128) + (080/2) - 128 | dw $4000 + (000*128) + (100/2) - 128
@@ -2747,6 +2762,24 @@ HeroButton20x11SYSXLolo:            db  %1100 0011 | dw $4000 + (110*128) + (180
 HeroButton20x11SYSXPippols:         db  %1100 0011 | dw $4000 + (121*128) + (000/2) - 128 | dw $4000 + (121*128) + (020/2) - 128 | dw $4000 + (121*128) + (040/2) - 128
 HeroButton20x11SYSXRandar:          db  %1100 0011 | dw $4000 + (121*128) + (060/2) - 128 | dw $4000 + (121*128) + (080/2) - 128 | dw $4000 + (121*128) + (100/2) - 128
 HeroButton20x11SYSXCles:            db  %1100 0011 | dw $4000 + (121*128) + (120/2) - 128 | dw $4000 + (121*128) + (140/2) - 128 | dw $4000 + (121*128) + (160/2) - 128
+HeroButton20x11SYSXLuice:           db  %1100 0011 | dw $4000 + (121*128) + (180/2) - 128 | dw $4000 + (121*128) + (200/2) - 128 | dw $4000 + (121*128) + (220/2) - 128
+
+HeroButton20x11SYSXDick:              db  %1100 0011 | dw $4000 + (132*128) + (000/2) - 128 | dw $4000 + (132*128) + (020/2) - 128 | dw $4000 + (132*128) + (040/2) - 128
+HeroButton20x11SYSXAphrodite:         db  %1100 0011 | dw $4000 + (132*128) + (060/2) - 128 | dw $4000 + (132*128) + (080/2) - 128 | dw $4000 + (132*128) + (100/2) - 128
+HeroButton20x11SYSXTienRen:           db  %1100 0011 | dw $4000 + (132*128) + (120/2) - 128 | dw $4000 + (132*128) + (140/2) - 128 | dw $4000 + (132*128) + (160/2) - 128
+HeroButton20x11SYSXPopolon:           db  %1100 0011 | dw $4000 + (132*128) + (180/2) - 128 | dw $4000 + (132*128) + (200/2) - 128 | dw $4000 + (132*128) + (220/2) - 128
+
+HeroButton20x11SYSXHoMei:             db  %1100 0011 | dw $4000 + (143*128) + (000/2) - 128 | dw $4000 + (143*128) + (020/2) - 128 | dw $4000 + (143*128) + (040/2) - 128
+HeroButton20x11SYSXPriestessKi:       db  %1100 0011 | dw $4000 + (143*128) + (060/2) - 128 | dw $4000 + (143*128) + (080/2) - 128 | dw $4000 + (143*128) + (100/2) - 128
+HeroButton20x11SYSXMeiHong:           db  %1100 0011 | dw $4000 + (143*128) + (120/2) - 128 | dw $4000 + (143*128) + (140/2) - 128 | dw $4000 + (143*128) + (160/2) - 128
+HeroButton20x11SYSXPrinceGilgamesh:   db  %1100 0011 | dw $4000 + (143*128) + (180/2) - 128 | dw $4000 + (143*128) + (200/2) - 128 | dw $4000 + (143*128) + (220/2) - 128
+
+HeroButton20x11SYSXRandomHajile:      db  %1100 0011 | dw $4000 + (154*128) + (000/2) - 128 | dw $4000 + (154*128) + (020/2) - 128 | dw $4000 + (154*128) + (040/2) - 128
+HeroButton20x11SYSXBensonCunningham:  db  %1100 0011 | dw $4000 + (154*128) + (060/2) - 128 | dw $4000 + (154*128) + (080/2) - 128 | dw $4000 + (154*128) + (100/2) - 128
+HeroButton20x11SYSXJamieSeed:         db  %1100 0011 | dw $4000 + (154*128) + (120/2) - 128 | dw $4000 + (154*128) + (140/2) - 128 | dw $4000 + (154*128) + (160/2) - 128
+HeroButton20x11SYSXArmoredSnatcher:   db  %1100 0011 | dw $4000 + (154*128) + (180/2) - 128 | dw $4000 + (154*128) + (200/2) - 128 | dw $4000 + (154*128) + (220/2) - 128
+
+HeroButton20x11SYSXDruid:             db  %1100 0011 | dw $4000 + (165*128) + (000/2) - 128 | dw $4000 + (165*128) + (020/2) - 128 | dw $4000 + (165*128) + (040/2) - 128
 
 
 HeroLevelUpCode:
