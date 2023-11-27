@@ -241,6 +241,9 @@ CopyRamToVramPage3ForBattleEngine:
 
 ;$c1a3 = leftbottom = 002
 
+MonsterHerocollidedWithOnMap: ds  1
+MonsterHerocollidedWithOnMapAmount: ds  1
+
 MonsterMovementPathPointer: db  0
 MonsterMovementAmountOfSteps:  db  0
 MonsterMovementPath:  ds LenghtMonsterMovementPathTable

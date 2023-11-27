@@ -684,6 +684,7 @@ SetAvailableRecruitArmy:
 
   .SetCost:
   call  SetCostSelectedCreatureInHL     ;in: a=creature nr. pushes and pops bc
+
   call  SetNumber16BitCastle
   ret
   
@@ -851,6 +852,13 @@ SetCostSelectedCreatureInHL:            ;in: a=creature nr. pushes and pops bc
   ld    h,0
   ld    l,(ix+MonsterTableCostGold)
 
+  add   hl,hl                           ;*2
+  push  hl
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  pop   de
+  add   hl,de                           ;*10  
+
   ;now set engine back in page 1+2 in rom
   ld    a,CastleOverviewCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
@@ -860,6 +868,10 @@ SetGemsCostSelectedCreatureInHL:
   call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
   ld    h,0
   ld    l,(ix+MonsterTableCostGems)
+
+  res   7,l                             ;bit 5,6 and 7 are used for the creature's level
+  res   6,l
+  res   5,l
 
   ;now set engine back in page 1+2 in rom
   ld    a,CastleOverviewCodeBlock       ;Map block
@@ -1005,139 +1017,9 @@ SetTextBuildingWhenClicked:
 ;;  Therefor this routine can ABSOLUTELY NOT be in page 2 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ShowEnemyHeroStats:
+;ShowEnemyHeroStats:
 
 
-ShowEnemyStats:
-call screenon
-  call  SetEnemyStatsWindow             ;show window of enemy stats
-  call  SwapAndSetPage                  ;swap and set page
-;  call  SetEnemyStatsWindow             ;show window of enemy stats
-  
-  .engine:
-  call  PopulateControls                ;read out keys
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-  ld    a,(NewPrContr)
-  and   %0011 0000
-  jr    nz,.end
-  jr    .engine  
-
-  .end:
-  ld    a,%0011 0000
-	ld		(ControlsOnInterrupt),a                  ;reset trigger a
-  ret
-
-SetEnemyStatsWindow:
-
-  ld    de,$0000 + (007*128) + (008/2) - 128
-
-	ld		a,(spat+1)			                ;x cursor
-  sub   32
-  jr    nc,.NotCarryX
-  xor   a
-  .NotCarryX:
-  cp    126
-  jr    c,.NoOverFlowRight
-  ld    a,126
-  .NoOverFlowRight:
-
-  push  af                              ;store x window
-
-	srl		a				                        ;/2
-  ld    h,0
-  ld    l,a
-  add   hl,de
-  ex    de,hl
-  
-	ld		a,(spat+0)			                ;y cursor
-	ld    b,-50
-	cp    70
-	jr    nc,.CursorTopOfScreen
-	ld    b,32
-	.CursorTopOfScreen:
-	add   a,b
-	
-	
-  sub   a,24
-  jr    nc,.NotCarryY
-  xor   a
-  .NotCarryY:
-  cp    119
-  jr    c,.NoOverFlowBottom
-  ld    a,119
-  .NoOverFlowBottom:
-
-  push  af                              ;store y window
-
-  ld    h,0
-  ld    l,a
-  add   hl,hl                           ;*2
-  add   hl,hl                           ;*4
-  add   hl,hl                           ;*8
-  add   hl,hl                           ;*16
-  add   hl,hl                           ;*32
-  add   hl,hl                           ;*64
-  add   hl,hl                           ;*128
-  add   hl,de
-  ex    de,hl
-
-  ld    hl,24/2 + (24*128)               
-  add   hl,de  
-  push  hl
-    
-  ld    hl,$4000 + (062*128) + (174/2) - 128
-  ld    bc,$0000 + (069*256) + (062/2)
-  ld    a,ChestBlock           ;block to copy graphics from
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  ld    a,4                             ;unit nr
-  call  SetArmyUnits.SetSYSX
-  pop   de
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
-
-
-  pop   af                              ;y window
-  add   a,14
-  ld    c,a
-  pop   af                              ;x window
-  add   a,16
-  ld    b,a
-  ld    a,4                             ;unit nr
-
-  push  bc
-  call  SetAvailableRecruitArmy.SetName
-  pop   bc
-
-  ld    a,c
-  add   a,43
-  ld    c,a  
-  ld    a,b
-  add   a,8
-  ld    b,a  
-
-  ld    hl,TextAHorde
-
-  push  bc
-  call  SetText                         ;in: b=dx, c=dy, hl->text  
-  pop   bc
-
-  ld    a,c
-  add   a,07
-  ld    c,a  
-  ld    a,b
-  add   a,23
-  ld    b,a  
-
-  ld    hl,4
-  call  SetNumber16BitCastle
-  ret
-
-TextAHorde: db "A Horde",255
 
 
 

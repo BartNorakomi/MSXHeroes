@@ -568,13 +568,9 @@ CalculateCostToSurrender:               ;out: hl->cost
   pop   de
   add   hl,de
   
-  ;divide total cost by 2. Total cost is half the purhcasing price of current monsters
-  push  hl
-  pop   bc
-  ld    de,2
-  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
-  push  bc
-  pop   hl 
+  ;multiply total cost by 5 (since total cost is already divided by 10 and we only want half the total cost)
+  ld    de,5
+  call  MultiplyHlWithDE                ;Out: HL = result  
   ret
 
   .LeftPlayerSurrendered:
@@ -611,13 +607,9 @@ CalculateCostToSurrender:               ;out: hl->cost
   pop   de
   add   hl,de
 
-  ;divide total cost by 2. Total cost is half the purhcasing price of current monsters
-  push  hl
-  pop   bc
-  ld    de,2
-  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
-  push  bc
-  pop   hl 
+  ;multiply total cost by 5 (since total cost is already divided by 10 and we only want half the total cost)
+  ld    de,5
+  call  MultiplyHlWithDE                ;Out: HL = result  
   ret
 
   .CalculateCostMonsters:
@@ -652,7 +644,7 @@ SurrenderButtonPressed:
   call  CalculateCostToSurrender        ;out: hl->cost
 
   ;set fee for surrendering
-  ld    b,127                           ;dx
+  ld    b,125                           ;dx
   ld    c,142                           ;dy
 ;  ld    hl,5490
   call  SetNumber16BitCastle
@@ -1450,9 +1442,7 @@ CalculateXpGainedLeftPlayer:
   pop   hl
   ld    a,l
   or    h
-  ret   z
-;  jr    z,.EndAddXpToRightPlayer        ;don't add xp if right player is a neutral monster
-  
+  jp    z,CalculateXpGainedWhenRightPlayerIsNeutralMonster
 
   ;right hero
   ld    iy,(HeroThatGetsAttacked)       ;defending hero
@@ -1507,7 +1497,6 @@ CalculateXpGainedLeftPlayer:
   add   hl,de
   ret
 
-
   .CalculateXpGained:
   ld    e,(ix+MonsterAmount)
   ld    d,(ix+MonsterAmount+1)
@@ -1523,6 +1512,16 @@ CalculateXpGainedLeftPlayer:
   pop   hl
 
   call  MultiplyHlWithDE                ;Out: HL = result  
+  ret
+
+CalculateXpGainedWhenRightPlayerIsNeutralMonster:
+  call  SetMonsterTableInIYNeutralMonster
+  ld    d,0
+  ld    e,(iy+MonsterTableHp)           ;de->hp per unit
+  call  SetAllMonstersInMonsterTable.SetAmountInA
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
   ret
 
 CheckVictoryOrDefeat:
@@ -1836,7 +1835,7 @@ CheckVictoryOrDefeat:
   ret
 
   .RightHeroIsANeutralMonster:
-  ld    a,1 ;(ix+MonsterNumber)
+  call  SetNeutralMonsterHeroCollidedWithInA
   call  CheckRightClickToDisplayInfo.SetSYSX
   exx
   ld    de,256*(015) + (211)
@@ -1844,7 +1843,7 @@ CheckVictoryOrDefeat:
   ld    de,$0000 + (015*128) + (210/2) - 128
   call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-  call  .SetMonsterTableInIY
+  call  SetMonsterTableInIYNeutralMonster
   push  iy
   pop   hl
   ld    de,MonsterTableName
@@ -1856,20 +1855,6 @@ CheckVictoryOrDefeat:
 
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
   call  SetText
-  ret
-
-.SetMonsterTableInIY:
-  ld    a,MonsterAddressesForBattle1Block               ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-  ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
-  ld    iy,Monster001Table-LengthMonsterAddressesTable           
-  ld    h,0
-  ld    l,1 ;(ix+MonsterNumber)
-  ld    de,LengthMonsterAddressesTable
-  call  MultiplyHlWithDE                ;Out: HL = result
-  push  hl
-  pop   de
-  add   iy,de                           ;iy->monster table idle
   ret
 
   .CopyActivePageToInactivePage:
@@ -1890,6 +1875,21 @@ CheckVictoryOrDefeat:
 	db		000,000,000,001
 	db		000,001,212,000
 	db		000,000,$d0	
+
+SetMonsterTableInIYNeutralMonster:
+  ld    a,MonsterAddressesForBattle1Block               ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ;go to: Monster001Table-16 + monsternumber * LengthMonsterAddressesTable
+  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+  call  SetNeutralMonsterHeroCollidedWithInA
+  ld    h,0
+  ld    l,a
+  ld    de,LengthMonsterAddressesTable
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   de
+  add   iy,de                           ;iy->monster table idle
+  ret
 
 SetVictoryOrDefeatButton:
   ld    hl,VictoryOrDefeatButtonTable-2
@@ -2528,6 +2528,242 @@ CheckDefendButtonPressed:
 
 
 
+
+
+
+
+ShowEnemyStats:
+call screenon
+  call  SetEnemyStatsWindow             ;show window of enemy stats
+  call  SwapAndSetPage                  ;swap and set page
+  
+  .engine:
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  and   %0011 0000
+  jr    nz,.end
+  jr    .engine  
+
+  .end:
+  ld    a,%0011 0000
+	ld		(ControlsOnInterrupt),a                  ;reset trigger a
+  ret
+
+SetEnemyStatsWindow:
+  ld    de,$0000 + (007*128) + (008/2) - 128
+
+	ld		a,(spat+1)			                ;x cursor
+  sub   32
+  jr    nc,.NotCarryX
+  xor   a
+  .NotCarryX:
+  cp    126
+  jr    c,.NoOverFlowRight
+  ld    a,126
+  .NoOverFlowRight:
+
+  ld    b,a                             ;b=x
+
+	srl		a				                        ;/2
+  ld    h,0
+  ld    l,a
+  add   hl,de
+  ex    de,hl
+  
+	ld		a,(spat+0)			                ;y cursor
+	ld    c,-50
+	cp    70
+	jr    nc,.CursorTopOfScreen
+	ld    c,32
+	.CursorTopOfScreen:
+	add   a,c
+
+  sub   a,24
+  jr    nc,.NotCarryY
+  xor   a
+  .NotCarryY:
+  cp    119
+  jr    c,.NoOverFlowBottom
+  ld    a,119
+  .NoOverFlowBottom:
+
+  ld    c,a                               ;c=y
+  push  bc
+
+  ld    h,0
+  ld    l,a
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  add   hl,hl                           ;*8
+  add   hl,hl                           ;*16
+  add   hl,hl                           ;*32
+  add   hl,hl                           ;*64
+  add   hl,hl                           ;*128
+  add   hl,de
+  ex    de,hl
+    
+  ld    hl,$4000 + (062*128) + (174/2) - 128
+  ld    bc,$0000 + (069*256) + (062/2)
+  ld    a,ChestBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  call  SetNeutralMonsterHeroCollidedWithInA
+  call  CheckRightClickToDisplayInfo.SetSYSX
+
+  exx
+  pop   bc                              ;x,y coordinates of window
+  push  bc
+  push  af
+  ld    a,b                             ;x
+  add   a,31
+  ld    e,a
+
+  ld    a,c                             ;y
+  add   a,28
+  ld    d,a
+  pop   af
+  exx
+
+
+
+
+  call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  pop   bc                              ;x,y coordinates of window
+
+  ld    a,c                             ;y
+  add   a,14
+  ld    c,a
+
+  ld    a,b                             ;x
+  add   a,16+22
+  ld    b,a
+  ld    a,4                             ;unit nr
+
+  push  bc
+
+  call  SetMonsterTableInIYNeutralMonster
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  pop   bc
+  push  bc
+  
+  call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+
+  pop   bc
+
+  ld    a,c                             ;y
+  add   a,43
+  ld    c,a  
+  ld    a,b                             ;x
+  add   a,8-22
+  ld    b,a  
+
+  ;now look at the amount of neutral army and set the text accordingly
+  call  SetAllMonstersInMonsterTable.SetAmountInA
+  cp    1
+  ld    hl,TextAFew
+  jr    z,.AmountFound
+  cp    5
+  ld    hl,TextSeveral
+  jr    z,.AmountFound
+  cp    13
+  ld    hl,TextMany
+  jr    z,.AmountFound
+  cp    29
+  ld    hl,TextNumerous
+  jr    z,.AmountFound
+  cp    61
+  ld    hl,TextAHorde
+  jr    z,.AmountFound
+  cp    93
+  ld    hl,TextCountless
+  jr    z,.AmountFound
+  .AmountFound:
+
+
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  pop   bc
+
+  ld    a,c
+  add   a,07
+  ld    c,a  
+  ld    a,b
+  add   a,23
+  ld    b,a  
+  push  bc
+
+  call  SetMonsterTableInIYNeutralMonster
+  pop   bc
+
+  ld    a,(iy+MonsterTableCostGems)
+  and   %1110 0000
+  cp    Level1Unit
+  ld    hl,1
+  jp    z,SetNumber16BitCastle
+  cp    Level2Unit
+  ld    hl,2
+  jp    z,SetNumber16BitCastle
+  cp    Level3Unit
+  ld    hl,3
+  jp    z,SetNumber16BitCastle
+  cp    Level4Unit
+  ld    hl,4
+  jp    z,SetNumber16BitCastle
+  cp    Level5Unit
+  ld    hl,5
+  jp    z,SetNumber16BitCastle
+  cp    Level6Unit
+  ld    hl,6
+  jp    z,SetNumber16BitCastle
+
+TextAFew:       db " A Few",255
+TextSeveral:    db "Several",255
+TextMany:       db " Many",255
+TextNumerous:   db "Numerous",255
+TextAHorde:     db "A horde",255
+TextCountless:  db "Countless",255
+
+
+
+
+
+
+
+
+
+
+
+
+ListOfMonsters:
+  db    021                               ;128 Spear Guard (Castlevania)
+  db    022                               ;129 Medusa Head (Castlevania)
+  db    025                               ;130 Skeleton (Castlevania)
+  db    091                               ;131 Running Man (Metal Gear)
+  db    092                               ;132 Trooper (Metal Gear)
+  db    093                               ;133 Antigas Man (Metal Gear)
+  db    094                               ;134 Footman (Metal Gear)
+
+SetNeutralMonsterHeroCollidedWithInA:
+  ld    a,(MonsterHerocollidedWithOnMap)
+  sub   a,128                             ;monsters start at tile 128
+  ld    d,0
+  ld    e,a
+  ld    hl,ListOfMonsters
+  add   hl,de
+  ld    a,(hl)                            ;monster number
+  ret
+
 SetAllMonstersInMonsterTable:
   ld    ix,(plxcurrentheroAddress)
   ld    a,(ix+HeroUnits+00)              ;monster 1 nr  
@@ -2566,16 +2802,18 @@ SetAllMonstersInMonsterTable:
   ld    h,(ix+HeroUnits+17)              ;monster 6 amount
   ld    (ListOfMonstersToPut+26),hl
 
-
-
   ld    hl,(HeroThatGetsAttacked)         ;check if we fight against a hero or a neutral monster
   ld    a,l
   or    h
   jr    nz,.DefenderHasAHero
 
-  ld    a,1
+  ;which neutral monster are we fighting ?
+  call  SetNeutralMonsterHeroCollidedWithInA
   ld    (ListOfMonstersToPut+30),a
-  ld    hl,1                             ;monster 1 amount
+
+  call  .SetAmountInA
+  ld    l,a
+  ld    h,0
   ld    (ListOfMonstersToPut+31),hl
 
   xor   a
@@ -2590,7 +2828,62 @@ SetAllMonstersInMonsterTable:
   ld    (ListOfMonstersToPut+51),hl
   ld    (ListOfMonstersToPut+55),a
   ld    (ListOfMonstersToPut+56),hl
-  jr    .EndSetAllMonsters
+  jp    .EndSetAllMonsters
+
+  .SetAmountInA:
+  ld    a,(MonsterHerocollidedWithOnMapAmount)
+  sub   a,246
+  jr    z,.Amount1                        ;246(1),247(2),248(3),249(4),250(5),251(6)
+  dec   a
+  jr    z,.Amount2
+  dec   a
+  jr    z,.Amount3
+  dec   a
+  jr    z,.Amount4
+  dec   a
+  jr    z,.Amount5
+
+  .Amount6:                             ;between 0 and 31 -> add 93 -> between 93 and 124
+  ld    a,r
+  and   31
+xor a  
+  add   a,93
+  ret
+
+  .Amount5:                             ;between 0 and 31 -> add 61 -> between 61 and 92
+  ld    a,r
+  and   31
+xor a  
+  add   a,61
+  ret
+
+  .Amount4:                             ;between 0 and 31 -> add 29 -> between 29 and 60
+  ld    a,r
+  and   31
+xor a  
+  add   a,29
+  ret
+
+  .Amount3:                             ;between 0 and 15 -> add 13 -> between 13 and 28
+  ld    a,r
+  and   15
+xor a  
+  add   a,13
+  ret
+
+  .Amount2:                             ;between 0 and 07 -> add 05 -> between 05 and 12
+  ld    a,r
+  and   7
+xor a  
+  add   a,5
+  ret
+  
+  .Amount1:                             ;between 0 and 03 -> add 01 -> between 01 and 04 
+  ld    a,r
+  and   3
+xor a  
+  inc   a
+  ret
 
   .DefenderHasAHero:
   ld    ix,(HeroThatGetsAttacked)

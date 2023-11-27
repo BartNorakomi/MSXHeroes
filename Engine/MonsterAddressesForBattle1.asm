@@ -15,6 +15,82 @@ RangedMonster:                equ 128
 
 LengthMonsterAddressesTable: equ Monster002Table-Monster001Table
 
+Level1Unit: equ  %0000 0000
+Level2Unit: equ  %0010 0000
+Level3Unit: equ  %0100 0000
+Level4Unit: equ  %0110 0000
+Level5Unit: equ  %1000 0000
+Level6Unit: equ  %1010 0000
+
+
+
+
+
+
+
+
+
+SDSnatcherUnitLevel1Number:           equ 6
+SDSnatcherUnitLevel1Attack:           equ 3
+SDSnatcherUnitLevel1Defense:          equ 3
+SDSnatcherUnitLevel1HP:               equ 4
+SDSnatcherUnitLevel1Speed:            equ 4
+SDSnatcherUnitLevel1Growth:           equ 16
+SDSnatcherUnitLevel1CostGold:         equ 30/10
+SDSnatcherUnitLevel1CostGems:         equ 00+Level1Unit
+SDSnatcherUnitLevel1CostRubies:       equ 0
+
+SDSnatcherUnitLevel2Number:           equ 5
+SDSnatcherUnitLevel2Attack:           equ 6
+SDSnatcherUnitLevel2Defense:          equ 6
+SDSnatcherUnitLevel2HP:               equ 16
+SDSnatcherUnitLevel2Speed:            equ 6
+SDSnatcherUnitLevel2Growth:           equ 9
+SDSnatcherUnitLevel2CostGold:         equ 130/10
+SDSnatcherUnitLevel2CostGems:         equ 00+Level2Unit
+SDSnatcherUnitLevel2CostRubies:       equ 0
+
+SDSnatcherUnitLevel3Number:           equ 1
+SDSnatcherUnitLevel3Attack:           equ 7
+SDSnatcherUnitLevel3Defense:          equ 10
+SDSnatcherUnitLevel3HP:               equ 30
+SDSnatcherUnitLevel3Speed:            equ 3
+SDSnatcherUnitLevel3Growth:           equ 6
+SDSnatcherUnitLevel3CostGold:         equ 250/10
+SDSnatcherUnitLevel3CostGems:         equ 00+Level3Unit
+SDSnatcherUnitLevel3CostRubies:       equ 0
+
+SDSnatcherUnitLevel4Number:           equ 2
+SDSnatcherUnitLevel4Attack:           equ 11
+SDSnatcherUnitLevel4Defense:          equ 8
+SDSnatcherUnitLevel4HP:               equ 35
+SDSnatcherUnitLevel4Speed:            equ 6
+SDSnatcherUnitLevel4Growth:           equ 4
+SDSnatcherUnitLevel4CostGold:         equ 350/10
+SDSnatcherUnitLevel4CostGems:         equ 00+Level4Unit
+SDSnatcherUnitLevel4CostRubies:       equ 0
+
+SDSnatcherUnitLevel5Number:           equ 3
+SDSnatcherUnitLevel5Attack:           equ 12
+SDSnatcherUnitLevel5Defense:          equ 12
+SDSnatcherUnitLevel5HP:               equ 40
+SDSnatcherUnitLevel5Speed:            equ 7
+SDSnatcherUnitLevel5Growth:           equ 3
+SDSnatcherUnitLevel5CostGold:         equ 550/10
+SDSnatcherUnitLevel5CostGems:         equ 00+Level5Unit
+SDSnatcherUnitLevel5CostRubies:       equ 0
+
+SDSnatcherUnitLevel6Number:           equ 4
+SDSnatcherUnitLevel6Attack:           equ 16
+SDSnatcherUnitLevel6Defense:          equ 13
+SDSnatcherUnitLevel6HP:               equ 115
+SDSnatcherUnitLevel6Speed:            equ 5
+SDSnatcherUnitLevel6Growth:           equ 1
+SDSnatcherUnitLevel6CostGold:         equ 850/10
+SDSnatcherUnitLevel6CostGems:         equ 02+Level6Unit
+SDSnatcherUnitLevel6CostRubies:       equ 0
+
+
 Monster001Table:                        ;brown flyer (sd snatcher)
   dw    Monster001Idle
   dw    Monster001Move
@@ -27,14 +103,14 @@ Monster001Table:                        ;brown flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    007                             ;speed
-  db    001                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel3CostGold        ;cost (gold)
+  db    UsasUnitLevel3CostGems        ;cost (gems)
+  db    UsasUnitLevel3CostRubies      ;cost (rubies)
+  db    UsasUnitLevel3HP              ;hp
+  db    UsasUnitLevel3Speed           ;speed
+  db    UsasUnitLevel3Attack          ;attack
+  db    UsasUnitLevel3Defense         ;defense
+  db    UsasUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Brown Flyer",255
 
@@ -50,14 +126,14 @@ Monster002Table:                        ;green flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
-  db    004                             ;cost (gold)
-  db    000                             ;cost (gems)
-  db    004                             ;cost (rubies)
-  db    003                             ;hp
-  db    006                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel4CostGold        ;cost (gold)
+  db    UsasUnitLevel4CostGems        ;cost (gems)
+  db    UsasUnitLevel4CostRubies      ;cost (rubies)
+  db    UsasUnitLevel4HP              ;hp
+  db    UsasUnitLevel4Speed           ;speed
+  db    UsasUnitLevel4Attack          ;attack
+  db    UsasUnitLevel4Defense         ;defense
+  db    UsasUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Green Flyer",255
 
@@ -73,14 +149,14 @@ Monster003Table:                        ;Dark grey flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
-  db    003                             ;cost (gold)
-  db    003                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    006                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel5CostGold        ;cost (gold)
+  db    UsasUnitLevel5CostGems        ;cost (gems)
+  db    UsasUnitLevel5CostRubies      ;cost (rubies)
+  db    UsasUnitLevel5HP              ;hp
+  db    UsasUnitLevel5Speed           ;speed
+  db    UsasUnitLevel5Attack          ;attack
+  db    UsasUnitLevel5Defense         ;defense
+  db    UsasUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "DarkG Flyer",255
 
@@ -96,14 +172,14 @@ Monster004Table:                        ;light grey flyer (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+00                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    006                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel6CostGold        ;cost (gold)
+  db    UsasUnitLevel6CostGems        ;cost (gems)
+  db    UsasUnitLevel6CostRubies      ;cost (rubies)
+  db    UsasUnitLevel6HP              ;hp
+  db    UsasUnitLevel6Speed           ;speed
+  db    UsasUnitLevel6Attack          ;attack
+  db    UsasUnitLevel6Defense         ;defense
+  db    UsasUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "LightGFlyer",255
 
@@ -119,14 +195,14 @@ Monster005Table:                        ;big spider (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    008                             ;hp
-  db    007                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel2CostGold        ;cost (gold)
+  db    UsasUnitLevel2CostGems        ;cost (gems)
+  db    UsasUnitLevel2CostRubies      ;cost (rubies)
+  db    UsasUnitLevel2HP              ;hp
+  db    UsasUnitLevel2Speed           ;speed
+  db    UsasUnitLevel2Attack          ;attack
+  db    UsasUnitLevel2Defense         ;defense
+  db    UsasUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Big Spider",255," "
 
@@ -142,14 +218,14 @@ Monster006Table:                        ;tiny spider (sd snatcher)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    16+04                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    005                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel1CostGold        ;cost (gold)
+  db    UsasUnitLevel1CostGems        ;cost (gems)
+  db    UsasUnitLevel1CostRubies      ;cost (rubies)
+  db    UsasUnitLevel1HP              ;hp
+  db    UsasUnitLevel1Speed           ;speed
+  db    UsasUnitLevel1Attack          ;attack
+  db    UsasUnitLevel1Defense         ;defense
+  db    UsasUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Tiny Spider",255
 
@@ -166,7 +242,7 @@ Monster007Table:                        ;Bobblun blue (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -189,7 +265,7 @@ Monster008Table:                        ;Bubblun green (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -212,7 +288,7 @@ Monster009Table:                        ;zen chan blue robotic (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -235,7 +311,7 @@ Monster010Table:                        ;mad zen chan red robotic (bubble bobble
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -258,7 +334,7 @@ Monster011Table:                        ;mighta ghoul (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -281,7 +357,7 @@ Monster012Table:                        ;skell monsta ghost whale (bubble bobble
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -304,7 +380,7 @@ Monster013Table:                        ;Banebou spring jumper (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -327,7 +403,7 @@ Monster014Table:                        ;Hidegons blue fuzzy (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -350,7 +426,7 @@ Monster015Table:                        ;drunk green (bubble bobble)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -373,7 +449,7 @@ Monster016Table:                        ;super drunk green (bubble bobble)
   db    64                              ;nx  
   db    64+04                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -396,7 +472,7 @@ Monster017Table:                        ;super mighta ghoul (bubble bobble)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -405,6 +481,72 @@ Monster017Table:                        ;super mighta ghoul (bubble bobble)
   db    012                             ;growth
   db    000                             ;special ability
   db    "SuperMighta",255
+
+
+
+
+
+CastleVaniaUnitLevel1Number:           equ 19
+CastleVaniaUnitLevel1Attack:           equ 2
+CastleVaniaUnitLevel1Defense:          equ 3
+CastleVaniaUnitLevel1HP:               equ 4
+CastleVaniaUnitLevel1Speed:            equ 5
+CastleVaniaUnitLevel1Growth:           equ 15
+CastleVaniaUnitLevel1CostGold:         equ 50/10
+CastleVaniaUnitLevel1CostGems:         equ 00+Level1Unit
+CastleVaniaUnitLevel1CostRubies:       equ 0
+
+CastleVaniaUnitLevel2Number:           equ 23
+CastleVaniaUnitLevel2Attack:           equ 6
+CastleVaniaUnitLevel2Defense:          equ 4
+CastleVaniaUnitLevel2HP:               equ 16
+CastleVaniaUnitLevel2Speed:            equ 4
+CastleVaniaUnitLevel2Growth:           equ 8
+CastleVaniaUnitLevel2CostGold:         equ 125/10
+CastleVaniaUnitLevel2CostGems:         equ 00+Level2Unit
+CastleVaniaUnitLevel2CostRubies:       equ 0
+
+CastleVaniaUnitLevel3Number:           equ 18
+CastleVaniaUnitLevel3Attack:           equ 10
+CastleVaniaUnitLevel3Defense:          equ 6
+CastleVaniaUnitLevel3HP:               equ 25
+CastleVaniaUnitLevel3Speed:            equ 7
+CastleVaniaUnitLevel3Growth:           equ 5
+CastleVaniaUnitLevel3CostGold:         equ 200/10
+CastleVaniaUnitLevel3CostGems:         equ 00+Level3Unit
+CastleVaniaUnitLevel3CostRubies:       equ 0
+
+CastleVaniaUnitLevel4Number:           equ 26
+CastleVaniaUnitLevel4Attack:           equ 10
+CastleVaniaUnitLevel4Defense:          equ 10
+CastleVaniaUnitLevel4HP:               equ 25
+CastleVaniaUnitLevel4Speed:            equ 3
+CastleVaniaUnitLevel4Growth:           equ 4
+CastleVaniaUnitLevel4CostGold:         equ 250/10
+CastleVaniaUnitLevel4CostGems:         equ 00+Level4Unit
+CastleVaniaUnitLevel4CostRubies:       equ 0
+
+CastleVaniaUnitLevel5Number:           equ 20
+CastleVaniaUnitLevel5Attack:           equ 13
+CastleVaniaUnitLevel5Defense:          equ 13
+CastleVaniaUnitLevel5HP:               equ 45
+CastleVaniaUnitLevel5Speed:            equ 6
+CastleVaniaUnitLevel5Growth:           equ 3
+CastleVaniaUnitLevel5CostGold:         equ 500/10
+CastleVaniaUnitLevel5CostGems:         equ 00+Level5Unit
+CastleVaniaUnitLevel5CostRubies:       equ 0
+
+CastleVaniaUnitLevel6Number:           equ 24
+CastleVaniaUnitLevel6Attack:           equ 16
+CastleVaniaUnitLevel6Defense:          equ 12
+CastleVaniaUnitLevel6HP:               equ 90
+CastleVaniaUnitLevel6Speed:            equ 9
+CastleVaniaUnitLevel6Growth:           equ 1
+CastleVaniaUnitLevel6CostGold:         equ 900/10
+CastleVaniaUnitLevel6CostGems:         equ 00+Level6Unit
+CastleVaniaUnitLevel6CostRubies:       equ 2
+
+
 
 Monster018Table:                        ;Fish Man (Castlevania)
   dw    Monster018Idle
@@ -418,14 +560,14 @@ Monster018Table:                        ;Fish Man (Castlevania)
   db    BattleMonsterSpriteSheet1Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel3CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel3CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel3CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel3HP              ;hp
+  db    CastleVaniaUnitLevel3Speed           ;speed
+  db    CastleVaniaUnitLevel3Attack          ;attack
+  db    CastleVaniaUnitLevel3Defense         ;defense
+  db    CastleVaniaUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Fish Man",255,"   "
 
@@ -441,14 +583,14 @@ Monster019Table:                        ;Zombie (Castlevania)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel1CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel1CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel1CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel1HP              ;hp
+  db    CastleVaniaUnitLevel1Speed           ;speed
+  db    CastleVaniaUnitLevel1Attack          ;attack
+  db    CastleVaniaUnitLevel1Defense         ;defense
+  db    CastleVaniaUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Zombie",255,"     "
 
@@ -464,14 +606,14 @@ Monster020Table:                        ;Mummy Man (Castlevania)
   db    BattleMonsterSpriteSheet2Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel5CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel5CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel5CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel5HP              ;hp
+  db    CastleVaniaUnitLevel5Speed           ;speed
+  db    CastleVaniaUnitLevel5Attack          ;attack
+  db    CastleVaniaUnitLevel5Defense         ;defense
+  db    CastleVaniaUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Mummy Man",255,"  "
 
@@ -487,14 +629,14 @@ Monster021Table:                        ;Spear Guard (Castlevania)
   db    BattleMonsterSpriteSheet1Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel3CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel3CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel3CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel3HP              ;hp
+  db    CastleVaniaUnitLevel3Speed           ;speed
+  db    CastleVaniaUnitLevel3Attack          ;attack
+  db    CastleVaniaUnitLevel3Defense         ;defense
+  db    CastleVaniaUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Spear Guard",255
 
@@ -510,14 +652,14 @@ Monster022Table:                        ;Medusa Head (Castlevania)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel2CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel2CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel2CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel2HP              ;hp
+  db    CastleVaniaUnitLevel2Speed           ;speed
+  db    CastleVaniaUnitLevel2Attack          ;attack
+  db    CastleVaniaUnitLevel2Defense         ;defense
+  db    CastleVaniaUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Medusa Head",255
   
@@ -533,14 +675,14 @@ Monster023Table:                        ;Flea Man (Castlevania)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel2CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel2CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel2CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel2HP              ;hp
+  db    CastleVaniaUnitLevel2Speed           ;speed
+  db    CastleVaniaUnitLevel2Attack          ;attack
+  db    CastleVaniaUnitLevel2Defense         ;defense
+  db    CastleVaniaUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Flea Man",255,"   "
 
@@ -556,14 +698,14 @@ Monster024Table:                        ;Grim Reaper (Castlevania)
   db    BattleMonsterSpriteSheet3Block
   db    48                              ;nx  
   db    48+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel6CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel6CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel6CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel6HP              ;hp
+  db    CastleVaniaUnitLevel6Speed           ;speed
+  db    CastleVaniaUnitLevel6Attack          ;attack
+  db    CastleVaniaUnitLevel6Defense         ;defense
+  db    CastleVaniaUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "Grim Reaper",255
   
@@ -579,14 +721,14 @@ Monster025Table:                        ;Skeleton (Castlevania)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel1CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel1CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel1CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel1HP              ;hp
+  db    CastleVaniaUnitLevel1Speed           ;speed
+  db    CastleVaniaUnitLevel1Attack          ;attack
+  db    CastleVaniaUnitLevel1Defense         ;defense
+  db    CastleVaniaUnitLevel1Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Skeleton",255,"   "
 
@@ -602,18 +744,79 @@ Monster026Table:                        ;Axe man (Castlevania)
   db    BattleMonsterSpriteSheet2Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel4CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel4CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel4CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel4HP              ;hp
+  db    CastleVaniaUnitLevel4Speed           ;speed
+  db    CastleVaniaUnitLevel4Attack          ;attack
+  db    CastleVaniaUnitLevel4Defense         ;defense
+  db    CastleVaniaUnitLevel4Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
-  db    "Axe man",255,"    "
+  db    "Axe Man",255,"    "
 
 
+
+
+DragonSlayerUnitLevel1Number:           equ 30
+DragonSlayerUnitLevel1Attack:           equ 4
+DragonSlayerUnitLevel1Defense:          equ 5
+DragonSlayerUnitLevel1HP:               equ 10
+DragonSlayerUnitLevel1Speed:            equ 4
+DragonSlayerUnitLevel1Growth:           equ 14
+DragonSlayerUnitLevel1CostGold:         equ 80/10
+DragonSlayerUnitLevel1CostGems:         equ 00+Level1Unit
+DragonSlayerUnitLevel1CostRubies:       equ 0
+
+DragonSlayerUnitLevel2Number:           equ 27
+DragonSlayerUnitLevel2Attack:           equ 6
+DragonSlayerUnitLevel2Defense:          equ 6
+DragonSlayerUnitLevel2HP:               equ 11
+DragonSlayerUnitLevel2Speed:            equ 4
+DragonSlayerUnitLevel2Growth:           equ 9
+DragonSlayerUnitLevel2CostGold:         equ 100/10
+DragonSlayerUnitLevel2CostGems:         equ 00+Level2Unit
+DragonSlayerUnitLevel2CostRubies:       equ 0
+
+DragonSlayerUnitLevel3Number:           equ 29
+DragonSlayerUnitLevel3Attack:           equ 8
+DragonSlayerUnitLevel3Defense:          equ 8
+DragonSlayerUnitLevel3HP:               equ 25
+DragonSlayerUnitLevel3Speed:            equ 6
+DragonSlayerUnitLevel3Growth:           equ 7
+DragonSlayerUnitLevel3CostGold:         equ 200/10
+DragonSlayerUnitLevel3CostGems:         equ 00+Level3Unit
+DragonSlayerUnitLevel3CostRubies:       equ 0
+
+DragonSlayerUnitLevel4Number:           equ 31
+DragonSlayerUnitLevel4Attack:           equ 10
+DragonSlayerUnitLevel4Defense:          equ 12
+DragonSlayerUnitLevel4HP:               equ 35
+DragonSlayerUnitLevel4Speed:            equ 5
+DragonSlayerUnitLevel4Growth:           equ 4
+DragonSlayerUnitLevel4CostGold:         equ 300/10
+DragonSlayerUnitLevel4CostGems:         equ 00+Level4Unit
+DragonSlayerUnitLevel4CostRubies:       equ 0
+
+DragonSlayerUnitLevel5Number:           equ 35
+DragonSlayerUnitLevel5Attack:           equ 12
+DragonSlayerUnitLevel5Defense:          equ 13
+DragonSlayerUnitLevel5HP:               equ 40
+DragonSlayerUnitLevel5Speed:            equ 5
+DragonSlayerUnitLevel5Growth:           equ 2
+DragonSlayerUnitLevel5CostGold:         equ 400/10
+DragonSlayerUnitLevel5CostGems:         equ 00+Level5Unit
+DragonSlayerUnitLevel5CostRubies:       equ 0
+
+DragonSlayerUnitLevel6Number:           equ 33
+DragonSlayerUnitLevel6Attack:           equ 15
+DragonSlayerUnitLevel6Defense:          equ 15
+DragonSlayerUnitLevel6HP:               equ 100
+DragonSlayerUnitLevel6Speed:            equ 7
+DragonSlayerUnitLevel6Growth:           equ 1
+DragonSlayerUnitLevel6CostGold:         equ 1000/10
+DragonSlayerUnitLevel6CostGems:         equ 00+Level6Unit
+DragonSlayerUnitLevel6CostRubies:       equ 2
 
 
 
@@ -629,19 +832,19 @@ Monster027Table:                        ;Scorpii (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel2CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel2CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel2CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel2HP              ;hp
+  db    DragonSlayerUnitLevel2Speed           ;speed
+  db    DragonSlayerUnitLevel2Attack          ;attack
+  db    DragonSlayerUnitLevel2Defense         ;defense
+  db    DragonSlayerUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Scorpii",255,"    "
 
 
-Monster028Table:                        ;Porgi (Dragon Slayer IV)
+Monster028Table:                        ;Porgi (pink fatty) (Dragon Slayer IV)
   dw    Monster028Idle
   dw    Monster028Move
   dw    GeneralMonsterAttackPatternRight
@@ -653,18 +856,18 @@ Monster028Table:                        ;Porgi (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel1CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel1CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel1CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel1HP              ;hp
+  db    DragonSlayerUnitLevel1Speed           ;speed
+  db    DragonSlayerUnitLevel1Attack          ;attack
+  db    DragonSlayerUnitLevel1Defense         ;defense
+  db    DragonSlayerUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Porgi",255,"      "
 
-Monster029Table:                        ;Rock man (Dragon Slayer IV)
+Monster029Table:                        ;Rock man (grey/white round small head) (Dragon Slayer IV)
   dw    Monster029Idle
   dw    Monster029Move
   dw    GeneralMonsterAttackPatternRight
@@ -676,18 +879,18 @@ Monster029Table:                        ;Rock man (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel3CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel3CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel3CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel3HP              ;hp
+  db    DragonSlayerUnitLevel3Speed           ;speed
+  db    DragonSlayerUnitLevel3Attack          ;attack
+  db    DragonSlayerUnitLevel3Defense         ;defense
+  db    DragonSlayerUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Rock Man",255,"   "
 
-Monster030Table:                        ;Piglet (Dragon Slayer IV)
+Monster030Table:                        ;Piglet (piggy red nose) (Dragon Slayer IV)
   dw    Monster030Idle
   dw    Monster030Move
   dw    GeneralMonsterAttackPatternRight
@@ -699,18 +902,18 @@ Monster030Table:                        ;Piglet (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel1CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel1CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel1CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel1HP              ;hp
+  db    DragonSlayerUnitLevel1Speed           ;speed
+  db    DragonSlayerUnitLevel1Attack          ;attack
+  db    DragonSlayerUnitLevel1Defense         ;defense
+  db    DragonSlayerUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Piglet",255,"     "
 
-Monster031Table:                        ;Gers (Dragon Slayer IV)
+Monster031Table:                        ;Gers (white grey flat head) (Dragon Slayer IV)
   dw    Monster031Idle
   dw    Monster031Move
   dw    GeneralMonsterAttackPatternRight
@@ -722,18 +925,18 @@ Monster031Table:                        ;Gers (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel4CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel4CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel4CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel4HP              ;hp
+  db    DragonSlayerUnitLevel4Speed           ;speed
+  db    DragonSlayerUnitLevel4Attack          ;attack
+  db    DragonSlayerUnitLevel4Defense         ;defense
+  db    DragonSlayerUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Gers",255,"       "
 
-Monster032Table:                        ;Yashinotkin (Dragon Slayer IV)
+Monster032Table:                        ;Yashinotkin (red fish like creature) (Dragon Slayer IV)
   dw    Monster032Idle
   dw    Monster032Move
   dw    GeneralMonsterAttackPatternRight
@@ -745,14 +948,14 @@ Monster032Table:                        ;Yashinotkin (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel2CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel2CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel2CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel2HP              ;hp
+  db    DragonSlayerUnitLevel2Speed           ;speed
+  db    DragonSlayerUnitLevel2Attack          ;attack
+  db    DragonSlayerUnitLevel2Defense         ;defense
+  db    DragonSlayerUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Yashinotkin",255
 
@@ -768,18 +971,18 @@ Monster033Table:                        ;King Mu (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel6CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel6CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel6CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel6HP              ;hp
+  db    DragonSlayerUnitLevel6Speed           ;speed
+  db    DragonSlayerUnitLevel6Attack          ;attack
+  db    DragonSlayerUnitLevel6Defense         ;defense
+  db    DragonSlayerUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "King Mu",255,"    "
 
-Monster034Table:                        ;Crawler (Dragon Slayer IV)
+Monster034Table:                        ;Crawler (blue 3 legs) (Dragon Slayer IV)
   dw    Monster034Idle
   dw    Monster034Move
   dw    GeneralMonsterAttackPatternRight
@@ -791,14 +994,14 @@ Monster034Table:                        ;Crawler (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel3CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel3CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel3CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel3HP              ;hp
+  db    DragonSlayerUnitLevel3Speed           ;speed
+  db    DragonSlayerUnitLevel3Attack          ;attack
+  db    DragonSlayerUnitLevel3Defense         ;defense
+  db    DragonSlayerUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Crawler",255,"    "
 
@@ -814,14 +1017,14 @@ Monster035Table:                        ;Octo (Dragon Slayer IV)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DragonSlayerUnitLevel5CostGold        ;cost (gold)
+  db    DragonSlayerUnitLevel5CostGems        ;cost (gems)
+  db    DragonSlayerUnitLevel5CostRubies      ;cost (rubies)
+  db    DragonSlayerUnitLevel5HP              ;hp
+  db    DragonSlayerUnitLevel5Speed           ;speed
+  db    DragonSlayerUnitLevel5Attack          ;attack
+  db    DragonSlayerUnitLevel5Defense         ;defense
+  db    DragonSlayerUnitLevel5Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Octo",255,"       "
 
@@ -838,7 +1041,7 @@ Monster036Table:                        ;Sarge green (Contra)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -861,7 +1064,7 @@ Monster037Table:                        ;Lieutenant red (Contra)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -884,7 +1087,7 @@ Monster038Table:                        ;FootSoldier (Contra)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -907,7 +1110,7 @@ Monster039Table:                        ;Grenadier (Contra)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -930,7 +1133,7 @@ Monster040Table:                        ;Sniper (Contra)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -953,7 +1156,7 @@ Monster041Table:                        ;Gigafly (Contra)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -976,7 +1179,7 @@ Monster042Table:                        ;Alien Grunt (Contra)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -999,7 +1202,7 @@ Monster043Table:                        ;Infiltrant (Contra)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1022,7 +1225,7 @@ Monster044Table:                        ;Red Soldier (Contra)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1045,7 +1248,7 @@ Monster045Table:                        ;Face Hugger (Contra)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1068,7 +1271,7 @@ Monster046Table:                        ;Gorudea (Contra)
   db    32                              ;nx  
   db    56+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1091,7 +1294,7 @@ Monster047Table:                        ;Turret (Contra)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    002                             ;speed
@@ -1100,6 +1303,73 @@ Monster047Table:                        ;Turret (Contra)
   db    012                             ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Turret",255,"     "
+
+
+
+
+UsasUnitLevel1Number:           equ 51
+UsasUnitLevel1Attack:           equ 5
+UsasUnitLevel1Defense:          equ 3
+UsasUnitLevel1HP:               equ 8
+UsasUnitLevel1Speed:            equ 6
+UsasUnitLevel1Growth:           equ 14
+UsasUnitLevel1CostGold:         equ 70/10
+UsasUnitLevel1CostGems:         equ 00+Level1Unit
+UsasUnitLevel1CostRubies:       equ 0
+
+UsasUnitLevel2Number:           equ 52
+UsasUnitLevel2Attack:           equ 6
+UsasUnitLevel2Defense:          equ 7
+UsasUnitLevel2HP:               equ 20
+UsasUnitLevel2Speed:            equ 3
+UsasUnitLevel2Growth:           equ 8
+UsasUnitLevel2CostGold:         equ 120/10
+UsasUnitLevel2CostGems:         equ 00+Level2Unit
+UsasUnitLevel2CostRubies:       equ 0
+
+UsasUnitLevel3Number:           equ 54
+UsasUnitLevel3Attack:           equ 9
+UsasUnitLevel3Defense:          equ 5
+UsasUnitLevel3HP:               equ 25
+UsasUnitLevel3Speed:            equ 6
+UsasUnitLevel3Growth:           equ 7
+UsasUnitLevel3CostGold:         equ 200/10
+UsasUnitLevel3CostGems:         equ 00+Level3Unit
+UsasUnitLevel3CostRubies:       equ 0
+
+UsasUnitLevel4Number:           equ 48
+UsasUnitLevel4Attack:           equ 9
+UsasUnitLevel4Defense:          equ 8
+UsasUnitLevel4HP:               equ 30
+UsasUnitLevel4Speed:            equ 8
+UsasUnitLevel4Growth:           equ 5
+UsasUnitLevel4CostGold:         equ 250/10
+UsasUnitLevel4CostGems:         equ 00+Level4Unit
+UsasUnitLevel4CostRubies:       equ 0
+
+UsasUnitLevel5Number:           equ 49
+UsasUnitLevel5Attack:           equ 9
+UsasUnitLevel5Defense:          equ 12
+UsasUnitLevel5HP:               equ 65
+UsasUnitLevel5Speed:            equ 4
+UsasUnitLevel5Growth:           equ 2
+UsasUnitLevel5CostGold:         equ 425/10
+UsasUnitLevel5CostGems:         equ 00+Level5Unit
+UsasUnitLevel5CostRubies:       equ 1
+
+UsasUnitLevel6Number:           equ 50
+UsasUnitLevel6Attack:           equ 15
+UsasUnitLevel6Defense:          equ 14
+UsasUnitLevel6HP:               equ 90
+UsasUnitLevel6Speed:            equ 7
+UsasUnitLevel6Growth:           equ 1
+UsasUnitLevel6CostGold:         equ 850/10
+UsasUnitLevel6CostGems:         equ 02+Level6Unit
+UsasUnitLevel6CostRubies:       equ 0
+
+
+
+
 
 Monster048Table:                        ;GraveWing (Usas)
   dw    Monster048Idle
@@ -1113,16 +1383,16 @@ Monster048Table:                        ;GraveWing (Usas)
   db    BattleMonsterSpriteSheet2Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel4CostGold        ;cost (gold)
+  db    UsasUnitLevel4CostGems        ;cost (gems)
+  db    UsasUnitLevel4CostRubies      ;cost (rubies)
+  db    UsasUnitLevel4HP              ;hp
+  db    UsasUnitLevel4Speed           ;speed
+  db    UsasUnitLevel4Attack          ;attack
+  db    UsasUnitLevel4Defense         ;defense
+  db    UsasUnitLevel4Growth          ;growth
   db    000                             ;special ability
-  db    "GraveWing",255,"  "
+  db    "Gravewing",255,"  "
 
 Monster049Table:                        ;Vanguard (Usas)
   dw    Monster049Idle
@@ -1136,14 +1406,14 @@ Monster049Table:                        ;Vanguard (Usas)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel5CostGold        ;cost (gold)
+  db    UsasUnitLevel5CostGems        ;cost (gems)
+  db    UsasUnitLevel5CostRubies      ;cost (rubies)
+  db    UsasUnitLevel5HP              ;hp
+  db    UsasUnitLevel5Speed           ;speed
+  db    UsasUnitLevel5Attack          ;attack
+  db    UsasUnitLevel5Defense         ;defense
+  db    UsasUnitLevel5Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Vanguard",255,"   "
 
@@ -1159,14 +1429,14 @@ Monster050Table:                        ;Aerial Luna (Usas)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel6CostGold        ;cost (gold)
+  db    UsasUnitLevel6CostGems        ;cost (gems)
+  db    UsasUnitLevel6CostRubies      ;cost (rubies)
+  db    UsasUnitLevel6HP              ;hp
+  db    UsasUnitLevel6Speed           ;speed
+  db    UsasUnitLevel6Attack          ;attack
+  db    UsasUnitLevel6Defense         ;defense
+  db    UsasUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "Aerial Luna",255
   
@@ -1182,14 +1452,14 @@ Monster051Table:                        ;Mini Phanto (Usas)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel1CostGold        ;cost (gold)
+  db    UsasUnitLevel1CostGems        ;cost (gems)
+  db    UsasUnitLevel1CostRubies      ;cost (rubies)
+  db    UsasUnitLevel1HP              ;hp
+  db    UsasUnitLevel1Speed           ;speed
+  db    UsasUnitLevel1Attack          ;attack
+  db    UsasUnitLevel1Defense         ;defense
+  db    UsasUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Mini Phanto",255
   
@@ -1205,14 +1475,14 @@ Monster052Table:                        ;Thicket Tot (Usas)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel2CostGold        ;cost (gold)
+  db    UsasUnitLevel2CostGems        ;cost (gems)
+  db    UsasUnitLevel2CostRubies      ;cost (rubies)
+  db    UsasUnitLevel2HP              ;hp
+  db    UsasUnitLevel2Speed           ;speed
+  db    UsasUnitLevel2Attack          ;attack
+  db    UsasUnitLevel2Defense         ;defense
+  db    UsasUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Thicket Tot",255
   
@@ -1228,14 +1498,14 @@ Monster053Table:                        ;Bonefin (Usas)
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel1CostGold        ;cost (gold)
+  db    UsasUnitLevel1CostGems        ;cost (gems)
+  db    UsasUnitLevel1CostRubies      ;cost (rubies)
+  db    UsasUnitLevel1HP              ;hp
+  db    UsasUnitLevel1Speed           ;speed
+  db    UsasUnitLevel1Attack          ;attack
+  db    UsasUnitLevel1Defense         ;defense
+  db    UsasUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Bonefin",255,"    "
 
@@ -1251,14 +1521,14 @@ Monster054Table:                        ;Zomblet (Usas)
   db    BattleMonsterSpriteSheet2Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    UsasUnitLevel3CostGold        ;cost (gold)
+  db    UsasUnitLevel3CostGems        ;cost (gems)
+  db    UsasUnitLevel3CostRubies      ;cost (rubies)
+  db    UsasUnitLevel3HP              ;hp
+  db    UsasUnitLevel3Speed           ;speed
+  db    UsasUnitLevel3Attack          ;attack
+  db    UsasUnitLevel3Defense         ;defense
+  db    UsasUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Zomblet",255,"    "
 
@@ -1275,7 +1545,7 @@ Monster055Table:                        ;Cheek (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1298,7 +1568,7 @@ Monster056Table:                        ;Official (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1321,7 +1591,7 @@ Monster057Table:                        ;Kasa-obake (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1344,7 +1614,7 @@ Monster058Table:                        ;Fishmonger (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1367,7 +1637,7 @@ Monster059Table:                        ;Ronin (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1390,7 +1660,7 @@ Monster060Table:                        ;Bucket Head (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1413,7 +1683,7 @@ Monster061Table:                        ;Headmaster (Goemon)
   db    48                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1436,7 +1706,7 @@ Monster062Table:                        ;Granola (Goemon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1459,7 +1729,7 @@ Monster063Table:                        ;Rouge Gazer (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1482,7 +1752,7 @@ Monster064Table:                        ;Glacierling (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1505,7 +1775,7 @@ Monster065Table:                        ;Floatwing (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1528,7 +1798,7 @@ Monster066Table:                        ;CrimsonPeek (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1551,7 +1821,7 @@ Monster067Table:                        ;Fernling (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1574,7 +1844,7 @@ Monster068Table:                        ;Bladezilla (Psycho World)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1597,7 +1867,7 @@ Monster069Table:                        ;Spitvine (Psycho World)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1620,7 +1890,7 @@ Monster070Table:                        ;OptiLeaper (Psycho World)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1643,7 +1913,7 @@ Monster071Table:                        ;huge boo (golvellius)
   db    64                              ;nx  
   db    64+04                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    006                             ;speed
@@ -1666,7 +1936,7 @@ Monster072Table:                        ;King Kong (king kong)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1689,7 +1959,7 @@ Monster073Table:                        ;RockGoliath (king kong)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1712,7 +1982,7 @@ Monster074Table:                        ;Stone Guard (king kong)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1735,7 +2005,7 @@ Monster075Table:                        ;LimeCritter (king kong)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1758,7 +2028,7 @@ Monster076Table:                        ;Salmon Hog (king kong)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1781,7 +2051,7 @@ Monster077Table:                        ;Swamp Goop (king kong)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1812,7 +2082,7 @@ Monster078Table:                        ;Bat (Golvellius)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1835,7 +2105,7 @@ Monster079Table:                        ;Olive Boa (Golvellius)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1858,7 +2128,7 @@ Monster080Table:                        ;SilkenLarva (Golvellius)
   db    16                              ;nx  
   db    08+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1881,7 +2151,7 @@ Monster081Table:                        ;ChocoTusker (Golvellius)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1904,7 +2174,7 @@ Monster082Table:                        ;JadeWormlet (Golvellius)
   db    16                              ;nx  
   db    08+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1927,7 +2197,7 @@ Monster083Table:                        ;Sable Raven (Golvellius)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1950,7 +2220,7 @@ Monster084Table:                        ;Headless (Golvellius)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1973,7 +2243,7 @@ Monster085Table:                        ;Seraph (Golvellius)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -1996,7 +2266,7 @@ Monster086Table:                        ;Flame Cobra (Golvellius)
   db    56                              ;nx  
   db    64+04                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    008                             ;speed
@@ -2022,7 +2292,7 @@ Monster087Table:                        ;Visage (undeadline)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2045,7 +2315,7 @@ Monster088Table:                        ;JungleBrute (undeadline)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2068,7 +2338,7 @@ Monster089Table:                        ;Lurcher (undeadline)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2093,7 +2363,7 @@ Monster090Table:                        ;Scavenger (Metal Gear)
   db    16                              ;nx  
   db    08+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2116,7 +2386,7 @@ Monster091Table:                        ;Running Man (Metal Gear)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2139,7 +2409,7 @@ Monster092Table:                        ;Trooper (Metal Gear)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2162,7 +2432,7 @@ Monster093Table:                        ;Antigas Man (Metal Gear)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2185,7 +2455,7 @@ Monster094Table:                        ;Footman (Metal Gear)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2213,7 +2483,7 @@ Monster095Table:                        ;Geld (Ys 3)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2236,7 +2506,7 @@ Monster096Table:                        ;Raddel (Ys 3)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2259,7 +2529,7 @@ Monster097Table:                        ;Bikmorl (Ys 3)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2282,7 +2552,7 @@ Monster098Table:                        ;Slime (Ys 3)
   db    16                              ;nx  
   db    08+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2305,7 +2575,7 @@ Monster099Table:                        ;Keyron (Ys 3)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2328,7 +2598,7 @@ Monster100Table:                        ;Gululmus (Ys 3)
   db    16                              ;nx  
   db    08+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2351,7 +2621,7 @@ Monster101Table:                        ;Sabre Wolf (Ys 3)
   db    48                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    003                             ;hp
   db    009                             ;speed
@@ -2378,7 +2648,7 @@ Monster102Table:                        ;Lee Young (yie ar kung fu)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2401,7 +2671,7 @@ Monster103Table:                        ;Yen Pei (braid hair) (yie ar kung fu)
   db    48                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2424,7 +2694,7 @@ Monster104Table:                        ;Lan Fang (fan thrower) (yie ar kung fu)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2447,7 +2717,7 @@ Monster105Table:                        ;Po Chin (fatty) (yie ar kung fu)
   db    48                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2470,7 +2740,7 @@ Monster106Table:                        ;Wen Hu (yie ar kung fu)
   db    48                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2493,7 +2763,7 @@ Monster107Table:                        ;Wei Chin (yie ar kung fu)
   db    48                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2516,7 +2786,7 @@ Monster108Table:                        ;Mei Ling (yie ar kung fu)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2539,7 +2809,7 @@ Monster109Table:                        ;Han Chen (bomb thrower) (yie ar kung fu
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2562,7 +2832,7 @@ Monster110Table:                        ;Li Yen (final boss) (yie ar kung fu)
   db    32                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2597,7 +2867,7 @@ Monster111Table:                        ;Queen Sora (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2620,7 +2890,7 @@ Monster112Table:                        ;King Mori (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2643,7 +2913,7 @@ Monster113Table:                        ;Knight Yama (mongolface) (akanbe dragon
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2666,7 +2936,7 @@ Monster114Table:                        ;Bishop Mori (monkey) (akanbe dragon)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2689,7 +2959,7 @@ Monster115Table:                        ;B. Heichi (rhino) (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2712,7 +2982,7 @@ Monster116Table:                        ;Roke Mizu (zebra) (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2735,7 +3005,7 @@ Monster117Table:                        ;Porn Mizu (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2758,7 +3028,7 @@ Monster118Table:                        ;Roke Yama (kangaroo) (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2781,7 +3051,7 @@ Monster119Table:                        ;Porn Heichi (eliphant) (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2804,7 +3074,7 @@ Monster120Table:                        ;Yama Knight (bushman) (akanbe dragon)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2827,7 +3097,7 @@ Monster121Table:                        ;Queen (endboss) (akanbe dragon)
   db    48                              ;nx  
   db    56+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2850,7 +3120,7 @@ Monster122Table:                        ;Spooky (Spooky)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2873,7 +3143,7 @@ Monster123Table:                        ;Ghosty (spooky)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2896,7 +3166,7 @@ Monster124Table:                        ;KuGyoku Den (legendly 9 gems)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2919,7 +3189,7 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2942,7 +3212,7 @@ Monster126Table:                        ;sofia
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2965,7 +3235,7 @@ Monster127Table:                        ;Rastan (rastan saga)
   db    32                              ;nx  
   db    38+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -2988,7 +3258,7 @@ Monster128Table:                        ;BlasterBot
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3011,7 +3281,7 @@ Monster129Table:                        ;Screech
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3034,7 +3304,7 @@ Monster130Table:                        ;Schaefer
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3057,7 +3327,7 @@ Monster131Table:                        ;Jon Sparkle (malaya no hihou)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3080,7 +3350,7 @@ Monster132Table:                        ;Monmon (mon mon monster)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3103,7 +3373,7 @@ Monster133Table:                        ;Cob Crusher (mon mon monster)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3126,7 +3396,7 @@ Monster134Table:                        ;Limb Linger (mon mon monster)
   db    16                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3149,7 +3419,7 @@ Monster135Table:                        ;deva (deva)
   db    32                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3172,7 +3442,7 @@ Monster136Table:                        ;Spectroll (deva)
   db    16                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3195,7 +3465,7 @@ Monster137Table:                        ;Yurei Kage (deva)
   db    32                              ;nx  
   db    48+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3218,7 +3488,7 @@ Monster138Table:                        ;Blob (usas2)
   db    48                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3241,7 +3511,7 @@ Monster139Table:                        ;Emir Mystic (usas2)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3264,7 +3534,7 @@ Monster140Table:                        ;duncan seven (core dump)
   db    32                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3287,7 +3557,7 @@ Monster141Table:                        ;Monstrilla (core dump)
   db    64                              ;nx  
   db    64+04                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3310,7 +3580,7 @@ Monster142Table:                        ;Biolumia (core dump)
   db    32                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3333,7 +3603,7 @@ Monster143Table:                        ;Anna Lee (cabage patch kids)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3356,7 +3626,7 @@ Monster144Table:                        ;Pastry Chef (comic bakery)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3379,7 +3649,7 @@ Monster145Table:                        ;Indy Brave (magical tree)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3402,7 +3672,7 @@ Monster146Table:                        ;Red Lupin (arsene lupin)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3425,7 +3695,7 @@ Monster147Table:                        ;Green Lupin (arsene lupin)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3448,7 +3718,7 @@ Monster148Table:                        ;Major Mirth (arsene lupin)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3471,7 +3741,7 @@ Monster149Table:                        ;Vic Viper (kings valley 2)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3494,7 +3764,7 @@ Monster150Table:                        ;Rock Roll (kings valley 2)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3517,7 +3787,7 @@ Monster151Table:                        ;Slouman (kings valley 2)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3540,7 +3810,7 @@ Monster152Table:                        ;Pyoncy (kings valley 2)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    050                             ;hp
   db    011                             ;speed
@@ -3569,7 +3839,7 @@ Monster153Table:                        ;Andorogynus (Andorogynus)
   db    16                              ;nx  
   db    40+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3592,7 +3862,7 @@ Monster154Table:                        ;Thexder (Thexder)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3615,7 +3885,7 @@ Monster155Table:                        ;BounceBot (Thexder)
   db    16                              ;nx  
   db    16+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3638,7 +3908,7 @@ Monster156Table:                        ;ColossalBot (Thexder)
   db    32                              ;nx  
   db    24+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
@@ -3661,7 +3931,7 @@ Monster157Table:                        ;SuperRunner (SuperRunner)
   db    16                              ;nx  
   db    32+08                           ;ny
   db    004                             ;cost (gold)
-  db    001                             ;cost (gems)
+  db    001+Level1Unit                  ;cost (gems)
   db    000                             ;cost (rubies)
   db    053                             ;hp
   db    011                             ;speed
