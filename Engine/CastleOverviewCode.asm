@@ -758,6 +758,7 @@ SetAvailableRecruitArmy:
   pop   bc
 
   ld    a,(PutLetter+dx)                ;dx of text that was just put
+  add   a,3
   ld    b,a
   pop   hl                              ;pop amount
   call  SetNumber16BitCastle
@@ -918,6 +919,15 @@ SetDefenseSelectedCreatureInHL:
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
+SetGrowthSelectedCreatureInHL:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  ld    h,0
+  ld    l,(ix+MonsterTableGrowth)
+
+  ;now set engine back in page 1+2 in rom
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
 
 SetMonsterTableInIXCastleOverview:      ;in: a=creature nr
   ld    h,0
@@ -1338,6 +1348,7 @@ EndTurn:
   ld    hl,(Date)
   inc   hl
   ld    (Date),hl
+  call  AddCreaturesToPools             ;At start of player 1's turn first day of the week, add all creatures to all castles
   call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
   call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
   call  ClearAlreadyBuiltThisTurnCastles;At start of player 1's turn, clear all these bytes
@@ -1350,6 +1361,107 @@ EndTurn:
   call  ActivateFirstActiveHeroForCurrentPlayer
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
+  ret
+
+AddCreaturesToPools:
+  ;set day
+  ld    bc,(Date)
+  ld    de,7                            ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,h                             ;day 1 is when hl=0
+  or    l
+  ret   nz
+
+  ld    ix,Castle1
+  call  .AddCreatures
+  ld    ix,Castle2
+  call  .AddCreatures
+  ld    ix,Castle3
+  call  .AddCreatures
+  ld    ix,Castle4
+  call  .AddCreatures
+  ret
+  
+  .AddCreatures:
+  ld    a,(ix+CastleBarracksLevel)
+  or    a
+  ret   z
+  dec   a
+  jp    z,.BarracksLevel1
+  dec   a
+  jp    z,.BarracksLevel2
+  dec   a
+  jp    z,.BarracksLevel3
+  dec   a
+  jp    z,.BarracksLevel4
+  dec   a
+  jp    z,.BarracksLevel5
+
+  .BarracksLevel6:
+  ld    a,(ix+CastleLevel6Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel6UnitsAvail)
+  ld    d,(ix+CastleLevel6UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel6UnitsAvail),l
+  ld    (ix+CastleLevel6UnitsAvail+1),h
+
+  .BarracksLevel5:
+  ld    a,(ix+CastleLevel5Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel5UnitsAvail)
+  ld    d,(ix+CastleLevel5UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel5UnitsAvail),l
+  ld    (ix+CastleLevel5UnitsAvail+1),h
+
+  .BarracksLevel4:
+  ld    a,(ix+CastleLevel4Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel4UnitsAvail)
+  ld    d,(ix+CastleLevel4UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel4UnitsAvail),l
+  ld    (ix+CastleLevel4UnitsAvail+1),h
+
+  .BarracksLevel3:
+  ld    a,(ix+CastleLevel3Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel3UnitsAvail)
+  ld    d,(ix+CastleLevel3UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel3UnitsAvail),l
+  ld    (ix+CastleLevel3UnitsAvail+1),h
+
+  .BarracksLevel2:
+  ld    a,(ix+CastleLevel2Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel2UnitsAvail)
+  ld    d,(ix+CastleLevel2UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel2UnitsAvail),l
+  ld    (ix+CastleLevel2UnitsAvail+1),h
+
+  .BarracksLevel1:
+  ld    a,(ix+CastleLevel1Units)
+  push  ix
+  call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  pop   ix
+  ld    e,(ix+CastleLevel1UnitsAvail)
+  ld    d,(ix+CastleLevel1UnitsAvail+1)
+  add   hl,de
+  ld    (ix+CastleLevel1UnitsAvail),l
+  ld    (ix+CastleLevel1UnitsAvail+1),h
   ret
 
 SetManaAndMovementToMax:
@@ -4500,7 +4612,7 @@ SetPlayerStartTurnText:
   ld    de,7                            ;divide the days by 7, the rest is the day of the week
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
   inc   hl                              ;1-7
-  ld    b,069+00                        ;dx
+  ld    b,069+04                        ;dx
   ld    c,053+00                        ;dy
   call  SetNumber16BitCastle
 
@@ -4514,14 +4626,14 @@ SetPlayerStartTurnText:
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
   push  bc                              ;months
   inc   hl
-  ld    b,104+00                        ;dx
+  ld    b,104+04                        ;dx
   ld    c,053+00                        ;dy
   call  SetNumber16BitCastle
 
   ;set month
   pop   hl
   inc   hl
-  ld    b,142+00                        ;dx
+  ld    b,142+04                        ;dx
   ld    c,053+00                        ;dy
   call  SetNumber16BitCastle
 
@@ -4533,7 +4645,7 @@ SetPlayerStartTurnText:
 	ld		a,(whichplayernowplaying?)
 	ld    h,0
 	ld    l,a
-  ld    b,095+00                        ;dx
+  ld    b,095+06                        ;dx
   ld    c,091+00                        ;dy
   call  SetNumber16BitCastle
   ret

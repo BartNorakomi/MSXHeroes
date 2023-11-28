@@ -12,15 +12,15 @@ HeroOverViewFirstWindowchoicesSX:   equ 000
 HeroOverViewFirstWindowchoicesSY:   equ 000
 HeroOverViewFirstWindowchoicesDX:   equ 058 - 05
 HeroOverViewFirstWindowchoicesDY:   equ 037
-HeroOverViewFirstWindowchoicesNX:   equ 088 + 10
+HeroOverViewFirstWindowchoicesNX:   equ 106
 HeroOverViewFirstWindowchoicesNY:   equ 122
 
 HeroOverViewFirstWindowButtonNY:  equ 011
-HeroOverViewFirstWindowButtonNX:  equ 072 + 10
+HeroOverViewFirstWindowButtonNX:  equ 090
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-HeroOverViewSkillsWindowSX:   equ 088 + 10
+HeroOverViewSkillsWindowSX:   equ 106
 HeroOverViewSkillsWindowSY:   equ 000
 HeroOverViewSkillsWindowDX:   equ 030
 HeroOverViewSkillsWindowDY:   equ 025

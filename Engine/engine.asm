@@ -4915,7 +4915,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
 .Inventory: db  003,005,014,015,045,029,030,037,042,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesDruid
+.HeroSpecificInfo: dw HeroAddressesDrPettrovich
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -4945,7 +4945,7 @@ Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesArmoredSnatcher
+.HeroSpecificInfo: dw HeroAddressesKelesisTheCook
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero3y:		db	01	                ;
@@ -4968,7 +4968,7 @@ Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesRandomHajile
+.HeroSpecificInfo: dw HeroAddressesBensonCunningham
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero4y:		db	00		                ;
@@ -5115,7 +5115,7 @@ Pl2Hero1Units:  db 165 | dw 001 |      db 166 | dw 001 |      db 167 | dw 001 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesSnatcher
+.HeroSpecificInfo: dw HeroAddressesArmoredSnatcher
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl2hero2y:		ds  lenghtherotable,255
@@ -5246,7 +5246,7 @@ LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
@@ -5258,7 +5258,7 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  037,012,013,014,015,016,017,018,000,000
+db 255 | TavernHeroesPlayer1:        db  031,043,058,014,015,016,017,018,000,000
 db 255 | TavernHeroesPlayer2:        db  007,008,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000

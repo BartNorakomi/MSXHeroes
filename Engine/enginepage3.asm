@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 0
+StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
 
 InitiateGame:
@@ -716,11 +716,11 @@ LoadCastleOverview:
 TextNumber: ;ds  10
 db  "31456",255
 
-HeroOverViewFirstWindowButtonOffSX:           equ 008
+HeroOverViewFirstWindowButtonOffSX:           equ 000
 HeroOverViewFirstWindowButtonOffSY:           equ 122
-HeroOverViewFirstWindowButtonMouseOverSX:     equ 008
+HeroOverViewFirstWindowButtonMouseOverSX:     equ 000
 HeroOverViewFirstWindowButtonMouseOverSY:     equ 133
-HeroOverViewFirstWindowButtonMouseClickedSX:  equ 008
+HeroOverViewFirstWindowButtonMouseClickedSX:  equ 000
 HeroOverViewFirstWindowButtonMouseClickedSY:  equ 144
 
 HeroOverViewFirstWindowButton1DX:   equ HeroOverViewFirstWindowchoicesDX + 008
@@ -3159,7 +3159,7 @@ HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Necromancer ",255,U
 HeroAddressesLoganSerios:     db "Logan Serios",255,"     ","Knight      ",255,LoganSeriosSpriteBlock| dw HeroSYSXLoganSerios,HeroPortrait10x18SYSXLoganSerios,HeroButton20x11SYSXLoganSerios,HeroPortrait16x30SYSXLoganSerios                | db 01 | db 034 |
 HeroAddressesHollyWhite:      db "Holly White",255,"      ","Barbarian   ",255,HollyWhiteSpriteBlock| dw HeroSYSXHollyWhite,HeroPortrait10x18SYSXHollyWhite,HeroButton20x11SYSXHollyWhite,HeroPortrait16x30SYSXHollyWhite                     | db 04 | db 035 |
 HeroAddressesMercies:         db "Mercies ",255,"         ","Shieldbearer",255,MerciesSpriteBlock| dw HeroSYSXMercies,HeroPortrait10x18SYSXMercies,HeroButton20x11SYSXMercies,HeroPortrait16x30SYSXMercies                                    | db 07 | db 036 |
-HeroAddressesNatashaRomanenko:db "Natasha Romanenko",255,   "Overlord    ",255,NatashaRomanenkoSpriteBlock | dw HeroSYSXNatashaRomanenko,HeroPortrait10x18SYSXNatashaRomanenko,HeroButton20x11SYSXNatashaRomanenko,HeroPortrait16x30SYSXNatashaRomanenko   | db 10 | db 037 |
+HeroAddressesNatashaRomanenko:db "Nastasha",255,"         ","Overlord    ",255,NatashaRomanenkoSpriteBlock | dw HeroSYSXNatashaRomanenko,HeroPortrait10x18SYSXNatashaRomanenko,HeroButton20x11SYSXNatashaRomanenko,HeroPortrait16x30SYSXNatashaRomanenko   | db 10 | db 037 |
 HeroAddressesRuth:            db "Ruth ",255,"            ","Alchemist   ",255,RuthSpriteBlock| dw HeroSYSXRuth,HeroPortrait10x18SYSXRuth,HeroButton20x11SYSXRuth,HeroPortrait16x30SYSXRuth                                                   | db 13 | db 038 |
 HeroAddressesGeera:           db "Geera",255,"            ","Sage        ",255,GeeraSpriteBlock| dw HeroSYSXGeera,HeroPortrait10x18SYSXGeera,HeroButton20x11SYSXGeera,HeroPortrait16x30SYSXGeera                                              | db 16 | db 039 |
 HeroAddressesYoungNoble:      db "Young Noble",255,"      ","Ranger      ",255,YoungNobleSpriteBlock| dw HeroSYSXYoungNoble,HeroPortrait10x18SYSXYoungNoble,HeroButton20x11SYSXYoungNoble,HeroPortrait16x30SYSXYoungNoble                     | db 19 | db 040 |
