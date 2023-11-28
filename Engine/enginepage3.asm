@@ -43,10 +43,7 @@ StartGame:
   call  DoCopy
 ;  call  OneTimeCharAndColorSprites
 
-;  ld    hl,Castle1
-;  ld    (WhichCastleIsPointerPointingAt?),hl
-;  ld    a,1
-;  ld    (EnterCastle?),a
+;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine

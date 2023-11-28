@@ -111,7 +111,6 @@ SetSpellExplanation_Earth.TextDamage: equ 0600Ah ; last def. pass 3
 SetTextInButton.NextLine: equ 0684Ch ; last def. pass 3
 UsasUnitLevel1HP: equ 08h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button12XLeft: equ 0CBh ; last def. pass 3
-SetAvailableRecruitArmy.SetSpeed: equ 0475Dh ; last def. pass 3
 SetButtonStatusAndText: equ 06753h ; last def. pass 3
 LIdle1Monster029: equ 067E8h ; last def. pass 3
 ContraGroupBUnitLevel1Defense: equ 05h ; last def. pass 3
@@ -1719,6 +1718,7 @@ Monster021AttackPatternLeftUp: equ 09C96h ; last def. pass 3
 Monster3.SYSXinROM: equ 0C3CEh ; last def. pass 3
 SwiftbladeAttack: equ 03h ; last def. pass 3
 CurrentActiveMonster: equ 0C38Ah ; last def. pass 3
+SetHPSelectedCreatureInHL: equ 04A69h ; last def. pass 3
 CheckEndHeroOverviewStatus.NotOverHeroOverViewStatusWindow: equ 0652Dh ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button5XRight: equ 05Bh ; last def. pass 3
 ContraGroupBUnitLevel6CostGems: equ 0A0h ; last def. pass 3
@@ -3098,7 +3098,6 @@ HeroOverViewInventoryIconButton3MouseOverSX: equ 092h ; last def. pass 3
 UsasUnitLevel1Speed: equ 06h ; last def. pass 3
 RIdle3Monster163: equ 0B3A0h ; last def. pass 3
 InventoryItem40ButtonOffSY: equ 0ECh ; last def. pass 3
-SetSpeedSelectedCreatureInHL: equ 04A69h ; last def. pass 3
 CheckEndHeroOverviewInventory.NotOverHeroOverViewInventoryWindow: equ 064EFh ; last def. pass 3
 GenericButtonTable3.Button2XLeft: equ 0CEh ; last def. pass 3
 RAttack1Monster049: equ 0AF90h ; last def. pass 3
@@ -3554,6 +3553,7 @@ YieArKungFuUnitLevel6Defense: equ 0Fh ; last def. pass 3
 Monster133Idle: equ 0ACF7h ; last def. pass 3
 HeroPortrait14x9SYSXRandomHajile: equ 04D0Eh ; last def. pass 3
 SetNumber16Bit.Check1Fold: equ 06455h ; last def. pass 3
+SetAvailableRecruitArmy.SetHP: equ 0475Dh ; last def. pass 3
 TradingHeroesButtonTable.Button7Ytop: equ 028h ; last def. pass 3
 InventoryItem06MouseOverSX: equ 0A6h ; last def. pass 3
 HeroOverViewSpellIconButton14MouseOverSX: equ 030h ; last def. pass 3
@@ -3719,7 +3719,6 @@ CheckButtonMouseInteractionCastleMainScreen.buttonIsStillLit: equ 0B272h ; last 
 HeroPortrait14x9SYSXGeera: equ 0488Eh ; last def. pass 3
 Monster057Idle: equ 0A02Eh ; last def. pass 3
 sprite0tgs: equ 026F1h ; last def. pass 3
-SetAvailableRecruitArmy.speed: equ 04720h ; last def. pass 3
 HeroPortrait16x30SYSXHoMei: equ 0ACA0h ; last def. pass 3
 HeroOverViewSpellIconButton18MouseOverSX: equ 0B0h ; last def. pass 3
 RIdle2Monster041: equ 0AFD0h ; last def. pass 3
@@ -6468,6 +6467,7 @@ DescriptionRobe3: equ 051FAh ; last def. pass 3
 TextQuickTip3: equ 0665Bh ; last def. pass 3
 GreenBuildButton: equ 03FCBh ; last def. pass 3
 PopulateKeyMatrix.Loop: equ 017A0h ; last def. pass 3
+SetAvailableRecruitArmy.HP: equ 04720h ; last def. pass 3
 HeroSYSXDrPettrovich: equ 06FA0h ; last def. pass 3
 Level1Unit: equ 00h ; last def. pass 3
 InventoryItem30ButtonOffSY: equ 0C4h ; last def. pass 3

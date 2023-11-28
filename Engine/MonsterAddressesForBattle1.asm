@@ -419,7 +419,7 @@ Monster017Table:                        ;super mighta ghoul (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel5Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel5Growth          ;growth
   db    000                             ;special ability
-  db    "SuperMighta",255
+  db    "Supermighta",255
 
 
 
@@ -3911,7 +3911,7 @@ Monster166Table:                        ;HikoDrone (space manbow)
   db    012                             ;defense
   db    012                             ;growth
   db    000                             ;special ability
-  db    "HikoDrone",255,"  "
+  db    "Hikodrone",255,"  "
 
 Monster167Table:                        ;Wonder Boy (Wonder Boy)
   dw    Monster167Idle

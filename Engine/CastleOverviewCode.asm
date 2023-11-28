@@ -269,9 +269,9 @@ SetAvailableRecruitArmy:
   call  .cost
   call  .Gemscost
   call  .Rubiescost
-  call  .speed
-  call  .defense
   call  .attack
+  call  .defense
+  call  .HP
   call  .SetBrownRecruitBarIf0UnitsAvailable
   call  .SetInactiveWindowIfUnavailable
   ret
@@ -541,33 +541,33 @@ SetAvailableRecruitArmy:
 
   .attack:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-10                        ;dx
-  ld    c,054                           ;dy
+  ld    b,083-14                        ;dx
+  ld    c,038                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-10                        ;dx
-  ld    c,054                           ;dy
+  ld    b,167-14                        ;dx
+  ld    c,038                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-10                        ;dx
-  ld    c,054                           ;dy
+  ld    b,251-14                        ;dx
+  ld    c,038                           ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-10                        ;dx
-  ld    c,054+56                        ;dy
+  ld    b,083-14                        ;dx
+  ld    c,038+56                        ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-10                        ;dx
-  ld    c,054+56                        ;dy
+  ld    b,167-14                        ;dx
+  ld    c,038+56                        ;dy
   call  .SetAttack
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-10                        ;dx
-  ld    c,054+56                        ;dy
+  ld    b,251-14                        ;dx
+  ld    c,038+56                        ;dy
   call  .SetAttack  
   ret
 
@@ -578,32 +578,32 @@ SetAvailableRecruitArmy:
   
   .defense:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-10                        ;dx
+  ld    b,083-14                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-10                        ;dx
+  ld    b,167-14                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-10                        ;dx
+  ld    b,251-14                        ;dx
   ld    c,047                           ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-10                        ;dx
+  ld    b,083-14                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-10                        ;dx
+  ld    b,167-14                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-10                        ;dx
+  ld    b,251-14                        ;dx
   ld    c,047+56                        ;dy
   call  .SetDefense  
   ret
@@ -613,40 +613,40 @@ SetAvailableRecruitArmy:
   call  SetNumber16BitCastle
   ret
 
-  .speed:
+  .HP:
   ld    a,(iy+CastleLevel1Units+00)
-  ld    b,083-10                        ;dx
-  ld    c,040                           ;dy
-  call  .SetSpeed
+  ld    b,083-14                        ;dx
+  ld    c,056                           ;dy
+  call  .SetHP
 
   ld    a,(iy+CastleLevel1Units+01)
-  ld    b,167-10                        ;dx
-  ld    c,040                           ;dy
-  call  .SetSpeed
+  ld    b,167-14                        ;dx
+  ld    c,056                           ;dy
+  call  .SetHP
 
   ld    a,(iy+CastleLevel1Units+02)
-  ld    b,251-10                        ;dx
-  ld    c,040                           ;dy
-  call  .SetSpeed
+  ld    b,251-14                        ;dx
+  ld    c,056                           ;dy
+  call  .SetHP
 
   ld    a,(iy+CastleLevel1Units+03)
-  ld    b,083-10                        ;dx
-  ld    c,040+56                        ;dy
-  call  .SetSpeed
+  ld    b,083-14                        ;dx
+  ld    c,056+56                        ;dy
+  call  .SetHP
 
   ld    a,(iy+CastleLevel1Units+04)
-  ld    b,167-10                        ;dx
-  ld    c,040+56                        ;dy
-  call  .SetSpeed
+  ld    b,167-14                        ;dx
+  ld    c,056+56                        ;dy
+  call  .SetHP
 
   ld    a,(iy+CastleLevel1Units+05)
-  ld    b,251-10                        ;dx
-  ld    c,040+56                        ;dy
-  call  .SetSpeed  
+  ld    b,251-14                        ;dx
+  ld    c,056+56                        ;dy
+  call  .SetHP  
   ret
 
-  .SetSpeed:
-  call  SetSpeedSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
+  .SetHP:
+  call  SetHPSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   call  SetNumber16BitCastle
   ret
   
@@ -888,10 +888,10 @@ SetRubiesCostSelectedCreatureInHL:
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
-SetSpeedSelectedCreatureInHL:
+SetHPSelectedCreatureInHL:
   call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
   ld    h,0
-  ld    l,(ix+MonsterTableSpeed)
+  ld    l,(ix+MonsterTableHp)
 
   ;now set engine back in page 1+2 in rom
   ld    a,CastleOverviewCodeBlock       ;Map block
