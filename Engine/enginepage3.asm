@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 1
+StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 
 InitiateGame:
@@ -13,12 +13,12 @@ InitiateGame:
   ld    (CurrentCursorSpriteCharacter),hl
   call  SpriteInitialize                ;set color, attr and char addresses
 
-;  ld    a,2
-;  ld    (PlayerThatGetsAttacked),a
-;  ld    hl,pl2hero1y
+  ld    a,2
+  ld    (PlayerThatGetsAttacked),a
+  ld    hl,pl2hero1y
 ;ld hl,0
-;  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
-;  ld    a,1
+  ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
+  ld    a,1
 ;  ld    (EnterCombat?),a
 
 StartGame:
@@ -81,12 +81,12 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   ld    (AddressToWriteTo),de
   call  CopyRamToVramCorrectedCastleOverview.AddressesSet
 
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  pop   af
-  out   ($a8),a                         ;reset rom/ram settings of page 1+2
   ret
 
 
@@ -110,12 +110,13 @@ CopyRamToVramCorrectedCastleOverview:
 
   call  .go                             ;go copy
 
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  pop   af
-  out   ($a8),a                         ;reset rom/ram settings of page 1+2
 ei
   ret
 
@@ -180,12 +181,13 @@ CopyRamToVramPage3ForBattleEngine:
 
   call  .go                             ;go copy
 
+  pop   af
+  out   ($a8),a                         ;reset rom/ram settings of page 1+2
+
 ;now set engine back in page 1+2 in rom
 	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-  pop   af
-  out   ($a8),a                         ;reset rom/ram settings of page 1+2
   ei
   ret
 
@@ -278,11 +280,13 @@ MovementLenghtMonsters: equ 8
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16)
+;  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
   db  002 | dw 500 | db 012 + (16*08), 056 + (01*16)
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
   db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
-  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
+  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16)
+;  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
 
   db  001 | dw 001 | db 012 + (25*08), 056 + (00*16)
   db  000 | dw 000 | db 012 + (24*08), 056 + (01*16)

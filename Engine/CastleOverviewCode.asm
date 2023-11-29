@@ -1909,6 +1909,12 @@ SetAdditionalStatFromInventoryItemsInHL:
   ld    a,(de)                          ;amount of damage this item provides
   push  bc
   ld    b,0
+
+  or    a
+  jp    p,.positive
+  dec   b
+  .positive:
+
   ld    c,a
   add   hl,bc
   pop   bc
@@ -2137,6 +2143,118 @@ ItemAttackPointsTable:
   db    0
   db    0
   db    0
+
+ItemUnitSpeedPointsTable:
+;sword (0)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    SwiftbladeUnitSpeed;(+1)
+;armor (5)
+  db    RegaliaDiPlebUnitSpeed;(+1)
+  db    0
+  db    TheJuggernautUnitSpeed;(-1)
+  db    0
+  db    0
+;shield (10)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;helmet (15)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    PikemensHelmetUnitSpeed;(+1)
+;boots (20)
+  db    ShadowTramperUnitSpeed;(+2)
+  db    0
+  db    0
+  db    0
+  db    SturdyBootsUnitSpeed;(+3)
+;gloves (25)
+  db    0
+  db    IronHandUnitSpeed;(-1)
+  db    0
+  db    0
+  db    0
+;ring (30)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;robe (40)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+
+ItemUnitHpPointsTable:
+;sword (0)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;armor (5)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    CaesarsChestplateUnitHp;(+2)
+;shield (10)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;helmet (15)
+  db    0
+  db    0
+  db    0
+  db    TheViridescentUnitHp;(+3)
+  db    0
+;boots (20)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;gloves (25)
+  db    0
+  db    0
+  db    ElkSkinGlovesUnitHp;(+2)
+  db    0
+  db    0
+;ring (30)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;neclace (35)
+  db    0
+  db    0
+  db    0
+  db    0
+  db    0
+;robe (40)
+  db    0
+  db    0
+  db    0
+  db    RuralVestUnitHp;(+3)
+  db    LabcoatUnitHp;(-2)
 
 
 SetHeroPortrait10x18:
@@ -3865,13 +3983,13 @@ SkillTextOffenceExpert:
                           db  "Offence     ",255
 SkillTextArmourerBasic:
                           db  "Basic       ",254   ;SkillTextnr# 007
-                          db  "Armourer    ",255
+                          db  "Armorer     ",255
 SkillTextArmourerAdvanced:
                           db  "Advanced    ",254
-                          db  "Armourer    ",255
+                          db  "Armorer     ",255
 SkillTextArmourerExpert:
                           db  "Expert      ",254
-                          db  "Armourer    ",255
+                          db  "Armorer     ",255
 SkillTextresistanceBasic:
                           db  "Basic       ",254   ;SkillTextnr# 010
                           db  "Resistance  ",255

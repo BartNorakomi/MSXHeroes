@@ -127,6 +127,10 @@ vblank:
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
 
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
 
@@ -149,7 +153,11 @@ vblank:
 
   pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
-
+  pop   af
+	ld		($7000),a                       ;recall block 2 setting
+  pop   af
+	ld		($6000),a                       ;recall block 1 setting
+ 
 	call	putsprite                       ;out spat data
 
   ld    a,(vblankintflag)
@@ -1218,11 +1226,12 @@ EnterTradeMenuBetween2FriendlyHeroes:
 EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters:
   ld    (.SelfModifyingCodeRoutine),hl
 
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
-
-	ld		a,(memblocks.1)                 ;save page 1+2 block settings
-	push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
   out   ($a8),a
@@ -1234,20 +1243,22 @@ EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters:
   call  $ffff
 
   pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-  pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
+  pop   af
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
 EnterSpecificRoutineHeroOverviewCode:
   ld    (.SelfModifyingCodeRoutine),hl
 
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
-
-	ld		a,(memblocks.1)                 ;save page 1+2 block settings
-	push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
   out   ($a8),a
@@ -1256,13 +1267,14 @@ EnterSpecificRoutineHeroOverviewCode:
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   .SelfModifyingCodeRoutine:	equ	$+1
-  call  HudCode
-
-  pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  $ffff
 
   pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
+  pop   af
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom    
 
   xor   a
   ld    (vblankintflag),a
@@ -1275,11 +1287,12 @@ EnterSpecificRoutineHeroOverviewCode:
 EnterSpecificRoutineInCastleOverviewCode:
   ld    (.SelfModifyingCodeRoutine),hl
 
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
-
-	ld		a,(memblocks.1)                 ;save page 1+2 block settings
-	push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
   out   ($a8),a
@@ -1288,13 +1301,14 @@ EnterSpecificRoutineInCastleOverviewCode:
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   .SelfModifyingCodeRoutine:	equ	$+1
-  call  HudCode
-
-  pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  $ffff
 
   pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
+  pop   af
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom    
 
   xor   a
   ld    (vblankintflag),a
@@ -1307,11 +1321,12 @@ EnterSpecificRoutineInCastleOverviewCode:
 EnterSpecificRoutineInBattleCode:
   ld    (.SelfModifyingCodeRoutine),hl
 
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
-
-	ld		a,(memblocks.1)                 ;save page 1+2 block settings
-	push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
   out   ($a8),a
@@ -1320,13 +1335,14 @@ EnterSpecificRoutineInBattleCode:
   call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   .SelfModifyingCodeRoutine:	equ	$+1
-  call  HudCode
-
-  pop   af
-  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  $ffff
 
   pop   af
   out   ($a8),a                         ;restore ram/rom page settings     
+  pop   af
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom    
 
   xor   a
   ld    (vblankintflag),a
@@ -3677,6 +3693,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   jr    z,.Battle
 
   .Battle:
+  ld    a,BattleCodeBlock
+	ld		($6000),a                       ;set battle code block for explosion and projectile routines
+
   ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   or    a
   call  nz,HandleExplosionSprite
@@ -4901,7 +4920,7 @@ pl1hero1move:	db	20,20
 pl1hero1mana:	dw	99,20
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db 047 | dw 001 |      db 164 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -4914,7 +4933,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  003,005,014,015,045,029,030,037,042,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrPettrovich
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -4944,7 +4963,7 @@ Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .AirSpells:         db  %0000 0000
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
-.Inventory: db  004,009,014,019,024,029,034,039,044,  016,027,033,043,038,039;9 body slots and 6 open slots
+.Inventory: db  045,045,045,045,045,045,045,045,044,  016,027,033,043,038,039;9 body slots and 6 open slots
 .HeroSpecificInfo: dw HeroAddressesKelesisTheCook
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -5102,11 +5121,11 @@ pl2hero1move:	db	03,20
 pl2hero1mana:	dw	03,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db 165 | dw 001 |      db 166 | dw 001 |      db 167 | dw 001 |      db 168 | dw 001 |      db 169 | dw 001 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
-.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
+Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+.HeroStatAttack:  db 2
+.HeroStatDefense:  db 3
+.HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 5  ;amount of spell damage
 .HeroSkills:  db  33,10,1,0,0,17
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells

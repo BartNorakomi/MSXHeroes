@@ -1507,8 +1507,13 @@ CalculateXpGainedLeftPlayer:
 
   push  hl                              ;hl->amount of units died
   call  SetMonsterTableInIY             ;in x->Monster1.. table, out: 
-  ld    d,0
-  ld    e,(iy+MonsterTableHp)           ;de->hp per unit
+
+  call  SetTotalMonsterHPInHL           ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  push  hl
+  pop   de
+
+;  ld    d,0
+;  ld    e,(iy+MonsterTableHp)           ;de->hp per unit
   pop   hl
 
   call  MultiplyHlWithDE                ;Out: HL = result  
@@ -2076,7 +2081,7 @@ CheckRightClickToDisplayInfo:
 
   ;set hp
   pop   af                              ;y window
-  add   a,47
+  add   a,48
   ld    c,a                             ;dy
   pop   af                              ;x window
   add   a,41
@@ -2099,46 +2104,46 @@ CheckRightClickToDisplayInfo:
   call  SetMonsterTableInIY
 
   ;set total hp
+  call  SetTotalMonsterHPInHL           ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+
   ld    a,(PutLetter+dy)                ;dx of letter we just put
   ld    c,a                             ;dy
   ld    a,(PutLetter+dx)                ;dx of letter we just put
   ld    b,a                             ;dx
 
-  ld    h,0
-  ld    l,(iy+MonsterTableHp)
   call  SetNumber16BitCastle
 
   ;set speed
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+
   pop   bc
   ld    a,c                             ;dy
   sub   a,9
   ld    c,a                             ;dy
   push  bc
 
-  ld    hl,0
-  ld    l,(iy+MonsterTableSpeed)
   call  SetNumber16BitCastle
 
   ;set defense
+  call  SetTotalMonsterDefenseInHL      ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
+
   pop   bc
   ld    a,c                             ;dy
   sub   a,10
   ld    c,a                             ;dy
   push  bc
 
-  ld    hl,0
-  ld    l,(iy+MonsterTableDefense)
   call  SetNumber16BitCastle
 
   ;set attack
+  call  SetTotalMonsterAttackInHL       ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
+
   pop   bc
   ld    a,c                             ;dy
   sub   a,9
   ld    c,a                             ;dy
   push  bc
 
-  ld    hl,0
-  ld    l,(iy+MonsterTableAttack)
   call  SetNumber16BitCastle
 
   ;set name
@@ -2193,11 +2198,121 @@ CheckRightClickToDisplayInfo:
                 dw $4000+(230*128)+(00/2)-128, $4000+(230*128)+(14/2)-128, $4000+(230*128)+(28/2)-128, $4000+(230*128)+(42/2)-128, $4000+(230*128)+(56/2)-128, $4000+(230*128)+(70/2)-128, $4000+(230*128)+(84/2)-128, $4000+(230*128)+(98/2)-128, $4000+(230*128)+(112/2)-128, $4000+(230*128)+(126/2)-128, $4000+(230*128)+(140/2)-128, $4000+(230*128)+(154/2)-128, $4000+(230*128)+(168/2)-128, $4000+(230*128)+(182/2)-128, $4000+(230*128)+(196/2)-128, $4000+(230*128)+(210/2)-128, $4000+(230*128)+(224/2)-128, $4000+(230*128)+(238/2)-128
 
 
+SetTotalMonsterHPInHL:  ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  push  ix
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    a,l
+  or    h
+  jr    nz,.HeroFound                   ;check if this is a neutral enemy
+  ld    hl,0                            ;if defender is neutral monster, speed boost=0
+  jr    .endAddSpeed
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
 
+  ld    de,ItemUnitHpPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  .endAddSpeed:
+  pop   ix
 
+  ld    d,0
+  ld    e,(iy+MonsterTableHp)
+  add   hl,de                           ;add additional hp from inventory items
+  ret
 
+SetTotalMonsterSpeedInHL: ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  push  ix
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    a,l
+  or    h
+  jr    nz,.HeroFound                   ;check if this is a neutral enemy
+  ld    hl,0                            ;if defender is neutral monster, speed boost=0
+  jr    .endAddSpeed
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
 
+  ld    de,ItemUnitSpeedPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  .endAddSpeed:
+  pop   ix
 
+  ld    d,0
+  ld    e,(iy+MonsterTableSpeed)
+  add   hl,de                           ;add additional speed from inventory items
+  ret
+
+SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
+  push  ix
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    a,l
+  or    h
+  jr    nz,.HeroFound                   ;check if this is a neutral enemy
+  ld    hl,0                            ;if defender is neutral monster, speed boost=0
+  jr    .endAddSpeed
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
+
+  ld    de,ItemDefencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  .endAddSpeed:
+  pop   ix
+
+  ld    d,0
+  ld    e,(iy+MonsterTableDefense)
+  add   hl,de                           ;add additional speed from inventory items
+  ret
+
+SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
+  push  ix
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    a,l
+  or    h
+  jr    nz,.HeroFound                   ;check if this is a neutral enemy
+  ld    hl,0                            ;if defender is neutral monster, speed boost=0
+  jr    .endAddSpeed
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
+
+  ld    de,ItemAttackPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  .endAddSpeed:
+  pop   ix
+
+  ld    d,0
+  ld    e,(iy+MonsterTableAttack)
+  add   hl,de                           ;add additional speed from inventory items
+  ret
 
 CheckPointerOnDefendingHero:
   ld    a,(spat)
@@ -2238,15 +2353,23 @@ CheckPointerOnDefendingHero:
 
   ;set attack
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
-  ld    h,0
-  ld    l,(ix+HeroStatAttack)
+  ld    de,ItemAttackPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  ld    e,(ix+HeroStatAttack)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,060+134                           ;dx
   ld    c,060                           ;dy  
   call  SetNumber16BitCastle
 
   ;set defense
-  ld    h,0
-  ld    l,(ix+HeroStatDefense)
+  ld    de,ItemDefencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  ld    e,(ix+HeroStatDefense)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,060+134                           ;dx
   ld    c,069                           ;dy  
   call  SetNumber16BitCastle
@@ -2276,8 +2399,15 @@ CheckPointerOnDefendingHero:
   call  SetNumber16BitCastle
 
   ;set spell damage
-  ld    h,0
-  ld    l,(ix+HeroStatSpellDamage)
+  ld    de,ItemSpellDamagePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatSpelldamage)
+  ld    d,0
+  add   hl,de
+
+;  ld    h,0
+;  ld    l,(ix+HeroStatSpellDamage)
   ld    b,060+134                           ;dx
   ld    c,088                           ;dy  
   call  SetNumber16BitCastle
@@ -2310,7 +2440,7 @@ CheckPointerOnAttackingHero:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
-  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
+  ld    ix,(plxcurrentheroAddress)            ;lets call this attacking
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
@@ -2326,16 +2456,24 @@ CheckPointerOnAttackingHero:
   call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;set attack
-  ld    ix,(plxcurrentheroAddress)            ;lets call this defending
-  ld    h,0
-  ld    l,(ix+HeroStatAttack)
+  ld    ix,(plxcurrentheroAddress)
+  ld    de,ItemAttackPointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  ld    e,(ix+HeroStatAttack)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,060                           ;dx
   ld    c,060                           ;dy  
   call  SetNumber16BitCastle
 
   ;set defense
-  ld    h,0
-  ld    l,(ix+HeroStatDefense)
+  ld    de,ItemDefencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  ld    e,(ix+HeroStatDefense)           ;attack
+  ld    d,0
+  add   hl,de
   ld    b,060                           ;dx
   ld    c,069                           ;dy  
   call  SetNumber16BitCastle
@@ -2365,8 +2503,15 @@ CheckPointerOnAttackingHero:
   call  SetNumber16BitCastle
 
   ;set spell damage
-  ld    h,0
-  ld    l,(ix+HeroStatSpellDamage)
+  ld    de,ItemSpellDamagePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    e,(ix+HeroStatSpelldamage)
+  ld    d,0
+  add   hl,de
+
+;  ld    h,0
+;  ld    l,(ix+HeroStatSpellDamage)
   ld    b,060                           ;dx
   ld    c,088                           ;dy  
   call  SetNumber16BitCastle
@@ -2963,10 +3108,22 @@ xor a
   ld    (CurrentActiveMonster),a
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
+
+  call  SetTotalMonsterHPInHL  ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  ld    e,l
+
   ld    b,(iy+MonsterTableSpriteSheetBlock)
   ld    c,(iy+MonsterTableNX)
   ld    d,(iy+MonsterTableNY)
-  ld    e,(iy+MonsterTableHp)
+;  ld    e,(iy+MonsterTableHp)
+
+
+
+
+
+
+
+
 
   pop   af                              ;monster number
   or    a
@@ -3463,9 +3620,14 @@ MoveMonster:
   
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle  
-  ld    d,0
-  ld    e,(iy+MonsterTableAttack)       ;attacking monster damage per unit
-  push  de
+
+  call  SetTotalMonsterAttackInHL  ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  push  hl
+
+
+;  ld    d,0
+;  ld    e,(iy+MonsterTableAttack)       ;attacking monster damage per unit
+;  push  de
   call  SetCurrentActiveMOnsterInIX
   pop   de
   ld    l,(ix+MonsterAmount)
@@ -3487,7 +3649,10 @@ MoveMonster:
 
   ld    ix,(MonsterThatIsBeingAttacked)
   call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    c,(iy+MonsterTableHp)           ;total hp of a unit of this type
+
+  call  SetTotalMonsterHPInHL  ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  ld    c,l
+;  ld    c,(iy+MonsterTableHp)           ;total hp of a unit of this type
 
   pop   hl                              ;negative total damage
 

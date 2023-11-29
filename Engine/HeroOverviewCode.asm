@@ -1348,12 +1348,12 @@ DescriptionSword4:        db  "The Butterfly",254 | ButterflyAttack: equ 1 | But
                           db  "+1",255
 
                           ;item 004
-DescriptionSword5:        db  "swiftblade",254 | SwiftbladeAttack: equ 3
+DescriptionSword5:        db  "swiftblade",254 | SwiftbladeAttack: equ 3 | SwiftbladeUnitSpeed: equ 1
                           db  "Attack + 3",254
-                          db  "unit movement speed +1",255
+                          db  "Unit movement speed +1",255
 
                           ;item 005
-DescriptionArmor1:        db  "Regalia Di Pleb",254 | RegaliaDiPlebDefence: equ 3
+DescriptionArmor1:        db  "Regalia Di Pleb",254 | RegaliaDiPlebDefence: equ 3 | RegaliaDiPlebUnitSpeed: equ 1
                           db  "Defense +3",254
                           db  "Unit movement speed +1",255
 
@@ -1362,7 +1362,7 @@ DescriptionArmor2:        db  "Young Blood's Armor",254 | YoungBloodsArmorDefenc
                           db  "Defense +4",255
 
                           ;item 007
-DescriptionArmor3:        db  "The Juggernaut",254 | TheJuggernautDefence: equ 7
+DescriptionArmor3:        db  "The Juggernaut",254 | TheJuggernautDefence: equ 7 | TheJuggernautUnitSpeed: equ -1
                           db  "Defense +7",254
                           db  "Unit movement speed - 1",255
 
@@ -1372,7 +1372,7 @@ DescriptionArmor4:        db  "Yojimbo the Ronin",254 | YojumboTheRoninDefence: 
                           db  "-25% damage from fire",255
 
                           ;item 009
-DescriptionArmor5:        db  "Caesar's Chestplate",254 | CeasarsChestplateDefence: equ 3
+DescriptionArmor5:        db  "Caesar's Chestplate",254 | CeasarsChestplateDefence: equ 3 | CaesarsChestplateUnitHp: equ 2
                           db  "Defense +3",254
                           db  "Max hp units +2",255
 
@@ -1422,18 +1422,18 @@ DescriptionHelmet3:        db  "Cerebro",254
                           db  "Intelligence +6",255 | CerebroIntelligence: equ 6
 
                           ;item 018
-DescriptionHelmet4:        db  "The Viridescent",254 | TheViridescentDefence: equ 3
+DescriptionHelmet4:        db  "The Viridescent",254 | TheViridescentDefence: equ 3 | TheViridescentUnitHp: equ 3
                           db  "Defense +3",254
                           db  "Max hp units +3",255
 
                           ;item 019
-DescriptionHelmet5:        db  "Pikemen's Helmet",254 | PikemensHelmetDefence: equ 2
+DescriptionHelmet5:        db  "Pikemen's Helmet",254 | PikemensHelmetDefence: equ 2 | PikemensHelmetUnitSpeed: equ 1
                           db  "Defense +2",254
                           db  "Unit movement speed +1",255
 
 
                           ;item 020
-DescriptionBoots1:        db  "Shadow Tramper",254
+DescriptionBoots1:        db  "Shadow Tramper",254 | ShadowTramperUnitSpeed: equ 2
                           db  "Unit movement speed +2",255
 
                           ;item 021
@@ -1451,7 +1451,7 @@ DescriptionBoots4:        db  "Knight's Night Slippers",254
                           db  "-25% damage from water",255
 
                           ;item 024
-DescriptionBoots5:        db  "Sturdy Boots",254
+DescriptionBoots5:        db  "Sturdy Boots",254 | SturdyBootsUnitSpeed: equ 3
                           db  "Unit movement speed +3",255
 
                           ;item 025
@@ -1460,12 +1460,12 @@ DescriptionGloves1:        db  "Gripfast",254
                           db  "for hero on worldmap",255
 
                           ;item 026
-DescriptionGloves2:        db  "Iron Hand",254
+DescriptionGloves2:        db  "Iron Hand",254 | IronHandUnitSpeed: equ -1
                           db  "-30% damage from air",254
-                          db  "unit movement speed -1",255
+                          db  "Unit movement speed -1",255
 
                           ;item 027
-DescriptionGloves3:        db  "Elk Skin Gloves",254
+DescriptionGloves3:        db  "Elk Skin Gloves",254 | ElkSkinGlovesUnitHp: equ 2
                           db  "Attack +2",254
                           db  "Max hp units +2",255
 
@@ -1537,13 +1537,13 @@ DescriptionRobe3:        db  "Enchanted Robe",254 | EnchantedRobeSpellPower: equ
                           db  "Spell power +4",255
 
                           ;item 043
-DescriptionRobe4:        db  "Rural Vest",254
+DescriptionRobe4:        db  "Rural Vest",254 | RuralVestUnitHp: equ 3
                           db  "Max hp units +3",255
 
                           ;item 044
-DescriptionRobe5:        db  "Labcoat",254 | LabCoatSpellPower: equ 7
+DescriptionRobe5:        db  "Labcoat",254 | LabCoatSpellPower: equ 7 | LabcoatUnitHp: equ -2
                           db  "Spell power +7",254
-                          db  "Max hp units -3",255
+                          db  "Max hp units -2",255
 
                           ;item 000
 DescriptionEmpty:        db  255
@@ -3512,7 +3512,7 @@ SetStatusTextAttack:
   ld    e,(ix+HeroStatAttack)           ;attack
   ld    d,0
   add   hl,de
-  ld    b,HeroOverViewStatusWindowDX + 056 + 004
+  ld    b,HeroOverViewStatusWindowDX + 056 + 004-3
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle
 
@@ -3522,7 +3522,7 @@ SetStatusTextAttack:
   ld    e,(ix+HeroStatDefense)
   ld    d,0
   add   hl,de
-  ld    b,HeroOverViewStatusWindowDX + 067 + 004
+  ld    b,HeroOverViewStatusWindowDX + 067 + 004 -2
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle
 
@@ -3532,7 +3532,7 @@ SetStatusTextAttack:
   ld    e,(ix+HeroStatKnowledge)
   ld    d,0
   add   hl,de                           ;total knowledge
-  ld    b,HeroOverViewStatusWindowDX + 075 + 004
+  ld    b,HeroOverViewStatusWindowDX + 075 + 004 +2
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle
 
@@ -3542,7 +3542,7 @@ SetStatusTextAttack:
   ld    e,(ix+HeroStatSpelldamage)
   ld    d,0
   add   hl,de
-  ld    b,HeroOverViewStatusWindowDX + 084 + 004
+  ld    b,HeroOverViewStatusWindowDX + 084 + 004 +5
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle
 
@@ -4525,19 +4525,20 @@ SkillOffenceExpert:
                           db  "Expert Offence                   ",254
                           db  "The hand to hand damage of your  ",254
                           db  "units is increased by 30%.       ",255
+;Armorer is a secondary skill, that reduces the physical damage done to hero's creatures. Physical damage means damage done by enemy creatures engaged in melee or ranged combat. Armorer secondary skill does not reduce damage from spells cast by enemy heroes or creatures.
 SkillArmourerBasic:
-                          db  "Basic Armourer                   ",255   ;skillnr# 007
-                          db  "Basic Armourer                   ",254
+                          db  "Basic Armorer                    ",255   ;skillnr# 007
+                          db  "Basic Armorer                    ",254
                           db  "Damage inflicted on your army is ",254
                           db  "reduced by 5%                    ",255
 SkillArmourerAdvanced:
-                          db  "Advanced Armourer                ",255
-                          db  "Advanced Armourer                ",254
+                          db  "Advanced Armorer                 ",255
+                          db  "Advanced Armo rer                ",254
                           db  "Damage inflicted on your army is ",254
                           db  "reduced by 10%                   ",255
 SkillArmourerExpert:
-                          db  "Expert Armourer                  ",255
-                          db  "Expert Armourer                  ",254
+                          db  "Expert Armorer                   ",255
+                          db  "Expert Armorer                   ",254
                           db  "Damage inflicted on your army is ",254
                           db  "reduced by 15%                   ",255
 SkillResistanceBasic:
