@@ -1538,6 +1538,13 @@ CheckHeroPicksUpItem:
   jp    z,.MagicRefill
   cp    74
   jp    z,.GoodiesBag
+  cp    75                              ;left bottom of tower battle
+  ret   z
+  cp    76                              ;right bottom of tower battle
+  ret   z
+  cp    77                              ;alternative water well
+  ret   z
+
 
 .InventoryItems:
   ;items 83-127 are our inventory items
