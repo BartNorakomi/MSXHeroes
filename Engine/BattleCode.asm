@@ -2305,13 +2305,107 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
 
   ld    de,ItemAttackPointsTable
   ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  push  ix
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
-  .endAddSpeed:
   pop   ix
+  .endAddSpeed:
 
   ld    d,0
   ld    e,(iy+MonsterTableAttack)
   add   hl,de                           ;add additional speed from inventory items
+
+  call  .AddDamageFromSkills
+  pop   ix
+  ret
+
+.AddDamageFromSkills:
+  ;add damage boost from skills (Archery and Offence)
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedMonster
+  jp    z,.MonsterIsRanged
+
+  .MonsterIsMelee:
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillOffence
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillOffence
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillOffence
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillOffence
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillOffence
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillOffence
+  ret
+
+  .CheckSkillOffence:
+  cp    04                              ;Basic Offence  (melee Attack damage +10%)  
+  jr    z,.BasicOffenceFound
+  cp    05                              ;Advanced Offence  (melee Attack damage +20%)  
+  jr    z,.AdvancedOffenceFound
+  cp    06                              ;Expert Offence  (melee Attack damage +30%)  
+  jr    z,.ExpertOffenceFound
+  ret
+
+  .BasicOffenceFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    .ApplyPercentBasedBoost
+
+  .AdvancedOffenceFound:
+  ld    de,5                            ;divide total attack by 5 to get 20%
+  jp    .ApplyPercentBasedBoost
+
+  .ExpertOffenceFound:
+  ld    de,03                           ;divide total attack by 3 to get 33%
+  jp    .ApplyPercentBasedBoost
+  
+  .MonsterIsRanged:
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkilArchery
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkilArchery
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkilArchery
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkilArchery
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkilArchery
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkilArchery
+  ret
+
+  .CheckSkilArchery:
+  cp    01                              ;Basic Archery  (ranged Attack damage +10%)  
+  jr    z,.BasicArcheryFound
+  cp    02                              ;Advanced Archery  (ranged Attack damage +20%)  
+  jr    z,.AdvancedArcheryFound
+  cp    03                              ;Expert Archery  (ranged Attack damage +50%)  
+  jr    z,.ExpertArcheryFound
+  ret
+
+  .BasicArcheryFound:                   ;Basic Archery  (ranged Attack damage +10%)  
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    .ApplyPercentBasedBoost
+
+  .AdvancedArcheryFound:                ;Advanced Archery  (ranged Attack damage +20%)  
+  ld    de,5                            ;divide total attack by 5 to get 20%
+  jp    .ApplyPercentBasedBoost
+
+  .ExpertArcheryFound:                  ;Expert Archery  (ranged Attack damage +50%) 
+  ld    de,2                            ;divide total attack by 2 to get 50%
+  jp    .ApplyPercentBasedBoost
+
+  .ApplyPercentBasedBoost:
+  push  hl                              ;hl=current total attack monster (after applying damage boosts from items)
+  
+  push  hl
+  pop   bc
+;  ld    de,2                            ;divide total attack by 2 to get 50%
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  pop   hl
+  add   hl,bc                           ;add the 50% boost to total attack monster
   ret
 
 CheckPointerOnDefendingHero:
@@ -3621,7 +3715,7 @@ MoveMonster:
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle  
 
-  call  SetTotalMonsterAttackInHL  ;in ix->monster, iy->monstertable. out: hl=total hp (including boosts from inventory items, skills and magic)
+  call  SetTotalMonsterAttackInHL  ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
   push  hl
 
 
@@ -3932,10 +4026,13 @@ SortMonstersOnTheirSpeed:
   push  iy
   push  bc
   call  SetMonsterTableInIY
+
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  ld    e,l
   
 
   
-  ld    e,(iy+MonsterTableSpeed)
+;  ld    e,(iy+MonsterTableSpeed)
   pop   bc
   pop   iy
   push  de
@@ -3949,7 +4046,11 @@ SortMonstersOnTheirSpeed:
   push  bc  
   call  SetMonsterTableInIY
 
-  ld    a,(iy+MonsterTableSpeed)
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  ld    a,l
+
+
+;  ld    a,(iy+MonsterTableSpeed)
   pop   bc
   pop   iy
   pop   de
@@ -5394,10 +5495,10 @@ CheckSwitchToNextMonster:
   ld    a,2
 	ld    (EraseMonster+sPage),a
 
-  call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-  ld    a,(iy+MonsterTableSpeed)
-	ld    (CurrentActiveMonsterSpeed),a
+;  call  SetCurrentActiveMOnsterInIX
+;  call  SetMonsterTableInIY             ;out: iy->monster table idle
+;  ld    a,(iy+MonsterTableSpeed)
+;	ld    (CurrentActiveMonsterSpeed),a
   ret
   
 FindNextActiveMonster:
@@ -6340,8 +6441,17 @@ SetcursorWhenGridTileIsActive:
   or    a
   jp    z,.SetHand
 
-	ld    a,(CurrentActiveMonsterSpeed)
-  ld    c,a
+
+;  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  ld    c,l
+  inc   c                               ;we need to add 2 to the total monster speed for accurate detection of distance that monster can traverse on the battle field map
+  inc   c
+
+
+;	ld    a,(CurrentActiveMonsterSpeed)
+;  ld    c,a
 
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
@@ -6773,8 +6883,17 @@ SetcursorWhenGridTileIsActive:
 
   .CheckTile:
 
-	ld    a,(CurrentActiveMonsterSpeed)
-  ld    c,a
+
+  push  hl
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  ld    c,l
+  inc   c                               ;we need to add 1 to the total monster speed for accurate detection to see if an enemy can be attacked
+  pop   hl
+
+;	ld    a,(CurrentActiveMonsterSpeed)
+;  ld    c,a
 
   ld    a,(hl)
   cp    c ;MovementLenghtMonsters-1         ;if tile pointer points at =>6, that means monster does not have enough movement points to move there

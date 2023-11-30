@@ -285,8 +285,8 @@ ListOfMonstersToPut:
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
   db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
-  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16)
-;  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
+;  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16)
+  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
 
   db  001 | dw 001 | db 012 + (25*08), 056 + (00*16)
   db  000 | dw 000 | db 012 + (24*08), 056 + (01*16)
@@ -398,7 +398,7 @@ HandleRetaliation?: db  0
 MonsterDied?: db  0
 MoveMonsterToY: ds  1
 MoveMonsterToX: ds  1
-CurrentActiveMonsterSpeed: ds  1
+;CurrentActiveMonsterSpeed: ds  1
 CurrentActiveMonster: db  1
 TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
