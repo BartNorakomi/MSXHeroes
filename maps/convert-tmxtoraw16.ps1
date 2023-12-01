@@ -45,6 +45,10 @@ function Convert-TmxFile
         foreach ($tile in $layer.innertext.split(","))
         {
             $value = [byte](([uint16]$tile - 1) -band 255) # Subtract 1 and keep only the lower 8 bits
+if ($value -eq 255) {
+    $value = 0
+}
+
             $rawData[$position] = $value
             $position++
         }

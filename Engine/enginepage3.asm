@@ -24,6 +24,7 @@ InitiateGame:
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
   call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
+  call  ConvertMonstersObjectLayer      ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
   .WhenExitingCombat:
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
@@ -65,16 +66,15 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
 
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
   push  af
+	ld		a,(memblocks.1)
+  push  af
+	ld		a,(memblocks.2)
+  push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1+2
   out   ($a8),a      
-
   ex    af,af'
-  di
-	ld		($6000),a
-	inc   a
-	ld		($7000),a
-	ei
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   ld    (AddressToWriteFrom),hl
   ld    (NXAndNY),bc
@@ -82,45 +82,41 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   call  CopyRamToVramCorrectedCastleOverview.AddressesSet
 
   pop   af
+  call  block34
+  pop   af
+  call  block12
+  pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-
-;now set engine back in page 1+2 in rom
-	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ei
   ret
-
-
 
 CopyRamToVramCorrectedCastleOverview:
   ex    af,af'                          ;store rom block
 
-  di
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
+  push  af
+	ld		a,(memblocks.1)
+  push  af
+	ld		a,(memblocks.2)
   push  af
 
   ld    a,(slot.page12rom)              ;all RAM except page 1+2
   out   ($a8),a      
-
   ex    af,af'
-;  di
-	ld		($6000),a
-	inc   a
-	ld		($7000),a
-;	ei
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   call  .go                             ;go copy
 
   pop   af
+  call  block34
+  pop   af
+  call  block12
+  pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-
-;now set engine back in page 1+2 in rom
-	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-
-ei
+  ei
   ret
 
-.go:
+  .go:
   ld    (AddressToWriteFrom),hl
   ld    (NXAndNY),bc
 
@@ -144,7 +140,6 @@ ei
   dec   a
   ld    (NXAndNY+1),a
   jp    nz,.loop
-;  ei
   ret
 
   .WriteOneLine:
@@ -163,39 +158,35 @@ ei
   ret
 
 CopyRamToVramPage3ForBattleEngine:
-  ex    af,af'                          ;store rom block
+;  ex    af,af'                          ;store rom block
 
   in    a,($a8)                         ;store current rom/ram settings of page 1+2
   push  af
-
-  di
+	ld		a,(memblocks.1)
+  push  af
+	ld		a,(memblocks.2)
+  push  af
   ld    a,(slot.page12rom)              ;all RAM except page 1+2
   out   ($a8),a      
 
   ld    a,(BlockToReadFrom)
-;  di
-	ld		($6000),a
-	inc   a
-	ld		($7000),a
-;	ei
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   call  .go                             ;go copy
 
   pop   af
+  call  block34
+  pop   af
+  call  block12
+  pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-
-;now set engine back in page 1+2 in rom
-	ld		a,(memblocks.1)                 ;reset the memblocks to what they were before this routine
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
-
   ei
   ret
 
-.go:
-
+  .go:
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
-;  di
+  di
 
   .loop:
   call  .WriteOneLine
@@ -203,7 +194,6 @@ CopyRamToVramPage3ForBattleEngine:
   dec   a
   ld    (NXAndNY+1),a
   jp    nz,.loop
-;  ei
   ret
 
   .WriteOneLine:
@@ -241,6 +231,7 @@ CopyRamToVramPage3ForBattleEngine:
 ;$c1a3 = leftbottom = 002
 
 MonsterHerocollidedWithOnMap: ds  1
+AddressOfMonsterHerocollidedWithOnMap: ds  1
 MonsterHerocollidedWithOnMapAmount: ds  1
 
 MonsterMovementPathPointer: db  0
@@ -280,8 +271,10 @@ MovementLenghtMonsters: equ 8
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16)
-;  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
-  db  002 | dw 500 | db 012 + (16*08), 056 + (01*16)
+
+  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
+;  db  002 | dw 500 | db 012 + (16*08), 056 + (01*16)
+
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
   db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
@@ -2443,6 +2436,210 @@ LoadWorldObjectLayerMap:
   call  Depack
   ret
 
+
+
+ListOfUnlockedMonstersLevel1:
+  db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
+
+  db    000                               ;end
+
+  db    128                               ;128 Spear Guard (Castlevania)
+  db    129                               ;129 Medusa Head (Castlevania)
+  db    130                               ;130 Skeleton (Castlevania)
+  db    131                               ;131 Running Man (Metal Gear)
+  db    132                               ;132 Trooper (Metal Gear)
+  db    133                               ;133 Antigas Man (Metal Gear)
+  db    134                               ;134 Footman (Metal Gear)
+  db    135                               ;135 Emir Mystic (Usas2)
+  db    136                               ;136 Spectroll (deva)
+
+  db    000                               ;end
+ListOfUnlockedMonstersLevel2:
+  db    161                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
+
+  db    000                               ;end
+
+  db    137                               ;137 Thexder (Thexder)
+  db    138                               ;138 Andorogynus (Andorogynus)
+  db    139                               ;139 Limb Linger (mon mon monster)
+  db    140                               ;140 Monmon (mon mon monster)
+  db    141                               ;141 Cob Crusher (mon mon monster)
+  db    142                               ;142 Green Lupin (arsene lupin)
+  db    143                               ;143 Red Lupin (arsene lupin)
+  db    144                               ;144 Major Mirth (arsene lupin)
+
+  db    000                               ;end
+ListOfUnlockedMonstersLevel3:
+  db    162                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
+
+  db    000                               ;end
+
+  db    145                               ;145 Anna Lee (cabage patch kids)
+  db    146                               ;146 JungleBrute (undeadline)
+  db    147                               ;147 Lurcher (undeadline)
+  db    148                               ;148 sofia (sofia)
+  db    149                               ;149 SuperRunner (SuperRunner)
+  db    150                               ;150 Schaefer (predator)
+  db    151                               ;151 Jon Sparkle (malaya no hihou)
+  db    152                               ;152 KuGyoku Den (legendly 9 gems)
+
+  db    000                               ;end
+ListOfUnlockedMonstersLevel4:
+  db    255                               ;255=no level 4 monsters unlocked
+
+  db    153                               ;153 Pastry Chef (comic bakery)
+  db    154                               ;154 Indy Brave (magical tree)
+  db    155                               ;155 Seraph (Golvellius)
+  db    156                               ;156 Headless (Golvellius)
+  db    157                               ;157 BlasterBot
+  db    0                                 ;158
+  db    0                                 ;159
+  db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
+
+  db    000                               ;end
+ListOfUnlockedMonstersLevel5:
+  db    255                               ;255=no level 5 monsters unlocked
+
+  db    161                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
+  db    162                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
+  db    163                               ;163 Bonefin (Usas)
+  db    164                               ;164 OptiLeaper (1 eyes white blue jumper) (Psycho World)
+  db    165                               ;165 Fernling (green little plant) (Psycho World)
+  db    166                               ;166 Slime (Ys 3)
+  db    167                               ;167 Scavenger (Metal Gear)
+  db    168                               ;168 BounceBot (Thexder)
+
+  db    000                               ;end
+ListOfUnlockedMonstersLevel6:
+  db    255                               ;255=no level 6 monsters unlocked
+
+  db    169                               ;169 Rock Roll (kings valley 2)
+  db    170                               ;170 Slouman (kings valley 2)
+  db    171                               ;171 Pyoncy (kings valley 2)
+  db    172                               ;172 Vic Viper (kings valley 2)
+  db    173                               ;173 GooGoo (quinpl)
+  db    174                               ;174 Spooky (Spooky)
+  db    175                               ;175 Ghosty (spooky)
+  db    176                               ;176 Visage (undeadline)
+
+  db    000                               ;end
+
+MonsterLevel1Pointer: dw  ListOfUnlockedMonstersLevel1
+MonsterLevel2Pointer: dw  ListOfUnlockedMonstersLevel2
+MonsterLevel3Pointer: dw  ListOfUnlockedMonstersLevel3
+MonsterLevel4Pointer: dw  ListOfUnlockedMonstersLevel4
+MonsterLevel5Pointer: dw  ListOfUnlockedMonstersLevel5
+MonsterLevel6Pointer: dw  ListOfUnlockedMonstersLevel6
+
+ConvertMonstersObjectLayer:
+  ld    hl,$8000-1
+
+  .loopAndXorA:
+  xor   a
+  .loop:
+  inc   hl
+  bit   6,h                           ;check if hl=$c000 (end of object layer in ram)
+  ret   nz
+
+  or    (hl)
+  jp    z,.loop
+  
+  .Check:
+  cp    7
+  jr    nc,.loopAndXorA
+
+  dec   a
+  jp    z,.Level1Monster
+  dec   a
+  jr    z,.Level2Monster
+  dec   a
+  jr    z,.Level3Monster
+  dec   a
+  jr    z,.Level4Monster
+  dec   a
+  jr    z,.Level5Monster
+
+  .Level6Monster:
+  ld    de,(MonsterLevel6Pointer)
+  ld    a,(de)
+  cp    255
+  jr    z,.Level5Monster
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel6Pointer
+  ld    de,ListOfUnlockedMonstersLevel6
+  .SetMonsterLevel6Pointer:
+  ld    (MonsterLevel6Pointer),de
+  jp    .loopAndXorA
+
+  .Level5Monster:
+  ld    de,(MonsterLevel5Pointer)
+  ld    a,(de)
+  cp    255
+  jr    z,.Level4Monster
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel5Pointer
+  ld    de,ListOfUnlockedMonstersLevel5
+  .SetMonsterLevel5Pointer:
+  ld    (MonsterLevel5Pointer),de
+  jp    .loopAndXorA
+
+  .Level4Monster:
+  ld    de,(MonsterLevel4Pointer)
+  ld    a,(de)
+  cp    255
+  jr    z,.Level3Monster
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel4Pointer
+  ld    de,ListOfUnlockedMonstersLevel4
+  .SetMonsterLevel4Pointer:
+  ld    (MonsterLevel4Pointer),de
+  jp    .loopAndXorA
+
+  .Level3Monster:
+  ld    de,(MonsterLevel3Pointer)
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel3Pointer
+  ld    de,ListOfUnlockedMonstersLevel3
+  .SetMonsterLevel3Pointer:
+  ld    (MonsterLevel3Pointer),de
+  jp    .loopAndXorA
+
+  .Level2Monster:
+  ld    de,(MonsterLevel2Pointer)
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel2Pointer
+  ld    de,ListOfUnlockedMonstersLevel2
+  .SetMonsterLevel2Pointer:
+  ld    (MonsterLevel2Pointer),de
+  jp    .loopAndXorA
+  
+  .Level1Monster:
+  ld    de,(MonsterLevel1Pointer)
+  call  .ConvertLevelToMonster
+  jr    nz,.SetMonsterLevel1Pointer
+  ld    de,ListOfUnlockedMonstersLevel1
+  .SetMonsterLevel1Pointer:
+  ld    (MonsterLevel1Pointer),de
+  jp    .loopAndXorA
+
+  .ConvertLevelToMonster:
+  ld    a,(de)
+  ld    (hl),a
+  cp    160                           ;monster nr 160 and above are 1 tile in size
+  jr    nc,.EndCheck1Or2TilesInSize
+  ld    bc,-128
+  add   hl,bc
+  add   a,64                          ;bottom part of monster is 64 tiles higher
+  ld    (hl),a
+  sbc   hl,bc
+    
+  .EndCheck1Or2TilesInSize:
+  inc   de
+  ld    a,(de)
+  or    a
+  ret
+
+
 LoadWorldMap:
 ;unpack map data
   ld    a,(slot.page1rom)             ;all RAM except page 1
@@ -3151,7 +3348,7 @@ HeroAddressesSnatcher:        db "Snatcher",255,"         ","Knight      ",255,S
 HeroAddressesGolvellius:      db "Kelesis",255,"          ","Barbarian   ",255,GolvelliusSpriteBlock| dw HeroSYSXGolvellius,HeroPortrait10x18SYSXGolvellius,HeroButton20x11SYSXGolvellius,HeroPortrait16x30SYSXGolvellius                     | db 04 | db 024 |
 
 HeroAddressesBillRizer:       db "Bill Rizer",255,"       ","Shieldbearer",255,BillRizerSpriteBlock| dw HeroSYSXBillRizer,HeroPortrait10x18SYSXBillRizer,HeroButton20x11SYSXBillRizer,HeroPortrait16x30SYSXBillRizer                          | db 07 | db 025 |
-HeroAddressesPochi:           db "Pochi",255,"            ","Overlord    ",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
+HeroAddressesPochi:           db "Pochi Worzen",255,"     ","Overlord    ",255,PochiSpriteBlock| dw HeroSYSXPochi,HeroPortrait10x18SYSXPochi,HeroButton20x11SYSXPochi,HeroPortrait16x30SYSXPochi                                              | db 10 | db 026 |
 HeroAddressesGreyFox:         db "Grey Fox",255,"         ","Alchemist   ",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
 HeroAddressesTrevorBelmont:   db "Trevor Belmont",255,"   ","Sage        ",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
 HeroAddressesBigBoss:         db "Big Boss",255,"         ","Ranger      ",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
@@ -3165,10 +3362,10 @@ HeroAddressesHollyWhite:      db "Holly White",255,"      ","Barbarian   ",255,H
 HeroAddressesMercies:         db "Mercies ",255,"         ","Shieldbearer",255,MerciesSpriteBlock| dw HeroSYSXMercies,HeroPortrait10x18SYSXMercies,HeroButton20x11SYSXMercies,HeroPortrait16x30SYSXMercies                                    | db 07 | db 036 |
 HeroAddressesNatashaRomanenko:db "Nastasha",255,"         ","Overlord    ",255,NatashaRomanenkoSpriteBlock | dw HeroSYSXNatashaRomanenko,HeroPortrait10x18SYSXNatashaRomanenko,HeroButton20x11SYSXNatashaRomanenko,HeroPortrait16x30SYSXNatashaRomanenko   | db 10 | db 037 |
 HeroAddressesRuth:            db "Ruth ",255,"            ","Alchemist   ",255,RuthSpriteBlock| dw HeroSYSXRuth,HeroPortrait10x18SYSXRuth,HeroButton20x11SYSXRuth,HeroPortrait16x30SYSXRuth                                                   | db 13 | db 038 |
-HeroAddressesGeera:           db "Geera",255,"            ","Sage        ",255,GeeraSpriteBlock| dw HeroSYSXGeera,HeroPortrait10x18SYSXGeera,HeroButton20x11SYSXGeera,HeroPortrait16x30SYSXGeera                                              | db 16 | db 039 |
+HeroAddressesGeera:           db "Geera Worzen",255,"     ","Sage        ",255,GeeraSpriteBlock| dw HeroSYSXGeera,HeroPortrait10x18SYSXGeera,HeroButton20x11SYSXGeera,HeroPortrait16x30SYSXGeera                                              | db 16 | db 039 |
 HeroAddressesYoungNoble:      db "Young Noble",255,"      ","Ranger      ",255,YoungNobleSpriteBlock| dw HeroSYSXYoungNoble,HeroPortrait10x18SYSXYoungNoble,HeroButton20x11SYSXYoungNoble,HeroPortrait16x30SYSXYoungNoble                     | db 19 | db 040 |
 
-HeroAddressesDawel:           db "Dawel",255,"            ","Wizzard     ",255,DawelSpriteBlock| dw HeroSYSXDawel,HeroPortrait10x18SYSXDawel,HeroButton20x11SYSXDawel,HeroPortrait16x30SYSXDawel                                              | db 22 | db 041 |
+HeroAddressesDawel:           db "Dawel Worzen",255,"     ","Wizzard     ",255,DawelSpriteBlock| dw HeroSYSXDawel,HeroPortrait10x18SYSXDawel,HeroButton20x11SYSXDawel,HeroPortrait16x30SYSXDawel                                              | db 22 | db 041 |
 HeroAddressesPocky:           db "Pocky",255,"            ","Battle Mage ",255,PockySpriteBlock| dw HeroSYSXPocky,HeroPortrait10x18SYSXPocky,HeroButton20x11SYSXPocky,HeroPortrait16x30SYSXPocky                                              | db 25 | db 042 |
 HeroAddressesKelesisTheCook:  db "Kelesis The Cook",255," ","Scholar     ",255,KelesisTheCookSpriteBlock| dw HeroSYSXKelesisTheCook,HeroPortrait10x18SYSXKelesisTheCook,HeroButton20x11SYSXKelesisTheCook,HeroPortrait16x30SYSXKelesisTheCook | db 28 | db 043 |
 HeroAddressesLolo:            db "Lolo",255,"             ","Necromancer ",255,LoloSpriteBlock| dw HeroSYSXLolo,HeroPortrait10x18SYSXLolo,HeroButton20x11SYSXLolo,HeroPortrait16x30SYSXLolo                                                   | db 31 | db 044 |

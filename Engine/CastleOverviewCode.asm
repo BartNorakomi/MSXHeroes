@@ -12314,7 +12314,37 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    nc,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
+;  ld    hl,BarracksLevel1Cost
+
+
+
+
+
+  ld    a,(iy+CastleBarracksLevel)
+  or    a
   ld    hl,BarracksLevel1Cost
+  jp    z,.BarracksLevelFound
+  dec   a
+  ld    hl,BarracksLevel2Cost
+  jp    z,.BarracksLevelFound
+  dec   a
+  ld    hl,BarracksLevel3Cost
+  jp    z,.BarracksLevelFound
+  dec   a
+  ld    hl,BarracksLevel4Cost
+  jp    z,.BarracksLevelFound
+  ld    hl,BarracksLevel5Cost
+  .BarracksLevelFound:
+
+
+
+
+
+
+
+
+
+
   ld    (CheckRequirementsWhichBuilding?),hl
   jp    .CheckRequirementsBuildingMet
 
@@ -12326,7 +12356,30 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    z,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
+;  ld    hl,MineLevel1Cost
+
+
+
+
+  ld    a,(iy+CastleMineLevel)
+  or    a
   ld    hl,MineLevel1Cost
+  jp    z,.MineLevelFound
+  dec   a
+  ld    hl,MineLevel2Cost
+  jp    z,.MineLevelFound
+  ld    hl,MineLevel3Cost
+  .MineLevelFound:
+
+
+
+
+
+
+
+
+
+
   ld    (CheckRequirementsWhichBuilding?),hl
   jp    .CheckRequirementsBuildingMet
 
@@ -12337,7 +12390,26 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    z,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
+;  ld    hl,SawmillLevel1Cost
+
+
+
+  ld    a,(iy+CastleSawmillLevel)
+  or    a
   ld    hl,SawmillLevel1Cost
+  jp    z,.SawmillLevelFound
+  dec   a
+  ld    hl,SawmillLevel2Cost
+  jp    z,.SawmillLevelFound
+  ld    hl,SawmillLevel3Cost
+  .SawmillLevelFound:
+
+
+
+
+
+
+
   ld    (CheckRequirementsWhichBuilding?),hl
   jp    .CheckRequirementsBuildingMet
 
@@ -12348,7 +12420,33 @@ Set9BuildButtons:                       ;check which buttons should be blue, gre
   jp    z,.Green
   bit   0,(iy+AlreadyBuiltThisTurn?)
   jp    nz,.Red
+;  ld    hl,MagicGuildLevel1Cost
+
+
+
+  ld    a,(iy+CastleMageGuildLevel)
+  or    a
   ld    hl,MagicGuildLevel1Cost
+  jp    z,.MagicGuildLevelFound
+  dec   a
+  ld    hl,MagicGuildLevel2Cost
+  jp    z,.MagicGuildLevelFound
+  dec   a
+  ld    hl,MagicGuildLevel3Cost
+  jp    z,.MagicGuildLevelFound
+  ld    hl,MagicGuildLevel4Cost
+  .MagicGuildLevelFound:
+
+
+
+
+
+
+
+
+
+
+
   ld    (CheckRequirementsWhichBuilding?),hl
   jp    .CheckRequirementsBuildingMet
 

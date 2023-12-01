@@ -2909,24 +2909,24 @@ SetEnemyStatsWindow:
 
   ;now look at the amount of neutral army and set the text accordingly
   call  SetAllMonstersInMonsterTable.SetAmountInA
-  cp    1
-  ld    hl,TextAFew
-  jr    z,.AmountFound
   cp    5
-  ld    hl,TextSeveral
-  jr    z,.AmountFound
+  ld    hl,TextAFew
+  jr    c,.AmountFound
   cp    13
-  ld    hl,TextMany
-  jr    z,.AmountFound
+  ld    hl,TextSeveral
+  jr    c,.AmountFound
   cp    29
-  ld    hl,TextNumerous
-  jr    z,.AmountFound
+  ld    hl,TextMany
+  jr    c,.AmountFound
   cp    61
-  ld    hl,TextAHorde
-  jr    z,.AmountFound
+  ld    hl,TextNumerous
+  jr    c,.AmountFound
   cp    93
+  ld    hl,TextAHorde
+  jr    c,.AmountFound
+;  cp    93
   ld    hl,TextCountless
-  jr    z,.AmountFound
+;  jr    z,.AmountFound
   .AmountFound:
 
 
@@ -2992,6 +2992,48 @@ ListOfMonsters:
   db    092                               ;132 Trooper (Metal Gear)
   db    093                               ;133 Antigas Man (Metal Gear)
   db    094                               ;134 Footman (Metal Gear)
+  db    139                               ;135 Emir Mystic (Usas2)
+  db    136                               ;136 Spectroll (deva)
+  db    154                               ;137 Thexder (Thexder)
+  db    153                               ;138 Andorogynus (Andorogynus)
+  db    134                               ;139 Limb Linger (mon mon monster)
+  db    132                               ;140 Monmon (mon mon monster)
+  db    133                               ;141 Cob Crusher (mon mon monster)
+  db    147                               ;142 Green Lupin (arsene lupin)
+  db    146                               ;143 Red Lupin (arsene lupin)
+  db    148                               ;144 Major Mirth (arsene lupin)
+  db    143                               ;145 Anna Lee (cabage patch kids)
+  db    088                               ;146 JungleBrute (undeadline)
+  db    089                               ;147 Lurcher (undeadline)
+  db    126                               ;148 sofia (sofia)
+  db    157                               ;149 SuperRunner (SuperRunner)
+  db    130                               ;150 Schaefer (predator)
+  db    131                               ;151 Jon Sparkle (malaya no hihou)
+  db    124                               ;152 KuGyoku Den (legendly 9 gems)
+  db    144                               ;153 Pastry Chef (comic bakery)
+  db    145                               ;154 Indy Brave (magical tree)
+  db    085                               ;155 Seraph (Golvellius)
+  db    084                               ;156 Headless (Golvellius)
+  db    128                               ;157 BlasterBot
+  db    0                                 ;158
+  db    0                                 ;159
+  db    030                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
+  db    032                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
+  db    034                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
+  db    053                               ;163 Bonefin (Usas)
+  db    070                               ;164 OptiLeaper (1 eyes white blue jumper) (Psycho World)
+  db    067                               ;165 Fernling (green little plant) (Psycho World)
+  db    098                               ;166 Slime (Ys 3)
+  db    090                               ;167 Scavenger (Metal Gear)
+  db    155                               ;168 BounceBot (Thexder)
+  db    150                               ;169 Rock Roll (kings valley 2)
+  db    151                               ;170 Slouman (kings valley 2)
+  db    152                               ;171 Pyoncy (kings valley 2)
+  db    149                               ;172 Vic Viper (kings valley 2)
+  db    125                               ;173 GooGoo (quinpl)
+  db    122                               ;174 Spooky (Spooky)
+  db    123                               ;175 Ghosty (spooky)
+  db    087                               ;176 Visage (undeadline)
 
 SetNeutralMonsterHeroCollidedWithInA:
   ld    a,(MonsterHerocollidedWithOnMap)
@@ -3083,44 +3125,38 @@ SetAllMonstersInMonsterTable:
   jr    z,.Amount5
 
   .Amount6:                             ;between 0 and 31 -> add 93 -> between 93 and 124
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
-xor a  
   add   a,93
   ret
 
   .Amount5:                             ;between 0 and 31 -> add 61 -> between 61 and 92
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
-xor a  
   add   a,61
   ret
 
   .Amount4:                             ;between 0 and 31 -> add 29 -> between 29 and 60
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
-xor a  
   add   a,29
   ret
 
   .Amount3:                             ;between 0 and 15 -> add 13 -> between 13 and 28
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   15
-xor a  
   add   a,13
   ret
 
   .Amount2:                             ;between 0 and 07 -> add 05 -> between 05 and 12
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   7
-xor a  
   add   a,5
   ret
   
   .Amount1:                             ;between 0 and 03 -> add 01 -> between 01 and 04 
-  ld    a,r
+  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   3
-xor a  
   inc   a
   ret
 
@@ -5857,7 +5893,6 @@ RecoverOverwrittenMonsters:
 
 	ld		a,(activepage)
   xor   1
-  .SetdPage:
 	ld    (TransparantImageBattle+dPage),a
 
   ld    a,(iy+MonsterY)
@@ -5925,7 +5960,6 @@ RecoverOverwrittenMonsters:
 PutMonster:
 	ld		a,(activepage)
   xor   1
-  .SetdPage:
 	ld    (TransparantImageBattle+dPage),a
 
   ld    a,(ix+MonsterY)

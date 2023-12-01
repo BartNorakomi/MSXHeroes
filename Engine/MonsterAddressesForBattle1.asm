@@ -2958,7 +2958,7 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "GooGoo",255,"     "
 
-Monster126Table:                        ;sofia
+Monster126Table:                        ;sofia (sofia)
   dw    Monster126Idle
   dw    Monster126Move
   dw    GeneralMonsterAttackPatternRight
@@ -3050,7 +3050,7 @@ Monster129Table:                        ;Screech
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Screech",255,"    "
 
-Monster130Table:                        ;Schaefer
+Monster130Table:                        ;Schaefer (predator)
   dw    Monster130Idle
   dw    Monster130Move
   dw    Monster130AttackPatternRight
@@ -7089,7 +7089,7 @@ Monster129AttackPatternRight:
 Monster129AttackPatternLeft:
   db    AnimateAttack | dw LAttack1Monster129 | db 000,ShootProjectile,WaitImpactProjectile  
 ;######################################################################################
-;Schaefer
+;Schaefer (predator)
 
 RIdle1Monster130:   equ $4000 + (176*128) + (000/2) - 128  ;(y*128) + (x/2)
 RIdle2Monster130:   equ $4000 + (176*128) + (016/2) - 128  ;(y*128) + (x/2)

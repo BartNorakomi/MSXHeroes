@@ -293,7 +293,6 @@ DisplayEnemyStatsRightClick:
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
   ld    hl,ShowEnemyStats
   jp    EnterSpecificRoutineInBattleCode
-  jp    EnterSpecificRoutineInCastleOverviewCode
 
 
 
@@ -1446,6 +1445,8 @@ CheckHeroCollidesWithMonster:
   ret   c                               ;tilenr. 128 - 224 are creatures
 
   ld    (MonsterHerocollidedWithOnMap),a
+  ld    a,l
+  ld    (AddressOfMonsterHerocollidedWithOnMap),a
 
   ld    a,(NeutralEnemyDied?)
   or    a
@@ -3989,6 +3990,8 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   ld    a,(hl)                          ;monster tile
   ld    (MonsterHerocollidedWithOnMap),a
+  ld    a,l
+  ld    (AddressOfMonsterHerocollidedWithOnMap),a
   inc   hl                              ;amount
   ld    a,(hl)                          ;monster tile
   ld    (MonsterHerocollidedWithOnMapAmount),a
@@ -4921,18 +4924,20 @@ EmptyHeroRecruitedAtTavern:
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero1y:		db	3
-pl1hero1x:		db	4
-pl1hero1xp: dw 999 ;65000 ;3000 ;999
+pl1hero1x:		db	3
+pl1hero1xp: dw 0 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
-pl1hero1mana:	dw	99,20
+pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
-pl1hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+Pl1Hero1Units:  db DragonSlayerUnitLevel1Number | dw 016 |      db DragonSlayerUnitLevel2Number | dw 006 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  6,22,21,30,0,0
+;.HeroSkills:  db  6,22,21,30,0,0
+.HeroSkills:  db  25,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -4940,8 +4945,9 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesDrPettrovich
+;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -4957,7 +4963,7 @@ pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -4980,7 +4986,7 @@ pl1hero3xp: dw 0000
 pl1hero3move:	db	20,20
 pl1hero3mana:	dw	04,20
 pl1hero3manarec:db	5		                ;recover x mana every turn
-pl1hero3status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -5017,7 +5023,7 @@ Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroSpecificInfo: dw HeroAddressesDruid
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero5y:		db	00		                ;
@@ -5122,7 +5128,8 @@ pl1hero9y:		db	00		                ;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 pl2hero1y:		db	3
-pl2hero1x:		db	6
+;pl2hero1x:		db	6
+pl2hero1x:		db	100
 pl2hero1xp: dw 0000
 pl2hero1move:	db	03,20
 pl2hero1mana:	dw	03,10
@@ -5272,7 +5279,8 @@ LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
+;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
@@ -5284,7 +5292,7 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  031,043,058,014,015,016,017,018,000,000
+db 255 | TavernHeroesPlayer1:        db  006,008,010,039,041,026,000,000,000,000
 db 255 | TavernHeroesPlayer2:        db  007,008,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
@@ -5293,11 +5301,11 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  60000
-.Wood:    dw  5300
-.Ore:     dw  5400
-.Gems:    dw  5130
-.Rubies:  dw  5560
+.Gold:    dw  20000
+.Wood:    dw  20
+.Ore:     dw  20
+.Gems:    dw  10
+.Rubies:  dw  10
 ResourcesPlayer2:
 .Gold:    dw  5000
 .Wood:    dw  300

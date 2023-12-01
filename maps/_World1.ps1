@@ -1,6 +1,3 @@
-cd..
-cd maps
-
 .\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\world1.tmx -targetPath .\  -excludeLayer "background" -pack
 Remove-Item -Path "world1objects.map.pck"
 Rename-Item -Path "world1.map.pck" -NewName "world1objects.map.pck"
