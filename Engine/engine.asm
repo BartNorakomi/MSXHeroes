@@ -2306,7 +2306,7 @@ movehero:
 	
   .domovehero:
   ld    ix,(plxcurrentheroAddress)
-  ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+;  ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   
 	ld		a,(ix+HeroMove)
 	sub		a,1                             ;we reduce the amount of movement steps hero has this turn, when it reaches 0, end movement
@@ -2354,6 +2354,7 @@ movehero:
   jp    .endmovement
   
   .animate:
+  ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
   ld    d,(ix+HeroSpecificInfo+1)
   push  de
@@ -4931,13 +4932,13 @@ pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl1Hero1Units:  db DragonSlayerUnitLevel1Number | dw 016 |      db DragonSlayerUnitLevel2Number | dw 006 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl1Hero1Units:  db DragonSlayerUnitLevel1Number | dw 016 |      db DragonSlayerUnitLevel2Number | dw 006 |      db 7 | dw 700 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
-.HeroSkills:  db  25,0,0,0,0,0
+.HeroSkills:  db  25,18,3,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000

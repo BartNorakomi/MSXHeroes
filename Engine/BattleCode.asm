@@ -1434,6 +1434,9 @@ CalculateXpGainedRightPlayer:
   call  CalculateXpGainedLeftPlayer.CalculateXpGained
   pop   de
   add   hl,de
+
+  ld    ix,(HeroThatGetsAttacked)       ;defending hero
+  call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
   ret
 
 CalculateXpGainedLeftPlayer:
@@ -1495,6 +1498,9 @@ CalculateXpGainedLeftPlayer:
   call  .CalculateXpGained
   pop   de
   add   hl,de
+  
+  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
   ret
 
   .CalculateXpGained:
@@ -1527,6 +1533,48 @@ CalculateXpGainedWhenRightPlayerIsNeutralMonster:
   ld    h,0
   ld    l,a
   call  MultiplyHlWithDE                ;Out: HL = result
+
+  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ret
+
+AddXPBoostFromLearning:                 ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillLearning
+  ret
+
+  .CheckSkillLearning:
+  cp    16                              ;Basic Learning  (xp +10%)  
+  jr    z,.BasicLearningFound
+  cp    17                              ;Advanced Learning  (xp +20%)  
+  jr    z,.AdvancedLearningFound
+  cp    18                              ;Expert Learning  (xp +30%)  
+  jr    z,.ExpertLearningFound
+  ret
+
+  .BasicLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    ApplyPercentBasedBoost
+
+  .AdvancedLearningFound:
+  ld    de,5                            ;divide total attack by 5 to get 20%
+  jp    ApplyPercentBasedBoost
+
+  .ExpertLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  call  ApplyPercentBasedBoost
+  add   hl,bc                           ;add that 10% again to get 20%
+  add   hl,bc                           ;add that 10% again to get 30%
   ret
 
 CheckVictoryOrDefeat:
@@ -2212,14 +2260,14 @@ SetTotalMonsterHPInHL:  ;in ix->monster, iy->monstertable. out: hl=total hp (inc
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
   ld    hl,0                            ;if defender is neutral monster, speed boost=0
-  jr    .endAddSpeed
+  jr    .endAddHP
   .HeroFound:
   ;/are we checking a monster that belongs to the left or right hero ?
 
   ld    de,ItemUnitHpPointsTable
   ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
-  .endAddSpeed:
+  .endAddHP:
   pop   ix
 
   ld    d,0
@@ -2270,14 +2318,19 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
   ld    hl,0                            ;if defender is neutral monster, speed boost=0
-  jr    .endAddSpeed
+  jr    .endAddDefense
   .HeroFound:
   ;/are we checking a monster that belongs to the left or right hero ?
 
   ld    de,ItemDefencePointsTable
   ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
-  .endAddSpeed:
+
+  ld    d,0
+  ld    e,(ix+HeroStatDefense)
+  add   hl,de                           ;add defense from hero
+  
+  .endAddDefense:
   pop   ix
 
   ld    d,0
@@ -2297,9 +2350,7 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
   ld    a,l
   or    h
-  jr    nz,.HeroFound                   ;check if this is a neutral enemy
-  ld    hl,0                            ;if defender is neutral monster, speed boost=0
-  jr    .endAddSpeed
+  jr    z,.setAttackNeutralMonster
   .HeroFound:
   ;/are we checking a monster that belongs to the left or right hero ?
 
@@ -2308,17 +2359,27 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   push  ix
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
   pop   ix
-  .endAddSpeed:
 
   ld    d,0
-  ld    e,(iy+MonsterTableAttack)
-  add   hl,de                           ;add additional speed from inventory items
+  ld    e,(iy+MonsterTableAttack)       ;monsters own attack
+  add   hl,de                           ;add additional attack from inventory items
 
-  call  .AddDamageFromSkills
+  ld    d,0
+  ld    e,(ix+HeroStatAttack)
+  add   hl,de                           ;add attack from hero
+
+  call  .AddDamageFromSkills            ;add a % boost to attack based on Offense or Archery
   pop   ix
   ret
 
-.AddDamageFromSkills:
+  .setAttackNeutralMonster:
+  ld    h,0
+  ld    l,(iy+MonsterTableAttack)
+  pop   ix
+  ret
+
+
+  .AddDamageFromSkills:
   ;add damage boost from skills (Archery and Offence)
   ld    a,(iy+MonsterTableSpecialAbility)
   cp    RangedMonster
@@ -2350,16 +2411,19 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
 
   .BasicOffenceFound:
   ld    de,10                           ;divide total attack by 10 to get 10%
-  jp    .ApplyPercentBasedBoost
+  jp    ApplyPercentBasedBoost
 
   .AdvancedOffenceFound:
   ld    de,5                            ;divide total attack by 5 to get 20%
-  jp    .ApplyPercentBasedBoost
+  jp    ApplyPercentBasedBoost
 
   .ExpertOffenceFound:
-  ld    de,03                           ;divide total attack by 3 to get 33%
-  jp    .ApplyPercentBasedBoost
-  
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  call  ApplyPercentBasedBoost
+  add   hl,bc                           ;add that 10% again to get 20%
+  add   hl,bc                           ;add that 10% again to get 30%
+  ret
+
   .MonsterIsRanged:
   ld    a,(ix+HeroSkills+0)
   call  .CheckSkilArchery
@@ -2386,17 +2450,17 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
 
   .BasicArcheryFound:                   ;Basic Archery  (ranged Attack damage +10%)  
   ld    de,10                           ;divide total attack by 10 to get 10%
-  jp    .ApplyPercentBasedBoost
+  jp    ApplyPercentBasedBoost
 
   .AdvancedArcheryFound:                ;Advanced Archery  (ranged Attack damage +20%)  
   ld    de,5                            ;divide total attack by 5 to get 20%
-  jp    .ApplyPercentBasedBoost
+  jp    ApplyPercentBasedBoost
 
   .ExpertArcheryFound:                  ;Expert Archery  (ranged Attack damage +50%) 
   ld    de,2                            ;divide total attack by 2 to get 50%
-  jp    .ApplyPercentBasedBoost
+  jp    ApplyPercentBasedBoost
 
-  .ApplyPercentBasedBoost:
+ApplyPercentBasedBoost:
   push  hl                              ;hl=current total attack monster (after applying damage boosts from items)
   
   push  hl

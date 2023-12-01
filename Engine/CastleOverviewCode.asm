@@ -4247,12 +4247,18 @@ call ScreenOn
 
   ld    a,(BigChest?)
   or    a
-  ld    de,750                          ;gold
+  ld    hl,750                          ;gold
   jr    z,.SetAmountOfXp                ;zero flag: chest is red
-  ld    de,1000                         ;gold
+  ld    hl,1000                         ;gold
   .SetAmountOfXp:
-  ld    l,(ix+HeroXp+0)
-  ld    h,(ix+HeroXp+1)
+
+
+;  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  call  SetChestText.AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  
+
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
   add   hl,de
   ret   c
   ld    (ix+HeroXp+0),l
@@ -4365,10 +4371,70 @@ SetChestText:
   jr    z,.SetAmountOfXp                ;zero flag: chest is red
   ld    hl,1000                         ;gold
   .SetAmountOfXp:
+
+  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  call  .AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  
+
+  
   ld    b,121+00                        ;dx
   ld    c,171+00                        ;dy
   call  SetNumber16BitCastle
   ret
+
+
+
+.AddXPBoostFromLearning:                 ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillLearning
+  ret
+
+  .CheckSkillLearning:
+  cp    16                              ;Basic Learning  (xp +10%)  
+  jr    z,.BasicLearningFound
+  cp    17                              ;Advanced Learning  (xp +20%)  
+  jr    z,.AdvancedLearningFound
+  cp    18                              ;Expert Learning  (xp +30%)  
+  jr    z,.ExpertLearningFound
+  ret
+
+  .BasicLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    .ApplyPercentBasedBoost
+
+  .AdvancedLearningFound:
+  ld    de,5                            ;divide total attack by 5 to get 20%
+  jp    .ApplyPercentBasedBoost
+
+  .ExpertLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  call  .ApplyPercentBasedBoost
+  add   hl,bc                           ;add that 10% again to get 20%
+  add   hl,bc                           ;add that 10% again to get 30%
+  ret
+
+.ApplyPercentBasedBoost:
+  push  hl                              ;hl=current total attack monster (after applying damage boosts from items)
+  
+  push  hl
+  pop   bc
+;  ld    de,2                            ;divide total attack by 2 to get 50%
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  pop   hl
+  add   hl,bc                           ;add the 50% boost to total attack monster
+  ret
+
 
 SetChestGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128          ;red chest (rubies)
