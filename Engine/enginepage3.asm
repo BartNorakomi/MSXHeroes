@@ -170,6 +170,7 @@ CopyRamToVramPage3ForBattleEngine:
   out   ($a8),a      
 
   ld    a,(BlockToReadFrom)
+
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   call  .go                             ;go copy
@@ -249,6 +250,7 @@ MonsterThatIsBeingAttackedNX:  ds  1
 MonsterThatIsBeingAttackedY:  ds  1
 MonsterThatIsBeingAttackedNY:  ds  1
 
+;MonsterTabledCopiedToRamPage3:  ds  Monster002Table-Monster001Table
 
 ;MonsterFacingRightWhileAttacking?:  db  1
 ActiveMonsterAttackingDirection: ds  1

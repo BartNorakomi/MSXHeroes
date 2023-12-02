@@ -14382,6 +14382,9 @@ SetIndividualBuildings:
   call  docopy
   .EndCheckMageGuild:
 
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
 ;tavern
   ld    a,(iy+CastleTavern)
   or    a

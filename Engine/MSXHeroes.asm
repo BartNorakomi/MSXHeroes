@@ -849,11 +849,18 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-; block $50 - 51
-;
+; block $50
 BattleCodeBlock:  equ   $50
 phase	$4000
   include "BattleCode.asm"
+  kut:
+	ds		$8000-$,$ff
+dephase
+
+; block $51
+BattleCodePage2Block:  equ   $51
+phase	$8000
+  include "BattleCodePage2.asm"
 	ds		$c000-$,$ff
 dephase
 

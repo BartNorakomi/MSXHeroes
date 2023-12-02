@@ -1516,7 +1516,7 @@ DescriptionNecklace3:        db  "Negligee of Teeth",254 | NegligeeOfTeethIntell
                           ;item 038
 DescriptionNecklace4:        db  "Skull of the Unborn",254
                           db  "Increases Necromancy",254
-                          db  "skill by 5%",255
+                          db  "skill by 10%",255
 
                           ;item 039
 DescriptionNecklace5:        db  "The Choker",254 | TheChokerSpellPower: equ 6
@@ -4675,7 +4675,7 @@ SkillNecromancyAdvanced:
 SkillNecromancyExpert:
                           db  "Expert Necromancy                ",255
                           db  "Expert Necromancy                ",254
-                          db  "Revives 30% of enemy creatures   ",254
+                          db  "Revives 1/3 of enemy creatures   ",254
                           db  "that have fallen in battle.      ",255
 
 
