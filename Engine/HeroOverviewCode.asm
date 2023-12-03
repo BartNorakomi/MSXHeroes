@@ -4499,32 +4499,32 @@ SkillArcheryBasic:
                           db  "Basic Archery                    ",255   ;skillnr# 001
                           db  "Basic Archery                    ",254
                           db  "The ranged Attack damage of your ",254
-                          db  "units is increased by 10%.       ",255
+                          db  "units is increased by 10%        ",255
 SkillArcheryAdvanced:
                           db  "Advanced Archery                 ",255
                           db  "Advanced Archery                 ",254
                           db  "The ranged Attack damage of your ",254
-                          db  "units is increased by 20%.       ",255
+                          db  "units is increased by 20%        ",255
 SkillArcheryExpert:
                           db  "Expert Archery                   ",255
                           db  "Expert Archery                   ",254
                           db  "The ranged Attack damage of your ",254
-                          db  "units is increased by 50%.       ",255
+                          db  "units is increased by 50%        ",255
 SkillOffenceBasic:
                           db  "Basic Offence                    ",255   ;skillnr# 004
                           db  "Basic Offence                    ",254
                           db  "The hand to hand damage of your  ",254
-                          db  "units is increased by 10%.       ",255
+                          db  "units is increased by 10%        ",255
 SkillOffenceAdvanced:
                           db  "Advanced Offence                 ",255
                           db  "Advanced Offence                 ",254
                           db  "The hand to hand damage of your  ",254
-                          db  "units is increased by 20%.       ",255
+                          db  "units is increased by 20%        ",255
 SkillOffenceExpert:
                           db  "Expert Offence                   ",255
                           db  "Expert Offence                   ",254
                           db  "The hand to hand damage of your  ",254
-                          db  "units is increased by 30%.       ",255
+                          db  "units is increased by 30%        ",255
 ;Armorer is a secondary skill, that reduces the physical damage done to hero's creatures. Physical damage means damage done by enemy creatures engaged in melee or ranged combat. Armorer secondary skill does not reduce damage from spells cast by enemy heroes or creatures.
 SkillArmourerBasic:
                           db  "Basic Armorer                    ",255   ;skillnr# 007
@@ -4586,17 +4586,17 @@ SkillLearningBasic:
                           db  "Basic Learning                   ",255   ;skillnr# 016
                           db  "Basic Learning                   ",254
                           db  "Your hero's accumulated          ",254
-                          db  "experience is amplified by 10%.  ",255
+                          db  "experience is amplified by 10%   ",255
 SkillLearningAdvanced:
                           db  "Advanced Learning                ",255
                           db  "Advanced Learning                ",254
                           db  "Your hero's accumulated          ",254
-                          db  "experience is amplified by 20%.  ",255
+                          db  "experience is amplified by 20%   ",255
 SkillLearningExpert:
                           db  "Expert Learning                  ",255
                           db  "Expert Learning                  ",254
                           db  "Your hero's accumulated          ",254
-                          db  "experience is amplified by 30%.  ",255
+                          db  "experience is amplified by 30%   ",255
 SkillLogisticsBasic:
                           db  "Basic Logistics                  ",255   ;skillnr# 019
                           db  "Basic Logistics                  ",254
@@ -4620,17 +4620,17 @@ SkillIntelligenceBasic:
                           db  "Basic Intelligence               ",255   ;skillnr# 022
                           db  "Basic Intelligence               ",254
                           db  "Boosts your hero's maximum spell ",254
-                          db  "points by 25%.                   ",255
+                          db  "points by 25%                    ",255
 SkillIntelligenceAdvanced:
                           db  "Advanced Intelligence            ",255
                           db  "Advanced Intelligence            ",254
                           db  "Boosts your hero's maximum spell ",254
-                          db  "points by 50%.                   ",255
+                          db  "points by 50%                    ",255
 SkillIntelligenceExpert:
                           db  "Expert Intelligence              ",255
                           db  "Expert Intelligence              ",254
                           db  "Boosts your hero's maximum spell ",254
-                          db  "points by 100%.                  ",255
+                          db  "points by 100%                   ",255
 SkillSorceryBasic:
                           db  "Basic Sorcery                    ",255   ;skillnr# 025
                           db  "Basic Sorcery                    ",254

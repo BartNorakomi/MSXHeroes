@@ -381,6 +381,8 @@ OrderOfMonstersFromHighToLow:
   dw  Monster12  ;0C1B1h
   dw  Monster13  ;0C1B1h
 
+BrokenArrow?: ds  1 ;0=normal bow and arrow (ranged 100% damage), 1=broken arrow (ranged 50% damage)
+
 NeutralEnemyDied?: db  0
 SwitchToNextMonster?: db  0
 MoVeMonster?: db  0

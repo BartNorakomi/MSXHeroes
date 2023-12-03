@@ -9817,7 +9817,7 @@ CastleOverviewMarketPlaceCode:
   .SetIcanOfferYouWindow:
   ld    hl,$4000 + (109*128) + (000/2) - 128
   ld    de,$0000 + (123*128) + (000/2) - 128
-  ld    bc,$0000 + (044*256) + (256/2)
+  ld    bc,$0000 + (043*256) + (256/2)
   ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 

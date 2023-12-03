@@ -32,7 +32,7 @@ HandleMonsters:
   or    a
   jr    z,.EndEraseGridTile
 
-  call  EraseMonsterPreviousFrame       ;copmy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
+  call  EraseMonsterPreviousFrame       ;copy from page 2 to inactive page to erase monster (this does not affect other monsters, since they are hardwritten into page 2)
 
   .EndEraseGridTile:
 
@@ -55,7 +55,7 @@ HandleMonsters:
     
   call  CheckIsCursorOnATileThisFrame
 
-  di | call  SetcursorWhenGridTileIsActive | ei
+  call  SetcursorWhenGridTileIsActive | ei
 
   ld    a,(IsCursorOnATileThisFrame?)
   or    a
@@ -387,6 +387,26 @@ SetMonsterTableInIY:
   ;go to: Monster001Table-LengthMonsterAddressesTable + (monsternumber * LengthMonsterAddressesTable)
   ld    a,MonsterAddressesForBattle1Block               ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  ld    h,0
+  ld    l,(ix+MonsterNumber)
+  ld    de,LengthMonsterAddressesTable
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+  ex    de,hl
+  add   iy,de
+  ret
+
+SetMonsterTableInIYWithoutEnablingInt:
+  ld    a,(slot.page12rom)              ;all RAM except page 1+2
+  out   ($a8),a     
+
+  ;go to: Monster001Table-LengthMonsterAddressesTable + (monsternumber * LengthMonsterAddressesTable)
+  ld    a,MonsterAddressesForBattle1Block               ;Map block
+;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+	ld		(memblocks.2),a
+	ld		($7000),a
 
   ld    h,0
   ld    l,(ix+MonsterNumber)
@@ -1953,8 +1973,10 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ;/are we checking a monster that belongs to the left or right hero ?
 
   ld    de,ItemDefencePointsTable
-  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet
+  push  ix
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  pop   ix
 
   ld    d,0
   ld    e,(ix+HeroStatDefense)
@@ -2141,8 +2163,10 @@ CheckPointerOnDefendingHero:
   ;set attack
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
   ld    de,ItemAttackPointsTable
-  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet
+  push  ix
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  pop   ix
   ld    e,(ix+HeroStatAttack)           ;attack
   ld    d,0
   add   hl,de
@@ -2153,7 +2177,9 @@ CheckPointerOnDefendingHero:
   ;set defense
   ld    de,ItemDefencePointsTable
   ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  push  ix
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  pop   ix
   ld    e,(ix+HeroStatDefense)           ;attack
   ld    d,0
   add   hl,de
@@ -2187,8 +2213,10 @@ CheckPointerOnDefendingHero:
 
   ;set spell damage
   ld    de,ItemSpellDamagePointsTable
-  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
-  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet
+  push  ix
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
+  pop   ix
   ld    e,(ix+HeroStatSpelldamage)
   ld    d,0
   add   hl,de
@@ -2202,7 +2230,6 @@ CheckPointerOnDefendingHero:
   ;set name
   ld    b,064+134                           ;dx
   ld    c,047                           ;dy
-
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
@@ -3412,7 +3439,6 @@ MoveMonster:
   call  SetTotalMonsterAttackInHL  ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
   push  hl
 
-
 ;  ld    d,0
 ;  ld    e,(iy+MonsterTableAttack)       ;attacking monster damage per unit
 ;  push  de
@@ -3423,11 +3449,46 @@ MoveMonster:
   call  MultiplyHlWithDE                ;Out: HL = result
   ;Now we have total damage in HL
 
+;check if ranged attacker has a broken arrow
+  ld    a,(BrokenArrow?)
+  or    a
+  jr    z,.EndCheckBrokenArrow
+  push  hl
+  pop   bc
+  ld    de,2                            ;50% damage for ranged monsters with broken arrow mouse pointer
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl
+  .EndCheckBrokenArrow:
+;/check if ranged attacker has a broken arrow
+
+;check if attack is a retaliation, and retaliating monster is ranged, if so: 50% damage
+  ld    a,(HandleRetaliation?)          ;check if current attack is a retaliation
+  or    a
+  jr    z,.EndCheckRetaliation
+
+  push  hl
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  pop   hl
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedMonster
+  jp    nz,.EndCheckRetaliation
+
+  push  hl
+  pop   bc
+  ld    de,2                            ;50% damage for retaliating ranged monsters
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl
+
+  .EndCheckRetaliation:
+;/check if attack is a retaliation, and retaliating monster is ranged, if so: 50% damage
+
   ;an attacked monster loses life with this formula:
   ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
   ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
-  
-;  call  ApplyDamageModifiers
+;  call  ApplyAttackDefenseFormula 
 
   ld    de,0
   ex    de,hl
@@ -3446,7 +3507,9 @@ MoveMonster:
   ld    ix,(MonsterThatIsBeingAttacked)
   .loop:
   ld    d,0
-  ld    e,(ix+MonsterHP)
+  ld    e,c
+;  ld    e,(ix+MonsterHP)
+
   add   hl,de
   jr    c,.NoUnitsOrExactly1UnitLost
 
@@ -3645,6 +3708,79 @@ MoveMonster:
   sub   a,4
   ld    (ix+MonsterY),a
   ret
+
+  ;an attacked monster loses life with this formula:
+  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
+  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+ApplyAttackDefenseFormula:          ;in: hl=total damage, out: hl=total damage after attack/defense formula
+  push  hl
+  
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  SetMonsterTableInIY             ;out: iy->monster table idle  
+  call  SetTotalMonsterDefenseInHL  ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
+  push  hl
+
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle  
+  call  SetTotalMonsterAttackInHL  ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
+  pop   de
+  
+  or    a
+  sbc   hl,de                         ;subtrack attacker's attack - defender's defense
+  jr    z,.AttackAndDefenseAreTheSame
+  
+  jr    c,.DefenseIsHigher
+
+  .AttackIsHigher:                    ;the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
+  ld    a,l
+  cp    61
+  jr    c,.Go2
+  ld    a,60
+  .Go2:
+  ld    e,a
+
+  pop   hl
+
+  push  de
+  ld    de,20                           ;divide total attack by 20 to get 5%
+  call  ApplyPercentBasedBoost
+  pop   de
+
+  .loop1:
+  dec   e
+  ret   z
+  add   hl,bc                           ;add that 5% again
+  jp    .loop1
+ 
+  .DefenseIsHigher:                     ;attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+  ld    a,l
+  neg
+  cp    13
+  jr    c,.Go
+  ld    a,12
+  .Go:
+
+  ld    e,a
+  pop   hl
+
+  push  de
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  call  ApplyPercentBasedBoost
+  pop   de
+  or    a
+  sbc   hl,bc
+  sbc   hl,bc
+
+  .loop2:
+  dec   e
+  ret   z
+  sbc   hl,bc                           ;subtract that 2.5% again
+  jp    .loop2
+
+  .AttackAndDefenseAreTheSame:
+  pop   hl
+  ret
+
 
 MoveGridPointer:
   ld    a,(spat)
@@ -4280,6 +4416,9 @@ CheckSpaceToMoveMonster:
   bit   4,a
   ret   z
 
+  xor   a
+  ld    (BrokenArrow?),a
+
   ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
   ld    de,CursorBoots
   call  CompareHLwithDE
@@ -4327,8 +4466,10 @@ CheckSpaceToMoveMonster:
   jp    z,.BrokenArrowFoundSetMovementPath
   ret
 
-  .BowAndArrowFoundSetMovementPath:
   .BrokenArrowFoundSetMovementPath:
+  ld    a,1
+  ld    (BrokenArrow?),a
+  .BowAndArrowFoundSetMovementPath:  
   call  SetCurrentActiveMOnsterInIX
   ld    a,(ix+MonsterX)
   ld    iy,(MonsterThatIsBeingAttacked)
@@ -5598,6 +5739,8 @@ SetcursorWhenGridTileIsActive:
   inc   c
 
 
+  di
+
 ;	ld    a,(CurrentActiveMonsterSpeed)
 ;  ld    c,a
 
@@ -5605,7 +5748,7 @@ SetcursorWhenGridTileIsActive:
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means current monster is standing there
   jr    z,.ProhibitionSign
-  cp    c                               ;if tile pointer points at =>x, that means monster does not have enough movement points to move there
+  cp    c                               ;if tile pointer points at > c, that means monster does not have enough movement points to move there
   jr    nc,.ProhibitionSign
 
 
@@ -5685,9 +5828,9 @@ SetcursorWhenGridTileIsActive:
   .CheckPointerOnEnemy:
   ld    a,(CurrentActiveMonster)
   cp    7
-  jr    nc,.LeftPlayerIsActive
+  jr    nc,.RightPlayerIsActive
 
-  .RightPlayerIsActive:
+  .LeftPlayerIsActive:
   ld    ix,Monster7
   call  .CheckMonster
   ld    ix,Monster8
@@ -5702,7 +5845,7 @@ SetcursorWhenGridTileIsActive:
   call  .CheckMonster
   ret
 
-  .LeftPlayerIsActive:
+  .RightPlayerIsActive:
   ld    ix,Monster1
   call  .CheckMonster
   ld    ix,Monster2
@@ -5802,7 +5945,7 @@ SetcursorWhenGridTileIsActive:
 
   ;At this point pointer is on an enemy, check if current monster is ranged
   call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  call  SetMonsterTableInIYWithoutEnablingInt             ;out: iy->monster table idle
   ld    a,(iy+MonsterTableSpecialAbility)
   cp    RangedMonster
   jp    z,RangedMonsterCheck
@@ -6032,9 +6175,9 @@ SetcursorWhenGridTileIsActive:
   .CheckTile:
 
 
-  push  hl
+  push  hl;
   call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  call  SetMonsterTableInIYWithoutEnablingInt             ;out: iy->monster table idle
   call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
   ld    c,l
   inc   c                               ;we need to add 1 to the total monster speed for accurate detection to see if an enemy can be attacked
@@ -6060,7 +6203,7 @@ SetcursorWhenGridTileIsActive:
 
 
 
-RangedMonstersRange:  equ 7
+RangedMonstersRange:  equ 10 ;actual range is 10-2=8
 RangedMonsterCheck:
   xor   a
   ld    (IsThereAnyEnemyRightNextToActiveMonster?),a
