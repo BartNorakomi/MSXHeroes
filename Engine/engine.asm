@@ -97,7 +97,7 @@ LevelEngine:
   jp    LevelEngine
 
 
-
+vblankintflag2: ds 1
 PreviousVblankIntFlag:  db  1
 page1bank:  ds  1
 vblank:
@@ -112,17 +112,33 @@ vblank:
   push  bc
   push  de
   push  hl
-;  push  ix
-;  push  iy
 
-;  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-;  cp    2
-;  jr    z,.CastleOverView
+  ;add a slowdown to the mousemovement during minimap scrolling
+  ld    a,(LockMiniMapOn?)
+  or    a
+  jr    z,.EndCheckSlowdown
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(ControlsOnInterrupt)
+  and   %0000 1111
+  jr    z,.EndCheckSlowdown
+
+  ld    a,(vblankintflag2)
+  inc   a                               ;vblank flag gets incremented
+  ld    (vblankintflag2),a  
+  and   15
+  jr    nz,.skip
+  .EndCheckSlowdown:
+  ;/add a slowdown to the mousemovement during minimap scrolling
 
   call  PopulateControlsOnInterrupt     ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	MovePointer	                    ;readout keyboard and mouse matrix/movement and move (mouse) pointer (set mouse coordinates in spat)
   call  MiniMapSquareIconInteractionOnInterrupt
+  .skip:
 
 ;when we set sprite character we also need to look at the worldmap object layer.
 ;for instance, we need to check if the mouse pointer is over an object
@@ -164,8 +180,6 @@ vblank:
   inc   a                               ;vblank flag gets incremented
   ld    (vblankintflag),a  
 
-;  pop   iy 
-;  pop   ix 
   pop   hl 
   pop   de 
   pop   bc 
@@ -343,7 +357,7 @@ MiniMapSquareIconInteractionOnInterrupt:
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
   ld    a,(ControlsOnInterrupt)
-  bit   4,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  bit   4,a                             ;check ontrols to see if space is pressed
   jr    z,.LockOff
   
   ld    a,(spat+0)                      ;y mouse
@@ -4397,7 +4411,7 @@ scrollscreen:                           ;you can either scroll the scroll by mov
 	ld		a,(keys+6)
 	bit		1,a			                        ;check ontrols to see if CTRL is pressed
 	jp		nz,.EndCheckCTRL
-
+  
   ld    a,(Controls)                    ;freeze directional control when CTRL pressed
   and   %1111 0000
   ld    (Controls),a
@@ -4462,6 +4476,12 @@ scrollscreen:                           ;you can either scroll the scroll by mov
 	sub		a,TilesPerColumn-1
 	ld		e,a
 
+  call  .ScrollMap
+	ld		a,(keys+6)
+	bit		0,a			                        ;shift (holding down shift scrolls twice as fast)
+  ret   nz
+
+  .ScrollMap:
 	ld		a,(mappointerx)
 	add		a,b                             ;set new map pointer x
 	cp		d                               ;check if camera is still within the total map
@@ -4934,13 +4954,13 @@ pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl1Hero1Units:  db 0 | dw 0 |      db 0 | dw 0 |      db 7 | dw 1 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl1Hero1Units:  db 0 | dw 0 |      db 0 | dw 0 |      db 1 | dw 5 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
-.HeroSkills:  db  25,18,3,31,0,0
+.HeroSkills:  db  25,18,3,33,9,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -4949,7 +4969,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  004,009,045,045,024,045,045,038,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -5139,19 +5159,21 @@ pl2hero1mana:	dw	03,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl2Hero1Units:  db 7 | dw 8 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 3
 .HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 5  ;amount of spell damage
-.HeroSkills:  db  33,10,1,0,0,17
+.HeroSkills:  db  33,10,1,9,0,17
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
 .AirSpells:         db  %0000 0000
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
-.Inventory: ds  lenghtinventorytable,045
+;               swo arm shi hel boo glo rin nec rob
+.Inventory: db  045,009,010,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
 .HeroSpecificInfo: dw HeroAddressesJamieSeed
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 

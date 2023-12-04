@@ -1358,6 +1358,7 @@ EndTurn:
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
+  call  AddKingsGarmentIncomeToPlayer   ;add 125 income to hero with Kings Garment to player
   call  ActivateFirstActiveHeroForCurrentPlayer
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
@@ -1562,6 +1563,43 @@ SetAndRotateTavernHeroes:               ;At start of player 1's turn, rotate all
   ld    (hl),a
   ret
 
+AddKingsGarmentIncomeToPlayer:
+  call  SetHero1ForCurrentPlayerInIX
+
+  ld    b,amountofheroesperplayer
+  .loop:
+  push  ix
+  call  .CheckSkill
+  pop   ix
+  
+  ld    de,lenghtherotable
+  add   ix,de                           ;next hero
+  djnz  .loop
+  ret
+  
+  .CheckSkill:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255
+  ret   z                               ;dont add King's Garment gold if hero is inactive/died/retreated
+  ld    a,(ix+Heroy)
+  cp    255                             ;a retreated or fled hero has x=255
+  ret   z                               ;dont add King's Garment gold if hero is inactive/died/retreated
+
+  ld    a,(ix+HeroInventory+8)          ;robe
+  cp    040                             ;The King's Garment (+125 gold per day)
+  ret   nz
+
+   call  SetResourcesCurrentPlayerinIX  
+ ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)
+  ld    de,125
+  add   hl,de
+  ret   c
+  ld    (ix+0),l
+  ld    (ix+1),h
+  ret
+
 AddEstatesIncomeToPlayer:  
   call  SetHero1ForCurrentPlayerInIX
 
@@ -1582,7 +1620,8 @@ AddEstatesIncomeToPlayer:
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    255
   ret   z                               ;dont add estates gold if hero is inactive/died/retreated
-  cp    254
+  ld    a,(ix+Heroy)
+  cp    255                             ;a retreated or fled hero has x=255
   ret   z                               ;dont add estates gold if hero is inactive/died/retreated
 
   ld    a,(ix+HeroSkills)
@@ -10226,9 +10265,9 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "lose your entire army. ",254
-                          db  "by paying John a fee of 1000 Gold Surrender ?",254
-                          db  "Are you sure about retreating? Just remember, you'll ",254
+.DescriptionFire1:        db  "The SilkenLarvas do 2222 damage. 222 SilkenLarvas die",254
+                          db  "Round 4 begins",254
+                          db  "The SilkenLarvas wait for a better time to act",254
                           db  "Take a look at the available building options. ",255
 
 ;.AncientScroll:           db  "Unearthing an ancient scroll you",254

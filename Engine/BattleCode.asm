@@ -14,6 +14,12 @@ HandleMonsters:
   call  CheckSwitchToNextMonster
   call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
 
+;battle code page 2
+  ld    a,BattleCodePage2Block          ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
+  call  SetBattleText
+;/battle code page 2
+
 ;current monster (erase)
   call  SetCurrentActiveMOnsterInIX
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
@@ -180,11 +186,11 @@ call screenon
   cp    5
   jr    z,.SurrenderButtonPressed
   cp    4
-  jr    z,.DefendButtonPressed
-  cp    3
-  jr    z,.SpellBookButtonPressed
-  cp    2
   jr    z,.WaitButtonPressed
+  cp    3
+  jr    z,.DefendButtonPressed
+  cp    2
+  jr    z,.SpellBookButtonPressed
   cp    1
   jr    z,.AutoCombatButtonPressed
   
@@ -1807,6 +1813,7 @@ CheckRightClickToDisplayInfo:
   ld    hl,.TextSlash
   call  SetText
 
+;.kut: jp .kut
   ;set total hp
   call  SetTotalMonsterHPInHL           ;in ix->monster. out: hl=total hp (including boosts from inventory items, skills and magic)
 
@@ -1906,6 +1913,9 @@ SetTotalMonsterHPInHL:  ;in ix->monster. out: hl=total hp (including boosts from
   ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
   jr    c,.HeroFound
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+
   ld    a,l
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
@@ -1935,6 +1945,9 @@ SetTotalMonsterSpeedInHL: ;in ix->monster, iy->monstertable. out: hl=total speed
   ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
   jr    c,.HeroFound
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+
   ld    a,l
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
@@ -1964,6 +1977,9 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
   jr    c,.HeroFound
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+
   ld    a,l
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
@@ -2000,6 +2016,9 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
   jr    c,.HeroFound
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+
   ld    a,l
   or    h
   jr    z,.setAttackNeutralMonster
@@ -2438,6 +2457,27 @@ CheckWaitButtonPressed:
 
   ld    a,1
   ld    (SwitchToNextMonster?),a
+  
+  ;Prepare text to be put in the battle text box
+  ld    a,1                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  .EntryPointForDefendButtonPressed:
+  ld    (BattleTextQ),a
+  ld    a,2
+  ld    (SetBattleText?),a              ;amount of frames/pages we put text
+
+  ld    a,(ix+MonsterAmount)            ;set amount
+  or    (ix+MonsterAmount+1)
+  ld    (BattleTextQ+1),a               ;amount: 1 or more
+
+  call  SetMonsterTableInIY             ;copy monster name
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  ld    de,BattleTextQ+3
+  ld    bc,12
+  ldir
+  ;/Prepare text to be put in the battle text box
   ret
 
 CheckDefendButtonPressed:
@@ -2471,6 +2511,11 @@ CheckDefendButtonPressed:
 
   ld    a,1
   ld    (SwitchToNextMonster?),a
+
+  ;Prepare text to be put in the battle text box
+  ld    a,2                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  jp    CheckWaitButtonPressed.EntryPointForDefendButtonPressed
+  ;/Prepare text to be put in the battle text box
   ret
 
 ;############################# Code needs to be in $4000-$7fff ################################
@@ -3449,6 +3494,16 @@ MoveMonster:
   call  MultiplyHlWithDE                ;Out: HL = result
   ;Now we have total damage in HL
 
+  ;an attacked monster loses life with this formula:
+  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
+  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+  call  ApplyAttackDefenseFormula 
+
+
+
+
+
+
 ;check if ranged attacker has a broken arrow
   ld    a,(BrokenArrow?)
   or    a
@@ -3485,30 +3540,26 @@ MoveMonster:
   .EndCheckRetaliation:
 ;/check if attack is a retaliation, and retaliating monster is ranged, if so: 50% damage
 
-  ;an attacked monster loses life with this formula:
-  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
-  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
-;  call  ApplyAttackDefenseFormula 
+;Armorer is a secondary skill, that reduces the physical damage done to hero's creatures. Physical damage means damage done by enemy creatures engaged in melee or ranged combat. Armorer secondary skill does not reduce damage from spells cast by enemy heroes or creatures.
+  call  ApplyAttackReductionFromArmorer
+  call  ApplyAttackReductionFromGreenLeafShield
 
   ld    de,0
   ex    de,hl
   or    a
-  sbc   hl,de                           ;negative total damage
+  sbc   hl,de                           ;negative total damage dealt
   push  hl
 
   ld    ix,(MonsterThatIsBeingAttacked)
 
   call  SetTotalMonsterHPInHL  ;in ix->monster. out: hl=total hp (including boosts from inventory items, skills and magic)
-  ld    c,l
-;  ld    c,(iy+MonsterTableHp)           ;total hp of a unit of this type
-
-  pop   hl                              ;negative total damage
+  ld    c,l                             ;total hp of a unit of this type
+  pop   hl                              ;negative total damage dealt
 
   ld    ix,(MonsterThatIsBeingAttacked)
   .loop:
   ld    d,0
-  ld    e,c
-;  ld    e,(ix+MonsterHP)
+  ld    e,(ix+MonsterHP)                ;monster's current hp
 
   add   hl,de
   jr    c,.NoUnitsOrExactly1UnitLost
@@ -3567,13 +3618,16 @@ MoveMonster:
   or    a
   jp    z,.EndMovement
   .EndCheckRangedMonster:
+  ;/no retaliation for ranged attacking monsters
+
+
+
 
   ld    ix,(MonsterThatIsBeingAttacked)
   bit   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   jr    nz,.EndMovement
   set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   ld    a,1
-;  ld    (MonsterThatIsRetaliating),ix
   ld    (HandleRetaliation?),a
   jr    .EndMovement
     
@@ -3708,6 +3762,127 @@ MoveMonster:
   sub   a,4
   ld    (ix+MonsterY),a
   ret
+
+ApplyAttackReductionFromGreenLeafShield:
+  push  hl                              ;total damage dealt
+  
+  ld    ix,(MonsterThatIsBeingAttacked)
+
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  pop   hl                              ;total damage dealt
+  ret   z                               ;Neutral Monster Is Being Attacked. Dont Check For Armorer
+  push  hl
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
+  
+  pop   hl                              ;total damage dealt
+
+  ld    a,(ix+HeroInventory+2)          ;shield
+  cp    010                             ;Greenleaf Shield (50% less damage from ranged units)
+  ret   nz
+
+  ;at this point monster that is being attack has greenleaf shield applied, check if attacker is ranged
+  push  hl
+  call  SetCurrentActiveMOnsterInIX
+  call  SetMonsterTableInIY             ;out: iy->monster table idle  
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedMonster
+  pop   hl
+  ret   nz
+  
+  ld    de,02                           ;divide total attack by 2 to get 50%
+  call  ApplyPercentBasedBoost
+  or    a
+  sbc   hl,bc
+  sbc   hl,bc
+  ret
+  
+
+;Armorer is a secondary skill, that reduces the physical damage done to hero's creatures. Physical damage means damage done by enemy creatures engaged in melee or ranged combat. Armorer secondary skill does not reduce damage from spells cast by enemy heroes or creatures.
+ApplyAttackReductionFromArmorer:
+  push  hl                              ;total damage dealt
+  
+  ld    ix,(MonsterThatIsBeingAttacked)
+
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  pop   hl                              ;total damage dealt
+  ret   z                               ;Neutral Monster Is Being Attacked. Dont Check For Armorer
+  push  hl
+  .HeroFound:
+  ;/are we checking a monster that belongs to the left or right hero ?
+
+  pop   hl                              ;total damage dealt
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillArmorer
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillArmorer
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillArmorer
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillArmorer
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillArmorer
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillArmorer
+  ret
+
+  .CheckSkillArmorer:
+  cp    07                              ;Basic Armorer  (-5% physical damage)  
+  jr    z,.BasicArmorerFound
+  cp    08                              ;Advanced Armorer  (-10% physical damage)  
+  jr    z,.AdvancedArmorerFound
+  cp    09                              ;Expert Armorer  (-15% physical damage)  
+  jr    z,.ExpertArmorerFound
+  ret
+
+  .BasicArmorerFound:
+  ld    de,20                           ;divide total attack by 20 to get 5%
+  call  ApplyPercentBasedBoost
+  or    a
+  sbc   hl,bc
+  sbc   hl,bc
+  ret
+
+  .AdvancedArmorerFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  call  ApplyPercentBasedBoost
+  or    a
+  sbc   hl,bc
+  sbc   hl,bc
+  ret
+
+  .ExpertArmorerFound:
+  ld    de,07                           ;divide total attack by 7 to get 14.28%
+  call  ApplyPercentBasedBoost
+  or    a
+  sbc   hl,bc
+  sbc   hl,bc
+  ret
+
+
+
 
   ;an attacked monster loses life with this formula:
   ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
@@ -4790,7 +4965,33 @@ CheckSwitchToNextMonster:
 
   ld    a,2
 	ld    (EraseMonster+sPage),a
+
+  ld    a,(HandleRetaliation?)
+  or    a
+  ret   nz
+
+  ld    hl,.WaitButtonActive
+  ld    de,GenericButtonTable + (3*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %0111 1111
+  cp    1                               ;check waiting
+  ret   nz
+
+  ld    hl,.WaitButtonGrey
+  ld    de,GenericButtonTable + (3*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
   ret
+
+.WaitButtonGrey:
+  db  %1100 0011 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128
+.WaitButtonActive:
+  db  %1100 0011 | dw $4000 + (054*128) + (160/2) - 128 | dw $4000 + (054*128) + (178/2) - 128 | dw $4000 + (054*128) + (196/2) - 128
+  
   
 FindNextActiveMonster:
   call  SortMonstersOnTheirSpeed
@@ -4859,6 +5060,14 @@ FindNextActiveMonster:
   ld    (Monster10+MonsterStatus),a
   ld    (Monster11+MonsterStatus),a
   ld    (Monster12+MonsterStatus),a
+  ld    a,5                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  ld    (BattleTextQ),a
+  ld    a,2
+  ld    (SetBattleText?),a              ;amount of frames/pages we put text
+  ld    a,(BattleRound)
+  inc   a
+  ld    (BattleRound),a
+  ld    (BattleTextQ+1),a
   jp    FindNextActiveMonster
 
   .MonsterFound:

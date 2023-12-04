@@ -19,7 +19,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -230,6 +230,15 @@ CopyRamToVramPage3ForBattleEngine:
 ;$c188 = monster = 001
 
 ;$c1a3 = leftbottom = 002
+BattleTextQ: db 5 | dw 0001 | db "           ",255  ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+BattleRound:  db  1
+SetBattleText?: db  2                               ;amount of frames/pages text will be put        
+BattleText1: db 0 | dw 0001 | db "           ",255  ;example wait:        The SilkenLarva(s) wait
+BattleText2: db 0 | dw 0000 | db "           ",255  ;example defend:      SilkenLarva(s): +10 defense
+BattleText3: db 0 | dw 2222 | db "           ",255  ;example deal damage: SilkenLarva do/deal 2222 dmg
+BattleText4: db 0 | dw 0300 | db "           ",255  ;example units dead:  300 SilkenLarva(s) die 
+BattleText5: db 0 | dw 0000 | db "           ",255  ;example next round:  Round 4 begins
+
 
 MonsterHerocollidedWithOnMap: ds  1
 AddressOfMonsterHerocollidedWithOnMap: ds  1

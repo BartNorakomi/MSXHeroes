@@ -2094,14 +2094,14 @@ Monster089Table:                        ;Lurcher (undeadline)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    CastleVaniaUnitLevel1CostGold        ;cost (gold)
+  db    CastleVaniaUnitLevel1CostGems        ;cost (gems)
+  db    CastleVaniaUnitLevel1CostRubies      ;cost (rubies)
+  db    CastleVaniaUnitLevel1HP              ;hp
+  db    CastleVaniaUnitLevel1Speed           ;speed
+  db    CastleVaniaUnitLevel1Attack          ;attack
+  db    CastleVaniaUnitLevel1Defense         ;defense
+  db    CastleVaniaUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Lurcher",255,"    "
 

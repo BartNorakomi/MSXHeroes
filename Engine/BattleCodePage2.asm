@@ -334,9 +334,10 @@ BattleButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5
   db  %1100 0011 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (000*128) + (178/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db BattleButton1Ytop,BattleButton1YBottom,BattleButton1XLeft,BattleButton1XRight | dw $0000 + (BattleButton1Ytop*128) + (BattleButton1XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + (000*128) + (214/2) - 128 | dw $4000 + (000*128) + (232/2) - 128 | dw $4000 + (018*128) + (160/2) - 128 | db BattleButton2Ytop,BattleButton2YBottom,BattleButton2XLeft,BattleButton2XRight | dw $0000 + (BattleButton2Ytop*128) + (BattleButton2XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + (018*128) + (178/2) - 128 | dw $4000 + (018*128) + (196/2) - 128 | dw $4000 + (018*128) + (214/2) - 128 | db BattleButton3Ytop,BattleButton3YBottom,BattleButton3XLeft,BattleButton3XRight | dw $0000 + (BattleButton3Ytop*128) + (BattleButton3XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (018*128) + (232/2) - 128 | dw $4000 + (036*128) + (160/2) - 128 | dw $4000 + (036*128) + (178/2) - 128 | db BattleButton4Ytop,BattleButton4YBottom,BattleButton4XLeft,BattleButton4XRight | dw $0000 + (BattleButton4Ytop*128) + (BattleButton4XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton5Ytop,BattleButton5YBottom,BattleButton5XLeft,BattleButton5XRight | dw $0000 + (BattleButton5Ytop*128) + (BattleButton5XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (054*128) + (160/2) - 128 | dw $4000 + (054*128) + (178/2) - 128 | dw $4000 + (054*128) + (196/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
+
+  db  %1100 0011 | dw $4000 + (054*128) + (160/2) - 128 | dw $4000 + (054*128) + (178/2) - 128 | dw $4000 + (054*128) + (196/2) - 128 | db BattleButton4Ytop,BattleButton4YBottom,BattleButton4XLeft,BattleButton4XRight | dw $0000 + (BattleButton4Ytop*128) + (BattleButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (018*128) + (232/2) - 128 | dw $4000 + (036*128) + (160/2) - 128 | dw $4000 + (036*128) + (178/2) - 128 | db BattleButton5Ytop,BattleButton5YBottom,BattleButton5XLeft,BattleButton5XRight | dw $0000 + (BattleButton5Ytop*128) + (BattleButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (054*128) + (214/2) - 128 | dw $4000 + (054*128) + (232/2) - 128 | dw $4000 + (072*128) + (160/2) - 128 | db BattleButton7Ytop,BattleButton7YBottom,BattleButton7XLeft,BattleButton7XRight | dw $0000 + (BattleButton7Ytop*128) + (BattleButton7XLeft/2) - 128
 
 
@@ -1008,4 +1009,147 @@ HandleExplosionSprite:
   xor   a
   ld    (ShowExplosionSprite?),a  
   ret
+
+SetBattleText:
+  ld    a,(SetBattleText?)
+  dec   a
+  ret   m
+  ld    (SetBattleText?),a
+
+  dec   a
+  call  z,.Setup                        ;the first frame we set text, setup the text in the list
+
+  call  .CleanTextField
+
+  ld    ix,BattleText1
+  ld    c,203                           ;dy
+  call  .SetText
+  ld    ix,BattleText2
+  ld    c,195                           ;dy
+  call  .SetText
+  ret
+
+  .SetText:
+  ld    a,(ix)                          ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  dec   a
+  jp    z,.wait
+  dec   a
+  jp    z,.defend
+  dec   a
+;  jp    z,.DealDamage
+  dec   a
+;  jp    z,.UnitsDie
+  dec   a
+  jp    z,.NextRound
+  ret
+
+  .NextRound:
+  ld    b,060                           ;dx
+
+  ld    hl,.TextRound
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    a,(ix+1)                        ;round nr
+  ld    h,0
+  ld    l,a
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetNumber16BitCastle
+  pop   bc
+
+  ld    hl,.TextBegins
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+;  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+;  pop   bc
+  ret
+.TextRound: db "Round ",255
+.TextBegins: db " begins",255
+
+
+  .defend:
+  ld    b,060                           ;dx
+
+  push  ix
+  pop   hl
+  ld    de,3
+  add   hl,de                           ;monster name
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+
+  ld    a,(ix+1)                        ;amount: 1 or more
+  dec   a
+  ld    hl,.TextdefenseSingleUnit
+  jr    z,.AmountFound2
+  ld    hl,.TextdefenseMultipleUnits
+  .AmountFound2:
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+;  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+;  pop   bc
+  ret
+.TextdefenseSingleUnit: db ": +10 defense.",255
+.TextdefenseMultipleUnits: db "s: +10 defense.",255
+
+
+
+
+  .wait:
+  ld    b,060                           ;dx
+  ld    hl,.TextThe
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  push  ix
+  pop   hl
+  ld    de,3
+  add   hl,de                           ;monster name
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    a,(ix+1)                        ;amount: 1 or more
+  dec   a
+  ld    hl,.Textwaits
+  jr    z,.AmountFound1
+  ld    hl,.Textswait
+  .AmountFound1:
+
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+;  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+;  pop   bc
+  ret
+.TextThe: db "The ",255
+.Textwaits: db " waits.",255
+.Textswait: db "s wait.",255
+
+.Setup:
+  ld    hl,BattleText1
+  ld    de,BattleText2
+  ld    bc,4*(BattleText2-BattleText1)
+  ldir
   
+  ld    hl,BattleTextQ
+  ld    de,BattleText1
+  ld    bc,BattleText2-BattleText1
+  ldir
+  ret
+
+.CleanTextField:
+  ld    hl,$4000 + (195*128) + (060/2) - 128
+  ld    de,$0000 + (195*128) + (060/2) - 128
+  ld    bc,$0000 + (014*256) + (118/2)
+  ld    a,BattleFieldSnowBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
