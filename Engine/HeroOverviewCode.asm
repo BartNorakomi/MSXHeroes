@@ -4462,17 +4462,19 @@ SetSkillExplanation:
   add   hl,de
   jp    SetText
 
-TextPlusSymbol:             equ $2b
-TextMinusSymbol:            equ $2d
-TextPercentageSymbol:       equ $25
-TextSpace:                  equ $20
-TextNumber0:                equ $30
-TextApostrofeSymbol:        equ $27
-TextColonSymbol:            equ $3a
-TextSlashSymbol:            equ $2f
-TextQuestionMarkSymbol:     equ $3f
-TextCommaSymbol:            equ $2c
-TextDotSymbol:              equ $2e
+TextPlusSymbol:               equ $2b
+TextMinusSymbol:              equ $2d
+TextPercentageSymbol:         equ $25
+TextSpace:                    equ $20
+TextNumber0:                  equ $30
+TextApostrofeSymbol:          equ $27
+TextColonSymbol:              equ $3a
+TextSlashSymbol:              equ $2f
+TextQuestionMarkSymbol:       equ $3f
+TextCommaSymbol:              equ $2c
+TextDotSymbol:                equ $2e
+TextOpeningParenthesisSymbol: equ $28
+TextClosingParenthesisSymbol: equ $29
 
 TextNumberSymbolsSXNX: db 121,5,  126,2,  128,4,  132,3,  135,3,  138,4,  142,4,  146,4,  150,4,  154,4,  158,4  
 TextPercentageSymbolSXNX: db  162,4 ;"%"

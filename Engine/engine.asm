@@ -816,6 +816,10 @@ SetText:                                ;in: b=dx, c=dy, hl->text
   jp    z,.TextCommaSymbol
   cp    TextDotSymbol                   ;.
   jp    z,.TextDotSymbol
+  cp    TextOpeningParenthesisSymbol    ;(
+  jp    z,.TextOpeningParenthesisSymbol
+  cp    TextClosingParenthesisSymbol    ;)
+  jp    z,.TextClosingParenthesisSymbol
 
   cp    TextNumber0+10
   jr    c,.Number
@@ -892,6 +896,14 @@ SetText:                                ;in: b=dx, c=dy, hl->text
   ld    hl,.TextDotSymbolSXNX  
   jr    .GoPutLetter
 
+  .TextOpeningParenthesisSymbol:
+  ld    hl,.TextOpeningParenthesisSymbolSXNX  
+  jr    .GoPutLetter
+
+  .TextClosingParenthesisSymbol:
+  ld    hl,.TextClosingParenthesisSymbolSXNX  
+  jr    .GoPutLetter
+
   .Space:
   ld    a,(PutLetter+dx)                ;set dx of next letter
   add   a,5
@@ -917,6 +929,8 @@ SetText:                                ;in: b=dx, c=dy, hl->text
 .TextQuestionMarkSymbolSXNX:  db  223,3 ;"?"
 .TextCommaSymbolSXNX:  db  226,2 ;","
 .TextDotSymbolSXNX:  db  207,1 ;","
+.TextOpeningParenthesisSymbolSXNX:  db  133,2 ;"("
+.TextClosingParenthesisSymbolSXNX:  db  134,2 ;")"
 
 ;                               A      B      C      D      E      F      G      H      I      J      K      L      M      N      O      P      Q      R      S      T      U      V      W      X      Y      Z
 .TextCoordinateTable:       db  084,3, 087,3, 090,3, 093,3, 096,3, 099,3, 102,4, 107,3, 110,3, 113,3, 116,4, 120,3, 123,5, 129,4, 133,3, 136,3, 139,3, 142,3, 145,3, 148,3, 151,3, 154,3, 157,5, 162,3, 165,3, 168,3
@@ -3553,9 +3567,14 @@ MovePointer:					                  ;move mouse pointer (set mouse coordinates in
 movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   ex    af,af'
   ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  ld    e,000
+  cp    3
+  ld    d,212-16 + 6
+  jr    z,.XBorderSet
+
   cp    2
   ld    d,212-16
-  ld    e,000
   jr    nc,.XBorderSet
   ld    d,ycoorspritebottom
   ld    e,ycoordinateStartPlayfield
@@ -5306,7 +5325,7 @@ LenghtCastleTable:      equ Castle2-Castle1
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  004,  001,  1,      1,          1,        0,        0,              1,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
@@ -5327,11 +5346,11 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  20000
-.Wood:    dw  20
-.Ore:     dw  20
-.Gems:    dw  10
-.Rubies:  dw  10
+.Gold:    dw  60000 ;20000
+.Wood:    dw  900;20
+.Ore:     dw  900;20
+.Gems:    dw  900;10
+.Rubies:  dw  900;10
 ResourcesPlayer2:
 .Gold:    dw  5000
 .Wood:    dw  300

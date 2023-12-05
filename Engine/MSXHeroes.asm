@@ -853,7 +853,6 @@ dephase
 BattleCodeBlock:  equ   $50
 phase	$4000
   include "BattleCode.asm"
-  kut:
 	ds		$8000-$,$ff
 dephase
 

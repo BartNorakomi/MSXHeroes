@@ -280,7 +280,7 @@ SetFontPage0Y212:                       ;set font at (0,212) page 0
 SetBattleButtons:
   ld    hl,BattleButtonTable-2
   ld    de,GenericButtonTable-2
-  ld    bc,2+(GenericButtonTableLenghtPerButton*7)
+  ld    bc,2+(GenericButtonTableLenghtPerButton*9)
   ldir
 
   ;turn retreat button off, when fighting vs neutral monsters (monsters without hero)
@@ -328,8 +328,19 @@ BattleButton7YBottom:        equ BattleButton7Ytop + 018
 BattleButton7XLeft:          equ 236
 BattleButton7XRight:         equ BattleButton7XLeft + 018
 
+BattleButton8Ytop:           equ 192
+BattleButton8YBottom:        equ BattleButton8Ytop + 010
+BattleButton8XLeft:          equ 170
+BattleButton8XRight:         equ BattleButton8XLeft + 010
+
+BattleButton9Ytop:           equ 192+10
+BattleButton9YBottom:        equ BattleButton9Ytop + 010
+BattleButton9XLeft:          equ 170
+BattleButton9XRight:         equ BattleButton9XLeft + 010
+
+
 BattleButtonTableGfxBlock:  db  LevelUpBlock
-BattleButtonTableAmountOfButtons:  db  7
+BattleButtonTableAmountOfButtons:  db  9
 BattleButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
   db  %1100 0011 | dw $4000 + (000*128) + (160/2) - 128 | dw $4000 + (000*128) + (178/2) - 128 | dw $4000 + (000*128) + (196/2) - 128 | db BattleButton1Ytop,BattleButton1YBottom,BattleButton1XLeft,BattleButton1XRight | dw $0000 + (BattleButton1Ytop*128) + (BattleButton1XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + (000*128) + (214/2) - 128 | dw $4000 + (000*128) + (232/2) - 128 | dw $4000 + (018*128) + (160/2) - 128 | db BattleButton2Ytop,BattleButton2YBottom,BattleButton2XLeft,BattleButton2XRight | dw $0000 + (BattleButton2Ytop*128) + (BattleButton2XLeft/2) - 128 
@@ -339,6 +350,9 @@ BattleButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5
   db  %1100 0011 | dw $4000 + (018*128) + (232/2) - 128 | dw $4000 + (036*128) + (160/2) - 128 | dw $4000 + (036*128) + (178/2) - 128 | db BattleButton5Ytop,BattleButton5YBottom,BattleButton5XLeft,BattleButton5XRight | dw $0000 + (BattleButton5Ytop*128) + (BattleButton5XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (054*128) + (214/2) - 128 | dw $4000 + (054*128) + (232/2) - 128 | dw $4000 + (072*128) + (160/2) - 128 | db BattleButton7Ytop,BattleButton7YBottom,BattleButton7XLeft,BattleButton7XRight | dw $0000 + (BattleButton7Ytop*128) + (BattleButton7XLeft/2) - 128
+;text arrow up/down
+  db  %1100 0011 | dw $4000 + (090*128) + (160/2) - 128 | dw $4000 + (090*128) + (170/2) - 128 | dw $4000 + (090*128) + (180/2) - 128 | db BattleButton8Ytop,BattleButton8YBottom,BattleButton8XLeft,BattleButton8XRight | dw $0000 + (BattleButton8Ytop*128) + (BattleButton8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (100*128) + (160/2) - 128 | dw $4000 + (100*128) + (170/2) - 128 | dw $4000 + (100*128) + (180/2) - 128 | db BattleButton9Ytop,BattleButton9YBottom,BattleButton9XLeft,BattleButton9XRight | dw $0000 + (BattleButton9Ytop*128) + (BattleButton9XLeft/2) - 128
 
 
 HandleNecromancy:                       ;a percentage of dead enemy monsters will be revived as skeletons for the attacking hero
@@ -1010,33 +1024,61 @@ HandleExplosionSprite:
   ld    (ShowExplosionSprite?),a  
   ret
 
+ClearBattleText:
+  ld    hl,.BattleTextPointer
+  ld    de,BattleTextPointer
+  ld    bc,.EndBattleText-.BattleTextPointer
+  ldir
+  ret
+
+.BattleTextPointer:  dw  BattleText2
+.BattleRound:  db  1
+.SetBattleText?: db  2                               ;amount of frames/pages text will be put        
+.BattleText8: db 0 | dw 0000 | db 0    ,"           ",255  ;example next round:  Round 4 begins
+.BattleText7: db 0 | dw 0000 | db 0    ,"           ",255  ;example next round:  Round 4 begins
+.BattleText6: db 0 | dw 0000 | db 0    ,"           ",255  ;example next round:  Round 4 begins
+.BattleText5: db 0 | dw 0000 | db 0    ,"           ",255  ;example next round:  Round 4 begins
+.BattleText4: db 0 | dw 0000 | db 0    ,"           ",255  ;example units dead:  300 SilkenLarva(s) die 
+.BattleText3: db 0 | dw 0000 | db 0    ,"           ",255  ;example deal damage: SilkenLarva do/deal 2222 dmg
+.BattleText2: db 0 | dw 0000 | db 0    ,"           ",255  ;example defend:      SilkenLarva(s): +10 defense
+.BattleText1: db 5 | dw 0001 | db 0    ,"           ",255  ;example wait:        The SilkenLarva(s) wait
+.BattleTextQ: db 0 | dw 0000 | db 0    ,"           ",255  ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+.EndBattleText:
+
 SetBattleText:
   ld    a,(SetBattleText?)
   dec   a
   ret   m
   ld    (SetBattleText?),a
-
   dec   a
-  call  z,.Setup                        ;the first frame we set text, setup the text in the list
+  call  z,.MoveEveryTextEntry1PositionUp;the first frame we set text, setup the text in the list
+;  cp    10
+;  jp    z,.ResetBattleTextPointer
+  cp    7
+  jp    z,.EndSetBattleText
 
+  .SetBattleTextWithoutMovingEntries:
   call  .CleanTextField
 
-  ld    ix,BattleText1
-  ld    c,203                           ;dy
-  call  .SetText
-  ld    ix,BattleText2
+  ld    ix,(BattleTextPointer)
   ld    c,195                           ;dy
+  call  .SetText
+  ld    de,BattleTextQ-BattleText1
+  add   ix,de
+  ld    c,203                           ;dy
   call  .SetText
   ret
 
   .SetText:
+  ld    b,060                           ;dx
+
   ld    a,(ix)                          ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
   dec   a
   jp    z,.wait
   dec   a
   jp    z,.defend
   dec   a
-;  jp    z,.DealDamage
+  jp    z,.DealDamage
   dec   a
 ;  jp    z,.UnitsDie
   dec   a
@@ -1044,7 +1086,9 @@ SetBattleText:
   ret
 
   .NextRound:
-  ld    b,060                           ;dx
+  ld    a,(ix+1)                        ;round nr
+  dec   a
+  jr    z,.CombatStart
 
   ld    hl,.TextRound
   push  bc
@@ -1067,42 +1111,73 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
 ;  pop   bc
   ret
+
+  .CombatStart:
+  ld    hl,.TextCombatStart
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  ret
+  
+.TextCombatStart: db "      Combat Start",255
 .TextRound: db "Round ",255
-.TextBegins: db " begins",255
+.TextBegins: db " begins.",255
 
 
   .defend:
-  ld    b,060                           ;dx
-
   push  ix
   pop   hl
-  ld    de,3
+  ld    de,4
   add   hl,de                           ;monster name
   push  bc
   call  SetText                         ;in: b=dx, c=dy, hl->text    
   pop   bc
 
-
-  ld    a,(ix+1)                        ;amount: 1 or more
+  ld    a,(ix+3)                        ;single unit ?
   dec   a
-  ld    hl,.TextdefenseSingleUnit
+  ld    hl,.TextdefendSingleUnit
   jr    z,.AmountFound2
-  ld    hl,.TextdefenseMultipleUnits
+  ld    hl,.TextdefendMultipleUnits
   .AmountFound2:
   ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    hl,.TextdefendOpenPlus
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  add   a,2
+  ld    b,a                             ;dx
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    a,(ix+1)                        ;amount of added defense
+  ld    h,0
+  ld    l,a
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetNumber16BitCastle
+  pop   bc
+
+  ld    hl,.Textdef
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  add   a,1
   ld    b,a                             ;dx
 ;  push  bc
   call  SetText                         ;in: b=dx, c=dy, hl->text    
 ;  pop   bc
   ret
-.TextdefenseSingleUnit: db ": +10 defense.",255
-.TextdefenseMultipleUnits: db "s: +10 defense.",255
+
+.TextdefendOpenPlus: db "(+",255
+.TextdefendSingleUnit: db " defends.",255
+.TextdefendMultipleUnits: db "s defend.",255
+.Textdef: db "def)",255
 
 
 
 
   .wait:
-  ld    b,060                           ;dx
   ld    hl,.TextThe
   push  bc
   call  SetText                         ;in: b=dx, c=dy, hl->text    
@@ -1110,7 +1185,7 @@ SetBattleText:
 
   push  ix
   pop   hl
-  ld    de,3
+  ld    de,4
   add   hl,de                           ;monster name
   ld    a,(PutLetter+dx)                ;set dx of text  
   ld    b,a                             ;dx
@@ -1118,7 +1193,7 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
   pop   bc
 
-  ld    a,(ix+1)                        ;amount: 1 or more
+  ld    a,(ix+3)                        ;single unit ?
   dec   a
   ld    hl,.Textwaits
   jr    z,.AmountFound1
@@ -1135,16 +1210,63 @@ SetBattleText:
 .Textwaits: db " waits.",255
 .Textswait: db "s wait.",255
 
-.Setup:
-  ld    hl,BattleText1
-  ld    de,BattleText2
-  ld    bc,4*(BattleText2-BattleText1)
+
+.DealDamage:
+  push  ix
+  pop   hl
+  ld    de,4
+  add   hl,de                           ;monster name
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    a,(ix+3)                        ;single unit ?
+  dec   a
+  ld    hl,.TextDeals
+  jr    z,.AmountFound3
+  ld    hl,.TextsDeal
+  .AmountFound3:
+
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    l,(ix+1)                        ;amount of damage
+  ld    h,(ix+2)                        ;amount of damage
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetNumber16BitCastle
+  pop   bc
+
+  ld    hl,.TextsDMG
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+;  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+;  pop   bc
+  ret
+.TextDeals: db " deals ",255
+.TextsDeal: db "s deal ",255
+.TextsDMG: db " dmg.",255
+
+.EndSetBattleText:
+  xor   a
+  ld    (SetBattleText?),a
+  ret
+
+.MoveEveryTextEntry1PositionUp:
+  ld    hl,BattleText7
+  ld    de,BattleText8
+  ld    bc,BattleTextQ-BattleText8
   ldir
-  
-  ld    hl,BattleTextQ
-  ld    de,BattleText1
-  ld    bc,BattleText2-BattleText1
-  ldir
+;  jp    .ResetBattleTextPointer
+
+.ResetBattleTextPointer:
+  ld    hl,BattleText2
+  ld    (BattleTextPointer),hl
   ret
 
 .CleanTextField:

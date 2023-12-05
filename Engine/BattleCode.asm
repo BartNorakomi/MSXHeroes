@@ -116,6 +116,7 @@ call screenon
   ld    a,BattleCodePage2Block          ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  ClearBattleFieldGridStartOfBattle
+  call  ClearBattleText
   call  SetFontPage0Y212                ;set font at (0,212) page 0
   call  SetBattleButtons
 ;/battle code page 2
@@ -179,20 +180,57 @@ call screenon
   ret   nc
 
   ld    a,b
-  cp    7
+  cp    9
   jr    z,.DiskOptionsButtonPressed
-  cp    6
+  cp    8
   jr    z,.RetreatButtonPressed
-  cp    5
+  cp    7
   jr    z,.SurrenderButtonPressed
-  cp    4
+  cp    6
   jr    z,.WaitButtonPressed
-  cp    3
+  cp    5
   jr    z,.DefendButtonPressed
-  cp    2
+  cp    4
   jr    z,.SpellBookButtonPressed
-  cp    1
+  cp    3
   jr    z,.AutoCombatButtonPressed
+  cp    2
+  jr    z,.BattleTextUpButtonPressed
+;  cp    1
+;  jr    z,.BattleTextDownButtonPressed
+
+.BattleTextDownButtonPressed:
+  ld    hl,(BattleTextPointer)
+  ld    bc,BattleTextQ-BattleText1
+  add   hl,bc
+
+  ld    de,BattleText1
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   nc
+  
+  add   hl,de
+  ld    (BattleTextPointer),hl
+
+  ld    a,128
+  ld    (SetBattleText?),a
+  ret
+
+.BattleTextUpButtonPressed:
+  ld    hl,(BattleTextPointer)
+  ld    bc,BattleTextQ-BattleText1
+  or    a
+  sbc   hl,bc
+
+  ld    de,BattleText8
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   c
+  
+  add   hl,de
+  ld    (BattleTextPointer),hl
+
+  ld    a,128
+  ld    (SetBattleText?),a
+  ret
   
 .AutoCombatButtonPressed:
   ret
@@ -2004,6 +2042,23 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ld    d,0
   ld    e,(iy+MonsterTableDefense)
   add   hl,de                           ;add additional speed from inventory items
+
+  ;apply 20% defense boost when defending
+  ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  and   %0111 1111
+  cp    MonsterStatusDefending          ;is monster defending ?
+  ret   nz
+
+  ld    de,05                           ;divide total attack by 5 to get 20%
+  call  ApplyPercentBasedBoost          ;out: hl=total defense including 20% boost. bc=added defense
+
+  ld    a,c                             ;make sure to add a minimum of 1 defense
+  or    a
+  ret   nz
+  ld    bc,1
+  add   hl,bc                           ;add the 50% boost to total attack monster
+  ;/apply 20% defense boost when defending
+;##########Warning: the defense boost should be added last, since we are reading the BC value out of this last routine for the text box (CheckDefendButtonPressed)
   ret
 
 SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total attack (including boosts from inventory items, skills and magic)
@@ -2467,19 +2522,20 @@ CheckWaitButtonPressed:
 
   ld    a,(ix+MonsterAmount)            ;set amount
   or    (ix+MonsterAmount+1)
-  ld    (BattleTextQ+1),a               ;amount: 1 or more
+  ld    (BattleTextQ+3),a               ;single unit ?
 
   call  SetMonsterTableInIY             ;copy monster name
   push  iy
   pop   hl
   ld    de,MonsterTableName
   add   hl,de
-  ld    de,BattleTextQ+3
+  ld    de,BattleTextQ+4                ;monster name
   ld    bc,12
   ldir
   ;/Prepare text to be put in the battle text box
   ret
 
+;A creature may defend during their phase. Doing so grants them a 20% bonus to their defense rating (after bonuses and spell effects) and skips the rest of their turn. 
 CheckDefendButtonPressed:
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -2512,7 +2568,13 @@ CheckDefendButtonPressed:
   ld    a,1
   ld    (SwitchToNextMonster?),a
 
+  call  SetMonsterTableInIY             ;out: iy->monster table idle  
+  call  SetTotalMonsterDefenseInHL      ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
+  ;out: bc added defense (20%) from defending
   ;Prepare text to be put in the battle text box
+  ld    a,c
+  ld    (BattleTextQ+1),a               ;amount of added defense
+
   ld    a,2                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
   jp    CheckWaitButtonPressed.EntryPointForDefendButtonPressed
   ;/Prepare text to be put in the battle text box
@@ -3543,6 +3605,40 @@ MoveMonster:
 ;Armorer is a secondary skill, that reduces the physical damage done to hero's creatures. Physical damage means damage done by enemy creatures engaged in melee or ranged combat. Armorer secondary skill does not reduce damage from spells cast by enemy heroes or creatures.
   call  ApplyAttackReductionFromArmorer
   call  ApplyAttackReductionFromGreenLeafShield
+
+
+
+
+  ;Prepare text to be put in the battle text box
+  push  hl
+  ld    a,3                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  ld    (BattleTextQ),a
+  ld    a,2
+  ld    (SetBattleText?),a              ;amount of frames/pages we put text
+  ld    (BattleTextQ+1),hl              ;amount of damage
+  call  SetCurrentActiveMOnsterInIX
+
+  ld    a,(ix+MonsterAmount)            ;set amount
+  or    (ix+MonsterAmount+1)
+  ld    (BattleTextQ+3),a               ;single unit ?
+
+  call  SetMonsterTableInIY             ;copy monster name
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  ld    de,BattleTextQ+4
+  ld    bc,12
+  ldir
+  pop   hl
+  ;Prepare text to be put in the battle text box
+
+
+
+
+
+
+
 
   ld    de,0
   ex    de,hl

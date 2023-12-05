@@ -12219,32 +12219,75 @@ CheckButtonMouseInteractionSingleBuildButton:
 
   .CityWalls:  
   .Castle:
+  ld    a,(iy+CastleLevel)
+  cp    5
+  jr    z,.CityWallsNewBuilding
   inc   (iy+CastleLevel)
+  jp    PurchaseBuilding
+  .CityWallsNewBuilding:
+  ld    a,8                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .MarketPlace:  
-  ld    (iy+CastleMarket),1
+  ld    a,7                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .Tavern:
-  ld    (iy+CastleTavern),1
+  ld    a,6                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .MagicGuild:
+  ld    a,(iy+CastleMageGuildLevel)
+  or    a
+  jr    z,.MagicGuildNewBuilding
   inc   (iy+CastleMageGuildLevel)
+  jp    PurchaseBuilding
+  .MagicGuildNewBuilding:
+  ld    a,5                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .Sawmill:
+  ld    a,(iy+CastleSawmillLevel)
+  or    a
+  jr    z,.SawmillNewBuilding
   inc   (iy+CastleSawmillLevel)
+  jp    PurchaseBuilding
+  .SawmillNewBuilding:
+  ld    a,3                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .Mine:
+  ld    a,(iy+CastleMineLevel)
+  or    a
+  jr    z,.MineNewBuilding
   inc   (iy+CastleMineLevel)
+  jp    PurchaseBuilding
+  .MineNewBuilding:
+  ld    a,4                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
   .BarracksTower:
   .Barracks:
+  ld    a,(iy+CastleBarracksLevel)
+  or    a
+  jr    z,.BarracksNewBuilding
+  cp    5
+  jr    z,.BarracksTowerNewBuilding
   inc   (iy+CastleBarracksLevel)
+  jp    PurchaseBuilding
+  .BarracksTowerNewBuilding:
+  ld    a,2                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
+  jp    PurchaseBuilding
+  .BarracksNewBuilding:
+  ld    a,1                             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  ld    (SetNewBuilding?),a
   jp    PurchaseBuilding
 
 PurchaseBuilding:
@@ -14001,12 +14044,7 @@ CastleOverviewCode:                     ;in: iy-castle
   ;/compare old visiting and defending heroes with new
   .goEnterCastle:
 
-
-
   call  SetScreenOff
-
-
-
 
   ld    hl,CastleOverviewPalette
   call  SetPalette
@@ -14014,14 +14052,24 @@ CastleOverviewCode:                     ;in: iy-castle
   xor   a
 	ld		(activepage),a                  ;start in page 0
 
+  ld    a,(ShowNewlyBoughtBuildingFadingIn?)
+  or    a
+  jr    nz,.EndCheckShowNewlyBoughtBuilding
+  call  EnableNewBuilding
+  xor   a
+  ld    (SetNewBuilding?),a
+  .EndCheckShowNewlyBoughtBuilding:
+
   call  SetCastleOverviewGraphics       ;put gfx in page 1
   call  SwapAndSetPage                  ;swap to and set page 1
   call  SetIndividualBuildings          ;put buildings in page 0, then docopy them from page 0 to page 1 transparantly
-  call  SwapAndSetPage                  ;swap to and set page 1  
+  call  SwapAndSetPage                  ;swap to and set page 0 
   call  SetNameCastleAndDailyIncome
 
   ld    hl,CopyPage1To0
   call  docopy
+
+  call  FadeInNewlyBoughtBuilding
 
   ld    a,179
   call  SetExitButtonHeight
@@ -14030,11 +14078,9 @@ CastleOverviewCode:                     ;in: iy-castle
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
-
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
-
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
@@ -14050,15 +14096,350 @@ CastleOverviewCode:                     ;in: iy-castle
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
 
-
-
-
-
   halt
-
-  call  SetScreenOn
-    
+  call  SetScreenOn    
   jp  .engine
+
+CopyPage2To0:
+	db		0,0,0,2
+	db		0,0,0,0
+	db		0,1,212,0
+	db		0,0,$d0	
+CopyPage0To2:
+	db		0,0,0,0
+	db		0,0,0,2
+	db		0,1,212,0
+	db		0,0,$d0	
+	
+
+EnableNewBuilding:
+  ld    a,(SetNewBuilding?)             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  dec   a
+  jr    z,.barracks
+  dec   a
+  jr    z,.barracksUpgrade
+  dec   a
+  jr    z,.sawmill
+  dec   a
+  jr    z,.mine
+  dec   a
+  jr    z,.mageguild
+  dec   a
+  jr    z,.tavern
+  dec   a
+  jr    z,.market
+  dec   a
+  jr    z,.citywalls
+  ret
+
+  .citywalls:
+  ld    (iy+CastleLevel),6
+  ret
+
+  .market:
+  ld    (iy+CastleMarket),1
+  ret
+
+  .tavern:
+  ld    (iy+CastleTavern),1
+  ret
+
+  .mageguild:
+  ld    (iy+CastleMageGuildLevel),1
+  ret
+
+  .mine:
+  ld    (iy+CastleMineLevel),1
+  ret
+
+  .sawmill:
+  ld    (iy+CastleSawmillLevel),1
+  ret
+
+  .barracksUpgrade:
+  ld    (iy+CastleBarracksLevel),6
+  ret
+
+  .barracks:
+  ld    (iy+CastleBarracksLevel),1
+  ret
+
+SetVariablesNewBuilding:
+  ld    a,(SetNewBuilding?)             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
+  dec   a
+  jr    z,.barracks
+  dec   a
+  jr    z,.barracksUpgrade
+  dec   a
+  jr    z,.sawmill
+  dec   a
+  jr    z,.mine
+  dec   a
+  jr    z,.mageguild
+  dec   a
+  jr    z,.tavern
+  dec   a
+  jr    z,.market
+  dec   a
+  jr    z,.citywalls
+  ret
+
+  .citywalls:
+  ld    b,CityWallsSX
+  ld    c,CityWallsSY
+  ld    l,CityWallsSX+CityWallsNX
+  ld    h,CityWallsSY+CityWallsNY
+  ld    e,1                             ;buildings that touch right edge?
+  ret
+
+  .market:
+  ld    b,MarketSX
+  ld    c,MarketSY
+  ld    l,MarketSX+MarketNX
+  ld    h,MarketSY+MarketNY
+  ld    e,1                             ;buildings that touch right edge?
+  ret
+
+  .tavern:
+  ld    b,TavernSX
+  ld    c,TavernSY
+  ld    l,TavernSX+TavernNX
+  ld    h,TavernSY+TavernNY
+  ld    e,0                             ;buildings that touch right edge?
+  ret
+
+  .mageguild:
+  ld    b,MageGuildSX
+  ld    c,MageGuildSY
+  ld    l,MageGuildSX+MageGuildNX
+  ld    h,MageGuildSY+MageGuildNY
+  ld    e,0                             ;buildings that touch right edge?
+  ret
+
+  .mine:
+  ld    b,mineSX
+  ld    c,mineSY
+  ld    l,mineSX+mineNX
+  ld    h,mineSY+mineNY
+  ld    e,0                             ;buildings that touch right edge?
+  ret
+
+  .sawmill:
+  ld    b,sawmillSX
+  ld    c,sawmillSY
+  ld    l,sawmillSX+sawmillNX
+  ld    h,sawmillSY+sawmillNY
+  ld    e,0                             ;buildings that touch right edge?
+  ret
+
+  .barracksUpgrade:
+  ld    b,barracksUpgradeSX
+  ld    c,barracksUpgradeSY
+  ld    l,barracksUpgradeSX+barracksUpgradeNX
+  ld    h,barracksUpgradeSY+barracksUpgradeNY
+  ld    e,1                             ;buildings that touch right edge?
+  ret
+
+  .barracks:
+  ld    b,BarracksSX
+  ld    c,BarracksSY
+  ld    l,BarracksSX+BarracksNX
+  ld    h,BarracksSY+BarracksNY
+  ld    e,1                             ;buildings that touch right edge?
+  ret
+
+  BarracksSX:  equ 176-2
+  BarracksSY:  equ 057
+  BarracksNX:  equ 080
+  BarracksNY:  equ 101
+
+  BarracksUpgradeSX:  equ 202
+  BarracksUpgradeSY:  equ 006
+  BarracksUpgradeNX:  equ 048 + 5
+  BarracksUpgradeNY:  equ 088
+
+  SawMillSX:  equ 032
+  SawMillSY:  equ 101
+  SawMillNX:  equ 060
+  SawMillNY:  equ 035
+
+  MineSX:  equ 050
+  MineSY:  equ 126
+  MineNX:  equ 126
+  MineNY:  equ 052
+
+  MageGuildSX:  equ 000
+  MageGuildSY:  equ 019
+  MageGuildNX:  equ 048
+  MageGuildNY:  equ 168
+
+  TavernSX:  equ 060
+  TavernSY:  equ 097
+  TavernNX:  equ 158
+  TavernNY:  equ 115
+
+  MarketSX:  equ 166
+  MarketSY:  equ 106
+  MarketNX:  equ 090 - 2
+  MarketNY:  equ 088
+
+  CityWallsSX:  equ 000
+  CityWallsSY:  equ 185
+  CityWallsNX:  equ 255
+  CityWallsNY:  equ 027
+
+FadeInNewlyBoughtBuilding:
+  ld    a,(SetNewBuilding?)
+  or    a
+  ret   z
+
+  ld    hl,CopyPage0To2
+  call  docopy                          ;copy whole castle with old buildings to page 2
+  call  SetScreenOn    
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0  
+  call  SetCastleOverviewGraphics       ;put gfx in page 1
+  ld    a,2*32+31
+  call  SetPageSpecial.setpage          ;set page 2
+
+  ld    a,1
+	ld		(activepage),a                  ;start in page 0
+
+  call  EnableNewBuilding
+  call  SetIndividualBuildings          ;put buildings in page 0, then docopy them from page 0 to page 1 transparantly
+
+  xor   a
+	ld		(activepage),a                  ;start in page 0  
+  call  SetNameCastleAndDailyIncome
+
+  ;at this point we have our old graphics in page 2 and our new graphics (with new building) in page 1
+
+  call  SetVariablesNewBuilding
+  ld    d,.AmountOfBuildingSteps
+  .AmountOfBuildingSteps:  equ 13
+
+  exx
+  ld    c,$9b                             ;outport for docopy
+  ld    d,32                              ;value to write to register at docopy
+  ld    e,17+128                          ;register for writing at docopy
+  exx
+
+  ld    a,b                               ;sx
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+  call  GoBuildBuildingPart
+
+  ld    hl,CopyPage2To0
+  call  docopy
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
+  xor   a
+  ld    (SetNewBuilding?),a
+  ret
+
+GoBuildBuildingPartBuildingThatTouchRightEdge:
+  .loop:
+  exx
+  ld    hl,BuildingFadeIn                  ;copy from page 1 to page 0
+  ld    a,d
+  di
+  out   ($99),a
+  ld    a,e
+  ei
+  out   ($99),a
+
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed
+  exx
+  
+  ld    a,(BuildingFadeIn+sx)
+  add   a,d                               ;.AmountOfBuildingSteps
+  jr    nc,.go
+  add   a,b                               ;add sx
+  ld    (BuildingFadeIn+sx),a
+  ld    (BuildingFadeIn+dx),a
+
+  ld    a,(BuildingFadeIn+sy)
+  inc   a
+  cp    h                                 ;sy+ny
+  ret   nc
+  ld    (BuildingFadeIn+sy),a
+  ld    (BuildingFadeIn+dy),a
+  jp    .loop
+
+  .go:
+  ld    (BuildingFadeIn+sx),a
+  ld    (BuildingFadeIn+dx),a
+  jp    .loop
+
+GoBuildBuildingPart:
+  push  af
+
+  ld    (BuildingFadeIn+sx),a
+  ld    (BuildingFadeIn+dx),a
+  ld    a,c                               ;sy
+  ld    (BuildingFadeIn+sy),a
+  ld    (BuildingFadeIn+dy),a  
+  bit   0,e
+  call  nz,GoBuildBuildingPartBuildingThatTouchRightEdge.loop
+  bit   0,e
+  call  z,.loop
+
+  pop   af
+  inc   a
+  ret
+
+  .loop:
+  exx
+  ld    hl,BuildingFadeIn                  ;copy from page 1 to page 0
+  ld    a,d
+  di
+  out   ($99),a
+  ld    a,e
+  ei
+  out   ($99),a
+
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed,$a3ed
+	dw    $a3ed,$a3ed,$a3ed
+  exx
+  
+  ld    a,(BuildingFadeIn+sx)
+  add   a,d                               ;.AmountOfBuildingSteps
+  cp    l                                 ;sx+nx
+  jr    c,.go
+  sub   a,l                               ;overflow right
+  add   a,b                               ;add sx
+  ld    (BuildingFadeIn+sx),a
+  ld    (BuildingFadeIn+dx),a
+
+  ld    a,(BuildingFadeIn+sy)
+  inc   a
+  cp    h                                 ;sy+ny
+  ret   nc
+  ld    (BuildingFadeIn+sy),a
+  ld    (BuildingFadeIn+dy),a
+  jp    .loop
+
+  .go:
+  ld    (BuildingFadeIn+sx),a
+  ld    (BuildingFadeIn+dx),a
+  jp    .loop
 
 
 SetActiveCastleOverviewButtons:
@@ -14631,8 +15012,6 @@ SetResourcesPlayer:
   ld    h,(ix+9)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
   ret
-
-
 
 
 
