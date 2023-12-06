@@ -753,7 +753,9 @@ dephase
 ;
 MagicGuildBlock:  equ   $3a
 phase	$4000
-  incbin "..\grapx\CastleOverview\MagicGuild.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\MagicGuildCastlePalette.SC5",7,25 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\MagicGuild.SC5",25 * 128 + 7,154 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\MagicGuildCastlePalette.SC5",179 * 128 + 7,33 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -762,7 +764,8 @@ dephase
 ;
 ChamberOfCommerceBlock:  equ   $3c
 phase	$4000
-  incbin "..\grapx\CastleOverview\ChamberOfCommerce.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\ChamberOfCommerce.SC5",7,80 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\ChamberOfCommerceCastlePalette.SC5",80 * 128 + 7,132 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -780,7 +783,9 @@ dephase
 ;
 TavernBlock:  equ   $40
 phase	$4000
-  incbin "..\grapx\CastleOverview\Tavern.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\Tavern.SC5",7,131 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\TavernCastlePalette.SC5",131 * 128 + 7,32 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\Tavern.SC5",163 * 128 + 7,049 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1111,6 +1116,19 @@ phase	$4000
 ;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $83 - 84
+;
+RecruitCreatures4MonstersBlock:  equ   $83
+phase	$4000
+  incbin "..\grapx\CastleOverview\RecruitCreaturesMonster1.SC5",7,30 * 128      ;30 lines
+  incbin "..\grapx\CastleOverview\RecruitCreaturesMonster2.SC5",7,30 * 128      ;30 lines
+  incbin "..\grapx\CastleOverview\RecruitCreaturesMonster3.SC5",7,30 * 128      ;30 lines
+  incbin "..\grapx\CastleOverview\RecruitCreaturesMonster4.SC5",7,30 * 128      ;30 lines
+	ds		$c000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

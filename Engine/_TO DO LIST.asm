@@ -19,6 +19,9 @@ AI
 castle:
 palettesplits bij alle schermen 
 m=terug naar main scherm ipv leave castle
+multiple markets=discount
+castle upgrade naar level 6= gold in main screen flikker tussen level 6 en level 5 waarde
+
 
 general:
 units >1k moet nog verwerkt worden in de aantallen

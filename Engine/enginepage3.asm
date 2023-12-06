@@ -44,7 +44,7 @@ StartGame:
   call  DoCopy
 ;  call  OneTimeCharAndColorSprites
 
-;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
+  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -87,9 +87,9 @@ CopyRamToVramCorrectedWithoutActivePageSetting:
   call  block12
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-  ei
   ret
 
+AreWeWritingToVram?: db  0
 CopyRamToVramCorrectedCastleOverview:
   ex    af,af'                          ;store rom block
 
@@ -113,7 +113,6 @@ CopyRamToVramCorrectedCastleOverview:
   call  block12
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-  ei
   ret
 
   .go:
@@ -132,7 +131,6 @@ CopyRamToVramCorrectedCastleOverview:
   .AddressesSet:
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
-  di
 
   .loop:
   call  .WriteOneLine
@@ -143,19 +141,37 @@ CopyRamToVramCorrectedCastleOverview:
   ret
 
   .WriteOneLine:
-  xor   a                               ;we want to write to (204,151)
   ld    hl,(AddressToWriteTo)           ;set next line to start writing to
   add   hl,de                           ;increase 128 bytes to go to the next line
   ld    (AddressToWriteTo),hl
-	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
+
+  ld    a,1
+  ld    (AreWeWritingToVram?),a
+
+  xor   a                               ;we want to write to (204,151)
+
+
+	call	SetVdp_Write ;WithoutDisablingOrEnablingInt ;start writing to address bhl
 
   ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
   add   hl,de                           ;increase 128 bytes to go to the next line
   ld    (AddressToWriteFrom),hl
   ld    a,(NXAndNY)
+;  cp    128
+;  jr    z,.outi128
+
   ld    b,a
   otir
+
+  xor   a
+  ld    (AreWeWritingToVram?),a
+
   ret
+
+;.outi128:
+;  call  outix128
+;  ei
+;  ret
 
 CopyRamToVramPage3ForBattleEngine:
 ;  ex    af,af'                          ;store rom block
@@ -181,13 +197,11 @@ CopyRamToVramPage3ForBattleEngine:
   call  block12
   pop   af
   out   ($a8),a                         ;reset rom/ram settings of page 1+2
-  ei
   ret
 
   .go:
   ld    c,$98                           ;out port
   ld    de,128                          ;increase 128 bytes to go to the next line
-  di
 
   .loop:
   call  .WriteOneLine
@@ -202,6 +216,7 @@ CopyRamToVramPage3ForBattleEngine:
   ld    hl,(AddressToWriteTo)           ;set next line to start writing to
   add   hl,de                           ;increase 128 bytes to go to the next line
   ld    (AddressToWriteTo),hl
+  di
 	call	SetVdp_WriteWithoutDisablingOrEnablingInt ;start writing to address bhl
 
   ld    hl,(AddressToWriteFrom)         ;set next line to start writing from
@@ -210,6 +225,7 @@ CopyRamToVramPage3ForBattleEngine:
   ld    a,(NXAndNY)
   ld    b,a
   otir
+  ei
   ret
 
 
@@ -2189,8 +2205,8 @@ EnterCastle:
 
   call  SetSpatInCastle
 
-  call  CastleOverviewCode
-;  call  CastleOverviewBuildCode
+;  call  CastleOverviewCode
+  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
@@ -2695,10 +2711,18 @@ World1Palette:
 SetInterruptHandler:
   di
   ld    hl,InterruptHandler 
-  ld    ($38+1),hl                      ;set new normal interrupt
-  ld    a,$c3                           ;jump command
-  ei
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
   ld    ($38),a
+  ;lineinterrupt OFF
+  ld    a,(VDP_0)           ;reset ei1
+  and   %1110 1111
+;  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  ei
+  out   ($99),a
   ret
 
 		; set temp ISR

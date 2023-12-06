@@ -162,7 +162,9 @@ vblank:
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-	call	setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+  ld    a,(AreWeWritingToVram?)
+  or    a
+	call	z,setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
 
   ld    a,(page1bank)                   ;put the bank back in page 1 which was there before we ran setspritecharacter
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
@@ -173,8 +175,10 @@ vblank:
 	ld		($7000),a                       ;recall block 2 setting
   pop   af
 	ld		($6000),a                       ;recall block 1 setting
- 
-	call	putsprite                       ;out spat data
+	
+  ld    a,(AreWeWritingToVram?)
+  or    a
+	call	z,putsprite                       ;out spat data
 
   ld    a,(vblankintflag)
   inc   a                               ;vblank flag gets incremented
@@ -191,6 +195,240 @@ vblank:
   pop   hl 
   pop   de 
   pop   bc 
+  pop   af 
+  ei
+  ret
+
+CurrentLineIntHeight: ds  1
+CastleInterruptHandler:
+  push  af
+  
+  ld    a,1               ;set s#1
+  out   ($99),a
+  ld    a,15+128
+  out   ($99),a
+  in    a,($99)           ;check and acknowledge line interrupt
+  rrca
+  jp    c,LineintCastleScreen        
+  
+  xor   a                 ;set s#0
+  out   ($99),a
+  ld    a,15+128
+  out   ($99),a
+  in    a,($99)           ;check and acknowledge vblank interrupt
+  rlca
+  jp    c,VblankCastleScreen
+ 
+  pop   af 
+  ei
+  ret
+
+VblankCastleScreen:
+  push  hl
+  push  bc
+
+  ld    a,(CurrentLineIntHeight)
+  cp    FirstLineintHeightCastleMagicGuild
+  jr    z,.SkipSettingPaletteOnVblank
+
+  ld    hl,World1Palette
+  call  SetPaletteOnInterrupt
+  .SkipSettingPaletteOnVblank:
+
+  pop   bc
+  pop   hl
+  jp    vblank
+
+LineintFlag:  ds  1
+LineintCastleScreen:
+  push  hl
+  push  bc
+
+  ld    a,(LineintFlag)
+  inc   a
+  ld    (LineintFlag),a
+
+  ld    a,(CurrentLineIntHeight)
+  cp    FirstLineintHeightCastleTavern
+  jp    z,.FirstLineIntCastleTavernScreen
+  cp    SecondLineintHeightCastleTavern
+  jp    z,.SecondLineIntCastleTavernScreen
+
+  cp    FirstLineintHeightCastleRecruit
+  jr    z,.FirstLineIntCastleRecruitScreen
+  cp    SecondLineintHeightCastleRecruit
+  jr    z,.SecondLineIntCastleRecruitScreen
+
+  cp    FirstLineintHeightCastleMagicGuild
+  jr    z,.FirstLineIntCastleMagicGuildScreen
+  cp    SecondLineintHeightCastleMagicGuild
+  jr    z,.SecondLineIntCastleMagicGuildScreen
+
+  cp    FirstLineintHeightCastleMarket
+  jp    z,.LineIntCastlemarketScreen
+  cp    SecondLineintHeightCastleMarket
+  jp    z,.LineIntCastlemarketScreen
+  cp    ThirdLineintHeightCastleMarket
+  jp    z,.LineIntCastlemarketScreen
+
+  ld    hl,CastleOverviewPalette
+  call  SetPaletteOnInterrupt
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .SecondLineIntCastleRecruitScreen:
+  ld    a,2               ;Set Status register #2
+  out   ($99),a
+  ld    a,15+128          ;we are about to check for HR
+  out   ($99),a
+ 
+.Waitline:                ;wait until end of HBLANK
+  in    a,($99)           ;Read Status register #2
+  and   %0010 0000        ;bit to check for HBlank detection
+  jr    z,.Waitline
+  
+  ld    hl,World1Palette
+  call  SetPaletteOnInterrupt
+
+  ld    a,FirstLineintHeightCastleRecruit
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret 
+
+  .FirstLineIntCastleRecruitScreen:
+  ld    hl,CastleOverviewPalette
+  call  SetPaletteOnInterrupt
+
+  ld    a,SecondLineintHeightCastleRecruit
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .FirstLineIntCastleMagicGuildScreen:
+  ld    hl,World1Palette
+  call  SetPaletteOnInterrupt
+
+  ld    a,SecondLineintHeightCastleMagicGuild
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .SecondLineIntCastleMagicGuildScreen:
+  ld    hl,CastleOverviewPalette
+  call  SetPaletteOnInterrupt
+
+  ld    a,FirstLineintHeightCastleMagicGuild
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .LineIntCastlemarketScreen:
+  ld    hl,CastleOverviewPalette
+  call  SetPaletteOnInterrupt
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .FirstLineIntCastleTavernScreen:
+  ld    hl,CastleOverviewPalette
+  call  SetPaletteOnInterrupt
+
+  ld    a,SecondLineintHeightCastleTavern
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+  .SecondLineIntCastleTavernScreen:
+  ld    hl,World1Palette
+  call  SetPaletteOnInterrupt
+
+  ld    a,FirstLineintHeightCastleTavern
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  out   ($99),a 
+
+  pop   bc
+  pop   hl
+
+  pop   af 
+  ei
+  ret  
+
+SetPaletteOnInterrupt:
+	xor		a
+	out		($99),a
+	ld		a,16+128
+	out		($99),a
+	ld    c,$9a
+	outi | outi | outi | outi | outi | outi | outi | outi
+	outi | outi | outi | outi | outi | outi | outi | outi
+	outi | outi | outi | outi | outi | outi | outi | outi
+	outi | outi | outi | outi | outi | outi | outi | outi
+	ret
+
+vblankintflag:  db  0
+;lineintflag:  db  0
+InterruptHandler:
+  push  af
+
+  xor   a                               ;set s#0
+  out   ($99),a
+  ld    a,15+128
+  out   ($99),a
+  in    a,($99)                         ;check and acknowledge vblank interrupt
+  rlca
+  jp    c,vblank                        ;vblank detected, so jp to that routine
+ 
   pop   af 
   ei
   ret
@@ -565,31 +803,6 @@ checktriggerhud:
 
 
 
-
-
-
-
-
-
-
-
-
-vblankintflag:  db  0
-;lineintflag:  db  0
-InterruptHandler:
-  push  af
-
-  xor   a                               ;set s#0
-  out   ($99),a
-  ld    a,15+128
-  out   ($99),a
-  in    a,($99)                         ;check and acknowledge vblank interrupt
-  rlca
-  jp    c,vblank                        ;vblank detected, so jp to that routine
- 
-  pop   af 
-  ei
-  ret
 
 SetTotalManaHero:
 ;total mana depends on the following
@@ -3755,7 +3968,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
   .CastleOverview:
   ld    hl,CursorHand
-	jp		.CastleEntry
+	jp		.setcharacter ;CastleEntry
 
   .HeroOverview:
   ld    hl,CursorHand
@@ -4243,9 +4456,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   call  CompareHLwithDE           ;only set sprite if character has changed
   ret   z
   add   hl,de
-  .CastleEntry:
   ld    (CurrentCursorSpriteCharacter),hl
-
+  .CastleEntry:
+  
 ;character
 	xor		a				;page 0/1
 	ld		hl,sprcharaddr	;sprite 0 character table in VRAM
@@ -5325,7 +5538,7 @@ LenghtCastleTable:      equ Castle2-Castle1
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  004,  001,  1,      1,          1,        1,        1,              1,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
 Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
 Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
 Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255

@@ -7014,6 +7014,7 @@ ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when ref
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
   call  SetVisitingAndDefendingHeroesAndArmyWindow  
   call  SetVisitingAndDefendingHeroesAndArmy
   call  SwapAndSetPage                  ;swap and set page
@@ -7024,6 +7025,34 @@ ExitVisitingAndDefendingArmyRoutine:    ;a jump to this routine is made when ref
   dec   a
   jp    z,CastleOverviewTavernCode.engine
   jp    CastleOverviewRecruitCode.engine
+
+
+FirstLineintHeightCastleTavern: equ 125
+SecondLineintHeightCastleTavern: equ 160
+
+;FirstLineintHeightCastleTavern: equ 125
+;SecondLineintHeightCastleTavern: equ 158
+SetCastleTavernInterruptHandler:
+  di
+  ld    hl,CastleInterruptHandler 
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
+  ld    ($38),a
+ 
+  ld    a,(VDP_0)           ;set ei1
+  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  out   ($99),a
+
+  ld    a,FirstLineintHeightCastleTavern
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
 
 CastleOverviewTavernCode:
   call  SetScreenOff
@@ -7068,6 +7097,10 @@ CastleOverviewTavernCode:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  call  SetCastleTavernInterruptHandler
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -7079,7 +7112,7 @@ CastleOverviewTavernCode:
 ;
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+  jp    nz,CastleOverviewCode
 
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
@@ -7127,7 +7160,7 @@ CastleOverviewTavernCode:
   call  SetGenericButtons               ;copies button state from rom -> vram
   ;/tavern buttons
 
-  halt
+  call  WaitVblank
   call  SetScreenOn
   jp  .engine
 
@@ -9364,17 +9397,53 @@ TavernButtonTableWhenNotEnoughCash: ;status (bit 7=off/on, bit 6=button normal (
 
 
 
+FirstLineintHeightCastleMarket: equ 074
+SecondLineintHeightCastleMarket: equ 117
+ThirdLineintHeightCastleMarket: equ 159
+SetCastleMarketInterruptHandler:
+  di
+  ld    hl,CastleInterruptHandler 
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
+  ld    ($38),a
+ 
+  ld    a,(VDP_0)           ;set ei1
+  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  out   ($99),a
 
+  ld    a,FirstLineintHeightCastleMarket
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
 
+SetCastleMarketInterruptSecondLine:
+  ld    a,SecondLineintHeightCastleMarket
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
+
+SetCastleMarketInterruptThirdLine:
+  ld    a,ThirdLineintHeightCastleMarket
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
 
 CastleOverviewMarketPlaceCode:
   call  SetScreenOff
 
-
   call  SetMarketPlaceButtons
-
-
-
 
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a
@@ -9382,8 +9451,6 @@ CastleOverviewMarketPlaceCode:
   ld    ix,GenericButtonTable
   ld    (PreviousButtonClickedIX),ix
   ld    (PreviousButton2ClickedIX),ix
-
-
 
   ld    hl,World1Palette
   call  SetPalette
@@ -9409,6 +9476,10 @@ CastleOverviewMarketPlaceCode:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  call  SetCastleMarketInterruptHandler
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -9420,7 +9491,7 @@ CastleOverviewMarketPlaceCode:
 ;
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+  jp    nz,CastleOverviewCode
 
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
@@ -9484,7 +9555,7 @@ CastleOverviewMarketPlaceCode:
 
   ;/market place buttons
 
-  halt
+;  halt
   call  SetScreenOn
   jp  .engine
 
@@ -9858,7 +9929,8 @@ CastleOverviewMarketPlaceCode:
   ld    de,$0000 + (123*128) + (000/2) - 128
   ld    bc,$0000 + (043*256) + (256/2)
   ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    SetCastleMarketInterruptThirdLine
 
   .SetIconResourceNeeded:
   ld    a,(MarketPlaceResourceNeeded)
@@ -9939,7 +10011,8 @@ CastleOverviewMarketPlaceCode:
   ld    de,$0000 + (080*128) + (000/2) - 128
   ld    bc,$0000 + (043*256) + (256/2)
   ld    a,ChamberOfCommerceButtonsBlock ;block to copy graphics from
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  jp    SetCastleMarketInterruptSecondLine
   
 SetMarketPlaceButtons:
   ld    hl,MarketPlaceButtonTable-2
@@ -10038,9 +10111,32 @@ MarketPlaceButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), 
   db  %0001 0011 | dw $4000 + (000*128) + (154/2) - 128 | dw $4000 + (014*128) + (154/2) - 128 | dw $4000 + (028*128) + (140/2) - 128 | db MarketPlaceButton13Ytop,MarketPlaceButton13YBottom,MarketPlaceButton13XLeft,MarketPlaceButton13XRight | dw $0000 + (MarketPlaceButton13Ytop*128) + (MarketPlaceButton13XLeft/2) - 128
 
 
+FirstLineintHeightCastleMagicGuild: equ 023
+SecondLineintHeightCastleMagicGuild: equ 173
+SetCastleMagicGuildInterruptHandler:
+  di
+  ld    hl,CastleInterruptHandler 
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
+  ld    ($38),a
+ 
+  ld    a,(VDP_0)           ;set ei1
+  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  out   ($99),a
+
+  ld    a,FirstLineintHeightCastleMagicGuild
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
+
 CastleOverviewMagicGuildCode:
   call  SetScreenOff
-
 
   call  SetMagicGuildButtons
 
@@ -10067,6 +10163,10 @@ CastleOverviewMagicGuildCode:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  call  SetCastleMagicGuildInterruptHandler
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -10078,7 +10178,7 @@ CastleOverviewMagicGuildCode:
 ;
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+  jp    nz,CastleOverviewCode
 
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
@@ -10097,7 +10197,7 @@ CastleOverviewMagicGuildCode:
   call  SetGenericButtons               ;copies button state from rom -> vram
   ;/magic skill icons in the magic guild
 
-  halt
+  call  WaitVblank
   call  SetScreenOn
   jp  .engine
 
@@ -10391,7 +10491,7 @@ SetGenericButtons:                      ;put button in mirror page below screen,
 
 
 ;  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  call  CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+;  call  CopyTransparantButtons          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 
@@ -10399,9 +10499,9 @@ SetGenericButtons:                      ;put button in mirror page below screen,
 ;  halt
 
 
-  ret
+;  ret
 
-CopyTransparantButtons:  
+;CopyTransparantButtons:  
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -10821,6 +10921,10 @@ CastleOverviewRecruitCode:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  call  SetCastleRecruitInterruptHandler
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -10832,11 +10936,7 @@ CastleOverviewRecruitCode:
 ;
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
-
-
-
-
+  jp    nz,CastleOverviewCode
 
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
@@ -10864,18 +10964,6 @@ CastleOverviewRecruitCode:
   ld    (ix+GenericButtonStatus),a
   ;/and unmark it after we copy all the buttons in their state
   ;/VisitingAndDefendingHeroesAndArmy buttons
-
-
-
-
-
-
-
-
-
-
-
-
 
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
@@ -10911,9 +10999,33 @@ CastleOverviewRecruitCode:
 
   call  CheckEndRecruitUnitWindow   ;check if mouse is clicked outside of recruit single unit window. If so, close this window
 
-  halt
+  call  WaitVblank
   call  SetScreenOn
   jp  .engine
+
+FirstLineintHeightCastleRecruit: equ 126
+SecondLineintHeightCastleRecruit: equ 160
+SetCastleRecruitInterruptHandler:
+  di
+  ld    hl,CastleInterruptHandler 
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
+  ld    ($38),a
+ 
+  ld    a,(VDP_0)           ;set ei1
+  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  out   ($99),a
+
+  ld    a,FirstLineintHeightCastleRecruit
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
 
 CheckEndRecruitUnitWindow:
   ld    a,(RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton) ;BUY button
@@ -11774,11 +11886,7 @@ CheckButtonMouseInteractionRecruitButtons:
 
 
 CastleOverviewBuildCode:                ;in: iy-castle
-
   call  SetScreenOff
-
-
-
 
   call  Set9BuildButtons                ;check which buttons should be blue, green and red
 
@@ -11822,6 +11930,12 @@ CastleOverviewBuildCode:                ;in: iy-castle
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  call  SetCastleBuildInterruptHandler
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+;  ld    hl,CursorHand
+;	call	setspritecharacter.CastleEntry
+	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -11833,7 +11947,7 @@ CastleOverviewBuildCode:                ;in: iy-castle
 ;
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+  jp    nz,CastleOverviewCode
 
   ;buttons in the bottom of screen
   ld    ix,CastleOverviewButtonTable 
@@ -11863,11 +11977,32 @@ CastleOverviewBuildCode:                ;in: iy-castle
   call  SetSingleBuildButton            ;copies button state from rom -> vram
   ;/single build button
 
-;  halt
-
+  call  WaitVblank
   call  SetScreenOn
-  
   jp  .engine
+
+lineintheightCastleBuild: equ 15
+SetCastleBuildInterruptHandler:
+  di
+  ld    hl,CastleInterruptHandler 
+  ld    ($38+1),hl          ;set new normal interrupt
+  ld    a,$c3               ;jump command
+  ld    ($38),a
+ 
+  ld    a,(VDP_0)           ;set ei1
+  or    16                  ;ei1 checks for lineint and vblankint
+  ld    (VDP_0),a           ;ei0 (which is default at boot) only checks vblankint
+  out   ($99),a
+  ld    a,128
+  out   ($99),a
+
+  ld    a,lineintheightCastleBuild
+  ld    (CurrentLineIntHeight),a
+  out   ($99),a
+  ld    a,19+128            ;set lineinterrupt height
+  ei
+  out   ($99),a 
+  ret
 
 xOffsetVandX: equ 39
 YOffsetVandX: equ +0
@@ -14001,6 +14136,7 @@ HandleAllHeroesLearnMagicGuildSpells:
 
 
 CastleOverviewCode:                     ;in: iy-castle
+  call  SetInterruptHandler             ;normal ingame interrupt handler
   call  HandleAllHeroesLearnMagicGuildSpells
 
   ld    a,3
@@ -14078,6 +14214,9 @@ CastleOverviewCode:                     ;in: iy-castle
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
+  ld    hl,CursorHand
+	call	setspritecharacter.CastleEntry
+
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -14096,9 +14235,17 @@ CastleOverviewCode:                     ;in: iy-castle
   ld    ix,CastleOverviewButtonTable
   call  SetCastleButtons                ;copies button state from rom -> vram
 
-  halt
+  call  WaitVblank
   call  SetScreenOn    
   jp  .engine
+
+WaitVblank:
+  ld    a,(vblankintflag)               ;waiting for vblank gives more stability to the output of the spritedata on vblank
+  ld    hl,vblankintflag
+  .checkflag:
+  cp    (hl)
+  jr    z,.checkflag
+  ret
 
 CopyPage2To0:
 	db		0,0,0,2
@@ -14293,6 +14440,15 @@ FadeInNewlyBoughtBuilding:
   or    a
   ret   z
 
+  ld    a,(VDP_0+8)                     ;sprites off
+  or    %00000010
+  ld    (VDP_0+8),a
+  di
+  out   ($99),a
+  ld    a,8+128
+  ei
+  out   ($99),a
+
   ld    hl,CopyPage0To2
   call  docopy                          ;copy whole castle with old buildings to page 2
   call  SetScreenOn    
@@ -14347,6 +14503,15 @@ FadeInNewlyBoughtBuilding:
 
   xor   a
   ld    (SetNewBuilding?),a
+
+  ld    a,(VDP_0+8)                     ;sprites on
+  and   %11111101
+  ld    (VDP_0+8),a
+  di
+  out   ($99),a
+  ld    a,8+128
+  ei
+  out   ($99),a
   ret
 
 GoBuildBuildingPartBuildingThatTouchRightEdge:
@@ -14857,6 +15022,13 @@ SetBuildGraphics:
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,BuildBlock                    ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;set recourse window
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (020*256) + (256/2)
+  ld    a,ChamberOfCommerceBlock          ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 ClearTextBuildWindow:
@@ -14872,12 +15044,29 @@ SetCastleOverViewFontPage0Y212:           ;set font at (0,212) page 0
   ld    bc,$0000 + (006*256) + (256/2)
   ld    a,CastleOverviewFontBlock         ;font graphics block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  
+
 SetRecruitGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,RecruitCreaturesBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ;set monster
+  ld    a,r
+  and   3
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  jr    z,.MonsterFound
+  dec   a
+  ld    hl,$4000 + (030*128) + (000/2) - 128
+  jr    z,.MonsterFound
+  dec   a
+  ld    hl,$4000 + (060*128) + (000/2) - 128
+  jr    z,.MonsterFound
+  ld    hl,$4000 + (090*128) + (000/2) - 128
+  .MonsterFound:
+  ld    de,$0000 + (133*128) + (000/2) - 128
+  ld    bc,$0000 + (030*256) + (256/2)
+  ld    a,RecruitCreatures4MonstersBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetRecruitGraphics6CreatureWindows:
@@ -15012,16 +15201,6 @@ SetResourcesPlayer:
   ld    h,(ix+9)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
   ret
-
-
-
-
-
-
-
-
-
-
 
 
 

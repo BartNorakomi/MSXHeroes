@@ -85,7 +85,7 @@ UsasUnitLevel2CostRubies:       equ 0
 
 UsasUnitLevel3Number:           equ 54
 UsasUnitLevel3Attack:           equ 9
-UsasUnitLevel3Defense:          equ 0
+UsasUnitLevel3Defense:          equ 7
 UsasUnitLevel3HP:               equ 25
 UsasUnitLevel3Speed:            equ 6
 UsasUnitLevel3Growth:           equ 7
