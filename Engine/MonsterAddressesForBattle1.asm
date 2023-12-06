@@ -3982,7 +3982,28 @@ Monster169Table:                        ;Kubiwatari (jumping head statue) (hinot
   db    000                             ;special ability
   db    "Kubiwatari",255," "
   
-
+Monster170Table:                        ;butterfly (maze of gallious)
+;  dw    Monster170Idle
+;  dw    Monster170Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet10Block
+  db    32                              ;nx  
+  db    24+08                           ;ny
+  db    004                             ;cost (gold)
+  db    001+Level1Unit                  ;cost (gems)
+  db    000                             ;cost (rubies)
+  db    053                             ;hp
+  db    011                             ;speed
+  db    060                             ;attack
+  db    012                             ;defense
+  db    012                             ;growth
+  db    000                             ;special ability
+  db    "Kubiwatari",255," "
 
 
 

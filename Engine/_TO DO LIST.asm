@@ -17,11 +17,10 @@ units in hud nog een beetje finetunen
 AI
 
 castle:
-palettesplits bij alle schermen 
-m=terug naar main scherm ipv leave castle
 multiple markets=discount
-castle upgrade naar level 6= gold in main screen flikker tussen level 6 en level 5 waarde
-
+character slots in tavern en recruit screen zijn beetje fokked (met die zwarte strepen)
+black & white sprite zodat palette split niet opvalt
+fix de sprite die af en toe wegvalt
 
 general:
 units >1k moet nog verwerkt worden in de aantallen
