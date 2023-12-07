@@ -42,7 +42,7 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
   ;show recruit window for selected unit
   ld    hl,$4000 + (047*128) + (000/2) - 128
   ld    de,$0000 + (032*128) + (048/2) - 128
-  ld    bc,$0000 + (092*256) + (162/2)
+  ld    bc,$0000 + (084*256) + (162/2)
   ld    a,ButtonsRecruitBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -7098,10 +7098,8 @@ CastleOverviewTavernCode:
   call  docopy
 
   call  SetCastleTavernInterruptHandler
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
 	
-  .engine:  
+  .engine:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
@@ -9477,10 +9475,8 @@ CastleOverviewMarketPlaceCode:
   call  docopy
 
   call  SetCastleMarketInterruptHandler
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
 	
-  .engine:  
+  .engine:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
@@ -10164,8 +10160,6 @@ CastleOverviewMagicGuildCode:
   call  docopy
 
   call  SetCastleMagicGuildInterruptHandler
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
 	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -10365,8 +10359,8 @@ SpellDescriptionsMagicGuild:
                           db  "the battlefield",255
 
 
-.DescriptionFire1:        db  "The SilkenLarvas do 2222 damage. 222 SilkenLarvas die",254
-                          db  "Round 4 begins",254
+.DescriptionFire1:        db  "Castle Market place Tavern Magic Guild Sawmill",254
+                          db  "Mine Barracks Tower City walls Walls Place",254
                           db  "The SilkenLarvas wait for a better time to act",254
                           db  "Take a look at the available building options. ",255
 
@@ -10922,8 +10916,6 @@ CastleOverviewRecruitCode:
   call  docopy
 
   call  SetCastleRecruitInterruptHandler
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
 	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -10934,7 +10926,13 @@ CastleOverviewRecruitCode:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
+  ld    a,(RecruitButtonMAXBUYTable+0*RecruitButtonMAXBUYTableLenghtPerButton) ;BUY button
+  or    a
   ld    a,(Controls)
+  jr    z,.NotInRecruitMAXBUYWindow
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  call  nz,ExitSingleUnitRecruitWindow
+  .NotInRecruitMAXBUYWindow:
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   jp    nz,CastleOverviewCode
 
@@ -11931,10 +11929,6 @@ CastleOverviewBuildCode:                ;in: iy-castle
   call  docopy
 
   call  SetCastleBuildInterruptHandler
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
-;  ld    hl,CursorHand
-;	call	setspritecharacter.CastleEntry
 	
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -11981,7 +11975,7 @@ CastleOverviewBuildCode:                ;in: iy-castle
   call  SetScreenOn
   jp  .engine
 
-lineintheightCastleBuild: equ 15
+lineintheightCastleBuild: equ 14
 SetCastleBuildInterruptHandler:
   di
   ld    hl,CastleInterruptHandler 
@@ -14214,10 +14208,7 @@ CastleOverviewCode:                     ;in: iy-castle
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
 
-  ld    hl,CursorHand
-	call	setspritecharacter.CastleEntry
-
-  .engine:  
+  .engine:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 ;

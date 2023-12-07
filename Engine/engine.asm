@@ -3967,14 +3967,18 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 	jp		.setcharacter
 
   .CastleOverview:
-  ld    hl,CursorHand
-	jp		.setcharacter ;CastleEntry
+  ld    hl,SpriteColPoiterInCastleSprite
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    hl,CursorPointerIncastle
+	jp		.setcharacter
 
   .HeroOverview:
   ld    hl,CursorHand
 	jp		.setcharacter
 
   .Ingame:
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ld    a,(LockMiniMapOn?)
   or    a
   ld    hl,CursorHand
@@ -4526,6 +4530,7 @@ CursorEnterCastle:      equ SpriteCharCursorSprites + (13 * 32*3)
 CursorProhibitionSign:  equ SpriteProhibitionSignChar
 CursorBowAndArrow:      equ SpriteBowAndArrowChar
 CursorBrokenArrow:      equ SpriteBowAndArrowChar + (01 * 32*3)
+CursorPointerIncastle:  equ SpritePoiterInCastleChar
 
 CursorSwordLeftUp:      equ SpriteCharSword8DirectionsSprites + (00 * 32*3)
 CursorSwordLeftDown:    equ SpriteCharSword8DirectionsSprites + (01 * 32*3)
@@ -4560,12 +4565,12 @@ SpriteProhibitionSignColor:
 SpriteCharSword8DirectionsSprites:
 	include "../sprites/Swords8Directions.tgs.gen"
 SpriteBowAndArrowChar:
-	incbin "../sprites/sprconv FOR SINGLE SPRITES/BowAndArrow.spr",0,32*3 * 03
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/BowAndArrow.spr",0,32*3 * 02
+SpritePoiterInCastleChar:
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/PointerInCastle.spr",0,32*3 * 01
 
-
-
-
-
+SpriteColPoiterInCastleSprite:
+  ds 16,colorlightbrown| ds 16,colormiddlebrown+64 | ds 16,colorwhite+64
 SpriteColCursorSprites:
   ds 16,colorlightgreen| ds 16,colormidgreen+64 | ds 16,colorwhite+64
 

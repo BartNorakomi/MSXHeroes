@@ -727,7 +727,7 @@ CopyPage0To1:
 CopyPage1To0:
 	db		0,0,0,1
 	db		0,0,0,0
-	db		0,1,0,1
+	db		0,1,212,0
 	db		0,0,$d0	
 
 LoadCastleOverview:
@@ -2206,10 +2206,10 @@ EnterCastle:
   call  SetSpatInCastle
 
 ;  call  CastleOverviewCode
-  call  CastleOverviewBuildCode
+;  call  CastleOverviewBuildCode
 ;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
-;  call  CastleOverviewMarketPlaceCode
+  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
 
   call  SetSpatInGame
