@@ -1815,10 +1815,6 @@ CheckRightClickToDisplayInfo:
   add   hl,de
   ex    de,hl
 
-  ld    hl,10/2 + (22*128)               
-  add   hl,de  
-  push  hl
-
   ld    hl,$4000 + (000*128) + (162/2) - 128
   ld    bc,$0000 + (061*256) + (086/2)
   ld    a,ScrollBlock           ;block to copy graphics from
@@ -1826,15 +1822,30 @@ CheckRightClickToDisplayInfo:
 
   ld    a,(ix+MonsterNumber)
   call  .SetSYSX
-  pop   de
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+;  ld    de,100*256 + 028      ;(dy*256 + dx)
+
+  ex    af,af'
+  pop   af                              ;y window
+  add   a,23
+  ld    d,a
+  pop   af                              ;x window
+  add   a,10
+  ld    e,a
+  push  af
+  ld    a,d   
+  push  af
+  ex    af,af'
+
+  call  CopyTransparantImageBattleCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
 
   ;set hp
   pop   af                              ;y window
-  add   a,48
+  add   a,48-23
   ld    c,a                             ;dy
   pop   af                              ;x window
-  add   a,41
+  add   a,41-10
   ld    b,a                             ;dx
   push  bc
 
@@ -1939,6 +1950,35 @@ CheckRightClickToDisplayInfo:
                         ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
 
 
+CopyTransparantImageBattleCode:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  push  af
+  ld    a,b
+  ld    (CopyCastleButton2+ny),a
+  ld    a,c
+  add   a,a
+  ld    (CopyCastleButton2+nx),a
+  pop   af
+
+  push  de
+  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  pop   de
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  ld    a,d
+  ld    (CopyCastleButton2+dy),a
+  ld    a,e
+  ld    (CopyCastleButton2+dx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  jp    docopy
 
 SetTotalMonsterHPInHL:  ;in ix->monster. out: hl=total hp (including boosts from inventory items, skills and magic)
   call  SetMonsterTableInIY             ;in x->Monster1.. table, out: 
@@ -2678,7 +2718,7 @@ SetEnemyStatsWindow:
   push  bc
   push  af
   ld    a,b                             ;x
-  add   a,31
+  add   a,31+1
   ld    e,a
 
   ld    a,c                             ;y

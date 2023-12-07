@@ -11,14 +11,14 @@ SetBattlefieldCasualtiesDefender:
   ld    (CasualtiesOverviewCopy+dy),a
 
   ld    hl,$4000 + (142*128) + (044/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (020/2) - 128
   ld    bc,$0000 + (022*256) + (138/2)
   ld    a,VictoryBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    b,004                           ;dx number
   ld    c,0                             ;amount of slots with casualties
-  ld    de,$0000 + (214*128) + (004/2) - 128 ;dx 14x14 unit portrait
+  ld    de,$0000 + (214*128) + (024/2) - 128 ;dx 14x14 unit portrait
 
   ld    iy,(HeroThatGetsAttacked)      ;defending hero
   ld    a,(iy+HeroUnits+0)              ;monster type/nr
@@ -68,14 +68,14 @@ SetBattlefieldCasualtiesAttacker:
   ld    (CasualtiesOverviewCopy+dy),a
 
   ld    hl,$4000 + (142*128) + (044/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (020/2) - 128
   ld    bc,$0000 + (022*256) + (138/2)
   ld    a,VictoryBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    b,004                           ;dx number
   ld    c,0                             ;amount of slots with casualties
-  ld    de,$0000 + (214*128) + (004/2) - 128 ;dx 14x14 unit portrait
+  ld    de,$0000 + (214*128) + (024/2) - 128 ;dx 14x14 unit portrait
 
   ld    iy,(plxcurrentheroAddress)      ;defending hero
   ld    a,(iy+HeroUnits+0)              ;monster type/nr
@@ -175,13 +175,26 @@ SetBattlefieldCasualtiesAttacker:
   push  bc
   ld    c,212+17                           ;dy
   push  de
+  ld    a,b
+  add   a,20
+  ld    b,a
   call  SetNumber16BitCastle
   
   ex    af,af'
   call  SetSYSX14x14
   pop   de
   push  de
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+;  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  push  hl
+  ld    hl,128
+  add   hl,de
+  add   hl,hl
+  ex    de,hl
+  pop   hl
+  
+  call  CopyTransparantImageBattleCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
   pop   de
   pop   bc
 
@@ -1121,7 +1134,6 @@ SetBattleText:
 .TextRound: db "Round ",255
 .TextBegins: db " begins.",255
 
-
   .defend:
   push  ix
   pop   hl
@@ -1131,11 +1143,18 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
   pop   bc
 
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ld    hl,.TextdefendMultipleUnits
+  jr    nz,.EndCheckNameEndsWithS_defend
+  ld    hl,.TextdefendMultipleUnits+1
+  .EndCheckNameEndsWithS_defend:
+
   ld    a,(ix+3)                        ;single unit ?
   dec   a
+  jr    nz,.AmountFound2
   ld    hl,.TextdefendSingleUnit
-  jr    z,.AmountFound2
-  ld    hl,.TextdefendMultipleUnits
   .AmountFound2:
   ld    a,(PutLetter+dx)                ;set dx of text  
   ld    b,a                             ;dx
@@ -1174,9 +1193,6 @@ SetBattleText:
 .TextdefendMultipleUnits: db "s defend.",255
 .Textdef: db "def)",255
 
-
-
-
   .wait:
   ld    hl,.TextThe
   push  bc
@@ -1193,11 +1209,19 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
   pop   bc
 
+
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ld    hl,.TextwaitsMultipleUnits
+  jr    nz,.EndCheckNameEndsWithS_wait
+  ld    hl,.TextwaitsMultipleUnits+1
+  .EndCheckNameEndsWithS_wait:
+
   ld    a,(ix+3)                        ;single unit ?
   dec   a
-  ld    hl,.Textwaits
-  jr    z,.AmountFound1
-  ld    hl,.Textswait
+  jr    nz,.AmountFound1
+  ld    hl,.TextwaitsSingleUnit
   .AmountFound1:
 
   ld    a,(PutLetter+dx)                ;set dx of text  
@@ -1207,8 +1231,8 @@ SetBattleText:
 ;  pop   bc
   ret
 .TextThe: db "The ",255
-.Textwaits: db " waits.",255
-.Textswait: db "s wait.",255
+.TextwaitsSingleUnit: db " waits.",255
+.TextwaitsMultipleUnits: db "s wait.",255
 
 
 .DealDamage:
@@ -1220,11 +1244,21 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
   pop   bc
 
+
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ld    hl,.TextdealdamageMultipleUnits
+  jr    nz,.EndCheckNameEndsWithS_dealdamage
+  ld    hl,.TextdealdamageMultipleUnits+1
+  .EndCheckNameEndsWithS_dealdamage:
+
+
+
   ld    a,(ix+3)                        ;single unit ?
   dec   a
-  ld    hl,.TextDeals
-  jr    z,.AmountFound3
-  ld    hl,.TextsDeal
+  jr    nz,.AmountFound3
+  ld    hl,.TextdealdamageSingleUnit
   .AmountFound3:
 
   ld    a,(PutLetter+dx)                ;set dx of text  
@@ -1248,8 +1282,8 @@ SetBattleText:
   call  SetText                         ;in: b=dx, c=dy, hl->text    
 ;  pop   bc
   ret
-.TextDeals: db " deals ",255
-.TextsDeal: db "s deal ",255
+.TextdealdamageSingleUnit: db " deals ",255
+.TextdealdamageMultipleUnits: db "s deal ",255
 .TextsDMG: db " dmg.",255
 
 .EndSetBattleText:

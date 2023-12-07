@@ -16,10 +16,6 @@ units splitsen op hud
 units in hud nog een beetje finetunen
 AI
 
-castle:
-multiple markets=discount
-character slots in tavern en recruit screen zijn beetje fokked (met die zwarte strepen)
-
 general:
 units >1k moet nog verwerkt worden in de aantallen
 muziek

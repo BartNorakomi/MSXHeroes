@@ -1952,13 +1952,6 @@ DYDXFirstHeroWindow14x9InHud:       equ 067*128 + (208/2) - 128      ;(dy*128 + 
 DYDXSecondHeroWindow14x9InHud:      equ 078*128 + (208/2) - 128      ;(dy*128 + dx/2) = (208,078)
 DYDXThirdHeroWindow14x9InHud:       equ 089*128 + (208/2) - 128      ;(dy*128 + dx/2) = (208,089)
 
-NXAndNY14x14CharaterPortraits:      equ 014*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
-DYDXUnit1WindowInHud:               equ 153*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit2WindowInHud:               equ 153*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit3WindowInHud:               equ 153*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit4WindowInHud:               equ 176*128 + (204/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit5WindowInHud:               equ 176*128 + (220/2) - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit6WindowInHud:               equ 176*128 + (236/2) - 128      ;(dy*128 + dx/2) = (204,153)
 
 SetResources?:  db  3
 SetHeroArmyAndStatusInHud?: db  3
@@ -5191,7 +5184,7 @@ pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl1Hero1Units:  db 0 | dw 0 |      db 0 | dw 0 |      db 1 | dw 5 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl1Hero1Units:  db 0 | dw 0 |      db 100 | dw 1 |      db 100 | dw 5 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5397,7 +5390,7 @@ pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
-Pl2Hero1Units:  db 7 | dw 8 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl2Hero1Units:  db 7 | dw 108 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 3
 .HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)

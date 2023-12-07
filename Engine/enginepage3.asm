@@ -20,7 +20,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -44,7 +44,7 @@ StartGame:
   call  DoCopy
 ;  call  OneTimeCharAndColorSprites
 
-  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
+;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -430,7 +430,7 @@ CurrentActiveMonster: db  1
 TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
 CasualtiesOverviewCopy:
-	db		000,000,212,000
+	db		020,000,212,000
 	db		068,000,144,000
 	db		132,000,022,000
 	db		000,000,$d0	
@@ -2207,9 +2207,9 @@ EnterCastle:
 
 ;  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-;  call  CastleOverviewRecruitCode
+  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
-  call  CastleOverviewMarketPlaceCode
+;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
 
   call  SetSpatInGame

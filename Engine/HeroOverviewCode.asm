@@ -902,14 +902,6 @@ SetAddressHeroPortrait16x30SYSXinBC:
 ;  sbc   hl,bc
   ret
 
-NXAndNY14x24CharaterPortraits:      equ 024*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
-DYDXUnit1WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+32)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit2WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+52)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit3WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+72)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit4WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+92)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit5WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+112)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-DYDXUnit6WindowInHud14x24:          equ (HeroOverViewArmyWindowDY+30)*128 + (HeroOverViewArmyWindowDX+132)/2 - 128      ;(dy*128 + dx/2) = (204,153)
-
 SetArmyIconsAndAmount:
   ld    ix,(plxcurrentheroAddress)
 
@@ -959,32 +951,32 @@ SetArmyIconsAndAmount:
   ld    a,(ix+HeroUnits+00)             ;unit slot 1, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit1WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    a,(ix+HeroUnits+03)             ;unit slot 2, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit2WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    a,(ix+HeroUnits+06)             ;unit slot 3, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit3WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    a,(ix+HeroUnits+09)             ;unit slot 4, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit4WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    a,(ix+HeroUnits+12)             ;unit slot 5, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit5WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    a,(ix+HeroUnits+15)             ;unit slot 6, check which unit
   call  .SetSYSX
   ld    de,DYDXUnit6WindowInHud14x24    ;(dy*128 + dx/2) = (204,153)
-  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
@@ -1002,6 +994,15 @@ SetArmyIconsAndAmount:
   ld    a,Enemy14x24PortraitsBlock      ;Map block
   ld    bc,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
+
+NXAndNY14x24CharaterPortraits:      equ 024*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
+DYDXUnit1WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+32)
+DYDXUnit2WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+52)
+DYDXUnit3WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+72)
+DYDXUnit4WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+92)
+DYDXUnit5WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+112)
+DYDXUnit6WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+132)
+
                         ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
 UnitSYSXTable14x24Portraits:  
                 dw $4000+(00*128)+(00/2)-128, $4000+(00*128)+(14/2)-128, $4000+(00*128)+(28/2)-128, $4000+(00*128)+(42/2)-128, $4000+(00*128)+(56/2)-128, $4000+(00*128)+(70/2)-128, $4000+(00*128)+(84/2)-128, $4000+(00*128)+(98/2)-128, $4000+(00*128)+(112/2)-128, $4000+(00*128)+(126/2)-128, $4000+(00*128)+(140/2)-128, $4000+(00*128)+(154/2)-128, $4000+(00*128)+(168/2)-128, $4000+(00*128)+(182/2)-128, $4000+(00*128)+(196/2)-128, $4000+(00*128)+(210/2)-128, $4000+(00*128)+(224/2)-128, $4000+(00*128)+(238/2)-128
@@ -1017,6 +1018,36 @@ UnitSYSXTable14x24Portraits:
                 dw $4000+(216*128)+(00/2)-128, $4000+(216*128)+(14/2)-128, $4000+(216*128)+(28/2)-128, $4000+(216*128)+(42/2)-128, $4000+(216*128)+(56/2)-128, $4000+(216*128)+(70/2)-128, $4000+(216*128)+(84/2)-128, $4000+(216*128)+(98/2)-128, $4000+(216*128)+(112/2)-128, $4000+(216*128)+(126/2)-128, $4000+(216*128)+(140/2)-128, $4000+(216*128)+(154/2)-128, $4000+(216*128)+(168/2)-128, $4000+(216*128)+(182/2)-128, $4000+(216*128)+(196/2)-128, $4000+(216*128)+(210/2)-128, $4000+(216*128)+(224/2)-128, $4000+(216*128)+(238/2)-128
                 dw $4000+(230*128)+(00/2)-128, $4000+(230*128)+(14/2)-128, $4000+(230*128)+(28/2)-128, $4000+(230*128)+(42/2)-128, $4000+(230*128)+(56/2)-128, $4000+(230*128)+(70/2)-128, $4000+(230*128)+(84/2)-128, $4000+(230*128)+(98/2)-128, $4000+(230*128)+(112/2)-128, $4000+(230*128)+(126/2)-128, $4000+(230*128)+(140/2)-128, $4000+(230*128)+(154/2)-128, $4000+(230*128)+(168/2)-128, $4000+(230*128)+(182/2)-128, $4000+(230*128)+(196/2)-128, $4000+(230*128)+(210/2)-128, $4000+(230*128)+(224/2)-128, $4000+(230*128)+(238/2)-128
 
+
+CopyTransparantImageHeroOverviewCode:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+  push  af
+  ld    a,b
+  ld    (CopyCastleButton2+ny),a
+  ld    a,c
+  add   a,a
+  ld    (CopyCastleButton2+nx),a
+  pop   af
+
+  push  de
+  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  pop   de
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  ld    a,d
+  ld    (CopyCastleButton2+dy),a
+  ld    a,e
+  ld    (CopyCastleButton2+dx),a
+
+  ld    hl,CopyCastleButton2
+  call  docopy
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  jp    docopy
 
 
 ;inventory has:
