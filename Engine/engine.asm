@@ -971,9 +971,18 @@ SetHeroMaxMovementPoints:
   ret
 
 SetText:                                ;in: b=dx, c=dy, hl->text
+  ld    a,212
+  ld    (PutLetter+sy),a                ;set dx of text
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  cp    3
+  jr    nz,.GoSetText
+  ld    a,250
+  ld    (PutLetter+sy),a                ;set dx of text  
+  .GoSetText:
+  
+
   ld    a,6
   ld    (PutLetter+ny),a                ;set dx of text
-
 
   ld    a,b
   ld    (PutLetter+dx),a                ;set dx of text
@@ -1151,6 +1160,53 @@ SetText:                                ;in: b=dx, c=dy, hl->text
 ds 12
 .TextCoordinateTableSmall:  db  000,4, 004,3, 007,3, 010,3, 013,3, 016,2, 019,3, 022,3, 025,1, 026,2, 028,3, 032,1, 033,5, 038,3, 042,3, 046,3, 050,3, 054,2, 057,3, 060,2, 062,3, 065,3, 068,5, 073,3, 076,3, 080,4
 
+SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0:
+;jp SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
+  ld    de,1000
+  call  CompareHLwithDE
+  jr    c,.NumberIsSmallerThan1000
+  ;at this point number>999
+
+  add   hl,de
+  ld    de,10000
+  call  CompareHLwithDE
+  jr    c,.NumberIsSmallerThan10000
+  ;at this point number>9999
+
+  add   hl,de
+  push  bc
+  push  iy
+  call  SetNumber16BitCastle.ConvertToDecimal16bit
+  ld    iy,TextNumber
+  ld    (iy+2),"k"
+  ld    (iy+3),255
+  pop   iy
+  pop   bc
+  ld    hl,TextNumber
+  jp    SetText
+
+  .NumberIsSmallerThan10000:
+  add   hl,de
+  push  bc
+  push  iy
+  call  SetNumber16BitCastle.ConvertToDecimal16bit
+
+  ld    iy,TextNumber
+  ld    a,(iy+1)
+  ld    (iy+2),a
+  ld    (iy+1),"."
+  ld    (iy+3),"k"
+  ld    (iy+4),255
+
+  pop   iy
+  pop   bc
+
+  ld    hl,TextNumber
+  jp    SetText
+
+  .NumberIsSmallerThan1000:
+  add   hl,de
+ 
 SetNumber16BitCastleSkipIfAmountIs0:
   ld    a,h
   cp    l
@@ -3774,11 +3830,12 @@ movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   ex    af,af'
   ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
-  ld    e,000
+  ld    e,016                           ;top border
   cp    3
-  ld    d,212-16 + 6
+  ld    d,212-16 + 6 +16                ;bottom border
   jr    z,.XBorderSet
 
+  ld    e,000
   cp    2
   ld    d,212-16
   jr    nc,.XBorderSet
@@ -5184,7 +5241,7 @@ pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl1Hero1Units:  db 0 | dw 0 |      db 100 | dw 1 |      db 100 | dw 5 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl1Hero1Units:  db 000 | dw 000 |      db 7 | dw 1 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5390,7 +5447,7 @@ pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
-Pl2Hero1Units:  db 7 | dw 108 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl2Hero1Units:  db 0 | dw 0 |      db 7 | dw 100 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 3
 .HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)

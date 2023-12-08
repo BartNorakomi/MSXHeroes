@@ -302,23 +302,23 @@ MovementLenghtMonsters: equ 8
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
-  db  001 | dw 100 | db 012 + (01*08), 056 + (00*16)
+  db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
 
-  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16)
-;  db  002 | dw 500 | db 012 + (16*08), 056 + (01*16)
+  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
+;  db  002 | dw 500 | db 012 + (16*08), 056 + (01*16) + 16
 
-  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16)
-  db  004 | dw 700 | db 012 + (00*08), 056 + (05*16)
-  db  005 | dw 800 | db 012 + (00*08), 056 + (07*16)
-;  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16)
-  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16)
+  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
+  db  004 | dw 700 | db 012 + (00*08), 056 + (05*16) + 16
+  db  005 | dw 800 | db 012 + (00*08), 056 + (07*16) + 16
+;  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16) + 16
+  db  006 | dw 900 | db 012 + (01*08), 056 + (08*16) + 16
 
-  db  001 | dw 001 | db 012 + (25*08), 056 + (00*16)
-  db  000 | dw 000 | db 012 + (24*08), 056 + (01*16)
-  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16)
-  db  007 | dw 001 | db 012 + (24*08), 056 + (05*16)
-  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16)
-  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16)
+  db  001 | dw 001 | db 012 + (25*08), 056 + (00*16) + 16
+  db  000 | dw 000 | db 012 + (24*08), 056 + (01*16) + 16
+  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16) + 16
+  db  007 | dw 001 | db 012 + (24*08), 056 + (05*16) + 16
+  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16) + 16
+  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16) + 16
 
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 BattleFieldGrid: ;0C15Ch
@@ -369,13 +369,13 @@ EraseMonster:
 	db		0,%0000 0000,$d0
 
 PutMonsterAmountOnBattleField:
-	db		000,000,249,255
+	db		240,000,249,255
 	db		000,000,000,255
 	db		000,000,007,000
 	db		0,%0000 0000,$98
 
 SmoothCornerPutMonsterAmount:
-	db	  000,000,249,000
+	db	  240,000,249,000
 	db	  001,000,249,000
 	db	  001,000,007,000
 	db		0,%0000 0000,$90
@@ -430,7 +430,7 @@ CurrentActiveMonster: db  1
 TotalAmountOfMonstersOnBattleField:  equ 1 + 12 ;1st 'monster' is gridtile
 
 CasualtiesOverviewCopy:
-	db		020,000,212,000
+	db		020,000,212+16,000
 	db		068,000,144,000
 	db		132,000,022,000
 	db		000,000,$d0	
@@ -2205,9 +2205,9 @@ EnterCastle:
 
   call  SetSpatInCastle
 
-;  call  CastleOverviewCode
+  call  CastleOverviewCode
 ;  call  CastleOverviewBuildCode
-  call  CastleOverviewRecruitCode
+;  call  CastleOverviewRecruitCode
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
@@ -2343,6 +2343,13 @@ EnterCombat:
 	ld		(putmovementstars?),a
   ld    (framecounter),a
 	ld		(movehero?),a	
+
+  xor   a                               ;reset vertical offset register (battlescreen is 16 pixels shifted down)
+  di
+  out   ($99),a
+  ld    a,23+128
+  ei
+  out   ($99),a
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   jp    StartGame.WhenExitingCombat

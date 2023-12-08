@@ -2383,37 +2383,37 @@ SetArmyUnitsAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,204 + 1
   ld    c,169
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,220 + 1
   ld    c,169
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,236 + 1
   ld    c,169
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,204 + 1
   ld    c,192
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,220 + 1
   ld    c,192
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,236 + 1
   ld    c,192
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
 SetManaAndMovementBars:
@@ -6722,37 +6722,37 @@ SetActiveTradingHeroArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,056
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,076
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,096
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,116
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,136
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,156
   ld    c,061
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
   .army:
@@ -6807,37 +6807,37 @@ SetHeroWhoGetsTradeWithArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,056
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,076
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,096
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,116
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,136
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,156
   ld    c,125
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
   .army:
@@ -8813,37 +8813,37 @@ SetDefendingHeroArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,029
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,045
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,061
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,077
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,093
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,109
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
   .army:
@@ -8930,37 +8930,37 @@ SetVisitingHeroArmyAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,157
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,173
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,189
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,205
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,221
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,237
   ld    c,197
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
   .army:

@@ -1,10 +1,11 @@
 HandleMonsters:
-;ld a,8 ; 20 is the max
-;di
-;out ($99),a
-;ld a,23+128
-;ei
-;out ($99),a
+;ld a,12 ; 20 is the max
+ld a,16 ; 20 is the max
+di
+out ($99),a
+ld a,23+128
+ei
+out ($99),a
 
 ;  call  HandleProjectileSprite         ;done on int
 ;  call  HandleExplosionSprite          ;done on int
@@ -58,9 +59,8 @@ HandleMonsters:
   ld    a,(SwitchToNextMonster?)
   or    a
   jr    nz,.EndPutGridTile
-    
-  call  CheckIsCursorOnATileThisFrame
 
+  call  CheckIsCursorOnATileThisFrame
   call  SetcursorWhenGridTileIsActive | ei
 
   ld    a,(IsCursorOnATileThisFrame?)
@@ -117,7 +117,8 @@ call screenon
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  ClearBattleFieldGridStartOfBattle
   call  ClearBattleText
-  call  SetFontPage0Y212                ;set font at (0,212) page 0
+;  call  SetFontPage0Y212                ;set font at (0,212) page 0
+  call  SetFontPage0Y250                ;set font at (0,212) page 0
   call  SetBattleButtons
 ;/battle code page 2
 
@@ -319,7 +320,7 @@ call screenon
 
 ;.CopyTransparantButtons:  
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
-  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  ld    de,$8000 + ((212+16)*128) + (000/2) - 128  ;dy,dx
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 	ld		a,(activepage)
@@ -339,9 +340,14 @@ call screenon
   sub   a,(ix+GenericButtonXleft)
   ld    (CopyCastleButton2+nx),a
 
+  ld    a,212+16
+  ld    (CopyCastleButton2+sy),a
+
   ld    hl,CopyCastleButton2
   call  docopy
-;  halt
+
+  ld    a,212
+  ld    (CopyCastleButton2+sy),a
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
@@ -603,7 +609,7 @@ SurrenderButtonPressed:
   call  DoCopy
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (120*128) + (014/2) - 128
+  ld    de,$0000 + ((120+16)*128) + (014/2) - 128
   ld    bc,$0000 + (059*256) + (228/2)
   ld    a,RetreatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -612,7 +618,7 @@ SurrenderButtonPressed:
 
   ;set fee for surrendering
   ld    b,125                           ;dx
-  ld    c,142                           ;dy
+  ld    c,142+16                           ;dy
 ;  ld    hl,5490
   call  SetNumber16BitCastle
   
@@ -624,7 +630,7 @@ SurrenderButtonPressed:
   ld    ix,(plxcurrentheroAddress)
   .CurrentActiveHeroFound:
   ld    b,123                           ;dx
-  ld    c,135                           ;dy
+  ld    c,135+16                           ;dy
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
@@ -749,24 +755,24 @@ SurrenderButtonPressed:
   jp    docopy
 
 .BackupPage1toPage3:
-	db		014,000,120,001
+	db		014,000,120+16,001
 	db		000,000,256-59,003
 	db		228,000,059,000
 	db		000,000,$d0	
 .BackupPage0toPage3:
-	db		014,000,120,000
+	db		014,000,120+16,000
 	db		000,000,256-59,003
 	db		228,000,059,000
 	db		000,000,$d0	
 
 .RestorePage3toPage0:
 	db		000,000,256-59,003
-	db		014,000,120,000
+	db		014,000,120+16,000
 	db		228,000,059,000
 	db		000,000,$d0	
 .RestorePage3toPage1:
 	db		000,000,256-59,003
-	db		014,000,120,001
+	db		014,000,120+16,001
 	db		228,000,059,000
 	db		000,000,$d0	
 
@@ -848,12 +854,12 @@ SetSurrenderButtons:
   ld    (GenericButtonTable2),a  
   ret
 
-SurrenderButton1Ytop:           equ 153
+SurrenderButton1Ytop:           equ 153+16
 SurrenderButton1YBottom:        equ SurrenderButton1Ytop + 019
 SurrenderButton1XLeft:          equ 062
 SurrenderButton1XRight:         equ SurrenderButton1XLeft + 020
 
-SurrenderButton2Ytop:           equ 154
+SurrenderButton2Ytop:           equ 154+16
 SurrenderButton2YBottom:        equ SurrenderButton2Ytop + 018
 SurrenderButton2XLeft:          equ 174
 SurrenderButton2XRight:         equ SurrenderButton2XLeft + 020
@@ -877,7 +883,7 @@ RetreatButtonPressed:
   call  DoCopy
 
   ld    hl,$4000 + (058*128) + (000/2) - 128
-  ld    de,$0000 + (120*128) + (014/2) - 128
+  ld    de,$0000 + ((120+16)*128) + (014/2) - 128
   ld    bc,$0000 + (059*256) + (228/2)
   ld    a,RetreatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -1333,7 +1339,7 @@ CheckVictoryOrDefeat:
   call  SwapAndSetPage                  ;swap and set page 1  
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (002*128) + (024/2) - 128
+  ld    de,$0000 + ((002+16)*128) + (024/2) - 128
   ld    bc,$0000 + (207*256) + (210/2)
   ld    a,DefeatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -1444,13 +1450,13 @@ CheckVictoryOrDefeat:
   call  SwapAndSetPage                  ;swap and set page 1  
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (002*128) + (024/2) - 128
+  ld    de,$0000 + ((002+16)*128) + (024/2) - 128
   ld    bc,$0000 + (127*256) + (210/2)
   ld    a,VictoryBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,$4000 + (127*128) + (000/2) - 128
-  ld    de,$0000 + ((002+127)*128) + (024/2) - 128
+  ld    de,$0000 + ((002+127+16)*128) + (024/2) - 128
   ld    bc,$0000 + ((207-127)*256) + (210/2)
   ld    a,DefeatBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -1479,7 +1485,7 @@ CheckVictoryOrDefeat:
 
   ;set xp gained
   ld    b,112                           ;dx
-  ld    c,116                           ;dy
+  ld    c,116+16                           ;dy
   call  SetNumber16BitCastle
   
 ;battle code page 2
@@ -1550,7 +1556,7 @@ CheckVictoryOrDefeat:
   ld    bc,$4000
   xor   a
   sbc   hl,bc
-  ld    de,$0000 + (011*128) + (032/2) - 128
+  ld    de,$0000 + ((011+16)*128) + (032/2) - 128
   ld    bc,NXAndNY16x30HeroIcon
   ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -1558,14 +1564,14 @@ CheckVictoryOrDefeat:
   ;set name
   pop   ix
   ld    b,090                           ;dx
-  ld    c,013                           ;dy
+  ld    c,013+16                           ;dy
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
   ld    b,121                           ;dx
-  ld    c,109                           ;dy
+  ld    c,109+16                           ;dy
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
@@ -1589,7 +1595,7 @@ CheckVictoryOrDefeat:
   ld    bc,$4000
   xor   a
   sbc   hl,bc
-  ld    de,$0000 + (011*128) + (210/2) - 128
+  ld    de,$0000 + ((011+16)*128) + (210/2) - 128
   ld    bc,NXAndNY16x30HeroIcon
   ld    a,Hero16x30PortraitsBlock          ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
@@ -1597,7 +1603,7 @@ CheckVictoryOrDefeat:
   ;set name
   pop   ix
   ld    b,166                           ;dx
-  ld    c,013                           ;dy
+  ld    c,013+16                           ;dy
   ld    l,(ix+HeroSpecificInfo+0)       ;get hero specific info / name
   ld    h,(ix+HeroSpecificInfo+1)
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
@@ -1608,9 +1614,9 @@ CheckVictoryOrDefeat:
   call  SetNeutralMonsterHeroCollidedWithInA
   call  CheckRightClickToDisplayInfo.SetSYSX
   exx
-  ld    de,256*(015) + (211)
+  ld    de,256*(015+16) + (211)
   exx
-  ld    de,$0000 + (015*128) + (210/2) - 128
+  ld    de,$0000 + ((015+16)*128) + (210/2) - 128
   call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   call  SetMonsterTableInIYNeutralMonster
@@ -1621,7 +1627,7 @@ CheckVictoryOrDefeat:
 
   ;set name
   ld    b,166                           ;dx
-  ld    c,013                           ;dy
+  ld    c,013+16                           ;dy
 
   call  CheckPointerOnAttackingHero.CenterHeroNameHasGainedALevel
   call  SetText
@@ -1636,13 +1642,13 @@ CheckVictoryOrDefeat:
   jp    docopy
 
 .CopyPage1toPage0:
-	db		000,000,000,001
-	db		000,000,000,000
+	db		000,000,016,001
+	db		000,000,016,000
 	db		000,001,212,000
 	db		000,000,$d0	
 .CopyPage0toPage1:
-	db		000,000,000,000
-	db		000,000,000,001
+	db		000,000,016,000
+	db		000,000,016,001
 	db		000,001,212,000
 	db		000,000,$d0	
 
@@ -1653,7 +1659,7 @@ SetVictoryOrDefeatButton:
   ldir
   ret
 
-VictoryOrDefeatButton1Ytop:           equ 183
+VictoryOrDefeatButton1Ytop:           equ 183 + 16
 VictoryOrDefeatButton1YBottom:        equ VictoryOrDefeatButton1Ytop + 019
 VictoryOrDefeatButton1XLeft:          equ 208
 VictoryOrDefeatButton1XRight:         equ VictoryOrDefeatButton1XLeft + 020
@@ -1763,7 +1769,7 @@ CheckRightClickToDisplayInfo:
   pop   af
   pop   af
   
-  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + ((000+16)*128) + (000/2) - 128
 
 	ld		a,(spat+1)			                ;x cursor
   sub   32
@@ -1827,7 +1833,7 @@ CheckRightClickToDisplayInfo:
 
   ex    af,af'
   pop   af                              ;y window
-  add   a,23
+  add   a,23+16
   ld    d,a
   pop   af                              ;x window
   add   a,10
@@ -1862,7 +1868,6 @@ CheckRightClickToDisplayInfo:
   ld    hl,.TextSlash
   call  SetText
 
-;.kut: jp .kut
   ;set total hp
   call  SetTotalMonsterHPInHL           ;in ix->monster. out: hl=total hp (including boosts from inventory items, skills and magic)
 
@@ -1961,7 +1966,7 @@ CopyTransparantImageBattleCode:
   pop   af
 
   push  de
-  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  ld    de,$8000 + ((212+16)*128) + (000/2) - 128  ;dy,dx
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   pop   de
 
@@ -1974,8 +1979,14 @@ CopyTransparantImageBattleCode:
   ld    a,e
   ld    (CopyCastleButton2+dx),a
 
+  ld    a,212+16
+  ld    (CopyCastleButton2+sy),a
+
   ld    hl,CopyCastleButton2
   call  docopy
+
+  ld    a,212
+  ld    (CopyCastleButton2+sy),a
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   jp    docopy
@@ -2239,9 +2250,9 @@ ApplyPercentBasedBoost:
 
 CheckPointerOnDefendingHero:
   ld    a,(spat)
-  cp    38
+  cp    38+16
   ret   nc
-  cp    06
+  cp    06+16
   ret   c
   ld    a,(spat+1)
   cp    236
@@ -2353,9 +2364,9 @@ CheckPointerOnDefendingHero:
 
 CheckPointerOnAttackingHero:
   ld    a,(spat)
-  cp    38
+  cp    38+16
   ret   nc
-  cp    06
+  cp    06+16
   ret   c
   ld    a,(spat+1)
   cp    10
@@ -4095,14 +4106,16 @@ ApplyAttackDefenseFormula:          ;in: hl=total damage, out: hl=total damage a
 
 MoveGridPointer:
   ld    a,(spat)
-  add   a,14; 8
+  add   a,14 
   
   and   %1111 0000
   bit   4,a
-  jr    nz,.EvenTiles
+  jr    z,.EvenTiles
 
+  .OddTiles:
   sub   a,9
   ld    (ix+MonsterY),a
+
   ld    a,(spat+1)
   sub   a,6 ;8
   
@@ -4245,14 +4258,14 @@ BuildUpBattleFieldAndPutMonsters:
   xor   a
 
   .XLeftHero: equ 0
-  .YLeftHero: equ 12
+  .YLeftHero: equ 12+16
 
   exx
   ld    de,256*(.YLeftHero) + (.XLeftHero)
   exx
   sbc   hl,bc
-  ld    de,$0000 + (.YLeftHero*128) + (.XLeftHero/2) - 128
-  ld    bc,NXAndNY16x30HeroIcon
+;  ld    bc,NXAndNY16x30HeroIcon
+  ld    bc,.NXAndNY16x28HeroIconTempSolution
   ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
   call  .CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
@@ -4276,17 +4289,19 @@ BuildUpBattleFieldAndPutMonsters:
 
 
   .XRightHero: equ 256-16
-  .YRightHero: equ 12
+  .YRightHero: equ 12+16
 
   exx
   ld    de,256*(.YRightHero) + (.XRightHero)
+
   exx
   sbc   hl,bc
-  ld    de,$0000 + (.YRightHero*128) + (.XRightHero/2) - 128
-  ld    bc,NXAndNY16x30HeroIcon
+;  ld    bc,NXAndNY16x30HeroIcon
+  ld    bc,.NXAndNY16x28HeroIconTempSolution
   ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
   jp    .CopyTransparantImage          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+.NXAndNY16x28HeroIconTempSolution:   equ 028*256 + (016/2)            ;(ny*256 + nx/2) = (14x09)
 
 
 
@@ -4313,7 +4328,7 @@ BuildUpBattleFieldAndPutMonsters:
   ld    (CopyCastleButton2+nx),a
   pop   af
 
-  ld    de,$8000 + (212*128) + (000/2) - 128  ;dy,dx
+  ld    de,$8000 + ((212+16)*128) + (000/2) - 128  ;dy,dx
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 	ld		a,(activepage)
@@ -4326,9 +4341,14 @@ BuildUpBattleFieldAndPutMonsters:
   ld    a,e
   ld    (CopyCastleButton2+dx),a
 
+  ld    a,212+16
+  ld    (CopyCastleButton2+sy),a
+
   ld    hl,CopyCastleButton2
   call  docopy
-;  halt
+
+  ld    a,212
+  ld    (CopyCastleButton2+sy),a
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
@@ -4395,25 +4415,25 @@ BuildUpBattleFieldAndPutMonsters:
 .CopyMonstersFromPage0to1:
 	db		0,0,0,0
 	db		0,0,0,1
-	db		0,1,188,0
+	db		0,1,188+16,0
 	db		0,0,$d0	
 
 .CopyMonstersFromPage0to2:
 	db		0,0,0,0
 	db		0,0,0,2
-	db		0,1,188,0
+	db		0,1,188+16,0
 	db		0,0,$d0	
 
 .CopyPage1To2:
 	db		0,0,0,1
 	db		0,0,0,2
-	db		0,1,188,0
+	db		0,1,188+16,0
 	db		0,0,$d0	
 
 .CopyPage1To3:
 	db		0,0,0,1
 	db		0,0,0,3
-	db		0,1,188,0
+	db		0,1,188+16,0
 	db		0,0,$d0	
 
   .SetRocks:
@@ -4445,11 +4465,11 @@ BuildUpBattleFieldAndPutMonsters:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 RocksVersion1:
-  dw    $0000 + ((00*16+040)*128) + ((07*08 + 12)/2) - 128, BattleFieldGrid+007 + 00*LenghtBattleField
-  dw    $0000 + ((01*16+040)*128) + ((08*08 + 12)/2) - 128, BattleFieldGrid+008 + 01*LenghtBattleField
-  dw    $0000 + ((04*16+040)*128) + ((09*08 + 12)/2) - 128, BattleFieldGrid+009 + 04*LenghtBattleField
-  dw    $0000 + ((04*16+040)*128) + ((11*08 + 12)/2) - 128, BattleFieldGrid+011 + 04*LenghtBattleField
-  dw    $0000 + ((05*16+040)*128) + ((10*08 + 12)/2) - 128, BattleFieldGrid+010 + 05*LenghtBattleField
+  dw    $0000 + ((00*16+056)*128) + ((07*08 + 12)/2) - 128, BattleFieldGrid+007 + 00*LenghtBattleField
+  dw    $0000 + ((01*16+056)*128) + ((08*08 + 12)/2) - 128, BattleFieldGrid+008 + 01*LenghtBattleField
+  dw    $0000 + ((04*16+056)*128) + ((09*08 + 12)/2) - 128, BattleFieldGrid+009 + 04*LenghtBattleField
+  dw    $0000 + ((04*16+056)*128) + ((11*08 + 12)/2) - 128, BattleFieldGrid+011 + 04*LenghtBattleField
+  dw    $0000 + ((05*16+056)*128) + ((10*08 + 12)/2) - 128, BattleFieldGrid+010 + 05*LenghtBattleField
 
 Set255WhereMonsterStandsInBattleFieldGrid:
   call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
@@ -4587,21 +4607,22 @@ SetAmountUnderMonster:
 
 
   ld    hl,$4000 + (038*128) + (000/2) - 128
-  ld    de,$0000 + (249*128) + (000/2) - 128  ;dy,dx
+  ld    de,$0000 + (249*128) + (240/2) - 128  ;dy,dx
   ld    bc,$0000 + (007*256) + (016/2)        ;ny,nx  
   ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 
-  ld    b,001                           ;dx
+  ld    b,241                           ;dx
   ld    c,250                           ;dy
   ld    l,(ix+MonsterAmount)
   ld    h,(ix+MonsterAmount+1)
-  call  SetNumber16BitCastle
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 ;  call  Set4PurpleDotsAroundNumber
 
   ld    a,(PutLetter+dx)                ;dx of last letter put + that letter's nx
+sub 240
   ld    (PutMonsterAmountOnBattleField+nx),a
 
   ;if nx=16 add 0 to textbox
@@ -5937,11 +5958,11 @@ SetAllNumbersInGrid:
   ret   c
   jp    .SetnumberInHLHeightAlreadyInA
 
-FindMonsterInBattleFieldGrid:  
+FindMonsterInBattleFieldGrid:
   ld    hl,BattleFieldGrid
 
   ld    a,(ix+MonsterY)
-  sub   056
+  sub   056 + 16
   add   (ix+MonsterNY)
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -5972,7 +5993,7 @@ FindCursorInBattleFieldGrid:
   ld    hl,BattleFieldGrid
 
   ld    a,(Monster0+MonsterY)
-  sub   a,39
+  sub   a,39 + 16
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
@@ -6002,10 +6023,10 @@ CheckIsCursorOnATileThisFrame:
   xor   a
   ld    (IsCursorOnATileThisFrame?),a
 
-  ld    a,(Monster0+MonsterY)
-  cp    $18                             ;check if grid tile is above lowest tile
+  ld    a,(Monster0+MonsterY)           ;y grid tile
+  cp    24 + 16                         ;check if grid tile is above lowest tile
   ret   c
-  cp    $b7                             ;check if grid tile is below lowest tile
+  cp    183 + 16                        ;check if grid tile is below lowest tile
   ret   nc
 
 ;2 left edges
@@ -6061,9 +6082,9 @@ CheckWasCursorOnATilePreviousFrame:
   ld    (WasCursorOnATilePreviousFrame?),a
 
   ld    a,(Monster0+MonsterYPrevious)
-  cp    $18                             ;check if grid tile is above lowest tile
+  cp    24 + 16                         ;check if grid tile is above lowest tile
   ret   c
-  cp    $b7                             ;check if grid tile is below lowest tile
+  cp    183 + 16                        ;check if grid tile is below lowest tile
   ret   nc
 
   ld    a,1
@@ -6088,16 +6109,13 @@ SetcursorWhenGridTileIsActive:
 
 ;	ld    a,(CurrentActiveMonsterSpeed)
 ;  ld    c,a
-
+;
   call  FindCursorInBattleFieldGrid
   ld    a,(hl)
   cp    1                               ;if tile pointer points at is "1", that means current monster is standing there
   jr    z,.ProhibitionSign
   cp    c                               ;if tile pointer points at > c, that means monster does not have enough movement points to move there
   jr    nc,.ProhibitionSign
-
-
-
 
 
   ld    a,(ix+MonsterNX)
@@ -6304,7 +6322,7 @@ SetcursorWhenGridTileIsActive:
 	srl		a				                        ;/8
 	srl		a				                        ;/16
   bit   0,a
-  jr    z,.EvenRow
+  jr    nz,.EvenRow
   
   .OddRow:
 ;$b6 t/m $c4
@@ -6857,7 +6875,7 @@ EraseMonsterPreviousFrame:
 
 SetBattleFieldSnowGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (016*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
   ld    a,BattleFieldSnowBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

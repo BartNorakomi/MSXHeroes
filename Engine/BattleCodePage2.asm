@@ -7,18 +7,18 @@ SetBattlefieldCasualtiesDefender:
   ret   z                               ;don't add xp if right player is a neutral monster
 ;  jp    z,.SetBattlefieldCasualtiesDefenderNeutralMonster
 
-  ld    a,173
+  ld    a,173+16
   ld    (CasualtiesOverviewCopy+dy),a
 
   ld    hl,$4000 + (142*128) + (044/2) - 128
-  ld    de,$0000 + (212*128) + (020/2) - 128
+  ld    de,$0000 + ((212+16)*128) + (020/2) - 128
   ld    bc,$0000 + (022*256) + (138/2)
   ld    a,VictoryBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    b,004                           ;dx number
   ld    c,0                             ;amount of slots with casualties
-  ld    de,$0000 + (214*128) + (024/2) - 128 ;dx 14x14 unit portrait
+  ld    de,$0000 + ((214+16)*128) + (024/2) - 128 ;dx 14x14 unit portrait
 
   ld    iy,(HeroThatGetsAttacked)      ;defending hero
   ld    a,(iy+HeroUnits+0)              ;monster type/nr
@@ -64,18 +64,18 @@ SetBattlefieldCasualtiesDefender:
   jp    SetBattlefieldCasualtiesAttacker.AllSlotsChecked
 
 SetBattlefieldCasualtiesAttacker:
-  ld    a,144
+  ld    a,144+16
   ld    (CasualtiesOverviewCopy+dy),a
 
   ld    hl,$4000 + (142*128) + (044/2) - 128
-  ld    de,$0000 + (212*128) + (020/2) - 128
+  ld    de,$0000 + ((212+16)*128) + (020/2) - 128
   ld    bc,$0000 + (022*256) + (138/2)
   ld    a,VictoryBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
 
   ld    b,004                           ;dx number
   ld    c,0                             ;amount of slots with casualties
-  ld    de,$0000 + (214*128) + (024/2) - 128 ;dx 14x14 unit portrait
+  ld    de,$0000 + ((214+16)*128) + (024/2) - 128 ;dx 14x14 unit portrait
 
   ld    iy,(plxcurrentheroAddress)      ;defending hero
   ld    a,(iy+HeroUnits+0)              ;monster type/nr
@@ -173,7 +173,7 @@ SetBattlefieldCasualtiesAttacker:
 
   ;set amount
   push  bc
-  ld    c,212+17                           ;dy
+  ld    c,212+17+16                           ;dy
   push  de
   ld    a,b
   add   a,20
@@ -290,6 +290,13 @@ SetFontPage0Y212:                       ;set font at (0,212) page 0
   ld    a,CastleOverviewFontBlock         ;font graphics block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+SetFontPage0Y250:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (250*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
 SetBattleButtons:
   ld    hl,BattleButtonTable-2
   ld    de,GenericButtonTable-2
@@ -306,47 +313,47 @@ SetBattleButtons:
   ld    (GenericButtonTable+2*GenericButtonTableLenghtPerButton),a
   ret
 
-BattleButton1Ytop:           equ 193
+BattleButton1Ytop:           equ 193 + 16
 BattleButton1YBottom:        equ BattleButton1Ytop + 018
 BattleButton1XLeft:          equ 002
 BattleButton1XRight:         equ BattleButton1XLeft + 018
 
-BattleButton2Ytop:           equ 193
+BattleButton2Ytop:           equ 193 + 16
 BattleButton2YBottom:        equ BattleButton2Ytop + 018
 BattleButton2XLeft:          equ 020
 BattleButton2XRight:         equ BattleButton2XLeft + 018
 
-BattleButton3Ytop:           equ 193
+BattleButton3Ytop:           equ 193 + 16
 BattleButton3YBottom:        equ BattleButton3Ytop + 018
 BattleButton3XLeft:          equ 038
 BattleButton3XRight:         equ BattleButton3XLeft + 018
 
-BattleButton4Ytop:           equ 193
+BattleButton4Ytop:           equ 193 + 16
 BattleButton4YBottom:        equ BattleButton4Ytop + 018
 BattleButton4XLeft:          equ 180
 BattleButton4XRight:         equ BattleButton4XLeft + 018
 
-BattleButton5Ytop:           equ 193
+BattleButton5Ytop:           equ 193 + 16
 BattleButton5YBottom:        equ BattleButton5Ytop + 018
 BattleButton5XLeft:          equ 198
 BattleButton5XRight:         equ BattleButton5XLeft + 018
 
-BattleButton6Ytop:           equ 193
+BattleButton6Ytop:           equ 193 + 16
 BattleButton6YBottom:        equ BattleButton6Ytop + 018
 BattleButton6XLeft:          equ 218
 BattleButton6XRight:         equ BattleButton6XLeft + 018
 
-BattleButton7Ytop:           equ 193
+BattleButton7Ytop:           equ 193 + 16
 BattleButton7YBottom:        equ BattleButton7Ytop + 018
 BattleButton7XLeft:          equ 236
 BattleButton7XRight:         equ BattleButton7XLeft + 018
 
-BattleButton8Ytop:           equ 192
+BattleButton8Ytop:           equ 192 + 16
 BattleButton8YBottom:        equ BattleButton8Ytop + 010
 BattleButton8XLeft:          equ 170
 BattleButton8XRight:         equ BattleButton8XLeft + 010
 
-BattleButton9Ytop:           equ 192+10
+BattleButton9Ytop:           equ 192+10 + 16
 BattleButton9YBottom:        equ BattleButton9Ytop + 010
 BattleButton9XLeft:          equ 170
 BattleButton9XRight:         equ BattleButton9XLeft + 010
@@ -765,7 +772,7 @@ HandleProjectileSprite:
   ret
 
 .EndProjectile:
-  ld    a,213                         ;explosion y
+  ld    a,213+16                        ;explosion y
   ld    (spat+4*16),a
   ld    (spat+4*17),a
   ld    (spat+4*18),a
@@ -852,7 +859,7 @@ HandleExplosionSprite:
   cp    6
   ret   c
   
-  ld    a,213                         ;explosion y
+  ld    a,213+16                         ;explosion y
   ld    (spat+4*16),a
   ld    (spat+4*17),a
   ld    (spat+4*18),a
@@ -928,7 +935,7 @@ HandleExplosionSprite:
   cp    16
   ret   c
   
-  ld    a,213                         ;explosion y
+  ld    a,213+16                         ;explosion y
   ld    (spat+4*16),a
   ld    (spat+4*17),a
   ld    (spat+4*18),a
@@ -1023,7 +1030,7 @@ HandleExplosionSprite:
   cp    20
   ret   c
   
-  ld    a,213                         ;explosion y
+  ld    a,213+16                         ;explosion y
   ld    (spat+4*16),a
   ld    (spat+4*17),a
   ld    (spat+4*18),a
@@ -1074,11 +1081,11 @@ SetBattleText:
   call  .CleanTextField
 
   ld    ix,(BattleTextPointer)
-  ld    c,195                           ;dy
+  ld    c,195+16                           ;dy
   call  .SetText
   ld    de,BattleTextQ-BattleText1
   add   ix,de
-  ld    c,203                           ;dy
+  ld    c,203+16                           ;dy
   call  .SetText
   ret
 
@@ -1305,7 +1312,7 @@ SetBattleText:
 
 .CleanTextField:
   ld    hl,$4000 + (195*128) + (060/2) - 128
-  ld    de,$0000 + (195*128) + (060/2) - 128
+  ld    de,$0000 + ((195+16)*128) + (060/2) - 128
   ld    bc,$0000 + (014*256) + (118/2)
   ld    a,BattleFieldSnowBlock         ;font graphics block
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY

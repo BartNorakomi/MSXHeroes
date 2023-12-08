@@ -914,37 +914,37 @@ SetArmyIconsAndAmount:
   ld    h,(ix+HeroUnits+02)
   ld    b,HeroOverViewArmyWindowDX + 031 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+04)
   ld    h,(ix+HeroUnits+05)
   ld    b,HeroOverViewArmyWindowDX + 051 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+07)
   ld    h,(ix+HeroUnits+08)
   ld    b,HeroOverViewArmyWindowDX + 071 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+10)
   ld    h,(ix+HeroUnits+11)
   ld    b,HeroOverViewArmyWindowDX + 091 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+13)
   ld    h,(ix+HeroUnits+14)
   ld    b,HeroOverViewArmyWindowDX + 111 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
 
   ld    l,(ix+HeroUnits+16)
   ld    h,(ix+HeroUnits+17)
   ld    b,HeroOverViewArmyWindowDX + 131 + 2
   ld    c,HeroOverViewArmyWindowDY + 056
-  call  SetNumber16BitCastleSkipIfAmountIs0
+  call  SetNumber16BitCastleSetWithKWhenAbove999SkipIfAmountIs0
   ret
 
   .army:

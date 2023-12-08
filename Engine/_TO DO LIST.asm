@@ -17,6 +17,5 @@ units in hud nog een beetje finetunen
 AI
 
 general:
-units >1k moet nog verwerkt worden in de aantallen
 muziek
 sfx
