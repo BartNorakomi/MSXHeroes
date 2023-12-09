@@ -1523,7 +1523,7 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
   ;right player has lost their entire army
-
+  
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
   call  SwapAndSetPage                  ;swap and set page 1  
@@ -2330,9 +2330,9 @@ ApplyPercentBasedBoost:
 
 CheckPointerOnDefendingHero:
   ld    a,(spat)
-  cp    38+16
+  cp    38+24
   ret   nc
-  cp    06+16
+  cp    06+24
   ret   c
   ld    a,(spat+1)
   cp    236
@@ -2444,9 +2444,9 @@ CheckPointerOnDefendingHero:
 
 CheckPointerOnAttackingHero:
   ld    a,(spat)
-  cp    38+16
+  cp    38+24
   ret   nc
-  cp    06+16
+  cp    06+24
   ret   c
   ld    a,(spat+1)
   cp    10
@@ -4390,7 +4390,6 @@ BuildUpBattleFieldAndPutMonsters:
 ;  jp    docopy
   ret
 
-  .CopyARowOf12PixelsFromBottomOfPage3ToPage2:
 
   .SetHeroes:
   ;left hero
@@ -4399,22 +4398,26 @@ BuildUpBattleFieldAndPutMonsters:
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
   pop   ix
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    bc,$4000
-  xor   a
+
+  ;get hero looking down address 
+  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
+  or    a,128 + (064 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
+  xor   8             	
+  ld    l,a
+  ld    h,(ix+HeroInfoSYSX+1)  
 
   .XLeftHero: equ 0
-  .YLeftHero: equ 12+16
+  .YLeftHero: equ 30
 
   exx
   ld    de,256*(.YLeftHero) + (.XLeftHero)
   exx
-  sbc   hl,bc
-;  ld    bc,NXAndNY16x30HeroIcon
-  ld    bc,.NXAndNY16x28HeroIconTempSolution
-  ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
-  call  .CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    bc,.NXAndNY16x32HeroIcon
+
+  ld    a,(ix+HeroInfoSpriteBlock)
+
+  call  .CopyTransparantImageHero           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;right hero
   ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
@@ -4429,42 +4432,74 @@ BuildUpBattleFieldAndPutMonsters:
   ld    h,(ix+HeroSpecificInfo+1)
   push  hl
   pop   ix
-  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)    ;find hero portrait 16x30 address
-  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
-  ld    bc,$4000
-  xor   a
-
+  
+  ;get hero looking down address 
+  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
+  or    a,128 + (064 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
+  xor   8             	
+  ld    l,a
+  ld    h,(ix+HeroInfoSYSX+1)  
 
   .XRightHero: equ 256-16
-  .YRightHero: equ 12+16
+  .YRightHero: equ 30
 
   exx
   ld    de,256*(.YRightHero) + (.XRightHero)
 
   exx
-  sbc   hl,bc
-;  ld    bc,NXAndNY16x30HeroIcon
-  ld    bc,.NXAndNY16x28HeroIconTempSolution
-  ld    a,Hero16x30TransparantPortraitsBlock          ;block to copy graphics from
-  jp    .CopyTransparantImage          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ld    bc,.NXAndNY16x32HeroIcon
+  ld    a,(ix+HeroInfoSpriteBlock)
+  jp    .CopyTransparantImageHero          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-.NXAndNY16x28HeroIconTempSolution:   equ 028*256 + (016/2)            ;(ny*256 + nx/2) = (14x09)
+.NXAndNY16x32HeroIcon:   equ 032*256 + (016/2)            ;(ny*256 + nx/2) = (14x09)
 
 
+.CopyTransparantImageHero:  
+;put button in mirror page below screen, then copy that button to the same page at it's coordinates
+
+  ld    (BlockToReadFrom),a
+  ld    (AddressToWriteFrom),hl
+  ld    de,$8000 + ((212+12)*128) + (000/2) - 128  ;dy,dx
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+  ld    (NXAndNY),bc
+
+  ld    a,b
+  ld    (CopyCastleButton2+ny),a
+  ld    a,c
+  add   a,a
+  ld    (CopyCastleButton2+nx),a
+
+  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+	ld		a,(activepage)
+  xor   1
+	ld    (CopyCastleButton2+dPage),a
+
+  exx
+  ld    a,d
+  ld    (CopyCastleButton2+dy),a
+  ld    a,e
+  ld    (CopyCastleButton2+dx),a
+
+  ld    a,212+12
+  ld    (CopyCastleButton2+sy),a
+
+  ld    a,3
+	ld    (CopyCastleButton2+sPage),a
+  ld    hl,CopyCastleButton2
+  call  docopy
+  ld    a,1
+	ld    (CopyCastleButton2+sPage),a
+
+  ld    a,212
+  ld    (CopyCastleButton2+sy),a
+
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+  ret
 
 
-
-
-
-
-
-;  Example of input:
-;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
-;  exx
-;  ld    hl,$4000 + (114*128) + (200/2) - 128  ;y,x
-;  ld    de,$0000 + ((042+YOffsetVandX)*128) + ((064 + xOffsetVandX)/2) - 128  ;y,x
-;  ld    bc,$0000 + (017*256) + (018/2)        ;ny,nx
-;  ld    a,ButtonsBuildBlock      ;font graphics block
 .CopyTransparantImage:  
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   push  af
@@ -4499,7 +4534,6 @@ BuildUpBattleFieldAndPutMonsters:
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
-
   ret
 
 

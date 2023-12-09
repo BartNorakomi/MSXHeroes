@@ -969,10 +969,7 @@ dephase
 ;
 ; block $65 - 66
 ;
-Hero16x30TransparantPortraitsBlock:  equ   $65
 phase	$4000
-  incbin "..\grapx\HeroesSprites\16x30PortraitsTransparant.SC5",7,212 * 128      ;212 lines
-
 	ds		$c000-$,$ff
 dephase
 

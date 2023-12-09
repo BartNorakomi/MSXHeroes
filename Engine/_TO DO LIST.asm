@@ -3,6 +3,9 @@ AI
 magic skills (en text bij magic in textbox)
 options menu
 nummers boven monsters moeten properly gezet worden voor monsters die aangevallen worden (bijvoorbeeld overgang van 3 naar 2 digits etc)
+hero portrait is 28 pixels hoog ipv 30
+
+victory or defeat check at start of turn, zonder die boodschap te geven
 
 worldmap:
 AI
