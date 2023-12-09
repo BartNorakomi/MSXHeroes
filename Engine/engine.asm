@@ -28,13 +28,12 @@ LevelEngine:
   call  CheckHeroLevelUp                ;Check if hero should level up
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
-  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
   call  AnimateHeroes                   ;animate the current active hero
   call  CheckEnterCombat                ;
   .EndHeroChecks:
+  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
 
 ;  call  SetSpatInGame
-
 
   call  putbottomobjects
 	call	putbottomcastles
@@ -1729,11 +1728,20 @@ SetMappositionHero:                     ;adds mappointer x and y to the mapdata,
   ret
 
 CheckHeroCollidesWithMonster:
-  Call  SetMappositionHero              ;sets heroes position in mapdata in hl
-
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   ld    (page1bank),a
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,(RemoveDeadMonstersNeutralMonster?)
+  or    a
+  jr    nz,.RemoveDeadMonstersNeutralMonster
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ret   z
+
+  Call  SetMappositionHero              ;sets heroes position in mapdata in hl
 
   ld    a,(hl)
   cp    192
@@ -1743,13 +1751,14 @@ CheckHeroCollidesWithMonster:
 
   ld    (MonsterHerocollidedWithOnMap),a
   ld    a,l
-  ld    (AddressOfMonsterHerocollidedWithOnMap),a
+  ld    (XAddressOfMonsterHerocollidedWithOnMap),a
 
   ld    a,(NeutralEnemyDied?)
   or    a
   jr    nz,.ThisEnemyJustDied
 
   inc   hl
+  ld    (AddressOfMonsterAmountHerocollidedWithOnMap),hl
   ld    a,(hl)
   ld    (MonsterHerocollidedWithOnMapAmount),a
 
@@ -1757,6 +1766,12 @@ CheckHeroCollidesWithMonster:
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   jp    EnterCombat
 
+  .RemoveDeadMonstersNeutralMonster:
+  ld    hl,(AddressOfMonsterAmountHerocollidedWithOnMap)
+  ld    (hl),a                          ;set new amount: 246(1),247(2),248(3),249(4),250(5),251(6)
+  xor   a
+  ld    (RemoveDeadMonstersNeutralMonster?),a  
+  ret
 
   .ThisEnemyJustDied:
   xor   a
@@ -3971,6 +3986,11 @@ ReadOutKeyboardAndMovePointer:
 	call	movecursory                     ;move cursor up(a=-1)/down(a=+1)
 
 	ld		a,(spat+0)
+  cp    216
+  jp    nz,.EndCheck216    
+  ld    a,215
+	ld		(spat+0),a
+  .EndCheck216:
 	ld		(spat+4),a
 	ld		(spat+8),a
 	ld		a,(spat+1)
@@ -4295,7 +4315,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    a,(hl)                          ;monster tile
   ld    (MonsterHerocollidedWithOnMap),a
   ld    a,l
-  ld    (AddressOfMonsterHerocollidedWithOnMap),a
+  ld    (XAddressOfMonsterHerocollidedWithOnMap),a
   inc   hl                              ;amount
   ld    a,(hl)                          ;monster tile
   ld    (MonsterHerocollidedWithOnMapAmount),a
@@ -5174,7 +5194,7 @@ addytomouse:	equ	4
 
 amountofplayers:		db	4
 player1human?:			db	1
-player2human?:			db	1
+player2human?:			db	0
 player3human?:			db	1
 player4human?:			db	1
 whichplayernowplaying?:	db	1

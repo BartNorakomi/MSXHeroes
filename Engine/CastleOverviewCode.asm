@@ -14130,7 +14130,6 @@ CopyPage0To2:
 	db		0,1,212,0
 	db		0,0,$d0	
 	
-
 EnableNewBuilding:
   ld    a,(SetNewBuilding?)             ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
   dec   a
@@ -14311,6 +14310,9 @@ FadeInNewlyBoughtBuilding:
   ld    a,(SetNewBuilding?)
   or    a
   ret   z
+
+  ld    a,1
+  ld    (ReloadAllObjectsInVram?),a     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
 
   ld    a,(VDP_0+8)                     ;sprites off
   or    %00000010

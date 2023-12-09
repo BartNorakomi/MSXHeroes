@@ -261,8 +261,11 @@ BattleText1: db 255 | dw 255 | db 255    ,"           ",255  ;example wait:     
 BattleTextQ: db 255 | dw 255 | db 255    ,"           ",255  ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
 
 
+RemoveDeadMonstersNeutralMonster?: ds  1
+AddressOfMonsterAmountHerocollidedWithOnMap: ds  2
+
 MonsterHerocollidedWithOnMap: ds  1
-AddressOfMonsterHerocollidedWithOnMap: ds  1
+XAddressOfMonsterHerocollidedWithOnMap: ds  1
 MonsterHerocollidedWithOnMapAmount: ds  1
 
 MonsterMovementPathPointer: db  0
@@ -2193,6 +2196,7 @@ SetSpatInGame:
   ldir
   ret
 
+ReloadAllObjectsInVram?:  db  0           
 SetNewBuilding?:  db  0                 ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
 EnterCastle:
   ld    a,2
@@ -2252,18 +2256,11 @@ EnterCastle:
   
   call  SetScreenOff
 
-
-
-
-
-;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
-  call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
-;/THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
-
-
-
-
-
+  ld    a,(ReloadAllObjectsInVram?)     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
+  or    a
+  call  nz,LoadAllObjectsInVram         ;Load all objects in page 2 starting at (0,64)
+  xor   a
+  ld    (ReloadAllObjectsInVram?),a     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
 
   ld    hl,World1Palette
   call  SetPalette  
@@ -2430,23 +2427,12 @@ SetAllSpriteCoordinatesInPage2:
   ld    (pl4hero8y+HeroDYDX),hl
   ret
 
-
 LoadAllObjectsInVram:                   ;Load all objects in page 2 starting at (0,64)
   ld    d,World1ObjectsBlock
   ld    a,1
   ld    hl,064*128                      ;write to page 2 at (0,64)
   call  copyGraphicsToScreen192         ;in d=block, ahl=address to write to.  
   ret
-
-
-
-
-
-
-
-
-
-
 
 CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\tavern.pl"

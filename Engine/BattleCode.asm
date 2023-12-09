@@ -1,12 +1,4 @@
 HandleMonsters:
-;ld a,12 ; 20 is the max
-ld a,16 ; 20 is the max
-di
-out ($99),a
-ld a,23+128
-ei
-out ($99),a
-
 ;  call  PressMToLookAtPage2And3
 
 ;  call  HandleProjectileSprite         ;done on int
@@ -126,8 +118,14 @@ PressMToLookAtPage2And3:
 InitiateBattle:
 call screenon
 
+  ld    a,16                            ;vertical offset register (battlescreen is 16 pixels shifted down)
+  di
+  out   ($99),a
+  ld    a,23+128
+  ei
+  out   ($99),a
+
 ;  ld    hl,pl1hero1y
-  
 ;  ld    hl,(plxcurrentheroAddress)
 ;  ld    (plxcurrentheroAddress),hl       ;y hero that gets attacked
 ;  ld    hl,pl2hero1y
@@ -1079,7 +1077,7 @@ RemoveDeadMonstersDefender:
   pop   hl
   ld    a,l
   or    h
-  ret   z                               ;no need to remove monsters if enemy is a neutral monster
+  jr    z,.RemoveDeadMonstersNeutralMonster
 
   ld    a,(Monster7+MonsterAmount)
   ld    (iy+HeroUnits+1),a
@@ -1136,9 +1134,61 @@ RemoveDeadMonstersDefender:
   .EndCheck0UnitsLeftSlot6:
   ret
 
+.RemoveDeadMonstersNeutralMonster:
+  ld    hl,0                            ;amount of monsters remaining
+
+  ld    ix,Monster7
+  call  .CheckAmountOfMonstersRemaining
+  ld    ix,Monster8
+  call  .CheckAmountOfMonstersRemaining
+  ld    ix,Monster9
+  call  .CheckAmountOfMonstersRemaining
+  ld    ix,Monster10
+  call  .CheckAmountOfMonstersRemaining
+  ld    ix,Monster11
+  call  .CheckAmountOfMonstersRemaining
+  ld    ix,Monster12
+  call  .CheckAmountOfMonstersRemaining
+
+  ld    de,5
+  sbc   hl,de
+  ld    a,246                           ;between 01 and 04 amount=246
+  jr    c,.SetAmount
+
+  ld    de,8
+  sbc   hl,de
+  ld    a,247                           ;between 05 and 12 amount=247
+  jr    c,.SetAmount
+
+  ld    de,16
+  sbc   hl,de
+  ld    a,248                           ;between 13 and 28 amount=248
+  jr    c,.SetAmount
+
+  ld    de,32
+  sbc   hl,de
+  ld    a,249                           ;between 29 and 60 amount=249
+  jr    c,.SetAmount
+
+  ld    de,32
+  sbc   hl,de
+  ld    a,250                           ;between 61 and 92 amount=250
+  jr    c,.SetAmount
+
+;  ld    de,32
+;  sbc   hl,de
+  ld    a,251                           ;between 93 and 124 amount=251
+;  jr    c,.SetAmount
+
+  .SetAmount:
+  ld    (RemoveDeadMonstersNeutralMonster?),a
+  ret
   
-
-
+  .CheckAmountOfMonstersRemaining:      ;calculate remaining amount of neutral monsters
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  add   hl,de
+  ret
 
 CalculateXpGainedRightPlayer:
   ;left hero
@@ -3080,37 +3130,37 @@ SetAllMonstersInMonsterTable:
   jr    z,.Amount5
 
   .Amount6:                             ;between 0 and 31 -> add 93 -> between 93 and 124
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
   add   a,93
   ret
 
   .Amount5:                             ;between 0 and 31 -> add 61 -> between 61 and 92
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
   add   a,61
   ret
 
   .Amount4:                             ;between 0 and 31 -> add 29 -> between 29 and 60
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   31
   add   a,29
   ret
 
   .Amount3:                             ;between 0 and 15 -> add 13 -> between 13 and 28
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   15
   add   a,13
   ret
 
   .Amount2:                             ;between 0 and 07 -> add 05 -> between 05 and 12
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   7
   add   a,5
   ret
   
   .Amount1:                             ;between 0 and 03 -> add 01 -> between 01 and 04 
-  ld    a,(AddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
+  ld    a,(XAddressOfMonsterHerocollidedWithOnMap) ;we use mappointer address as randomiser for monster amount
   and   3
   inc   a
   ret
