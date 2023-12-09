@@ -20,7 +20,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
@@ -313,12 +313,12 @@ ListOfMonstersToPut:
 ;  db  006 | dw 900 | db 012 + (13*08), 056 + (08*16) + 16
   db  006 | dw 900 | db 012 + (01*08), 056 + (08*16) + 16
 
-  db  001 | dw 001 | db 012 + (25*08), 056 + (00*16) + 16
-  db  000 | dw 000 | db 012 + (24*08), 056 + (01*16) + 16
-  db  007 | dw 610 | db 012 + (24*08), 056 + (03*16) + 16
-  db  007 | dw 001 | db 012 + (24*08), 056 + (05*16) + 16
-  db  007 | dw 810 | db 012 + (24*08), 056 + (07*16) + 16
-  db  007 | dw 910 | db 012 + (25*08), 056 + (08*16) + 16
+ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
+ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (27*08), 056 + (02*16) + 16
+ListOfMonstersToPutMonster9:   db  007 | dw 610 | db 012 + (26*08), 056 + (03*16) + 16
+ListOfMonstersToPutMonster10:  db  007 | dw 001 | db 012 + (26*08), 056 + (05*16) + 16
+ListOfMonstersToPutMonster11:  db  007 | dw 810 | db 012 + (27*08), 056 + (06*16) + 16
+ListOfMonstersToPutMonster12:  db  007 | dw 910 | db 012 + (27*08), 056 + (08*16) + 16
 
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 BattleFieldGrid: ;0C15Ch
@@ -349,6 +349,12 @@ BlockToReadFrom:            ds  1
 AddressToWriteTo:           ds  2
 AddressToWriteFrom:         ds  2
 NXAndNY:                    ds  2
+
+RepairARowOf12PixelsFromBottomOfPage2ToPage3:
+	db		0,0,188+16,2
+	db		0,0,172+16,3
+	db		0,1,12,0
+	db		0,0,$d0	
 
 TransparantImageBattle:
 	db		000,000,000,3

@@ -4,8 +4,7 @@ SetBattlefieldCasualtiesDefender:
   pop   hl
   ld    a,l
   or    h
-  ret   z                               ;don't add xp if right player is a neutral monster
-;  jp    z,.SetBattlefieldCasualtiesDefenderNeutralMonster
+  jp    z,.SetBattlefieldCasualtiesDefenderNeutralMonster
 
   ld    a,173+16
   ld    (CasualtiesOverviewCopy+dy),a
@@ -59,6 +58,63 @@ SetBattlefieldCasualtiesDefender:
   ld    a,(iy+HeroUnits+15)             ;monster type/nr
   ld    l,(iy+HeroUnits+16)
   ld    h,(iy+HeroUnits+17)             ;amount units slot 1
+  ld    ix,Monster12
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+  jp    SetBattlefieldCasualtiesAttacker.AllSlotsChecked
+
+.SetBattlefieldCasualtiesDefenderNeutralMonster:
+  ld    a,173+16
+  ld    (CasualtiesOverviewCopy+dy),a
+
+  ld    hl,$4000 + (142*128) + (044/2) - 128
+  ld    de,$0000 + ((212+16)*128) + (020/2) - 128
+  ld    bc,$0000 + (022*256) + (138/2)
+  ld    a,VictoryBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  ld    b,004                           ;dx number
+  ld    c,0                             ;amount of slots with casualties
+  ld    de,$0000 + ((214+16)*128) + (024/2) - 128 ;dx 14x14 unit portrait
+
+  ld    iy,ListOfMonstersToPutMonster7
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
+  ld    ix,Monster7
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,ListOfMonstersToPutMonster8
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
+  ld    ix,Monster8
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,ListOfMonstersToPutMonster9
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
+  ld    ix,Monster9
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,ListOfMonstersToPutMonster10
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
+  ld    ix,Monster10
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,ListOfMonstersToPutMonster11
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
+  ld    ix,Monster11
+  call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
+
+  ld    iy,ListOfMonstersToPutMonster12
+  ld    a,(iy+0)              ;monster type/nr
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster12
   call  SetBattlefieldCasualtiesAttacker.CheckAmountOfMonstersSlotDied
   jp    SetBattlefieldCasualtiesAttacker.AllSlotsChecked
@@ -445,49 +501,41 @@ SetMinimumOf1Unit:
   ret
 
 CalculateTotalNumberOfUnitsLostDefender:
-  ld    ix,(HeroThatGetsAttacked)       ;defending hero
-  push  ix
-  pop   hl
-  ld    a,l
-  or    h
-  ret   z                               ;don't add xp if right player is a neutral monster
-;  jp    z,.SetBattlefieldCasualtiesDefenderNeutralMonster
-
   ld    bc,0                            ;total amount of units lost
 
-  ld    iy,(HeroThatGetsAttacked)       ;defending hero
-  ld    l,(iy+HeroUnits+1)
-  ld    h,(iy+HeroUnits+2)              ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster7
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster7
   call  .CalculateAmountOfUnitsLost
 
-  ld    iy,(HeroThatGetsAttacked)       ;defending hero
-  ld    l,(iy+HeroUnits+4)
-  ld    h,(iy+HeroUnits+5)              ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster8
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster8
   call  .CalculateAmountOfUnitsLost
 
-  ld    iy,(HeroThatGetsAttacked)      ;defending hero
-  ld    l,(iy+HeroUnits+7)
-  ld    h,(iy+HeroUnits+8)              ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster9
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster9
   call  .CalculateAmountOfUnitsLost
 
-  ld    iy,(HeroThatGetsAttacked)      ;defending hero
-  ld    l,(iy+HeroUnits+10)
-  ld    h,(iy+HeroUnits+11)             ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster10
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster10
   call  .CalculateAmountOfUnitsLost
 
-  ld    iy,(HeroThatGetsAttacked)      ;defending hero
-  ld    l,(iy+HeroUnits+13)
-  ld    h,(iy+HeroUnits+14)             ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster11
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster11
   call  .CalculateAmountOfUnitsLost
 
-  ld    iy,(HeroThatGetsAttacked)      ;defending hero
-  ld    l,(iy+HeroUnits+16)
-  ld    h,(iy+HeroUnits+17)             ;amount units slot 1
+  ld    iy,ListOfMonstersToPutMonster12
+  ld    l,(iy+1)
+  ld    h,(iy+2)              ;amount units
   ld    ix,Monster12
   call  .CalculateAmountOfUnitsLost
   ret
@@ -1316,3 +1364,75 @@ SetBattleText:
   ld    bc,$0000 + (014*256) + (118/2)
   ld    a,BattleFieldSnowBlock         ;font graphics block
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+;defending hero died, and loses items
+AttackingHeroTakesItemsDefendingHero:
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  ld    iy,(HeroThatGetsAttacked)       ;defending hero
+  push  iy
+  pop   hl
+  ld    a,l
+  or    h
+  ret   z                               ;we cant take items from neutral monsters
+
+  ld    d,9 + 6                         ;9 body slots, 6 open slots
+  .PassItemLoop:
+  call  .PassItem
+  inc   ix
+  inc   iy
+  dec   d
+  jr    nz,.PassItemLoop
+  ret
+  
+  .PassItem:
+  ld    a,(iy+HeroInventory)
+  cp    045                             ;empty slot ? (no item to pass)
+  ret   z
+  ld    c,a
+  ld    a,(ix+HeroInventory)
+  cp    045                             ;empty slot to put item ?
+  jr    z,.EmptyBodySlotFound
+  ;at this point receiving hero has no empty body slots, see if there is an empty open slot and put item there
+  push  ix
+  ld    ix,(plxcurrentheroAddress)            ;attacking hero
+  ld    b,6                             ;amount of open slots
+  .loop:
+  ld    a,(ix+HeroInventory+9)
+  cp    045
+  jr    z,.EmptyOpenSlotFound
+  inc   ix
+  djnz  .loop
+  pop   ix
+  ret
+
+  .EmptyBodySlotFound:
+  ld    (ix+HeroInventory),c
+  ret
+  .EmptyOpenSlotFound:
+  ld    (ix+HeroInventory+9),c
+  pop   ix
+  ret
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

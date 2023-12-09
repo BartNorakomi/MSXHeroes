@@ -7,6 +7,8 @@ ld a,23+128
 ei
 out ($99),a
 
+;  call  PressMToLookAtPage2And3
+
 ;  call  HandleProjectileSprite         ;done on int
 ;  call  HandleExplosionSprite          ;done on int
   call  CheckRightClickToDisplayInfo    ;rightclicking a hero or monster displays their info
@@ -92,6 +94,33 @@ out ($99),a
   call  StoreSYSXNYNXAndBlock           ;writes values to (AddressToWriteFrom), (NXAndNY) and (BlockToReadFrom)
   call  Recover
   .EndRecoverGridTile:
+  ret
+
+PressMToLookAtPage2And3:
+  ld    a,(NewPrContr)
+  bit   5,a                            ;check ontrols to see if m is pressed 
+  call  nz,.SetPage2
+
+  ld    a,(NewPrContr)
+  bit   6,a                            ;check ontrols to see if f1 is pressed 
+  call  nz,.SetPage3  
+  ret
+
+.SetPage2:
+  ld    a,2*32+31
+  call  SetPageSpecial.setpage
+  jp    .WaitKeyPress
+
+.SetPage3:
+  ld    a,3*32+31
+  call  SetPageSpecial.setpage
+  jp    .WaitKeyPress
+
+.WaitKeyPress:
+  call  PopulateControls                ;read out keys
+  ld    a,(NewPrContr)
+  bit   4,a                            ;check ontrols to see if space is pressed 
+  jp    z,.WaitKeyPress
   ret
 
 InitiateBattle:
@@ -1505,6 +1534,7 @@ CheckVictoryOrDefeat:
   ld    a,BattleCodePage2Block               ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
   call  HandleNecromancy                ;a percentage of dead enemy monsters will be revived as skeletons for the attacking hero
+  call  AttackingHeroTakesItemsDefendingHero
 ;/battle code page 2
 
   .engine:
@@ -2955,19 +2985,13 @@ SetAllMonstersInMonsterTable:
   ld    hl,(HeroThatGetsAttacked)         ;check if we fight against a hero or a neutral monster
   ld    a,l
   or    h
-  jr    nz,.DefenderHasAHero
+  jp    nz,.DefenderHasAHero
 
-  ;which neutral monster are we fighting ?
-  call  SetNeutralMonsterHeroCollidedWithInA
-  ld    (ListOfMonstersToPut+30),a
-
-  call  .SetAmountInA
-  ld    l,a
-  ld    h,0
-  ld    (ListOfMonstersToPut+31),hl
-
+  ;clear all 6 monster slots
   xor   a
   ld    hl,0
+  ld    (ListOfMonstersToPut+30),a
+  ld    (ListOfMonstersToPut+31),hl
   ld    (ListOfMonstersToPut+35),a
   ld    (ListOfMonstersToPut+36),hl
   ld    (ListOfMonstersToPut+40),a
@@ -2978,6 +3002,68 @@ SetAllMonstersInMonsterTable:
   ld    (ListOfMonstersToPut+51),hl
   ld    (ListOfMonstersToPut+55),a
   ld    (ListOfMonstersToPut+56),hl
+
+;  jr    .Situation1                   ;situation 2: we divide all the monsters over 2 slots
+
+  ld    a,r
+  and   3
+  jr    z,.Situation2                   ;situation 2: we divide all the monsters over 2 slots
+  dec   a
+  jr    z,.Situation3                   ;situation 3: we divide all the monsters over 3 slots
+  
+  .Situation1:                          ;situation 1: we divide all the monsters over 1 slot
+  call  SetNeutralMonsterHeroCollidedWithInA ;which neutral monster are we fighting ?  
+  ld    (ListOfMonstersToPut+40),a
+  call  .SetAmountInA
+
+  ld    l,a
+  ld    h,0
+  ld    (ListOfMonstersToPut+41),hl
+  jp    .EndSetAllMonsters
+
+  .Situation2:                          ;situation 2: we divide all the monsters over 2 slots
+  call  SetNeutralMonsterHeroCollidedWithInA ;which neutral monster are we fighting ?  
+  ld    (ListOfMonstersToPut+40),a
+  ld    (ListOfMonstersToPut+45),a
+  call  .SetAmountInA
+  cp    1
+  jr    nz,.EndCheckTotalAmountIs1
+  xor   a
+  ld    (ListOfMonstersToPut+40),a
+  ld    a,1
+  .EndCheckTotalAmountIs1:
+	srl		a				                        ;/2  
+  ld    l,a
+  ld    h,0
+  ld    (ListOfMonstersToPut+41),hl
+  ld    de,0
+  adc   hl,de                           ;check if there was a monster left in the carry when shifting with srl a
+  ld    (ListOfMonstersToPut+46),hl
+  jp    .EndSetAllMonsters
+
+  .Situation3:                          ;situation 3: we divide all the monsters over 3 slots
+  call  SetNeutralMonsterHeroCollidedWithInA ;which neutral monster are we fighting ?  
+  ld    (ListOfMonstersToPut+45),a
+  ex    af,af'
+  call  .SetAmountInA
+  ld    e,a
+  ld    c,3                             ;divide by 3
+  call  Div8                            ;In: Divide E by divider C, Out: A = result, B = rest
+  ld    l,a
+  ld    h,0
+  or    a
+  jr    z,.DivisionResultIs0  
+  ex    af,af'
+  ld    (ListOfMonstersToPut+35),a
+  ld    (ListOfMonstersToPut+40),a
+  ex    af,af'
+  ld    (ListOfMonstersToPut+36),hl
+  ld    (ListOfMonstersToPut+41),hl
+  .DivisionResultIs0:
+  ld    d,0
+  ld    e,b
+  add   hl,de                           ;check if there was a monster left in the carry when shifting with srl a
+  ld    (ListOfMonstersToPut+46),hl
   jp    .EndSetAllMonsters
 
   .SetAmountInA:
@@ -4217,9 +4303,11 @@ SortMonstersOnTheirSpeed:
   ret
 ; the y coordinates are now sorted in ascending order
 
-
-
-
+CopyARowOf12PixelsFromBottomOfPage3ToPage2:
+	db		0,0,172+16,3
+	db		0,0,188+16,2
+	db		0,1,12,0
+	db		0,0,$d0	
   
 BuildUpBattleFieldAndPutMonsters:  
   xor   a
@@ -4235,15 +4323,24 @@ BuildUpBattleFieldAndPutMonsters:
   call  .SetHeroes
   ld    hl,.CopyPage1To3
   call  DoCopy                          ;copy battle field to page 3 vram->vram
+
+  ld    hl,CopyARowOf12PixelsFromBottomOfPage3ToPage2
+  call  DoCopy
   call  SetAllMonstersInMonsterTable    ;set all monsters in the tables in enginepage3
   call  .PutAllMonsters                 ;put all monsters in page 0
   call  .CopyAllMonstersToPage1and2
+
 
   xor   a
 ;ld a,1
   ld    (CurrentActiveMonster),a
   call  CheckSwitchToNextMonster.GoToNextActiveMonster
+
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  jp    docopy
   ret
+
+  .CopyARowOf12PixelsFromBottomOfPage3ToPage2:
 
   .SetHeroes:
   ;left hero
@@ -4527,15 +4624,14 @@ CheckMonsterDied:
   ld    a,(ix+MonsterNYPrevious)
   ld    (EraseMonster+ny),a
 
+  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+  call  docopy
+
   ld    hl,EraseMonster
   call  docopy
 
   ;then recover other monsters that we also erased from inactive page
   call  RecoverOverwrittenMonstersSkipMonster0
-
-
-
-
 
   call  SwapAndSetPage                  ;swap and set page
 
@@ -4562,6 +4658,9 @@ CheckMonsterDied:
   ld    a,(ix+MonsterNYPrevious)
   ld    (EraseMonster+ny),a
 
+  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+  call  docopy
+
   ld    hl,EraseMonster
   call  docopy
 
@@ -4569,10 +4668,6 @@ CheckMonsterDied:
   call  RecoverOverwrittenMonstersSkipMonster0
 
   call  SwapAndSetPage                  ;swap and set page
-
-
-
-
 
   ;then set this new background to page 2 (copy from inactive page to page 2)
 	ld		a,(activepage)
@@ -5024,6 +5119,9 @@ CheckSwitchToNextMonster:
   ld    (TransparantImageBattleRecoverySprite+nx),a
 
   ld    hl,TransparantImageBattleRecoverySprite
+  call  docopy
+
+  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
   call  docopy
 
   .GoToNextActiveMonster:
@@ -5570,12 +5668,13 @@ RecoverOverwrittenMonsters:
   pop   ix
   ;/Repair Amount under monster, EXCEPT when we are handling grid sprite
 
-
   ld    hl,TransparantImageBattle
   call  docopy
-
-
-  ret
+ret
+  ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
+  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+  jp    docopy
+;  ret
 
 
 PutMonster:
@@ -5617,7 +5716,11 @@ PutMonster:
 
   ld    hl,TransparantImageBattle
   call  docopy
-  ret
+ret
+  ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
+  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+  jp    docopy
+;  ret
 
 StoreSYSXNYNXAndBlock:
   ld    l,(ix+MonsterSYSX+0)            ;SY SX in rom

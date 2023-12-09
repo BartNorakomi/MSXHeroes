@@ -5241,7 +5241,7 @@ pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl1Hero1Units:  db 000 | dw 000 |      db 7 | dw 1 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 000 | dw 000 |      db 000 | dw 000 |      db 007 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5447,7 +5447,7 @@ pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
-Pl2Hero1Units:  db 0 | dw 0 |      db 7 | dw 100 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+Pl2Hero1Units:  db 000 | dw 000 |      db 000 | dw 000 |      db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 3
 .HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
@@ -5460,7 +5460,7 @@ Pl2Hero1Units:  db 0 | dw 0 |      db 7 | dw 100 |      db 0 | dw 0 |      db 0 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  045,009,010,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
+.Inventory: db  003,009,010,045,045,045,045,045,044,  045,045,045,006,007,008;9 body slots and 6 open slots
 .HeroSpecificInfo: dw HeroAddressesJamieSeed
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
