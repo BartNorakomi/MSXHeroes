@@ -1,3 +1,470 @@
+HandleEnemyAI:                          ;in: d=SpecialAbility, c=speed
+  inc   c                               ;increase movement speed by 1
+  ld    a,d
+  cp    128
+  jp    z,HandleEnemyAIRangeMonster
+
+HandleEnemyAIMeleeMonster:
+  ld    a,c
+  exx
+  ld    c,a                             ;copy of movement speed
+  ld    b,18                            ;we can extrend monsters movement speed by 18 to find at least the nearest target
+
+  .loop:
+  exx
+  ld    ix,Monster1 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster2 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster3 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster4 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster5 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster6 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster1 | call .Checkpass2  ;check if monster is in range
+  ld    ix,Monster2 | call .Checkpass2  ;check if monster is in range
+  ld    ix,Monster3 | call .Checkpass2  ;check if monster is in range
+  ld    ix,Monster4 | call .Checkpass2  ;check if monster is in range
+  ld    ix,Monster5 | call .Checkpass2  ;check if monster is in range
+  ld    ix,Monster6 | call .Checkpass2  ;check if monster is in range
+
+  ;at this point monster has not found an enemy within range, increase monster's range, but monster then cant attack anymore. So put 255 at the end of the MonsterMovementPath
+  inc   c
+  exx
+  djnz  .loop
+  ;in case monster can't reach a target, it will just defend instead
+  ld    a,1
+  ld    (DefendButtonPressed?),a  
+  ret
+  
+  .Checkpass2:                          ;check if monster is in range
+  ld    (MonsterThatIsBeingAttacked),ix
+  jr    .endCheckAmount
+
+  .Checkpass1:                          ;check if monster amount>9 and monster is in range
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    de,10  
+  call  CompareHLwithDE
+  ret   c                               ;don't check if amount>10
+  .endCheckAmount:
+  ld    a,(ix+MonsterHP)
+  or    a
+  ret   z                               ;don't check if monster is dead
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+
+  call  .CanMonsterBeAttackedFromTheRIght?
+  call  .CanMonsterBeAttackedFromTheRIghtBottom?
+  call  .CanMonsterBeAttackedFromTheRIghtTop?
+  call  .CanMonsterBeAttackedFromTheLeft?
+  call  .CanMonsterBeAttackedFromTheLeftBottom?
+  call  .CanMonsterBeAttackedFromTheLeftTop?
+  ret
+
+  .CanMonsterBeAttackedFromTheLeftBottom?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  dec   hl
+  ld    de,LenghtBattleField
+  add   hl,de
+  call  .CheckLeftBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftBottomWidth1Tile
+  ret
+  .CheckLeftBottomWidth1Tile:
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,012                           ;initiate attack right up
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+
+  .CanMonsterBeAttackedFromTheLeftTop?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  dec   hl
+  ld    de,LenghtBattleField
+  or    a
+  sbc   hl,de
+  call  .CheckLeftTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckLeftTopWidth1Tile
+  ret
+  .CheckLeftTopWidth1Tile:
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,014                           ;initiate attack right bottom
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+
+  .CanMonsterBeAttackedFromTheRIghtBottom?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  inc   hl
+  ld    de,LenghtBattleField
+  add   hl,de
+  call  .CheckRightBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightBottomWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightBottomWidth1Tile
+  ret
+  .CheckRightBottomWidth1Tile:
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,018                           ;initiate attack left up
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+
+  .CanMonsterBeAttackedFromTheRIghtTop?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  inc   hl
+  ld    de,LenghtBattleField
+  or    a
+  sbc   hl,de
+  call  .CheckRightTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightTopWidth1Tile
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  inc   hl
+  inc   hl
+  call  .CheckRightTopWidth1Tile
+  ret
+  .CheckRightTopWidth1Tile:
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,016                           ;initiate attack left bottom
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+
+  .CanMonsterBeAttackedFromTheLeft?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  dec   hl
+  dec   hl
+
+  push  ix
+  push  hl
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterNX)
+  pop   hl
+  pop   ix
+
+  cp    17
+  jr    c,.MonsterWidthFound_Left       ;Monster Is 1 Tile Wide
+  dec   hl
+  dec   hl
+  cp    33
+  jr    c,.MonsterWidthFound_Left       ;Monster Is 2 Tiles Wide
+  dec   hl
+  dec   hl
+  cp    57
+  jr    c,.MonsterWidthFound_Left       ;Monster Is 3 Tiles Wide
+  dec   hl
+  dec   hl                              ;Monster Is 4 Tiles Wide
+  .MonsterWidthFound_Left:
+  
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,013                           ;initiate attack right
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+  
+  .CanMonsterBeAttackedFromTheRIght?:
+  call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
+  inc   hl
+  inc   hl
+
+  ld    a,(ix+MonsterNX)
+  cp    17
+  jr    c,.MonsterWidthFound_Right      ;Monster Is 1 Tile Wide
+  inc   hl
+  inc   hl
+  cp    33
+  jr    c,.MonsterWidthFound_Right      ;Monster Is 2 Tiles Wide
+  inc   hl
+  inc   hl
+  cp    57
+  jr    c,.MonsterWidthFound_Right      ;Monster Is 3 Tiles Wide
+  inc   hl
+  inc   hl                              ;Monster Is 4 Tiles Wide
+  .MonsterWidthFound_Right:
+
+  ld    a,(hl)
+  cp    255                             ;unable to move here
+  ret   z  
+  cp    c                               ;movement speed monster
+  ret   nc
+  pop   af
+  pop   af
+  push  bc                              ;c=monster movement speed
+  ld    c,017                           ;initiate attack left
+  call  CheckSpaceToMoveMonster.CursorLocationSet
+  pop   bc                              ;c=monster movement speed
+  
+  exx
+  ld    hl,MonsterMovementPath
+  ld    d,0
+  ld    e,c
+  dec   e
+  add   hl,de
+  ld    (hl),255                        ;255=end movement(normal walk)
+  ret
+
+HandleEnemyAIRangeMonster:
+;pass 1: check in range AND amount>9
+  ld    ix,Monster1 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster2 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster3 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster4 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster5 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster6 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+
+;pass 2: check amount>9
+  ld    ix,Monster1 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster2 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster3 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster4 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster5 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster6 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+
+;pass 3: check in range
+  ld    ix,Monster1 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster2 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster3 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster4 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster5 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster6 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+
+;pass 4: attack any monster attackable
+  ld    ix,Monster1 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster2 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster3 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster4 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster5 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster6 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ret
+
+  .CheckPass4:                          ;attack any monster attackable
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   z                               ;check if this monster can be attacked
+  pop   af                              ;pop the call to this routine and attack this monster
+  ret
+
+  .CheckPass3:                          ;check amount>9
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   z                               ;check if this monster can be attacked
+  ld    a,(BrokenArrow?)                ;check if in range            
+  or    a
+  ret   nz  
+  pop   af                              ;pop the call to this routine and attack this monster
+  ret
+
+  .CheckPass2:                          ;check amount>9
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   z                               ;check if this monster can be attacked
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    de,10  
+  call  CompareHLwithDE                 ;check if monster amount>10
+  ret   c
+  pop   af                              ;pop the call to this routine and attack this monster
+  ret
+
+  .CheckPass1:                          ;check in range AND amount>9
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   z                               ;check if this monster can be attacked
+  ld    a,(BrokenArrow?)                ;check if in range            
+  or    a
+  ret   nz
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    de,10 
+  call  CompareHLwithDE                 ;check if monster amount>10
+  ret   c
+  pop   af                              ;pop the call to this routine and attack this monster
+  ret
+
+  .CheckIfMonsterCanBeAttacked:
+  xor   a
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    a,(ix+MonsterHP)
+  or    a
+  ret   z                               ;don't check if monster is dead
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+  
+  ;we check if monster in ix can be attacked, and we check full damage (bowandarrow) or 50% damage (brokenarrow)
+  call  RangedMonsterCheck
+
+  ld    a,(BrokenArrow?)                
+  cp    2                               ;2=2=monster dead/if there is any enemy right next to active monster, we can not attack monsters out of melee range at all 
+  ret   z
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(ix+MonsterX)
+  ld    iy,(MonsterThatIsBeingAttacked)
+  cp    (iy+MonsterX)
+  ld    c,013                           ;initiate attack right
+  jr    c,.DirectionFound
+  ld    c,017                           ;initiate attack left
+  .DirectionFound:
+  ld    a,1
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  xor   a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+  ld    iy,MonsterMovementPath
+  ld    (iy),c                          ;255=end movement(normal walk), 10=attack right, 
+  ret
+
 SetBattlefieldCasualtiesDefender:
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
   push  ix
@@ -1114,6 +1581,10 @@ ClearBattleText:
 .EndBattleText:
 
 SetBattleText:
+  ld    a,(LeftOrRightPlayerLostEntireArmy?)
+  or    a
+  ret   nz
+
   ld    a,(SetBattleText?)
   dec   a
   ret   m

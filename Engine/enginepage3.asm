@@ -276,6 +276,9 @@ LenghtMonsterMovementPathTable: equ 50
 ShowExplosionSprite?:  db  0
 ExplosionSpriteStep:  ds  1
 
+LeftOrRightPlayerLostEntireArmy?:  ds  1
+;CanWeTerminateBattle?:  ds  1
+
 MonsterThatIsRetaliating:  ds  2
 MonsterThatIsBeingAttacked:  ds  2
 MonsterThatIsBeingAttackedX:  ds  1
@@ -305,10 +308,11 @@ MovementLenghtMonsters: equ 8
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
+;  db  001 | dw 100 | db 012 + (25*08), 056 + (02*16) + 16
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
 
-  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
-;  db  002 | dw 500 | db 012 + (16*08), 056 + (01*16) + 16
+;  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
+  db  002 | dw 500 | db 012 + (10*08), 056 + (07*16) + 16
 
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16) + 16

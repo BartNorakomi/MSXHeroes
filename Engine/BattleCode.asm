@@ -1,3 +1,50 @@
+CheckEnemyAI:
+
+ld    a,2
+ld    (PlayerThatGetsAttacked),a
+
+
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz
+
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  ret   nz
+
+
+  call  SetCurrentActiveMOnsterInIX
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h                               ;check if current active monster is a neutral monster
+  jr    z,.NeutralOrComputerControlledMonsterFound
+
+  ld    a,(CurrentActiveMonster)        ;left or right player is currently active ?
+  cp    7
+  ret   c                               ;left player is always a human player
+  ld    a,(PlayerThatGetsAttacked)      ;check if player that gets attacked is human
+
+  ld    hl,player1human?-1
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    a,(hl)
+  or    a
+  ret   nz                              ;no need to handle AI if player that gets attacked is human
+  
+  .NeutralOrComputerControlledMonsterFound:
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    d,(iy+MonsterTableSpecialAbility)
+  ld    c,(iy+MonsterTableSpeed)
+
+;battle code page 2
+  ld    a,BattleCodePage2Block          ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
+  call  HandleEnemyAI                   ;in: d=SpecialAbility, c=speed
+;/battle code page 2
+  ret
+
 HandleMonsters:
 ;  call  PressMToLookAtPage2And3
 
@@ -8,6 +55,8 @@ HandleMonsters:
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
   call  CheckSwitchToNextMonster
   call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
+  call  CheckEnemyAI                    ;
+
 
 ;battle code page 2
   ld    a,BattleCodePage2Block          ;Map block
@@ -138,6 +187,8 @@ call screenon
   ld    (MonsterAnimationStep),a
   ld    (MonsterAnimationSpeed),a
   ld    (MoVeMonster?),a
+  ld    (LeftOrRightPlayerLostEntireArmy?),a
+;  ld    (CanWeTerminateBattle?),a
 
 ;battle code page 2
   ld    a,BattleCodePage2Block          ;Map block
@@ -1413,6 +1464,12 @@ CheckVictoryOrDefeat:
   ret   nz
   ;left player has lost their entire army
 
+  ld    a,1
+  ld    (LeftOrRightPlayerLostEntireArmy?),a 
+  ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  or    a
+  ret   nz
+
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
   call  SwapAndSetPage                  ;swap and set page 1  
@@ -1523,6 +1580,12 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
   ;right player has lost their entire army
+
+  ld    a,1
+  ld    (LeftOrRightPlayerLostEntireArmy?),a 
+  ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  or    a
+  ret   nz
   
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
@@ -1755,6 +1818,10 @@ CheckRightClickToDisplayInfo:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  ret   nz
+
   ld    a,(NewPrContr)
   bit   5,a                             ;check ontrols to see if m is pressed 
   ret   z
@@ -6235,7 +6302,7 @@ CheckIsCursorOnATileThisFrame:
   ret   nc
   ;check edges left even and odd rows
   ld    a,(Monster0+MonsterY)
-  sub   a,39
+  sub   a,39 + 16
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
@@ -6248,7 +6315,7 @@ CheckIsCursorOnATileThisFrame:
   .EndCheckLeftExceptions:
   ;check edges right even and odd rows
   ld    a,(Monster0+MonsterY)
-  sub   a,39
+  sub   a,39 + 16
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
@@ -6291,7 +6358,7 @@ SetcursorWhenGridTileIsActive:
   inc   c                               ;we need to add 2 to the total monster speed for accurate detection of distance that monster can traverse on the battle field map
   inc   c
 
-
+;
   di
 
 ;	ld    a,(CurrentActiveMonsterSpeed)
@@ -6502,14 +6569,14 @@ SetcursorWhenGridTileIsActive:
 
   ;At this pointer pointer is on an enemy, check if pointer is left, right, above or below monster
   ;are we on even or odd row?
-  ld    a,(Monster0+MonsterY)
-  sub   a,39
+  ld    a,(Monster0+MonsterY) ;
+  sub   a,39 + 16
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
 	srl		a				                        ;/16
   bit   0,a
-  jr    nz,.EvenRow
+  jr    z,.EvenRow
   
   .OddRow:
 ;$b6 t/m $c4
@@ -6566,7 +6633,7 @@ SetcursorWhenGridTileIsActive:
 ;%1000 1110 ;$8e
 ;%1001 0000 ;$90
   ld    a,(spat)
-  and   %0000 1111
+  and   %0000 1110
   ld    hl,CursorSwordLeftDown  
   cp    %0000 0010
   jp    z,.CheckSetSwordLeftDown
@@ -6600,7 +6667,7 @@ SetcursorWhenGridTileIsActive:
 ;%1000 1110 ;$8e
 ;%1001 0000 ;$90
   ld    a,(spat)
-  and   %0000 1111
+  and   %0000 1110
   ld    hl,CursorSwordRightDown  
   cp    %0000 0010
   jp    z,.CheckSetSwordRightDown
@@ -6720,12 +6787,12 @@ SetcursorWhenGridTileIsActive:
 
 
 
-  jp    .CheckTile
+;  jp    .CheckTile
 
   .CheckTile:
 
 
-  push  hl;
+  push  hl
   call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIYWithoutEnablingInt             ;out: iy->monster table idle
   call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
@@ -6978,6 +7045,9 @@ RangedMonsterCheck:
   jp    z,.EnemyIsRightNextToActiveMonsterSoBrokenArrow
     
   ;if there is any enemy right next to active monster, we can not attack monsters out of melee range at all
+  ld    a,2
+  ld    (BrokenArrow?),a                ;2=if there is any enemy right next to active monster, we can not attack monsters out of melee range at all 
+
   ld    a,(IsThereAnyEnemyRightNextToActiveMonster?)
   or    a
   jp    nz,SetcursorWhenGridTileIsActive.SetProhibitionSign
@@ -6994,6 +7064,9 @@ RangedMonsterCheck:
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ld    hl,SpriteColCursorSprites
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+  ld    a,1
+  ld    (BrokenArrow?),a
   ret
 
   .EnemyIsRightNextToActiveMonsterSoBrokenArrow:
@@ -7007,6 +7080,15 @@ RangedMonsterCheck:
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ld    hl,SpriteColCursorSprites
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+
+
+  xor   a
+  ld    (BrokenArrow?),a
+
+
+
+
   ret
 
 
