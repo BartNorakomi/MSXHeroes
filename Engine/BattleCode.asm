@@ -1,9 +1,5 @@
 CheckEnemyAI:
 
-ld    a,2
-ld    (PlayerThatGetsAttacked),a
-
-
   ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
   or    a
   ret   nz
@@ -20,18 +16,23 @@ ld    (PlayerThatGetsAttacked),a
   or    h                               ;check if current active monster is a neutral monster
   jr    z,.NeutralOrComputerControlledMonsterFound
 
-  ld    a,(CurrentActiveMonster)        ;left or right player is currently active ?
-  cp    7
-  ret   c                               ;left player is always a human player
-  ld    a,(PlayerThatGetsAttacked)      ;check if player that gets attacked is human
+  ld    a,(HeroThatGetsAttacked)        ;check if a hero gets attacked or a neutral monster
+  or    a                               ;000=no hero, hero that gets attacked
+  jr    z,.EndCheckPlayerGetsAttackIsHuman?
 
+  ld    a,(PlayerThatGetsAttacked)      ;check if player that gets attacked is human
   ld    hl,player1human?-1
   ld    d,0
   ld    e,a
   add   hl,de
   ld    a,(hl)
   or    a
-  ret   nz                              ;no need to handle AI if player that gets attacked is human
+  ret   nz                              ;if right player is human autocombat is not possible
+  .EndCheckPlayerGetsAttackIsHuman?:
+
+  ld    a,(CurrentActiveMonster)        ;left or right player is currently active ?
+  cp    7
+  jp    c,.HumanPlayerFound             ;left player is always a human player
   
   .NeutralOrComputerControlledMonsterFound:
   call  SetMonsterTableInIY             ;out: iy->monster table idle
@@ -44,6 +45,12 @@ ld    (PlayerThatGetsAttacked),a
   call  HandleEnemyAI                   ;in: d=SpecialAbility, c=speed
 ;/battle code page 2
   ret
+
+.HumanPlayerFound:
+  ld    a,(AutoCombatButtonPressed?)
+  or    a
+  ret   z
+  jr    .NeutralOrComputerControlledMonsterFound
 
 HandleMonsters:
 ;  call  PressMToLookAtPage2And3
@@ -62,6 +69,7 @@ HandleMonsters:
   ld    a,BattleCodePage2Block          ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  SetBattleText
+  call  AnimateAutoCombatButton
 ;/battle code page 2
 
 ;current monster (erase)
@@ -167,6 +175,13 @@ PressMToLookAtPage2And3:
 InitiateBattle:
 call screenon
 
+
+
+;ld    a,2
+;ld    (PlayerThatGetsAttacked),a
+
+
+
   ld    a,16                            ;vertical offset register (battlescreen is 16 pixels shifted down)
   di
   out   ($99),a
@@ -188,7 +203,10 @@ call screenon
   ld    (MonsterAnimationSpeed),a
   ld    (MoVeMonster?),a
   ld    (LeftOrRightPlayerLostEntireArmy?),a
+  ld    (AutoCombatButtonPressed?),a
 ;  ld    (CanWeTerminateBattle?),a
+
+
 
 ;battle code page 2
   ld    a,BattleCodePage2Block          ;Map block
@@ -312,6 +330,9 @@ call screenon
   ret
   
 .AutoCombatButtonPressed:
+  ld    a,(AutoCombatButtonPressed?)
+  xor   1
+  ld    (AutoCombatButtonPressed?),a
   ret
 
 .WaitButtonPressed:
@@ -1949,9 +1970,9 @@ CheckRightClickToDisplayInfo:
   jr    nc,.NotCarryY
   xor   a
   .NotCarryY:
-  cp    119
+  cp    113
   jr    c,.NoOverFlowBottom
-  ld    a,119
+  ld    a,113
   .NoOverFlowBottom:
 
   push  af                              ;store y window
@@ -6589,7 +6610,7 @@ SetcursorWhenGridTileIsActive:
 ;%1100 0010  $c2
 ;%1100 0100  $c4
   ld    a,(spat+1)
-  and   %0000 1111
+  and   %0000 1110
   cp    %0000 0110
   jp    z,.SetSwordRight
   cp    %0000 1000
@@ -6611,7 +6632,7 @@ SetcursorWhenGridTileIsActive:
 ;%1011 1000  $b8
 ;%1011 1010  $ba
   ld    a,(spat+1)
-  and   %0000 1111
+  and   %0000 1110
   cp    %0000 1100
   jp    z,.SetSwordRight
   cp    %0000 1110

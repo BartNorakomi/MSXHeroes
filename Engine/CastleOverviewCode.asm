@@ -1186,6 +1186,9 @@ UpdateHudCode:
 	ret
 
 HudCode:
+  call  checkcurrentplayerhuman         ;out zero flag, current player is computer
+	ret		z
+
   call  SetHeroArmyAndStatusInHud  
 	call	SetCastlesInWindows             ;erase castle windows, then put the castles in the windows
   call  SetResources
@@ -1194,6 +1197,9 @@ HudCode:
 ;  ld    ix,GenericButtonTable3
 ;  call  CheckButtonMouseInteractionGenericButtons
   call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
+
+  call  checkcurrentplayerhuman         ;out zero flag, current player is computer
+	ret		z
 
 	call	SetHeroesInWindows              ;erase hero windows, then put the heroes in the windows
 ;  call  CheckIfHeroButtonShouldRemainLit
@@ -1211,17 +1217,6 @@ HudCode:
   ld    b,a
   xor   a
   ld    (WhichHudButtonClicked?),a
-
-
-
-
-
-;  ret   nc                              ;carry=button pressed, b=which button
-
-
-
-
-
 
   ld    a,b
   cp    12
@@ -1800,6 +1795,9 @@ ClearResourcesHud:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetHeroArmyAndStatusInHud:
+  call  checkcurrentplayerhuman         ;out zero flag, current player is computer
+	ret		z
+
 	ld		a,(SetHeroArmyAndStatusInHud?)
 	dec		a
 	ret		z
@@ -15075,14 +15073,6 @@ SetResourcesPlayer:
   ld    h,(ix+9)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
   ret
-
-
-
-
-
-
-
-
 
 
 

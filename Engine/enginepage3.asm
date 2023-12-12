@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 0
+StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
@@ -20,11 +20,13 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
   call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
+  call  FindAndSetCastles               ;castles on the map have to be assigned to their players, and coordinates have to be set
+  call  PlaceHeroesInCastles            ;Place hero nr#1 in their castle
   call  ConvertMonstersObjectLayer      ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
   .WhenExitingCombat:
   call  SetScreenOff
@@ -295,6 +297,7 @@ WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
 WaitButtonPressed?: db  0
+AutoCombatButtonPressed?: db  0
 DefendButtonPressed?: db  0
 RetreatButtonPressed?: db  0
 SurrenderButtonPressed?: db  0
@@ -311,8 +314,8 @@ ListOfMonstersToPut:
 ;  db  001 | dw 100 | db 012 + (25*08), 056 + (02*16) + 16
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
 
-;  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
-  db  002 | dw 500 | db 012 + (10*08), 056 + (07*16) + 16
+  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
+;  db  002 | dw 500 | db 012 + (10*08), 056 + (07*16) + 16
 
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
   db  004 | dw 700 | db 012 + (00*08), 056 + (05*16) + 16
@@ -2452,6 +2455,7 @@ LoadHud:
 
 	ld		hl,copyfont	                    ;put font at (0,212)
 	call	docopy
+  call  CreateMiniMap                   ;using worldtiles from page 3 and worldmap, we can generate minimap  
   ld    hl,CopyPage0To1
 	call	docopy
   ret
@@ -2472,21 +2476,7 @@ LoadWorldTiles:
   call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
   ret
 
-LoadWorldObjectLayerMap:
-;unpack map data
-  ld    a,(slot.page1rom)             ;all RAM except page 1
-  out   ($a8),a      
 
-  ld    a,World1ObjectLayerMapBlock   ;Map block
-  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
-
-  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
-
-  ld    hl,World1ObjectLayerMap
-  ld    de,$8000
-  call  Depack
-  ret
 
 
 
@@ -2691,23 +2681,184 @@ ConvertMonstersObjectLayer:
   or    a
   ret
 
-
 LoadWorldMap:
 ;unpack map data
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
 
-  ld    a,World1MapBlock              ;Map block
+  ld    a,World2MapBlock              ;Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
   
-  ld    hl,World1Map
+  ld    hl,World2Map
   ld    de,$8000
   call  Depack
   ret
+
+LoadWorldObjectLayerMap:
+;unpack map data
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+
+  ld    a,World2ObjectLayerMapBlock   ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    hl,World2ObjectLayerMap
+  ld    de,$8000
+  call  Depack
+  ret
+
+CastleTileNr: equ 254
+FindAndSetCastles:                      ;castles on the map have to be assigned to their players, and coordinates have to be set
+  ld    hl,$8000-1
+  ld    ix,Castle1                      ;first castle in castle list
+
+  .SetCastleTileNrAndGoloop:
+  ld    a,CastleTileNr
+  .loop:
+  inc   hl
+  bit   6,h                             ;hl=$c000 ? (this happens when bit 6 of h=1)
+  ret   nz
+  cp    (hl)
+  jr    nz,.loop
+
+  ld    a,l                             ;x value castle
+  and   127
+  dec   a
+  ld    (ix+CastleX),a
+
+  push  hl
+
+  push  hl
+  pop   bc
+
+  inc   hl                              ;player that owns this castle
+  ld    a,(hl)
+  sub   a,245
+  ld    (ix+CastlePlayer),a
+  ld    (hl),0                          ;remove number from object map
+
+  ld    de,128
+  call  DivideBCbyDE                    ;In: BC/DE. mOut: BC = result, HL = rest
+ 
+  ld    a,c                             ;y value castle
+  inc   a
+  ld    (ix+CastleY),a  
+
+  pop   hl
+  ld    de,LenghtCastleTable
+  add   ix,de  
+  jp    .SetCastleTileNrAndGoloop
+  ret 
+
+PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
+  ld    ix,Castle1
+  call  .PlaceHero
+  ld    ix,Castle2
+  call  .PlaceHero
+  ld    ix,Castle3
+  call  .PlaceHero
+  ld    ix,Castle4
+  call  .PlaceHero
+  ret
+
+  .PlaceHero:
+  ld    a,(ix+CastlePlayer)
+  ld    iy,pl1hero1y
+  cp    1
+  jr    z,.SetHeroInCastle
+  ld    iy,pl2hero1y
+  cp    2
+  jr    z,.SetHeroInCastle
+  ld    iy,pl3hero1y
+  cp    3
+  jr    z,.SetHeroInCastle
+  ld    iy,pl4hero1y
+  cp    4
+  jr    z,.SetHeroInCastle
+  .SetHeroInCastle:
+  ld    a,(ix+CastleY)
+  dec   a
+  ld    (iy+HeroY),a
+  ld    a,(ix+CastleX)
+  add   a,2
+  ld    (iy+HeroX),a
+  ret
+
+;hud is placed in page 0 and will be copied to page 1 after this. So create minimap in page 0
+;minimap is 48x48. Worldmap is 128x128
+;48:128 = 3:8.. so read tile/pixel 1, 4, 7
+CreateMiniMap:                          ;using worldtiles from page 3 and worldmap, we can generate minimap
+;  call  LoadWorldTiles                  ;set all world map tiles in page 3
+
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+
+  ld		a,1                             ;set worldmap in bank 1 at $8000
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    hl,$8000
+  ld    b,48
+
+  .loop:
+  call  .GoCopyTilePiece
+  inc   hl
+  djnz  .loop
+  ret
+
+  .GoCopyTilePiece:
+  push  bc
+  push  hl
+
+  ld    a,(hl)                          ;tilenr
+
+	;set sx
+	ld		e,a                             ;store tilenr
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(.CopyTilePiece+sx),a
+	;/set sx
+
+	;set sy
+	ld		a,e
+	ld		d,-1
+.setsy:
+	sub		a,16
+	inc		d
+	jp		nc,.setsy
+	ld		a,d
+	add		a,a				                      ;*2
+	add		a,a				                      ;*4
+	add		a,a				                      ;*8
+	add		a,a				                      ;*16
+	ld		(.CopyTilePiece+sy),a
+	;/set sy
   
+  ld    hl,.CopyTilePiece
+  call  DoCopy
+
+  ld    a,(.CopyTilePiece+dx)
+  inc   a
+  ld    (.CopyTilePiece+dx),a
+
+  pop   hl
+  pop   bc
+  ret
+
+.CopyTilePiece:
+	db		0,0,0,3
+	db		203,0,005,0
+	db		1,0,1,0
+	db		0,%0000 0000,$98
+  
+
 World1Palette:
   incbin"..\grapx\tilesheets\world1tiles.pl"
 

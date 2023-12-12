@@ -1,3 +1,40 @@
+AnimateAutoCombatButton:
+  ld    a,(AutoCombatButtonPressed?)
+  or    a
+  jr    z,.AutoCombatNotOn
+
+  ld    a,(framecounter)
+  and   15
+
+  cp    4
+  ld    hl,$4000 + (072*128) + (196/2) - 128
+  jr    c,.SetAutoCombatButton
+
+  cp    8
+  ld    hl,$4000 + (072*128) + (214/2) - 128
+  jr    c,.SetAutoCombatButton
+
+  cp    12
+  ld    hl,$4000 + (072*128) + (232/2) - 128
+  jr    c,.SetAutoCombatButton
+
+  ld    hl,$4000 + (090*128) + (196/2) - 128
+
+  .SetAutoCombatButton:
+  ld    (1+GenericButtonTable+(GenericButtonTableLenghtPerButton*6)),hl  
+  ld    (3+GenericButtonTable+(GenericButtonTableLenghtPerButton*6)),hl  
+  ld    a,(GenericButtonTable+(GenericButtonTableLenghtPerButton*6))
+  or    %0000 0011
+  ld    (GenericButtonTable+(GenericButtonTableLenghtPerButton*6)),a
+  ret
+
+  .AutoCombatNotOn:
+  ld    hl,$4000 + (054*128) + (214/2) - 128
+  ld    (1+GenericButtonTable+(GenericButtonTableLenghtPerButton*6)),hl  
+  ld    hl,$4000 + (054*128) + (232/2) - 128
+  ld    (3+GenericButtonTable+(GenericButtonTableLenghtPerButton*6)),hl  
+  ret
+
 HandleEnemyAI:                          ;in: d=SpecialAbility, c=speed
   inc   c                               ;increase movement speed by 1
   ld    a,d
@@ -10,7 +47,36 @@ HandleEnemyAIMeleeMonster:
   ld    c,a                             ;copy of movement speed
   ld    b,18                            ;we can extrend monsters movement speed by 18 to find at least the nearest target
 
-  .loop:
+  ld    a,(CurrentActiveMonster)        ;left or right player is currently active ?
+  cp    7
+  jr    nc,.RightPlayerIsCurrentlyActive
+  
+  .LeftPlayerIsCurrentlyActive:
+  exx
+  ld    ix,Monster7 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster8 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster9 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster10 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster11 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+  ld    ix,Monster12 | call .Checkpass1CheckAttackFromTheLeftFirst  ;check if monster amount>9 and monster is in range
+
+  ld    ix,Monster7 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+  ld    ix,Monster8 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+  ld    ix,Monster9 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+  ld    ix,Monster10 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+  ld    ix,Monster11 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+  ld    ix,Monster12 | call .Checkpass2CheckAttackFromTheLeftFirst  ;check if monster is in range
+
+  ;at this point monster has not found an enemy within range, increase monster's range, but monster then cant attack anymore. So put 255 at the end of the MonsterMovementPath
+  inc   c
+  exx
+  djnz  .LeftPlayerIsCurrentlyActive
+  ;in case monster can't reach a target, it will just defend instead
+  ld    a,1
+  ld    (DefendButtonPressed?),a  
+  ret
+
+  .RightPlayerIsCurrentlyActive:
   exx
   ld    ix,Monster1 | call .Checkpass1  ;check if monster amount>9 and monster is in range
   ld    ix,Monster2 | call .Checkpass1  ;check if monster amount>9 and monster is in range
@@ -18,6 +84,7 @@ HandleEnemyAIMeleeMonster:
   ld    ix,Monster4 | call .Checkpass1  ;check if monster amount>9 and monster is in range
   ld    ix,Monster5 | call .Checkpass1  ;check if monster amount>9 and monster is in range
   ld    ix,Monster6 | call .Checkpass1  ;check if monster amount>9 and monster is in range
+
   ld    ix,Monster1 | call .Checkpass2  ;check if monster is in range
   ld    ix,Monster2 | call .Checkpass2  ;check if monster is in range
   ld    ix,Monster3 | call .Checkpass2  ;check if monster is in range
@@ -28,7 +95,7 @@ HandleEnemyAIMeleeMonster:
   ;at this point monster has not found an enemy within range, increase monster's range, but monster then cant attack anymore. So put 255 at the end of the MonsterMovementPath
   inc   c
   exx
-  djnz  .loop
+  djnz  .RightPlayerIsCurrentlyActive
   ;in case monster can't reach a target, it will just defend instead
   ld    a,1
   ld    (DefendButtonPressed?),a  
@@ -64,6 +131,39 @@ HandleEnemyAIMeleeMonster:
   call  .CanMonsterBeAttackedFromTheLeft?
   call  .CanMonsterBeAttackedFromTheLeftBottom?
   call  .CanMonsterBeAttackedFromTheLeftTop?
+  ret
+
+
+  .Checkpass2CheckAttackFromTheLeftFirst:                          ;check if monster is in range
+  ld    (MonsterThatIsBeingAttacked),ix
+  jr    .endCheckAmountCheckAttackFromTheLeftFirst
+
+  .Checkpass1CheckAttackFromTheLeftFirst:                          ;check if monster amount>9 and monster is in range
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    de,10  
+  call  CompareHLwithDE
+  ret   c                               ;don't check if amount>10
+  .endCheckAmountCheckAttackFromTheLeftFirst:
+  ld    a,(ix+MonsterHP)
+  or    a
+  ret   z                               ;don't check if monster is dead
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+
+  call  .CanMonsterBeAttackedFromTheLeft?
+  call  .CanMonsterBeAttackedFromTheLeftBottom?
+  call  .CanMonsterBeAttackedFromTheLeftTop?
+  call  .CanMonsterBeAttackedFromTheRIght?
+  call  .CanMonsterBeAttackedFromTheRIghtBottom?
+  call  .CanMonsterBeAttackedFromTheRIghtTop?
   ret
 
   .CanMonsterBeAttackedFromTheLeftBottom?:
@@ -345,6 +445,45 @@ HandleEnemyAIMeleeMonster:
   ret
 
 HandleEnemyAIRangeMonster:
+  ld    a,(CurrentActiveMonster)        ;left or right player is currently active ?
+  cp    7
+  jp    nc,.RightPlayerIsCurrentlyActive
+
+  .LeftPlayerIsCurrentlyActive:
+;pass 1: check in range AND amount>9
+  ld    ix,Monster7 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster8 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster9 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster10 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster11 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+  ld    ix,Monster12 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
+
+;pass 2: check amount>9
+  ld    ix,Monster7 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster8 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster9 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster10 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster11 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+  ld    ix,Monster12 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass2 ;check amount>9
+
+;pass 3: check in range
+  ld    ix,Monster7 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster8 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster9 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster10 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster11 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+  ld    ix,Monster12 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass3 ;check in range
+
+;pass 4: attack any monster attackable
+  ld    ix,Monster7 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster8 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster9 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster10 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster11 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ld    ix,Monster12 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass4 ;attack any monster attackable
+  ret
+
+  .RightPlayerIsCurrentlyActive:
 ;pass 1: check in range AND amount>9
   ld    ix,Monster1 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
   ld    ix,Monster2 | call .CheckIfMonsterCanBeAttacked | call  .CheckPass1 ;check in range AND amount>9
@@ -826,6 +965,29 @@ SetBattleButtons:
   ld    bc,2+(GenericButtonTableLenghtPerButton*9)
   ldir
 
+  call  .CheckRetreatButton
+
+  .CheckAutoCombatButton:
+  ;turn autocombat button off, when fighting vs human player
+  ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
+  ld    a,l
+  or    h
+  ret   z
+
+  ld    a,(PlayerThatGetsAttacked)      ;check if player that gets attacked is human
+  ld    hl,player1human?-1
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    a,(hl)
+  or    a
+  ret   z                               ;if right player is computer autocombat is possible
+
+  xor   a
+  ld    (GenericButtonTable+6*GenericButtonTableLenghtPerButton),a
+  ret
+
+  .CheckRetreatButton:
   ;turn retreat button off, when fighting vs neutral monsters (monsters without hero)
   ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
   ld    a,l
