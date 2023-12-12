@@ -746,19 +746,6 @@ CopyPage1To0:
 	db		0,1,212,0
 	db		0,0,$d0	
 
-LoadCastleOverview:
-  ld    a,0*32+31
-  call  SetPage
-
-  ld    d,CastleOverviewBlock
-  ld    a,0
-  ld    hl,$0000                        ;write to page 0
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-
-  ld    hl,CastleOverviewPalette
-  call  SetPalette
-  ret
-
 ;Text8bitNumberStored: ds  1
 TextNumber: ;ds  10
 db  "31456",255
@@ -2435,11 +2422,15 @@ SetAllSpriteCoordinatesInPage2:
   ret
 
 LoadAllObjectsInVram:                   ;Load all objects in page 2 starting at (0,64)
-  ld    d,World1ObjectsBlock
-  ld    a,1
-  ld    hl,064*128                      ;write to page 2 at (0,64)
-  call  copyGraphicsToScreen192         ;in d=block, ahl=address to write to.  
-  ret
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    (AddressToWriteFrom),hl
+  ld    de,$0000 + (064*128) + (000/2) - 128  ;dy,dx
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+  ld    bc,$0000 + (192*256) + (256/2)
+  ld    (NXAndNY),bc
+  ld    a,World1ObjectsBlock                   ;block to copy graphics from  
+  ld    (BlockToReadFrom),a
+  jp    CopyRamToVramPage3ForBattleEngine      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\tavern.pl"
@@ -2447,38 +2438,52 @@ CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\image7.pl"
 
 LoadHud:
-;  ld    d,HudBlock
-  ld    d,HudNewBlock
-  ld    a,0
-  ld    hl,$0000                        ;write to page 0
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
+  ld    a,1
+	ld		(activepage),a			
+
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,HudNewBlock                   ;block to copy graphics from  
+  call  CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 	ld		hl,copyfont	                    ;put font at (0,212)
 	call	docopy
   call  CreateMiniMap                   ;using worldtiles from page 3 and worldmap, we can generate minimap  
+	call  RepairDecorationEdgesHud
   ld    hl,CopyPage0To1
 	call	docopy
   ret
 
-;LoadHeroesSprites:
-;  ld    d,HeroesSpritesBlock
-;  ld    d,_32HeroesSpritesAndCurrentHeroBlock
-  
-;  ld    a,1
-;  ld    hl,$0000                        ;write to page 2
-;  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-;  ret
+RepairDecorationEdgesHud:	
+  ld    hl,$4000 + (005*128) + (202/2) - 128
+  ld    de,256*005 + 202                ;(dy*256 + dx)
+  ld    bc,$0000 + (005*256) + (050/2)
+  ld    a,HudNewBlock                   ;block to copy graphics from  
+  exx
+  ex    af,af'
+  ld    hl,CopyTransparantImageEXX
+  call  EnterSpecificRoutineInCastleOverviewCode
+
+  ld    hl,$4000 + (050*128) + (202/2) - 128
+  ld    de,256*050 + 202                ;(dy*256 + dx)
+  ld    bc,$0000 + (003*256) + (050/2)
+  ld    a,HudNewBlock                   ;block to copy graphics from  
+  exx
+  ex    af,af'
+  ld    hl,CopyTransparantImageEXX
+  jp    EnterSpecificRoutineInCastleOverviewCode
 
 LoadWorldTiles:
-  ld    d,World1TilesBlock
-  ld    a,1
-  ld    hl,$8000                        ;write to page 3
-  call  copyGraphicsToScreen256         ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram
-  ret
-
-
-
-
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    (AddressToWriteFrom),hl
+  ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+  ld    bc,$0000 + (000*256) + (256/2)
+  ld    (NXAndNY),bc
+  ld    a,World1TilesBlock                   ;block to copy graphics from  
+  ld    (BlockToReadFrom),a
+  jp    CopyRamToVramPage3ForBattleEngine      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 ListOfUnlockedMonstersLevel1:
   db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
@@ -2794,21 +2799,54 @@ PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
 ;minimap is 48x48. Worldmap is 128x128
 ;48:128 = 3:8.. so read tile/pixel 1, 4, 7
 CreateMiniMap:                          ;using worldtiles from page 3 and worldmap, we can generate minimap
-;  call  LoadWorldTiles                  ;set all world map tiles in page 3
-
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
 
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  ld    hl,$8000
-  ld    b,48
+  ld    hl,$8000                        ;worldmap mapdata
+  ld    c,16                            ;16*3 pixel y-axis
+  ld    b,16                            ;16*3 pixel x-axis
 
   .loop:
-  call  .GoCopyTilePiece
+  push  bc
+  call  .Copy1Row                       ;row 1 (y-axis)
+  pop   bc
+  ld    de,256
+  add   hl,de
+  push  bc
+  call  .Copy1Row                       ;row 4 (y-axis)
+  pop   bc
+  ld    de,256
+  add   hl,de
+  push  bc
+  call  .Copy1Row                       ;row 7 (y-axis)
+  pop   bc
+  ld    de,128
+  add   hl,de
+  dec   c
+  jr    nz,.loop
+  ret
+
+  .Copy1Row:
+  call  .GoCopyTilePiece                ;pixel 1 (x-axis)
   inc   hl
-  djnz  .loop
+  inc   hl
+  inc   hl
+  call  .GoCopyTilePiece                ;pixel 4 (x-axis)
+  inc   hl
+  inc   hl
+  inc   hl
+  call  .GoCopyTilePiece                ;pixel 7 (x-axis)
+  inc   hl
+  inc   hl
+  djnz  .Copy1Row
+  ld    a,.XMiniMap
+	ld		(.CopyTilePiece+dx),a
+	ld		a,(.CopyTilePiece+dy)
+  inc   a
+	ld		(.CopyTilePiece+dy),a
   ret
 
   .GoCopyTilePiece:
@@ -2852,9 +2890,10 @@ CreateMiniMap:                          ;using worldtiles from page 3 and worldm
   pop   bc
   ret
 
+.XMiniMap: equ 203
 .CopyTilePiece:
 	db		0,0,0,3
-	db		203,0,005,0
+	db		.XMiniMap,0,005,0
 	db		1,0,1,0
 	db		0,%0000 0000,$98
   
@@ -3008,82 +3047,6 @@ DoCopy:
 	dw    $a3ed,$a3ed,$a3ed,$a3ed
 	dw    $a3ed,$a3ed,$a3ed,$a3ed
 	dw    $a3ed,$a3ed,$a3ed
-  ret
-
-copyGraphicsToScreen192:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram  
-	call	SetVdp_Write                    ;start writing to address bhl
-
-  ld    a,(slot.page12rom)              ;all RAM except page 1
-  out   ($a8),a   
-
-  ld    a,d
-  call  block1234
-
-	ld		hl,$4000
-  ld    c,$98
-  ld    a,128                           ;1 lines
-
-  .loop1:
-  call  outix192
-  dec   a
-  jp    nz,.loop1
-
-  ld    a,(slot.page1rom)               ;all RAM except page 1
-  out   ($a8),a
-  ret
-
-copyGraphicsToScreen256:                ;in d=block, ahl=address to write to. This routine writes a full sc5 page (=$8000 bytes) to vram  
-	call	SetVdp_Write                    ;start writing to address bhl
-
-  ld    a,(slot.page12rom)              ;all RAM except page 1
-  out   ($a8),a   
-
-  ld    a,(memblocks.1)
-  push  af                              ;save block page settings
-
-  ld    a,d
-  call  block1234
-
-	ld		hl,$4000
-  ld    c,$98
-  ld    a,128                           ;256 lines, copy 128*256 = $4000 bytes to Vram      
-
-  .loop1:
-  call  outix256
-  dec   a
-  jp    nz,.loop1
-
-  pop   af
-  call  block1234                       ;restore block page settings
-
-  ld    a,(slot.page1rom)               ;all RAM except page 1
-  out   ($a8),a
-  ret
-
-copyGraphicsToScreen212:                ;in d=block, ahl=address to write to. This routine writes a set amount of bytes to vram. In this case 212 lines (212 lines * 128 bytes = $6a00 bytes)
-	call	SetVdp_Write                    ;start writing to address bhl
-
-  ld    a,d
-  call  block12
-
-	ld		hl,$4000
-  ld    c,$98
-  ld    a,64                            ;first 128 line, copy 64*256 = $4000 bytes to Vram      
-  call  .loop1    
-
-  ld    a,d                             ;Graphicsblock
-  inc   a
-  call  block12
-  
-	ld		hl,$4000
-  ld    a,42                            ;second 84 line, copy 64*256 = $4000 bytes to Vram      
-;  call  .loop1   
-;  ret
-
-  .loop1:
-  call  outix256
-  dec   a
-  jp    nz,.loop1
   ret
 
 currentpage:                ds  1

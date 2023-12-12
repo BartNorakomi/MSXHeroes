@@ -584,9 +584,9 @@ dephase
 ;
 ; block $16 - 17
 ;
-HudBlock:  equ   $16
+;HudBlock:  equ   $16
 phase	$4000
-  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
+;  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
 ;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase

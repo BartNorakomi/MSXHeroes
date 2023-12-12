@@ -14,6 +14,7 @@ worldmap:
 AI
 options/settings/save menu
 minimap
+remove castle en players die niet in gebruik zijn
 
 low prio:
 boots clicken op map, route moet in 2 richtingen uitgezocht worden (met die sterretjes op de map)

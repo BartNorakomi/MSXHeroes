@@ -12094,13 +12094,15 @@ SetVandXSymbols:
   ret
 
 
-
+CopyTransparantImageEXX:
+  ex    af,af'
+  exx
 ;  Example of input:
 ;  ld    de,256*(42+YOffsetVandX) + (064 + xOffsetVandX)
 ;  ld    hl,$4000 + (114*128) + (200/2) - 128  ;y,x
 ;  ld    bc,$0000 + (017*256) + (018/2)        ;ny,nx
 ;  ld    a,ButtonsBuildBlock      ;font graphics block
-CopyTransparantImage:  
+CopyTransparantImage: 
 ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   push  af
   ld    a,b
