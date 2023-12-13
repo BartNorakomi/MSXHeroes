@@ -409,6 +409,10 @@ World1ObjectLayerMapBlock:  equ   $05
 
 World2MapBlock:  equ   $05
 World2ObjectLayerMapBlock:  equ   $05
+
+World3MapBlock:  equ   $05
+World3ObjectLayerMapBlock:  equ   $05
+
 phase	$4000
 World1Map:
   incbin "..\maps\world1.map.pck"
@@ -418,6 +422,11 @@ World2Map:
   incbin "..\maps\world2.map.pck"
 World2ObjectLayerMap:
   incbin "..\maps\world2objects.map.pck"
+World3Map:
+  incbin "..\maps\world3.map.pck"
+World3ObjectLayerMap:
+  incbin "..\maps\world3objects.map.pck"
+
 	ds		$8000-$,$ff
 dephase
 

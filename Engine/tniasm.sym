@@ -253,6 +253,7 @@ Monster5.amount: equ 0C4CCh ; last def. pass 3
 CursorSwordRight: equ 02535h ; last def. pass 3
 PlayerStartTurnVButtonTableGfxBlock: equ 068E2h ; last def. pass 3
 MonsterStatusEnabled: equ 00h ; last def. pass 3
+World3ObjectLayerMapBlock: equ 05h ; last def. pass 3
 ListOfUnlockedMonstersLevel6: equ 0D4C1h ; last def. pass 3
 SetButtonStatusAndText.Setbutton: equ 06797h ; last def. pass 3
 CheckButtonMouseInteractionRecruitMAXBUYButtons.EndCheckEnoughRubiesToRecruitALLunits: equ 09847h ; last def. pass 3
@@ -2148,6 +2149,7 @@ DYDXVisitingHeroUnit5: equ 0B5DCh ; last def. pass 3
 MoveMonster.Go: equ 059CAh ; last def. pass 3
 GenericButtonTable3.Button12XRight: equ 0F8h ; last def. pass 3
 GenericButtonTable3AmountOfButtons: equ 0C9F3h ; last def. pass 3
+World3ObjectLayerMap: equ 06077h ; last def. pass 3
 Monster4.amount: equ 0C4BCh ; last def. pass 3
 MonsterMovingRight?: equ 0C457h ; last def. pass 3
 CopyRamToVramCorrectedCastleOverview: equ 0C0A1h ; last def. pass 3
@@ -2797,6 +2799,7 @@ CheckButtonMouseInteraction.buttonIsStillLit: equ 06652h ; last def. pass 3
 CheckEndHeroOverviewFirstWindow.NotOverHeroOverViewFirstWindowChoices: equ 0659Bh ; last def. pass 3
 HeroButton20x11SYSXUltrabox: equ 0559Eh ; last def. pass 3
 RIdle2Monster022: equ 06798h ; last def. pass 3
+World3MapBlock: equ 05h ; last def. pass 3
 SetAllNumbersInGrid.Direction4: equ 0671Dh ; last def. pass 3
 RIdle2Monster083: equ 073E8h ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.MouseOverButtonAndSpacePressedOverButtonNotYetLit: equ 0A0C4h ; last def. pass 3
@@ -5849,6 +5852,7 @@ engaddr: equ 03Eh ; last def. pass 3
 movementpath: equ 03969h ; last def. pass 3
 SetAvailableRecruitArmy.army: equ 0482Bh ; last def. pass 3
 slot.page12rom: equ 0E686h ; last def. pass 3
+World3Map: equ 0599Dh ; last def. pass 3
 GoemonUnitLevel5Speed: equ 04h ; last def. pass 3
 AkanbeDragonGroupAUnitLevel1CostRubies: equ 00h ; last def. pass 3
 LIdle2Monster101: equ 05FC8h ; last def. pass 3

@@ -2691,13 +2691,13 @@ LoadWorldMap:
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
 
-  ld    a,World2MapBlock              ;Map block
+  ld    a,World3MapBlock              ;Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
   
-  ld    hl,World2Map
+  ld    hl,World3Map
   ld    de,$8000
   call  Depack
   ret
@@ -2707,13 +2707,13 @@ LoadWorldObjectLayerMap:
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
 
-  ld    a,World2ObjectLayerMapBlock   ;Map block
+  ld    a,World3ObjectLayerMapBlock   ;Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  ld    hl,World2ObjectLayerMap
+  ld    hl,World3ObjectLayerMap
   ld    de,$8000
   call  Depack
   ret
