@@ -13,8 +13,6 @@ autocombat moet een sprite worden
 worldmap:
 AI
 options/settings/save menu
-minimap
-remove castle en players die niet in gebruik zijn
 
 low prio:
 boots clicken op map, route moet in 2 richtingen uitgezocht worden (met die sterretjes op de map)
@@ -26,8 +24,6 @@ vensters moeten nog gekopieerd worden, anders heb je kans op flikker bij pageswa
 skill icons
 
 castle:
-recruit monsters moeten een donkerbruine achtergrond hebben
-check eens of je rekening gehouden hebt met dingen als capitol: increases unit production by 100%
 
 general:
 muziek

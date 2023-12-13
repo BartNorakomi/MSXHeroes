@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 1
+StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
@@ -2805,6 +2805,9 @@ CreateMiniMap:                          ;using worldtiles from page 3 and worldm
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
+  ld    a,.YMiniMap
+	ld		(.CopyTilePiece+dy),a
+
   ld    hl,$8000                        ;worldmap mapdata
   ld    c,16                            ;16*3 pixel y-axis
   ld    b,16                            ;16*3 pixel x-axis
@@ -2842,6 +2845,7 @@ CreateMiniMap:                          ;using worldtiles from page 3 and worldm
   inc   hl
   inc   hl
   djnz  .Copy1Row
+  
   ld    a,.XMiniMap
 	ld		(.CopyTilePiece+dx),a
 	ld		a,(.CopyTilePiece+dy)
@@ -2891,9 +2895,11 @@ CreateMiniMap:                          ;using worldtiles from page 3 and worldm
   ret
 
 .XMiniMap: equ 203
+.YMiniMap: equ 005
+
 .CopyTilePiece:
 	db		0,0,0,3
-	db		.XMiniMap,0,005,0
+	db		.XMiniMap,0,.YMiniMap,0
 	db		1,0,1,0
 	db		0,%0000 0000,$98
   

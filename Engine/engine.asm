@@ -1463,7 +1463,7 @@ CastleCodeSetAdditionalStatFromInventoryItemsInHL:
 
 DisplayStartOfTurnMessage?: db  3
 DisplayQuickTips?: db  1
-Date: dw  0                          ;days, weeks, months
+Date: dw  6                          ;days, weeks, months
 DisplayStartOfTurnMessage:
   if    StartOfTurnMessageOn?
   else
@@ -5499,13 +5499,13 @@ pl2hero9y:		db	00		                ;
 .pl1hero6status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-pl3hero1y:		db	100
-pl3hero1x:		db	02
+pl3hero1y:		db	80
+pl3hero1x:		db	40
 pl3hero1xp: dw 0000
 pl3hero1move:	db	20,20
 pl3hero1mana:	dw	20,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
-pl3hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl3hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl3Hero1Units:  db 033 | dw 003 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -5545,7 +5545,7 @@ pl4hero1xp: dw 0000
 pl4hero1move:	db	10,20
 pl4hero1mana:	dw	10,20
 pl4hero1manarec:db	2		                ;recover x mana every turn
-pl4hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl4hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl4Hero1Units:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -5611,12 +5611,12 @@ LenghtCastleTable:      equ Castle2-Castle1
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
 ;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
-Castle2:  db  004,  001,  1,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   14,              9,             7,            3,            2,           1     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle2:  db  255,  255,  255,      5,          0,        0,        0,              6,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
 ;Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
-Castle3:  db  100,  001,  3,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
-Castle4:  db  100,  100,  4,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
-Castle5:  db  000,  000,  255
+Castle3:  db  255,  255,  255,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
+Castle4:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
+Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
 TempVariableCastleY:	ds	1

@@ -795,12 +795,12 @@ SetAvailableRecruitArmy:
   call  CopyTransparantImage            ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
-DYDXUnit1Window:               equ 038*256 + 008                ;(dy*256 + dx)
-DYDXUnit2Window:               equ 038*256 + 092                ;(dy*256 + dx)
-DYDXUnit3Window:               equ 038*256 + 176                ;(dy*256 + dx)
-DYDXUnit4Window:               equ 094*256 + 008                ;(dy*256 + dx)
-DYDXUnit5Window:               equ 094*256 + 092                ;(dy*256 + dx)
-DYDXUnit6Window:               equ 094*256 + 176                ;(dy*256 + dx)
+DYDXUnit1Window:               equ 038*256 + 008+1                ;(dy*256 + dx)
+DYDXUnit2Window:               equ 038*256 + 092+1                ;(dy*256 + dx)
+DYDXUnit3Window:               equ 038*256 + 176+1                ;(dy*256 + dx)
+DYDXUnit4Window:               equ 094*256 + 008+1                ;(dy*256 + dx)
+DYDXUnit5Window:               equ 094*256 + 092+1                ;(dy*256 + dx)
+DYDXUnit6Window:               equ 094*256 + 176+1                ;(dy*256 + dx)
 
 SetCostSelectedCreatureInHL:            ;in: a=creature nr. pushes and pops bc
   call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
@@ -1313,7 +1313,7 @@ EndTurn:
   ld    (SetHeroOverViewMenu?),a        ;hackjob
   ret
 
-AddCreaturesToPools:
+AddCreaturesToPools:                    ;add creatures to pool. bonus 50% for citadel, and 100% for capitol
   ;set day
   ld    bc,(Date)
   ld    de,7                            ;divide the days by 7, the rest is the day of the week
@@ -1351,7 +1351,8 @@ AddCreaturesToPools:
   ld    a,(ix+CastleLevel6Units)
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
-  pop   ix
+  pop   ix  
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel6UnitsAvail)
   ld    d,(ix+CastleLevel6UnitsAvail+1)
   add   hl,de
@@ -1363,6 +1364,7 @@ AddCreaturesToPools:
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   pop   ix
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel5UnitsAvail)
   ld    d,(ix+CastleLevel5UnitsAvail+1)
   add   hl,de
@@ -1374,6 +1376,7 @@ AddCreaturesToPools:
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   pop   ix
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel4UnitsAvail)
   ld    d,(ix+CastleLevel4UnitsAvail+1)
   add   hl,de
@@ -1385,6 +1388,7 @@ AddCreaturesToPools:
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   pop   ix
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel3UnitsAvail)
   ld    d,(ix+CastleLevel3UnitsAvail+1)
   add   hl,de
@@ -1396,6 +1400,7 @@ AddCreaturesToPools:
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   pop   ix
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel2UnitsAvail)
   ld    d,(ix+CastleLevel2UnitsAvail+1)
   add   hl,de
@@ -1407,11 +1412,22 @@ AddCreaturesToPools:
   push  ix
   call  SetGrowthSelectedCreatureInHL    ;in: a=creature nr. pushes and pops bc
   pop   ix
+  call  .Apply50or100PercentAddedGrowthForCitadelOrCapitol
   ld    e,(ix+CastleLevel1UnitsAvail)
   ld    d,(ix+CastleLevel1UnitsAvail+1)
   add   hl,de
   ld    (ix+CastleLevel1UnitsAvail),l
   ld    (ix+CastleLevel1UnitsAvail+1),h
+  ret
+
+.Apply50or100PercentAddedGrowthForCitadelOrCapitol:
+  ld    a,(ix+CastleLevel)
+  cp    4                               ;citadel ? (increases the production of all creatures by 50%
+  ld    de,02                           ;divide total attack by 2 to get 50%
+  jp    z,SetChestText.ApplyPercentBasedBoost
+  cp    5                               ;capitol ? (increases the production of all creatures by 100%
+  ld    de,01                           ;divide total attack by 1 to get 100%
+  jp    nc,SetChestText.ApplyPercentBasedBoost
   ret
 
 SetManaAndMovementToMax:
