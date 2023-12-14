@@ -4,11 +4,14 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw World3
+WorldPointer: dw World6
 
 World1: db  World1MapBlock | dw World1Map | db World1ObjectLayerMapBlock | dw World1ObjectLayerMap
 World2: db  World2MapBlock | dw World2Map | db World2ObjectLayerMapBlock | dw World2ObjectLayerMap
 World3: db  World3MapBlock | dw World3Map | db World3ObjectLayerMapBlock | dw World3ObjectLayerMap
+World4: db  World4MapBlock | dw World4Map | db World4ObjectLayerMapBlock | dw World4ObjectLayerMap
+World5: db  World5MapBlock | dw World5Map | db World5ObjectLayerMapBlock | dw World5ObjectLayerMap
+World6: db  World6MapBlock | dw World6Map | db World6ObjectLayerMapBlock | dw World6ObjectLayerMap
 
 InitiateGame:
   call  CHMOUS                          ;check if there is a mouse present

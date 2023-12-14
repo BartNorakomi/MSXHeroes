@@ -406,12 +406,16 @@ dephase
 ;
 World1MapBlock:  equ   $05
 World1ObjectLayerMapBlock:  equ   $05
-
 World2MapBlock:  equ   $05
 World2ObjectLayerMapBlock:  equ   $05
-
 World3MapBlock:  equ   $05
 World3ObjectLayerMapBlock:  equ   $05
+World4MapBlock:  equ   $05
+World4ObjectLayerMapBlock:  equ   $05
+World5MapBlock:  equ   $05
+World5ObjectLayerMapBlock:  equ   $05
+World6MapBlock:  equ   $05
+World6ObjectLayerMapBlock:  equ   $05
 
 phase	$4000
 World1Map:
@@ -426,6 +430,18 @@ World3Map:
   incbin "..\maps\world3.map.pck"
 World3ObjectLayerMap:
   incbin "..\maps\world3objects.map.pck"
+World4Map:
+  incbin "..\maps\world4.map.pck"
+World4ObjectLayerMap:
+  incbin "..\maps\world4objects.map.pck"
+World5Map:
+  incbin "..\maps\world5.map.pck"
+World5ObjectLayerMap:
+  incbin "..\maps\world5objects.map.pck"
+World6Map:
+  incbin "..\maps\world6.map.pck"
+World6ObjectLayerMap:
+  incbin "..\maps\world6objects.map.pck"
 
 	ds		$8000-$,$ff
 dephase
