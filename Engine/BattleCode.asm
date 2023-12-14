@@ -1,5 +1,4 @@
 CheckEnemyAI:
-
   ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
   or    a
   ret   nz
@@ -7,7 +6,6 @@ CheckEnemyAI:
   ld    a,(SwitchToNextMonster?)
   or    a
   ret   nz
-
 
   call  SetCurrentActiveMOnsterInIX
   push  ix
@@ -276,6 +274,14 @@ call screenon
 .CheckBattleButtonClicked:               ;in: carry=button clicked, b=button number
   ret   nc
 
+  ld    a,(MoVeMonster?)                ;1=move monster, 2=attack monster
+  or    a
+  jr    nz,.CheckAutoCombatButton       ;unable to press the above buttons when monster is in action
+
+  ld    a,(SwitchToNextMonster?)
+  or    a
+  jr    nz,.CheckAutoCombatButton       ;unable to press the above buttons when monster is in action
+
   ld    a,b
   cp    9
   jr    z,.DiskOptionsButtonPressed
@@ -289,12 +295,15 @@ call screenon
   jr    z,.DefendButtonPressed
   cp    4
   jr    z,.SpellBookButtonPressed
-  cp    3
-  jr    z,.AutoCombatButtonPressed
   cp    2
   jr    z,.BattleTextUpButtonPressed
-;  cp    1
-;  jr    z,.BattleTextDownButtonPressed
+  cp    1
+  jr    z,.BattleTextDownButtonPressed
+  .CheckAutoCombatButton:
+  ld    a,b
+  cp    3
+  jr    z,.AutoCombatButtonPressed
+  ret
 
 .BattleTextDownButtonPressed:
   ld    hl,(BattleTextPointer)

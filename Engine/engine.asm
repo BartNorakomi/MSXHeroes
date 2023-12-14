@@ -248,11 +248,15 @@ LineintCastleScreen:
   inc   a
   ld    (LineintFlag),a
 
+  ld    a,(AreWeInTavern1OrRecruit2?)
+  dec   a
   ld    a,(CurrentLineIntHeight)
+  jr    nz,.EndCheckTavern
   cp    FirstLineintHeightCastleTavern
   jp    z,.FirstLineIntCastleTavernScreen
   cp    SecondLineintHeightCastleTavern
   jp    z,.SecondLineIntCastleTavernScreen
+  .EndCheckTavern:
 
   cp    FirstLineintHeightCastleRecruit
   jr    z,.FirstLineIntCastleRecruitScreen
@@ -3777,59 +3781,223 @@ checkcurrentplayerhuman:	              ;out zero flag, current player is compute
 	ret
 ;/dont react to space / mouse click if current player is a computer
 
-mousey:	ds	1
-mousex:	ds	1
+MOUSID:	ds 1 ;EQU	$FAFD
+MSEPRT:	ds 1 ;EQU	$FC82
+
 ;ycoordinateStartPlayfield:  equ 16
 MovePointer:					                  ;move mouse pointer (set mouse coordinates in spat)
 	call	checkcurrentplayerhuman	        ;out zero flag, current player is computer
 	ret		z
 
-	call	ReadOutKeyboardAndMovePointer
-	call	ReadOutMouseMovementAndMovePointer
-  ret
+  ld    a,(MOUSID)
+  or    a
+  jp    z,ReadOutKeyboardAndMovePointer
 	
-	ReadOutMouseMovementAndMovePointer:
-  ret
-	ld    	a,12                          ;read mouse port 1
-	ld    	ix,$1ad
-	ld    	iy,($faf7)                    ;subrom slot - 1
-	call  	$1c
-	 
-	ld    	a,13                          ;read mouse X offset
-	ld    	ix,$1ad
-	ld    	iy,($faf7)                    ;subrom slot - 1
-	call  	$1c
-	cp		1
-	jp		nz,.mouseactive
+;	ReadOutMouseMovementAndMovePointer:
+;  ld    a,(MOUSID)
+;  or    a
+;  ret   z                               ;zero=mouse not found
 
-	ld    	a,14                          ;read mouse Y offset
-	ld    	ix,$1ad
-	ld    	iy,($faf7)                    ;subrom slot - 1
-	call 	$1c
-	cp		1
-	ret		z
-	call	movecursory
-	ld		a,1
-	call	movecursorx
-	jp		.setmousespat
+; Read (any) mouse
+; Out: (MOUSYX), current mouse position (Y,X)
+;      HL, mouse offsets (XXYY)	
+; Read padle
+; Out: (MSEOFS), mouse offsets (Y,X)
+;       HL, mouse offsets (XXYY)
+RDPADL:
+	LD	DE,(MSEPRT)
+	LD	A,15	; Read PSG r15 port B
+	CALL	RD_PSG
+	AND	%1000 1111	; interface 1
+	OR	E	; mouse NR
+	LD	E,A
 
-  .mouseactive:
-	call	movecursorx
+;Set x borders depending on what playing field we are in
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  cp    2
+  ld    h,240                           ;right border (castle overview)
+  ld    l,000                           ;left border (castle overview)
+  jr    nc,.XBorderSet
+  ld    h,xcoorspriteright              ;right border (in game)
+  ld    l,xcoordinateStartPlayfield     ;left border (in game)
+  .XBorderSet:
 
-	ld    	a,14                          ;read mouse Y offset
-	ld    	ix,$1ad
-	ld    	iy,($faf7)                    ;subrom slot - 1
-	call 	$1c
+; read out mouse X offset/movement
+	LD	B,40	; delay Z80
+	LD	C,20	; delay R800
+	CALL	RPDL.2
+	CALL	RPDL.0
+	LD	  c,A                             ;x offset
 
-	call	movecursory
-  .setmousespat:
-	ld		a,(spat+0)
-	ld		(spat+4),a
-	ld		(spat+8),a
-	ld		a,(spat+1)
-	ld		(spat+5),a
-	ld		(spat+9),a
-	ret
+;is mouse moving left or right ?
+  jp    m,.MoveLeft
+;move right
+  .MoveRight:
+  ld    a,(spat+1)
+  add   a,c
+  jr    c,.SetRightBorder
+  cp    h                               ;check right border
+  jr    c,.SetxRight
+  .SetRightBorder:
+  ld    a,h                             ;right border
+  .SetxRight:
+  ld    (spat+1),a
+  ld    (spat+5),a
+  ld    (spat+9),a
+  jp    .EndMoveLeft    
+;/move right
+
+;move left
+  .MoveLeft:
+  ld    a,(spat+1)
+  add   a,c
+  jr    nc,.SetLeftBorder
+  cp    l
+  jr    nc,.SetXLeft  
+  .SetLeftBorder:
+  ld    a,l  
+  .SetXLeft:
+  ld    (spat+1),a
+  ld    (spat+5),a
+  ld    (spat+9),a
+  .EndMoveLeft:
+;/move left
+
+;Set y borders depending on what playing field we are in
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  cp    3
+  ld    h,016                           ;top border (castle overview)
+  ld    l,218                           ;bottom border (castle overview)
+  jr    z,.YBorderSet
+
+  cp    2
+  ld    h,000                           ;top border (castle overview)
+  ld    l,196
+  jr    nc,.YBorderSet
+
+  ld    h,ycoordinateStartPlayfield
+  ld    l,ycoorspritebottom
+  .YBorderSet:
+
+; read out mouse Y offset/movement
+	LD	B,40	; delay Z80
+	LD	C,20	; delay R800
+	CALL	RPDL.1
+	CALL	RPDL.0
+	LD	  c,A                             ;y offset
+
+;is mouse moving up or down ?
+  jp    m,.MoveUp
+;move Down
+  .MoveDown:
+  ld    a,(spat+0)
+  add   a,c
+  jr    c,.SetDownBorder
+  cp    l
+  jr    c,.SetYDown
+  .SetDownBorder:
+  ld    a,l  
+  .SetYDown:
+  cp    216
+  jr    z,.Y216Found
+  ld    (spat+0),a
+  ld    (spat+4),a
+  ld    (spat+8),a
+  jp    .EndMoveUp    
+;/move Down
+
+;move Up
+  .MoveUp:
+  ld    a,(spat+0)
+  add   a,c
+  jr    nc,.SetUpBorder
+  cp    h
+  jr    nc,.SetYUp  
+  .SetUpBorder:
+  ld    a,h  
+  .SetYUp:
+
+  cp    216
+  jp    nz,.EndCheck216
+  .Y216Found:
+  ld    a,215
+  .EndCheck216:
+
+  ld    (spat+0),a
+  ld    (spat+4),a
+  ld    (spat+8),a
+  .EndMoveUp:
+;/move Up
+
+	EI	
+	RET	
+	
+RPDL.0:	RLCA	
+	RLCA	
+	RLCA	
+	RLCA	
+	LD	D,A
+	CALL	RPDL.1
+	OR	D
+	NEG	
+	RET	
+	
+RPDL.1:	LD	B,7
+	LD	C,6
+RPDL.2:	LD	A,15
+	CALL	WR_PSG
+	LD	A,(MSEPRT)
+	AND	$30
+	XOR	E
+	LD	E,A
+DLYCAL:	CALL	DLY_TR
+	LD	A,14
+	CALL	RD_PSG
+	AND	$0F
+	RET	
+	
+;        Wait routs
+; MSX 2
+DLY_M2:	DJNZ	DLY_M2
+	RET	
+; turbo R
+DLY_TR:	IN	A,($E6)	; Timer
+	LD	B,A
+DLTR.0:	IN	A,($E6)
+	SUB	B
+	CP	C
+	JP	C,DLTR.0
+	RET	
+	
+RD_PSG:	DI	
+	OUT	($A0),A
+	NOP	
+	NOP	
+	IN	A,($A2)
+	EI	
+	RET	
+WR_PSG:	DI	
+	OUT	($A0),A
+	LD	A,E
+	OUT	($A1),A
+	EI	
+	RET	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   ex    af,af'
@@ -3991,7 +4159,7 @@ ReadOutKeyboardAndMovePointer:
 ycoordinateStartPlayfield:  equ 04
 xcoordinateStartPlayfield:  equ 06
 ycoorspritebottom:	equ	180
-xcoorspriteright:	equ	235+4
+xcoorspriteright:	equ	239
 
 GameStatus: db  0                       ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
@@ -5257,7 +5425,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db DragonSlayerUnitLevel1Number | dw 014 |      db DragonSlayerUnitLevel2Number | dw 009 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -5275,7 +5443,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesDrasle1
+.HeroSpecificInfo: dw HeroAddressesJamieSeed
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -5459,18 +5627,18 @@ pl2hero1y:		db	3
 pl2hero1x:		db	6
 ;pl2hero1x:		db	100
 pl2hero1xp: dw 0000
-pl2hero1move:	db	03,20
-pl2hero1mana:	dw	03,10
+pl2hero1move:	db	20,20
+pl2hero1mana:	dw	10,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
 ;Pl2Hero1Units:  db 1 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
-.HeroStatDefense:  db 3
-.HeroStatKnowledge:  db 4  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 5  ;amount of spell damage
-.HeroSkills:  db  33,10,1,9,0,17
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -5478,8 +5646,8 @@ Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUni
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  003,009,010,045,045,045,045,045,044,  045,045,045,006,007,008;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesJamieSeed
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
+.HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl2hero2y:		ds  lenghtherotable,255
@@ -5609,13 +5777,10 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              6,            0,            0,        21,                2,         3,         157,         23,         24   | dw   99,              11,             060,            444,            6000,           20000     | db  000       , 0                , "Outer Heaven",255
-;Castle1:  db  004,  001,  1,      1,          1,        0,        4,              3,            0,            0,        AkanbeDragonGroupBUnitLevel1Number,                AkanbeDragonGroupBUnitLevel2Number,         AkanbeDragonGroupBUnitLevel3Number,         AkanbeDragonGroupBUnitLevel4Number,         AkanbeDragonGroupBUnitLevel5Number,         AkanbeDragonGroupBUnitLevel6Number   | dw   100,              100,             100,            100,            100,           100     | db  000       , 0                , "Outer Heaven",255
-Castle1:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
-Castle2:  db  255,  255,  255,      5,          0,        0,        0,              6,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
-;Castle2:  db  004,  100,  2,      1,          1,        0,        4,              6,            2,            2,        7,                 08,         09,         10,         11,         12   | dw   8,              8,              8,              8,              8,              8         | db  001       , 0                , "   Junker HQ",255
-Castle3:  db  255,  255,  255,      1,          1,        0,        4,              6,            3,            3,        8,                 11,         14,         17,         20,         23   | dw   8,              8,              8,              8,              8,              8         | db  002       , 0                , "    Arcadiam",255
-Castle4:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        9,                 12,         15,         18,         21,         24   | dw   8,              8,              8,              8,              8,              8         | db  003       , 0                , "    Zanzibar",255
+Castle1:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle2:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle3:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "   Junker HQ",255
+Castle4:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "    Zanzibar",255
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
@@ -5625,7 +5790,7 @@ TempVariableCastleX:	ds	1
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
 db 255 | TavernHeroesPlayer1:        db  006,008,010,039,041,026,000,000,000,000
-db 255 | TavernHeroesPlayer2:        db  007,008,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer2:        db  011,012,013,014,015,016,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
 
@@ -5639,11 +5804,11 @@ ResourcesPlayer1:
 .Gems:    dw  10 ;900;10
 .Rubies:  dw  10 ;900;10
 ResourcesPlayer2:
-.Gold:    dw  5000
-.Wood:    dw  300
-.Ore:     dw  100
-.Gems:    dw  60
-.Rubies:  dw  30
+.Gold:    dw  20000 ;60000 ;20000
+.Wood:    dw  20 ;900;20
+.Ore:     dw  20 ;900;20
+.Gems:    dw  10 ;900;10
+.Rubies:  dw  10 ;900;10
 ResourcesPlayer3:
 .Gold:    dw  5000
 .Wood:    dw  300
@@ -5660,8 +5825,8 @@ ResourcesPlayer4:
 amountofplayers:		db	2
 player1human?:			db	1
 player2human?:			db	0
-player3human?:			db	1
-player4human?:			db	1
+player3human?:			db	0
+player4human?:			db	0
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	

@@ -4,7 +4,15 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
+WorldPointer: dw World3
+
+World1: db  World1MapBlock | dw World1Map | db World1ObjectLayerMapBlock | dw World1ObjectLayerMap
+World2: db  World2MapBlock | dw World2Map | db World2ObjectLayerMapBlock | dw World2ObjectLayerMap
+World3: db  World3MapBlock | dw World3Map | db World3ObjectLayerMapBlock | dw World3ObjectLayerMap
+
 InitiateGame:
+  call  CHMOUS                          ;check if there is a mouse present
+
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
 
@@ -23,12 +31,12 @@ InitiateGame:
 ;  ld    (EnterCombat?),a
 
 StartGame:
-  call  LoadWorldMap                    ;unpack the worldmap to $8000 in ram (bank 1)
-  call  LoadWorldObjectLayerMap         ;unpack the world object layer map to $8000 in ram (bank 2)
+  call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
   call  FindAndSetCastles               ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  PlaceHeroesInCastles            ;Place hero nr#1 in their castle
   call  ConvertMonstersObjectLayer      ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
   .WhenExitingCombat:
+  call  CenterMousePointer
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
@@ -48,8 +56,144 @@ StartGame:
 
 ;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
+
+
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+CenterMousePointer:
+  ld    a,106
+  ld    (spat+0),a
+  ld    (spat+4),a
+  ld    (spat+8),a
+  ld    a,104
+  ld    (spat+1),a
+  ld    (spat+5),a
+  ld    (spat+9),a
+  ret
+
+; Check/Init Mouse
+CHMOUS:	
+  CALL	.MOUSIN
+	LD	A,$10	; first port 1
+	LD	(MSEPRT),A
+	CALL	.CHMS.0
+	JP	NC,.MOUSIN
+	LD	A,$60	; port 2
+	LD	(MSEPRT),A
+	CALL	.CHMS.0
+	JP	NC,.MOUSIN
+	
+	XOR	A	; not found
+	LD	(MOUSID),A
+;	LD	(MSEPRT),A
+;	SCF	
+	RET	
+	
+; Install Mouse
+.MOUSIN:	LD	A,255
+	LD	(MOUSID),A
+;	LD	HL,DLY_M2	; delay routs
+;	LD	A,($2D)
+;	CP	3
+;	JP	C,MSIN.0
+;	CALL	$0183
+;	AND	A
+;	JP	Z,MSIN.0
+;	LD	HL,DLY_TR
+;MSIN.0:	
+;  LD	(DLYCAL+1),HL
+	AND	A
+	EI	
+	RET	
+	
+.CHMS.0:	LD	B,40	; check 40 times
+.CHMS.1:	PUSH	BC
+	CALL	.RDPADL
+	LD	A,H	; Y-off
+	CP	1	; Y-off
+	JP	NZ,.CHMS.2
+	LD	A,L	; X-off
+	CP	1
+	JP	NZ,.CHMS.2
+	POP	BC
+	DJNZ	.CHMS.1
+	SCF		; Cy:1 (not found)
+	RET	
+.CHMS.2:	POP	BC	; found
+	AND	A	; Cy:0
+	RET	
+
+
+; Read padle
+; Out: (MSEOFS), mouse offsets (Y,X)
+;       HL, mouse offsets (XXYY)
+.RDPADL:	PUSH	BC
+	PUSH	DE
+	
+	LD	DE,(MSEPRT)
+	LD	A,15	; Read PSG r15 port B
+	CALL	RD_PSG
+	AND	%10001111	; interface 1
+	OR	E	; mouse NR
+	LD	E,A
+	
+; X offset
+	LD	B,40	; delay Z80
+	LD	C,20	; delay R800
+	CALL	.RPDL.2
+	CALL	.RPDL.0
+	LD	H,A
+	
+; Y offset
+	CALL	.RPDL.1
+	CALL	.RPDL.0
+	LD	L,A
+	
+	EI	
+	POP	DE
+	POP	BC
+	RET	
+	
+.RPDL.0:	RLCA	
+	RLCA	
+	RLCA	
+	RLCA	
+	LD	D,A
+	CALL	.RPDL.1
+	OR	D
+	NEG	
+	RET	
+	
+.RPDL.1:	LD	B,7
+	LD	C,6
+.RPDL.2:	LD	A,15
+	CALL	WR_PSG
+	LD	A,(MSEPRT)
+	AND	$30
+	XOR	E
+	LD	E,A
+.DLYCAL:	CALL	DLY_TR
+	LD	A,14
+	CALL	RD_PSG
+	AND	$0F
+	RET	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
@@ -2451,6 +2595,7 @@ LoadHud:
 	call	docopy
   call  CreateMiniMap                   ;using worldtiles from page 3 and worldmap, we can generate minimap  
 	call  RepairDecorationEdgesHud
+  call  SetCastlesInMiniMap 
   ld    hl,CopyPage0To1
 	call	docopy
   ret
@@ -2487,12 +2632,10 @@ LoadWorldTiles:
 
 ListOfUnlockedMonstersLevel1:
   db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
+  db    130                               ;130 Skeleton (Castlevania)
 
   db    000                               ;end
 
-  db    128                               ;128 Spear Guard (Castlevania)
-  db    129                               ;129 Medusa Head (Castlevania)
-  db    130                               ;130 Skeleton (Castlevania)
   db    131                               ;131 Running Man (Metal Gear)
   db    132                               ;132 Trooper (Metal Gear)
   db    133                               ;133 Antigas Man (Metal Gear)
@@ -2503,6 +2646,7 @@ ListOfUnlockedMonstersLevel1:
   db    000                               ;end
 ListOfUnlockedMonstersLevel2:
   db    161                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
+  db    129                               ;129 Medusa Head (Castlevania)
 
   db    000                               ;end
 
@@ -2518,6 +2662,7 @@ ListOfUnlockedMonstersLevel2:
   db    000                               ;end
 ListOfUnlockedMonstersLevel3:
   db    162                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
+  db    128                               ;128 Spear Guard (Castlevania)
 
   db    000                               ;end
 
@@ -2686,34 +2831,33 @@ ConvertMonstersObjectLayer:
   or    a
   ret
 
-LoadWorldMap:
+LoadWorldMapAndObjectLayerMap:
+  ld    ix,(WorldPointer)
+  
 ;unpack map data
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
 
-  ld    a,World3MapBlock              ;Map block
+  ld    a,(ix+0)                      ;Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
-  ld		a,1                             ;set worldmap in bank 1 at $8000
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+  ld		a,1                           ;set worldmap in bank 1 at $8000
+  out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
   
-  ld    hl,World3Map
+  ld    l,(ix+1)                      ;worldxMap address
+  ld    h,(ix+2)
   ld    de,$8000
   call  Depack
-  ret
 
-LoadWorldObjectLayerMap:
-;unpack map data
-  ld    a,(slot.page1rom)             ;all RAM except page 1
-  out   ($a8),a      
-
-  ld    a,World3ObjectLayerMapBlock   ;Map block
+;unpack object layer map data
+  ld    a,(ix+3)                      ;object layer Map block
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
-  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+  ld		a,2                           ;set worldmap object layer in bank 2 at $8000
+  out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  ld    hl,World3ObjectLayerMap
+  ld    l,(ix+4)                      ;WorldxObjectLayerMap address
+  ld    h,(ix+5)
   ld    de,$8000
   call  Depack
   ret
@@ -2793,6 +2937,62 @@ PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
   ld    a,(ix+CastleX)
   add   a,2
   ld    (iy+HeroX),a
+  ld    (iy+HeroStatus),2               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  ret
+
+SetCastlesInMiniMap:
+  ld    ix,Castle1
+  call  .SetCastle
+  ld    ix,Castle2
+  call  .SetCastle
+  ld    ix,Castle3
+  call  .SetCastle
+  ld    ix,Castle4
+  call  .SetCastle
+  ret
+
+  .SetCastle:
+;minimap is 48x48. Worldmap is 128x128
+;48:128 = 3:8.. so read tile/pixel 1, 4, 7  
+  ld    a,(ix+CastleX)
+  cp    255
+  ret   z
+  ld    h,0
+  ld    l,a
+  ld    de,3                            ;first multiply by 3
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   bc
+  ld    de,8                            ;then divide by 8
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  
+  ld    l,(ix+CastleY)
+  ld    h,0
+  ld    de,3                            ;first multiply by 3
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   bc
+  ld    de,8                            ;then divide by 8
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  pop   de
+  ld    a,c
+  add   CreateMiniMap.YMiniMap-2
+  ld    d,a
+
+  ld    a,e
+  add   CreateMiniMap.XMiniMap-1
+  ld    e,a
+  
+  ld    hl,$4000 + (071*128) + (212/2) - 128
+;  ld    de,256*025 + 220                ;(dy*256 + dx)
+  ld    bc,$0000 + (004*256) + (004/2)
+  ld    a,HudNewBlock                   ;block to copy graphics from  
+  exx
+  ex    af,af'
+  ld    hl,CopyTransparantImageEXX
+  call  EnterSpecificRoutineInCastleOverviewCode
   ret
 
 ;hud is placed in page 0 and will be copied to page 1 after this. So create minimap in page 0
@@ -2903,7 +3103,6 @@ CreateMiniMap:                          ;using worldtiles from page 3 and worldm
 	db		1,0,1,0
 	db		0,%0000 0000,$98
   
-
 World1Palette:
   incbin"..\grapx\tilesheets\world1tiles.pl"
 

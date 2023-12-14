@@ -22,9 +22,11 @@ units splitsen op hud
 units in hud nog een beetje finetunen
 vensters moeten nog gekopieerd worden, anders heb je kans op flikker bij pageswaps
 skill icons
+picked up inventory items should be equiped directly
 
 castle:
 
 general:
 muziek
 sfx
+mouse
