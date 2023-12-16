@@ -4,17 +4,11 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw World6
-
-World1: db  World1MapBlock | dw World1Map | db World1ObjectLayerMapBlock | dw World1ObjectLayerMap
-World2: db  World2MapBlock | dw World2Map | db World2ObjectLayerMapBlock | dw World2ObjectLayerMap
-World3: db  World3MapBlock | dw World3Map | db World3ObjectLayerMapBlock | dw World3ObjectLayerMap
-World4: db  World4MapBlock | dw World4Map | db World4ObjectLayerMapBlock | dw World4ObjectLayerMap
-World5: db  World5MapBlock | dw World5Map | db World5ObjectLayerMapBlock | dw World5ObjectLayerMap
-World6: db  World6MapBlock | dw World6Map | db World6ObjectLayerMapBlock | dw World6ObjectLayerMap
+WorldPointer: dw World7
 
 InitiateGame:
-  call  CHMOUS                          ;check if there is a mouse present
+  ld    hl,CHMOUS
+  call  ExecuteLoaderRoutine            ;check if there is a mouse present
 
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
@@ -35,9 +29,14 @@ InitiateGame:
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
-  call  FindAndSetCastles               ;castles on the map have to be assigned to their players, and coordinates have to be set
-  call  PlaceHeroesInCastles            ;Place hero nr#1 in their castle
-  call  ConvertMonstersObjectLayer      ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
+
+  ld    hl,FindAndSetCastles            ;castles on the map have to be assigned to their players, and coordinates have to be set
+  call  ExecuteLoaderRoutine
+  ld    hl,PlaceHeroesInCastles         ;Place hero nr#1 in their castle
+  call  ExecuteLoaderRoutine
+  ld    hl,ConvertMonstersObjectLayer   ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
+  call  ExecuteLoaderRoutine
+
   .WhenExitingCombat:
   call  CenterMousePointer
   call  SetScreenOff
@@ -55,14 +54,18 @@ StartGame:
   call  ClearMapPage0AndMapPage1
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  DoCopy
-;  call  OneTimeCharAndColorSprites
 
 ;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
-
-
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+ExecuteLoaderRoutine:
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+  ld    a,Loaderblock                 ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  jp    (hl)
 
 CenterMousePointer:
   ld    a,106
@@ -74,130 +77,6 @@ CenterMousePointer:
   ld    (spat+5),a
   ld    (spat+9),a
   ret
-
-; Check/Init Mouse
-CHMOUS:	
-  CALL	.MOUSIN
-	LD	A,$10	; first port 1
-	LD	(MSEPRT),A
-	CALL	.CHMS.0
-	JP	NC,.MOUSIN
-	LD	A,$60	; port 2
-	LD	(MSEPRT),A
-	CALL	.CHMS.0
-	JP	NC,.MOUSIN
-	
-	XOR	A	; not found
-	LD	(MOUSID),A
-;	LD	(MSEPRT),A
-;	SCF	
-	RET	
-	
-; Install Mouse
-.MOUSIN:	LD	A,255
-	LD	(MOUSID),A
-;	LD	HL,DLY_M2	; delay routs
-;	LD	A,($2D)
-;	CP	3
-;	JP	C,MSIN.0
-;	CALL	$0183
-;	AND	A
-;	JP	Z,MSIN.0
-;	LD	HL,DLY_TR
-;MSIN.0:	
-;  LD	(DLYCAL+1),HL
-	AND	A
-	EI	
-	RET	
-	
-.CHMS.0:	LD	B,40	; check 40 times
-.CHMS.1:	PUSH	BC
-	CALL	.RDPADL
-	LD	A,H	; Y-off
-	CP	1	; Y-off
-	JP	NZ,.CHMS.2
-	LD	A,L	; X-off
-	CP	1
-	JP	NZ,.CHMS.2
-	POP	BC
-	DJNZ	.CHMS.1
-	SCF		; Cy:1 (not found)
-	RET	
-.CHMS.2:	POP	BC	; found
-	AND	A	; Cy:0
-	RET	
-
-
-; Read padle
-; Out: (MSEOFS), mouse offsets (Y,X)
-;       HL, mouse offsets (XXYY)
-.RDPADL:	PUSH	BC
-	PUSH	DE
-	
-	LD	DE,(MSEPRT)
-	LD	A,15	; Read PSG r15 port B
-	CALL	RD_PSG
-	AND	%10001111	; interface 1
-	OR	E	; mouse NR
-	LD	E,A
-	
-; X offset
-	LD	B,40	; delay Z80
-	LD	C,20	; delay R800
-	CALL	.RPDL.2
-	CALL	.RPDL.0
-	LD	H,A
-	
-; Y offset
-	CALL	.RPDL.1
-	CALL	.RPDL.0
-	LD	L,A
-	
-	EI	
-	POP	DE
-	POP	BC
-	RET	
-	
-.RPDL.0:	RLCA	
-	RLCA	
-	RLCA	
-	RLCA	
-	LD	D,A
-	CALL	.RPDL.1
-	OR	D
-	NEG	
-	RET	
-	
-.RPDL.1:	LD	B,7
-	LD	C,6
-.RPDL.2:	LD	A,15
-	CALL	WR_PSG
-	LD	A,(MSEPRT)
-	AND	$30
-	XOR	E
-	LD	E,A
-.DLYCAL:	CALL	DLY_TR
-	LD	A,14
-	CALL	RD_PSG
-	AND	$0F
-	RET	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CopyRamToVram:                          ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ld    (AddressToWriteFrom),bc
@@ -491,17 +370,6 @@ BattleFieldGrid: ;0C15Ch
 EndBattleFieldGrid:
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255
 
-;BattleFieldGridForDistanceCalculation:
-;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
-;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
-;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
-;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000 
-;  db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
-;  db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
-  
 BlockToReadFrom:            ds  1
 AddressToWriteTo:           ds  2
 AddressToWriteFrom:         ds  2
@@ -2414,7 +2282,7 @@ EnterCastle:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  DoCopy
 ;  call  OneTimeCharAndColorSprites
-
+  call  CenterMousePointer
 
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
@@ -2427,22 +2295,6 @@ EnterCastle:
 	ld		(mappointerx),a
 
   jp    LevelEngine
-
-
-;  jp    StartGame.WhenExitingHeroOverviewCastleAndBattle                       ;back to game
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 SwapAndSetPage:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
@@ -2596,9 +2448,16 @@ LoadHud:
 
 	ld		hl,copyfont	                    ;put font at (0,212)
 	call	docopy
-  call  CreateMiniMap                   ;using worldtiles from page 3 and worldmap, we can generate minimap  
+
+
+  ld    hl,CreateMiniMap                ;using worldtiles from page 3 and worldmap, we can generate minimap  
+  call  ExecuteLoaderRoutine
+
 	call  RepairDecorationEdgesHud
-  call  SetCastlesInMiniMap 
+
+  ld    hl,SetCastlesInMiniMap          ;castles on the map have to be assigned to their players, and coordinates have to be set
+  call  ExecuteLoaderRoutine
+
   ld    hl,CopyPage0To1
 	call	docopy
   ret
@@ -2623,13 +2482,20 @@ RepairDecorationEdgesHud:
   jp    EnterSpecificRoutineInCastleOverviewCode
 
 LoadWorldTiles:
+  ld    ix,(WorldPointer)
+  
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+  ld    a,Loaderblock                 ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    (AddressToWriteFrom),hl
   ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
   ld    (AddressToWriteTo),de           ;address to write to in page 3
   ld    bc,$0000 + (000*256) + (256/2)
   ld    (NXAndNY),bc
-  ld    a,World1TilesBlock                   ;block to copy graphics from  
+  ld    a,(ix+6)                      ;tilesheet block
   ld    (BlockToReadFrom),a
   jp    CopyRamToVramPage3ForBattleEngine      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
@@ -2726,383 +2592,48 @@ MonsterLevel4Pointer: dw  ListOfUnlockedMonstersLevel4
 MonsterLevel5Pointer: dw  ListOfUnlockedMonstersLevel5
 MonsterLevel6Pointer: dw  ListOfUnlockedMonstersLevel6
 
-ConvertMonstersObjectLayer:
-  ld    hl,$8000-1
-
-  .loopAndXorA:
-  xor   a
-  .loop:
-  inc   hl
-  bit   6,h                           ;check if hl=$c000 (end of object layer in ram)
-  ret   nz
-
-  or    (hl)
-  jp    z,.loop
-  
-  .Check:
-  cp    7
-  jr    nc,.loopAndXorA
-
-  dec   a
-  jp    z,.Level1Monster
-  dec   a
-  jr    z,.Level2Monster
-  dec   a
-  jr    z,.Level3Monster
-  dec   a
-  jr    z,.Level4Monster
-  dec   a
-  jr    z,.Level5Monster
-
-  .Level6Monster:
-  ld    de,(MonsterLevel6Pointer)
-  ld    a,(de)
-  cp    255
-  jr    z,.Level5Monster
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel6Pointer
-  ld    de,ListOfUnlockedMonstersLevel6
-  .SetMonsterLevel6Pointer:
-  ld    (MonsterLevel6Pointer),de
-  jp    .loopAndXorA
-
-  .Level5Monster:
-  ld    de,(MonsterLevel5Pointer)
-  ld    a,(de)
-  cp    255
-  jr    z,.Level4Monster
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel5Pointer
-  ld    de,ListOfUnlockedMonstersLevel5
-  .SetMonsterLevel5Pointer:
-  ld    (MonsterLevel5Pointer),de
-  jp    .loopAndXorA
-
-  .Level4Monster:
-  ld    de,(MonsterLevel4Pointer)
-  ld    a,(de)
-  cp    255
-  jr    z,.Level3Monster
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel4Pointer
-  ld    de,ListOfUnlockedMonstersLevel4
-  .SetMonsterLevel4Pointer:
-  ld    (MonsterLevel4Pointer),de
-  jp    .loopAndXorA
-
-  .Level3Monster:
-  ld    de,(MonsterLevel3Pointer)
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel3Pointer
-  ld    de,ListOfUnlockedMonstersLevel3
-  .SetMonsterLevel3Pointer:
-  ld    (MonsterLevel3Pointer),de
-  jp    .loopAndXorA
-
-  .Level2Monster:
-  ld    de,(MonsterLevel2Pointer)
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel2Pointer
-  ld    de,ListOfUnlockedMonstersLevel2
-  .SetMonsterLevel2Pointer:
-  ld    (MonsterLevel2Pointer),de
-  jp    .loopAndXorA
-  
-  .Level1Monster:
-  ld    de,(MonsterLevel1Pointer)
-  call  .ConvertLevelToMonster
-  jr    nz,.SetMonsterLevel1Pointer
-  ld    de,ListOfUnlockedMonstersLevel1
-  .SetMonsterLevel1Pointer:
-  ld    (MonsterLevel1Pointer),de
-  jp    .loopAndXorA
-
-  .ConvertLevelToMonster:
-  ld    a,(de)
-  ld    (hl),a
-  cp    160                           ;monster nr 160 and above are 1 tile in size
-  jr    nc,.EndCheck1Or2TilesInSize
-  ld    bc,-128
-  add   hl,bc
-  add   a,64                          ;bottom part of monster is 64 tiles higher
-  ld    (hl),a
-  sbc   hl,bc
-    
-  .EndCheck1Or2TilesInSize:
-  inc   de
-  ld    a,(de)
-  or    a
-  ret
 
 LoadWorldMapAndObjectLayerMap:
   ld    ix,(WorldPointer)
   
-;unpack map data
   ld    a,(slot.page1rom)             ;all RAM except page 1
   out   ($a8),a      
+  ld    a,Loaderblock                 ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
-  ld    a,(ix+0)                      ;Map block
+  ld    l,(ix+4)                      ;WorldxObjectLayerMap address
+  ld    h,(ix+5) 
+  push  hl
+  ld    a,(ix+3)                      ;object layer Map block
+  push  af
+  ld    a,(ix+0)                      ;Map block  
+  ld    l,(ix+1)                      ;worldxMap address
+  ld    h,(ix+2)
+  
+;unpack map data
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld		a,1                           ;set worldmap in bank 1 at $8000
   out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
   
-  ld    l,(ix+1)                      ;worldxMap address
-  ld    h,(ix+2)
   ld    de,$8000
   call  Depack
 
 ;unpack object layer map data
-  ld    a,(ix+3)                      ;object layer Map block
+  pop   af
   call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld		a,2                           ;set worldmap object layer in bank 2 at $8000
   out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  ld    l,(ix+4)                      ;WorldxObjectLayerMap address
-  ld    h,(ix+5)
+  pop   hl
   ld    de,$8000
   call  Depack
   ret
 
-CastleTileNr: equ 254
-FindAndSetCastles:                      ;castles on the map have to be assigned to their players, and coordinates have to be set
-  ld    hl,$8000-1
-  ld    ix,Castle1                      ;first castle in castle list
-
-  .SetCastleTileNrAndGoloop:
-  ld    a,CastleTileNr
-  .loop:
-  inc   hl
-  bit   6,h                             ;hl=$c000 ? (this happens when bit 6 of h=1)
-  ret   nz
-  cp    (hl)
-  jr    nz,.loop
-
-  ld    a,l                             ;x value castle
-  and   127
-  dec   a
-  ld    (ix+CastleX),a
-
-  push  hl
-
-  push  hl
-  pop   bc
-
-  inc   hl                              ;player that owns this castle
-  ld    a,(hl)
-  sub   a,245
-  ld    (ix+CastlePlayer),a
-  ld    (hl),0                          ;remove number from object map
-
-  ld    de,128
-  call  DivideBCbyDE                    ;In: BC/DE. mOut: BC = result, HL = rest
- 
-  ld    a,c                             ;y value castle
-  inc   a
-  ld    (ix+CastleY),a  
-
-  pop   hl
-  ld    de,LenghtCastleTable
-  add   ix,de  
-  jp    .SetCastleTileNrAndGoloop
-  ret 
-
-PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
-  ld    ix,Castle1
-  call  .PlaceHero
-  ld    ix,Castle2
-  call  .PlaceHero
-  ld    ix,Castle3
-  call  .PlaceHero
-  ld    ix,Castle4
-  call  .PlaceHero
-  ret
-
-  .PlaceHero:
-  ld    a,(ix+CastlePlayer)
-  ld    iy,pl1hero1y
-  cp    1
-  jr    z,.SetHeroInCastle
-  ld    iy,pl2hero1y
-  cp    2
-  jr    z,.SetHeroInCastle
-  ld    iy,pl3hero1y
-  cp    3
-  jr    z,.SetHeroInCastle
-  ld    iy,pl4hero1y
-  cp    4
-  jr    z,.SetHeroInCastle
-  .SetHeroInCastle:
-  ld    a,(ix+CastleY)
-  dec   a
-  ld    (iy+HeroY),a
-  ld    a,(ix+CastleX)
-  add   a,2
-  ld    (iy+HeroX),a
-  ld    (iy+HeroStatus),2               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  ret
-
-SetCastlesInMiniMap:
-  ld    ix,Castle1
-  call  .SetCastle
-  ld    ix,Castle2
-  call  .SetCastle
-  ld    ix,Castle3
-  call  .SetCastle
-  ld    ix,Castle4
-  call  .SetCastle
-  ret
-
-  .SetCastle:
-;minimap is 48x48. Worldmap is 128x128
-;48:128 = 3:8.. so read tile/pixel 1, 4, 7  
-  ld    a,(ix+CastleX)
-  cp    255
-  ret   z
-  ld    h,0
-  ld    l,a
-  ld    de,3                            ;first multiply by 3
-  call  MultiplyHlWithDE                ;Out: HL = result
-  push  hl
-  pop   bc
-  ld    de,8                            ;then divide by 8
-  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
-  push  bc
-  
-  ld    l,(ix+CastleY)
-  ld    h,0
-  ld    de,3                            ;first multiply by 3
-  call  MultiplyHlWithDE                ;Out: HL = result
-  push  hl
-  pop   bc
-  ld    de,8                            ;then divide by 8
-  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
-
-  pop   de
-  ld    a,c
-  add   CreateMiniMap.YMiniMap-2
-  ld    d,a
-
-  ld    a,e
-  add   CreateMiniMap.XMiniMap-1
-  ld    e,a
-  
-  ld    hl,$4000 + (071*128) + (212/2) - 128
-;  ld    de,256*025 + 220                ;(dy*256 + dx)
-  ld    bc,$0000 + (004*256) + (004/2)
-  ld    a,HudNewBlock                   ;block to copy graphics from  
-  exx
-  ex    af,af'
-  ld    hl,CopyTransparantImageEXX
-  call  EnterSpecificRoutineInCastleOverviewCode
-  ret
-
-;hud is placed in page 0 and will be copied to page 1 after this. So create minimap in page 0
-;minimap is 48x48. Worldmap is 128x128
-;48:128 = 3:8.. so read tile/pixel 1, 4, 7
-CreateMiniMap:                          ;using worldtiles from page 3 and worldmap, we can generate minimap
-  ld    a,(slot.page1rom)             ;all RAM except page 1
-  out   ($a8),a      
-
-  ld		a,1                             ;set worldmap in bank 1 at $8000
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
-
-  ld    a,.YMiniMap
-	ld		(.CopyTilePiece+dy),a
-
-  ld    hl,$8000                        ;worldmap mapdata
-  ld    c,16                            ;16*3 pixel y-axis
-  ld    b,16                            ;16*3 pixel x-axis
-
-  .loop:
-  push  bc
-  call  .Copy1Row                       ;row 1 (y-axis)
-  pop   bc
-  ld    de,256
-  add   hl,de
-  push  bc
-  call  .Copy1Row                       ;row 4 (y-axis)
-  pop   bc
-  ld    de,256
-  add   hl,de
-  push  bc
-  call  .Copy1Row                       ;row 7 (y-axis)
-  pop   bc
-  ld    de,128
-  add   hl,de
-  dec   c
-  jr    nz,.loop
-  ret
-
-  .Copy1Row:
-  call  .GoCopyTilePiece                ;pixel 1 (x-axis)
-  inc   hl
-  inc   hl
-  inc   hl
-  call  .GoCopyTilePiece                ;pixel 4 (x-axis)
-  inc   hl
-  inc   hl
-  inc   hl
-  call  .GoCopyTilePiece                ;pixel 7 (x-axis)
-  inc   hl
-  inc   hl
-  djnz  .Copy1Row
-  
-  ld    a,.XMiniMap
-	ld		(.CopyTilePiece+dx),a
-	ld		a,(.CopyTilePiece+dy)
-  inc   a
-	ld		(.CopyTilePiece+dy),a
-  ret
-
-  .GoCopyTilePiece:
-  push  bc
-  push  hl
-
-  ld    a,(hl)                          ;tilenr
-
-	;set sx
-	ld		e,a                             ;store tilenr
-	add		a,a				                      ;*2
-	add		a,a				                      ;*4
-	add		a,a				                      ;*8
-	add		a,a				                      ;*16
-	ld		(.CopyTilePiece+sx),a
-	;/set sx
-
-	;set sy
-	ld		a,e
-	ld		d,-1
-.setsy:
-	sub		a,16
-	inc		d
-	jp		nc,.setsy
-	ld		a,d
-	add		a,a				                      ;*2
-	add		a,a				                      ;*4
-	add		a,a				                      ;*8
-	add		a,a				                      ;*16
-	ld		(.CopyTilePiece+sy),a
-	;/set sy
-  
-  ld    hl,.CopyTilePiece
-  call  DoCopy
-
-  ld    a,(.CopyTilePiece+dx)
-  inc   a
-  ld    (.CopyTilePiece+dx),a
-
-  pop   hl
-  pop   bc
-  ret
-
-.XMiniMap: equ 203
-.YMiniMap: equ 005
-
-.CopyTilePiece:
+CopyTilePiece:
 	db		0,0,0,3
-	db		.XMiniMap,0,.YMiniMap,0
+	db		XMiniMap,0,YMiniMap,0
 	db		1,0,1,0
 	db		0,%0000 0000,$98
   
@@ -3534,7 +3065,6 @@ PopulateControls:
 	ld		(Controls),a
 	ld		(NewPrContr),a
   ret
-
 
 PopulateControlsOnInterrupt:	
 	ld		a,15		                        ; select joystick port 1
@@ -4025,6 +3555,10 @@ memblocks:
 
 VDP_0:		                  rb    8
 VDP_8:		                  rb    30
+
+ComputerID:                 rb    1       ;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
+CPUMode:                    rb    1       ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
+TurboOn?:                   rb    1       ;0=no, $c3=yes
 
 engaddr:	                  equ	  $03e
 loader.address:             equ   $8000

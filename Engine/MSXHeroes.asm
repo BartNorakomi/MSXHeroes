@@ -264,6 +264,20 @@ init:
 	ld 		a,5			    ;switch to screen 5
 	call 	$5f
 
+  ld    a,($180)    ;$c3 = turbo on
+  ld    (TurboOn?),a
+
+;  ld    a,%1000 0001
+;  ld		ix,$180     ;CHGCPU: A = LED 0 0 0 0 0 x x | ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
+;  call	$15F
+
+;  ld		ix,$183     ;GETCPU: Returns current CPU mode, Output   : A = 0 0 0 0 0 0 x x                           
+;  call	$15F
+;  ld		(CPUMode),a ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
+
+  ld		a,($2d)			;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
+  ld		(ComputerID),a
+
 ;let's copy the copies of the vdp registers to our addresses of choice
   ld    hl,$F3DF
   ld    de,VDP_0
@@ -384,10 +398,8 @@ enlength:	Equ	$-engine
 ;
 Loaderblock:  equ $02
 phase	$4000
-StartLoaderRoutine:
 	include	"loader.asm"	
-endLoaderRoutine:
-LoaderRoutinelength:	Equ	$-StartLoaderRoutine
+endLoader:
 	ds		$8000-$,$ff		
 dephase
 
@@ -416,6 +428,8 @@ World5MapBlock:  equ   $05
 World5ObjectLayerMapBlock:  equ   $05
 World6MapBlock:  equ   $05
 World6ObjectLayerMapBlock:  equ   $05
+World7MapBlock:  equ   $05
+World7ObjectLayerMapBlock:  equ   $05
 
 phase	$4000
 World1Map:
@@ -442,6 +456,11 @@ World6Map:
   incbin "..\maps\world6.map.pck"
 World6ObjectLayerMap:
   incbin "..\maps\world6objects.map.pck"
+World7Map:
+  incbin "..\maps\world7.map.pck"
+World7ObjectLayerMap:
+  incbin "..\maps\world7objects.map.pck"
+
 
 	ds		$8000-$,$ff
 dephase
@@ -1158,6 +1177,15 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $85 - 86
+;
+TilesSdSnatcherBlock:  equ   $85
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesSDSnatcher.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesSDSnatcherBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

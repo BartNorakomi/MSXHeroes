@@ -2249,7 +2249,7 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ld    a,l
   or    h
   jr    nz,.HeroFound                   ;check if this is a neutral enemy
-  ld    hl,0                            ;if defender is neutral monster, speed boost=0
+  ld    hl,0                            ;if defender is neutral monster, def boost=0
   jr    .endAddDefense
   .HeroFound:
   ;/are we checking a monster that belongs to the left or right hero ?
@@ -2262,8 +2262,13 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
 
   ld    d,0
   ld    e,(ix+HeroStatDefense)
-  add   hl,de                           ;add defense from hero
-  
+  add   hl,de                           ;add defense from hero  
+
+  bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
+  jr    z,.SetDefense
+  ld    hl,0
+  .SetDefense:
+
   .endAddDefense:
   pop   ix
 
@@ -2485,6 +2490,13 @@ CheckPointerOnDefendingHero:
   ld    e,(ix+HeroStatDefense)           ;attack
   ld    d,0
   add   hl,de
+
+  bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
+  jr    z,.SetDefense
+  ld    hl,0
+  .SetDefense:
+
+
   ld    b,060+134                           ;dx
   ld    c,069                           ;dy  
   call  SetNumber16BitCastle
@@ -2590,6 +2602,13 @@ CheckPointerOnAttackingHero:
   ld    e,(ix+HeroStatDefense)           ;attack
   ld    d,0
   add   hl,de
+
+  bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
+  jr    z,.SetDefense
+  ld    hl,0
+  .SetDefense:
+
+
   ld    b,060                           ;dx
   ld    c,069                           ;dy  
   call  SetNumber16BitCastle

@@ -1369,7 +1369,7 @@ DescriptionSword2:        db  "Sword of Bahrain",254 | SwordOfBahrainAttack: equ
                           db  "Attack +5",255
 
                           ;item 002
-DescriptionSword3:        db  "Hell Slayer",254 | HellSlayerAttack: equ 7
+DescriptionSword3:        db  "Hell Slayer",254 | HellSlayerAttack: equ 7 | HellSlayerDefence: equ -2
                           db  "Attack +7",254
                           db  "Defense -2",255
 
@@ -3553,6 +3553,12 @@ SetStatusTextAttack:
   ld    e,(ix+HeroStatDefense)
   ld    d,0
   add   hl,de
+
+  bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
+  jr    z,.SetDefense
+  ld    hl,0
+  .SetDefense:
+
   ld    b,HeroOverViewStatusWindowDX + 067 + 004 -2
   ld    c,HeroOverViewStatusWindowDY + 034
   call  SetNumber16BitCastle

@@ -25,8 +25,8 @@ skill icons
 picked up inventory items should be equiped directly
 
 castle:
+newly bought hero should have 50% of level 1 and 2 units
 
 general:
 muziek
 sfx
-mouse

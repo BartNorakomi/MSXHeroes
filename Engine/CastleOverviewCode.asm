@@ -1856,6 +1856,12 @@ SetHeroStats:
   ld    e,(ix+HeroStatDefense)          ;defense
   ld    d,0
   add   hl,de
+  
+  bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
+  jr    z,.SetDefense
+  ld    hl,0
+  .SetDefense:
+  
   ld    b,225+001                       ;dx
   ld    c,145                           ;dy
   call  SetNumber16BitCastle
@@ -2043,7 +2049,7 @@ ItemDefencePointsTable:
 ;sword (0)
   db    0
   db    0
-  db    0
+  db    HellSlayerDefence ;(-2)
   db    ButterflyDefence ;(1)
   db    0
 ;armor (5)

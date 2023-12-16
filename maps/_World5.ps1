@@ -1,10 +1,10 @@
-.\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\world6.tmx -targetPath .\  -excludeLayer "background" -pack
-Remove-Item -Path "world6objects.map.pck"
-Rename-Item -Path "world6.map.pck" -NewName "world6objects.map.pck"
+.\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\world5.tmx -targetPath .\  -excludeLayer "background" -pack
+Remove-Item -Path "world5objects.map.pck"
+Rename-Item -Path "world5.map.pck" -NewName "world5objects.map.pck"
 
-.\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\world6.tmx -targetPath .\  -excludeLayer "objects" -pack
+.\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\world5.tmx -targetPath .\  -excludeLayer "objects" -pack
 
-Remove-Item -Path "world6.map"
+Remove-Item -Path "world5.map"
 
 cd..
 cd engine

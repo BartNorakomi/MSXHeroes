@@ -3605,7 +3605,7 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	add   a,a                             ;*2
 	ld    e,a
 	ld    d,0
-	ld    hl,mirrortransparentpieces
+	ld    hl,mirrortransparentpieces-32
 	add   hl,de                           ;sy mirror piece
 	ld    a,(hl)
 	ld    (putbackgroundoverhero+sy),a
@@ -3950,7 +3950,7 @@ RPDL.2:	LD	A,15
 	AND	$30
 	XOR	E
 	LD	E,A
-DLYCAL:	CALL	DLY_TR
+DLYCAL:	CALL	DLY_M2
 	LD	A,14
 	CALL	RD_PSG
 	AND	$0F
@@ -3961,13 +3961,13 @@ DLYCAL:	CALL	DLY_TR
 DLY_M2:	DJNZ	DLY_M2
 	RET	
 ; turbo R
-DLY_TR:	IN	A,($E6)	; Timer
-	LD	B,A
-DLTR.0:	IN	A,($E6)
-	SUB	B
-	CP	C
-	JP	C,DLTR.0
-	RET	
+;DLY_TR:	IN	A,($E6)	; Timer
+;	LD	B,A
+;DLTR.0:	IN	A,($E6)
+;	SUB	B
+;	CP	C
+;	JP	C,DLTR.0
+;	RET	
 	
 RD_PSG:	DI	
 	OUT	($A0),A
@@ -5305,7 +5305,7 @@ amountoftransparantpieces:  equ 64    ;tiles 16-63: see-through background piece
 UnwalkableTerrainPieces:    equ 149   ;tiles 149 and up are unwalkable terrain
 
 mirrortransparentpieces:                ;(piece number,) ymirror, xmirror
-  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
+;  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
   db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
   db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
   db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
@@ -5442,7 +5442,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  002,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesJamieSeed
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
