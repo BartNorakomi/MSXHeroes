@@ -430,6 +430,8 @@ World6MapBlock:  equ   $05
 World6ObjectLayerMapBlock:  equ   $05
 World7MapBlock:  equ   $05
 World7ObjectLayerMapBlock:  equ   $05
+World8MapBlock:  equ   $05
+World8ObjectLayerMapBlock:  equ   $05
 
 phase	$4000
 World1Map:
@@ -460,6 +462,10 @@ World7Map:
   incbin "..\maps\world7.map.pck"
 World7ObjectLayerMap:
   incbin "..\maps\world7objects.map.pck"
+World8Map:
+  incbin "..\maps\world8.map.pck"
+World8ObjectLayerMap:
+  incbin "..\maps\world8objects.map.pck"
 
 
 	ds		$8000-$,$ff
@@ -1186,6 +1192,18 @@ phase	$4000
   incbin "..\grapx\tilesheets\TilesSDSnatcherBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $87 - 88
+;
+TilesSolidSnakeBlock:  equ   $87
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesSolidSnake.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesSolidSnakeBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

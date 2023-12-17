@@ -5,6 +5,7 @@ World4: db  World4MapBlock | dw World4Map | db World4ObjectLayerMapBlock | dw Wo
 World5: db  World5MapBlock | dw World5Map | db World5ObjectLayerMapBlock | dw World5ObjectLayerMap | db World1TilesBlock
 World6: db  World6MapBlock | dw World6Map | db World6ObjectLayerMapBlock | dw World6ObjectLayerMap | db World1TilesBlock
 World7: db  World7MapBlock | dw World7Map | db World7ObjectLayerMapBlock | dw World7ObjectLayerMap | db TilesSdSnatcherBlock
+World8: db  World8MapBlock | dw World8Map | db World8ObjectLayerMapBlock | dw World8ObjectLayerMap | db TilesSolidSnakeBlock
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
