@@ -466,8 +466,6 @@ World8Map:
   incbin "..\maps\world8.map.pck"
 World8ObjectLayerMap:
   incbin "..\maps\world8objects.map.pck"
-
-
 	ds		$8000-$,$ff
 dephase
 
@@ -1202,6 +1200,47 @@ phase	$4000
   incbin "..\grapx\tilesheets\TilesSolidSnakeBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $89
+;
+World9MapBlock:  equ   $89
+World9ObjectLayerMapBlock:  equ   $89
+World10MapBlock:  equ   $89
+World10ObjectLayerMapBlock:  equ   $89
+
+phase	$4000
+World9Map:
+  incbin "..\maps\world9.map.pck"
+World9ObjectLayerMap:
+  incbin "..\maps\world9objects.map.pck"
+World10Map:
+  incbin "..\maps\world10.map.pck"
+World10ObjectLayerMap:
+  incbin "..\maps\world10objects.map.pck"
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $8a - 8b
+;
+TilesGentleBlock:  equ   $8a
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesGentle.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesGentleBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $8c - 8d
+;
+TilesGentleDesertBlock:  equ   $8c
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesGentleDesert.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesGentleDesertBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
 
 
 

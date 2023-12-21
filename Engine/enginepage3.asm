@@ -4,7 +4,7 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw World8
+WorldPointer: dw World10
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -2638,7 +2638,9 @@ CopyTilePiece:
 	db		0,%0000 0000,$98
   
 World1Palette:
-  incbin"..\grapx\tilesheets\world1tiles.pl"
+  incbin"..\grapx\tilesheets\PaletteGentleDesert.pl"
+;  incbin"..\grapx\tilesheets\PaletteGentle.pl"
+;  incbin"..\grapx\tilesheets\world1tiles.pl"
 
 SetInterruptHandler:
   di

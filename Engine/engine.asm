@@ -3455,6 +3455,9 @@ putbottomcastles:
   jp    docopy
 
 putbottomheroes:
+  ld    hl,doputheros.WaterTileFoundBottomHero
+  ld    (doputheros.SelfmodifyingCodeWaterTileJumpAddress),hl
+
 	ld		a,(activepage)	                ;check mirror page to mark background hero position as 'dirty'
 	or		a
 	ld		hl,mappage1
@@ -3470,6 +3473,9 @@ putbottomheroes:
 	jp		doputheros
 
 puttopheroes:
+  ld    hl,doputheros.WaterTileFoundTopHero
+  ld    (doputheros.SelfmodifyingCodeWaterTileJumpAddress),hl
+  
 	xor		a
 	ld		(doputheros.SelfModifyingCodeAddYToSYHero),a
 	ld		(doputheros.SelfModifyingCodeAddYToHero),a
@@ -3584,12 +3590,17 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	cp		254				                      ;is there a hero already here, AND is this hero behind an object ??
 	call	z,.behindheroandtree	
 	ld		(hl),255                        ;this tile is now 'dirty'
-
 	cp    amountoftransparantpieces       ;(64 tiles hero can stand behind) check if hero is behind a tree	
 	jp		nc,.notbehindtree		
 	ld		(hl),254                        ;254 when hero is behind an object (mark background position)
 	cp		non_see_throughpieces           ;(16) background pieces a hero can stand behind, but they are not see through
 	ret		c				                        ;hero is completely invisible behind the tree
+
+.FirstWaterpiece:  equ 58
+	cp    .FirstWaterpiece                ;(tiles 58-63 are transparant water tiles, which only affect hero's feet)
+	.SelfmodifyingCodeWaterTileJumpAddress: equ $+1
+	jp		nc,$ffff
+
   ;at this point hero is standing behind an object. So first put the hero, and then put the object on top of the hero.
 	ld		d,a				                      ;tile where hero is standing on
 	ld		hl,putherotopbottom
@@ -3599,7 +3610,7 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 ;  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
-;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
+;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112, 000,000, 000,000, 000,000, 000,000 | WaterTile: db 080,192, 080,208, 000,000, 000,000
   
 	ld		a,d				                      ;mappointer at position of hero	
 	add   a,a                             ;*2
@@ -3607,6 +3618,7 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	ld    d,0
 	ld    hl,mirrortransparentpieces-32
 	add   hl,de                           ;sy mirror piece
+	.WaterTileEntry:
 	ld    a,(hl)
 	ld    (putbackgroundoverhero+sy),a
 	inc   hl                              ;sx mirror piece
@@ -3619,6 +3631,19 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	ld    (putbackgroundoverhero+dx),a
 	ld    hl,putbackgroundoverhero
 	jp		docopy			                    ;put background (tree) over hero
+
+  .WaterTileFoundTopHero:
+  ;at this point hero is standing behind an object. So first put the hero, and then put the object on top of the hero.
+	ld		hl,putherotopbottom
+	jp    docopy			                    ;first put hero  
+
+  .WaterTileFoundBottomHero:
+	ld		hl,putherotopbottom
+  call	docopy			                    ;first put hero
+  ld    hl,.WaterTile
+  jr    .WaterTileEntry
+
+  .WaterTile: db 080,240
 
   .notbehindtree:
 	ld		hl,putherotopbottom
@@ -5418,7 +5443,7 @@ EmptyHeroRecruitedAtTavern:
 
 pl1hero1y:		db	3
 pl1hero1x:		db	3
-pl1hero1xp: dw 65000 ;65000 ;3000 ;999
+pl1hero1xp: dw 0 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
 pl1hero1mana:	dw	10,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
@@ -5443,7 +5468,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .Inventory: db  002,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesSnake2
+.HeroSpecificInfo: dw HeroAddressesMeiHong
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 

@@ -6,6 +6,8 @@ World5: db  World5MapBlock | dw World5Map | db World5ObjectLayerMapBlock | dw Wo
 World6: db  World6MapBlock | dw World6Map | db World6ObjectLayerMapBlock | dw World6ObjectLayerMap | db World1TilesBlock
 World7: db  World7MapBlock | dw World7Map | db World7ObjectLayerMapBlock | dw World7ObjectLayerMap | db TilesSdSnatcherBlock
 World8: db  World8MapBlock | dw World8Map | db World8ObjectLayerMapBlock | dw World8ObjectLayerMap | db TilesSolidSnakeBlock
+World9: db  World9MapBlock | dw World9Map | db World9ObjectLayerMapBlock | dw World9ObjectLayerMap | db TilesGentleBlock
+World10: db  World10MapBlock | dw World10Map | db World10ObjectLayerMapBlock | dw World10ObjectLayerMap | db TilesGentleDesertBlock
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
@@ -20,7 +22,7 @@ World8: db  World8MapBlock | dw World8Map | db World8ObjectLayerMapBlock | dw Wo
 ;  ds	16*2 ;the first 16 background pieces a hero can stand behind, but they are not see through
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
-;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112
+;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112, 000,000, 000,000, 000,000, 000,000, 080,192, 080,208, 000,000, 000,000
   
   
   
