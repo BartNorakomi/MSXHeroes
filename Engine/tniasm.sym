@@ -4031,7 +4031,7 @@ GolvelliusUnitLevel5Defense: equ 07h ; last def. pass 3
 BuildButton6XRight: equ 0AEh ; last def. pass 3
 SkillTextnecromancyExpert: equ 060BBh ; last def. pass 3
 CityWallsNY: equ 01Bh ; last def. pass 3
-World10ObjectLayerMap: equ 04CF6h ; last def. pass 3
+World10ObjectLayerMap: equ 04D0Bh ; last def. pass 3
 pl1hero8y.pl1hero6move: equ 0325Fh ; last def. pass 3
 HeroOverviewCodeBlock: equ 01Ch ; last def. pass 3
 ListOfMonsters: equ 0539Eh ; last def. pass 3
