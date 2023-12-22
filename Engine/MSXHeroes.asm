@@ -1208,6 +1208,8 @@ World9MapBlock:  equ   $89
 World9ObjectLayerMapBlock:  equ   $89
 World10MapBlock:  equ   $89
 World10ObjectLayerMapBlock:  equ   $89
+World11MapBlock:  equ   $89
+World11ObjectLayerMapBlock:  equ   $89
 
 phase	$4000
 World9Map:
@@ -1218,6 +1220,10 @@ World10Map:
   incbin "..\maps\world10.map.pck"
 World10ObjectLayerMap:
   incbin "..\maps\world10objects.map.pck"
+World11Map:
+  incbin "..\maps\world11.map.pck"
+World11ObjectLayerMap:
+  incbin "..\maps\world11objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
@@ -1238,6 +1244,16 @@ TilesGentleDesertBlock:  equ   $8c
 phase	$4000
   incbin "..\grapx\tilesheets\TilesGentleDesert.SC5",7,208 * 128      ;208 lines
   incbin "..\grapx\tilesheets\TilesGentleDesertBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $8e - 8f
+;
+TilesGentleAutumnBlock:  equ   $8e
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesGentleAutumn.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesGentleAutumnBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
