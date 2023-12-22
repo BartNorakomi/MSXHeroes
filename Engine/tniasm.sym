@@ -948,7 +948,7 @@ Monster2.x: equ 0C4C4h ; last def. pass 3
 RIdle2Monster099: equ 07FA8h ; last def. pass 3
 RIdle1Monster026: equ 09B80h ; last def. pass 3
 LIdle1Monster062: equ 0A3F0h ; last def. pass 3
-World10Map: equ 048ACh ; last def. pass 3
+World10Map: equ 048ABh ; last def. pass 3
 MarketPlaceButtonTable: equ 0896Dh ; last def. pass 3
 MoveMonster.WaitImpactProjectile: equ 05856h ; last def. pass 3
 LIdle3Monster149: equ 063E8h ; last def. pass 3
@@ -1934,7 +1934,7 @@ AkanbeDragonGroupAUnitLevel4Attack: equ 0Dh ; last def. pass 3
 RecoverOverwrittenMonstersHard: equ 063EFh ; last def. pass 3
 LAttack1Monster136: equ 083C0h ; last def. pass 3
 HeroPortrait16x30SYSXDruid: equ 0ACE0h ; last def. pass 3
-World11Map: equ 04D2Bh ; last def. pass 3
+World11Map: equ 04D98h ; last def. pass 3
 SetTotalMonsterAttackInHL.MonsterIsMelee: equ 04F25h ; last def. pass 3
 DisplayEnemyHeroStatsRightClick?: equ 0337h ; last def. pass 3
 CastleOverviewMarketPlaceCode.loop: equ 087E4h ; last def. pass 3
@@ -4034,7 +4034,7 @@ GolvelliusUnitLevel5Defense: equ 07h ; last def. pass 3
 BuildButton6XRight: equ 0AEh ; last def. pass 3
 SkillTextnecromancyExpert: equ 060BBh ; last def. pass 3
 CityWallsNY: equ 01Bh ; last def. pass 3
-World10ObjectLayerMap: equ 04D0Bh ; last def. pass 3
+World10ObjectLayerMap: equ 04D78h ; last def. pass 3
 pl1hero8y.pl1hero6move: equ 0325Fh ; last def. pass 3
 HeroOverviewCodeBlock: equ 01Ch ; last def. pass 3
 ListOfMonsters: equ 0539Eh ; last def. pass 3
@@ -5796,7 +5796,7 @@ InventoryItem26ButtonOffSX: equ 0DCh ; last def. pass 3
 EmptyHeroRecruitedAtTavern.HeroStatKnowledge: equ 03075h ; last def. pass 3
 InventoryItem41ButtonOffSY: equ 0ECh ; last def. pass 3
 HeroOverViewFirstWindowButtonNX: equ 05Ah ; last def. pass 3
-World9ObjectLayerMap: equ 0488Ch ; last def. pass 3
+World9ObjectLayerMap: equ 0488Bh ; last def. pass 3
 Loaderblock: equ 02h ; last def. pass 3
 InventoryItem44MouseOverSX: equ 0E2h ; last def. pass 3
 SetText.TextPercentageSymbolSXNX: equ 06E3h ; last def. pass 3
@@ -8277,7 +8277,7 @@ Monster003Idle: equ 09AE4h ; last def. pass 3
 pl1hero8y.EarthSpells: equ 03284h ; last def. pass 3
 GenericButtonTable3.Button5YBottom: equ 06Eh ; last def. pass 3
 SetcursorWhenGridTileIsActive.SetBoots: equ 0689Bh ; last def. pass 3
-World11ObjectLayerMap: equ 04E23h ; last def. pass 3
+World11ObjectLayerMap: equ 052A9h ; last def. pass 3
 Monster3.Number: equ 0C4DCh ; last def. pass 3
 ContraGroupAUnitLevel2HP: equ 0Ah ; last def. pass 3
 SetSpellExplanation_Air.GoSetText: equ 05E89h ; last def. pass 3
