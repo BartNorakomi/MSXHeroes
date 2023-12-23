@@ -9,6 +9,7 @@ World8: db  World8MapBlock | dw World8Map | db World8ObjectLayerMapBlock | dw Wo
 World9: db  World9MapBlock | dw World9Map | db World9ObjectLayerMapBlock | dw World9ObjectLayerMap | db TilesGentleBlock
 World10: db  World10MapBlock | dw World10Map | db World10ObjectLayerMapBlock | dw World10ObjectLayerMap | db TilesGentleDesertBlock
 World11: db  World11MapBlock | dw World11Map | db World11ObjectLayerMapBlock | dw World11ObjectLayerMap | db TilesGentleAutumnBlock
+World12: db  World12MapBlock | dw World12Map | db World12ObjectLayerMapBlock | dw World12ObjectLayerMap | db TilesGentleWinterBlock
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through

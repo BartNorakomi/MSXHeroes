@@ -4,7 +4,7 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw World11
+WorldPointer: dw World12
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -2638,7 +2638,8 @@ CopyTilePiece:
 	db		0,%0000 0000,$98
   
 World1Palette:
-  incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl"
+  incbin"..\grapx\tilesheets\PaletteGentleWinter.pl"
+;  incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl"
 ;  incbin"..\grapx\tilesheets\PaletteGentleDesert.pl"
 ;  incbin"..\grapx\tilesheets\PaletteGentle.pl"
 ;  incbin"..\grapx\tilesheets\world1tiles.pl"

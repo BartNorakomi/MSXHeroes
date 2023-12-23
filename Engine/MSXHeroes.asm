@@ -1210,6 +1210,8 @@ World10MapBlock:  equ   $89
 World10ObjectLayerMapBlock:  equ   $89
 World11MapBlock:  equ   $89
 World11ObjectLayerMapBlock:  equ   $89
+World12MapBlock:  equ   $89
+World12ObjectLayerMapBlock:  equ   $89
 
 phase	$4000
 World9Map:
@@ -1224,6 +1226,11 @@ World11Map:
   incbin "..\maps\world11.map.pck"
 World11ObjectLayerMap:
   incbin "..\maps\world11objects.map.pck"
+World12Map:
+  incbin "..\maps\world12.map.pck"
+World12ObjectLayerMap:
+  incbin "..\maps\world12objects.map.pck"
+
 	ds		$8000-$,$ff
 dephase
 
@@ -1257,6 +1264,15 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $90 - 91
+;
+TilesGentleWinterBlock:  equ   $90
+phase	$4000
+  incbin "..\grapx\tilesheets\TilesGentleWinter.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\tilesheets\TilesGentleWinterBottom48Lines.SC5",7,48 * 128 ;48 lines
+	ds		$c000-$,$ff
+dephase
 
 
 
