@@ -4,7 +4,7 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw World14
+WorldPointer: dw GentleMap01
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -29,7 +29,6 @@ InitiateGame:
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
-
   ld    hl,FindAndSetCastles            ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
   ld    hl,PlaceHeroesInCastles         ;Place hero nr#1 in their castle
@@ -41,11 +40,9 @@ StartGame:
   call  CenterMousePointer
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
+  call  SetMapPalette
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
-
   call  SetScreenOff
-  ld    hl,World1Palette
-  call  SetPalette  
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
@@ -2271,7 +2268,7 @@ EnterCastle:
   xor   a
   ld    (ReloadAllObjectsInVram?),a     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
 
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPalette  
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  SetInterruptHandler             ;set Vblank
@@ -2431,6 +2428,19 @@ LoadAllObjectsInVram:                   ;Load all objects in page 2 starting at 
   ld    (BlockToReadFrom),a
   jp    CopyRamToVramPage3ForBattleEngine      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
+SetMapPalette:
+  ld    a,(ix+7)                          ;palette value 0
+  ld    (InGamePalette),a
+  ld    a,(ix+8)                          ;palette value 0
+  ld    (InGamePalette+1),a
+  ld    a,(ix+9)                          ;palette value 1
+  ld    (InGamePalette+2),a
+  ld    a,(ix+10)                         ;palette value 1
+  ld    (InGamePalette+3),a
+
+  ld    hl,InGamePalette
+  jp    SetPalette  
+
 CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\tavern.pl"
   incbin"..\grapx\CastleOverview\CastleOverview.pl"
@@ -2484,18 +2494,18 @@ RepairDecorationEdgesHud:
 LoadWorldTiles:
   ld    ix,(WorldPointer)
   
-  ld    a,(slot.page1rom)             ;all RAM except page 1
+  ld    a,(slot.page1rom)               ;all RAM except page 1
   out   ($a8),a      
-  ld    a,Loaderblock                 ;Map block
-  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  ld    a,Loaderblock                   ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom
 
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    (AddressToWriteFrom),hl
   ld    de,$8000 + (000*128) + (000/2) - 128  ;dy,dx
-  ld    (AddressToWriteTo),de           ;address to write to in page 3
+  ld    (AddressToWriteTo),de             ;address to write to in page 3
   ld    bc,$0000 + (000*256) + (256/2)
   ld    (NXAndNY),bc
-  ld    a,(ix+6)                      ;tilesheet block
+  ld    a,(ix+6)                          ;tilesheet block
   ld    (BlockToReadFrom),a
   jp    CopyRamToVramPage3ForBattleEngine      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
@@ -2637,7 +2647,7 @@ CopyTilePiece:
 	db		1,0,1,0
 	db		0,%0000 0000,$98
   
-World1Palette:
+InGamePalette:
   incbin"..\grapx\tilesheets\PaletteGentleCave.pl"
 ;  incbin"..\grapx\tilesheets\PaletteGentleJungle.pl"
 ;  incbin"..\grapx\tilesheets\PaletteGentleWinter.pl"

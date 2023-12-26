@@ -1,17 +1,20 @@
-World1: db  World1MapBlock | dw World1Map | db World1ObjectLayerMapBlock | dw World1ObjectLayerMap | db World1TilesBlock
-World2: db  World2MapBlock | dw World2Map | db World2ObjectLayerMapBlock | dw World2ObjectLayerMap | db World1TilesBlock
-World3: db  World3MapBlock | dw World3Map | db World3ObjectLayerMapBlock | dw World3ObjectLayerMap | db World1TilesBlock
-World4: db  World4MapBlock | dw World4Map | db World4ObjectLayerMapBlock | dw World4ObjectLayerMap | db World1TilesBlock
-World5: db  World5MapBlock | dw World5Map | db World5ObjectLayerMapBlock | dw World5ObjectLayerMap | db World1TilesBlock
-World6: db  World6MapBlock | dw World6Map | db World6ObjectLayerMapBlock | dw World6ObjectLayerMap | db World1TilesBlock
-World7: db  World7MapBlock | dw World7Map | db World7ObjectLayerMapBlock | dw World7ObjectLayerMap | db TilesSdSnatcherBlock
-World8: db  World8MapBlock | dw World8Map | db World8ObjectLayerMapBlock | dw World8ObjectLayerMap | db TilesSolidSnakeBlock
-World9: db  World9MapBlock | dw World9Map | db World9ObjectLayerMapBlock | dw World9ObjectLayerMap | db TilesGentleBlock
-World10: db  World10MapBlock | dw World10Map | db World10ObjectLayerMapBlock | dw World10ObjectLayerMap | db TilesGentleDesertBlock
-World11: db  World11MapBlock | dw World11Map | db World11ObjectLayerMapBlock | dw World11ObjectLayerMap | db TilesGentleAutumnBlock
-World12: db  World12MapBlock | dw World12Map | db World12ObjectLayerMapBlock | dw World12ObjectLayerMap | db TilesGentleWinterBlock
-World13: db  World13MapBlock | dw World13Map | db World13ObjectLayerMapBlock | dw World13ObjectLayerMap | db TilesGentleJungleBlock
-World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | dw World14ObjectLayerMap | db TilesGentleCaveBlock
+World1:  db  World1MapBlock |  dw World1Map |  db World1ObjectLayerMapBlock |  dw World1ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World2:  db  World2MapBlock |  dw World2Map |  db World2ObjectLayerMapBlock |  dw World2ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World3:  db  World3MapBlock |  dw World3Map |  db World3ObjectLayerMapBlock |  dw World3ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World4:  db  World4MapBlock |  dw World4Map |  db World4ObjectLayerMapBlock |  dw World4ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World5:  db  World5MapBlock |  dw World5Map |  db World5ObjectLayerMapBlock |  dw World5ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World6:  db  World6MapBlock |  dw World6Map |  db World6ObjectLayerMapBlock |  dw World6ObjectLayerMap |  db World1TilesBlock         |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World7:  db  World7MapBlock |  dw World7Map |  db World7ObjectLayerMapBlock |  dw World7ObjectLayerMap |  db TilesSdSnatcherBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World8:  db  World8MapBlock |  dw World8Map |  db World8ObjectLayerMapBlock |  dw World8ObjectLayerMap |  db TilesSolidSnakeBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+World9:  db  World9MapBlock |  dw World9Map |  db World9ObjectLayerMapBlock |  dw World9ObjectLayerMap |  db TilesGentleBlock         |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
+World10: db  World10MapBlock | dw World10Map | db World10ObjectLayerMapBlock | dw World10ObjectLayerMap | db TilesGentleDesertBlock   |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
+World11: db  World11MapBlock | dw World11Map | db World11ObjectLayerMapBlock | dw World11ObjectLayerMap | db TilesGentleAutumnBlock   |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+World12: db  World12MapBlock | dw World12Map | db World12ObjectLayerMapBlock | dw World12ObjectLayerMap | db TilesGentleWinterBlock   |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+World13: db  World13MapBlock | dw World13Map | db World13ObjectLayerMapBlock | dw World13ObjectLayerMap | db TilesGentleJungleBlock   |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
+World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | dw World14ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+
+
+GentleMap01: db  GentleMap01MapBlock | dw GentleMap01Map | db GentleMap01ObjectLayerMapBlock | dw GentleMap01ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through

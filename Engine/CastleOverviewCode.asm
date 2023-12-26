@@ -6985,7 +6985,7 @@ CastleOverviewTavernCode:
   call  SetTavernButtons
   call  SetDefendingAndVisitingHeroButtons
 
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPalette
 
   xor   a
@@ -9366,7 +9366,7 @@ CastleOverviewMarketPlaceCode:
   ld    (PreviousButtonClickedIX),ix
   ld    (PreviousButton2ClickedIX),ix
 
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPalette
 
   xor   a
@@ -10103,7 +10103,7 @@ CastleOverviewMagicGuildCode:
 
   call  SetMagicGuildButtons
 
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPalette
 
   xor   a
@@ -10829,7 +10829,7 @@ CastleOverviewRecruitCode:
   ld    ix,GenericButtonTable
   ld    (PreviousButtonClickedIX),ix
   call  SetDefendingAndVisitingHeroButtons
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPalette
 
   xor   a

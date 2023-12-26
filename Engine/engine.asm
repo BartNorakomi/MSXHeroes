@@ -231,7 +231,7 @@ VblankCastleScreen:
   cp    FirstLineintHeightCastleMagicGuild
   jr    z,.SkipSettingPaletteOnVblank
 
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPaletteOnInterrupt
   .SkipSettingPaletteOnVblank:
 
@@ -296,7 +296,7 @@ LineintCastleScreen:
   and   %0010 0000        ;bit to check for HBlank detection
   jr    z,.Waitline
   
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPaletteOnInterrupt
 
   ld    a,FirstLineintHeightCastleRecruit
@@ -330,7 +330,7 @@ LineintCastleScreen:
   ret  
 
   .FirstLineIntCastleMagicGuildScreen:
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPaletteOnInterrupt
 
   ld    a,SecondLineintHeightCastleMagicGuild
@@ -392,7 +392,7 @@ LineintCastleScreen:
   ret  
 
   .SecondLineIntCastleTavernScreen:
-  ld    hl,World1Palette
+  ld    hl,InGamePalette
   call  SetPaletteOnInterrupt
 
   ld    a,FirstLineintHeightCastleTavern

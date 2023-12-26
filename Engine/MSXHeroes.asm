@@ -1216,6 +1216,8 @@ World13MapBlock:  equ   $89
 World13ObjectLayerMapBlock:  equ   $89
 World14MapBlock:  equ   $89
 World14ObjectLayerMapBlock:  equ   $89
+GentleMap01MapBlock:  equ   $89
+GentleMap01ObjectLayerMapBlock:  equ   $89
 
 phase	$4000
 World9Map:
@@ -1242,6 +1244,11 @@ World14Map:
   incbin "..\maps\world14.map.pck"
 World14ObjectLayerMap:
   incbin "..\maps\world14objects.map.pck"
+  
+GentleMap01Map:
+  incbin "..\maps\GentleMap01.map.pck"
+GentleMap01ObjectLayerMap:
+  incbin "..\maps\GentleMap01objects.map.pck"
 
 	ds		$8000-$,$ff
 dephase
