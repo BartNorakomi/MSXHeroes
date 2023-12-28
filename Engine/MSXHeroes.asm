@@ -1218,7 +1218,6 @@ World14MapBlock:  equ   $89
 World14ObjectLayerMapBlock:  equ   $89
 GentleMap01MapBlock:  equ   $89
 GentleMap01ObjectLayerMapBlock:  equ   $89
-
 phase	$4000
 World9Map:
   incbin "..\maps\world9.map.pck"
@@ -1249,7 +1248,6 @@ GentleMap01Map:
   incbin "..\maps\GentleMap01.map.pck"
 GentleMap01ObjectLayerMap:
   incbin "..\maps\GentleMap01objects.map.pck"
-
 	ds		$8000-$,$ff
 dephase
 
@@ -1312,6 +1310,30 @@ phase	$4000
   incbin "..\grapx\tilesheets\TilesGentleCaveBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
+
+
+
+;
+; block $96
+;
+GentleDesertMap01MapBlock:  equ   $96
+GentleDesertMap01ObjectLayerMapBlock:  equ   $96
+GentleDesertMap02MapBlock:  equ   $96
+GentleDesertMap02ObjectLayerMapBlock:  equ   $96
+
+phase	$4000
+GentleDesertMap01Map:
+  incbin "..\maps\GentleDesertMap01.map.pck"
+GentleDesertMap01ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap01objects.map.pck"
+GentleDesertMap02Map:
+  incbin "..\maps\GentleDesertMap02.map.pck"
+GentleDesertMap02ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap02objects.map.pck"
+	ds		$8000-$,$ff
+dephase
+
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
