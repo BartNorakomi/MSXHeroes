@@ -1320,6 +1320,12 @@ GentleDesertMap01MapBlock:  equ   $96
 GentleDesertMap01ObjectLayerMapBlock:  equ   $96
 GentleDesertMap02MapBlock:  equ   $96
 GentleDesertMap02ObjectLayerMapBlock:  equ   $96
+GentleDesertMap03MapBlock:  equ   $96
+GentleDesertMap03ObjectLayerMapBlock:  equ   $96
+GentleDesertMap04MapBlock:  equ   $96
+GentleDesertMap04ObjectLayerMapBlock:  equ   $96
+GentleDesertMap05MapBlock:  equ   $96
+GentleDesertMap05ObjectLayerMapBlock:  equ   $96
 
 phase	$4000
 GentleDesertMap01Map:
@@ -1330,6 +1336,19 @@ GentleDesertMap02Map:
   incbin "..\maps\GentleDesertMap02.map.pck"
 GentleDesertMap02ObjectLayerMap:
   incbin "..\maps\GentleDesertMap02objects.map.pck"
+GentleDesertMap03Map:
+  incbin "..\maps\GentleDesertMap03.map.pck"
+GentleDesertMap03ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap03objects.map.pck"
+GentleDesertMap04Map:
+  incbin "..\maps\GentleDesertMap04.map.pck"
+GentleDesertMap04ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap04objects.map.pck"
+GentleDesertMap05Map:
+  incbin "..\maps\GentleDesertMap05.map.pck"
+GentleDesertMap05ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap05objects.map.pck"
+
 	ds		$8000-$,$ff
 dephase
 

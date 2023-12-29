@@ -17,6 +17,9 @@ World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | d
 GentleMap01: db  GentleMap01MapBlock | dw GentleMap01Map | db GentleMap01ObjectLayerMapBlock | dw GentleMap01ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
 GentleDesertMap01: db  GentleDesertMap01MapBlock | dw GentleDesertMap01Map | db GentleDesertMap01ObjectLayerMapBlock | dw GentleDesertMap01ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
 GentleDesertMap02: db  GentleDesertMap02MapBlock | dw GentleDesertMap02Map | db GentleDesertMap02ObjectLayerMapBlock | dw GentleDesertMap02ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
+GentleDesertMap03: db  GentleDesertMap03MapBlock | dw GentleDesertMap03Map | db GentleDesertMap03ObjectLayerMapBlock | dw GentleDesertMap03ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
+GentleDesertMap04: db  GentleDesertMap04MapBlock | dw GentleDesertMap04Map | db GentleDesertMap04ObjectLayerMapBlock | dw GentleDesertMap04ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
+GentleDesertMap05: db  GentleDesertMap05MapBlock | dw GentleDesertMap05Map | db GentleDesertMap05ObjectLayerMapBlock | dw GentleDesertMap05ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
