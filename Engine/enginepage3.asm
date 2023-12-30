@@ -4,7 +4,8 @@ StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw GentleDesertMap05
+WorldPointer: dw GentleWinterMap01
+;WorldPointer: dw GentleDesertMap05
 ;WorldPointer: dw GentleMap01
 
 InitiateGame:

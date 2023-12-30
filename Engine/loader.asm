@@ -21,6 +21,13 @@ GentleDesertMap03: db  GentleDesertMap03MapBlock | dw GentleDesertMap03Map | db 
 GentleDesertMap04: db  GentleDesertMap04MapBlock | dw GentleDesertMap04Map | db GentleDesertMap04ObjectLayerMapBlock | dw GentleDesertMap04ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
 GentleDesertMap05: db  GentleDesertMap05MapBlock | dw GentleDesertMap05Map | db GentleDesertMap05ObjectLayerMapBlock | dw GentleDesertMap05ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
 
+GentleWinterMap01: db  GentleWinterMap01MapBlock | dw GentleWinterMap01Map | db GentleWinterMap01ObjectLayerMapBlock | dw GentleWinterMap01ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+;GentleWinterMap02: db  GentleWinterMap02MapBlock | dw GentleWinterMap02Map | db GentleWinterMap02ObjectLayerMapBlock | dw GentleWinterMap02ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+;GentleWinterMap03: db  GentleWinterMap03MapBlock | dw GentleWinterMap03Map | db GentleWinterMap03ObjectLayerMapBlock | dw GentleWinterMap03ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+;GentleWinterMap04: db  GentleWinterMap04MapBlock | dw GentleWinterMap04Map | db GentleWinterMap04ObjectLayerMapBlock | dw GentleWinterMap04ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+;GentleWinterMap05: db  GentleWinterMap05MapBlock | dw GentleWinterMap05Map | db GentleWinterMap05ObjectLayerMapBlock | dw GentleWinterMap05ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4
+
+
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
 ;016-023 obstacle

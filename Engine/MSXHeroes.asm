@@ -1348,10 +1348,49 @@ GentleDesertMap05Map:
   incbin "..\maps\GentleDesertMap05.map.pck"
 GentleDesertMap05ObjectLayerMap:
   incbin "..\maps\GentleDesertMap05objects.map.pck"
-
 	ds		$8000-$,$ff
 dephase
 
+
+
+;
+; block $97
+;
+GentleWinterMap01MapBlock:  equ   $97
+GentleWinterMap01ObjectLayerMapBlock:  equ   $97
+GentleWinterMap02MapBlock:  equ   $97
+GentleWinterMap02ObjectLayerMapBlock:  equ   $97
+GentleWinterMap03MapBlock:  equ   $97
+GentleWinterMap03ObjectLayerMapBlock:  equ   $97
+GentleWinterMap04MapBlock:  equ   $97
+GentleWinterMap04ObjectLayerMapBlock:  equ   $97
+GentleWinterMap05MapBlock:  equ   $97
+GentleWinterMap05ObjectLayerMapBlock:  equ   $97
+
+
+phase	$4000
+GentleWinterMap01Map:
+  incbin "..\maps\GentleWinterMap01.map.pck"
+GentleWinterMap01ObjectLayerMap:
+  incbin "..\maps\GentleWinterMap01objects.map.pck"
+;GentleWinterMap02Map:
+;  incbin "..\maps\GentleWinterMap02.map.pck"
+;GentleWinterMap02ObjectLayerMap:
+;  incbin "..\maps\GentleWinterMap02objects.map.pck"
+;GentleWinterMap03Map:
+;  incbin "..\maps\GentleWinterMap03.map.pck"
+;GentleWinterMap03ObjectLayerMap:
+;  incbin "..\maps\GentleWinterMap03objects.map.pck"
+;GentleWinterMap04Map:
+;  incbin "..\maps\GentleWinterMap04.map.pck"
+;GentleWinterMap04ObjectLayerMap:
+;  incbin "..\maps\GentleWinterMap04objects.map.pck"
+;GentleWinterMap05Map:
+;  incbin "..\maps\GentleWinterMap05.map.pck"
+;GentleWinterMap05ObjectLayerMap:
+;  incbin "..\maps\GentleWinterMap05objects.map.pck"
+	ds		$8000-$,$ff
+dephase
 
 
 totallenght:	Equ	$-MSXHeroes
