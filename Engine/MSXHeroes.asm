@@ -1373,10 +1373,10 @@ GentleWinterMap01Map:
   incbin "..\maps\GentleWinterMap01.map.pck"
 GentleWinterMap01ObjectLayerMap:
   incbin "..\maps\GentleWinterMap01objects.map.pck"
-;GentleWinterMap02Map:
-;  incbin "..\maps\GentleWinterMap02.map.pck"
-;GentleWinterMap02ObjectLayerMap:
-;  incbin "..\maps\GentleWinterMap02objects.map.pck"
+GentleWinterMap02Map:
+  incbin "..\maps\GentleWinterMap02.map.pck"
+GentleWinterMap02ObjectLayerMap:
+  incbin "..\maps\GentleWinterMap02objects.map.pck"
 ;GentleWinterMap03Map:
 ;  incbin "..\maps\GentleWinterMap03.map.pck"
 ;GentleWinterMap03ObjectLayerMap:
