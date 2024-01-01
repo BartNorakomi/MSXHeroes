@@ -31,8 +31,8 @@ GentleWinterMap05: db  GentleWinterMap05MapBlock | dw GentleWinterMap05Map | db 
 GentleJungleMap01: db  GentleJungleMap01MapBlock | dw GentleJungleMap01Map | db GentleJungleMap01ObjectLayerMapBlock | dw GentleJungleMap01ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 GentleJungleMap02: db  GentleJungleMap02MapBlock | dw GentleJungleMap02Map | db GentleJungleMap02ObjectLayerMapBlock | dw GentleJungleMap02ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 GentleJungleMap03: db  GentleJungleMap03MapBlock | dw GentleJungleMap03Map | db GentleJungleMap03ObjectLayerMapBlock | dw GentleJungleMap03ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
-;GentleJungleMap04: db  GentleJungleMap04MapBlock | dw GentleJungleMap04Map | db GentleJungleMap04ObjectLayerMapBlock | dw GentleJungleMap04ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
-;GentleJungleMap05: db  GentleJungleMap05MapBlock | dw GentleJungleMap05Map | db GentleJungleMap05ObjectLayerMapBlock | dw GentleJungleMap05ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
+GentleJungleMap04: db  GentleJungleMap04MapBlock | dw GentleJungleMap04Map | db GentleJungleMap04ObjectLayerMapBlock | dw GentleJungleMap04ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
+GentleJungleMap05: db  GentleJungleMap05MapBlock | dw GentleJungleMap05Map | db GentleJungleMap05ObjectLayerMapBlock | dw GentleJungleMap05ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 
 
 ;tiles:

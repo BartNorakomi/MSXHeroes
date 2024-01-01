@@ -1408,10 +1408,6 @@ GentleJungleMap02MapBlock:  equ   $99
 GentleJungleMap02ObjectLayerMapBlock:  equ   $99
 GentleJungleMap03MapBlock:  equ   $99
 GentleJungleMap03ObjectLayerMapBlock:  equ   $99
-GentleJungleMap04MapBlock:  equ   $99
-GentleJungleMap04ObjectLayerMapBlock:  equ   $99
-GentleJungleMap05MapBlock:  equ   $99
-GentleJungleMap05ObjectLayerMapBlock:  equ   $99
 
 phase	$4000
 GentleJungleMap01Map:
@@ -1426,15 +1422,26 @@ GentleJungleMap03Map:
   incbin "..\maps\GentleJungleMap03.map.pck"
 GentleJungleMap03ObjectLayerMap:
   incbin "..\maps\GentleJungleMap03objects.map.pck"
-;GentleJungleMap04Map:
-;  incbin "..\maps\GentleJungleMap04.map.pck"
-;GentleJungleMap04ObjectLayerMap:
-;  incbin "..\maps\GentleJungleMap04objects.map.pck"
-;GentleJungleMap05Map:
-;  incbin "..\maps\GentleJungleMap05.map.pck"
-;GentleJungleMap05ObjectLayerMap:
-;  incbin "..\maps\GentleJungleMap05objects.map.pck"
+	ds		$8000-$,$ff
+dephase
 
+;
+; block $9a
+;
+GentleJungleMap04MapBlock:  equ   $9a
+GentleJungleMap04ObjectLayerMapBlock:  equ   $9a
+GentleJungleMap05MapBlock:  equ   $9a
+GentleJungleMap05ObjectLayerMapBlock:  equ   $9a
+
+phase	$4000
+GentleJungleMap04Map:
+  incbin "..\maps\GentleJungleMap04.map.pck"
+GentleJungleMap04ObjectLayerMap:
+  incbin "..\maps\GentleJungleMap04objects.map.pck"
+GentleJungleMap05Map:
+  incbin "..\maps\GentleJungleMap05.map.pck"
+GentleJungleMap05ObjectLayerMap:
+  incbin "..\maps\GentleJungleMap05objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
