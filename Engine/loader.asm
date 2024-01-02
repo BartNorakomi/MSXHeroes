@@ -34,6 +34,12 @@ GentleJungleMap03: db  GentleJungleMap03MapBlock | dw GentleJungleMap03Map | db 
 GentleJungleMap04: db  GentleJungleMap04MapBlock | dw GentleJungleMap04Map | db GentleJungleMap04ObjectLayerMapBlock | dw GentleJungleMap04ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 GentleJungleMap05: db  GentleJungleMap05MapBlock | dw GentleJungleMap05Map | db GentleJungleMap05ObjectLayerMapBlock | dw GentleJungleMap05ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 
+GentleAutumnMap01: db  GentleAutumnMap01MapBlock | dw GentleAutumnMap01Map | db GentleAutumnMap01ObjectLayerMapBlock | dw GentleAutumnMap01ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+;GentleAutumnMap02: db  GentleAutumnMap02MapBlock | dw GentleAutumnMap02Map | db GentleAutumnMap02ObjectLayerMapBlock | dw GentleAutumnMap02ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+;GentleAutumnMap03: db  GentleAutumnMap03MapBlock | dw GentleAutumnMap03Map | db GentleAutumnMap03ObjectLayerMapBlock | dw GentleAutumnMap03ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+;GentleAutumnMap04: db  GentleAutumnMap04MapBlock | dw GentleAutumnMap04Map | db GentleAutumnMap04ObjectLayerMapBlock | dw GentleAutumnMap04ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+;GentleAutumnMap05: db  GentleAutumnMap05MapBlock | dw GentleAutumnMap05Map | db GentleAutumnMap05ObjectLayerMapBlock | dw GentleAutumnMap05ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4
+
 
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
