@@ -1454,20 +1454,26 @@ GentleAutumnMap02MapBlock:  equ   $9b
 GentleAutumnMap02ObjectLayerMapBlock:  equ   $9b
 GentleAutumnMap03MapBlock:  equ   $9b
 GentleAutumnMap03ObjectLayerMapBlock:  equ   $9b
+GentleAutumnMap04MapBlock:  equ   $9b
+GentleAutumnMap04ObjectLayerMapBlock:  equ   $9b
 
 phase	$4000
 GentleAutumnMap01Map:
   incbin "..\maps\GentleAutumnMap01.map.pck"
 GentleAutumnMap01ObjectLayerMap:
   incbin "..\maps\GentleAutumnMap01objects.map.pck"
-;GentleAutumnMap02Map:
-;  incbin "..\maps\GentleAutumnMap02.map.pck"
-;GentleAutumnMap02ObjectLayerMap:
-;  incbin "..\maps\GentleAutumnMap02objects.map.pck"
-;GentleAutumnMap03Map:
-;  incbin "..\maps\GentleAutumnMap03.map.pck"
-;GentleAutumnMap03ObjectLayerMap:
-;  incbin "..\maps\GentleAutumnMap03objects.map.pck"
+GentleAutumnMap02Map:
+  incbin "..\maps\GentleAutumnMap02.map.pck"
+GentleAutumnMap02ObjectLayerMap:
+  incbin "..\maps\GentleAutumnMap02objects.map.pck"
+GentleAutumnMap03Map:
+  incbin "..\maps\GentleAutumnMap03.map.pck"
+GentleAutumnMap03ObjectLayerMap:
+  incbin "..\maps\GentleAutumnMap03objects.map.pck"
+GentleAutumnMap04Map:
+  incbin "..\maps\GentleAutumnMap04.map.pck"
+GentleAutumnMap04ObjectLayerMap:
+  incbin "..\maps\GentleAutumnMap04objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 

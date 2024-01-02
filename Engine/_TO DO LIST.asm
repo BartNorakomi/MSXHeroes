@@ -13,6 +13,7 @@ autocombat moet een sprite worden
 worldmap:
 AI
 options/settings/save menu
+omdraaien save en end turn knop (ivm muis die de rand raakt)
 
 low prio:
 boots clicken op map, route moet in 2 richtingen uitgezocht worden (met die sterretjes op de map)
