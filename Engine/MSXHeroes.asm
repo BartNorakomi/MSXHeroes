@@ -1474,6 +1474,22 @@ GentleAutumnMap04Map:
   incbin "..\maps\GentleAutumnMap04.map.pck"
 GentleAutumnMap04ObjectLayerMap:
   incbin "..\maps\GentleAutumnMap04objects.map.pck"
+kut:
+	ds		$8000-$,$ff
+dephase
+
+
+;
+; block $9c
+;
+GentleAutumnMap05MapBlock:  equ   $9c
+GentleAutumnMap05ObjectLayerMapBlock:  equ   $9c
+
+phase	$4000
+GentleAutumnMap05Map:
+  incbin "..\maps\GentleAutumnMap05.map.pck"
+GentleAutumnMap05ObjectLayerMap:
+  incbin "..\maps\GentleAutumnMap05objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
