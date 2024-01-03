@@ -1505,6 +1505,8 @@ GentleCaveMap03MapBlock:  equ   $9d
 GentleCaveMap03ObjectLayerMapBlock:  equ   $9d
 GentleCaveMap04MapBlock:  equ   $9d
 GentleCaveMap04ObjectLayerMapBlock:  equ   $9d
+GentleCaveMap05MapBlock:  equ   $9d
+GentleCaveMap05ObjectLayerMapBlock:  equ   $9d
 
 phase	$4000
 GentleCaveMap01Map:
@@ -1523,6 +1525,10 @@ GentleCaveMap04Map:
   incbin "..\maps\GentleCaveMap04.map.pck"
 GentleCaveMap04ObjectLayerMap:
   incbin "..\maps\GentleCaveMap04objects.map.pck"
+GentleCaveMap05Map:
+  incbin "..\maps\GentleCaveMap05.map.pck"
+GentleCaveMap05ObjectLayerMap:
+  incbin "..\maps\GentleCaveMap05objects.map.pck"
 kut:
 	ds		$8000-$,$ff
 dephase

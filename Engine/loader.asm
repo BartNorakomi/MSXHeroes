@@ -44,7 +44,7 @@ GentleCaveMap01: db  GentleCaveMap01MapBlock | dw GentleCaveMap01Map | db Gentle
 GentleCaveMap02: db  GentleCaveMap02MapBlock | dw GentleCaveMap02Map | db GentleCaveMap02ObjectLayerMapBlock | dw GentleCaveMap02ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 GentleCaveMap03: db  GentleCaveMap03MapBlock | dw GentleCaveMap03Map | db GentleCaveMap03ObjectLayerMapBlock | dw GentleCaveMap03ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 GentleCaveMap04: db  GentleCaveMap04MapBlock | dw GentleCaveMap04Map | db GentleCaveMap04ObjectLayerMapBlock | dw GentleCaveMap04ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
-;GentleCaveMap05: db  GentleCaveMap05MapBlock | dw GentleCaveMap05Map | db GentleCaveMap05ObjectLayerMapBlock | dw GentleCaveMap05ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
+GentleCaveMap05: db  GentleCaveMap05MapBlock | dw GentleCaveMap05Map | db GentleCaveMap05ObjectLayerMapBlock | dw GentleCaveMap05ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 
 
 ;tiles:
