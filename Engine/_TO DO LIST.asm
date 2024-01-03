@@ -14,6 +14,7 @@ worldmap:
 AI
 options/settings/save menu
 omdraaien save en end turn knop (ivm muis die de rand raakt)
+dont animate when running (cuz already animated)
 
 low prio:
 boots clicken op map, route moet in 2 richtingen uitgezocht worden (met die sterretjes op de map)

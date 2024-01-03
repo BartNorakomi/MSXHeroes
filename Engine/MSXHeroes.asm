@@ -1474,7 +1474,6 @@ GentleAutumnMap04Map:
   incbin "..\maps\GentleAutumnMap04.map.pck"
 GentleAutumnMap04ObjectLayerMap:
   incbin "..\maps\GentleAutumnMap04objects.map.pck"
-kut:
 	ds		$8000-$,$ff
 dephase
 
@@ -1492,6 +1491,42 @@ GentleAutumnMap05ObjectLayerMap:
   incbin "..\maps\GentleAutumnMap05objects.map.pck"
 	ds		$8000-$,$ff
 dephase
+
+
+
+;
+; block $9d
+;
+GentleCaveMap01MapBlock:  equ   $9d
+GentleCaveMap01ObjectLayerMapBlock:  equ   $9d
+GentleCaveMap02MapBlock:  equ   $9d
+GentleCaveMap02ObjectLayerMapBlock:  equ   $9d
+GentleCaveMap03MapBlock:  equ   $9d
+GentleCaveMap03ObjectLayerMapBlock:  equ   $9d
+GentleCaveMap04MapBlock:  equ   $9d
+GentleCaveMap04ObjectLayerMapBlock:  equ   $9d
+
+phase	$4000
+GentleCaveMap01Map:
+  incbin "..\maps\GentleCaveMap01.map.pck"
+GentleCaveMap01ObjectLayerMap:
+  incbin "..\maps\GentleCaveMap01objects.map.pck"
+GentleCaveMap02Map:
+  incbin "..\maps\GentleCaveMap02.map.pck"
+GentleCaveMap02ObjectLayerMap:
+  incbin "..\maps\GentleCaveMap02objects.map.pck"
+GentleCaveMap03Map:
+  incbin "..\maps\GentleCaveMap03.map.pck"
+GentleCaveMap03ObjectLayerMap:
+  incbin "..\maps\GentleCaveMap03objects.map.pck"
+GentleCaveMap04Map:
+  incbin "..\maps\GentleCaveMap04.map.pck"
+GentleCaveMap04ObjectLayerMap:
+  incbin "..\maps\GentleCaveMap04objects.map.pck"
+kut:
+	ds		$8000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
