@@ -1233,32 +1233,32 @@ RemoveDeadMonstersDefender:
 
   ld    de,5
   sbc   hl,de
-  ld    a,246                           ;between 01 and 04 amount=246
+  ld    a,Number1Tile                   ;between 01 and 04 amount="1"
   jr    c,.SetAmount
 
   ld    de,8
   sbc   hl,de
-  ld    a,247                           ;between 05 and 12 amount=247
+  ld    a,Number1Tile+1                 ;between 05 and 12 amount="2"
   jr    c,.SetAmount
 
   ld    de,16
   sbc   hl,de
-  ld    a,248                           ;between 13 and 28 amount=248
+  ld    a,Number1Tile+2                 ;between 13 and 28 amount="3"
   jr    c,.SetAmount
 
   ld    de,32
   sbc   hl,de
-  ld    a,249                           ;between 29 and 60 amount=249
+  ld    a,Number1Tile+3                 ;between 29 and 60 amount="4"
   jr    c,.SetAmount
 
   ld    de,32
   sbc   hl,de
-  ld    a,250                           ;between 61 and 92 amount=250
+  ld    a,Number1Tile+4                 ;between 61 and 92 amount="5"
   jr    c,.SetAmount
 
 ;  ld    de,32
 ;  sbc   hl,de
-  ld    a,251                           ;between 93 and 124 amount=251
+  ld    a,Number1Tile+5                 ;between 93 and 124 amount="6"
 ;  jr    c,.SetAmount
 
   .SetAmount:
@@ -3234,8 +3234,8 @@ SetAllMonstersInMonsterTable:
 
   .SetAmountInA:
   ld    a,(MonsterHerocollidedWithOnMapAmount)
-  sub   a,246
-  jr    z,.Amount1                        ;246(1),247(2),248(3),249(4),250(5),251(6)
+  sub   a,Number1Tile
+  jr    z,.Amount1                        ;192(1),193(2),194(3),195(4),196(5),197(6)
   dec   a
   jr    z,.Amount2
   dec   a

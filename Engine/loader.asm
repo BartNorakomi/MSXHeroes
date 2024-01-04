@@ -13,8 +13,11 @@ World12: db  World12MapBlock | dw World12Map | db World12ObjectLayerMapBlock | d
 World13: db  World13MapBlock | dw World13Map | db World13ObjectLayerMapBlock | dw World13ObjectLayerMap | db TilesGentleJungleBlock   |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | dw World14ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 
-
 GentleMap01: db  GentleMap01MapBlock | dw GentleMap01Map | db GentleMap01ObjectLayerMapBlock | dw GentleMap01ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
+GentleMap02: db  GentleMap02MapBlock | dw GentleMap02Map | db GentleMap02ObjectLayerMapBlock | dw GentleMap02ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
+GentleMap03: db  GentleMap03MapBlock | dw GentleMap03Map | db GentleMap03ObjectLayerMapBlock | dw GentleMap03ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
+GentleMap04: db  GentleMap04MapBlock | dw GentleMap04Map | db GentleMap04ObjectLayerMapBlock | dw GentleMap04ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
+GentleMap05: db  GentleMap05MapBlock | dw GentleMap05Map | db GentleMap05ObjectLayerMapBlock | dw GentleMap05ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4
 
 GentleDesertMap01: db  GentleDesertMap01MapBlock | dw GentleDesertMap01Map | db GentleDesertMap01ObjectLayerMapBlock | dw GentleDesertMap01ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
 GentleDesertMap02: db  GentleDesertMap02MapBlock | dw GentleDesertMap02Map | db GentleDesertMap02ObjectLayerMapBlock | dw GentleDesertMap02ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4
@@ -326,7 +329,7 @@ ConvertMonstersObjectLayer:
   jr    nc,.EndCheck1Or2TilesInSize
   ld    bc,-128
   add   hl,bc
-  add   a,64                          ;bottom part of monster is 64 tiles higher
+  add   a,64+6                        ;top part of monster is 64+6 tiles higher (the +6 are the 6 numbers)
   ld    (hl),a
   sbc   hl,bc
     
@@ -337,6 +340,7 @@ ConvertMonstersObjectLayer:
   ret
 
 CastleTileNr: equ 254
+Number1Tile:  equ 192
 FindAndSetCastles:                      ;castles on the map have to be assigned to their players, and coordinates have to be set
  ; ld    a,(slot.page1rom)             ;all RAM except page 1
  ; out   ($a8),a      
@@ -368,7 +372,7 @@ FindAndSetCastles:                      ;castles on the map have to be assigned 
 
   inc   hl                              ;player that owns this castle
   ld    a,(hl)
-  sub   a,245
+  sub   a,Number1Tile-1
   ld    (ix+CastlePlayer),a
   ld    (hl),0                          ;remove number from object map
 

@@ -13,8 +13,6 @@ autocombat moet een sprite worden
 worldmap:
 AI
 options/settings/save menu
-omdraaien save en end turn knop (ivm muis die de rand raakt)
-dont animate when running (cuz already animated)
 
 low prio:
 boots clicken op map, route moet in 2 richtingen uitgezocht worden (met die sterretjes op de map)
@@ -25,9 +23,9 @@ units in hud nog een beetje finetunen
 vensters moeten nog gekopieerd worden, anders heb je kans op flikker bij pageswaps
 skill icons
 picked up inventory items should be equiped directly
+als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft van het scherm opgebouwd ziet, en de andere helft is nog van de mirror page (w/e?)
 
 castle:
-newly bought hero should have 50% of level 1 and 2 units
 
 general:
 muziek

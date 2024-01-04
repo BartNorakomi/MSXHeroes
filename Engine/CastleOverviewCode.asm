@@ -1241,7 +1241,7 @@ HudCode:
   cp    03
   jp    z,CheckCastleArrowDown
 
-  cp    01
+  cp    02
   jp    z,EndTurn
   ret
 
@@ -1954,7 +1954,7 @@ ItemSpellDamagePointsTable:
   db    0
 ;helmet (15)
   db    YattaShiNeSpellDamage ;(2)
-  db    0
+  db    FireHoodSpellDamage ;(4)
   db    0
   db    0
   db    0
@@ -2135,7 +2135,7 @@ ItemAttackPointsTable:
 ;gloves (25)
   db    0
   db    0
-  db    0
+  db    ElkSkinGlovesAttack ;(2)
   db    0
   db    0
 ;ring (30)
@@ -8445,7 +8445,7 @@ CastleOverviewTavernCode:
   ld    a,(hl)
   ld    (ix+HeroStatSpellDamage),a
   
-  ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle
+  ;give the hero 1 level 1 unit, which is the same as the level 1 units in this castle (the amount is set in EmptyHeroRecruitedAtTavern:)
   ld    a,(iy+CastleLevel1Units)        ;castle x  
   ld    (ix+HeroUnits),a
 

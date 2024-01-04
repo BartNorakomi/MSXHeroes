@@ -2,6 +2,7 @@ phase	$c000
 
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
+DisplayNumbers1to6?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleCaveMap04
@@ -9,7 +10,7 @@ ShowNewlyBoughtBuildingFadingIn?:  db  1
 ;WorldPointer: dw GentleJungleMap05
 ;WorldPointer: dw GentleWinterMap05
 ;WorldPointer: dw GentleDesertMap05
-WorldPointer: dw GentleMap01
+WorldPointer: dw GentleMap03
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -1400,10 +1401,10 @@ GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button8Ytop,.Button8YBottom,.Button8XLeft,.Button8XRight | dw $0000 + (.Button8Ytop*128) + (.Button8XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
   db  %1100 0011 | dw $4000 + ((128+25+76)*128) + (180/2) - 128 | dw $4000 + ((128+25+76)*128) + (200/2) - 128 | dw $4000 + ((128+25+76)*128) + (220/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
-  ;system/options
-  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (000/2) - 128 | dw $4000 + ((139+25+76)*128) + (016/2) - 128 | dw $4000 + ((139+25+76)*128) + (032/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
   ;end turn
-  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (048/2) - 128 | dw $4000 + ((139+25+76)*128) + (064/2) - 128 | dw $4000 + ((139+25+76)*128) + (080/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (048/2) - 128 | dw $4000 + ((139+25+76)*128) + (064/2) - 128 | dw $4000 + ((139+25+76)*128) + (080/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  ;system/options
+  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (000/2) - 128 | dw $4000 + ((139+25+76)*128) + (016/2) - 128 | dw $4000 + ((139+25+76)*128) + (032/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
 
   ;arrow up, 3 hero buttons, arrow down
 .Button1Ytop:           equ 055

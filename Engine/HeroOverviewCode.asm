@@ -1445,7 +1445,7 @@ DescriptionHelmet1:        db  "Yatta Shi-ne",254 | YattaShiNeDefence: equ 2 | Y
 
                           ;item 016
 DescriptionHelmet2:        db  "Fire hood",254
-                          db  "Spell power +4",254
+                          db  "Spell power +4",254 | FireHoodSpellDamage: equ 4
                           db  "+10% fire spell damage",255
 
                           ;item 017
@@ -1496,7 +1496,7 @@ DescriptionGloves2:        db  "Iron Hand",254 | IronHandUnitSpeed: equ -1
                           db  "Unit movement speed -1",255
 
                           ;item 027
-DescriptionGloves3:        db  "Elk Skin Gloves",254 | ElkSkinGlovesUnitHp: equ 2
+DescriptionGloves3:        db  "Elk Skin Gloves",254 | ElkSkinGlovesUnitHp: equ 2 | ElkSkinGlovesAttack: equ 2
                           db  "Attack +2",254
                           db  "Max hp units +2",255
 

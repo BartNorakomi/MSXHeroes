@@ -1529,9 +1529,49 @@ GentleCaveMap05Map:
   incbin "..\maps\GentleCaveMap05.map.pck"
 GentleCaveMap05ObjectLayerMap:
   incbin "..\maps\GentleCaveMap05objects.map.pck"
+	ds		$8000-$,$ff
+dephase
+
+
+
+;
+; block $9e
+;
+GentleMap02MapBlock:  equ   $9e
+GentleMap02ObjectLayerMapBlock:  equ   $9e
+GentleMap03MapBlock:  equ   $9e
+GentleMap03ObjectLayerMapBlock:  equ   $9e
+GentleMap04MapBlock:  equ   $9e
+GentleMap04ObjectLayerMapBlock:  equ   $9e
+GentleMap05MapBlock:  equ   $9e
+GentleMap05ObjectLayerMapBlock:  equ   $9e
+
+phase	$4000
+GentleMap02Map:
+  incbin "..\maps\GentleMap02.map.pck"
+GentleMap02ObjectLayerMap:
+  incbin "..\maps\GentleMap02objects.map.pck"
+GentleMap03Map:
+  incbin "..\maps\GentleMap03.map.pck"
+GentleMap03ObjectLayerMap:
+  incbin "..\maps\GentleMap03objects.map.pck"
+GentleMap04Map:
+  incbin "..\maps\GentleMap04.map.pck"
+GentleMap04ObjectLayerMap:
+  incbin "..\maps\GentleMap04objects.map.pck"
+GentleMap05Map:
+  incbin "..\maps\GentleMap05.map.pck"
+GentleMap05ObjectLayerMap:
+  incbin "..\maps\GentleMap05objects.map.pck"
 kut:
 	ds		$8000-$,$ff
 dephase
+
+
+
+
+
+
 
 
 totallenght:	Equ	$-MSXHeroes

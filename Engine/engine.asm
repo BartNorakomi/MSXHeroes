@@ -454,6 +454,10 @@ CheckEnterCombat:
   jp    EnterCombat
   
 AnimateHeroes:
+	ld		a,(movehero?)
+	or		a                               ;don't animate when hero is running
+  ret   nz
+
   ld    a,(framecounter)
   and   3
   ret   nz
@@ -1839,8 +1843,6 @@ CheckHeroPicksUpItem:
 	ld		(ChangeManaAndMovement?),a	
   pop   af
 
-  cp    64
-  jp    z,.Scroll
   cp    65
   jp    z,.TreasureChestBig
   cp    66
@@ -1861,8 +1863,8 @@ CheckHeroPicksUpItem:
   jp    z,.MagicRefill
   cp    74
   jp    z,.GoodiesBag
-  cp    75                              ;left bottom of tower battle
-  ret   z
+  cp    75
+  jp    z,.Scroll
   cp    76                              ;right bottom of tower battle
   ret   z
   cp    77                              ;alternative water well
@@ -4463,7 +4465,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   cp    128
   ret   nc                              ;tilenr. 192 and up are top parts of objects
 
-  ld    a,(hl)
+  cp    64                              ;left bottom part of tower battle
+  ret   z
+
+;  ld    a,(hl)
   or    a
   ret   z
 
@@ -5149,7 +5154,12 @@ PutTopObjectFromObjectLayer:            ;hl->points to tile in inactive page, de
   ld    (Copy16x16Tile+copytype),a
 
   ld    a,(hl)
+
+  if    DisplayNumbers1to6?
   cp    192
+  else
+  cp    192+6 ;(this does NOT display the numbers 1-6)
+  endif  
   ret   c                               ;tilenr. 192 and up are the top parts of objets
 
   ld    a,255
@@ -5467,7 +5477,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  002,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesGoemon2
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
