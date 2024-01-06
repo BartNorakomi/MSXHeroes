@@ -1568,7 +1568,14 @@ kut:
 dephase
 
 
-
+;
+; block $9f - $a0
+;
+DefeatBlock2:  equ   $9f
+phase	$4000
+  incbin "..\grapx\Battlefield\Defeat2.SC5",7,207 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 
 

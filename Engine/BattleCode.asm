@@ -51,7 +51,7 @@ CheckEnemyAI:
   jr    .NeutralOrComputerControlledMonsterFound
 
 HandleMonsters:
-;  call  PressMToLookAtPage2And3
+  call  PressMToLookAtPage2And3
 
 ;  call  HandleProjectileSprite         ;done on int
 ;  call  HandleExplosionSprite          ;done on int
@@ -1507,7 +1507,12 @@ CheckVictoryOrDefeat:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + ((002+16)*128) + (024/2) - 128
   ld    bc,$0000 + (207*256) + (210/2)
+  ld    a,r
+  and   1
   ld    a,DefeatBlock           ;block to copy graphics from
+  jr    z,.go
+  ld    a,DefeatBlock2           ;block to copy graphics from
+  .go:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
@@ -4490,11 +4495,20 @@ BuildUpBattleFieldAndPutMonsters:
   ld    hl,.CopyPage1To3
   call  DoCopy                          ;copy battle field to page 3 vram->vram
 
-  ld    hl,CopyARowOf12PixelsFromBottomOfPage3ToPage2
-  call  DoCopy
+;  ld    hl,CopyARowOf12PixelsFromBottomOfPage3ToPage2
+;  call  DoCopy
   call  SetAllMonstersInMonsterTable    ;set all monsters in the tables in enginepage3
   call  .PutAllMonsters                 ;put all monsters in page 0
   call  .CopyAllMonstersToPage1and2
+
+
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  jp    docopy
+
+
+;  ld    a,3*32+31
+;  call  SetPageSpecial.setpage
+;.kut: jp .kut
 
 
   xor   a
@@ -5379,7 +5393,6 @@ CheckSwitchToNextMonster:
   ;erase this monster from inactive page (copy from page 3 to inactive page)
   ;then recover other monsters that we also erased from inactive page
   ;then set this new background to page 2 (copy from inactive page to page 2)
-
 	ld		a,(activepage)
   xor   1
 	ld    (EraseMonster+dPage),a
@@ -6329,7 +6342,7 @@ CheckIsCursorOnATileThisFrame:
   ld    a,(Monster0+MonsterY)           ;y grid tile
   cp    24 + 16                         ;check if grid tile is above lowest tile
   ret   c
-  cp    183 + 16                        ;check if grid tile is below lowest tile
+  cp    183 ;+ 16                        ;check if grid tile is below lowest tile
   ret   nc
 
 ;2 left edges
