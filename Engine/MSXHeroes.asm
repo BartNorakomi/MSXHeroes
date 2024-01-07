@@ -595,9 +595,9 @@ dephase
 ;
 ; block $0e - 0f
 ;
-BattleFieldSnowBlock:  equ   $0e
+BattleFieldWinterBlock:  equ   $0e
 phase	$4000
-  incbin "..\grapx\BattleField\BattleFieldSnow.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1577,9 +1577,50 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $a1 - a2
+;
+BattleFieldDesertBlock:  equ   $a1
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldDesert.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
+;
+; block $a3 - a4
+;
+BattleFieldCaveBlock:  equ   $a3
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldCave.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
+;
+; block $a5 - a6
+;
+BattleFieldGentleBlock:  equ   $a5
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldGentle.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
+;
+; block $a7 - a8
+;
+BattleFieldAutumnBlock:  equ   $a7
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldAutumn.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $a9 - aa
+;
+BattleFieldJungleBlock:  equ   $a9
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldJungle.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

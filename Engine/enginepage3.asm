@@ -5,12 +5,12 @@ UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-;WorldPointer: dw GentleCaveMap04
-;WorldPointer: dw GentleAutumnMap05
-;WorldPointer: dw GentleJungleMap05
+;WorldPointer: dw GentleCaveMap01
+;WorldPointer: dw GentleAutumnMap01
+WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleWinterMap05
-;WorldPointer: dw GentleDesertMap05
-WorldPointer: dw GentleMap03
+;WorldPointer: dw GentleDesertMap01
+;WorldPointer: dw GentleMap03
 
 InitiateGame:
   ld    hl,CHMOUS

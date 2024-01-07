@@ -4483,13 +4483,13 @@ CopyARowOf12PixelsFromBottomOfPage3ToPage2:
 BuildUpBattleFieldAndPutMonsters:  
   xor   a
 	ld		(activepage),a			            ;page 0
-  call  SetBattleFieldSnowGraphics      ;set battle field in page 1 ram->vram
+  call  SetBattleFieldGraphics          ;set battle field in page 1 ram->vram
   call  .SetRocks
   call  .SetHeroes
   ld    hl,.CopyPage1To2
   call  DoCopy                          ;copy battle field to page 2 vram->vram
   call  SwapAndSetPage                  ;swap and set page 1
-  call  SetBattleFieldSnowGraphics      ;set battle field in page 0 ram->vram
+  call  SetBattleFieldGraphics          ;set battle field in page 0 ram->vram
   call  .SetRocks
   call  .SetHeroes
   ld    hl,.CopyPage1To3
@@ -4773,14 +4773,27 @@ BuildUpBattleFieldAndPutMonsters:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    bc,$0000 + (016*256) + (016/2)
   ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
+
+  push  de
+  exx
+  pop   de
+  exx
+  call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+ret
+
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+
+  ld    de,256*(100) + (100)
+
+
+
 RocksVersion1:
-  dw    $0000 + ((00*16+056)*128) + ((07*08 + 12)/2) - 128, BattleFieldGrid+007 + 00*LenghtBattleField
-  dw    $0000 + ((01*16+056)*128) + ((08*08 + 12)/2) - 128, BattleFieldGrid+008 + 01*LenghtBattleField
-  dw    $0000 + ((04*16+056)*128) + ((09*08 + 12)/2) - 128, BattleFieldGrid+009 + 04*LenghtBattleField
-  dw    $0000 + ((04*16+056)*128) + ((11*08 + 12)/2) - 128, BattleFieldGrid+011 + 04*LenghtBattleField
-  dw    $0000 + ((05*16+056)*128) + ((10*08 + 12)/2) - 128, BattleFieldGrid+010 + 05*LenghtBattleField
+  dw    $0000 + ((00*16+056)*256) + ((07*08 + 12)), BattleFieldGrid+007 + 00*LenghtBattleField
+  dw    $0000 + ((01*16+056)*256) + ((08*08 + 12)), BattleFieldGrid+008 + 01*LenghtBattleField
+  dw    $0000 + ((04*16+056)*256) + ((09*08 + 12)), BattleFieldGrid+009 + 04*LenghtBattleField
+  dw    $0000 + ((04*16+056)*256) + ((11*08 + 12)), BattleFieldGrid+011 + 04*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((10*08 + 12)), BattleFieldGrid+010 + 05*LenghtBattleField
 
 Set255WhereMonsterStandsInBattleFieldGrid:
   call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
@@ -7204,11 +7217,16 @@ EraseMonsterPreviousFrame:
   call  docopy
   ret
 
-SetBattleFieldSnowGraphics:
+SetBattleFieldGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (016*128) + (000/2) - 128
   ld    bc,$0000 + (212*256) + (256/2)
-  ld    a,BattleFieldSnowBlock           ;block to copy graphics from
+;  ld    a,BattleFieldWinterBlock           ;block to copy graphics from
+;  ld    a,BattleFieldDesertBlock           ;block to copy graphics from
+;  ld    a,BattleFieldCaveBlock              ;block to copy graphics from
+;  ld    a,BattleFieldGentleBlock              ;block to copy graphics from
+;  ld    a,BattleFieldAutumnBlock              ;block to copy graphics from
+  ld    a,BattleFieldJungleBlock              ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 HeroFledRetreating:                     ;retreating is free, but entire army is lost

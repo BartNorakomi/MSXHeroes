@@ -1995,7 +1995,7 @@ SetBattleText:
   ld    hl,$4000 + (195*128) + (060/2) - 128
   ld    de,$0000 + ((195+16)*128) + (060/2) - 128
   ld    bc,$0000 + (014*256) + (118/2)
-  ld    a,BattleFieldSnowBlock         ;font graphics block
+  ld    a,BattleFieldWinterBlock         ;font graphics block
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 ;defending hero died, and loses items
