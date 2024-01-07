@@ -7,10 +7,10 @@ ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleAutumnMap01
-WorldPointer: dw GentleJungleMap01
-;WorldPointer: dw GentleWinterMap05
+;WorldPointer: dw GentleJungleMap01
+;WorldPointer: dw GentleWinterMap01
 ;WorldPointer: dw GentleDesertMap01
-;WorldPointer: dw GentleMap03
+WorldPointer: dw GentleMap03
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -47,6 +47,7 @@ StartGame:
   call  SetScreenOff
   call  LoadWorldTiles                  ;set all world map tiles in page 3
   call  SetMapPalette
+  call  SetBattleScreenBlock
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
   call  SetScreenOff
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
@@ -2442,6 +2443,11 @@ SetMapPalette:
   ld    hl,InGamePalette
   jp    SetPalette  
 
+SetBattleScreenBlock:
+  ld    a,(ix+11)                          ;palette value 0
+  ld    (BattleGraphicsBlock),a
+  ret
+
 CastleOverviewPalette:
 ;  incbin"..\grapx\CastleOverview\tavern.pl"
   incbin"..\grapx\CastleOverview\CastleOverview.pl"
@@ -3601,6 +3607,8 @@ oldControls: 				        rb    1
 
 ControlsOnInterrupt:	                  rb		1
 NewPrControlsOnInterrupt:	        rb		1
+
+BattleGraphicsBlock:	      rb		1
 
 endenginepage3variables:  equ $+enginepage3length
 org variables

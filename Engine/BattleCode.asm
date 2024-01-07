@@ -7226,7 +7226,7 @@ SetBattleFieldGraphics:
 ;  ld    a,BattleFieldCaveBlock              ;block to copy graphics from
 ;  ld    a,BattleFieldGentleBlock              ;block to copy graphics from
 ;  ld    a,BattleFieldAutumnBlock              ;block to copy graphics from
-  ld    a,BattleFieldJungleBlock              ;block to copy graphics from
+  ld    a,(BattleGraphicsBlock)              ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 HeroFledRetreating:                     ;retreating is free, but entire army is lost
