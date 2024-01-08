@@ -10220,70 +10220,70 @@ CastleOverviewMagicGuildCode:
   .ButtonFound:
   ld    hl,EarthLevel1Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth1
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth4
   jp    z,.SpellFound
   ld    hl,EarthLevel2Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth2
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth3
   jp    z,.SpellFound
   ld    hl,EarthLevel3Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth3
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth2
   jp    z,.SpellFound
   ld    hl,EarthLevel4Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth4
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionEarth1
   jp    z,.SpellFound
 
   ld    hl,FireLevel1Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire1
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire4
   jp    z,.SpellFound
   ld    hl,FireLevel2Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire2
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire3
   jp    z,.SpellFound
   ld    hl,FireLevel3Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire3
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire2
   jp    z,.SpellFound
   ld    hl,FireLevel4Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire4
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionFire1
   jp    z,.SpellFound
 
   ld    hl,AirLevel1Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir1
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir4
   jp    z,.SpellFound
   ld    hl,AirLevel2Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir2
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir3
   jp    z,.SpellFound
   ld    hl,AirLevel3Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir3
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir2
   jp    z,.SpellFound
   ld    hl,AirLevel4Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir4
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionAir1
   jp    z,.SpellFound
 
   ld    hl,WaterLevel1Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater1
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater4
   jp    z,.SpellFound
   ld    hl,WaterLevel2Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater2
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater3
   jp    z,.SpellFound
   ld    hl,WaterLevel3Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater3
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater2
   jp    z,.SpellFound
   ld    hl,WaterLevel4Untouched
   call  CompareHLwithDE
-  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater4
+  ld    hl,SpellDescriptionsMagicGuild.DescriptionWater1
   jp    z,.SpellFound
   
   .SpellFound:
@@ -10302,87 +10302,75 @@ CastleOverviewMagicGuildCode:
   jp    SetText
 
 SpellDescriptionsMagicGuild:
-.DescriptionEarth1:        db  "earth meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.DescriptionEarth2:        db  "earth",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.DescriptionEarth3:        db  "earthstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.DescriptionEarth4:        db  "earthbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
 
 
+.DescriptionEarth4:       db  "Ethereal Chains",254
+                          db  "Reduces the speed of the selected",254
+                          db  "enemy unit by 50%",255
+
+.DescriptionEarth3:       db  "Plate Armor",254
+                          db  "Increases the defense of the selected",254
+                          db  "friendly unit by 5.",255
+
+.DescriptionEarth2:       db  "Resurrection",254
+                          db  "Reanimates 40 HP of killed living",254
+                          db  "friendly creatures.",255
+
+.DescriptionEarth1:       db  "Meteor Shower",254
+                          db  "Deals damage to all creatures in target",254
+                          db  "and adjacent hexes.",255
 
 
-;.DescriptionFire1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionFire4:        db  "Curse",254
+                          db  "Causes the selected enemy unit to deal",254
+                          db  "-3 damage when attacking.",255
+
+.DescriptionFire3:        db  "Blur",254
+                          db  "Target ranged unit deals 50% less",254
+                          db  "damage.",255
+
+.DescriptionFire2:        db  "Fireball",254
+                          db  "Deals damage to target unit and",254
+                          db  "adjecent units.",255
+
+.DescriptionFire1:        db  "Inferno",254
+                          db  "Deals damage in a 5 hex area of",254
+                          db  "effect.",255
 
 
-.DescriptionFire1:        db  "Castle Market place Tavern Magic Guild Sawmill",254
-                          db  "Mine Barracks Tower City walls Walls Place",254
-                          db  "The SilkenLarvas wait for a better time to act",254
-                          db  "Take a look at the available building options. ",255
+.Descriptionair4:         db  "Haste",254
+                          db  "Increases the speed of the selected",254
+                          db  "friendly unit by 4.",255
 
-;.AncientScroll:           db  "Unearthing an ancient scroll you",254
-;                          db  "imbue your spellbook with its mystic spell",254
-;                          db  "acient scroll hypnotism",254
-;                          db  " ",255
+.Descriptionair3:         db  "Disrupting Ray",254
+                          db  "Reduces the defense of the selected ",254
+                          db  "unit by 4.",255
 
+.Descriptionair2:         db  "Counterstrike",254
+                          db  "Target allied unit has unlimited",254
+                          db  "retaliations each round.",255
 
-
-.DescriptionFire2:        db  "fire",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.DescriptionFire3:        db  "firestorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.DescriptionFire4:        db  "firebullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
-
-.Descriptionair1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionair2:        db  "air",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionair3:        db  "airstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionair4:        db  "airbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
-
-.Descriptionwater1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionwater2:        db  "water",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionwater3:        db  "waterstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
-
-.Descriptionwater4:        db  "waterbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
+.Descriptionair1:         db  "Chain Lightning",254
+                          db  "Strikes up to 5 troops on the",254
+                          db  "battlefield.",255
 
 
+.Descriptionwater4:       db  "Cure",254
+                          db  "Removes all negative spell effects",254
+                          db  "and heals for 20 HP",255
+
+.Descriptionwater3:       db  "Ice Bolt",254
+                          db  "Deals damage to a single enemy unit.",254
+                          db  " ",255
+
+.Descriptionwater2:       db  "Ice Trap",254
+                          db  "Enemy unit cant attack until attacked,",254
+                          db  "dispelled or effect wears off",255
+
+
+.Descriptionwater1:       db  "Frost Ring",254
+                          db  "Causes damage to all units adjacent to",254
+                          db  "the central hex.",255
 
 
 

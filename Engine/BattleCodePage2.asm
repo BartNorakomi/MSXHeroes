@@ -2052,13 +2052,13 @@ AttackingHeroTakesItemsDefendingHero:
 ;                level cost      dmg             aoe               notes
 ;earth
 ;Ethereal chains 1     6                                           50% less speed
-;Plated Armor    2     5                                           +5 defense
+;Plate Armor     2     5                                           +5 defense
 ;resurrection    3     20                                          Reanimates 40 + (power×40) HP of killed friendly living creatures for the current battle/permanently.
 ;meteor shower   4     16        50+(powerx10)   3 hex tiles wide
 
 ;fire
 ;curse           1     5                                           attack -3
-;blind           2     10                                          cant attack until attacked, dispelled or effect wears off
+;blur            2     11                                          -50% damage for ranged units
 ;fireball        3     15        15+(powerx10)   3 hex tiles wide
 ;inferno         4     16        20+(powerx10)   5 hex tiles wide
 
@@ -2071,14 +2071,14 @@ AttackingHeroTakesItemsDefendingHero:
 ;water
 ;cure            1     6                                           Removes all negative spell effects from the selected unit and heals for 20+(power x 5) HP
 ;ice bolt        2     8         30+(powerx10)
-;blur            3     12                                          -50% damage for ranged units
+;ice trap        3     10                                          cant attack until attacked, dispelled or effect wears off
 ;frost ring      4     12        30+(powerx10)   3 hex tiles wide  does not damage center hex
 
 ;universal
 ;magic arrow     1     5         10+(powerx10)
 ;frenzy          2     14                                          Friendly troop's attack is increased by 100% of its defense and its defense is reduced to 0.
 ;teleport        3     15                                          Target allied troop instantly moves to an unoccupied target hex.
-;prayer          4     16                                          +3 attack, defense and speed
+;inner beast     4     16                                          +3 attack, defense and speed
 
 
 

@@ -2546,7 +2546,7 @@ SpellDescriptions:
                           db  "Reduces the speed of the selected",254
                           db  "enemy unit by 50%",255
 
-.DescriptionEarth3:       db  "Plated Armor",254
+.DescriptionEarth3:       db  "Plate Armor",254
                           db  "Increases the defense of the selected",254
                           db  "friendly unit by 5.",255
 
@@ -2563,9 +2563,9 @@ SpellDescriptions:
                           db  "Causes the selected enemy unit to deal",254
                           db  "-3 damage when attacking.",255
 
-.DescriptionFire3:        db  "Blind",254
-                          db  "Enemy unit cant attack until attacked,",254
-                          db  "dispelled or effect wears off",255
+.DescriptionFire3:        db  "Blur",254
+                          db  "Target ranged unit deals 50% less",254
+                          db  "damage.",255
 
 .DescriptionFire2:        db  "Fireball",254
                           db  "Deals damage to target unit and",254
@@ -2601,9 +2601,10 @@ SpellDescriptions:
                           db  "Deals damage to a single enemy unit.",254
                           db  " ",255
 
-.Descriptionwater2:       db  "Blur",254
-                          db  "Target ranged unit deals 50% less",254
-                          db  "damage.",255
+.Descriptionwater2:       db  "Ice Trap",254
+                          db  "Enemy unit cant attack until attacked,",254
+                          db  "dispelled or effect wears off",255
+
 
 .Descriptionwater1:       db  "Frost Ring",254
                           db  "Causes damage to all units adjacent to",254
@@ -2622,7 +2623,7 @@ DescriptionAllSpellSchools2:  db  "Teleport",254
                               db  "Teleport allied troop to an unoccupied",254
                               db  "space.",255
 
-DescriptionAllSpellSchools1:  db  "Prayer",254
+DescriptionAllSpellSchools1:  db  "Inner Beast",254
                               db  "Friendly unit receievs +3 attack,",254
                               db  "+3 defense and +3 speed.",255
 
