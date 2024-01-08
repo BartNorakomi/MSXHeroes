@@ -1563,7 +1563,6 @@ GentleMap05Map:
   incbin "..\maps\GentleMap05.map.pck"
 GentleMap05ObjectLayerMap:
   incbin "..\maps\GentleMap05objects.map.pck"
-kut:
 	ds		$8000-$,$ff
 dephase
 

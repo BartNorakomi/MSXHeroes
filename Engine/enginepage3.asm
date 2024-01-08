@@ -31,7 +31,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
@@ -60,6 +60,9 @@ StartGame:
   call  DoCopy
 
 ;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
+
+;  ld    a,1 | ld    (SetHeroOverViewMenu?),a
+
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
@@ -338,6 +341,8 @@ SetMonsterInBattleFieldGrid?: db  1
 LenghtBattleField:  equ 28
 HeightBattleField:  equ 09
 MovementLenghtMonsters: equ 8
+RepairAmountAboveMonster?: db 1
+AmountMonsterBeforeBeingAttacked: ds  2
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
@@ -346,13 +351,13 @@ ListOfMonstersToPut:
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
   db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
   db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
-  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
+  db  006 | dw 900 | db 012 + (16*08), 056 + (07*16) + 16
 
 ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
 ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (26*08), 056 + (01*16) + 16
 ListOfMonstersToPutMonster9:   db  007 | dw 610 | db 012 + (26*08), 056 + (03*16) + 16
 ListOfMonstersToPutMonster10:  db  007 | dw 001 | db 012 + (27*08), 056 + (04*16) + 16
-ListOfMonstersToPutMonster11:  db  007 | dw 810 | db 012 + (27*08), 056 + (06*16) + 16
+ListOfMonstersToPutMonster11:  db  007 | dw 810 | db 012 + (25*08), 056 + (06*16) + 16
 ListOfMonstersToPutMonster12:  db  007 | dw 910 | db 012 + (26*08), 056 + (07*16) + 16
 
   db  255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255,255,255, 255,255,255, 255

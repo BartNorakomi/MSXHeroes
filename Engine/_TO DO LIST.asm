@@ -1,7 +1,6 @@
 battle:
 magic skills (en text bij magic in textbox)
 options menu
-nummers boven monsters moeten properly gezet worden voor monsters die aangevallen worden (bijvoorbeeld overgang van 3 naar 2 digits etc)
 
 toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.

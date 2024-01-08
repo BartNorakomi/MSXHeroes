@@ -2417,6 +2417,11 @@ HeroOverviewSpellBookWindowCode_Fire:
 
 
 HeroOverviewSpellBookWindowCode_Earth:
+
+
+;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+
 ;  call  ResetStatusSpellBookButtons
   call  SetHeroOverViewSpellBookWindow  ;set skills Window in inactive page
   call  ClearWhiteWindow
@@ -2535,74 +2540,91 @@ SetWhiteWindow:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY  
 
 SpellDescriptions:
-.DescriptionEarth1:        db  "earth meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
 
-.DescriptionEarth2:        db  "earth",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
 
-.DescriptionEarth3:        db  "earthstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionEarth4:       db  "Ethereal Chains",254
+                          db  "Reduces the speed of the selected",254
+                          db  "enemy unit by 50%",255
 
-.DescriptionEarth4:        db  "earthbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
+.DescriptionEarth3:       db  "Plated Armor",254
+                          db  "Increases the defense of the selected",254
+                          db  "friendly unit by 5.",255
 
-.DescriptionFire1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionEarth2:       db  "Resurrection",254
+                          db  "Reanimates 40 HP of killed living",254
+                          db  "friendly creatures.",255
 
-.DescriptionFire2:        db  "fire",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionEarth1:       db  "Meteor Shower",254
+                          db  "Deals damage to all creatures in target",254
+                          db  "and adjacent hexes.",255
 
-.DescriptionFire3:        db  "firestorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
 
-.DescriptionFire4:        db  "firebullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
+.DescriptionFire4:        db  "Curse",254
+                          db  "Causes the selected enemy unit to deal",254
+                          db  "-3 damage when attacking.",255
 
-.Descriptionair1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionFire3:        db  "Blind",254
+                          db  "Enemy unit cant attack until attacked,",254
+                          db  "dispelled or effect wears off",255
 
-.Descriptionair2:        db  "air",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionFire2:        db  "Fireball",254
+                          db  "Deals damage to target unit and",254
+                          db  "adjecent units.",255
 
-.Descriptionair3:        db  "airstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.DescriptionFire1:        db  "Inferno",254
+                          db  "Deals damage in a 5 hex area of",254
+                          db  "effect.",255
 
-.Descriptionair4:        db  "airbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
 
-.Descriptionwater1:        db  "meteor",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.Descriptionair4:         db  "Haste",254
+                          db  "Increases the speed of the selected",254
+                          db  "friendly unit by 4.",255
 
-.Descriptionwater2:        db  "water",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.Descriptionair3:         db  "Disrupting Ray",254
+                          db  "Reduces the defense of the selected ",254
+                          db  "unit by 4.",255
 
-.Descriptionwater3:        db  "waterstorm",254
-                          db  "damages all units on the",254
-                          db  "the battlefield",255
+.Descriptionair2:         db  "Counterstrike",254
+                          db  "Target allied unit has unlimited",254
+                          db  "retaliations each round.",255
 
-.Descriptionwater4:        db  "waterbullet",254
-                          db  "damages all units on the",254
-                          db  "the screen",255
+.Descriptionair1:         db  "Chain Lightning",254
+                          db  "Strikes up to 5 troops on the",254
+                          db  "battlefield.",255
 
-DescriptionAllSpellSchools1: db  "bla 1",255
-DescriptionAllSpellSchools2: db  "bla 2",255
-DescriptionAllSpellSchools3: db  "bla 3",255
-DescriptionAllSpellSchools4: db  "bla 4",255
+
+.Descriptionwater4:       db  "Cure",254
+                          db  "Removes all negative spell effects",254
+                          db  "and heals for 20 HP",255
+
+.Descriptionwater3:       db  "Ice Bolt",254
+                          db  "Deals damage to a single enemy unit.",254
+                          db  " ",255
+
+.Descriptionwater2:       db  "Blur",254
+                          db  "Target ranged unit deals 50% less",254
+                          db  "damage.",255
+
+.Descriptionwater1:       db  "Frost Ring",254
+                          db  "Causes damage to all units adjacent to",254
+                          db  "the central hex.",255
+
+
+DescriptionAllSpellSchools4:  db  "Magic Arrow",254
+                              db  "Deals damage to selected enemy unit.",254
+                              db  " ",255
+
+DescriptionAllSpellSchools3:  db  "Frenzy",254
+                              db  "Unit's defense is added to it's attack,",254
+                              db  "while defense is set to 0.",255
+
+DescriptionAllSpellSchools2:  db  "Teleport",254
+                              db  "Teleport allied troop to an unoccupied",254
+                              db  "space.",255
+
+DescriptionAllSpellSchools1:  db  "Prayer",254
+                              db  "Friendly unit receievs +3 attack,",254
+                              db  "+3 defense and +3 speed.",255
 
 SetSpellExplanation_Water:
   ld    a,(SetSkillsDescription?)
@@ -2619,65 +2641,56 @@ SetSpellExplanation_Water:
   .SetDamage:
   ld    a,(MenuOptionSelected?Backup)
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,10
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools1
+  jp    z,DamageAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,210
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools2
+  jp    z,DamageAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,0
-  jp    z,.DamageAmountFound
-  ld    b,140
-  .DamageAmountFound:
+  ld    b,DamageAllSpellSchools3
+  jp    z,DamageAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAllSpellSchools4
+  jp    z,DamageAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 170
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 130
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  ld    hl,.TextDamage
-  jp    SetText
-  .TextDamage: db  "Damage",255
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageWaterSpell1
+  jp    z,DamageAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageWaterSpell2
+  jp    z,DamageAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageWaterSpell3
+  jp    z,DamageAmountFound
+  ld    b,DamageWaterSpell4
+  jp    DamageAmountFound
 
   .SetCost:
-  ld    a,(MenuOptionSelected?Backup)
-  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,66
-  jp    z,.CostAmountFound
+  ld    a,(MenuOptionSelected?Backup) 
+  cp    1                               ;a = (ix+H eroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools1
+  jp    z,CostAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,9
-  jp    z,.CostAmountFound
+  ld    b,CostAllSpellSchools2
+  jp    z,CostAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,12
-  jp    z,.CostAmountFound
-  ld    b,25
-  .CostAmountFound:
+  ld    b,CostAllSpellSchools3
+  jp    z,CostAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools4
+  jp    z,CostAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 175
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-
-  ld    b,HeroOverViewSpellBookWindowDX + 146
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  ld    hl,.TextCost
-  jp    SetText
-  .TextCost: db  "Cost",255
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostWaterSpell1
+  jp    z,CostAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostWaterSpell2
+  jp    z,CostAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostWaterSpell3
+  jp    z,CostAmountFound
+  ld    b,CostWaterSpell4
+  jp    CostAmountFound
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -2711,9 +2724,7 @@ SetSpellExplanation_Water:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  ret
-
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   .GoSetText:
   ld    a,(MenuOptionSelected?Backup)
@@ -2770,65 +2781,56 @@ SetSpellExplanation_Air:
   .SetDamage:
   ld    a,(MenuOptionSelected?Backup)
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,10
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools1
+  jp    z,DamageAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,210
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools2
+  jp    z,DamageAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,0
-  jp    z,.DamageAmountFound
-  ld    b,140
-  .DamageAmountFound:
+  ld    b,DamageAllSpellSchools3
+  jp    z,DamageAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAllSpellSchools4
+  jp    z,DamageAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 170
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 130
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  ld    hl,.TextDamage
-  jp    SetText
-  .TextDamage: db  "Damage",255
-
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAirSpell1
+  jp    z,DamageAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAirSpell2
+  jp    z,DamageAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAirSpell3
+  jp    z,DamageAmountFound
+  ld    b,DamageAirSpell4
+  jp    DamageAmountFound
 
   .SetCost:
-  ld    a,(MenuOptionSelected?Backup)
-  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,66
-  jp    z,.CostAmountFound
+  ld    a,(MenuOptionSelected?Backup) 
+  cp    1                               ;a = (ix+H eroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools1
+  jp    z,CostAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,9
-  jp    z,.CostAmountFound
+  ld    b,CostAllSpellSchools2
+  jp    z,CostAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,12
-  jp    z,.CostAmountFound
-  ld    b,25
-  .CostAmountFound:
+  ld    b,CostAllSpellSchools3
+  jp    z,CostAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools4
+  jp    z,CostAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 175
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 146
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  ld    hl,.TextCost
-  jp    SetText
-  .TextCost: db  "Cost",255
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAirSpell1
+  jp    z,CostAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAirSpell2
+  jp    z,CostAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAirSpell3
+  jp    z,CostAmountFound
+  ld    b,CostAirSpell4
+  jp    CostAmountFound
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -2863,9 +2865,7 @@ SetSpellExplanation_Air:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  ret
-
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   .GoSetText:
   ld    a,(MenuOptionSelected?Backup)
@@ -2939,65 +2939,56 @@ SetSpellExplanation_Fire:
   .SetDamage:
   ld    a,(MenuOptionSelected?Backup)
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,10
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools1
+  jp    z,DamageAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,210
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools2
+  jp    z,DamageAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,0
-  jp    z,.DamageAmountFound
-  ld    b,140
-  .DamageAmountFound:
+  ld    b,DamageAllSpellSchools3
+  jp    z,DamageAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAllSpellSchools4
+  jp    z,DamageAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 170
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 130
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  ld    hl,.TextDamage
-  jp    SetText
-  .TextDamage: db  "Damage",255
-
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageFireSpell1
+  jp    z,DamageAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageFireSpell2
+  jp    z,DamageAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageFireSpell3
+  jp    z,DamageAmountFound
+  ld    b,DamageFireSpell4
+  jp    DamageAmountFound
 
   .SetCost:
-  ld    a,(MenuOptionSelected?Backup)
-  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,66
-  jp    z,.CostAmountFound
+  ld    a,(MenuOptionSelected?Backup) 
+  cp    1                               ;a = (ix+H eroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools1
+  jp    z,CostAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,9
-  jp    z,.CostAmountFound
+  ld    b,CostAllSpellSchools2
+  jp    z,CostAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,12
-  jp    z,.CostAmountFound
-  ld    b,25
-  .CostAmountFound:
+  ld    b,CostAllSpellSchools3
+  jp    z,CostAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools4
+  jp    z,CostAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 175
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 146
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  ld    hl,.TextCost
-  jp    SetText
-  .TextCost: db  "Cost",255
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostFireSpell1
+  jp    z,CostAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostFireSpell2
+  jp    z,CostAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostFireSpell3
+  jp    z,CostAmountFound
+  ld    b,CostFireSpell4
+  jp    CostAmountFound
 
   .SetSpellIcon:
   call  SetWhiteWindow
@@ -3030,9 +3021,7 @@ SetSpellExplanation_Fire:
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  ret
-
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   .GoSetText:
   ld    a,(MenuOptionSelected?Backup)
@@ -3083,8 +3072,41 @@ SetSpellExplanation_Fire:
 
 
 
+DamageAmountFound:
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 168
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  push  iy
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
+  pop   iy
 
+  ld    b,HeroOverViewSpellBookWindowDX + 132
+  ld    c,HeroOverViewSpellBookWindowDY + 173
+  ld    hl,.TextDamage
+  jp    SetText
+  .TextDamage: db  "Damage:",255
 
+CostAmountFound:
+  ld    a,b
+  or    a
+  ret   z
+  ld    b,HeroOverViewSpellBookWindowDX + 174
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  push  iy
+  ld    l,a
+  ld    h,0
+  call  SetNumber16BitCastle
+  pop   iy
+
+  ld    b,HeroOverViewSpellBookWindowDX + 148
+  ld    c,HeroOverViewSpellBookWindowDY + 159
+  ld    hl,.TextCost
+  jp    SetText
+  .TextCost: db  "Cost:",255
 
 SetSpellExplanation_Earth:              ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
   ld    a,(SetSkillsDescription?)
@@ -3101,72 +3123,62 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   .SetDamage:
   ld    a,(MenuOptionSelected?Backup)
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,10
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools1
+  jp    z,DamageAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,210
-  jp    z,.DamageAmountFound
+  ld    b,DamageAllSpellSchools2
+  jp    z,DamageAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,0
-  jp    z,.DamageAmountFound
-  ld    b,140
-  .DamageAmountFound:
+  ld    b,DamageAllSpellSchools3
+  jp    z,DamageAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageAllSpellSchools4
+  jp    z,DamageAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 170
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
-
-  ld    b,HeroOverViewSpellBookWindowDX + 130
-  ld    c,HeroOverViewSpellBookWindowDY + 159
-  ld    hl,.TextDamage
-  jp    SetText
-  .TextDamage: db  "Damage",255
-
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageEarthSpell1
+  jp    z,DamageAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageEarthSpell2
+  jp    z,DamageAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,DamageEarthSpell3
+  jp    z,DamageAmountFound
+  ld    b,DamageEarthSpell4
+  jp    DamageAmountFound
 
   .SetCost:
-  ld    a,(MenuOptionSelected?Backup)
-  cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,66
-  jp    z,.CostAmountFound
+  ld    a,(MenuOptionSelected?Backup) 
+  cp    1                               ;a = (ix+H eroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools1
+  jp    z,CostAmountFound
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,9
-  jp    z,.CostAmountFound
+  ld    b,CostAllSpellSchools2
+  jp    z,CostAmountFound
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    b,12
-  jp    z,.CostAmountFound
-  ld    b,25
-  .CostAmountFound:
+  ld    b,CostAllSpellSchools3
+  jp    z,CostAmountFound
+  cp    4                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostAllSpellSchools4
+  jp    z,CostAmountFound
 
-  ld    a,b
-  or    a
-  ret   z
-  ld    b,HeroOverViewSpellBookWindowDX + 175
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  push  iy
-  ld    l,a
-  ld    h,0
-  call  SetNumber16BitCastle
-  pop   iy
+  cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostEarthSpell1
+  jp    z,CostAmountFound
+  cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostEarthSpell2
+  jp    z,CostAmountFound
+  cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    b,CostEarthSpell3
+  jp    z,CostAmountFound
+  ld    b,CostEarthSpell4
+  jp    CostAmountFound
 
-  ld    b,HeroOverViewSpellBookWindowDX + 146
-  ld    c,HeroOverViewSpellBookWindowDY + 173
-  ld    hl,.TextCost
-  jp    SetText
-  .TextCost: db  "Cost",255
 
   .SetSpellIcon:
   call  SetWhiteWindow
 
   ld    a,(MenuOptionSelected?Backup)
-
-
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
   jp    z,.SetIcon
@@ -3195,9 +3207,7 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    de,$0000 + ((HeroOverViewSpellBookWindowDY + 160) *128) + ((HeroOverViewSpellBookWindowDx+10)/2)
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
-  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-  ret
-
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   .GoSetText:
   ld    a,(MenuOptionSelected?Backup)
@@ -3231,6 +3241,55 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    c,HeroOverViewSpellBookWindowDY + 159
   jp    SetText
 
+CostAllSpellSchools4: equ 5
+CostAllSpellSchools3: equ 14
+CostAllSpellSchools2: equ 15
+CostAllSpellSchools1: equ 16
+
+CostEarthSpell4: equ 6
+CostEarthSpell3: equ 5
+CostEarthSpell2: equ 20
+CostEarthSpell1: equ 16
+
+CostFireSpell4: equ 5
+CostFireSpell3: equ 10
+CostFireSpell2: equ 15
+CostFireSpell1: equ 16
+
+CostAirSpell4: equ 6
+CostAirSpell3: equ 4
+CostAirSpell2: equ 30
+CostAirSpell1: equ 24
+
+CostWaterSpell4: equ 6
+CostWaterSpell3: equ 8
+CostWaterSpell2: equ 12
+CostWaterSpell1: equ 12
+
+DamageAllSpellSchools4: equ 10
+DamageAllSpellSchools3: equ 0
+DamageAllSpellSchools2: equ 0
+DamageAllSpellSchools1: equ 0
+
+DamageEarthSpell4: equ 0
+DamageEarthSpell3: equ 0
+DamageEarthSpell2: equ 0
+DamageEarthSpell1: equ 50
+
+DamageFireSpell4: equ 0
+DamageFireSpell3: equ 0
+DamageFireSpell2: equ 15
+DamageFireSpell1: equ 20
+
+DamageAirSpell4: equ 0
+DamageAirSpell3: equ 0
+DamageAirSpell2: equ 0
+DamageAirSpell1: equ 60
+
+DamageWaterSpell4: equ 0
+DamageWaterSpell3: equ 30
+DamageWaterSpell2: equ 0
+DamageWaterSpell1: equ 30
 
 EarthSelected:
   xor   a
@@ -4718,13 +4777,13 @@ SkillNecromancyExpert:
                           db  "that have fallen in battle.      ",255
 
 
-SetHeroOverViewFontPage0Y212:           ;set font at (0,212) page 0
-  ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
+;SetHeroOverViewFontPage0Y212:           ;set font at (0,212) page 0
+;  ld    hl,$4000 + (000*128) + (000/2) - 128
+;  ld    de,$0000 + (212*128) + (000/2) - 128
 ;  ld    de,$0000 + (000*128) + (000/2) - 128
-  ld    bc,$0000 + (005*256) + (256/2)
-  ld    a,HeroOverviewFontBlock         ;font graphics block
-  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+;  ld    bc,$0000 + (005*256) + (256/2)
+;  ld    a,HeroOverviewFontBlock         ;font graphics block
+;  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
 SetHeroOverViewFirstWindow:
   ld    hl,$4000 + (HeroOverViewFirstWindowchoicesSY*128) + (HeroOverViewFirstWindowchoicesSX/2) -128

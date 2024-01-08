@@ -3956,6 +3956,11 @@ MoveMonster:
 
   ld    ix,(MonsterThatIsBeingAttacked)
 
+  ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    (AmountMonsterBeforeBeingAttacked),hl
+
   call  SetTotalMonsterHPInHL  ;in ix->monster. out: hl=total hp (including boosts from inventory items, skills and magic)
   ld    c,l                             ;total hp of a unit of this type
   pop   hl                              ;negative total damage dealt
@@ -4851,8 +4856,8 @@ CheckMonsterDied:
   ld    a,(ix+MonsterNYPrevious)
   ld    (EraseMonster+ny),a
 
-  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
-  call  docopy
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  call  docopy
 
   ld    hl,EraseMonster
   call  docopy
@@ -4885,8 +4890,8 @@ CheckMonsterDied:
   ld    a,(ix+MonsterNYPrevious)
   ld    (EraseMonster+ny),a
 
-  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
-  call  docopy
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  call  docopy
 
   ld    hl,EraseMonster
   call  docopy
@@ -4934,8 +4939,6 @@ SetAmountUnderMonster:
   ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
-
   ld    b,241                           ;dx
   ld    c,250                           ;dy
   ld    l,(ix+MonsterAmount)
@@ -4981,10 +4984,99 @@ sub 240
   call  docopy  
   ret
 
+ClearAmountUnderMonster:
+  ;if nx=16 add 0 to textbox
+  ;if nx=32 add 8 to textbox
+  ;if nx=48 add 16 to textbox
+  ;if nx=64 add 24 to textbox
+  ld    a,16
+  ld    (PutMonsterAmountOnBattleField+nx),a
+  
+  ld    a,(ix+MonsterNX)
+  sub   a,16
+	srl		a				                        ;/2
+  add   a,(ix+MonsterX)
+  ld    (PutMonsterAmountOnBattleField+sx),a
+  ld    (PutMonsterAmountOnBattleField+dx),a
+
+  ld    a,(ix+MonsterY)
+  ld    (PutMonsterAmountOnBattleField+sy),a  
+  ld    (PutMonsterAmountOnBattleField+dy),a  
+
+;step 1: clear amount above monster by copying from page 3 to inactive page
+	ld		a,(activepage)
+  xor   1
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+  
+  ld    a,3                             ;clear amount by copying from page 3 to inactive page
+  ld    (PutMonsterAmountOnBattleField+spage),a
+
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy    
+
+;step 2: recover other monsters that we also erased from inactive page
+  xor   a
+  ld    (RepairAmountAboveMonster?),a  
+  call  RecoverOverwrittenMonstersSkipMonster0
+  ld    a,1
+  ld    (RepairAmountAboveMonster?),a  
+
+;step 3: copy new amount above monster from inactive page to active page
+	ld		a,(activepage)
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+  xor   1
+  ld    (PutMonsterAmountOnBattleField+spage),a
+
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy  
+  
+;step 4: clear amount above monster by copying from inactive page to page 2
+	ld		a,2
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy
+
+;step 5: repair overwritten monster in inactive page, by copying entire monster from page 2 to inactive page
+  ld    a,2
+  ld    (PutMonsterAmountOnBattleField+spage),a
+	ld		a,(activepage)
+  xor   1
+  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    a,(ix+MonsterY)
+  ld    (PutMonsterAmountOnBattleField+sy),a
+  ld    (PutMonsterAmountOnBattleField+dy),a
+  ld    a,(ix+MonsterX)
+  ld    (PutMonsterAmountOnBattleField+sx),a
+  ld    (PutMonsterAmountOnBattleField+dx),a
+  ld    a,(ix+MonsterNY)
+  ld    (PutMonsterAmountOnBattleField+ny),a
+  ld    a,(ix+MonsterNX)
+  ld    (PutMonsterAmountOnBattleField+nx),a
+  ld    hl,PutMonsterAmountOnBattleField
+  call  docopy
+
+  ld    a,7
+  ld    (PutMonsterAmountOnBattleField+ny),a
+  ld    a,240
+  ld    (PutMonsterAmountOnBattleField+sx),a
+  ld    a,249
+  ld    (PutMonsterAmountOnBattleField+sy),a  
+  ret
+
 SetAmountUnderMonsterIn3Pages:
 ;to do: when amount goes from 3 digits to 2 digits, 3d digit isnt erased
 ;to do: when amount goes from 2 digits to 1 digit, 2d digit isnt erased
 ;to do: when a huge monster is blocking the number, we should proceed the hard way
+  ld    hl,(AmountMonsterBeforeBeingAttacked)
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  call  CompareHLwithDE
+  ret   z                               ;don't set amount if it didn't change
+  
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  ClearAmountUnderMonster
+
   ld    ix,(MonsterThatIsBeingAttacked)
   call  SetAmountUnderMonster
 
@@ -5348,8 +5440,8 @@ CheckSwitchToNextMonster:
   ld    hl,TransparantImageBattleRecoverySprite
   call  docopy
 
-  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
-  call  docopy
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  call  docopy
 
   .GoToNextActiveMonster:
   ld    a,(HandleRetaliation?)
@@ -5880,7 +5972,9 @@ RecoverOverwrittenMonsters:
 
   call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
+  ld    a,(RepairAmountAboveMonster?)
+  or    a
+  jr    z,.EndRepairAmountAboveMonster
 
   ;Repair Amount under monster, EXCEPT when we are handling grid sprite
   push  ix
@@ -5894,12 +5988,14 @@ RecoverOverwrittenMonsters:
   pop   ix
   ;/Repair Amount under monster, EXCEPT when we are handling grid sprite
 
+  .EndRepairAmountAboveMonster:
+
   ld    hl,TransparantImageBattle
   call  docopy
 ret
   ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
-  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
-  jp    docopy
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  jp    docopy
 ;  ret
 
 
@@ -5944,8 +6040,8 @@ PutMonster:
   call  docopy
 ret
   ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
-  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
-  jp    docopy
+;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
+;  jp    docopy
 ;  ret
 
 StoreSYSXNYNXAndBlock:
