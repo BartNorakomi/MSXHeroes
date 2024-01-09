@@ -329,6 +329,7 @@ IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
+SpellExplanationDisplayed?: db  0
 SpellBookButtonPressed?: db  1
 SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
 WaitButtonPressed?: db  0

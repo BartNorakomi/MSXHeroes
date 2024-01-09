@@ -2046,52 +2046,45 @@ AttackingHeroTakesItemsDefendingHero:
   pop   ix
   ret
 
-LightUpCurrentActiveElementalButton:
-  ld    a,(SelectedElementInSpellBook)  ;0=earth, 1=fire, 2=air, 3=water
-  or    a
-  jr    z,.Earth
-  dec   a
-  jr    z,.Fire
-  dec   a
-  jr    z,.Air
+SetSpellExplanation:
+  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
 
-  .Water:
-  ld    a,%0010 0011
-  ld    (BattleSpellBookButtonTable + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
-  call  .LightUpButton
-  xor   a
-  ld    (BattleSpellBookButtonTable + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ld    a,1
+  ld    (SpellExplanationDisplayed?),a
+
+  xor   a                 ;hack to set text in current page
+  ld    (SetText.SelfModifyingCodeSetTextInCurrentPage),a
+
+  call  .GoSetText
+  call  .SetSpellIcon
+  call  .SetCost
+  call  .SetDamage
+
+  ld    a,1               ;back to set text in buffer page
+  ld    (SetText.SelfModifyingCodeSetTextInCurrentPage),a
   ret
 
-  .Air:
-  ld    a,%0010 0011
-  ld    (BattleSpellBookButtonTable + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
-  call  .LightUpButton
-  xor   a
-  ld    (BattleSpellBookButtonTable + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  .SetSpellIcon:
   ret
 
-  .Fire:
-  ld    a,%0010 0011
-  ld    (BattleSpellBookButtonTable + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
-  call  .LightUpButton
-  xor   a
-  ld    (BattleSpellBookButtonTable + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
-  ret
-  
-  .Earth:
-  ld    a,%0010 0011
-  ld    (BattleSpellBookButtonTable + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
-  call  .LightUpButton
-  xor   a
-  ld    (BattleSpellBookButtonTable + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  .SetCost:
   ret
 
-  .LightUpButton:
-  ld    ix,BattleSpellBookButtonTable
-  ld    iy,ButtonTableSpellBookSYSX_Water
-  jp    HandleSpellBook.CopyButtons     ;copies button state from rom -> vram
+  .SetDamage:
+  ret
 
+  .GoSetText:
+  ld    hl,SpellDescriptionsBattle.Descriptionwater4
+
+  ld    b,SpellBookX + 030
+  ld    c,SpellBookY + 159
+  jp    SetText
+  ret
+
+SpellDescriptionsBattle:
+.Descriptionwater4:       db  "Cure",254
+                          db  "Removes all negative spell effects",254
+                          db  "and heals for 20 HP",255
 
 
 SpellBookX:  equ 032
@@ -2111,10 +2104,10 @@ HandleSpellBook:
   ld    ix,(plxcurrentheroAddress)
   call  SetGraphicsElementalSpells
   call  SetGraphicsElementalSpells.SetUniversalSpells
+  call  LightUpCurrentActiveElementalButton
   halt                                  ;swap page on vblank for smooth transition
   call  SwapAndSetPage                  ;swap and set page 0
 
-  call  LightUpCurrentActiveElementalButton
 
   .engine:
   call  PopulateControls                ;read out keys
@@ -2123,7 +2116,7 @@ HandleSpellBook:
   ;handle interaction mouse - elemental buttons (4 buttons on the left side)
   ld    ix,BattleSpellBookButtonTable
   ld    iy,ButtonTableSpellBookSYSX_Water
-  call  .CheckButtonMouseInteraction
+  call  CheckButtonMouseInteraction4ElementalButtons
   ld    a,b
   or    a
   call  nz,.ElementalButtonPressed
@@ -2151,7 +2144,6 @@ HandleSpellBook:
 ;  ld    a,(MenuOptionSelected?)
 ;  or    a
 ;  jp    nz,.SpellIconPressed
-;  call  SetSpellExplanation_Water        ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
   ld    ix,BattleSpellIconButtons
   call  .CopyButtons                      ;copies button state from rom -> vram
   ;/handle interaction mouse - spell buttons (elemental and universal)
@@ -2290,6 +2282,109 @@ HandleSpellBook:
   call  .check
   add   ix,de
   djnz  .loop2
+
+  ld    a,(SpellExplanationDisplayed?)  
+  or    a
+  ret   z
+  xor   a
+  ld    (SpellExplanationDisplayed?),a  
+
+  ;if there is a spell explanation displayed and mouse is not over any spell icon, erase the spell explanation
+;  ld    hl,$4000 + (000*128) + (000/2) -128
+;  ld    de,$0000 + (SpellBookY*128) + (SpellBookX/2)
+;  ld    bc,$0000 + (HeroOverViewSpellBookWindowNY*256) + (HeroOverViewSpellBookWindowNX/2)
+
+  ld    hl,$4000 + (158*128) + (010/2) -128
+  ld    de,$0000 + ((SpellBookY+158)*128) + ((SpellBookX+10)/2)
+  ld    bc,$0000 + (20*256) + (176/2)
+  ld    a,SpellBookGraphicsBlock;Map block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+  .check:
+  ld    a,(ix+HeroOverviewWindowButtonStatus)
+  or    a
+  ret   z
+  
+  ld    a,(spat+0)                      ;y mouse
+  cp    (ix+HeroOverviewWindowButtonYtop)
+  jr    c,.NotOverButton
+  cp    (ix+HeroOverviewWindowButtonYbottom)
+  jr    nc,.NotOverButton
+  ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
+  cp    (ix+HeroOverviewWindowButtonXleft)
+  jr    c,.NotOverButton
+  cp    (ix+HeroOverviewWindowButtonXright)
+  jr    nc,.NotOverButton
+  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ld    a,(Controls)
+  bit   4,a                             ;check trigger a / space
+  jr    nz,.MouseOverButtonAndSpacePressed
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.MenuOptionSelected           ;space NOT pressed and button was fully lit ? Then menu option is selected
+  .MouseHoverOverButton:
+  pop   af                              ;no need to check the other buttons
+  bit   6,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ret   nz
+  ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+  jp    SetSpellExplanation             ;when first time hovering over a button, show the spell explanation
+
+  .MouseOverButtonAndSpacePressed:
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  jr    z,.MouseHoverOverButton
+
+  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
+  ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+  pop   af                              ;no need to check the other buttons
+  ret
+  
+  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
+  ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+  pop   af                              ;no need to check the other buttons
+  ret
+
+   .NotOverButton:
+  bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  jr    nz,.buttonIsStillLit
+  bit   6,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
+  ret   z
+  .buttonIsStillLit:
+  ld    (ix+HeroOverviewWindowButtonStatus),%1000 0011
+  pop   af                              ;no need to check the other buttons
+  ret
+
+.MenuOptionSelected:
+  ld    (ix+HeroOverviewWindowButtonStatus),%1010 0011
+
+  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
+;  ld    (MenuOptionSelected?),a
+  pop   af                                    ;pop the call in the button check loop 
+  ret
+
+
+
+
+
+
+CheckButtonMouseInteraction4ElementalButtons:
+  ld    b,(ix+HeroOverviewWindowAmountOfButtons)
+  ld    de,ButtonTableLenght
+
+  .loop2:
+  call  .check
+  add   ix,de
+  djnz  .loop2
   ret
   
   .check:
@@ -2367,10 +2462,51 @@ HandleSpellBook:
 
 
 
+LightUpCurrentActiveElementalButton:
+  ld    a,(SelectedElementInSpellBook)  ;0=earth, 1=fire, 2=air, 3=water
+  or    a
+  jr    z,.Earth
+  dec   a
+  jr    z,.Fire
+  dec   a
+  jr    z,.Air
 
+  .Water:
+  ld    a,%0010 0011
+  ld    (BattleSpellBookButtonTable + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  call  .LightUpButton
+  xor   a
+  ld    (BattleSpellBookButtonTable + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ret
 
+  .Air:
+  ld    a,%0010 0011
+  ld    (BattleSpellBookButtonTable + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  call  .LightUpButton
+  xor   a
+  ld    (BattleSpellBookButtonTable + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ret
 
+  .Fire:
+  ld    a,%0010 0011
+  ld    (BattleSpellBookButtonTable + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  call  .LightUpButton
+  xor   a
+  ld    (BattleSpellBookButtonTable + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ret
+  
+  .Earth:
+  ld    a,%0010 0011
+  ld    (BattleSpellBookButtonTable + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  call  .LightUpButton
+  xor   a
+  ld    (BattleSpellBookButtonTable + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ret
 
+  .LightUpButton:
+  ld    ix,BattleSpellBookButtonTable
+  ld    iy,ButtonTableSpellBookSYSX_Water
+  jp    HandleSpellBook.CopyButtons     ;copies button state from rom -> vram
 
 
 
