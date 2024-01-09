@@ -31,7 +31,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
@@ -329,6 +329,8 @@ IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
+SpellBookButtonPressed?: db  1
+SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
 WaitButtonPressed?: db  0
 AutoCombatButtonPressed?: db  0
 DefendButtonPressed?: db  0
@@ -930,7 +932,23 @@ ButtonTableSpellBookSYSX_Water_Activated:
   dw  $4000 + (HeroOverViewSpellBookButton4MouseOverSY*128) + (HeroOverViewSpellBookButton4MouseOverSX/2) - 128
   dw  $4000 + (HeroOverViewSpellBookButton4MouseClickedSY*128) + (HeroOverViewSpellBookButton4MouseClickedSX/2) - 128
 
+BattleSpellBookButtonTableAmountOfButtons_Water:  db  4
+BattleSpellBookButtonTable: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                             ny, nx
+  dw  $0000 + (BattleSpellBookButton1DY*128) + (BattleSpellBookButton1DX/2) | db %1000 0011, BattleSpellBookButton1DY,BattleSpellBookButton2DY,BattleSpellBookButton1DX,BattleSpellBookButton1DX+HeroOverViewSpellBookWindowButton1NX | dw $0000 + (HeroOverViewSpellBookWindowButton1NY*256) + (HeroOverViewSpellBookWindowButton1NX/2)
+  dw  $0000 + (BattleSpellBookButton2DY*128) + (BattleSpellBookButton2DX/2) | db %1000 0011, BattleSpellBookButton2DY,BattleSpellBookButton3DY,BattleSpellBookButton2DX,BattleSpellBookButton2DX+HeroOverViewSpellBookWindowButton2NX | dw $0000 + (HeroOverViewSpellBookWindowButton2NY*256) + (HeroOverViewSpellBookWindowButton1NX/2)
+  dw  $0000 + (BattleSpellBookButton3DY*128) + (BattleSpellBookButton3DX/2) | db %1000 0011, BattleSpellBookButton3DY,BattleSpellBookButton4DY,BattleSpellBookButton3DX,BattleSpellBookButton3DX+HeroOverViewSpellBookWindowButton3NX | dw $0000 + (HeroOverViewSpellBookWindowButton3NY*256) + (HeroOverViewSpellBookWindowButton1NX/2)
+  dw  $0000 + (BattleSpellBookButton4DY*128) + (BattleSpellBookButton4DX/2) | db %1000 0011, BattleSpellBookButton4DY,BattleSpellBookButton5DY,BattleSpellBookButton4DX,BattleSpellBookButton4DX+HeroOverViewSpellBookWindowButton4NX | dw $0000 + (HeroOverViewSpellBookWindowButton4NY*256) + (HeroOverViewSpellBookWindowButton1NX/2)
 
+BattleSpellBookButton1DX:   equ SpellBookX + 016
+BattleSpellBookButton1DY:   equ SpellBookY + 024
+BattleSpellBookButton2DX:   equ SpellBookX + 014
+BattleSpellBookButton2DY:   equ SpellBookY + 058
+BattleSpellBookButton3DX:   equ SpellBookX + 012
+BattleSpellBookButton3DY:   equ SpellBookY + 086
+BattleSpellBookButton4DX:   equ SpellBookX + 010
+BattleSpellBookButton4DY:   equ SpellBookY + 108
+BattleSpellBookButton5DX:   equ SpellBookX + 008
+BattleSpellBookButton5DY:   equ SpellBookY + 143 ;non existing, but in use
 
 
 
@@ -1760,6 +1778,37 @@ HeroOverviewSpellIconButtonTable_Water: ;y,x, status (bit 7=off, bit 6=mouse hov
   dw  $0000 + (HeroOverViewSpellIconButton7DY*128) + (HeroOverViewSpellIconButton7DX/2) | db %1000 0011, HeroOverViewSpellIconButton7DY,HeroOverViewSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton7DX,HeroOverViewSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   dw  $0000 + (HeroOverViewSpellIconButton8DY*128) + (HeroOverViewSpellIconButton8DX/2) | db %1000 0011, HeroOverViewSpellIconButton8DY,HeroOverViewSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,HeroOverViewSpellIconButton8DX,HeroOverViewSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
 
+db  8 ;amount of buttons
+BattleSpellIconButtons: ;y,x, status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer), ytop, ybottom, xleft, xright                                                                                                                                             ny, nx
+  dw  $0000 + (BattleSpellIconButton1DY*128) + (BattleSpellIconButton1DX/2) | db %1000 0011, BattleSpellIconButton1DY,BattleSpellIconButton1DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton1DX,BattleSpellIconButton1DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton2DY*128) + (BattleSpellIconButton2DX/2) | db %1000 0011, BattleSpellIconButton2DY,BattleSpellIconButton2DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton2DX,BattleSpellIconButton2DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton3DY*128) + (BattleSpellIconButton3DX/2) | db %1000 0011, BattleSpellIconButton3DY,BattleSpellIconButton3DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton3DX,BattleSpellIconButton3DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton4DY*128) + (BattleSpellIconButton4DX/2) | db %1000 0011, BattleSpellIconButton4DY,BattleSpellIconButton4DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton4DX,BattleSpellIconButton4DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+  dw  $0000 + (BattleSpellIconButton5DY*128) + (BattleSpellIconButton5DX/2) | db %1000 0011, BattleSpellIconButton5DY,BattleSpellIconButton5DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton5DX,BattleSpellIconButton5DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton6DY*128) + (BattleSpellIconButton6DX/2) | db %1000 0011, BattleSpellIconButton6DY,BattleSpellIconButton6DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton6DX,BattleSpellIconButton6DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton7DY*128) + (BattleSpellIconButton7DX/2) | db %1000 0011, BattleSpellIconButton7DY,BattleSpellIconButton7DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton7DX,BattleSpellIconButton7DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+  dw  $0000 + (BattleSpellIconButton8DY*128) + (BattleSpellIconButton8DX/2) | db %1000 0011, BattleSpellIconButton8DY,BattleSpellIconButton8DY+HeroOverViewSpellIconWindowButtonNY,BattleSpellIconButton8DX,BattleSpellIconButton8DX+HeroOverViewSpellIconWindowButtonNX | dw $0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
+
+BattleSpellIconButton1DX:   equ SpellBookX + 040
+BattleSpellIconButton1DY:   equ SpellBookY + 050
+BattleSpellIconButton2DX:   equ SpellBookX + 070
+BattleSpellIconButton2DY:   equ SpellBookY + 054
+BattleSpellIconButton3DX:   equ SpellBookX + 038
+BattleSpellIconButton3DY:   equ SpellBookY + 095
+BattleSpellIconButton4DX:   equ SpellBookX + 068
+BattleSpellIconButton4DY:   equ SpellBookY + 099
+BattleSpellIconButton5DX:   equ SpellBookX + 108
+BattleSpellIconButton5DY:   equ SpellBookY + 054
+BattleSpellIconButton6DX:   equ SpellBookX + 138
+BattleSpellIconButton6DY:   equ SpellBookY + 050
+BattleSpellIconButton7DX:   equ SpellBookX + 110
+BattleSpellIconButton7DY:   equ SpellBookY + 099
+BattleSpellIconButton8DX:   equ SpellBookX + 140
+BattleSpellIconButton8DY:   equ SpellBookY + 095
+
+
+
 ButtonTableSpellIconsEarthSYSX:
   dw  $4000 + (HeroOverViewSpellIconButton1OffSY*128) + (HeroOverViewSpellIconButton1OffSX/2) - 128
   dw  $4000 + (HeroOverViewSpellIconButton1MouseOverSY*128) + (HeroOverViewSpellIconButton1MouseOverSX/2) - 128
@@ -2064,9 +2113,9 @@ ButtonTableSpellBookSYSX_Water:
   dw  $4000 + (HeroOverViewSpellBookButton3MouseOverSY*128) + (HeroOverViewSpellBookButton3MouseOverSX/2) - 128
   dw  $4000 + (HeroOverViewSpellBookButton3MouseClickedSY*128) + (HeroOverViewSpellBookButton3MouseClickedSX/2) - 128
 
-;  dw  $4000 + (HeroOverViewSpellBookButton4OffSY*128) + (HeroOverViewSpellBookButton4OffSX/2) - 128
-;  dw  $4000 + (HeroOverViewSpellBookButton4MouseOverSY*128) + (HeroOverViewSpellBookButton4MouseOverSX/2) - 128
-;  dw  $4000 + (HeroOverViewSpellBookButton4MouseClickedSY*128) + (HeroOverViewSpellBookButton4MouseClickedSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellBookButton4OffSY*128) + (HeroOverViewSpellBookButton4OffSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellBookButton4MouseOverSY*128) + (HeroOverViewSpellBookButton4MouseOverSX/2) - 128
+  dw  $4000 + (HeroOverViewSpellBookButton4MouseClickedSY*128) + (HeroOverViewSpellBookButton4MouseClickedSX/2) - 128
 
 ActivatedSkillsButton:  ds  2
 ;ActivatedSpellIconButton:  ds  2

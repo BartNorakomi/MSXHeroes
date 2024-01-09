@@ -5469,11 +5469,11 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.HeroSkills:  db  25,18,3,33,9,0
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 1111
-.AirSpells:         db  %0000 1111
-.WaterSpells:       db  %0000 1111
-.AllSchoolsSpells:  db  %0000 1111
+.EarthSpells:       db  %0000 1010  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1101
+.AirSpells:         db  %0000 1011
+.WaterSpells:       db  %0000 0111
+.AllSchoolsSpells:  db  %0000 1011
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)

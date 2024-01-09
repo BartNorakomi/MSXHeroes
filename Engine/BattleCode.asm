@@ -68,6 +68,7 @@ HandleMonsters:
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  SetBattleText
   call  AnimateAutoCombatButton
+  call  HandleSpellBook  
 ;/battle code page 2
 
 ;current monster (erase)
@@ -170,6 +171,7 @@ PressMToLookAtPage2And3:
   jp    z,.WaitKeyPress
   ret
 
+BattleScreenVerticalOffset: equ 16
 InitiateBattle:
 call screenon
 
@@ -180,7 +182,7 @@ call screenon
 
 
 
-  ld    a,16                            ;vertical offset register (battlescreen is 16 pixels shifted down)
+  ld    a,BattleScreenVerticalOffset    ;vertical offset register (battlescreen is 16 pixels shifted down)
   di
   out   ($99),a
   ld    a,23+128
@@ -350,6 +352,8 @@ call screenon
   ret
 
 .SpellBookButtonPressed:
+  ld    a,1
+  ld    (SpellBookButtonPressed?),a
   ret
 
 .DefendButtonPressed:
