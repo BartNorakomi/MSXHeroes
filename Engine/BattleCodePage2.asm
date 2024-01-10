@@ -2304,7 +2304,7 @@ SpellDescriptionsBattle:
                           db  "damage.",255
 
 .DescriptionFire2:        db  "Fireball",254
-                          db  "Deals damage to target unit and",254
+                          db  "Deals damage to enemy unit and",254
                           db  "adjecent units.",255
 
 .DescriptionFire1:        db  "Inferno",254
@@ -2352,8 +2352,8 @@ SpellDescriptionsBattle:
                               db  " ",255
 
 .DescriptionAllSpellSchools3:  db  "Frenzy",254
-                              db  "Unit's defense is added to it's attack,",254
-                              db  "while defense is set to 0.",255
+                              db  "Friendly unit's defense is added to it's",254
+                              db  "attack, while defense is set to 0.",255
 
 .DescriptionAllSpellSchools2:  db  "Teleport",254
                               db  "Teleport allied troop to an unoccupied",254
@@ -2652,10 +2652,12 @@ HandleSpellBook:
 .MenuOptionSelected:
   ld    (ix+HeroOverviewWindowButtonStatus),%1010 0011
 
-  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
-;  ld    (MenuOptionSelected?),a
   pop   af                                    ;pop the call in the button check loop 
-  ret
+  pop   af                                    ;pop the call to .CheckButtonMouseInteraction
+
+  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
+  ld    (SpellSelected?),a                    ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
+  jp    ExitSpellBook                         ;spell has been selected, now return to battle
 
 
 

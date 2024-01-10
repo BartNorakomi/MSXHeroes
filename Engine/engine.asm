@@ -4859,7 +4859,6 @@ SpriteColMapSprites:
 	include "../sprites/MapRightSide.tcs.gen"
 	include "../sprites/MiniMapSquareIcon.tcs.gen"
 	
-
 putsprite:
 	xor		a				;page 0/1
 	ld		hl,sprattaddr	;sprite attribute table in VRAM ($17600)
@@ -4868,8 +4867,6 @@ putsprite:
 	ld		c,$98
 	call	outix128		;32 sprites
 	ret
-
-
 
 spat:						;sprite attribute table (y,x)
 	db		100,100,00,0	,100,100,04,0	,100,100,08,0	,004,006,12,0

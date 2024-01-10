@@ -1,6 +1,7 @@
 battle:
 magic skills (en text bij magic in textbox)
 options menu
+als je een vijand kunt slaan, maar prohibition sign is zichtbaar, zoek dan de nearest attack direction en laat die zien instead
 
 toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.

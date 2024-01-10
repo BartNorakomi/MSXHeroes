@@ -330,6 +330,7 @@ WasCursorOnATilePreviousFrame?: db  1
 IsCursorOnATileThisFrame?: db  1
 Wait1FrameBeforeWePutGridTile?: db  0
 SpellExplanationDisplayed?: db  0
+SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
 SpellBookButtonPressed?: db  1
 SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
 WaitButtonPressed?: db  0

@@ -6525,7 +6525,10 @@ SetcursorWhenGridTileIsActive:
   or    a
   jp    z,.SetHand
 
-
+  ld    a,(SpellSelected?)
+  or    a
+  jp    nz,SpellSelectedHandleCursor
+  
 ;  call  SetCurrentActiveMOnsterInIX
   call  SetMonsterTableInIY             ;out: iy->monster table idle
   call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
@@ -7256,21 +7259,265 @@ RangedMonsterCheck:
   ld    hl,SpriteColCursorSprites
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
 
-
-
   xor   a
   ld    (BrokenArrow?),a
-
-
-
-
   ret
 
 
+SpellSelectedHandleCursor:
+  ld    b,1                             ;are we checking friendly monster ?
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  jr    c,.FriendlyMonsterFound
+  ld    b,0                             ;are we checking friendly monster ?
+  .FriendlyMonsterFound:
 
+  ld    ix,Monster1
+  call  .CheckPointerOnCreature
+  ld    ix,Monster2
+  call  .CheckPointerOnCreature
+  ld    ix,Monster3
+  call  .CheckPointerOnCreature
+  ld    ix,Monster4
+  call  .CheckPointerOnCreature
+  ld    ix,Monster5
+  call  .CheckPointerOnCreature
+  ld    ix,Monster6
+  call  .CheckPointerOnCreature
 
+  ld    a,b
+  xor   1
+  ld    b,a                             ;are we checking friendly monster ?
 
+  ld    ix,Monster7
+  call  .CheckPointerOnCreature
+  ld    ix,Monster8
+  call  .CheckPointerOnCreature
+  ld    ix,Monster9
+  call  .CheckPointerOnCreature
+  ld    ix,Monster10
+  call  .CheckPointerOnCreature
+  ld    ix,Monster11
+  call  .CheckPointerOnCreature
+  ld    ix,Monster12
+  call  .CheckPointerOnCreature
+  
+  ;pointer is not on a monster, check if spell can be cast anywhere    
+  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3)
+  cp    3
+  jp    z,.SetSpriteSpellbook
 
+  .SetSpriteProhibitionSign:
+  ld    hl,CursorProhibitionSign
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteProhibitionSignColor
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
+  .CheckPointerOnCreature:
+  call  .Check1TileMonsterStandsOn  
+  ;if monster is at least 16 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,16
+  call  .Check
+
+  ;if monster is at least 32 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,32
+  call  .Check
+
+  ;if monster is at least 48 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,48
+  call  .Check
+  ret
+  .Check1TileMonsterStandsOn:
+  ld    a,(Monster0+MonsterX)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+
+  .Check:
+  cp    c
+  ret   nz
+
+  ld    a,(ix+MonsterY)
+  ld    c,a
+  ld    a,(ix+MonsterNY)
+  add   a,c
+  ld    c,a
+
+  ld    a,(Monster0+MonsterY)
+  add   a,017
+  cp    c
+  ret   nz
+
+  pop   af                              ;no need to check the other monsters
+  pop   af
+
+  ;at this point pointer is on a monster, check the spell we are about to cast, can this spell be cast on ally or neutral monster ?
+  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3)
+  cp    3
+  jp    z,.SpellCanBecastAnyWhere
+  cp    2
+  jp    z,.SpellCanBecastOnlyOnEnemy
+  cp    1
+  jp    z,.SpellCanBecastOnlyOnAlly
+
+;  ld    (MonsterThatIsBeingAttacked),ix
+;  ld    a,(ix+MonsterX)
+;  ld    (MonsterThatIsBeingAttackedX),a
+;  ld    a,(ix+MonsterNX)
+;  ld    (MonsterThatIsBeingAttackedNX),a
+;  ld    a,(ix+MonsterY)
+;  ld    (MonsterThatIsBeingAttackedY),a
+;  ld    a,(ix+MonsterNY)
+;  ld    (MonsterThatIsBeingAttackedNY),a
+
+  .SpellCanBecastOnlyOnAlly:
+  bit   0,b                             ;are we checking friendly monster ?
+  jp    nz,.SetSpriteSpellbook
+  jp    .SetSpriteProhibitionSign
+
+  .SpellCanBecastOnlyOnEnemy:
+  bit   0,b                             ;are we checking friendly monster ?
+  jp    z,.SetSpriteSpellbook
+  jp    .SetSpriteProhibitionSign
+
+  .SpellCanBecastAnyWhere:
+  .SetSpriteSpellbook:
+  ld    hl,CursorEnterCastle
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,SpriteColCursorSprites
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+                      ;castable on: ally(1),enemy(2),anywhere(3)
+;Earth
+SpellEtherealChains:  db 2
+SpellPlateArmor:      db 1
+SpellResurrection:    db 1
+SpellMeteor:          db 3
+;Fire
+SpellCurse:           db 2
+SpellBlur:            db 2
+SpellFireBall:        db 2
+Spellinferno:         db 3
+;Air
+SpellHaste:           db 1
+SpellDisruptingRay:   db 2
+SpellCounterStrike:   db 1
+SpellChainLightning:  db 2
+;Water
+SpellCure:            db 1
+SpellIceBolt:         db 2
+SpellIceTrap:         db 2
+SpellFrostRing:       db 3
+;Universal
+SpellMagicArrow:      db 2
+SpellFrenzy:          db 1
+SpellTeleport:        db 3
+SpellInnerBeast:      db 1
+
+GetSelectedSpellCastableOn:
+  call  GetSelectedSpellTable           ;set spell table in hl
+  ld    a,(hl)                          ;castable on: ally(1),enemy(2),anywhere(3)
+  ret
+
+GetSelectedSpellTable:                  ;set spell table in hl
+  ld    a,(SpellSelected?)
+  cp    1
+  ld    hl,SpellInnerBeast
+  ret   z
+  cp    2
+  ld    hl,SpellTeleport
+  ret   z
+  cp    3
+  ld    hl,SpellFrenzy
+  ret   z
+  cp    4
+  ld    hl,SpellMagicArrow
+  ret   z
+  ld    a,(SelectedElementInSpellBook)  ;0=earth, 1=fire, 2=air, 3=water
+  or    a
+  jr    z,.EarthSpellSelected
+  dec   a
+  jr    z,.FireSpellSelected
+  dec   a
+  jr    z,.AirSpellSelected
+
+  .WaterSpellSelected:
+  ld    a,(SpellSelected?)
+  cp    5
+  ld    hl,SpellFrostRing
+  ret   z
+  cp    6
+  ld    hl,SpellIceTrap
+  ret   z
+  cp    7
+  ld    hl,SpellIceBolt
+  ret   z
+  cp    8
+  ld    hl,SpellCure
+  ret
+
+  .AirSpellSelected:
+  ld    a,(SpellSelected?)
+  cp    5
+  ld    hl,SpellChainLightning
+  ret   z
+  cp    6
+  ld    hl,SpellCounterStrike
+  ret   z
+  cp    7
+  ld    hl,SpellDisruptingRay
+  ret   z
+  cp    8
+  ld    hl,SpellHaste
+  ret
+
+  .FireSpellSelected:
+  ld    a,(SpellSelected?)
+  cp    5
+  ld    hl,Spellinferno
+  ret   z
+  cp    6
+  ld    hl,SpellFireBall
+  ret   z
+  cp    7
+  ld    hl,SpellBlur
+  ret   z
+  cp    8
+  ld    hl,SpellCurse
+  ret
+
+  .EarthSpellSelected:
+  ld    a,(SpellSelected?)
+  cp    5
+  ld    hl,SpellMeteor
+  ret   z
+  cp    6
+  ld    hl,SpellResurrection
+  ret   z
+  cp    7
+  ld    hl,SpellPlateArmor
+  ret   z
+  cp    8
+  ld    hl,SpellEtherealChains
+  ret
 
 
 
