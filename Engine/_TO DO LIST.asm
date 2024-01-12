@@ -7,6 +7,8 @@ toen axe man aan de rechterrand van het scherm displace and width=32 werd, versc
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.
 mogelijk stond het monster waar ie op schoot naast 'm, waardoor het projectiel al verdwenen was voordat de routines db 128+16,WaitImpactProjectile gebeurd waren... ???
 
+bug: rightclick hero en dan de andere hero, dan wordt het venster niet netjes gewist
+
 low prio
 autocombat moet een sprite worden
 

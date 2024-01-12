@@ -51,7 +51,7 @@ CheckEnemyAI:
   jr    .NeutralOrComputerControlledMonsterFound
 
 HandleMonsters:
-  call  PressMToLookAtPage2And3
+;  call  PressMToLookAtPage2And3
 
 ;  call  HandleProjectileSprite         ;done on int
 ;  call  HandleExplosionSprite          ;done on int
@@ -68,7 +68,8 @@ HandleMonsters:
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  SetBattleText
   call  AnimateAutoCombatButton
-  call  HandleSpellBook  
+  call  HandleSpellBook                 ;spell book icon is pressed, handle spell book routine  
+  call  HandleSpellCast                 ;spell is cast, handle spell cast routine
 ;/battle code page 2
 
 ;current monster (erase)
@@ -286,7 +287,7 @@ call screenon
 
   ld    a,b
   cp    9
-  jr    z,.DiskOptionsButtonPressed
+  jp    z,.DiskOptionsButtonPressed
   cp    8
   jr    z,.RetreatButtonPressed
   cp    7
@@ -354,7 +355,7 @@ call screenon
 .SpellBookButtonPressed:
   ld    a,1
   ld    (SpellBookButtonPressed?),a
-  ret
+  jp    EndSpellSelected
 
 .DefendButtonPressed:
   ld    a,1
@@ -364,15 +365,15 @@ call screenon
 .SurrenderButtonPressed:
   ld    a,1
   ld    (SurrenderButtonPressed?),a
-  ret
+  jp    EndSpellSelected
 
 .RetreatButtonPressed:
   ld    a,1
   ld    (RetreatButtonPressed?),a
-  ret
+  jp    EndSpellSelected
 
 .DiskOptionsButtonPressed:
-  ret
+  jp    EndSpellSelected
 
 .SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   ld    a,(ix+GenericButtonGfxBlock)
@@ -1866,8 +1867,8 @@ CheckRightClickToDisplayInfo:
   ret   z
 
   ;CAN BE REMOVED LATER, USED NOW SO WE DONT OVERLAP 'M' WITH DEFEND
-  and   %1101 1111
-  ld    (NewPrContr),a
+;  and   %1101 1111
+;  ld    (NewPrContr),a
   ;/CAN BE REMOVED LATER, USED NOW SO WE DONT OVERLAP 'M' WITH DEFEND
 
 
@@ -1897,6 +1898,8 @@ CheckRightClickToDisplayInfo:
   call  .CheckMonster
 
   call  CheckPointerOnAttackingHero
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy                        ;in case both of these routines are executed directly after another, wait until screen is repaired
   call  CheckPointerOnDefendingHero
   ret
 
@@ -2007,11 +2010,13 @@ CheckRightClickToDisplayInfo:
   add   hl,de
   ex    de,hl
 
+  ;display monster overview window
   ld    hl,$4000 + (000*128) + (162/2) - 128
   ld    bc,$0000 + (061*256) + (086/2)
   ld    a,ScrollBlock           ;block to copy graphics from
+  push  de
+  pop   iy                      ;store de temp in iy
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
   ld    a,(ix+MonsterNumber)
   call  .SetSYSX
 
@@ -2030,6 +2035,24 @@ CheckRightClickToDisplayInfo:
   ex    af,af'
 
   call  CopyTransparantImageBattleCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY 
+
+  ;display status/spell effects
+  ld    a,(ix+MonsterStatusEffect1)
+  ld    hl,68/2 + (16*128)              ;monster status/spell effect 1 68 pixels right and 16 pixel down
+  call  .SetStatusSpellEffectIcon
+
+  ld    a,(ix+MonsterStatusEffect2)
+  ld    hl,68/2 + (30*128)              ;monster status/spell effect 2 68 pixels right and 30 pixel down
+  call  .SetStatusSpellEffectIcon
+
+  ld    a,(ix+MonsterStatusEffect3)
+  ld    hl,54/2 + (16*128)              ;monster status/spell effect 3 54 pixels right and 16 pixel down
+  call  .SetStatusSpellEffectIcon
+
+  ld    a,(ix+MonsterStatusEffect4)
+  ld    hl,54/2 + (30*128)              ;monster status/spell effect 4 54 pixels right and 30 pixel down
+  call  .SetStatusSpellEffectIcon
+
 
 
   ;set hp
@@ -2114,6 +2137,24 @@ CheckRightClickToDisplayInfo:
   call  SetText
 
   jp    WaitKeyPressToGoBackToGame
+
+  .SetStatusSpellEffectIcon:
+  push  iy
+  pop   de                              ;retreive de (left top point of monster overview window)
+  add   hl,de
+  ex    de,hl
+  ld    hl,$4000 + (151*128) + (032/2) - 128
+
+  and   %1111 0000                      ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+	srl		a				                        ;/2
+  ld    b,0
+  ld    c,a
+  add   hl,bc
+
+  ld    bc,$0000 + (012*256) + (012/2)
+  ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
 
   .TextSlash: db "/",255
 
@@ -3950,7 +3991,7 @@ MoveMonster:
 
 
 
-
+  .DealDamageToMonster:                 ;in: damage in hl, monster set in: MonsterThatIsBeingAttacked
 
   ld    de,0
   ex    de,hl
@@ -4008,16 +4049,19 @@ MoveMonster:
 ;  jr    .CheckRetaliate
   
   .CheckRetaliate:                      ;at this point monster is hit, but didn't die, check if monster can retaliate
-
   call  SetAmountUnderMonsterIn3Pages
+
+  ld    a,(SpellSelected?)              ;no need to handle retaliation when damage is spell related
+  or    a
+  ret   nz
 
   ld    a,(HandleRetaliation?)          ;check if current attack is a retaliation
   or    a                               ;in which case we don't need to retaliate again, otherwise endless loop
-  jr    z,.Go
+  jr    z,.go
   xor   a
   ld    (HandleRetaliation?),a
   jr    .EndSetStatusOnEndMovement
-  .Go:
+  .go:
 
 
 
@@ -4053,8 +4097,9 @@ MoveMonster:
   ld    a,1
   ld    (MonsterDied?),a
 
-
-
+  ld    a,(SpellSelected?)              ;no need to handle retaliation when damage is spell related
+  or    a
+  ret   nz
 
   ld    a,(HandleRetaliation?)          ;check if current attack is a retaliation
   or    a                               ;in which case we don't to end turn for attacking monster
@@ -4062,8 +4107,6 @@ MoveMonster:
   xor   a
   ld    (HandleRetaliation?),a
   jr    .EndSetStatusOnEndMovement
-
-
 
   .EndMovement:
   call  SetCurrentActiveMOnsterInIX
@@ -5419,6 +5462,7 @@ CheckSwitchToNextMonster:
   xor   a
   ld    (SwitchToNextMonster?),a
 
+  call  EndSpellSelected
   call  SetCurrentActiveMOnsterInIX
   call  Set255WhereMonsterStandsInBattleFieldGrid
 
@@ -7263,8 +7307,16 @@ RangedMonsterCheck:
   ld    (BrokenArrow?),a
   ret
 
+EndSpellSelected:
+  xor   a
+  ld    (SpellSelected?),a
+  ret
 
 SpellSelectedHandleCursor:
+  ld    a,(Controls)
+  bit   5,a                            ;check ontrols to see if m is pressed 
+  call  nz,EndSpellSelected
+  
   ld    b,1                             ;are we checking friendly monster ?
   ld    a,(CurrentActiveMonster)
   cp    7
@@ -7369,6 +7421,16 @@ SpellSelectedHandleCursor:
   pop   af                              ;no need to check the other monsters
   pop   af
 
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+
   ;at this point pointer is on a monster, check the spell we are about to cast, can this spell be cast on ally or neutral monster ?
   call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3)
   cp    3
@@ -7377,16 +7439,6 @@ SpellSelectedHandleCursor:
   jp    z,.SpellCanBecastOnlyOnEnemy
   cp    1
   jp    z,.SpellCanBecastOnlyOnAlly
-
-;  ld    (MonsterThatIsBeingAttacked),ix
-;  ld    a,(ix+MonsterX)
-;  ld    (MonsterThatIsBeingAttackedX),a
-;  ld    a,(ix+MonsterNX)
-;  ld    (MonsterThatIsBeingAttackedNX),a
-;  ld    a,(ix+MonsterY)
-;  ld    (MonsterThatIsBeingAttackedY),a
-;  ld    a,(ix+MonsterNY)
-;  ld    (MonsterThatIsBeingAttackedNY),a
 
   .SpellCanBecastOnlyOnAlly:
   bit   0,b                             ;are we checking friendly monster ?
@@ -7404,10 +7456,18 @@ SpellSelectedHandleCursor:
   ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
   ld    hl,SpriteColCursorSprites
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+
+  ld    a,(NewPrContr)
+  bit   4,a                            ;check ontrols to see if space is pressed 
+  ret   z
+  
+  ;at this point a space is pressed in order to cast the selected spell.
+  ld    a,1
+  ld    (CastSpell?),a
   ret
                       ;castable on: ally(1),enemy(2),anywhere(3)
 ;Earth
-SpellEtherealChains:  db 2
+SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine 
 SpellPlateArmor:      db 1
 SpellResurrection:    db 1
 SpellMeteor:          db 3
@@ -7422,8 +7482,8 @@ SpellDisruptingRay:   db 2
 SpellCounterStrike:   db 1
 SpellChainLightning:  db 2
 ;Water
-SpellCure:            db 1
-SpellIceBolt:         db 2
+SpellCure:            db 1 | dw SpellCureRoutine
+SpellIceBolt:         db 2 | dw SpellIceBoltRoutine
 SpellIceTrap:         db 2
 SpellFrostRing:       db 3
 ;Universal
@@ -7431,6 +7491,15 @@ SpellMagicArrow:      db 2
 SpellFrenzy:          db 1
 SpellTeleport:        db 3
 SpellInnerBeast:      db 1
+
+GetSelectedSpellRoutine:                ;set spell routine in hl
+  call  GetSelectedSpellTable           ;set spell table in hl
+  inc   hl
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)
+  ex    de,hl
+  ret
 
 GetSelectedSpellCastableOn:
   call  GetSelectedSpellTable           ;set spell table in hl
@@ -7519,7 +7588,34 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellEtherealChains
   ret
 
+SpellEtherealChainsRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,%0001 0000 + 6
+  ld    (ix+MonsterStatusEffect1),a
+  jp    EndSpellSelected
 
+SpellIceBoltRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
+  ld    hl,90*5
+  call  MoveMonster.DealDamageToMonster
+  jp    EndSpellSelected
+
+SpellCureRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+;  call  GetCureAmount                   ;out: a=cure amount
+;  add   a,(ix+MonsterHP)
+
+  ld    a,(ix+MonsterHP)
+  add   a,20
+  ld    (ix+MonsterHP),a
+  cp    (iy+MonsterTableHp)             ;hp per unit
+  jp    c,EndSpellSelected
+  ld    a,(iy+MonsterTableHp)           ;hp per unit
+  ld    (ix+MonsterHP),a
+  jp    EndSpellSelected
 
 
 
@@ -7680,15 +7776,6 @@ DeactivateHeroThatAttacks:
   .HeroTouchesEnemyHero:
   ld    (AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked),hl
 
-
-
-
-
-
-
-
-
-
   ld    ix,(plxcurrentheroAddress)      ;hero that initiated attack
   ld    (ix+HeroStatus),255             ;255 = inactive
 
@@ -7759,9 +7846,5 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
   ld    a,1
   ld    (NeutralEnemyDied?),a
   ret
-
-
-
-
 
 

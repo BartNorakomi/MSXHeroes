@@ -3302,8 +3302,8 @@ SetGraphicsElementalSpells:
 .Spell8DX:  equ SpellBookX + 140
 
 
-SetGraphicsUniversalSpells:
-  ret
+;SetGraphicsUniversalSpells:
+;  ret
 
 SetGraphicsSpellBook:
   ld    hl,$4000 + (000*128) + (000/2) -128
@@ -3312,7 +3312,18 @@ SetGraphicsSpellBook:
   ld    a,SpellBookGraphicsBlock;Map block
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+HandleSpellCast:
+  ld    a,(CastSpell?)
+  or    a
+  ret   z
+  xor   a
+  ld    (CastSpell?),a
 
+;  ld    hl,CheckVictoryOrDefeat.CopyPage1toPage0
+;  call  HandleSpellAnimation                          ;spell animation is handled in it's own loop
+
+  call  GetSelectedSpellRoutine                       ;set spell routine in hl
+  jp    (hl)                                          ;jump to spell routine
 
 ;Magic abilities:
 
