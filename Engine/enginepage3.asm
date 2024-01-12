@@ -494,6 +494,7 @@ MonsterStatusEffect1:   equ MonsterStatus+1
 MonsterStatusEffect2:   equ MonsterStatusEffect1+1
 MonsterStatusEffect3:   equ MonsterStatusEffect2+1
 MonsterStatusEffect4:   equ MonsterStatusEffect3+1
+MonsterStatusEffect5:   equ MonsterStatusEffect4+1
 LenghtMonsterTable:     equ Monster1-Monster0
 
 
@@ -524,6 +525,7 @@ Monster0:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Monster1:
@@ -545,6 +547,7 @@ Monster1:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 ;%0001 xxxx=ethereal chains (earth)
 ;%0010 xxxx=plate armor (earth)
 ;%0011 xxxx=curse (fire)
@@ -575,6 +578,7 @@ Monster2:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster3:
 .y: db  056 + (03*16) - 16  - 8
@@ -595,6 +599,7 @@ Monster3:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster4:
 .y: db  056 + (00*16) - 32
@@ -615,6 +620,7 @@ Monster4:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster5:
 .y: db  056 + (08*16) - 16  - 4
@@ -635,6 +641,7 @@ Monster5:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster6:
 .y: db  056 + (01*16) - 64  - 4
@@ -651,10 +658,11 @@ Monster6:
 .amount:  dw 47
 .hp:      db 01
 .status:  db  0                   ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
-.statusEffect1: db  16             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-.statusEffect2: db  32             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-.statusEffect3: db  48             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-.statusEffect4: db  64             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect1: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; player 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -677,6 +685,7 @@ Monster7:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster8:
 .y: db  056 + (02*16) - 32    
@@ -697,6 +706,7 @@ Monster8:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster9:
 .y: db  056 + (06*16) - 32
@@ -717,6 +727,7 @@ Monster9:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster10:
 .y: db  056 + (07*16) - 16  - 8
@@ -737,6 +748,7 @@ Monster10:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster11:
 .y: db  056 + (08*16) - 16  - 4
@@ -757,6 +769,7 @@ Monster11:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster12:
 .y: db  056 + (07*16) - 16  - 4
@@ -777,6 +790,7 @@ Monster12:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 ;;;;;;;;;;;;;;;;;; 2 spare monster slots for elementals
 
@@ -799,6 +813,7 @@ Monster13:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 Monster14:
 .y: db  040
@@ -819,6 +834,7 @@ Monster14:
 .statusEffect2: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect3: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 .statusEffect4: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+.statusEffect5: db  0             ;bit 0-3=duration, bit 4-7 spell,  spell, duration
 
 ClearMapPage0AndMapPage1:
   ld    hl,mappage0

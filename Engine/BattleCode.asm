@@ -2053,7 +2053,9 @@ CheckRightClickToDisplayInfo:
   ld    hl,54/2 + (30*128)              ;monster status/spell effect 4 54 pixels right and 30 pixel down
   call  .SetStatusSpellEffectIcon
 
-
+  ld    a,(ix+MonsterStatusEffect5)
+  ld    hl,68/2 + (43*128)              ;monster status/spell effect 4 54 pixels right and 30 pixel down
+  call  .SetStatusSpellEffectIcon
 
   ;set hp
   pop   af                              ;y window
@@ -7468,29 +7470,29 @@ SpellSelectedHandleCursor:
                       ;castable on: ally(1),enemy(2),anywhere(3)
 ;Earth
 SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine 
-SpellPlateArmor:      db 1
+SpellPlateArmor:      db 1 | dw SpellPlateArmorRoutine 
 SpellResurrection:    db 1
 SpellMeteor:          db 3
 ;Fire
-SpellCurse:           db 2
-SpellBlur:            db 2
+SpellCurse:           db 2 | dw SpellCurseRoutine 
+SpellBlur:            db 2 | dw SpellBlurRoutine 
 SpellFireBall:        db 2
 Spellinferno:         db 3
 ;Air
-SpellHaste:           db 1
-SpellDisruptingRay:   db 2
-SpellCounterStrike:   db 1
+SpellHaste:           db 1 | dw SpellHasteRoutine 
+SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine 
+SpellCounterStrike:   db 1 | dw SpellCounterStrikeRoutine 
 SpellChainLightning:  db 2
 ;Water
 SpellCure:            db 1 | dw SpellCureRoutine
 SpellIceBolt:         db 2 | dw SpellIceBoltRoutine
-SpellIceTrap:         db 2
+SpellIceTrap:         db 2 | dw SpellIceTrapRoutine 
 SpellFrostRing:       db 3
 ;Universal
-SpellMagicArrow:      db 2
-SpellFrenzy:          db 1
+SpellMagicArrow:      db 2 | dw SpellMagicArrowRoutine 
+SpellFrenzy:          db 1 | dw SpellFrenzyRoutine 
 SpellTeleport:        db 3
-SpellInnerBeast:      db 1
+SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine 
 
 GetSelectedSpellRoutine:                ;set spell routine in hl
   call  GetSelectedSpellTable           ;set spell table in hl
@@ -7588,17 +7590,97 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellEtherealChains
   ret
 
+EtherealChainsSpellNumber:  equ 1*16
 SpellEtherealChainsRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
 ;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,%0001 0000 + 6
-  ld    (ix+MonsterStatusEffect1),a
+  ld    a,EtherealChainsSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+PlateArmorSpellNumber:  equ 2*16
+SpellPlateArmorRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,PlateArmorSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+CurseSpellNumber:  equ 3*16
+SpellCurseRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,CurseSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+BlurSpellNumber:  equ 4*16
+SpellBlurRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,BlurSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+HasteSpellNumber:  equ 5*16
+SpellHasteRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,HasteSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+DisruptingRaySpellNumber:  equ 6*16
+SpellDisruptingRayRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,DisruptingRaySpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+CounterStrikeSpellNumber:  equ 7*16
+SpellCounterStrikeRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,CounterStrikeSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+iceTrapSpellNumber:  equ 8*16
+SpelliceTrapRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,iceTrapSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+FrenzySpellNumber:  equ 9*16
+SpellFrenzyRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,FrenzySpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+InnerBeastSpellNumber:  equ 10*16
+SpellInnerBeastRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetSpellDuration                ;out: a=spell duration
+  ld    a,InnerBeastSpellNumber + 6
+  call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 SpellIceBoltRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
 ;  call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
   ld    hl,90*5
+  call  MoveMonster.DealDamageToMonster
+  jp    EndSpellSelected
+
+SpellMagicArrowRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
+  ld    hl,40
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelected
 
@@ -7616,6 +7698,42 @@ SpellCureRoutine:
   ld    a,(iy+MonsterTableHp)           ;hp per unit
   ld    (ix+MonsterHP),a
   jp    EndSpellSelected
+
+;buffs and nerfs go into 1 of the 4 monster slots, check which is empty and put it in
+SetSpellInEmptyStatusSlot:              ;in: a=bit 0-3=duration, bit 4-7 spell 
+
+push ix
+
+  ld    c,a                             ;spell and duration in c
+  and   %1111 0000                      ;spell without duration
+  ld    d,a                             ;spell (without duration) in d
+
+  ld    b,5                             ;5 slots available
+
+  .loop:
+  ld    a,(ix+MonsterStatusEffect1)
+  or    a
+  jr    z,.EmptySlotFound
+  
+  and   %1111 0000                      ;spell without duration
+  cp    d                               ;is the same spell in this slot ?
+  jr    z,.EmptySlotFound  
+  
+  inc   ix                              ;next slot
+  djnz  .loop
+
+pop ix
+  ret
+  
+
+
+  .EmptySlotFound:
+  ld    (ix+MonsterStatusEffect1),c
+
+
+pop ix
+  ret
+
 
 
 

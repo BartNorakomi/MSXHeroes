@@ -5857,9 +5857,9 @@ ResourcesPlayer4:
 
 amountofplayers:		db	2
 player1human?:			db	1
-player2human?:			db	0
-player3human?:			db	0
-player4human?:			db	0
+player2human?:			db	1
+player3human?:			db	1
+player4human?:			db	1
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	
