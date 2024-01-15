@@ -3637,6 +3637,7 @@ AnimateMonster:
   jr    z,.MonsterIsFacingLeft
   jr    .MonsterIsFacingRight
 
+TeleportMovement: equ 10
 AnimateAttack:  equ 20
 DisplaceLeft: equ 21
 DisplaceRight: equ 22
@@ -3685,6 +3686,8 @@ MoveMonster:
   jp    z,.HandleAttackedMonster
   cp    128                           ;bit 7 on=change NX (after having checked for end movement)
   jp    nc,.ChangeNX
+  cp    TeleportMovement
+  jp    z,.TeleportMovement
   cp    12
   jp    z,.InitiateAttackRightUp
   cp    13
@@ -4149,6 +4152,23 @@ MoveMonster:
   jr    z,.MoveLeft
   cp    8
   jr    z,.MoveLeftUp
+  ret
+
+  .TeleportMovement:
+  inc   hl                              ;y
+  ld    a,(hl)
+  ld    (ix+MonsterY),a
+  inc   hl                              ;x
+  ld    a,(hl)
+  ld    (ix+MonsterX),a
+
+  xor   a
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  ld    (MonsterMovementPathPointer),a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+  ld    a,1
+  ld    (SwitchToNextMonster?),a
   ret
 
   .MoveRightUp:
@@ -7357,9 +7377,11 @@ SpellSelectedHandleCursor:
   call  .CheckPointerOnCreature
   
   ;pointer is not on a monster, check if spell can be cast anywhere    
-  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3)
+  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
   cp    3
   jp    z,.SetSpriteSpellbook
+  cp    5
+  jp    z,.CheckFreeHex
 
   .SetSpriteProhibitionSign:
   ld    hl,CursorProhibitionSign
@@ -7367,6 +7389,39 @@ SpellSelectedHandleCursor:
   ld    hl,SpriteProhibitionSignColor
   ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
   ret
+
+  .CheckFreeHex:
+  call  SetCurrentActiveMOnsterInIX
+  call  FindCursorInBattleFieldGrid
+  ld    a,(hl)
+  cp    255                             ;if tile pointer points at is "1", that means current monster is standing there
+  jr    z,.SetSpriteProhibitionSign
+  ld    a,(ix+MonsterNX)
+  cp    17
+  jp    c,.SetSpriteSpellbook
+  cp    33
+  jp    c,.MonsterIs2TilesWide
+  cp    57
+  jp    c,.MonsterIs3TilesWide
+  .MonsterIs4TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jp    z,.SetSpriteProhibitionSign
+  .MonsterIs3TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jp    z,.SetSpriteProhibitionSign
+  .MonsterIs2TilesWide:
+  inc   hl
+  inc   hl
+  ld    a,(hl)
+  cp    255
+  jp    z,.SetSpriteProhibitionSign
+  jp    .SetSpriteSpellbook
 
   .CheckPointerOnCreature:
   call  .Check1TileMonsterStandsOn  
@@ -7434,7 +7489,11 @@ SpellSelectedHandleCursor:
   ld    (MonsterThatIsBeingAttackedNY),a
 
   ;at this point pointer is on a monster, check the spell we are about to cast, can this spell be cast on ally or neutral monster ?
-  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3)
+  call  GetSelectedSpellCastableOn      ;out: a=castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
+  cp    5
+  jp    z,.CheckFreeHex
+  cp    4
+  jp    z,.SpellCanBecastOnlyOnRangedEnemy
   cp    3
   jp    z,.SpellCanBecastAnyWhere
   cp    2
@@ -7446,6 +7505,17 @@ SpellSelectedHandleCursor:
   bit   0,b                             ;are we checking friendly monster ?
   jp    nz,.SetSpriteSpellbook
   jp    .SetSpriteProhibitionSign
+
+  .SpellCanBecastOnlyOnRangedEnemy:
+  bit   0,b                             ;are we checking friendly monster ?
+  jp    nz,.SetSpriteProhibitionSign
+
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedMonster
+  jp    nz,.SetSpriteProhibitionSign
+  
+  jp    .SetSpriteSpellbook
 
   .SpellCanBecastOnlyOnEnemy:
   bit   0,b                             ;are we checking friendly monster ?
@@ -7467,17 +7537,17 @@ SpellSelectedHandleCursor:
   ld    a,1
   ld    (CastSpell?),a
   ret
-                      ;castable on: ally(1),enemy(2),anywhere(3)
+                      ;castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
 ;Earth
 SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine 
 SpellPlateArmor:      db 1 | dw SpellPlateArmorRoutine 
-SpellResurrection:    db 1
-SpellMeteor:          db 3
+SpellResurrection:    db 1 | dw SpellResurrectionRoutine 
+SpellMeteorShower:    db 3 | dw SpellMeteorShowerRoutine 
 ;Fire
 SpellCurse:           db 2 | dw SpellCurseRoutine 
-SpellBlur:            db 2 | dw SpellBlurRoutine 
-SpellFireBall:        db 2
-Spellinferno:         db 3
+SpellBlur:            db 4 | dw SpellBlurRoutine
+SpellFireBall:        db 2 | dw SpellFireBallRoutine 
+Spellinferno:         db 2 | dw SpellInfernoRoutine 
 ;Air
 SpellHaste:           db 1 | dw SpellHasteRoutine 
 SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine 
@@ -7486,12 +7556,12 @@ SpellChainLightning:  db 2
 ;Water
 SpellCure:            db 1 | dw SpellCureRoutine
 SpellIceBolt:         db 2 | dw SpellIceBoltRoutine
-SpellIceTrap:         db 2 | dw SpellIceTrapRoutine 
-SpellFrostRing:       db 3
+SpellIceTrap:         db 2 | dw SpellIceTrapRoutine
+SpellFrostRing:       db 3 | dw SpellFrostRingRoutine
 ;Universal
 SpellMagicArrow:      db 2 | dw SpellMagicArrowRoutine 
 SpellFrenzy:          db 1 | dw SpellFrenzyRoutine 
-SpellTeleport:        db 3
+SpellTeleport:        db 5 | dw SpellTeleportRoutine 
 SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine 
 
 GetSelectedSpellRoutine:                ;set spell routine in hl
@@ -7505,7 +7575,7 @@ GetSelectedSpellRoutine:                ;set spell routine in hl
 
 GetSelectedSpellCastableOn:
   call  GetSelectedSpellTable           ;set spell table in hl
-  ld    a,(hl)                          ;castable on: ally(1),enemy(2),anywhere(3)
+  ld    a,(hl)                          ;castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
   ret
 
 GetSelectedSpellTable:                  ;set spell table in hl
@@ -7578,7 +7648,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   .EarthSpellSelected:
   ld    a,(SpellSelected?)
   cp    5
-  ld    hl,SpellMeteor
+  ld    hl,SpellMeteorShower
   ret   z
   cp    6
   ld    hl,SpellResurrection
@@ -7677,10 +7747,216 @@ SpellIceBoltRoutine:
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelected
 
+SpellMeteorShowerRoutine:
+;  call  GetMeteorShowerDMGAmount        ;out: hl=ice bolt damage amount
+  ld    hl,150
+  ld    (AEOSpellDamage),hl
+  jp    GoCastAOESpell
+
+SpellFireBallRoutine:
+;  call  GetFireBallDMGAmount            ;out: hl=ice bolt damage amount
+  ld    hl,100
+  ld    (AEOSpellDamage),hl
+  jp    GoCastAOESpell
+
+SpellFrostRingRoutine:
+;  call  GetFrostRingDMGAmount            ;out: hl=ice bolt damage amount
+  ld    hl,100
+  ld    (AEOSpellDamage),hl
+
+  ld    hl,0
+  ld    (MonsterThatWasDamagedPreviousCheck),hl
+  ld    a,(Monster0+MonsterX)
+  ld    (CursorXWhereSpellWasCast),a
+  ld    a,(Monster0+MonsterY)
+  ld    (CursorYWhereSpellWasCast),a
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile left of cast point
+  sub   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  GoCastAOESpell.DamageMonsterOnThisTile
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check cast point (we skip this for frost ring)
+  add   a,16
+  ld    (CursorXWhereSpellWasCast),a
+
+  jr    GoCastAOESpell.EntryPointFrostRing
+
+GoCastAOESpell:
+  ld    hl,0
+  ld    (MonsterThatWasDamagedPreviousCheck),hl
+  ld    a,(Monster0+MonsterX)
+  ld    (CursorXWhereSpellWasCast),a
+  ld    a,(Monster0+MonsterY)
+  ld    (CursorYWhereSpellWasCast),a
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile left of cast point
+  sub   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check cast point
+  add   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+  
+  .EntryPointFrostRing:
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile right of cast point
+  add   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile right of cast point
+  sub   a,8
+  ld    (CursorXWhereSpellWasCast),a
+  ld    a,(CursorYWhereSpellWasCast)    ;check 1 tile right and 1 tile above cast point
+  sub   a,16
+  ld    (CursorYWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile left and 1 tile above cast point
+  sub   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+
+  ld    a,(CursorYWhereSpellWasCast)    ;check 1 tile left and 1 tile below cast point
+  add   a,32
+  ld    (CursorYWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+
+  ld    a,(CursorXWhereSpellWasCast)    ;check 1 tile right and 1 tile below cast point
+  add   a,16
+  ld    (CursorXWhereSpellWasCast),a
+  call  .DamageMonsterOnThisTile
+  jp    EndSpellSelected
+
+  .DamageMonsterOnThisTile:
+  call  CheckCollateralSpellDamage      ;check if there is a monster here that also gets hit. out: carry=monster found
+  ret   nc
+  
+  ld    ix,(MonsterThatIsBeingAttacked) ;we make sure each monster can only be damaged once
+  push  ix
+  pop   de
+  ld    hl,(MonsterThatWasDamagedPreviousCheck)
+  call  CompareHLwithDE                 ;check if this monster was already damaged
+  ret   z                               ;return if this monster was already damage previous tilecheck
+  ld    (MonsterThatWasDamagedPreviousCheck),de
+
+  ld    hl,(AEOSpellDamage)
+  call  MoveMonster.DealDamageToMonster
+  call  CheckMonsterDied                ;if monster died, erase it from the battlefield
+  .WaitExplosionMonster:
+  ld    a,(ShowExplosionSprite?)        ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
+  or    a
+  jr    nz,.WaitExplosionMonster
+  ret
+
+CheckCollateralSpellDamage:             ;check if there is a monster here that also gets hit
+  ld    ix,Monster1
+  call  .CheckPointerOnCreature
+  ld    ix,Monster2
+  call  .CheckPointerOnCreature
+  ld    ix,Monster3
+  call  .CheckPointerOnCreature
+  ld    ix,Monster4
+  call  .CheckPointerOnCreature
+  ld    ix,Monster5
+  call  .CheckPointerOnCreature
+  ld    ix,Monster6
+  call  .CheckPointerOnCreature
+  ld    ix,Monster7
+  call  .CheckPointerOnCreature
+  ld    ix,Monster8
+  call  .CheckPointerOnCreature
+  ld    ix,Monster9
+  call  .CheckPointerOnCreature
+  ld    ix,Monster10
+  call  .CheckPointerOnCreature
+  ld    ix,Monster11
+  call  .CheckPointerOnCreature
+  ld    ix,Monster12
+  call  .CheckPointerOnCreature
+  xor   a                             ;reset carry flag=no monster found
+  ret
+      
+  .CheckPointerOnCreature:
+  call  .Check1TileMonsterStandsOn  
+  ;if monster is at least 16 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    17
+  ret   c
+  ld    a,(CursorXWhereSpellWasCast)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,16
+  call  .Check
+
+  ;if monster is at least 32 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    33
+  ret   c
+  ld    a,(CursorXWhereSpellWasCast)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,32
+  call  .Check
+
+  ;if monster is at least 48 pixels wide, check also next time
+  ld    a,(ix+MonsterNX)
+  cp    57
+  ret   c
+  ld    a,(CursorXWhereSpellWasCast)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+  add   a,48
+  call  .Check
+  ret
+  .Check1TileMonsterStandsOn:
+  ld    a,(CursorXWhereSpellWasCast)
+  ld    c,a
+  ld    a,(ix+MonsterX)
+
+  .Check:
+  cp    c
+  ret   nz
+
+  ld    a,(ix+MonsterY)
+  ld    c,a
+  ld    a,(ix+MonsterNY)
+  add   a,c
+  ld    c,a
+
+  ld    a,(CursorYWhereSpellWasCast)
+  add   a,017
+  cp    c
+  ret   nz
+
+  pop   af                              ;no need to check the other monsters
+  pop   af
+
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    a,(ix+MonsterX)
+  ld    (MonsterThatIsBeingAttackedX),a
+  ld    a,(ix+MonsterNX)
+  ld    (MonsterThatIsBeingAttackedNX),a
+  ld    a,(ix+MonsterY)
+  ld    (MonsterThatIsBeingAttackedY),a
+  ld    a,(ix+MonsterNY)
+  ld    (MonsterThatIsBeingAttackedNY),a
+  scf                                   ;carry=monster found
+  ret
+
 SpellMagicArrowRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
 ;  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
   ld    hl,40
+  call  MoveMonster.DealDamageToMonster
+  jp    EndSpellSelected
+
+SpellInfernoRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+;  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
+  ld    hl,200
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelected
 
@@ -7697,6 +7973,66 @@ SpellCureRoutine:
   jp    c,EndSpellSelected
   ld    a,(iy+MonsterTableHp)           ;hp per unit
   ld    (ix+MonsterHP),a
+  jp    EndSpellSelected
+
+SpellResurrectionRoutine:
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    (AmountMonsterBeforeBeingAttacked),hl
+
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+;  call  GetResurrectionAmount          ;out: a=resurrection amount
+  ld    a,100
+  add   a,(ix+MonsterHP)
+  .CheckOverFlow:
+  ld    (ix+MonsterHP),a
+  cp    (iy+MonsterTableHp)             ;hp per unit
+  jp    c,.EndRessurectionRoutine
+
+  sub   (iy+MonsterTableHp)             ;hp per unit
+
+  call  .SetTotalAmountMonsterAtStartBattleInHL
+
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  jr    z,.MaxHpAndMaxAmountReached  
+  inc   de
+  ld    (ix+MonsterAmount),e
+  ld    (ix+MonsterAmount+1),d
+
+  jr    .CheckOverFlow
+  .MaxHpAndMaxAmountReached:
+  ld    a,(iy+MonsterTableHp)           ;hp per unit
+  ld    (ix+MonsterHP),a
+  jp    .EndRessurectionRoutine
+
+  .SetTotalAmountMonsterAtStartBattleInHL:
+  ld    hl,(ListOfMonstersToPutMonster12+1) ;total amount for this monster
+  ret
+
+  .EndRessurectionRoutine:
+  call  SetAmountUnderMonsterIn3Pages
+  jp    EndSpellSelected
+
+SpellTeleportRoutine:
+  ld    a,1
+  ld    (MoVeMonster?),a                ;1=move monster, 2=attack monster
+  xor   a
+  ld    (MonsterAnimationSpeed),a
+  ld    (MonsterAnimationStep),a
+  ld    iy,MonsterMovementPath
+  ld    (iy+0),TeleportMovement         ;255=end movement(normal walk), 10=attack right, 
+
+  call  SetCurrentActiveMOnsterInIX
+  ld    a,(Monster0+MonsterY)
+  sub   a,(ix+MonsterNY)
+  add   a,17
+  ld    (iy+1),a                        ;y destination teleport 
+  ld    a,(Monster0+MonsterX)
+  ld    (iy+2),a                        ;x destination teleport 
   jp    EndSpellSelected
 
 ;buffs and nerfs go into 1 of the 4 monster slots, check which is empty and put it in

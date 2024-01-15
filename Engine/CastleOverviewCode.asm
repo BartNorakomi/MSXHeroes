@@ -10334,8 +10334,8 @@ SpellDescriptionsMagicGuild:
                           db  "adjecent units.",255
 
 .DescriptionFire1:        db  "Inferno",254
-                          db  "Deals damage in a 5 hex area of",254
-                          db  "effect.",255
+                          db  "Deals damage to a single enemy unit",255
+;                          db  "effect.",255
 
 
 .Descriptionair4:         db  "Haste",254

@@ -2187,7 +2187,7 @@ CheckIfHeroButtonShouldRemainLit:	      ;check if mousepointer is no longer on a
   ret
 
 CompareHLwithDE:
-  xor   a
+  or    a
   sbc   hl,de
   ret
 

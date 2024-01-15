@@ -321,6 +321,12 @@ MonsterThatIsBeingAttackedNX:  ds  1
 MonsterThatIsBeingAttackedY:  ds  1
 MonsterThatIsBeingAttackedNY:  ds  1
 
+AEOSpellDamage: ds  2
+MonsterThatWasDamagedPreviousCheck: ds  2
+CursorXWhereSpellWasCast:  ds  1
+CursorYWhereSpellWasCast:  ds  1
+
+
 ;MonsterTabledCopiedToRamPage3:  ds  Monster002Table-Monster001Table
 
 ;MonsterFacingRightWhileAttacking?:  db  1
@@ -334,7 +340,7 @@ SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedE
 CastSpell?: db  0 ;selected spell has been used on enemy monster/friendly monster/battle field
 ;MonsterThatWeCastSpellOn: ds  2
 SpellBookButtonPressed?: db  1
-SelectedElementInSpellBook: db 0 ;0=earth, 1=fire, 2=air, 3=water
+SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
 WaitButtonPressed?: db  0
 AutoCombatButtonPressed?: db  0
 DefendButtonPressed?: db  0
@@ -355,9 +361,10 @@ ListOfMonstersToPut:
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
   db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
   db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
+
   db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
   db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
-  db  006 | dw 900 | db 012 + (16*08), 056 + (07*16) + 16
+  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
 
 ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
 ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (26*08), 056 + (01*16) + 16
