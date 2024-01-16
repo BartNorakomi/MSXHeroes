@@ -10350,9 +10350,9 @@ SpellDescriptionsMagicGuild:
                           db  "Target allied unit has unlimited",254
                           db  "retaliations each round.",255
 
-.Descriptionair1:         db  "Chain Lightning",254
-                          db  "Strikes up to 5 troops on the",254
-                          db  "battlefield.",255
+.Descriptionair1:         db  "Deflect",254
+                          db  "Target friendly unit has a 75% chance",254
+                          db  "to deflect enemy spells.",255
 
 
 .Descriptionwater4:       db  "Cure",254

@@ -5462,7 +5462,7 @@ Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUni
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+Pl1Hero1StatSpellDamage:  db 3  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
 ;.HeroSkills:  db  25,18,3,33,9,0
 .HeroSkills:  db  1,0,0,0,0,0
@@ -5670,7 +5670,7 @@ Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUni
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroStatSpellDamage:  db 7  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells

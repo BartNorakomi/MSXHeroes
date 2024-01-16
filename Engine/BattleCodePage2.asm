@@ -2324,9 +2324,9 @@ SpellDescriptionsBattle:
                           db  "Target allied unit has unlimited",254
                           db  "retaliations each round.",255
 
-.Descriptionair1:         db  "Chain Lightning",254
-                          db  "Strikes up to 5 troops on the",254
-                          db  "battlefield.",255
+.Descriptionair1:         db  "Deflect",254
+                          db  "Target friendly unit has a 75% chance",254
+                          db  "to deflect enemy spells.",255
 
 
 .Descriptionwater4:       db  "Cure",254
@@ -3331,14 +3331,14 @@ HandleSpellCast:
 ;earth
 ;Ethereal chains 1     6                                           50% less speed
 ;Plate Armor     2     5                                           +5 defense
-;resurrection    3     20                                          Reanimates 40 + (power×40) HP of killed friendly living creatures for the current battle/permanently.
+;resurrection    3     20                                          Reanimates 60 + (power×5) HP of killed friendly living creatures for the current battle/permanently.
 ;meteor shower   4     16        50+(powerx10)   3 hex tiles wide
 
 ;fire
 ;curse           1     5                                           attack -3
 ;blur            2     11                                          -50% damage for ranged units
 ;fireball        3     15        15+(powerx10)   3 hex tiles wide
-;inferno         4     16        20+(powerx10)   5 hex tiles wide
+;inferno         4     16        80+(powerx10)
 
 ;air
 ;haste           1     6                                           increase speed of unit by 4

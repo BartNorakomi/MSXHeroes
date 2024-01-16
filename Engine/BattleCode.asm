@@ -62,7 +62,6 @@ HandleMonsters:
   call  SetCurrentMonsterInBattleFieldGrid  ;set monster in grid, and fill grid with numbers representing distance to those tiles
   call  CheckEnemyAI                    ;
 
-
 ;battle code page 2
   ld    a,BattleCodePage2Block          ;Map block
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
@@ -5562,7 +5561,7 @@ CheckSwitchToNextMonster:
   ld    (iy),c                          ;255=end movement(normal walk), 10=attack right, 
   jr    .EndFindNextActiveMonster
   .EndHandleRetaliation:
-  call  FindNextActiveMonster
+  call  FindNextActiveMonster           ;switches to next turn if no more active monsters
   .EndFindNextActiveMonster:
 
   ;erase this monster from inactive page (copy from page 3 to inactive page)
@@ -5687,9 +5686,10 @@ FindNextActiveMonster:
   inc   ix
   djnz  .LoopDown
 
-
   ;No enabled or waiting monsters found, so let's go next turn !
   ;Set all monsters enabled
+  call  ReduceDurationStatusEffectsMonsters
+
   ld    a,MonsterStatusEnabled
   ld    (Monster1+MonsterStatus),a
   ld    (Monster2+MonsterStatus),a
@@ -7552,7 +7552,7 @@ Spellinferno:         db 2 | dw SpellInfernoRoutine
 SpellHaste:           db 1 | dw SpellHasteRoutine 
 SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine 
 SpellCounterStrike:   db 1 | dw SpellCounterStrikeRoutine 
-SpellChainLightning:  db 2
+SpellDeflect:         db 1 | dw SpellDeflectRoutine 
 ;Water
 SpellCure:            db 1 | dw SpellCureRoutine
 SpellIceBolt:         db 2 | dw SpellIceBoltRoutine
@@ -7618,7 +7618,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   .AirSpellSelected:
   ld    a,(SpellSelected?)
   cp    5
-  ld    hl,SpellChainLightning
+  ld    hl,SpellDeflect
   ret   z
   cp    6
   ld    hl,SpellCounterStrike
@@ -7660,108 +7660,211 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellEtherealChains
   ret
 
+ReduceDurationStatusEffectsMonsters:      ;at the start of a new round, decrease the duration of status effects for all monsters
+  ld    ix,Monster1
+  ld    c,12                              ;total amount of monsters
+  .totalMonstersLoop:
+  ld    b,5                               ;total amount of status effects per monster
+  .loop:
+  ld    a,(ix+MonsterStatusEffect1)       ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %0000 1111
+  jr    z,.NextStatusEffect
+  dec   (ix+MonsterStatusEffect1)         ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  ld    a,(ix+MonsterStatusEffect1)       ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %0000 1111
+  jr    nz,.NextStatusEffect
+  ld    (ix+MonsterStatusEffect1),0       ;duration reached 0, clear status effect
+  .NextStatusEffect:
+  inc   ix
+  djnz  .loop
+  
+  ld    de,LenghtMonsterTable-5
+  add   ix,de                             ;next monster
+  dec   c
+  jr    nz,.totalMonstersLoop
+  ret
+
+GetSpellPowerForCurrentActiveHero:
+  call  SetCurrentActiveMOnsterInIX
+  
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+;  push  ix
+;  pop   hl
+;  ld    a,l
+;  or    h
+;  pop   hl                              ;total damage dealt
+;  ret   z                               ;Neutral Monster Is Being Attacked. Dont Check For Armorer
+;  push  hl
+  .HeroFound:
+
+  ;get total spell damage for this hero
+  ld    de,ItemSpellDamagePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+  push  ix
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  pop   ix
+  ld    e,(ix+HeroStatSpelldamage)
+  ld    d,0
+  add   hl,de
+  ret
+
+GetSpellDuration:                         ;out: a=spell duration
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+
+  ;spell duration=spell damage/3 + 2
+  push  hl
+  pop   bc
+  ld    de,3
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,c
+  add   a,2
+  ret
+
 EtherealChainsSpellNumber:  equ 1*16
 SpellEtherealChainsRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,EtherealChainsSpellNumber + 6
+  or    EtherealChainsSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 PlateArmorSpellNumber:  equ 2*16
 SpellPlateArmorRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,PlateArmorSpellNumber + 6
+  or    PlateArmorSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,CurseSpellNumber + 6
+  or    CurseSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 BlurSpellNumber:  equ 4*16
 SpellBlurRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,BlurSpellNumber + 6
+  or    BlurSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 HasteSpellNumber:  equ 5*16
 SpellHasteRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,HasteSpellNumber + 6
+  or    HasteSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 DisruptingRaySpellNumber:  equ 6*16
 SpellDisruptingRayRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,DisruptingRaySpellNumber + 6
+  or    DisruptingRaySpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 CounterStrikeSpellNumber:  equ 7*16
 SpellCounterStrikeRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,CounterStrikeSpellNumber + 6
+  or    CounterStrikeSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 iceTrapSpellNumber:  equ 8*16
 SpelliceTrapRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,iceTrapSpellNumber + 6
+  or    IceTrapSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 FrenzySpellNumber:  equ 9*16
 SpellFrenzyRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,FrenzySpellNumber + 6
+  or    FrenzySpellNumber               ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
 InnerBeastSpellNumber:  equ 10*16
 SpellInnerBeastRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetSpellDuration                ;out: a=spell duration
-  ld    a,InnerBeastSpellNumber + 6
+  or    InnerBeastSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelected
 
-SpellIceBoltRoutine:
+DeflectSpellNumber:  equ 11*16
+SpellDeflectRoutine:
+  call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
-  ld    hl,90*5
+  or    DeflectSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  call  SetSpellInEmptyStatusSlot
+  jp    EndSpellSelected
+
+GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,30
+  add   hl,de
+  ret
+
+SpellIceBoltRoutine:
+  call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
+  ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelected
 
+GetMeteorShowerDMGAmount:               ;out: hl=damage: 50+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,50
+  add   hl,de
+  ret
+
 SpellMeteorShowerRoutine:
-;  call  GetMeteorShowerDMGAmount        ;out: hl=ice bolt damage amount
-  ld    hl,150
+  call  GetMeteorShowerDMGAmount        ;out: hl=meteor shower damage amount
   ld    (AEOSpellDamage),hl
   jp    GoCastAOESpell
+
+GetFireBallDMGAmount:                   ;out: hl=damage: 15+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,15
+  add   hl,de
+  ret
 
 SpellFireBallRoutine:
-;  call  GetFireBallDMGAmount            ;out: hl=ice bolt damage amount
-  ld    hl,100
+  call  GetFireBallDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
   jp    GoCastAOESpell
 
+GetFrostRingDMGAmount:                  ;out: hl=damage: 30+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,30
+  add   hl,de
+  ret
+
 SpellFrostRingRoutine:
-;  call  GetFrostRingDMGAmount            ;out: hl=ice bolt damage amount
-  ld    hl,100
+  call  GetFrostRingDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
 
   ld    hl,0
@@ -7779,8 +7882,119 @@ SpellFrostRingRoutine:
   ld    a,(CursorXWhereSpellWasCast)    ;check cast point (we skip this for frost ring)
   add   a,16
   ld    (CursorXWhereSpellWasCast),a
+  jp    GoCastAOESpell.EntryPointFrostRing
 
-  jr    GoCastAOESpell.EntryPointFrostRing
+GetMagicArrowDMGAmount:                 ;out: hl=damage: 10+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,10
+  add   hl,de
+  ret
+
+SpellMagicArrowRoutine:
+  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  MoveMonster.DealDamageToMonster
+  jp    EndSpellSelected
+
+GetInfernoDMGAmount:                    ;out: hl=damage: 80+(powerx10)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,10
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,80
+  add   hl,de
+  ret
+
+SpellInfernoRoutine:
+  call  GetInfernoDMGAmount             ;out: hl=magic arrow damage amount
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  MoveMonster.DealDamageToMonster
+  jp    EndSpellSelected
+
+GetCureAmount:                          ;out: hl=damage: 20+(power x 5)
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,5
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,20
+  add   hl,de
+  ret
+
+SpellCureRoutine:
+  call  GetCureAmount                   ;out: a=cure amount
+  ld    a,l
+  push  af                              ;cure amount
+  ld    ix,(MonsterThatIsBeingAttacked)
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+  pop   af                              ;cure amount
+  add   a,(ix+MonsterHP)
+  jr    nc,.NotCarry
+  ld    a,255
+  .NotCarry:
+  ld    (ix+MonsterHP),a
+  cp    (iy+MonsterTableHp)             ;hp per unit
+  jp    c,EndSpellSelected
+  ld    a,(iy+MonsterTableHp)           ;hp per unit
+  ld    (ix+MonsterHP),a
+  jp    EndSpellSelected
+
+GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP
+  call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
+  ld    de,5
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,60
+  add   hl,de
+  ld    a,l
+  ret
+
+SpellResurrectionRoutine:
+  call  GetResurrectionAmount          ;out: a=resurrection amount
+  push  af
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
+  ld    l,(ix+MonsterAmount)
+  ld    h,(ix+MonsterAmount+1)
+  ld    (AmountMonsterBeforeBeingAttacked),hl
+
+  call  SetMonsterTableInIY             ;out: iy->monster table idle
+
+  pop   af
+
+  add   a,(ix+MonsterHP)
+  jr    nc,.NotCarry
+  ld    a,255
+  .NotCarry:
+
+  .CheckOverFlow:
+  ld    (ix+MonsterHP),a
+  cp    (iy+MonsterTableHp)             ;hp per unit
+  jp    c,.EndRessurectionRoutine
+
+  sub   (iy+MonsterTableHp)             ;hp per unit
+
+  call  .SetTotalAmountMonsterAtStartBattleInHL
+
+  ld    e,(ix+MonsterAmount)
+  ld    d,(ix+MonsterAmount+1)
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  jr    z,.MaxHpAndMaxAmountReached  
+  inc   de
+  ld    (ix+MonsterAmount),e
+  ld    (ix+MonsterAmount+1),d
+
+  jr    .CheckOverFlow
+  .MaxHpAndMaxAmountReached:
+  ld    a,(iy+MonsterTableHp)           ;hp per unit
+  ld    (ix+MonsterHP),a
+  jp    .EndRessurectionRoutine
+
+  .SetTotalAmountMonsterAtStartBattleInHL:
+  ld    hl,(ListOfMonstersToPutMonster12+1) ;total amount for this monster
+  ret
+
+  .EndRessurectionRoutine:
+  call  SetAmountUnderMonsterIn3Pages
+  jp    EndSpellSelected
 
 GoCastAOESpell:
   ld    hl,0
@@ -7945,77 +8159,6 @@ CheckCollateralSpellDamage:             ;check if there is a monster here that a
   ld    (MonsterThatIsBeingAttackedNY),a
   scf                                   ;carry=monster found
   ret
-
-SpellMagicArrowRoutine:
-  ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
-  ld    hl,40
-  call  MoveMonster.DealDamageToMonster
-  jp    EndSpellSelected
-
-SpellInfernoRoutine:
-  ld    ix,(MonsterThatIsBeingAttacked)
-;  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
-  ld    hl,200
-  call  MoveMonster.DealDamageToMonster
-  jp    EndSpellSelected
-
-SpellCureRoutine:
-  ld    ix,(MonsterThatIsBeingAttacked)
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-;  call  GetCureAmount                   ;out: a=cure amount
-;  add   a,(ix+MonsterHP)
-
-  ld    a,(ix+MonsterHP)
-  add   a,20
-  ld    (ix+MonsterHP),a
-  cp    (iy+MonsterTableHp)             ;hp per unit
-  jp    c,EndSpellSelected
-  ld    a,(iy+MonsterTableHp)           ;hp per unit
-  ld    (ix+MonsterHP),a
-  jp    EndSpellSelected
-
-SpellResurrectionRoutine:
-  ld    ix,(MonsterThatIsBeingAttacked)
-  ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
-  ld    l,(ix+MonsterAmount)
-  ld    h,(ix+MonsterAmount+1)
-  ld    (AmountMonsterBeforeBeingAttacked),hl
-
-  call  SetMonsterTableInIY             ;out: iy->monster table idle
-;  call  GetResurrectionAmount          ;out: a=resurrection amount
-  ld    a,100
-  add   a,(ix+MonsterHP)
-  .CheckOverFlow:
-  ld    (ix+MonsterHP),a
-  cp    (iy+MonsterTableHp)             ;hp per unit
-  jp    c,.EndRessurectionRoutine
-
-  sub   (iy+MonsterTableHp)             ;hp per unit
-
-  call  .SetTotalAmountMonsterAtStartBattleInHL
-
-  ld    e,(ix+MonsterAmount)
-  ld    d,(ix+MonsterAmount+1)
-  call  CompareHLwithDE                 ;check if this is a general attack pattern right
-  jr    z,.MaxHpAndMaxAmountReached  
-  inc   de
-  ld    (ix+MonsterAmount),e
-  ld    (ix+MonsterAmount+1),d
-
-  jr    .CheckOverFlow
-  .MaxHpAndMaxAmountReached:
-  ld    a,(iy+MonsterTableHp)           ;hp per unit
-  ld    (ix+MonsterHP),a
-  jp    .EndRessurectionRoutine
-
-  .SetTotalAmountMonsterAtStartBattleInHL:
-  ld    hl,(ListOfMonstersToPutMonster12+1) ;total amount for this monster
-  ret
-
-  .EndRessurectionRoutine:
-  call  SetAmountUnderMonsterIn3Pages
-  jp    EndSpellSelected
 
 SpellTeleportRoutine:
   ld    a,1
