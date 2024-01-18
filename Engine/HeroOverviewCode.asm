@@ -2578,7 +2578,7 @@ SpellDescriptions:
 
 .Descriptionair4:         db  "Haste",254
                           db  "Increases the speed of the selected",254
-                          db  "friendly unit by 4.",255
+                          db  "friendly unit by 3.",255
 
 .Descriptionair3:         db  "Disrupting Ray",254
                           db  "Reduces the defense of the selected ",254
@@ -2616,15 +2616,15 @@ DescriptionAllSpellSchools4:  db  "Magic Arrow",254
                               db  " ",255
 
 DescriptionAllSpellSchools3:  db  "Frenzy",254
-                              db  "Unit's defense is added to it's attack,",254
-                              db  "while defense is set to 0.",255
+                              db  "Friendly unit's attack increases by 5",254
+                              db  "while its defense decreases by 5.",255
 
 DescriptionAllSpellSchools2:  db  "Teleport",254
                               db  "Teleport allied troop to an unoccupied",254
                               db  "space.",255
 
 DescriptionAllSpellSchools1:  db  "Inner Beast",254
-                              db  "Friendly unit receievs +3 attack,",254
+                              db  "Friendly unit receives +3 attack,",254
                               db  "+3 defense and +3 speed.",255
 
 SetSpellExplanation_Water:

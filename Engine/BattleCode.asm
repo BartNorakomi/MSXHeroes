@@ -1511,12 +1511,12 @@ CheckVictoryOrDefeat:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + ((002+16)*128) + (024/2) - 128
   ld    bc,$0000 + (207*256) + (210/2)
-  ld    a,r
-  and   1
+;  ld    a,r
+;  and   1
   ld    a,DefeatBlock           ;block to copy graphics from
-  jr    z,.go
-  ld    a,DefeatBlock2           ;block to copy graphics from
-  .go:
+;  jr    z,.go
+;  ld    a,DefeatBlock2           ;block to copy graphics from
+;  .go:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ;left hero
@@ -2277,11 +2277,89 @@ SetTotalMonsterSpeedInHL: ;in ix->monster, iy->monstertable. out: hl=total speed
   ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
   call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters  
   .endAddSpeed:
-  pop   ix
+  pop   ix                              ;ix monster
 
   ld    d,0
   ld    e,(iy+MonsterTableSpeed)
   add   hl,de                           ;add additional speed from inventory items
+
+  ld    b,HasteSpellNumber              ;add 3 to speed if haste beast is found
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckHaste
+  ld    de,3                            ;+3 speed if haste is found
+  add   hl,de
+  .EndCheckHaste:
+
+  ld    b,InnerBeastSpellNumber         ;add 3 to speed if inner beast is found
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckInnerBeast
+  ld    de,3                            ;+3 speed if inner beast is found
+  add   hl,de
+  .EndCheckInnerBeast:  
+
+  ld    b,EtherealChainsSpellNumber     ;remove 50% speed if monster has ethereal chains
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckEtherealChains
+  push  hl
+  pop   bc
+  ld    de,2                            ;50% reduction in speed if ethereal chains is found
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl
+  .EndCheckEtherealChains:
+  ret
+
+CheckPresenceStatusEffect:
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  ret   z
+  ld    a,(ix+MonsterStatusEffect2)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  ret   z
+  ld    a,(ix+MonsterStatusEffect3)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  ret   z
+  ld    a,(ix+MonsterStatusEffect4)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  ret   z
+  ld    a,(ix+MonsterStatusEffect5)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  ret
+
+RemoveSpell:                            ;in: b=spell number
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  jr    nz,.SpellNotFoundStatus1
+  ld    (ix+MonsterStatusEffect1),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  .SpellNotFoundStatus1:
+  ld    a,(ix+MonsterStatusEffect2)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  jr    nz,.SpellNotFoundStatus2
+  ld    (ix+MonsterStatusEffect2),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  .SpellNotFoundStatus2:
+  ld    a,(ix+MonsterStatusEffect3)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  jr    nz,.SpellNotFoundStatus3
+  ld    (ix+MonsterStatusEffect3),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  .SpellNotFoundStatus3:
+  ld    a,(ix+MonsterStatusEffect4)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    b
+  jr    nz,.SpellNotFoundStatus4
+  ld    (ix+MonsterStatusEffect4),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  .SpellNotFoundStatus4:
+  ld    a,(ix+MonsterStatusEffect5)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  ret   nz
+  ld    (ix+MonsterStatusEffect5),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
   ret
 
 SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
@@ -2326,6 +2404,40 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ld    d,0
   ld    e,(iy+MonsterTableDefense)
   add   hl,de                           ;add additional speed from inventory items
+
+  ld    b,PlateArmorSpellNumber         ;increase armor by 5 if monster has plate armor
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckPlateArmor
+  ld    de,5                            ;+5 armor if plate armor is found
+  add   hl,de
+  .EndCheckPlateArmor:
+
+  ld    b,InnerBeastSpellNumber         ;increase armor by 3 if monster has inner beast
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckInnerBeast
+  ld    de,3                            ;+3 armor if inner beast is found
+  add   hl,de
+  .EndCheckInnerBeast:
+
+  ld    b,DisruptingRaySpellNumber      ;decrease armor by 4 if monster has disrupting ray
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckDisruptingRay
+  ld    de,-4                           ;-4 armor if disrupting ray is found
+  add   hl,de
+  bit   7,h                             ;check overflow
+  jr    z,.EndCheckDisruptingRay
+  ld    hl,0                            ;armor=0 in case of overflow
+  .EndCheckDisruptingRay:
+
+  ld    b,FrenzySpellNumber             ;-5 armor, +5 attack
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckFrenzy
+  ld    de,-5                           ;-5 armor if frenzy is found
+  add   hl,de
+  bit   7,h                             ;check overflow
+  jr    z,.EndCheckFrenzy
+  ld    hl,0                            ;armor=0 in case of overflow
+  .EndCheckFrenzy:
 
   ;apply 20% defense boost when defending
   ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
@@ -2380,13 +2492,54 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
 
   call  .AddDamageFromSkills            ;add a % boost to attack based on Offense or Archery
   pop   ix
+
+  ld    b,InnerBeastSpellNumber         ;increase attack by 3 if monster has inner beast
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckInnerBeast
+  ld    de,3                            ;+3 attack if inner beast is found
+  add   hl,de
+  .EndCheckInnerBeast:
+
+  ld    b,FrenzySpellNumber             ;-5 armor, +5 attack
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckFrenzy
+  ld    de,+5                           ;-5 attack if frenzy is found
+  add   hl,de
+  .EndCheckFrenzy:
+
+  .CheckCurse:
+  ld    b,CurseSpellNumber              ;-3 damage
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckCurse
+  ld    de,-3                           ;-3 damage if curse is found
+  add   hl,de
+  bit   7,h                             ;check overflow
+  jr    z,.EndCheckCurse
+  ld    hl,1                            ;damage=1 in case of overflow
+  .EndCheckCurse:
+
+  ld    b,BlurSpellNumber               ;-50% damage
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    nz,.EndCheckBlur
+  push  hl
+  pop   bc
+  ld    de,2                            ;50% reduction in speed if ethereal chains is found
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc
+  pop   hl
+  .EndCheckBlur:
+
+  ld    a,l
+  or    h
+  ret   nz
+  ld    hl,1                            ;minimal attack damage=1
   ret
 
   .setAttackNeutralMonster:
   ld    h,0
   ld    l,(iy+MonsterTableAttack)
   pop   ix
-  ret
+  jp    .CheckCurse                     ;apply curse and blur also for neutral monsters
 
   .AddDamageFromSkills:
   ;add damage boost from skills (Archery and Offence)
@@ -4005,6 +4158,9 @@ MoveMonster:
 
   ld    ix,(MonsterThatIsBeingAttacked)
 
+  ld    b,IceTrapSpellNumber            ;monster cant act when ice trap is active
+  call  RemoveSpell                     ;check if monster is ice trapped. ice spell gets dispelled when attacked
+
   ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
   ld    l,(ix+MonsterAmount)
   ld    h,(ix+MonsterAmount+1)
@@ -4081,15 +4237,16 @@ MoveMonster:
   .EndCheckRangedMonster:
   ;/no retaliation for ranged attacking monsters
 
-
-
-
   ld    ix,(MonsterThatIsBeingAttacked)
   bit   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   jr    nz,.EndMovement
-  set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   ld    a,1
   ld    (HandleRetaliation?),a
+
+  ld    b,CounterStrikeSpellNumber      ;unlimited retaliations with counter strike
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  jr    z,.EndMovement
+  set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
   jr    .EndMovement
     
   .MonsterDied:
@@ -5653,6 +5810,19 @@ FindNextActiveMonster:
   ld    a,(iy+MonsterHP)
   or    a
   jr    z,.FindNext
+
+
+  push  ix
+  push  iy
+  pop   ix
+  push  bc
+  ld    b,IceTrapSpellNumber            ;monster cant act when ice trap is active
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  pop   bc
+  pop   ix
+  jr    z,.FindNext
+
+
   ld    a,(iy+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
   and   %0111 1111                     ;check enabled
   jr    z,.MonsterFound
@@ -7329,6 +7499,7 @@ RangedMonsterCheck:
   ld    (BrokenArrow?),a
   ret
 
+EndSpellSelectedAndSpellGetsDeflected:
 EndSpellSelected:
   xor   a
   ld    (SpellSelected?),a
@@ -7727,8 +7898,26 @@ GetSpellDuration:                         ;out: a=spell duration
   add   a,2
   ret
 
+CheckIfSpellGetsDeflected:
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    b,DeflectSpellNumber            ;75% to deflect spell
+  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  ret   nz
+  ;deflect found, check if spell gets deflected
+  ld    a,r
+  and   3
+  jr    z,.DontDeflect
+  xor   a                               ;zero=deflect
+  ret
+  .DontDeflect:
+  inc   a                               ;not zero=don't deflect
+  ret
+
 EtherealChainsSpellNumber:  equ 1*16
 SpellEtherealChainsRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    EtherealChainsSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -7745,6 +7934,9 @@ SpellPlateArmorRoutine:
 
 CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    CurseSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -7753,6 +7945,9 @@ SpellCurseRoutine:
 
 BlurSpellNumber:  equ 4*16
 SpellBlurRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    BlurSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -7769,6 +7964,9 @@ SpellHasteRoutine:
 
 DisruptingRaySpellNumber:  equ 6*16
 SpellDisruptingRayRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    DisruptingRaySpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -7785,6 +7983,9 @@ SpellCounterStrikeRoutine:
 
 iceTrapSpellNumber:  equ 8*16
 SpelliceTrapRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    IceTrapSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -7824,6 +8025,9 @@ GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
   ret
 
 SpellIceBoltRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
@@ -7851,6 +8055,9 @@ GetFireBallDMGAmount:                   ;out: hl=damage: 15+(powerx10)
   ret
 
 SpellFireBallRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetFireBallDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
   jp    GoCastAOESpell
@@ -7893,6 +8100,9 @@ GetMagicArrowDMGAmount:                 ;out: hl=damage: 10+(powerx10)
   ret
 
 SpellMagicArrowRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
@@ -7907,6 +8117,9 @@ GetInfernoDMGAmount:                    ;out: hl=damage: 80+(powerx10)
   ret
 
 SpellInfernoRoutine:
+  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
+  jp    z,EndSpellSelectedAndSpellGetsDeflected
+
   call  GetInfernoDMGAmount             ;out: hl=magic arrow damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
@@ -7936,6 +8149,17 @@ SpellCureRoutine:
   jp    c,EndSpellSelected
   ld    a,(iy+MonsterTableHp)           ;hp per unit
   ld    (ix+MonsterHP),a
+
+  ld    b,EtherealChainsSpellNumber     ;ice trap
+  call  RemoveSpell                     ;check if monster has this spell, if so remove it
+  ld    b,CurseSpellNumber              ;curse
+  call  RemoveSpell                     ;check if monster has this spell, if so remove it
+  ld    b,BlurSpellNumber               ;blur
+  call  RemoveSpell                     ;check if monster has this spell, if so remove it
+  ld    b,DisruptingRaySpellNumber      ;disrupting ray
+  call  RemoveSpell                     ;check if monster has this spell, if so remove it
+  ld    b,IceTrapSpellNumber            ;ice trap
+  call  RemoveSpell                     ;check if monster has this spell, if so remove it
   jp    EndSpellSelected
 
 GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP

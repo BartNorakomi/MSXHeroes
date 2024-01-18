@@ -10313,7 +10313,7 @@ SpellDescriptionsMagicGuild:
                           db  "friendly unit by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates 40 HP of killed living",254
+                          db  "Reanimates and heals a portion of killed living",254
                           db  "friendly creatures.",255
 
 .DescriptionEarth1:       db  "Meteor Shower",254
@@ -10357,7 +10357,7 @@ SpellDescriptionsMagicGuild:
 
 .Descriptionwater4:       db  "Cure",254
                           db  "Removes all negative spell effects",254
-                          db  "and heals for 20 HP",255
+                          db  "and heals unit.",255
 
 .Descriptionwater3:       db  "Ice Bolt",254
                           db  "Deals damage to a single enemy unit.",254

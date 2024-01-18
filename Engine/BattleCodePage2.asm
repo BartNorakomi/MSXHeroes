@@ -2076,30 +2076,48 @@ SetSpellExplanation:
 
 
   .SetDescriptionTexticonCostAndDamage:
+  ;inner beast
+  exx
+  ld    hl,0                            ;out: hl=damage
+  exx
   ld    a,(MenuOptionSelected?Backup)
   dec   a
   ld    hl,SpellDescriptionsBattle.DescriptionAllSpellSchools1
   ld    de,$4000 + (Spell20IconSY*128) + (Spell20IconSX/2) -128
   ld    b,CostAllSpellSchools1
-  ld    c,DamageAllSpellSchools1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;teleport
+;  exx
+;  ld    hl,0                            ;out: hl=damage
+;  exx
   dec   a
   ld    hl,SpellDescriptionsBattle.DescriptionAllSpellSchools2
   ld    de,$4000 + (Spell19IconSY*128) + (Spell19IconSX/2) -128
   ld    b,CostAllSpellSchools2
-  ld    c,DamageAllSpellSchools2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;frenzy
+;  exx
+;  ld    hl,0                            ;out: hl=damage
+;  exx
   dec   a
   ld    hl,SpellDescriptionsBattle.DescriptionAllSpellSchools3
   ld    de,$4000 + (Spell18IconSY*128) + (Spell18IconSX/2) -128
   ld    b,CostAllSpellSchools3
-  ld    c,DamageAllSpellSchools3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;magic arrow
+  push  af
+  exx
+  call  GetMagicArrowDMGAmount           ;out: hl=damage
+  exx
+  pop   af
+
   dec   a
   ld    hl,SpellDescriptionsBattle.DescriptionAllSpellSchools4
   ld    de,$4000 + (Spell17IconSY*128) + (Spell17IconSX/2) -128
   ld    b,CostAllSpellSchools4
-  ld    c,DamageAllSpellSchools4
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
   ld    a,(SelectedElementInSpellBook)  ;0=earth, 1=fire, 2=air, 3=water
@@ -2111,109 +2129,193 @@ SetSpellExplanation:
   jp    z,.SetSpellExplanationAir
   
   .SetSpellExplanationWater:
+  ;frost ring
+  exx
+  call  GetFrostRingDMGAmount           ;out: hl=damage
+  exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.Descriptionwater1
   ld    de,$4000 + (Spell16IconSY*128) + (Spell16IconSX/2) -128
   ld    b,CostWaterSpell1
-  ld    c,DamageWaterSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;ice trap
+  exx
+  ld    hl,0                            ;out: hl=damage
+  exx
+;  ld    a,(MenuOptionSelected?Backup)
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.Descriptionwater2
   ld    de,$4000 + (Spell15IconSY*128) + (Spell15IconSX/2) -128
   ld    b,CostWaterSpell2
-  ld    c,DamageWaterSpell2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;ice bolt
+  exx
+  call  GetIceBoltDMGAmount             ;out: hl=damage
+  exx
+  ld    a,(MenuOptionSelected?Backup)
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.Descriptionwater3
   ld    de,$4000 + (Spell14IconSY*128) + (Spell14IconSX/2) -128
   ld    b,CostWaterSpell3
-  ld    c,DamageWaterSpell3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;cure
+  exx
+  call  GetCureAmount                   ;out: hl=damage
+  exx
   ld    hl,SpellDescriptionsBattle.Descriptionwater4
   ld    de,$4000 + (Spell13IconSY*128) + (Spell13IconSX/2) -128
   ld    b,CostWaterSpell4
-  ld    c,DamageWaterSpell4
-  jp    .GoSetDescriptionTexticonCostAndDamage
+  jp    .GoSetDescriptionTexticonCostAndDamage_Cure
 
   .SetSpellExplanationAir:
+  ;deflect
+  exx
+  ld    hl,0                            ;out: hl=damage
+  exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionAir1
   ld    de,$4000 + (Spell12IconSY*128) + (Spell12IconSX/2) -128
   ld    b,CostAirSpell1
-  ld    c,DamageAirSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;counterstrike
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionAir2
   ld    de,$4000 + (Spell11IconSY*128) + (Spell11IconSX/2) -128
   ld    b,CostAirSpell2
-  ld    c,DamageAirSpell2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;disrupting ray
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionAir3
   ld    de,$4000 + (Spell10IconSY*128) + (Spell10IconSX/2) -128
   ld    b,CostAirSpell3
-  ld    c,DamageAirSpell3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;haste
   ld    hl,SpellDescriptionsBattle.DescriptionAir4
   ld    de,$4000 + (Spell09IconSY*128) + (Spell09IconSX/2) -128
   ld    b,CostAirSpell4
-  ld    c,DamageAirSpell4
   jp    .GoSetDescriptionTexticonCostAndDamage
 
   .SetSpellExplanationFire:
+  ;inferno
+  exx
+  call  GetInfernoDMGAmount             ;out: hl=damage
+  exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionFire1
   ld    de,$4000 + (Spell08IconSY*128) + (Spell08IconSX/2) -128
   ld    b,CostFireSpell1
-  ld    c,DamageFireSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;fireball
+  exx
+  call  GetFireBallDMGAmount            ;out: hl=damage
+  exx
+  ld    a,(MenuOptionSelected?Backup)
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionFire2
   ld    de,$4000 + (Spell07IconSY*128) + (Spell07IconSX/2) -128
   ld    b,CostFireSpell2
-  ld    c,DamageFireSpell2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;blur
+  exx
+  ld    hl,0                            ;out: hl=damage
+  exx
+  ld    a,(MenuOptionSelected?Backup)
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionFire3
   ld    de,$4000 + (Spell06IconSY*128) + (Spell06IconSX/2) -128
   ld    b,CostFireSpell3
-  ld    c,DamageFireSpell3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;curse
+;  exx
+;  ld    hl,0                            ;out: hl=damage
+;  exx
   ld    hl,SpellDescriptionsBattle.DescriptionFire4
   ld    de,$4000 + (Spell05IconSY*128) + (Spell05IconSX/2) -128
   ld    b,CostFireSpell4
-  ld    c,DamageFireSpell4
   jp    .GoSetDescriptionTexticonCostAndDamage
 
   .SetSpellExplanationEarth:
+  ;meteor shower
+  exx
+  call  GetMeteorShowerDMGAmount        ;out: hl=damage
+  exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionEarth1
   ld    de,$4000 + (Spell04IconSY*128) + (Spell04IconSX/2) -128
   ld    b,CostEarthSpell1
-  ld    c,DamageEarthSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;resurrection
+  exx
+  call  GetResurrectionAmount           ;out: hl=damage
+  exx
+  ld    a,(MenuOptionSelected?Backup)
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionEarth2
   ld    de,$4000 + (Spell03IconSY*128) + (Spell03IconSX/2) -128
   ld    b,CostEarthSpell2
-  ld    c,DamageEarthSpell2
-  jp    z,.GoSetDescriptionTexticonCostAndDamage
+  jp    z,.GoSetDescriptionTexticonCostAndDamage_Resurrection
+
+  ;plate armor
+  exx
+  ld    hl,0                            ;out: hl=damage
+  exx
+  ld    a,(MenuOptionSelected?Backup)
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionEarth3
   ld    de,$4000 + (Spell02IconSY*128) + (Spell02IconSX/2) -128
   ld    b,CostEarthSpell3
-  ld    c,DamageEarthSpell3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
+
+  ;ethereal chains
+;  exx
+;  ld    hl,0                            ;out: hl=damage
+;  exx
   ld    hl,SpellDescriptionsBattle.DescriptionEarth4
   ld    de,$4000 + (Spell01IconSY*128) + (Spell01IconSX/2) -128
   ld    b,CostEarthSpell4
-  ld    c,DamageEarthSpell4
   jp    .GoSetDescriptionTexticonCostAndDamage
 
+  .GoSetDescriptionTexticonCostAndDamage_Resurrection:
+  exx
+  push  hl                              ;store resurrection amount
+  ld    hl,0
+  exx
+  call  .GoSetDescriptionTexticonCostAndDamage
+  pop   hl                              ;pop and set resurrection amount
+  push  iy
+  ld    b,SpellBookX + 077
+  ld    c,SpellBookY + 166
+  call  SetNumber16BitCastle
+  pop   iy
+  ret
+
+  .GoSetDescriptionTexticonCostAndDamage_Cure:
+  exx
+  push  hl                              ;store cure amount
+  ld    hl,0
+  exx
+  call  .GoSetDescriptionTexticonCostAndDamage
+  pop   hl                              ;pop and set cure amount
+  push  iy
+  ld    b,SpellBookX + 89
+  ld    c,SpellBookY + 173
+  call  SetNumber16BitCastle
+  pop   iy
+  ret
 
   .GoSetDescriptionTexticonCostAndDamage:
   push  bc                              ;cost and damage
@@ -2229,7 +2331,7 @@ SetSpellExplanation:
   ld    bc,$0000 + (HeroOverViewSpellIconWindowButtonNY*256) + (HeroOverViewSpellIconWindowButtonNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
+  
   pop   bc                              ;cost and damage
   push  bc
   .CostAmountFound:
@@ -2248,15 +2350,17 @@ SetSpellExplanation:
 
   pop   bc                              ;cost and damage
   .DamageAmountFound:
-  ld    a,c
-  or    a
+  exx                                   ;hl=damage
+  ld    a,l
+  or    h
   ret   z
+  push  iy
   ld    b,SpellBookX + 168
   ld    c,SpellBookY + 173
-  push  iy
-  ld    l,a
-  ld    h,0
+;  ld    l,a
+;  ld    h,0
   call  SetNumber16BitCastle
+;  exx
   pop   iy
 
   ld    b,SpellBookX + 132
@@ -2287,7 +2391,7 @@ SpellDescriptionsBattle:
                           db  "friendly unit by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates 40 HP of killed living",254
+                          db  "Reanimates     HP of killed living",254
                           db  "friendly creatures.",255
 
 .DescriptionEarth1:       db  "Meteor Shower",254
@@ -2314,7 +2418,7 @@ SpellDescriptionsBattle:
 
 .Descriptionair4:         db  "Haste",254
                           db  "Increases the speed of the selected",254
-                          db  "friendly unit by 4.",255
+                          db  "friendly unit by 3.",255
 
 .Descriptionair3:         db  "Disrupting Ray",254
                           db  "Reduces the defense of the selected ",254
@@ -2331,7 +2435,7 @@ SpellDescriptionsBattle:
 
 .Descriptionwater4:       db  "Cure",254
                           db  "Removes all negative spell effects",254
-                          db  "and heals for 20 HP",255
+                          db  "and heals for     HP",255
 
 .Descriptionwater3:       db  "Ice Bolt",254
                           db  "Deals damage to a single enemy unit.",254
@@ -2352,15 +2456,15 @@ SpellDescriptionsBattle:
                               db  " ",255
 
 .DescriptionAllSpellSchools3:  db  "Frenzy",254
-                              db  "Friendly unit's defense is added to it's",254
-                              db  "attack, while defense is set to 0.",255
+                              db  "Friendly unit's attack increases by 5",254
+                              db  "while its defense decreases by 5.",255
 
 .DescriptionAllSpellSchools2:  db  "Teleport",254
                               db  "Teleport allied troop to an unoccupied",254
                               db  "space.",255
 
 .DescriptionAllSpellSchools1:  db  "Inner Beast",254
-                              db  "Friendly unit receievs +3 attack,",254
+                              db  "Friendly unit receives +3 attack,",254
                               db  "+3 defense and +3 speed.",255
 
 

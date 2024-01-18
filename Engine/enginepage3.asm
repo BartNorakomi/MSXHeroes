@@ -340,7 +340,7 @@ SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedE
 CastSpell?: db  0 ;selected spell has been used on enemy monster/friendly monster/battle field
 ;MonsterThatWeCastSpellOn: ds  2
 SpellBookButtonPressed?: db  1
-SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
+SelectedElementInSpellBook: db 0 ;0=earth, 1=fire, 2=air, 3=water
 WaitButtonPressed?: db  0
 AutoCombatButtonPressed?: db  0
 DefendButtonPressed?: db  0
@@ -565,6 +565,7 @@ Monster1:
 ;%1000 xxxx=ice trap (water)
 ;%1001 xxxx=frenzy (universal)
 ;%1010 xxxx=inner beast (universal)
+;%1011 xxxx=deflect (air)
 
 Monster2:
 .y: ds 1
