@@ -2473,8 +2473,31 @@ SpellDescriptionsBattle:
 
 
 
+SetAmountSpellPoints:
+  ld    b,100                           ;dx
+  ld    c,168                           ;dy
+  ld    hl,.TextSpellPoints
+  call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  call  SetCurrentActiveMOnsterInIX
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  .HeroFound:
 
+  ;set mana
+  ld    l,(ix+HeroMana)
+  ld    h,(ix+HeroMana+1)
+  ld    b,148                           ;dx
+  ld    c,168                           ;dy  
+  call  SetNumber16BitCastle
+  ret
+.TextSpellPoints: db  "Spell Points:",255
 
 SpellBookX:  equ 032
 SpellBookY:  equ 002+BattleScreenVerticalOffset
@@ -2489,6 +2512,7 @@ HandleSpellBook:
   ld    (SpellBookButtonPressed?),a
   ;build up all graphics in page 0
   call  SetGraphicsSpellBook
+  call  SetAmountSpellPoints
 
   ld    ix,(plxcurrentheroAddress)
   call  SetGraphicsElementalSpells
