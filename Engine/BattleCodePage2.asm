@@ -2781,16 +2781,40 @@ HandleSpellBook:
   ld    (ix+HeroOverviewWindowButtonStatus),%1010 0011
 
   pop   af                                    ;pop the call in the button check loop 
-  pop   af                                    ;pop the call to .CheckButtonMouseInteraction
 
   ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
   ld    (SpellSelected?),a                    ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
+
+  call  GetSelectedSpellCost                  ;out: a=spell cost
+  ld    e,a
+  ld    d,0
+  push  de
+
+  call  SetCurrentActiveMOnsterInIX
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  .HeroFound:
+
+  ;set mana
+  ld    l,(ix+HeroMana)
+  ld    h,(ix+HeroMana+1)
+  pop   de
+  or    a
+  sbc   hl,de
+  jr    c,.NotEnoughMana
+  pop   af                                    ;pop the call to .CheckButtonMouseInteraction
   jp    ExitSpellBook                         ;spell has been selected, now return to battle
 
-
-
-
-
+  .NotEnoughMana:
+  xor   a
+  ld    (SpellSelected?),a                    ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
+  ret
 
 CheckButtonMouseInteraction4ElementalButtons:
   ld    b,(ix+HeroOverviewWindowAmountOfButtons)

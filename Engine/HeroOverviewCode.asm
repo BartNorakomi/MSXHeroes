@@ -3242,31 +3242,6 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    c,HeroOverViewSpellBookWindowDY + 159
   jp    SetText
 
-CostAllSpellSchools4: equ 5
-CostAllSpellSchools3: equ 14
-CostAllSpellSchools2: equ 15
-CostAllSpellSchools1: equ 16
-
-CostEarthSpell4: equ 6
-CostEarthSpell3: equ 5
-CostEarthSpell2: equ 20
-CostEarthSpell1: equ 16
-
-CostFireSpell4: equ 5
-CostFireSpell3: equ 10
-CostFireSpell2: equ 15
-CostFireSpell1: equ 16
-
-CostAirSpell4: equ 6
-CostAirSpell3: equ 4
-CostAirSpell2: equ 30
-CostAirSpell1: equ 24
-
-CostWaterSpell4: equ 6
-CostWaterSpell3: equ 8
-CostWaterSpell2: equ 12
-CostWaterSpell1: equ 12
-
 DamageAllSpellSchools4: equ 10
 DamageAllSpellSchools3: equ 0
 DamageAllSpellSchools2: equ 0

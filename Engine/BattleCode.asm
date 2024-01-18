@@ -7500,6 +7500,33 @@ RangedMonsterCheck:
   ret
 
 EndSpellSelectedAndSpellGetsDeflected:
+
+EndSpellSelectedAndReduceManaCost:
+  call  GetSelectedSpellCost                  ;out: a=spell cost
+  ld    e,a
+  ld    d,0
+  push  de
+
+  call  SetCurrentActiveMOnsterInIX
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  .HeroFound:
+
+  ;set mana
+  ld    l,(ix+HeroMana)
+  ld    h,(ix+HeroMana+1)
+  pop   de
+  or    a
+  sbc   hl,de
+  ld    (ix+HeroMana),l
+  ld    (ix+HeroMana+1),h
+
 EndSpellSelected:
   xor   a
   ld    (SpellSelected?),a
@@ -7710,30 +7737,63 @@ SpellSelectedHandleCursor:
   ret
                       ;castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
 ;Earth
-SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine 
-SpellPlateArmor:      db 1 | dw SpellPlateArmorRoutine 
-SpellResurrection:    db 1 | dw SpellResurrectionRoutine 
-SpellMeteorShower:    db 3 | dw SpellMeteorShowerRoutine 
+SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine  | db  CostEarthSpell4
+SpellPlateArmor:      db 1 | dw SpellPlateArmorRoutine      | db  CostEarthSpell3
+SpellResurrection:    db 1 | dw SpellResurrectionRoutine    | db  CostEarthSpell2
+SpellMeteorShower:    db 3 | dw SpellMeteorShowerRoutine    | db  CostEarthSpell1
 ;Fire
-SpellCurse:           db 2 | dw SpellCurseRoutine 
-SpellBlur:            db 4 | dw SpellBlurRoutine
-SpellFireBall:        db 2 | dw SpellFireBallRoutine 
-Spellinferno:         db 2 | dw SpellInfernoRoutine 
+SpellCurse:           db 2 | dw SpellCurseRoutine           | db  CostFireSpell4
+SpellBlur:            db 4 | dw SpellBlurRoutine            | db  CostFireSpell3
+SpellFireBall:        db 2 | dw SpellFireBallRoutine        | db  CostFireSpell2
+Spellinferno:         db 2 | dw SpellInfernoRoutine         | db  CostFireSpell1
 ;Air
-SpellHaste:           db 1 | dw SpellHasteRoutine 
-SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine 
-SpellCounterStrike:   db 1 | dw SpellCounterStrikeRoutine 
-SpellDeflect:         db 1 | dw SpellDeflectRoutine 
+SpellHaste:           db 1 | dw SpellHasteRoutine           | db  CostAirSpell4
+SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine   | db  CostAirSpell3
+SpellCounterStrike:   db 1 | dw SpellCounterStrikeRoutine   | db  CostAirSpell2
+SpellDeflect:         db 1 | dw SpellDeflectRoutine         | db  CostAirSpell1
 ;Water
-SpellCure:            db 1 | dw SpellCureRoutine
-SpellIceBolt:         db 2 | dw SpellIceBoltRoutine
-SpellIceTrap:         db 2 | dw SpellIceTrapRoutine
-SpellFrostRing:       db 3 | dw SpellFrostRingRoutine
+SpellCure:            db 1 | dw SpellCureRoutine            | db  CostWaterSpell4
+SpellIceBolt:         db 2 | dw SpellIceBoltRoutine         | db  CostWaterSpell3
+SpellIceTrap:         db 2 | dw SpellIceTrapRoutine         | db  CostWaterSpell2
+SpellFrostRing:       db 3 | dw SpellFrostRingRoutine       | db  CostWaterSpell1
 ;Universal
-SpellMagicArrow:      db 2 | dw SpellMagicArrowRoutine 
-SpellFrenzy:          db 1 | dw SpellFrenzyRoutine 
-SpellTeleport:        db 5 | dw SpellTeleportRoutine 
-SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine 
+SpellMagicArrow:      db 2 | dw SpellMagicArrowRoutine      | db  CostAllSpellSchools4
+SpellFrenzy:          db 1 | dw SpellFrenzyRoutine          | db  CostAllSpellSchools3
+SpellTeleport:        db 5 | dw SpellTeleportRoutine        | db  CostAllSpellSchools2
+SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine      | db  CostAllSpellSchools1
+
+CostAllSpellSchools4: equ 5     ;magic arrow
+CostAllSpellSchools3: equ 14    ;frenzy
+CostAllSpellSchools2: equ 15    ;teleport
+CostAllSpellSchools1: equ 16    ;inner beast
+
+CostEarthSpell4: equ 6          ;ethereal chains
+CostEarthSpell3: equ 5          ;plate armor
+CostEarthSpell2: equ 20         ;resurretion
+CostEarthSpell1: equ 16         ;meteor shower
+
+CostFireSpell4: equ 5           ;curse
+CostFireSpell3: equ 10          ;blur
+CostFireSpell2: equ 15          ;fireball
+CostFireSpell1: equ 16          ;inferno
+
+CostAirSpell4: equ 6            ;haste
+CostAirSpell3: equ 4            ;disrupting ray
+CostAirSpell2: equ 30           ;counterstrike
+CostAirSpell1: equ 24           ;deflect
+
+CostWaterSpell4: equ 6          ;cure
+CostWaterSpell3: equ 8          ;ice bolt
+CostWaterSpell2: equ 12         ;ice trap
+CostWaterSpell1: equ 12         ;frost ring
+
+GetSelectedSpellCost:                   ;set cost in a
+  call  GetSelectedSpellTable           ;set spell table in hl
+  inc   hl
+  inc   hl
+  inc   hl
+  ld    a,(hl)                          ;cost
+  ret
 
 GetSelectedSpellRoutine:                ;set spell routine in hl
   call  GetSelectedSpellTable           ;set spell table in hl
@@ -7922,7 +7982,7 @@ SpellEtherealChainsRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    EtherealChainsSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 PlateArmorSpellNumber:  equ 2*16
 SpellPlateArmorRoutine:
@@ -7930,7 +7990,7 @@ SpellPlateArmorRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    PlateArmorSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
@@ -7941,7 +8001,7 @@ SpellCurseRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    CurseSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 BlurSpellNumber:  equ 4*16
 SpellBlurRoutine:
@@ -7952,7 +8012,7 @@ SpellBlurRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    BlurSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 HasteSpellNumber:  equ 5*16
 SpellHasteRoutine:
@@ -7960,7 +8020,7 @@ SpellHasteRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    HasteSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 DisruptingRaySpellNumber:  equ 6*16
 SpellDisruptingRayRoutine:
@@ -7971,7 +8031,7 @@ SpellDisruptingRayRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    DisruptingRaySpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 CounterStrikeSpellNumber:  equ 7*16
 SpellCounterStrikeRoutine:
@@ -7979,7 +8039,7 @@ SpellCounterStrikeRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    CounterStrikeSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 iceTrapSpellNumber:  equ 8*16
 SpelliceTrapRoutine:
@@ -7990,7 +8050,7 @@ SpelliceTrapRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    IceTrapSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 FrenzySpellNumber:  equ 9*16
 SpellFrenzyRoutine:
@@ -7998,7 +8058,7 @@ SpellFrenzyRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    FrenzySpellNumber               ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 InnerBeastSpellNumber:  equ 10*16
 SpellInnerBeastRoutine:
@@ -8006,7 +8066,7 @@ SpellInnerBeastRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    InnerBeastSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 DeflectSpellNumber:  equ 11*16
 SpellDeflectRoutine:
@@ -8014,7 +8074,7 @@ SpellDeflectRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    DeflectSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
@@ -8031,7 +8091,7 @@ SpellIceBoltRoutine:
   call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GetMeteorShowerDMGAmount:               ;out: hl=damage: 50+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
@@ -8106,7 +8166,7 @@ SpellMagicArrowRoutine:
   call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GetInfernoDMGAmount:                    ;out: hl=damage: 80+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
@@ -8123,7 +8183,7 @@ SpellInfernoRoutine:
   call  GetInfernoDMGAmount             ;out: hl=magic arrow damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GetCureAmount:                          ;out: hl=damage: 20+(power x 5)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
@@ -8160,7 +8220,7 @@ SpellCureRoutine:
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
   ld    b,IceTrapSpellNumber            ;ice trap
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
@@ -8218,7 +8278,7 @@ SpellResurrectionRoutine:
 
   .EndRessurectionRoutine:
   call  SetAmountUnderMonsterIn3Pages
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 GoCastAOESpell:
   ld    hl,0
@@ -8266,7 +8326,7 @@ GoCastAOESpell:
   add   a,16
   ld    (CursorXWhereSpellWasCast),a
   call  .DamageMonsterOnThisTile
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
   .DamageMonsterOnThisTile:
   call  CheckCollateralSpellDamage      ;check if there is a monster here that also gets hit. out: carry=monster found
@@ -8400,7 +8460,7 @@ SpellTeleportRoutine:
   ld    (iy+1),a                        ;y destination teleport 
   ld    a,(Monster0+MonsterX)
   ld    (iy+2),a                        ;x destination teleport 
-  jp    EndSpellSelected
+  jp    EndSpellSelectedAndReduceManaCost
 
 ;buffs and nerfs go into 1 of the 4 monster slots, check which is empty and put it in
 SetSpellInEmptyStatusSlot:              ;in: a=bit 0-3=duration, bit 4-7 spell 
