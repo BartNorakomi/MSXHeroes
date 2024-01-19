@@ -5289,11 +5289,19 @@ Copy16x16Tile:
 	db		016,000,016,000
 	db		000,000,$d0	
 
-;FreeToUseFastCopy1:                     ;freely usable anywhere
-;  db    000,000,000,000                 ;sx,--,sy,spage
-;  db    000,000,000,000                 ;dx,--,dy,dpage
-;  db    000,000,000,000                 ;nx,--,ny,--
-;  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
+BackupImagePage0Ready?: db  0           ;use FreeToUseFastCopy0 for copying from and to page 0
+FreeToUseFastCopy0:                     ;freely usable anywhere
+  db    000,000,000,000                 ;sx,--,sy,spage
+  db    000,000,000,000                 ;dx,--,dy,dpage
+  db    000,000,000,000                 ;nx,--,ny,--
+  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
+
+BackupImagePage1Ready?: db  0           ;use FreeToUseFastCopy1 for copying from and to page 1
+FreeToUseFastCopy1:                     ;freely usable anywhere
+  db    000,000,000,000                 ;sx,--,sy,spage
+  db    000,000,000,000                 ;dx,--,dy,dpage
+  db    000,000,000,000                 ;nx,--,ny,--
+  db    000,%0000 0000,$D0              ;fast copy -> Copy from right to left     
 
 ;FreeToUseFastCopy2:                     ;freely usable anywhere
 ;  db    000,000,000,000                 ;sx,--,sy,spage

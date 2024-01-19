@@ -204,6 +204,8 @@ call screenon
   ld    (MoVeMonster?),a
   ld    (LeftOrRightPlayerLostEntireArmy?),a
   ld    (AutoCombatButtonPressed?),a
+  ld    (LeftPlayerAlreadyCastSpellThisRound?),a
+  ld    (RightPlayerAlreadyCastSpellThisRound?),a
 ;  ld    (CanWeTerminateBattle?),a
 
 
@@ -352,6 +354,12 @@ call screenon
   ret
 
 .SpellBookButtonPressed:
+  ;check if spell button is grey
+  ld    hl,(GenericButtonTable + (5*GenericButtonTableLenghtPerButton) + 1)
+  ld    de,$4000 + (090*128) + (214/2) - 128
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   z
+
   ld    a,1
   ld    (SpellBookButtonPressed?),a
   jp    EndSpellSelected
@@ -5769,6 +5777,7 @@ CheckSwitchToNextMonster:
   or    a
   ret   nz
 
+  ;disable wait button if monster has already waited this round
   ld    hl,.WaitButtonActive
   ld    de,GenericButtonTable + (3*GenericButtonTableLenghtPerButton)
   ld    bc,7
@@ -5778,13 +5787,42 @@ CheckSwitchToNextMonster:
   ld    a,(ix+MonsterStatus)            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
   and   %0111 1111
   cp    1                               ;check waiting
-  ret   nz
+  jr    nz,.EndCheckWaitButton
 
   ld    hl,.WaitButtonGrey
   ld    de,GenericButtonTable + (3*GenericButtonTableLenghtPerButton)
   ld    bc,7
   ldir
+  .EndCheckWaitButton:
+  
+  ;disable spell book button if hero has already cast a spell this round
+  ld    hl,.SpellBookButtonActive
+  ld    de,GenericButtonTable + (5*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ;which hero is now active ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    a,(LeftPlayerAlreadyCastSpellThisRound?)
+  jr    c,.HeroFound
+  ld    a,(RightPlayerAlreadyCastSpellThisRound?)
+  .HeroFound:
+  or    a
+  ret   z
+
+  ld    hl,.SpellBookButtonGrey
+  ld    de,GenericButtonTable + (5*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
   ret
+
+.SpellBookButtonGrey:
+  db  %1100 0011 | dw $4000 + (090*128) + (214/2) - 128 | dw $4000 + (090*128) + (214/2) - 128 | dw $4000 + (090*128) + (214/2) - 128
+.SpellBookButtonActive:
+  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
 
 .WaitButtonGrey:
   db  %1100 0011 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128
@@ -5873,6 +5911,9 @@ FindNextActiveMonster:
   ld    (Monster10+MonsterStatus),a
   ld    (Monster11+MonsterStatus),a
   ld    (Monster12+MonsterStatus),a
+  xor   a
+  ld    (LeftPlayerAlreadyCastSpellThisRound?),a
+  ld    (RightPlayerAlreadyCastSpellThisRound?),a
   ld    a,5                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
   ld    (BattleTextQ),a
   ld    a,2
@@ -7514,9 +7555,18 @@ EndSpellSelectedAndReduceManaCost:
   ld    de,Monster7
   call  CompareHLwithDE                 ;check if this is a general attack pattern right
   ld    ix,(plxcurrentheroAddress)            ;left hero/attacking hero
+  ld    hl,LeftPlayerAlreadyCastSpellThisRound?
   jr    c,.HeroFound
   ld    ix,(HeroThatGetsAttacked)            ;lets call this defending
+  ld    hl,RightPlayerAlreadyCastSpellThisRound?
   .HeroFound:
+
+  ld    (hl),1                          ;this hero already cast a spell this round
+  ;turn spell book button grey/inactive
+  ld    hl,CheckSwitchToNextMonster.SpellBookButtonGrey
+  ld    de,GenericButtonTable + (5*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
 
   ;set mana
   ld    l,(ix+HeroMana)
@@ -8016,6 +8066,7 @@ SpellBlurRoutine:
 
 HasteSpellNumber:  equ 5*16
 SpellHasteRoutine:
+  call  AnimateSpellHaste
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    HasteSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8085,6 +8136,8 @@ GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
   ret
 
 SpellIceBoltRoutine:
+  call  AnimateSpellIceBolt
+
   call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
   jp    z,EndSpellSelectedAndSpellGetsDeflected
 
@@ -8194,6 +8247,8 @@ GetCureAmount:                          ;out: hl=damage: 20+(power x 5)
   ret
 
 SpellCureRoutine:
+  call  AnimateSpellCure
+
   call  GetCureAmount                   ;out: a=cure amount
   ld    a,l
   push  af                              ;cure amount
@@ -8727,5 +8782,247 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
   ld    a,1
   ld    (NeutralEnemyDied?),a
   ret
+
+  ld    de,$8000 + (188*128) + (192/2) - 128  ;dy,dx
+  .DestinationAddressInPage3Set:
+  ld    (AddressToWriteTo),de           ;address to write to in page 3
+
+  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+LenghtSpellAnimationStep: equ 4
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      db 7  ;animation speed (1=fast, 3=medium, 7=slow)
+CureAnimation:
+                      dw $4000 + (000*128) + (000/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (022/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (044/2) - 128 | db 022,022/2
+
+                      dw $4000 + (000*128) + (066/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (088/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (110/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (132/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (154/2) - 128 | db 022,022/2
+
+                      dw $4000 + (000*128) + (066/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (088/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (110/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (132/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (154/2) - 128 | db 022,022/2
+
+                      dw $4000 + (000*128) + (066/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (088/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (110/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (132/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (154/2) - 128 | db 022,022/2
+
+                      dw $4000 + (000*128) + (044/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (022/2) - 128 | db 022,022/2
+                      dw $4000 + (000*128) + (000/2) - 128 | db 022,022/2
+
+                      dw $4000 + (000*128) + (176/2) - 128 | db 022,022/2 ;empty copy
+
+                      dw 0
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      db 7  ;animation speed (1=fast, 3=medium, 7=slow)
+IceBoltAnimation:
+                      dw $4000 + (022*128) + ((24*0)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*1)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*2)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*3)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*4)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*5)/2) - 128 | db 024,024/2
+                      dw $4000 + (022*128) + ((24*6)/2) - 128 | db 024,024/2
+
+                      dw $4000 + (000*128) + (176/2) - 128 | db 024,024/2 ;empty copy
+
+                      dw 0
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      db 1  ;animation speed (1=fast, 3=medium, 7=slow)
+HasteAnimation:
+                      dw $4000 + (046*128) + ((44*0)/2) - 128 | db 059,044/2
+                      dw $4000 + (046*128) + ((44*1)/2) - 128 | db 059,044/2
+                      dw $4000 + (046*128) + ((44*2)/2) - 128 | db 059,044/2
+                      dw $4000 + (046*128) + ((44*3)/2) - 128 | db 059,044/2
+                      dw $4000 + (046*128) + ((44*4)/2) - 128 | db 059,044/2
+                      dw $4000 + ((046+059)*128) + ((44*0)/2) - 128 | db 059,044/2
+
+                      dw $4000 + ((046+059)*128) + ((44*1)/2) - 128 | db 059,044/2 ;empty copy
+
+                      dw 0
+
+AnimateSpellHaste:
+  ld    iy,HasteAnimation
+  jp    AnimateSpell
+
+AnimateSpellCure:
+  ld    iy,CureAnimation
+  jp    AnimateSpell
+
+AnimateSpellIceBolt:
+  ld    iy,IceBoltAnimation
+  jp    AnimateSpell
+
+AnimateSpell:
+  xor   a
+	ld		(activepage),a                        ;we will copy to the page which was active the previous frame
+  call  SwapAndSetPage                        ;swap and set page 1
+  ld    hl,CheckVictoryOrDefeat.CopyPage1toPage0
+  call  docopy
+
+  xor   a
+  ld    (SpellAnimationStep),a
+  ld    (SpellAnimationSpeed),a
+  ld    (BackupImagePage0Ready?),a
+  ld    (BackupImagePage1Ready?),a
+  ld    a,(iy-1)                              ;animation speed (1=fast, 3=medium, 7=slow)
+  ld    (SpellAnimationSpeed+1),a
+
+  .AnimationLoop:
+  ;put spell animation gfx at (0,188) page 3  
+  ld    l,(iy)
+  ld    h,(iy+1)                              ;sx animation in rom
+  ld    a,l
+  or    h
+  ret   z                                     ;animation end ?
+  ld    de,$8000 + (188*128) + (000/2) - 128  ;dy,dx
+  ld    b,(iy+2)                              ;ny
+  ld    c,(iy+3)                              ;nx/2
+  ld    a,SpellAnimationsBlock                ;block to copy graphics from
+  ld    (AddressToWriteFrom),hl
+  ld    (AddressToWriteTo),de                 ;address to write to in page 3
+  ld    (NXAndNY),bc
+  ld    (BlockToReadFrom),a
+  call  CopyRamToVramPage3ForBattleEngine     ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;source animation graphics in page 3 at (0,188)
+  ld    a,188
+  ld    (TransparantImageBattle+sy),a         ;sy in page 3
+  xor   a
+  ld    (TransparantImageBattle+sx),a         ;sx
+  ;monster location
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    a,(ix+MonsterY)
+  add   a,(ix+MonsterNY)
+  sub   (iy+2)                                ;ny spell animation
+  ld    (TransparantImageBattle+dy),a         ;dy
+  ld    a,(ix+MonsterNX)                      ;for dx of animation, take the middle of the monster, and subtract half of the spell animation width
+	srl		a				                              ;/2
+  add   a,(ix+MonsterX)                       ;middle of monster
+  sub   a,(iy+3)                              ;nx/2
+  ld    (TransparantImageBattle+dx),a         ;dx
+
+  ;animation size (ny,nx)
+  ld    a,(iy+2)                              ;ny
+  ld    (TransparantImageBattle+ny),a
+  ld    a,(iy+3)                              ;nx/2
+  add   a,a
+  ld    (TransparantImageBattle+nx),a
+  ;put animation graphics in buffer page
+	ld		a,(activepage)
+  xor   1
+	ld    (TransparantImageBattle+dPage),a  
+
+  ;before we copy first recover the background and make a new backup of the background
+  call  Recoverbackground                     ;recover the background behind the spell animation we places last frame
+;  call  MoveAnimation                   ;some animation may have movement to them
+  call  BackupImage                           ;before we put an image we first need to make a backup of the background
+
+  ld    hl,TransparantImageBattle
+  call  docopy
+
+  halt
+  call  SwapAndSetPage                        ;swap and set page
+
+  ld    a,(SpellAnimationSpeed+1)
+  ld    b,a
+  ld    a,(SpellAnimationSpeed)
+  inc   a
+  and   b
+  ld    (SpellAnimationSpeed),a
+  jp    nz,.AnimationLoop
+  ld    de,LenghtSpellAnimationStep
+  add   iy,de                                 ;next animation step
+  jp    .AnimationLoop
+
+;  ld    a,3*32+31
+;  call  SetPageSpecial.setpage
+;.kut: jp .kut
+
+  ret
+
+Recoverbackground:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    b,128
+  ld    ix,FreeToUseFastCopy1           ;use FreeToUseFastCopy1 for copying from and to page 1
+  jr    z,.RecoveryPageFound
+  ld    b,064
+  ld    ix,FreeToUseFastCopy0           ;use FreeToUseFastCopy0 for copying from and to page 0
+  .RecoveryPageFound:
+  bit   0,(ix-1)                        ;is backup ready ?
+  ret   z
+
+  ld    a,(ix+sy)
+  ld    (ix+dy),a
+  ld    a,(ix+sx)
+  ld    (ix+dx),a
+
+  ld    a,b
+  ld    (ix+sx),a                       ;source x is x=064 for page 0 and x=128 for page 1
+  ld    a,188
+  ld    (ix+sy),a                       ;source y is y=188 in page 3
+
+	ld		a,(activepage)                  ;destination page is our buffer page
+  xor   1
+  ld    (ix+dpage),a
+
+  ld    a,3                             ;source page is page 3
+  ld    (ix+spage),a
+
+  push  ix
+  pop   hl
+  jp    docopy
+
+BackupImage:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    a,128
+  ld    ix,FreeToUseFastCopy1           ;use FreeToUseFastCopy1 for copying from and to page 1
+  jr    z,.SetDx
+  ld    a,064
+  ld    ix,FreeToUseFastCopy0           ;use FreeToUseFastCopy0 for copying from and to page 0
+  .SetDx:
+  ld    (ix+dx),a                       ;backup to dx=64 if we backup an image from page 0 and backup to dx=128 if we backup an image from page 1
+  set   0,(ix-1)                        ;backup is now ready in this page to be used next frame
+
+  ld    a,3
+  ld    (ix+dpage),a
+  ld    a,(TransparantImageBattle+ny)
+  ld    (ix+ny),a
+  ld    a,(TransparantImageBattle+nx)
+  ld    (ix+nx),a
+
+  ld    a,(TransparantImageBattle+dy)
+  ld    (ix+sy),a
+  ld    a,(TransparantImageBattle+dx)
+  ld    (ix+sx),a
+
+  ld    a,188
+  ld    (ix+dy),a
+
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  xor   1
+  ld    (ix+spage),a
+
+  push  ix
+  pop   hl
+  jp    docopy
+
+
+
+
+
+
+
 
 

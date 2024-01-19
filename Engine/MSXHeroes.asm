@@ -1621,5 +1621,15 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $ab - ad
+;
+SpellAnimationsBlock:  equ   $ab
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

@@ -326,10 +326,9 @@ MonsterThatWasDamagedPreviousCheck: ds  2
 CursorXWhereSpellWasCast:  ds  1
 CursorYWhereSpellWasCast:  ds  1
 
+SpellAnimationStep: ds  1
+SpellAnimationSpeed: ds  2
 
-;MonsterTabledCopiedToRamPage3:  ds  Monster002Table-Monster001Table
-
-;MonsterFacingRightWhileAttacking?:  db  1
 ActiveMonsterAttackingDirection: ds  1
 IsCursorOnATile?: db  1
 WasCursorOnATilePreviousFrame?: db  1
@@ -338,9 +337,10 @@ Wait1FrameBeforeWePutGridTile?: db  0
 SpellExplanationDisplayed?: db  0
 SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
 CastSpell?: db  0 ;selected spell has been used on enemy monster/friendly monster/battle field
-;MonsterThatWeCastSpellOn: ds  2
 SpellBookButtonPressed?: db  1
-SelectedElementInSpellBook: db 0 ;0=earth, 1=fire, 2=air, 3=water
+SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
+LeftPlayerAlreadyCastSpellThisRound?: ds  1
+RightPlayerAlreadyCastSpellThisRound?: ds  1
 WaitButtonPressed?: db  0
 AutoCombatButtonPressed?: db  0
 DefendButtonPressed?: db  0

@@ -2972,6 +2972,10 @@ CheckMouseClickOutsideSpellBook:
 
   .NotOverHeroOverViewSpellBookWindow:
   pop   af
+
+  xor   a
+	ld		(NewPrContr),a                  ;turn off trigger pressed (to prevent pressing a button like defense when exiting spellbook)
+
   jp    ExitSpellBook
 
 ExitSpellBook:
@@ -3523,5 +3527,4 @@ HandleSpellCast:
 ;implosion       5     25        100+(powerx75)
 ;slayer          4     16                                          +8 attack vs units level 5 and higher
 ;armageddon      4     24        30+(powerx50)                     damages all troops
-
 
