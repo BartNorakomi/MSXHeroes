@@ -328,6 +328,7 @@ CursorYWhereSpellWasCast:  ds  1
 
 SpellAnimationStep: ds  1
 SpellAnimationSpeed: ds  2
+SpellAnimationGfxBlock: ds  1
 
 ActiveMonsterAttackingDirection: ds  1
 IsCursorOnATile?: db  1

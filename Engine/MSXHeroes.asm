@@ -1622,7 +1622,7 @@ phase	$4000
 dephase
 
 ;
-; block $ab - ad
+; block $ab - ac
 ;
 SpellAnimationsBlock:  equ   $ab
 phase	$4000
@@ -1630,6 +1630,60 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $ad - ae
+;
+SpellAnimations2Block:  equ   $ad
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations2.SC5",7,192 * 128      ;212 lines
+  incbin "..\grapx\BattleField\SpellAnimations2bottom64lines.SC5",7,064 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $af
+;
+SpellAnimations3Block:  equ   $af
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations3.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b0
+;
+SpellAnimations4Block:  equ   $b0
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations4.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b1
+;
+SpellAnimations5Block:  equ   $b1
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations5.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b2
+;
+SpellAnimations6Block:  equ   $b2
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations6.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b3
+;
+SpellAnimations7Block:  equ   $b3
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations7.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

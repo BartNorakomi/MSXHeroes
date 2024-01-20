@@ -2382,7 +2382,7 @@ SetSpellExplanation:
 
 
 SpellDescriptionsBattle:
-.DescriptionEarth4:       db  "Ethereal Chains",254
+.DescriptionEarth4:       db  "Earthbound",254
                           db  "Reduces the speed of the selected",254
                           db  "enemy unit by 50%",255
 
