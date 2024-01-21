@@ -5669,7 +5669,7 @@ pl2hero1x:		db	6
 ;pl2hero1x:		db	100
 pl2hero1xp: dw 0000
 pl2hero1move:	db	20,20
-pl2hero1mana:	dw	16,10
+pl2hero1mana:	dw	66,10
 pl2hero1manarec:db	2		                ;recover x mana every turn
 pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
