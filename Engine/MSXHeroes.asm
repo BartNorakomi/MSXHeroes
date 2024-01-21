@@ -1685,5 +1685,32 @@ phase	$4000
 	ds		$8000-$,$ff
 dephase
 
+;
+; block $b4
+;
+SpellAnimations8Block:  equ   $b4
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations8.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b5
+;
+SpellAnimations9Block:  equ   $b5
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations9.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $b6
+;
+SpellAnimations10Block:  equ   $b6
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations10.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

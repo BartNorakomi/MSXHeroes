@@ -8038,6 +8038,8 @@ SpellEtherealChainsRoutine:
 
 PlateArmorSpellNumber:  equ 2*16
 SpellPlateArmorRoutine:
+  call  AnimateSpellPlateArmor
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    PlateArmorSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8048,6 +8050,8 @@ CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
   call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
   jp    z,EndSpellSelectedAndSpellGetsDeflected
+
+  call  AnimateSpellCurse
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8109,6 +8113,8 @@ SpelliceTrapRoutine:
 
 FrenzySpellNumber:  equ 9*16
 SpellFrenzyRoutine:
+  call  AnimateSpellFrenzy
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    FrenzySpellNumber               ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8117,6 +8123,8 @@ SpellFrenzyRoutine:
 
 InnerBeastSpellNumber:  equ 10*16
 SpellInnerBeastRoutine:
+  call  AnimateSpellInnerBeast
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    InnerBeastSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8523,12 +8531,17 @@ SpellTeleportRoutine:
   ld    (iy+0),TeleportMovement         ;255=end movement(normal walk), 10=attack right, 
 
   call  SetCurrentActiveMOnsterInIX
+
   ld    a,(Monster0+MonsterY)
   sub   a,(ix+MonsterNY)
   add   a,17
   ld    (iy+1),a                        ;y destination teleport 
   ld    a,(Monster0+MonsterX)
   ld    (iy+2),a                        ;x destination teleport 
+
+  ld    (MonsterThatIsBeingAttacked),ix
+  call  AnimateSpellTeleport
+
   jp    EndSpellSelectedAndReduceManaCost
 
 ;buffs and nerfs go into 1 of the 4 monster slots, check which is empty and put it in
@@ -8981,26 +8994,157 @@ FrostRingAnimation:
                       dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw 0  ;end
 
-                      db  SpellAnimations7Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
+;                      db  SpellAnimations7Block ;animation gfx block
+;                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
+;DisruptingRayAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+;                      dw $4000 + ((064*0)*128) + ((030*0)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*1)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*2)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*3)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*4)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*5)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*6)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*0)*128) + ((030*7)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*1)*128) + ((030*0)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*1)*128) + ((030*1)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*1)*128) + ((030*2)/2) - 128 | db 064,030/2
+;                      dw $4000 + ((064*1)*128) + ((030*3)/2) - 128 | db 064,030/2
+
+;                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
+;                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
+;                      dw 0  ;end
+
+                      db  SpellAnimations8Block ;animation gfx block
+                      db  3  ;animation speed (1=fast, 3=medium, 7=slow)
 DisruptingRayAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((030*0)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*1)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*2)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*3)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*4)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*5)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*6)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*0)*128) + ((030*7)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*1)*128) + ((030*0)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*1)*128) + ((030*1)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*1)*128) + ((030*2)/2) - 128 | db 064,030/2
-                      dw $4000 + ((064*1)*128) + ((030*3)/2) - 128 | db 064,030/2
-
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*0)*128) + ((042*1)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*0)*128) + ((042*2)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*0)*128) + ((042*3)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*0)*128) + ((042*4)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw 0  ;end
+
+                      db  SpellAnimations8Block ;animation gfx block
+                      db  3  ;animation speed (1=fast, 3=medium, 7=slow)
+CurseAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*1)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*5)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*6)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*7)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw 0  ;end
+
+                      db  SpellAnimations8Block ;animation gfx block
+                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
+PlateArmorAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      dw $4000 + ((032*2)*128) + ((042*0)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*1)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*2)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*3)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*4)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*5)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*0)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*1)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*2)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*3)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*4)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*3)*128) + ((042*5)/2) - 128 | db 032,042/2
+                      dw $4000 + ((032*2)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw 0  ;end
+
+                      db  SpellAnimations9Block ;animation gfx block
+                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
+InnerBeastAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*0)*128) + ((064*1)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*0)*128) + ((064*2)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*0)*128) + ((064*3)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*1)*128) + ((064*0)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*1)*128) + ((064*1)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*1)*128) + ((064*2)/2) - 128 | db 064,064/2
+                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw 0  ;end
+
+                      db  SpellAnimations10Block ;animation gfx block
+                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
+TeleportAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*1)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*5)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*6)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*7)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*1)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*1)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw 0  ;end
+
+                      db  SpellAnimations10Block ;animation gfx block
+                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
+FrenzyAnimation:
+                                  ;sy,        sx(/2),           ny, nx(/2)
+                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*1)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*5)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*6)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*2)*128) + ((032*7)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*0)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*1)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*2)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*3)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*4)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*5)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*6)/2) - 128 | db 032,032/2
+                      dw $4000 + ((032*3)*128) + ((032*7)/2) - 128 | db 032,032/2
+
+                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
+                      dw 0  ;end
+
+AnimateSpellFrenzy:
+  ld    iy,FrenzyAnimation
+  jp    AnimateSpell
+
+AnimateSpellTeleport:
+  ld    iy,TeleportAnimation
+  jp    AnimateSpell
+
+AnimateSpellInnerBeast:
+  ld    iy,InnerBeastAnimation
+  jp    AnimateSpell
+
+AnimateSpellPlateArmor:
+  ld    iy,PlateArmorAnimation
+  jp    AnimateSpell
+
+AnimateSpellCurse:
+  ld    iy,CurseAnimation
+  jp    AnimateSpell
 
 AnimateSpellDisruptingRay:
   ld    iy,DisruptingRayAnimation
