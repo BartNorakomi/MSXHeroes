@@ -9005,31 +9005,9 @@ FrostRingAnimation:
                       dw $4000 + ((030*1+52)*128) + ((054*2)/2) - 128 | db 030,054/2
                       dw $4000 + ((030*1+52)*128) + ((054*3)/2) - 128 | db 030,054/2
                       dw $4000 + ((030*1+52)*128) + ((054*3)/2) - 128 | db 030,054/2
-
                       dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw 0  ;end
-
-;                      db  SpellAnimations7Block ;animation gfx block
-;                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-;DisruptingRayAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-;                      dw $4000 + ((064*0)*128) + ((030*0)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*1)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*2)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*3)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*4)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*5)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*6)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*0)*128) + ((030*7)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*1)*128) + ((030*0)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*1)*128) + ((030*1)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*1)*128) + ((030*2)/2) - 128 | db 064,030/2
-;                      dw $4000 + ((064*1)*128) + ((030*3)/2) - 128 | db 064,030/2
-
-;                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-;                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-;                      dw 0  ;end
 
                       db  SpellAnimations8Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
@@ -9356,6 +9334,8 @@ AnimateSpellDisruptingRay:
   jp    AnimateSpell
 
 AnimateSpellFrostRing:
+  ld    ix,Monster0                           ;aeo spell, center is cursor location
+  ld    (MonsterThatIsBeingAttacked),ix
   ld    iy,FrostRingAnimation
   jp    AnimateSpell
 
@@ -9380,6 +9360,8 @@ AnimateSpellInferno:
   jp    AnimateSpell
 
 AnimateSpellMeteorShower:
+  ld    ix,Monster0                           ;aeo spell, center is cursor location
+  ld    (MonsterThatIsBeingAttacked),ix
   ld    iy,MeteorShowerAnimation
   jp    AnimateSpell
 

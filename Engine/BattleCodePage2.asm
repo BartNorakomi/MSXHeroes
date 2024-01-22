@@ -2411,7 +2411,7 @@ SpellDescriptionsBattle:
                           db  "Deals damage to enemy unit and",254
                           db  "adjecent units.",255
 
-.DescriptionFire1:        db  "Sun Strike",254
+.DescriptionFire1:        db  "Sunstrike",254
                           db  "Deals damage to a single enemy unit",255
 ;                          db  "effect.",255
 
