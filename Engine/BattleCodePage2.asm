@@ -2394,7 +2394,7 @@ SpellDescriptionsBattle:
                           db  "Reanimates     HP of killed living",254
                           db  "friendly creatures.",255
 
-.DescriptionEarth1:       db  "Meteor Shower",254
+.DescriptionEarth1:       db  "Earthshock",254
                           db  "Deals damage to all creatures in target",254
                           db  "and adjacent hexes.",255
 
@@ -2403,15 +2403,15 @@ SpellDescriptionsBattle:
                           db  "Causes the selected enemy unit to deal",254
                           db  "-3 damage when attacking.",255
 
-.DescriptionFire3:        db  "Blur",254
+.DescriptionFire3:        db  "Blinding Fog",254
                           db  "Target ranged unit deals 50% less",254
                           db  "damage.",255
 
-.DescriptionFire2:        db  "Fireball",254
+.DescriptionFire2:        db  "Implosion",254
                           db  "Deals damage to enemy unit and",254
                           db  "adjecent units.",255
 
-.DescriptionFire1:        db  "Inferno",254
+.DescriptionFire1:        db  "Sun Strike",254
                           db  "Deals damage to a single enemy unit",255
 ;                          db  "effect.",255
 
@@ -2420,15 +2420,15 @@ SpellDescriptionsBattle:
                           db  "Increases the speed of the selected",254
                           db  "friendly unit by 3.",255
 
-.Descriptionair3:         db  "Disrupting Ray",254
+.Descriptionair3:         db  "Shieldbreaker",254
                           db  "Reduces the defense of the selected ",254
                           db  "unit by 4.",255
 
-.Descriptionair2:         db  "Counterstrike",254
+.Descriptionair2:         db  "Claw Back",254
                           db  "Target allied unit has unlimited",254
                           db  "retaliations each round.",255
 
-.Descriptionair1:         db  "Deflect",254
+.Descriptionair1:         db  "Spell Bubble",254
                           db  "Target friendly unit has a 75% chance",254
                           db  "to deflect enemy spells.",255
 
@@ -2437,11 +2437,11 @@ SpellDescriptionsBattle:
                           db  "Removes all negative spell effects",254
                           db  "and heals for     HP",255
 
-.Descriptionwater3:       db  "Ice Bolt",254
+.Descriptionwater3:       db  "Ice Peak",254
                           db  "Deals damage to a single enemy unit.",254
                           db  " ",255
 
-.Descriptionwater2:       db  "Ice Trap",254
+.Descriptionwater2:       db  "Hypnosis",254
                           db  "Enemy unit cant attack until attacked,",254
                           db  "dispelled or effect wears off",255
 
@@ -2463,7 +2463,7 @@ SpellDescriptionsBattle:
                               db  "Teleport allied troop to an unoccupied",254
                               db  "space.",255
 
-.DescriptionAllSpellSchools1:  db  "Inner Beast",254
+.DescriptionAllSpellSchools1:  db  "Primal Instinct",254
                               db  "Friendly unit receives +3 attack,",254
                               db  "+3 defense and +3 speed.",255
 
