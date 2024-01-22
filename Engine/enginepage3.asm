@@ -505,7 +505,7 @@ MonsterStatusEffect4:   equ MonsterStatusEffect3+1
 MonsterStatusEffect5:   equ MonsterStatusEffect4+1
 LenghtMonsterTable:     equ Monster1-Monster0
 
-
+AmountOfStatusEffects:  equ 5
 MonsterStatusEnabled:   equ 0
 MonsterStatusWaiting:   equ 1
 MonsterStatusDefending: equ 2

@@ -2339,6 +2339,36 @@ CheckPresenceStatusEffect:
   cp    b
   ret
 
+CheckPresenceSpellBubble:
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    c
+  ret   z
+  inc   ix
+  djnz  CheckPresenceSpellBubble
+  ret
+
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    c
+  ret   z
+  inc   ix
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    c
+  ret   z
+  inc   ix
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    c
+  ret   z
+  inc   ix
+  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  and   %1111 0000
+  cp    c
+  ret
+
+
 RemoveSpell:                            ;in: b=spell number
   ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
   and   %1111 0000
@@ -7541,6 +7571,7 @@ RangedMonsterCheck:
   ret
 
 EndSpellSelectedAndSpellGetsDeflected:
+  call  AnimateSpellDeflectActivatedAndPopped
 
 EndSpellSelectedAndReduceManaCost:
   call  GetSelectedSpellCost                  ;out: a=spell cost
@@ -8009,14 +8040,17 @@ GetSpellDuration:                         ;out: a=spell duration
   ret
 
 CheckIfSpellGetsDeflected:
-  ld    ix,(MonsterThatIsBeingAttacked)
-  ld    b,DeflectSpellNumber            ;75% to deflect spell
-  call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
-  ret   nz
-  ;deflect found, check if spell gets deflected
   ld    a,r
   and   3
   jr    z,.DontDeflect
+
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    c,DeflectSpellNumber            ;75% to deflect spell
+  ld    b,AmountOfStatusEffects
+  call  CheckPresenceSpellBubble        ;in b=spell number, check if spell is cast on this monster, out: z=spell found
+  ret   nz
+  ;deflect found, check if spell gets deflected
+  ld    (ix+MonsterStatusEffect1),0     ;remove spell bubble when found
   xor   a                               ;zero=deflect
   ret
   .DontDeflect:
@@ -9299,6 +9333,10 @@ AnimateSpellCounterStrike: ;claw back
 
 AnimateSpellIceTrap: ;hypnosis
   ld    iy,IceTrapAnimation
+  jp    AnimateSpell
+
+AnimateSpellDeflectActivatedAndPopped:
+  ld    iy,DeflectActivatedAndPoppedAnimation
   jp    AnimateSpell
 
 AnimateSpellDeflect:
