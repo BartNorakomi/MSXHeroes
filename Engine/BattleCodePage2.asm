@@ -1773,7 +1773,7 @@ SetBattleText:
   .SetText:
   ld    b,060                           ;dx
 
-  ld    a,(ix)                          ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round
+  ld    a,(ix)                          ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round,6=earthbound
   dec   a
   jp    z,.wait
   dec   a
@@ -1783,8 +1783,220 @@ SetBattleText:
   dec   a
 ;  jp    z,.UnitsDie
   dec   a
-  jp    z,.NextRound
+  jp    z,.NextRound                    ;5
+  dec   a
+  jp    z,.EarthBound
+  dec   a
+  jp    z,.PlateArmor
+  dec   a
+  jp    z,.Resurrection
+  dec   a
+  jp    z,.EarthShock
+  dec   a
+  jp    z,.Curse                        ;10
+  dec   a
+  jp    z,.BlindingFog                  
+  dec   a
+  jp    z,.Implosion
+  dec   a
+  jp    z,.Sunstrike
+  dec   a
+  jp    z,.Haste
+  dec   a
+  jp    z,.ShieldBreaker                ;15
+  dec   a
+  jp    z,.ClawBack
+  dec   a
+  jp    z,.SpellBubble
+  dec   a
+  jp    z,.Cure
+  dec   a
+  jp    z,.IcePeak
+  dec   a
+  jp    z,.Hypnosis                     ;20
+  dec   a
+  jp    z,.FrostRing
+  dec   a
+  jp    z,.MagicArrows
+  dec   a
+  jp    z,.Frenzy
+  dec   a
+  jp    z,.Teleport
+  dec   a
+  jp    z,.PrimalInstinct               ;25
   ret
+
+  .PrimalInstinct:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextPlus3dmgdefspd
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextPlus3dmgdefspd: db  "+3 all stats",255
+
+  .Teleport:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextTeleported
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextTeleported: db  "Teleported",255
+
+  .Frenzy:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextFrenzy
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextFrenzy: db  "Frenzy",255
+
+  .MagicArrows:
+  ld    hl,.TextMagicArrowsdmg
+  jp    .EntryAOESpells
+  .TextMagicArrowsdmg: db  "Magic Arrows dmg: ",255
+
+  .FrostRing:
+  ld    hl,.TextFrostRingAOEdmg
+  jp    .EntryAOESpells
+  .TextFrostRingAOEdmg: db  "Frost Ring AOE dmg: ",255
+
+  .Hypnosis:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextHypnotized
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextHypnotized: db  "Hypnotized",255
+
+  .IcePeak:
+  ld    hl,.TextIcePeakdmg
+  jp    .EntryAOESpells
+  .TextIcePeakdmg: db  "Ice Peak dmg: ",255
+
+  .Cure:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextCured
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextCured: db  "Cured",255
+
+  .SpellBubble:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextSpellBubble
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextSpellBubble: db  "Spell Bubble",255
+
+  .ClawBack:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextClawBack
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextClawBack: db  "Claw Back",255
+
+  .ShieldBreaker:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextMinus4Defense
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextMinus4Defense: db  "-4 def",255
+
+  .Haste:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextPlus3Speed
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextPlus3Speed: db  "+3 spd",255
+
+  .Sunstrike:
+  ld    hl,.TextSunstrikedmg
+  jp    .EntryAOESpells
+  .TextSunstrikedmg: db  "Sunstrike dmg: ",255
+
+  .Implosion:
+  ld    hl,.TextImplosionAOEdmg
+  jp    .EntryAOESpells
+  .TextImplosionAOEdmg: db  "Implosion AOE dmg: ",255
+
+  .BlindingFog:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextMinus50PercentDamage
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextMinus50PercentDamage: db  "-50% dmg",255
+
+  .Curse:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextMinus3Damage
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextMinus3Damage: db  "-3 dmg",255
+
+  .EarthShock:
+  ld    hl,.TextEarthShockAOEdmg
+  .EntryAOESpells:
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+  ld    hl,(AEOSpellDamage)
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetNumber16BitCastle
+  pop   bc
+  ret
+  .TextEarthShockAOEdmg: db  "Earthshock AOE dmg: ",255
+
+  .Resurrection:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextResurrected
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextResurrected: db  "Resurrected",255
+
+  .PlateArmor:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.TextPlus5Defense
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .TextPlus5Defense: db  "+5 def",255
+
+  .EarthBound:
+  call  .PutMonsterNameAndLetterS
+  ld    hl,.Textminus50PercentSpeed
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+  .Textminus50PercentSpeed: db  "-50% spd",255
+
+
+  .PutMonsterNameAndLetterS:
+  push  ix
+  pop   hl
+  ld    de,4
+  add   hl,de                           ;monster name
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+;  .AddLetterSForMultipleUnits:
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ret   z                               ;name already end with an s
+
+  ld    a,(ix+3)                        ;single unit ?
+  dec   a
+  ret   z                               ;single unit found
+
+  ld    hl,.TextLetterS
+
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  ret
+.TextLetterS: db "s: ",255
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   .NextRound:
   ld    a,(ix+1)                        ;round nr
@@ -2455,7 +2667,7 @@ SpellDescriptionsBattle:
                               db  "at a single enemy unit.",255
 
 .DescriptionAllSpellSchools3:  db  "Frenzy",254
-                              db  "Friendly unit's attack increases by 5",254
+                              db  "Friendly unit's damage increases by 5",254
                               db  "while its defense decreases by 5.",255
 
 .DescriptionAllSpellSchools2:  db  "Teleport",254
@@ -2463,7 +2675,7 @@ SpellDescriptionsBattle:
                               db  "troop to an an unoccupied space.",255
 
 .DescriptionAllSpellSchools1:  db  "Primal Instinct",254
-                              db  "Friendly unit receives +3 attack,",254
+                              db  "Friendly unit receives +3 damage,",254
                               db  "+3 defense and +3 speed.",255
 
 

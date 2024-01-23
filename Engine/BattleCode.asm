@@ -34,8 +34,12 @@ CheckEnemyAI:
   
   .NeutralOrComputerControlledMonsterFound:
   call  SetMonsterTableInIY             ;out: iy->monster table idle
+
+  call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
+  ld    c,l
+
   ld    d,(iy+MonsterTableSpecialAbility)
-  ld    c,(iy+MonsterTableSpeed)
+;  ld    c,(iy+MonsterTableSpeed)
 
 ;battle code page 2
   ld    a,BattleCodePage2Block          ;Map block
@@ -2991,7 +2995,10 @@ CheckWaitButtonPressed:
   ld    a,(ix+MonsterAmount)            ;set amount
   or    (ix+MonsterAmount+1)
   ld    (BattleTextQ+3),a               ;single unit ?
+;  jp    SetMonsterNameInBattleTextQ4
+  ;/Prepare text to be put in the battle text box
 
+  SetMonsterNameInBattleTextQ4:
   call  SetMonsterTableInIY             ;copy monster name
   push  iy
   pop   hl
@@ -3000,8 +3007,8 @@ CheckWaitButtonPressed:
   ld    de,BattleTextQ+4                ;monster name
   ld    bc,12
   ldir
-  ;/Prepare text to be put in the battle text box
   ret
+
 
 ;A creature may defend during their phase. Doing so grants them a 20% bonus to their defense rating (after bonuses and spell effects) and skips the rest of their turn. 
 CheckDefendButtonPressed:
@@ -4149,14 +4156,8 @@ MoveMonster:
   or    (ix+MonsterAmount+1)
   ld    (BattleTextQ+3),a               ;single unit ?
 
-  call  SetMonsterTableInIY             ;copy monster name
-  push  iy
-  pop   hl
-  ld    de,MonsterTableName
-  add   hl,de
-  ld    de,BattleTextQ+4
-  ld    bc,12
-  ldir
+  call  SetMonsterNameInBattleTextQ4
+
   pop   hl
   ;Prepare text to be put in the battle text box
 
@@ -7549,7 +7550,7 @@ RangedMonsterCheck:
   ld    (BrokenArrow?),a
   ret
 
-EndSpellSelectedAndSpellGetsSpellBubbleed:
+EndSpellSelectedAndSpellGetsSpellBubbled:
   call  AnimateSpellSpellBubbleActivatedAndPopped
 
 EndSpellSelectedAndReduceManaCost:
@@ -7817,7 +7818,7 @@ SpellIceBolt:         db 2 | dw SpellIceBoltRoutine         | db  CostWaterSpell
 Spellhypnosis:        db 2 | dw SpellhypnosisRoutine        | db  CostWaterSpell2
 SpellFrostRing:       db 3 | dw SpellFrostRingRoutine       | db  CostWaterSpell1
 ;Universal
-SpellMagicArrows:      db 2 | dw SpellMagicArrowsRoutine      | db  CostAllSpellSchools4
+SpellMagicArrows:     db 2 | dw SpellMagicArrowsRoutine     | db  CostAllSpellSchools4
 SpellFrenzy:          db 1 | dw SpellFrenzyRoutine          | db  CostAllSpellSchools3
 SpellTeleport:        db 5 | dw SpellTeleportRoutine        | db  CostAllSpellSchools2
 SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine      | db  CostAllSpellSchools1
@@ -7827,17 +7828,17 @@ CostAllSpellSchools3: equ 9     ;frenzy
 CostAllSpellSchools2: equ 13    ;teleport
 CostAllSpellSchools1: equ 14    ;primal instinct
 
-CostEarthSpell4: equ 5          ;earthbound
+CostEarthSpell4: equ 4          ;earthbound
 CostEarthSpell3: equ 6          ;plate armor
 CostEarthSpell2: equ 12         ;resurrection
 CostEarthSpell1: equ 16         ;earthshock
 
-CostFireSpell4: equ 4           ;curse
+CostFireSpell4: equ 6           ;curse
 CostFireSpell3: equ 10          ;blinding fog
 CostFireSpell2: equ 15          ;implosion
 CostFireSpell1: equ 16          ;sunstrike
 
-CostAirSpell4: equ 6            ;haste
+CostAirSpell4: equ 5            ;haste
 CostAirSpell3: equ 7            ;shieldbreaker
 CostAirSpell2: equ 11           ;ClawBack
 CostAirSpell1: equ 18           ;SpellBubble
@@ -8039,14 +8040,17 @@ CheckIfSpellGetsSpellBubbleed:
 EarthBoundSpellNumber:  equ 1*16
 SpellEarthBoundRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellEarthBound
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    EarthBoundSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    EarthBoundSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,6                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
+
   jp    EndSpellSelectedAndReduceManaCost
 
 PlateArmorSpellNumber:  equ 2*16
@@ -8057,25 +8061,27 @@ SpellPlateArmorRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    PlateArmorSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,7                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
-
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
   call  AnimateSpellCurse
-
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    CurseSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,10                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 BlindingFogSpellNumber:  equ 4*16
 SpellBlindingFogRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellBlindingFog
 
@@ -8083,6 +8089,8 @@ SpellBlindingFogRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    BlindingFogSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,11                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 HasteSpellNumber:  equ 5*16
@@ -8092,12 +8100,14 @@ SpellHasteRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    HasteSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,14                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 ShieldBreakerSpellNumber:  equ 6*16
 SpellShieldBreakerRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellShieldBreaker
 
@@ -8105,6 +8115,8 @@ SpellShieldBreakerRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    ShieldBreakerSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,15                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 ClawBackSpellNumber:  equ 7*16
@@ -8115,12 +8127,14 @@ SpellClawBackRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    ClawBackSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,16                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 hypnosisSpellNumber:  equ 8*16
 SpellhypnosisRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellhypnosis
 
@@ -8128,6 +8142,8 @@ SpellhypnosisRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    hypnosisSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,20                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 FrenzySpellNumber:  equ 9*16
@@ -8138,6 +8154,8 @@ SpellFrenzyRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    FrenzySpellNumber               ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,23                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 InnerBeastSpellNumber:  equ 10*16
@@ -8148,6 +8166,8 @@ SpellInnerBeastRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    InnerBeastSpellNumber           ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,25                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 SpellBubbleSpellNumber:  equ 11*16
@@ -8158,6 +8178,8 @@ SpellSpellBubbleRoutine:
   ld    ix,(MonsterThatIsBeingAttacked)
   or    SpellBubbleSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
+  ld    a,17                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
@@ -8170,13 +8192,16 @@ GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
 
 SpellIceBoltRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellIceBolt
 
   call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
+  ld    (AEOSpellDamage),hl             ;used for the battletext
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
+  ld    a,19                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GetEarthShockDMGAmount:               ;out: hl=damage: 50+(powerx10)
@@ -8189,9 +8214,10 @@ GetEarthShockDMGAmount:               ;out: hl=damage: 50+(powerx10)
 
 SpellEarthShockRoutine:
   call  AnimateSpellEarthShock
-
   call  GetEarthShockDMGAmount        ;out: hl=earthshock damage amount
   ld    (AEOSpellDamage),hl
+  ld    a,9                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    GoCastAOESpell
 
 GetimplosionDMGAmount:                   ;out: hl=damage: 15+(powerx10)
@@ -8204,12 +8230,14 @@ GetimplosionDMGAmount:                   ;out: hl=damage: 15+(powerx10)
 
 SpellimplosionRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellimplosion
 
   call  GetimplosionDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
+  ld    a,12                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    GoCastAOESpell
 
 GetFrostRingDMGAmount:                  ;out: hl=damage: 30+(powerx10)
@@ -8241,6 +8269,10 @@ SpellFrostRingRoutine:
   ld    a,(CursorXWhereSpellWasCast)    ;check cast point (we skip this for frost ring)
   add   a,16
   ld    (CursorXWhereSpellWasCast),a
+
+  ld    a,21                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
+
   jp    GoCastAOESpell.EntryPointFrostRing
 
 GetMagicArrowsDMGAmount:                 ;out: hl=damage: 10+(powerx10)
@@ -8253,13 +8285,18 @@ GetMagicArrowsDMGAmount:                 ;out: hl=damage: 10+(powerx10)
 
 SpellMagicArrowsRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellMagicArrows
 
   call  GetMagicArrowsDMGAmount             ;out: hl=magic arrows damage amount
+  ld    (AEOSpellDamage),hl             ;used for the battletext
+
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
+
+  ld    a,22                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GetsunstrikeDMGAmount:                    ;out: hl=damage: 80+(powerx10)
@@ -8272,13 +8309,18 @@ GetsunstrikeDMGAmount:                    ;out: hl=damage: 80+(powerx10)
 
 SpellsunstrikeRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
-  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
   call  AnimateSpellsunstrike
 
   call  GetsunstrikeDMGAmount             ;out: hl=magic arrows damage amount
+  ld    (AEOSpellDamage),hl             ;used for the battletext
+
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
+
+  ld    a,13                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GetCureAmount:                          ;out: hl=damage: 20+(power x 5)
@@ -8318,6 +8360,9 @@ SpellCureRoutine:
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
   ld    b,hypnosisSpellNumber            ;hypnosis
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
+
+  ld    a,18                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP
@@ -8378,6 +8423,9 @@ SpellResurrectionRoutine:
 
   .EndRessurectionRoutine:
   call  SetAmountUnderMonsterIn3Pages
+
+  ld    a,8                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
 GoCastAOESpell:
@@ -8565,7 +8613,16 @@ SpellTeleportRoutine:
   ld    (MonsterThatIsBeingAttacked),ix
   call  AnimateSpellTeleport
 
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    a,24                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
+  call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
+
+PrepBattleTextForSpells:  
+  ld    (BattleTextQ),a
+  ld    a,2
+  ld    (SetBattleText?),a              ;amount of frames/pages we put text
+  jp    SetMonsterNameInBattleTextQ4
 
 ;buffs and nerfs go into 1 of the 4 monster slots, check which is empty and put it in
 SetSpellInEmptyStatusSlot:              ;in: a=bit 0-3=duration, bit 4-7 spell 
