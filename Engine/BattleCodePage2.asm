@@ -2076,7 +2076,7 @@ SetSpellExplanation:
 
 
   .SetDescriptionTexticonCostAndDamage:
-  ;inner beast
+  ;primal instinct
   exx
   ld    hl,0                            ;out: hl=damage
   exx
@@ -2107,10 +2107,10 @@ SetSpellExplanation:
   ld    b,CostAllSpellSchools3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;magic arrow
+  ;magic arrows
   push  af
   exx
-  call  GetMagicArrowDMGAmount           ;out: hl=damage
+  call  GetMagicArrowsDMGAmount           ;out: hl=damage
   exx
   pop   af
 
@@ -2140,7 +2140,7 @@ SetSpellExplanation:
   ld    b,CostWaterSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;ice trap
+  ;hypnosis
   exx
   ld    hl,0                            ;out: hl=damage
   exx
@@ -2183,14 +2183,14 @@ SetSpellExplanation:
   ld    b,CostAirSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;counterstrike
+  ;claw back
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionAir2
   ld    de,$4000 + (Spell11IconSY*128) + (Spell11IconSX/2) -128
   ld    b,CostAirSpell2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;disrupting ray
+  ;shieldbreaker
   cp    7                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
   ld    hl,SpellDescriptionsBattle.DescriptionAir3
   ld    de,$4000 + (Spell10IconSY*128) + (Spell10IconSX/2) -128
@@ -2204,9 +2204,9 @@ SetSpellExplanation:
   jp    .GoSetDescriptionTexticonCostAndDamage
 
   .SetSpellExplanationFire:
-  ;inferno
+  ;sunstrike
   exx
-  call  GetInfernoDMGAmount             ;out: hl=damage
+  call  GetsunstrikeDMGAmount             ;out: hl=damage
   exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -2215,9 +2215,9 @@ SetSpellExplanation:
   ld    b,CostFireSpell1
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;fireball
+  ;implosion
   exx
-  call  GetFireBallDMGAmount            ;out: hl=damage
+  call  GetimplosionDMGAmount            ;out: hl=damage
   exx
   ld    a,(MenuOptionSelected?Backup)
   cp    6                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -2226,7 +2226,7 @@ SetSpellExplanation:
   ld    b,CostFireSpell2
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;blur
+  ;BlindingFog
   exx
   ld    hl,0                            ;out: hl=damage
   exx
@@ -2247,9 +2247,9 @@ SetSpellExplanation:
   jp    .GoSetDescriptionTexticonCostAndDamage
 
   .SetSpellExplanationEarth:
-  ;meteor shower
+  ;earthshock
   exx
-  call  GetMeteorShowerDMGAmount        ;out: hl=damage
+  call  GetEarthShockDMGAmount        ;out: hl=damage
   exx
   ld    a,(MenuOptionSelected?Backup)
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -2280,7 +2280,7 @@ SetSpellExplanation:
   ld    b,CostEarthSpell3
   jp    z,.GoSetDescriptionTexticonCostAndDamage
 
-  ;ethereal chains
+  ;earthbound
 ;  exx
 ;  ld    hl,0                            ;out: hl=damage
 ;  exx
@@ -2412,9 +2412,8 @@ SpellDescriptionsBattle:
                           db  "adjecent units.",255
 
 .DescriptionFire1:        db  "Sunstrike",254
-                          db  "Deals damage to a single enemy unit",255
-;                          db  "effect.",255
-
+                          db  "Calls down a solar beam to incinerate",254
+                          db  "a single enemy unit.",255
 
 .Descriptionair4:         db  "Haste",254
                           db  "Increases the speed of the selected",254
@@ -2422,7 +2421,7 @@ SpellDescriptionsBattle:
 
 .Descriptionair3:         db  "Shieldbreaker",254
                           db  "Reduces the defense of the selected ",254
-                          db  "unit by 4.",255
+                          db  "enemy unit by 4.",255
 
 .Descriptionair2:         db  "Claw Back",254
                           db  "Target allied unit has unlimited",254
@@ -2430,20 +2429,20 @@ SpellDescriptionsBattle:
 
 .Descriptionair1:         db  "Spell Bubble",254
                           db  "Target friendly unit has a 75% chance",254
-                          db  "to deflect enemy spells.",255
+                          db  "to deflect a single enemy spell.",255
 
 
 .Descriptionwater4:       db  "Cure",254
                           db  "Removes all negative spell effects",254
-                          db  "and heals for     HP",255
+                          db  "and heals for     HP.",255
 
 .Descriptionwater3:       db  "Ice Peak",254
-                          db  "Deals damage to a single enemy unit.",254
-                          db  " ",255
+                          db  "Conjures an ice shard from the ground,",254
+                          db  "impaling a single enemy.",255
 
 .Descriptionwater2:       db  "Hypnosis",254
                           db  "Enemy unit cant attack until attacked,",254
-                          db  "dispelled or effect wears off",255
+                          db  "dispelled or effect wears off.",255
 
 
 .Descriptionwater1:       db  "Frost Ring",254
@@ -2451,17 +2450,17 @@ SpellDescriptionsBattle:
                           db  "the central hex.",255
 
 
-.DescriptionAllSpellSchools4:  db  "Magic Arrow",254
-                              db  "Deals damage to selected enemy unit.",254
-                              db  " ",255
+.DescriptionAllSpellSchools4:  db  "magic arrows",254
+                              db  "Unleashes a relentless volley of arrows",254
+                              db  "at a single enemy unit.",255
 
 .DescriptionAllSpellSchools3:  db  "Frenzy",254
                               db  "Friendly unit's attack increases by 5",254
                               db  "while its defense decreases by 5.",255
 
 .DescriptionAllSpellSchools2:  db  "Teleport",254
-                              db  "Teleport allied troop to an unoccupied",254
-                              db  "space.",255
+                              db  "Instantaneously displaces an allied",254
+                              db  "troop to an an unoccupied space.",255
 
 .DescriptionAllSpellSchools1:  db  "Primal Instinct",254
                               db  "Friendly unit receives +3 attack,",254
@@ -3485,46 +3484,32 @@ HandleSpellCast:
 
 ;                level cost      dmg             aoe               notes
 ;earth
-;Ethereal chains 1     6                                           50% less speed
+;earthbound 1    6                                           50% less speed
 ;Plate Armor     2     5                                           +5 defense
 ;resurrection    3     20                                          Reanimates 60 + (power×5) HP of killed friendly living creatures for the current battle/permanently.
-;meteor shower   4     16        50+(powerx10)   3 hex tiles wide
+;earthshock      4     16        50+(powerx10)   3 hex tiles wide
 
 ;fire
 ;curse           1     5                                           attack -3
-;blur            2     11                                          -50% damage for ranged units
-;fireball        3     15        15+(powerx10)   3 hex tiles wide
-;inferno         4     16        80+(powerx10)
+;BlindingFog            2     11                                          -50% damage for ranged units
+;implosion        3     15        15+(powerx10)   3 hex tiles wide
+;sunstrike         4     16        80+(powerx10)
 
 ;air
 ;haste           1     6                                           increase speed of unit by 4
-;disrupting ray  2     4                                           -4 defense
-;counterstrike   3     30                                          unlimited retaliations
+;shieldbreaker  2     4                                           -4 defense
+;claw back   3     30                                          unlimited retaliations
 ;chain lightning 4     24        60+(powerx10)                     strikes up to 5 troops
 
 ;water
 ;cure            1     6                                           Removes all negative spell effects from the selected unit and heals for 20+(power x 5) HP
 ;ice bolt        2     8         30+(powerx10)
-;ice trap        3     10                                          cant attack until attacked, dispelled or effect wears off
+;hypnosis        3     10                                          cant attack until attacked, dispelled or effect wears off
 ;frost ring      4     12        30+(powerx10)   3 hex tiles wide  does not damage center hex
 
 ;universal
-;magic arrow     1     5         10+(powerx10)
+;magic arrows     1     5         10+(powerx10)
 ;frenzy          2     14                                          Friendly troop's attack is increased by 100% of its defense and its defense is reduced to 0.
 ;teleport        3     15                                          Target allied troop instantly moves to an unoccupied target hex.
-;inner beast     4     16                                          +3 attack, defense and speed
-
-
-
-
-
-
-
-
-;extra
-;magic mirror    4     25                                          30% change to reflect spell to random enemy
-;anti-magic      4     15                                          immune to spells
-;implosion       5     25        100+(powerx75)
-;slayer          4     16                                          +8 attack vs units level 5 and higher
-;armageddon      4     24        30+(powerx50)                     damages all troops
+;primal instinct     4     16                                          +3 attack, defense and speed
 

@@ -2298,23 +2298,23 @@ SetTotalMonsterSpeedInHL: ;in ix->monster, iy->monstertable. out: hl=total speed
   add   hl,de
   .EndCheckHaste:
 
-  ld    b,InnerBeastSpellNumber         ;add 3 to speed if inner beast is found
+  ld    b,InnerBeastSpellNumber         ;add 3 to speed if primal instinct is found
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   jr    nz,.EndCheckInnerBeast
-  ld    de,3                            ;+3 speed if inner beast is found
+  ld    de,3                            ;+3 speed if primal instinct is found
   add   hl,de
   .EndCheckInnerBeast:  
 
-  ld    b,EtherealChainsSpellNumber     ;remove 50% speed if monster has ethereal chains
+  ld    b,EarthBoundSpellNumber     ;remove 50% speed if monster has earthbound
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
-  jr    nz,.EndCheckEtherealChains
+  jr    nz,.EndCheckEarthBound
   push  hl
   pop   bc
-  ld    de,2                            ;50% reduction in speed if ethereal chains is found
+  ld    de,2                            ;50% reduction in speed if earthbound is found
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
   push  bc
   pop   hl
-  .EndCheckEtherealChains:
+  .EndCheckEarthBound:
   ret
 
 CheckPresenceStatusEffect:
@@ -2347,27 +2347,6 @@ CheckPresenceSpellBubble:
   inc   ix
   djnz  CheckPresenceSpellBubble
   ret
-
-  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-  and   %1111 0000
-  cp    c
-  ret   z
-  inc   ix
-  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-  and   %1111 0000
-  cp    c
-  ret   z
-  inc   ix
-  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-  and   %1111 0000
-  cp    c
-  ret   z
-  inc   ix
-  ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
-  and   %1111 0000
-  cp    c
-  ret
-
 
 RemoveSpell:                            ;in: b=spell number
   ld    a,(ix+MonsterStatusEffect1)     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
@@ -2450,22 +2429,22 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   add   hl,de
   .EndCheckPlateArmor:
 
-  ld    b,InnerBeastSpellNumber         ;increase armor by 3 if monster has inner beast
+  ld    b,InnerBeastSpellNumber         ;increase armor by 3 if monster has primal instinct
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   jr    nz,.EndCheckInnerBeast
-  ld    de,3                            ;+3 armor if inner beast is found
+  ld    de,3                            ;+3 armor if primal instinct is found
   add   hl,de
   .EndCheckInnerBeast:
 
-  ld    b,DisruptingRaySpellNumber      ;decrease armor by 4 if monster has disrupting ray
+  ld    b,ShieldBreakerSpellNumber      ;decrease armor by 4 if monster has shieldbreaker
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
-  jr    nz,.EndCheckDisruptingRay
-  ld    de,-4                           ;-4 armor if disrupting ray is found
+  jr    nz,.EndCheckShieldBreaker
+  ld    de,-4                           ;-4 armor if shieldbreaker is found
   add   hl,de
   bit   7,h                             ;check overflow
-  jr    z,.EndCheckDisruptingRay
+  jr    z,.EndCheckShieldBreaker
   ld    hl,0                            ;armor=0 in case of overflow
-  .EndCheckDisruptingRay:
+  .EndCheckShieldBreaker:
 
   ld    b,FrenzySpellNumber             ;-5 armor, +5 attack
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
@@ -2531,10 +2510,10 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   call  .AddDamageFromSkills            ;add a % boost to attack based on Offense or Archery
   pop   ix
 
-  ld    b,InnerBeastSpellNumber         ;increase attack by 3 if monster has inner beast
+  ld    b,InnerBeastSpellNumber         ;increase attack by 3 if monster has primal instinct
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   jr    nz,.EndCheckInnerBeast
-  ld    de,3                            ;+3 attack if inner beast is found
+  ld    de,3                            ;+3 attack if primal instinct is found
   add   hl,de
   .EndCheckInnerBeast:
 
@@ -2556,16 +2535,16 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   ld    hl,1                            ;damage=1 in case of overflow
   .EndCheckCurse:
 
-  ld    b,BlurSpellNumber               ;-50% damage
+  ld    b,BlindingFogSpellNumber               ;-50% damage
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
-  jr    nz,.EndCheckBlur
+  jr    nz,.EndCheckBlindingFog
   push  hl
   pop   bc
-  ld    de,2                            ;50% reduction in speed if ethereal chains is found
+  ld    de,2                            ;50% reduction in speed if earthbound is found
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
   push  bc
   pop   hl
-  .EndCheckBlur:
+  .EndCheckBlindingFog:
 
   ld    a,l
   or    h
@@ -2577,7 +2556,7 @@ SetTotalMonsterAttackInHL: ;in ix->monster, iy->monstertable. out: hl=total atta
   ld    h,0
   ld    l,(iy+MonsterTableAttack)
   pop   ix
-  jp    .CheckCurse                     ;apply curse and blur also for neutral monsters
+  jp    .CheckCurse                     ;apply curse and BlindingFog also for neutral monsters
 
   .AddDamageFromSkills:
   ;add damage boost from skills (Archery and Offence)
@@ -4196,8 +4175,8 @@ MoveMonster:
 
   ld    ix,(MonsterThatIsBeingAttacked)
 
-  ld    b,IceTrapSpellNumber            ;monster cant act when ice trap is active
-  call  RemoveSpell                     ;check if monster is ice trapped. ice spell gets dispelled when attacked
+  ld    b,hypnosisSpellNumber            ;monster cant act when hypnosis is active
+  call  RemoveSpell                     ;check if monster is hypnosisped. ice spell gets dispelled when attacked
 
   ;set AmountMonsterBeforeBeingAttacked, used to determine if monster amount went from triple to double digits or from double to single digits
   ld    l,(ix+MonsterAmount)
@@ -4281,7 +4260,7 @@ MoveMonster:
   ld    a,1
   ld    (HandleRetaliation?),a
 
-  ld    b,CounterStrikeSpellNumber      ;unlimited retaliations with counter strike
+  ld    b,ClawBackSpellNumber      ;unlimited retaliations with counter strike
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   jr    z,.EndMovement
   set   7,(ix+MonsterStatus)            ;bit 7=already retaliated this turn?
@@ -5884,7 +5863,7 @@ FindNextActiveMonster:
   push  iy
   pop   ix
   push  bc
-  ld    b,IceTrapSpellNumber            ;monster cant act when ice trap is active
+  ld    b,hypnosisSpellNumber            ;monster cant act when hypnosis is active
   call  CheckPresenceStatusEffect       ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   pop   bc
   pop   ix
@@ -7570,8 +7549,8 @@ RangedMonsterCheck:
   ld    (BrokenArrow?),a
   ret
 
-EndSpellSelectedAndSpellGetsDeflected:
-  call  AnimateSpellDeflectActivatedAndPopped
+EndSpellSelectedAndSpellGetsSpellBubbleed:
+  call  AnimateSpellSpellBubbleActivatedAndPopped
 
 EndSpellSelectedAndReduceManaCost:
   call  GetSelectedSpellCost                  ;out: a=spell cost
@@ -7818,55 +7797,55 @@ SpellSelectedHandleCursor:
   ret
                       ;castable on: ally(1),enemy(2),anywhere(3), only ranged enemy(4), free hex(5)
 ;Earth
-SpellEtherealChains:  db 2 | dw SpellEtherealChainsRoutine  | db  CostEarthSpell4
+SpellEarthBound:      db 2 | dw SpellEarthBoundRoutine      | db  CostEarthSpell4
 SpellPlateArmor:      db 1 | dw SpellPlateArmorRoutine      | db  CostEarthSpell3
 SpellResurrection:    db 1 | dw SpellResurrectionRoutine    | db  CostEarthSpell2
-SpellMeteorShower:    db 3 | dw SpellMeteorShowerRoutine    | db  CostEarthSpell1
+SpellEarthShock:      db 3 | dw SpellEarthShockRoutine      | db  CostEarthSpell1
 ;Fire
 SpellCurse:           db 2 | dw SpellCurseRoutine           | db  CostFireSpell4
-SpellBlur:            db 4 | dw SpellBlurRoutine            | db  CostFireSpell3
-SpellFireBall:        db 2 | dw SpellFireBallRoutine        | db  CostFireSpell2
-Spellinferno:         db 2 | dw SpellInfernoRoutine         | db  CostFireSpell1
+SpellBlindingFog:     db 4 | dw SpellBlindingFogRoutine     | db  CostFireSpell3
+Spellimplosion:       db 2 | dw SpellimplosionRoutine       | db  CostFireSpell2
+Spellsunstrike:       db 2 | dw SpellsunstrikeRoutine       | db  CostFireSpell1
 ;Air
 SpellHaste:           db 1 | dw SpellHasteRoutine           | db  CostAirSpell4
-SpellDisruptingRay:   db 2 | dw SpellDisruptingRayRoutine   | db  CostAirSpell3
-SpellCounterStrike:   db 1 | dw SpellCounterStrikeRoutine   | db  CostAirSpell2
-SpellDeflect:         db 1 | dw SpellDeflectRoutine         | db  CostAirSpell1
+SpellShieldBreaker:   db 2 | dw SpellShieldBreakerRoutine   | db  CostAirSpell3
+SpellClawBack:        db 1 | dw SpellClawBackRoutine        | db  CostAirSpell2
+SpellSpellBubble:     db 1 | dw SpellSpellBubbleRoutine     | db  CostAirSpell1
 ;Water
 SpellCure:            db 1 | dw SpellCureRoutine            | db  CostWaterSpell4
 SpellIceBolt:         db 2 | dw SpellIceBoltRoutine         | db  CostWaterSpell3
-SpellIceTrap:         db 2 | dw SpellIceTrapRoutine         | db  CostWaterSpell2
+Spellhypnosis:        db 2 | dw SpellhypnosisRoutine        | db  CostWaterSpell2
 SpellFrostRing:       db 3 | dw SpellFrostRingRoutine       | db  CostWaterSpell1
 ;Universal
-SpellMagicArrow:      db 2 | dw SpellMagicArrowRoutine      | db  CostAllSpellSchools4
+SpellMagicArrows:      db 2 | dw SpellMagicArrowsRoutine      | db  CostAllSpellSchools4
 SpellFrenzy:          db 1 | dw SpellFrenzyRoutine          | db  CostAllSpellSchools3
 SpellTeleport:        db 5 | dw SpellTeleportRoutine        | db  CostAllSpellSchools2
 SpellInnerBeast:      db 1 | dw SpellInnerBeastRoutine      | db  CostAllSpellSchools1
 
-CostAllSpellSchools4: equ 5     ;magic arrow
-CostAllSpellSchools3: equ 14    ;frenzy
-CostAllSpellSchools2: equ 15    ;teleport
-CostAllSpellSchools1: equ 16    ;inner beast
+CostAllSpellSchools4: equ 5     ;magic arrows
+CostAllSpellSchools3: equ 9     ;frenzy
+CostAllSpellSchools2: equ 13    ;teleport
+CostAllSpellSchools1: equ 14    ;primal instinct
 
-CostEarthSpell4: equ 6          ;ethereal chains
-CostEarthSpell3: equ 5          ;plate armor
-CostEarthSpell2: equ 20         ;resurretion
-CostEarthSpell1: equ 16         ;meteor shower
+CostEarthSpell4: equ 5          ;earthbound
+CostEarthSpell3: equ 6          ;plate armor
+CostEarthSpell2: equ 12         ;resurrection
+CostEarthSpell1: equ 16         ;earthshock
 
-CostFireSpell4: equ 5           ;curse
-CostFireSpell3: equ 10          ;blur
-CostFireSpell2: equ 15          ;fireball
-CostFireSpell1: equ 16          ;inferno
+CostFireSpell4: equ 4           ;curse
+CostFireSpell3: equ 10          ;blinding fog
+CostFireSpell2: equ 15          ;implosion
+CostFireSpell1: equ 16          ;sunstrike
 
 CostAirSpell4: equ 6            ;haste
-CostAirSpell3: equ 4            ;disrupting ray
-CostAirSpell2: equ 30           ;counterstrike
-CostAirSpell1: equ 24           ;deflect
+CostAirSpell3: equ 7            ;shieldbreaker
+CostAirSpell2: equ 11           ;ClawBack
+CostAirSpell1: equ 18           ;SpellBubble
 
 CostWaterSpell4: equ 6          ;cure
 CostWaterSpell3: equ 8          ;ice bolt
-CostWaterSpell2: equ 12         ;ice trap
-CostWaterSpell1: equ 12         ;frost ring
+CostWaterSpell2: equ 12         ;hypnosis
+CostWaterSpell1: equ 15         ;frost ring
 
 GetSelectedSpellCost:                   ;set cost in a
   call  GetSelectedSpellTable           ;set spell table in hl
@@ -7902,7 +7881,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellFrenzy
   ret   z
   cp    4
-  ld    hl,SpellMagicArrow
+  ld    hl,SpellMagicArrows
   ret   z
   ld    a,(SelectedElementInSpellBook)  ;0=earth, 1=fire, 2=air, 3=water
   or    a
@@ -7918,7 +7897,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellFrostRing
   ret   z
   cp    6
-  ld    hl,SpellIceTrap
+  ld    hl,Spellhypnosis
   ret   z
   cp    7
   ld    hl,SpellIceBolt
@@ -7930,13 +7909,13 @@ GetSelectedSpellTable:                  ;set spell table in hl
   .AirSpellSelected:
   ld    a,(SpellSelected?)
   cp    5
-  ld    hl,SpellDeflect
+  ld    hl,SpellSpellBubble
   ret   z
   cp    6
-  ld    hl,SpellCounterStrike
+  ld    hl,SpellClawBack
   ret   z
   cp    7
-  ld    hl,SpellDisruptingRay
+  ld    hl,SpellShieldBreaker
   ret   z
   cp    8
   ld    hl,SpellHaste
@@ -7945,13 +7924,13 @@ GetSelectedSpellTable:                  ;set spell table in hl
   .FireSpellSelected:
   ld    a,(SpellSelected?)
   cp    5
-  ld    hl,Spellinferno
+  ld    hl,Spellsunstrike
   ret   z
   cp    6
-  ld    hl,SpellFireBall
+  ld    hl,Spellimplosion
   ret   z
   cp    7
-  ld    hl,SpellBlur
+  ld    hl,SpellBlindingFog
   ret   z
   cp    8
   ld    hl,SpellCurse
@@ -7960,7 +7939,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   .EarthSpellSelected:
   ld    a,(SpellSelected?)
   cp    5
-  ld    hl,SpellMeteorShower
+  ld    hl,SpellEarthShock
   ret   z
   cp    6
   ld    hl,SpellResurrection
@@ -7969,7 +7948,7 @@ GetSelectedSpellTable:                  ;set spell table in hl
   ld    hl,SpellPlateArmor
   ret   z
   cp    8
-  ld    hl,SpellEtherealChains
+  ld    hl,SpellEarthBound
   ret
 
 ReduceDurationStatusEffectsMonsters:      ;at the start of a new round, decrease the duration of status effects for all monsters
@@ -8039,34 +8018,34 @@ GetSpellDuration:                         ;out: a=spell duration
   add   a,2
   ret
 
-CheckIfSpellGetsDeflected:
+CheckIfSpellGetsSpellBubbleed:
   ld    a,r
   and   3
-  jr    z,.DontDeflect
+  jr    z,.DontSpellBubble
 
   ld    ix,(MonsterThatIsBeingAttacked)
-  ld    c,DeflectSpellNumber            ;75% to deflect spell
+  ld    c,SpellBubbleSpellNumber            ;75% to SpellBubble spell
   ld    b,AmountOfStatusEffects
   call  CheckPresenceSpellBubble        ;in b=spell number, check if spell is cast on this monster, out: z=spell found
   ret   nz
-  ;deflect found, check if spell gets deflected
+  ;SpellBubble found, check if spell gets SpellBubbleed
   ld    (ix+MonsterStatusEffect1),0     ;remove spell bubble when found
-  xor   a                               ;zero=deflect
+  xor   a                               ;zero=SpellBubble
   ret
-  .DontDeflect:
-  inc   a                               ;not zero=don't deflect
+  .DontSpellBubble:
+  inc   a                               ;not zero=don't SpellBubble
   ret
 
-EtherealChainsSpellNumber:  equ 1*16
-SpellEtherealChainsRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+EarthBoundSpellNumber:  equ 1*16
+SpellEarthBoundRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellEtherealChains
+  call  AnimateSpellEarthBound
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    EtherealChainsSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    EarthBoundSpellNumber       ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
@@ -8082,8 +8061,8 @@ SpellPlateArmorRoutine:
 
 CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
   call  AnimateSpellCurse
 
@@ -8093,16 +8072,16 @@ SpellCurseRoutine:
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
-BlurSpellNumber:  equ 4*16
-SpellBlurRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+BlindingFogSpellNumber:  equ 4*16
+SpellBlindingFogRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellBlur
+  call  AnimateSpellBlindingFog
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    BlurSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    BlindingFogSpellNumber                 ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
@@ -8115,39 +8094,39 @@ SpellHasteRoutine:
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
-DisruptingRaySpellNumber:  equ 6*16
-SpellDisruptingRayRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+ShieldBreakerSpellNumber:  equ 6*16
+SpellShieldBreakerRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellDisruptingRay
+  call  AnimateSpellShieldBreaker
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    DisruptingRaySpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    ShieldBreakerSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
-CounterStrikeSpellNumber:  equ 7*16
-SpellCounterStrikeRoutine:
-  call  AnimateSpellCounterStrike
+ClawBackSpellNumber:  equ 7*16
+SpellClawBackRoutine:
+  call  AnimateSpellClawBack
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    CounterStrikeSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    ClawBackSpellNumber        ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
-iceTrapSpellNumber:  equ 8*16
-SpelliceTrapRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+hypnosisSpellNumber:  equ 8*16
+SpellhypnosisRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellIceTrap
+  call  AnimateSpellhypnosis
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    IceTrapSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    hypnosisSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
@@ -8171,13 +8150,13 @@ SpellInnerBeastRoutine:
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
-DeflectSpellNumber:  equ 11*16
-SpellDeflectRoutine:
-  call  AnimateSpellDeflect
+SpellBubbleSpellNumber:  equ 11*16
+SpellSpellBubbleRoutine:
+  call  AnimateSpellSpellBubble
   
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
-  or    DeflectSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
+  or    SpellBubbleSpellNumber              ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
   call  SetSpellInEmptyStatusSlot
   jp    EndSpellSelectedAndReduceManaCost
 
@@ -8190,8 +8169,8 @@ GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
   ret
 
 SpellIceBoltRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
   call  AnimateSpellIceBolt
 
@@ -8200,7 +8179,7 @@ SpellIceBoltRoutine:
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelectedAndReduceManaCost
 
-GetMeteorShowerDMGAmount:               ;out: hl=damage: 50+(powerx10)
+GetEarthShockDMGAmount:               ;out: hl=damage: 50+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
   ld    de,10
   call  MultiplyHlWithDE                ;Out: HL = result
@@ -8208,14 +8187,14 @@ GetMeteorShowerDMGAmount:               ;out: hl=damage: 50+(powerx10)
   add   hl,de
   ret
 
-SpellMeteorShowerRoutine:
-  call  AnimateSpellMeteorShower
+SpellEarthShockRoutine:
+  call  AnimateSpellEarthShock
 
-  call  GetMeteorShowerDMGAmount        ;out: hl=meteor shower damage amount
+  call  GetEarthShockDMGAmount        ;out: hl=earthshock damage amount
   ld    (AEOSpellDamage),hl
   jp    GoCastAOESpell
 
-GetFireBallDMGAmount:                   ;out: hl=damage: 15+(powerx10)
+GetimplosionDMGAmount:                   ;out: hl=damage: 15+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
   ld    de,10
   call  MultiplyHlWithDE                ;Out: HL = result
@@ -8223,13 +8202,13 @@ GetFireBallDMGAmount:                   ;out: hl=damage: 15+(powerx10)
   add   hl,de
   ret
 
-SpellFireBallRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+SpellimplosionRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellFireball
+  call  AnimateSpellimplosion
 
-  call  GetFireBallDMGAmount            ;out: hl=ice bolt damage amount
+  call  GetimplosionDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
   jp    GoCastAOESpell
 
@@ -8264,7 +8243,7 @@ SpellFrostRingRoutine:
   ld    (CursorXWhereSpellWasCast),a
   jp    GoCastAOESpell.EntryPointFrostRing
 
-GetMagicArrowDMGAmount:                 ;out: hl=damage: 10+(powerx10)
+GetMagicArrowsDMGAmount:                 ;out: hl=damage: 10+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
   ld    de,10
   call  MultiplyHlWithDE                ;Out: HL = result
@@ -8272,18 +8251,18 @@ GetMagicArrowDMGAmount:                 ;out: hl=damage: 10+(powerx10)
   add   hl,de
   ret
 
-SpellMagicArrowRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+SpellMagicArrowsRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellMagicArrow
+  call  AnimateSpellMagicArrows
 
-  call  GetMagicArrowDMGAmount             ;out: hl=magic arrow damage amount
+  call  GetMagicArrowsDMGAmount             ;out: hl=magic arrows damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelectedAndReduceManaCost
 
-GetInfernoDMGAmount:                    ;out: hl=damage: 80+(powerx10)
+GetsunstrikeDMGAmount:                    ;out: hl=damage: 80+(powerx10)
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
   ld    de,10
   call  MultiplyHlWithDE                ;Out: HL = result
@@ -8291,13 +8270,13 @@ GetInfernoDMGAmount:                    ;out: hl=damage: 80+(powerx10)
   add   hl,de
   ret
 
-SpellInfernoRoutine:
-  call  CheckIfSpellGetsDeflected       ;out: z=spell gets deflected
-  jp    z,EndSpellSelectedAndSpellGetsDeflected
+SpellsunstrikeRoutine:
+  call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
+  jp    z,EndSpellSelectedAndSpellGetsSpellBubbleed
 
-  call  AnimateSpellInferno
+  call  AnimateSpellsunstrike
 
-  call  GetInfernoDMGAmount             ;out: hl=magic arrow damage amount
+  call  GetsunstrikeDMGAmount             ;out: hl=magic arrows damage amount
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
   jp    EndSpellSelectedAndReduceManaCost
@@ -8329,15 +8308,15 @@ SpellCureRoutine:
   ld    a,(iy+MonsterTableHp)           ;hp per unit
   ld    (ix+MonsterHP),a
 
-  ld    b,EtherealChainsSpellNumber     ;ice trap
+  ld    b,EarthBoundSpellNumber     ;hypnosis
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
   ld    b,CurseSpellNumber              ;curse
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
-  ld    b,BlurSpellNumber               ;blur
+  ld    b,BlindingFogSpellNumber               ;BlindingFog
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
-  ld    b,DisruptingRaySpellNumber      ;disrupting ray
+  ld    b,ShieldBreakerSpellNumber      ;shieldbreaker
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
-  ld    b,IceTrapSpellNumber            ;ice trap
+  ld    b,hypnosisSpellNumber            ;hypnosis
   call  RemoveSpell                     ;check if monster has this spell, if so remove it
   jp    EndSpellSelectedAndReduceManaCost
 
@@ -8885,20 +8864,6 @@ CureAnimation:
                       dw $4000 + ((032*0)*128) + ((022*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw 0
 
-;                      db  SpellAnimationsBlock ;animation gfx block
-;                      db 7  ;animation speed (1=fast, 3=medium, 7=slow)
-;IceBoltAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-;                      dw $4000 + (022*128) + ((24*0)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*1)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*2)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*3)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*4)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*5)/2) - 128 | db 024,024/2
-;                      dw $4000 + (022*128) + ((24*6)/2) - 128 | db 024,024/2
-;                      dw $4000 + (000*128) + (176/2) - 128 | db 024,024/2 ;empty copy
-;                      dw 0  ;end
-
                       db  SpellAnimations16Block ;animation gfx block
                       db 0  ;animation speed (1=fast, 3=medium, 7=slow)
 HasteAnimation:
@@ -8922,7 +8887,7 @@ HasteAnimation:
 
                       db  SpellAnimations2Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-MeteorShowerAnimation:
+EarthShockAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 064,064/2
                       dw $4000 + ((064*0)*128) + ((064*1)/2) - 128 | db 064,064/2
@@ -8940,7 +8905,7 @@ MeteorShowerAnimation:
 
                       db  SpellAnimations2Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-MagicArrowAnimation:
+MagicArrowsAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((064*3)*128) + ((040*0)/2) - 128 | db 064,040/2
                       dw $4000 + ((064*3)*128) + ((040*1)/2) - 128 | db 064,040/2
@@ -8955,7 +8920,7 @@ MagicArrowAnimation:
 
                       db  SpellAnimations3Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-InfernoAnimation:
+sunstrikeAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 064,050/2
                       dw $4000 + ((064*0)*128) + ((050*1)/2) - 128 | db 064,050/2
@@ -8993,7 +8958,7 @@ IceBoltAnimation:
 
                       db  SpellAnimations5Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-FireballAnimation:
+implosionAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 064,050/2
                       dw $4000 + ((064*0)*128) + ((050*1)/2) - 128 | db 064,050/2
@@ -9011,7 +8976,7 @@ FireballAnimation:
 
                       db  SpellAnimations6Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-EtherealChainsAnimation:
+EarthBoundAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 026,042/2
                       dw $4000 + ((026*0)*128) + ((042*1)/2) - 128 | db 026,042/2
@@ -9045,7 +9010,7 @@ FrostRingAnimation:
 
                       db  SpellAnimations8Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-DisruptingRayAnimation:
+ShieldBreakerAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
                       dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
@@ -9197,7 +9162,7 @@ ResurrectionAnimation:
 
                       db  SpellAnimations12Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-DeflectAnimation:
+SpellBubbleAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 042,036/2
                       dw $4000 + ((042*0)*128) + ((036*1)/2) - 128 | db 042,036/2
@@ -9236,7 +9201,7 @@ DeflectAnimation:
 
                       db  SpellAnimations12Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-DeflectActivatedAndPoppedAnimation:
+SpellBubbleActivatedAndPoppedAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 042,036/2
                       dw $4000 + ((042*0)*128) + ((036*1)/2) - 128 | db 042,036/2
@@ -9260,7 +9225,7 @@ DeflectActivatedAndPoppedAnimation:
 
                       db  SpellAnimations13Block ;animation gfx block
                       db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-IceTrapAnimation:
+hypnosisAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((061*0)*128) + ((060*0)/2) - 128 | db 061,060/2
                       dw $4000 + ((061*0)*128) + ((060*1)/2) - 128 | db 061,060/2
@@ -9283,7 +9248,7 @@ IceTrapAnimation:
 
                       db  SpellAnimations14Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-CounterStrikeAnimation:
+ClawBackAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((026*0)*128) + ((030*0)/2) - 128 | db 026,030/2
                       dw $4000 + ((026*0)*128) + ((030*1)/2) - 128 | db 026,030/2
@@ -9300,7 +9265,7 @@ CounterStrikeAnimation:
 
                       db  SpellAnimations15Block ;animation gfx block
                       db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-BlurAnimation:
+BlindingFogAnimation:
                                   ;sy,        sx(/2),           ny, nx(/2)
                       dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 032,032/2
                       dw $4000 + ((032*0)*128) + ((032*1)/2) - 128 | db 032,032/2
@@ -9323,24 +9288,24 @@ BlurAnimation:
                       dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
                       dw 0  ;end
 
-AnimateSpellBlur: ;claw back
-  ld    iy,BlurAnimation
+AnimateSpellBlindingFog: ;claw back
+  ld    iy,BlindingFogAnimation
   jp    AnimateSpell
 
-AnimateSpellCounterStrike: ;claw back
-  ld    iy,CounterStrikeAnimation
+AnimateSpellClawBack: ;claw back
+  ld    iy,ClawBackAnimation
   jp    AnimateSpell
 
-AnimateSpellIceTrap: ;hypnosis
-  ld    iy,IceTrapAnimation
+AnimateSpellhypnosis: ;hypnosis
+  ld    iy,hypnosisAnimation
   jp    AnimateSpell
 
-AnimateSpellDeflectActivatedAndPopped:
-  ld    iy,DeflectActivatedAndPoppedAnimation
+AnimateSpellSpellBubbleActivatedAndPopped:
+  ld    iy,SpellBubbleActivatedAndPoppedAnimation
   jp    AnimateSpell
 
-AnimateSpellDeflect:
-  ld    iy,DeflectAnimation
+AnimateSpellSpellBubble:
+  ld    iy,SpellBubbleAnimation
   jp    AnimateSpell
 
 AnimateSpellResurrection:
@@ -9367,8 +9332,8 @@ AnimateSpellCurse:
   ld    iy,CurseAnimation
   jp    AnimateSpell
 
-AnimateSpellDisruptingRay:
-  ld    iy,DisruptingRayAnimation
+AnimateSpellShieldBreaker:
+  ld    iy,ShieldBreakerAnimation
   jp    AnimateSpell
 
 AnimateSpellFrostRing:
@@ -9377,30 +9342,30 @@ AnimateSpellFrostRing:
   ld    iy,FrostRingAnimation
   jp    AnimateSpell
 
-AnimateSpellEtherealChains:
-  ld    iy,EtherealChainsAnimation
+AnimateSpellEarthBound:
+  ld    iy,EarthBoundAnimation
   jp    AnimateSpell
 
-AnimateSpellFireball:
-  ld    iy,FireballAnimation
+AnimateSpellimplosion:
+  ld    iy,implosionAnimation
   jp    AnimateSpell
 
-AnimateSpellMagicArrow:
-  ld    iy,MagicArrowAnimation
+AnimateSpellMagicArrows:
+  ld    iy,MagicArrowsAnimation
   jp    AnimateSpell
 
 AnimateSpellIceBolt:
   ld    iy,IceBoltAnimation
   jp    AnimateSpell
 
-AnimateSpellInferno:
-  ld    iy,InfernoAnimation
+AnimateSpellsunstrike:
+  ld    iy,sunstrikeAnimation
   jp    AnimateSpell
 
-AnimateSpellMeteorShower:
+AnimateSpellEarthShock:
   ld    ix,Monster0                           ;aeo spell, center is cursor location
   ld    (MonsterThatIsBeingAttacked),ix
-  ld    iy,MeteorShowerAnimation
+  ld    iy,EarthShockAnimation
   jp    AnimateSpell
 
 AnimateSpellHaste:
@@ -9450,25 +9415,39 @@ AnimateSpell:
   ld    (TransparantImageBattle+sy),a         ;sy in page 3
   xor   a
   ld    (TransparantImageBattle+sx),a         ;sx
-  ;monster location
-  ld    ix,(MonsterThatIsBeingAttacked)
-  ld    a,(ix+MonsterY)
-  add   a,(ix+MonsterNY)
-  sub   (iy+2)                                ;ny spell animation
-  ld    (TransparantImageBattle+dy),a         ;dy
-  ld    a,(ix+MonsterNX)                      ;for dx of animation, take the middle of the monster, and subtract half of the spell animation width
-	srl		a				                              ;/2
-  add   a,(ix+MonsterX)                       ;middle of monster
-  sub   a,(iy+3)                              ;nx/2
-  res   0,a
-  ld    (TransparantImageBattle+dx),a         ;dx
-
   ;animation size (ny,nx)
   ld    a,(iy+2)                              ;ny
   ld    (TransparantImageBattle+ny),a
   ld    a,(iy+3)                              ;nx/2
   add   a,a
   ld    (TransparantImageBattle+nx),a
+  ;monster location
+  ld    ix,(MonsterThatIsBeingAttacked)
+  ld    a,(ix+MonsterY)
+  add   a,(ix+MonsterNY)
+  sub   (iy+2)                                ;ny spell animation
+  ld    (TransparantImageBattle+dy),a         ;dy
+
+  ld    a,(ix+MonsterNX)                      ;for dx of animation, take the middle of the monster, and subtract half of the spell animation width
+	srl		a				                              ;/2
+  add   a,(ix+MonsterX)                       ;middle of monster
+  sub   a,(iy+3)                              ;nx/2
+  res   0,a
+  jp    nc,.EndCheckOverFlowLeft
+
+  neg
+  ld    b,a
+  ld    (TransparantImageBattle+sx),a         ;sx
+  ld    a,(TransparantImageBattle+nx)
+  sub   a,b
+  ld    (TransparantImageBattle+nx),a
+
+
+  xor   a
+  .EndCheckOverFlowLeft:
+  ld    (TransparantImageBattle+dx),a         ;dx
+
+
   ;put animation graphics in buffer page
 	ld		a,(activepage)
   xor   1
@@ -9496,12 +9475,6 @@ AnimateSpell:
   ld    de,LenghtSpellAnimationStep
   add   iy,de                                 ;next animation step
   jp    .AnimationLoop
-
-;  ld    a,3*32+31
-;  call  SetPageSpecial.setpage
-;.kut: jp .kut
-
-  ret
 
 Recoverbackground:
 	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
