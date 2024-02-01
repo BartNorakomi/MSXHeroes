@@ -115,7 +115,7 @@ HandleMonsters:
   jr    nz,.EndPutGridTile
 
   call  CheckIsCursorOnATileThisFrame
-  call  SetcursorWhenGridTileIsActive | ei
+  call  SetcursorWhenGridTileIsActive ; | ei
 
   ld    a,(IsCursorOnATileThisFrame?)
   or    a
@@ -571,25 +571,25 @@ SetMonsterTableInIY:
   add   iy,de
   ret
 
-SetMonsterTableInIYWithoutEnablingInt:
-  ld    a,(slot.page12rom)              ;all RAM except page 1+2
-  out   ($a8),a     
+;SetMonsterTableInIYWithoutEnablingInt:
+;  ld    a,(slot.page12rom)              ;all RAM except page 1+2
+;  out   ($a8),a     
 
   ;go to: Monster001Table-LengthMonsterAddressesTable + (monsternumber * LengthMonsterAddressesTable)
-  ld    a,MonsterAddressesForBattle1Block               ;Map block
+;  ld    a,MonsterAddressesForBattle1Block               ;Map block
 ;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
-	ld		(memblocks.2),a
-	ld		($7000),a
+;	ld		(memblocks.2),a
+;	ld		($7000),a
 
-  ld    h,0
-  ld    l,(ix+MonsterNumber)
-  ld    de,LengthMonsterAddressesTable
-  call  MultiplyHlWithDE                ;Out: HL = result
-  ld    iy,Monster001Table-LengthMonsterAddressesTable           
-  ex    de,hl
-  add   iy,de
-  ret
+;  ld    h,0
+;  ld    l,(ix+MonsterNumber)
+;  ld    de,LengthMonsterAddressesTable
+;  call  MultiplyHlWithDE                ;Out: HL = result
+;  ld    iy,Monster001Table-LengthMonsterAddressesTable           
+;  ex    de,hl
+;  add   iy,de
+;  ret
 
 SetMonsterTableInIYNeutralMonster:
   ld    a,MonsterAddressesForBattle1Block               ;Map block
@@ -3570,7 +3570,13 @@ SetAllMonstersInMonsterTable:
   .SetMonster:
   push  bc
 
-  ld    (iy+MonsterStatus),0            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  xor   a
+  ld    (iy+MonsterStatus),a            ;0=enabled, 1=waiting, 2=defending, 3=turn ended, bit 7=already retaliated this turn?
+  ld    (iy+MonsterStatusEffect1),a     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  ld    (iy+MonsterStatusEffect2),a     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  ld    (iy+MonsterStatusEffect3),a     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  ld    (iy+MonsterStatusEffect4),a     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
+  ld    (iy+MonsterStatusEffect5),a     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
   
   ld    a,(ix+1)
   ld    (iy+MonsterAmount),a
@@ -6808,6 +6814,15 @@ CheckWasCursorOnATilePreviousFrame:
   ret
 
 SetcursorWhenGridTileIsActive:
+  call  .goSetCursorSprite
+
+  ld    hl,(BufferCursorSpriteChar)
+  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    hl,(BufferCursorSpriteCol)
+  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ret
+
+  .goSetCursorSprite:
   ld    a,(IsCursorOnATileThisFrame?)
   or    a
   jp    z,.SetHand
@@ -6824,7 +6839,7 @@ SetcursorWhenGridTileIsActive:
   inc   c
 
 ;
-  di
+;  di
 
 ;	ld    a,(CurrentActiveMonsterSpeed)
 ;  ld    c,a
@@ -6888,23 +6903,23 @@ SetcursorWhenGridTileIsActive:
   call  .CheckPointerOnEnemy
   
   ld    hl,CursorProhibitionSign
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteProhibitionSignColor
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
   ret
   
   .SetBoots:
   ld    hl,CursorBoots
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
   ret
 
   .SetHand:
   ld    hl,CursorHand
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
   ret
 
   .CheckPointerOnEnemy:
@@ -7027,11 +7042,67 @@ SetcursorWhenGridTileIsActive:
 
   ;At this point pointer is on an enemy, check if current monster is ranged
   call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIYWithoutEnablingInt             ;out: iy->monster table idle
+  call  SetMonsterTableInIY ;WithoutEnablingInt             ;out: iy->monster table idle
   ld    a,(iy+MonsterTableSpecialAbility)
   cp    RangedMonster
   jp    z,RangedMonsterCheck
 
+  call  .PointerIsOnEnemyCheckIfPossibleToAttack
+
+  ;jp to .EntryForRightPlayer if right player is active
+
+  ld    hl,CursorSwordLeft
+  call  .CheckSetSwordLeft
+  ld    hl,CursorSwordLeftDown
+  call  .CheckSetSwordLeftDown
+  ld    hl,CursorSwordLeftUp
+  call  .CheckSetSwordLeftUp
+  ld    hl,CursorSwordRight
+  call  .CheckSetSwordRight
+  ld    hl,CursorSwordRightDown
+  call  .CheckSetSwordRightDown
+  ld    hl,CursorSwordRightUp
+  call  .CheckSetSwordRightUp
+
+  .SetProhibitionSign:
+  ld    hl,CursorProhibitionSign
+  ld    (BufferCursorSpriteChar),hl
+  ld    hl,SpriteProhibitionSignColor
+  ld    (BufferCursorSpriteCol),hl
+  ret
+
+;  .EntryForRightPlayer:
+;  ld    hl,CursorSwordRight
+;  call  .CheckSetSwordRight
+;  ld    hl,CursorSwordRightDown
+;  call  .CheckSetSwordRightDown
+;  ld    hl,CursorSwordRightUp
+;  call  .CheckSetSwordRightUp
+;  ld    hl,CursorSwordLeft
+;  call  .CheckSetSwordLeft
+;  ld    hl,CursorSwordLeftDown
+;  call  .CheckSetSwordLeftDown
+;  ld    hl,CursorSwordLeftUp
+;  call  .CheckSetSwordLeftUp
+
+;  ld    hl,CursorProhibitionSign
+;  ld    (BufferCursorSpriteChar),hl
+;  ld    hl,SpriteProhibitionSignColor
+;  ld    (BufferCursorSpriteCol),hl
+;  ret
+
+
+
+
+
+
+
+
+
+
+
+
+  .PointerIsOnEnemyCheckIfPossibleToAttack:
   ;At this pointer pointer is on an enemy, check if pointer is left, right, above or below monster
   ;are we on even or odd row?
   ld    a,(Monster0+MonsterY) ;
@@ -7155,9 +7226,9 @@ SetcursorWhenGridTileIsActive:
 ;  jp    z,.SetSword
 
   .CheckSetSwordLeftDown:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position rightup of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7168,9 +7239,9 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckSetSwordLeftUp:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position rightdown of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7180,9 +7251,9 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckSetSwordRightDown:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position leftup of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7194,9 +7265,9 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckSetSwordRightUp:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position leftdown of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7206,9 +7277,9 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckSetSwordLeft:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position right of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7217,9 +7288,9 @@ SetcursorWhenGridTileIsActive:
   jp    .CheckTile
 
   .CheckSetSwordRight:
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ;check if 1 position left of enemy is a free tile within movement range of current active monster
   call  FindCursorInBattleFieldGrid
@@ -7259,7 +7330,7 @@ SetcursorWhenGridTileIsActive:
 
   push  hl
   call  SetCurrentActiveMOnsterInIX
-  call  SetMonsterTableInIYWithoutEnablingInt             ;out: iy->monster table idle
+  call  SetMonsterTableInIY ;WithoutEnablingInt             ;out: iy->monster table idle
   call  SetTotalMonsterSpeedInHL        ;in ix->monster, iy->monstertable. out: hl=total speed (including boosts from inventory items, skills and magic)
   ld    c,l
   inc   c                               ;we need to add 1 to the total monster speed for accurate detection to see if an enemy can be attacked
@@ -7270,14 +7341,11 @@ SetcursorWhenGridTileIsActive:
 
   ld    a,(hl)
   cp    c ;MovementLenghtMonsters-1         ;if tile pointer points at =>6, that means monster does not have enough movement points to move there
-  ret   c
+  ret   nc
   
-  .SetProhibitionSign:
-  ld    hl,CursorProhibitionSign
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
-  ld    hl,SpriteProhibitionSignColor
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  pop   af
   ret
+  
 
 
 
@@ -7526,9 +7594,9 @@ RangedMonsterCheck:
 
   .BrokenArrow:                         ;at this point enemy is out of range
   ld    hl,CursorBrokenArrow
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ld    a,1
   ld    (BrokenArrow?),a
@@ -7542,16 +7610,17 @@ RangedMonsterCheck:
 
   .BowAndArrow:
   ld    hl,CursorBowAndArrow
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   xor   a
   ld    (BrokenArrow?),a
   ret
 
 EndSpellSelectedAndSpellGetsSpellBubbled:
-  call  AnimateSpellSpellBubbleActivatedAndPopped
+  ld    iy,SpellBubbleActivatedAndPoppedAnimation
+  call  AnimateSpell
 
 EndSpellSelectedAndReduceManaCost:
   call  GetSelectedSpellCost                  ;out: a=spell cost
@@ -7644,9 +7713,9 @@ SpellSelectedHandleCursor:
 
   .SetSpriteProhibitionSign:
   ld    hl,CursorProhibitionSign
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteProhibitionSignColor
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
   ret
 
   .CheckFreeHex:
@@ -7784,9 +7853,9 @@ SpellSelectedHandleCursor:
   .SpellCanBecastAnyWhere:
   .SetSpriteSpellbook:
   ld    hl,CursorEnterCastle
-  ld    (setspritecharacter.SelfModifyingCodeSpriteCharacterBattle),hl
+  ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
-  ld    (setspritecharacter.SelfModifyingCodeSpriteColors),hl
+  ld    (BufferCursorSpriteCol),hl
 
   ld    a,(NewPrContr)
   bit   4,a                            ;check ontrols to see if space is pressed 
@@ -8042,7 +8111,8 @@ SpellEarthBoundRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellEarthBound
+  ld    iy,EarthBoundAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8055,7 +8125,8 @@ SpellEarthBoundRoutine:
 
 PlateArmorSpellNumber:  equ 2*16
 SpellPlateArmorRoutine:
-  call  AnimateSpellPlateArmor
+  ld    iy,PlateArmorAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8069,7 +8140,9 @@ CurseSpellNumber:  equ 3*16
 SpellCurseRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
-  call  AnimateSpellCurse
+  ld    iy,CurseAnimation
+  call  AnimateSpell
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    CurseSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8083,7 +8156,8 @@ SpellBlindingFogRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellBlindingFog
+  ld    iy,BlindingFogAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8095,7 +8169,9 @@ SpellBlindingFogRoutine:
 
 HasteSpellNumber:  equ 5*16
 SpellHasteRoutine:
-  call  AnimateSpellHaste
+  ld    iy,HasteAnimation
+  call  AnimateSpell
+
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
   or    HasteSpellNumber                ;add spell duration to spell number (a=bit 0-3=duration, bit 4-7 spell)
@@ -8109,7 +8185,8 @@ SpellShieldBreakerRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellShieldBreaker
+  ld    iy,ShieldBreakerAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8121,7 +8198,8 @@ SpellShieldBreakerRoutine:
 
 ClawBackSpellNumber:  equ 7*16
 SpellClawBackRoutine:
-  call  AnimateSpellClawBack
+  ld    iy,ClawBackAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8136,7 +8214,8 @@ SpellhypnosisRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellhypnosis
+  ld    iy,hypnosisAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8148,7 +8227,8 @@ SpellhypnosisRoutine:
 
 FrenzySpellNumber:  equ 9*16
 SpellFrenzyRoutine:
-  call  AnimateSpellFrenzy
+  ld    iy,FrenzyAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8160,7 +8240,8 @@ SpellFrenzyRoutine:
 
 InnerBeastSpellNumber:  equ 10*16
 SpellInnerBeastRoutine:
-  call  AnimateSpellInnerBeast
+  ld    iy,InnerBeastAnimation
+  call  AnimateSpell
 
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8172,7 +8253,8 @@ SpellInnerBeastRoutine:
 
 SpellBubbleSpellNumber:  equ 11*16
 SpellSpellBubbleRoutine:
-  call  AnimateSpellSpellBubble
+  ld    iy,SpellBubbleAnimation
+  call  AnimateSpell
   
   call  GetSpellDuration                ;out: a=spell duration for current hero (spell duration=spell damage/3 + 2)
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8194,7 +8276,8 @@ SpellIceBoltRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellIceBolt
+  ld    iy,IceBoltAnimation
+  call  AnimateSpell
 
   call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl             ;used for the battletext
@@ -8213,7 +8296,11 @@ GetEarthShockDMGAmount:               ;out: hl=damage: 50+(powerx10)
   ret
 
 SpellEarthShockRoutine:
-  call  AnimateSpellEarthShock
+  ld    ix,Monster0                           ;aeo spell, center is cursor location
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    iy,EarthShockAnimation
+  call  AnimateSpell
+
   call  GetEarthShockDMGAmount        ;out: hl=earthshock damage amount
   ld    (AEOSpellDamage),hl
   ld    a,9                             ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
@@ -8232,7 +8319,8 @@ SpellimplosionRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellimplosion
+  ld    iy,implosionAnimation
+  call  AnimateSpell
 
   call  GetimplosionDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
@@ -8249,7 +8337,10 @@ GetFrostRingDMGAmount:                  ;out: hl=damage: 30+(powerx10)
   ret
 
 SpellFrostRingRoutine:
-  call  AnimateSpellFrostRing
+  ld    ix,Monster0                           ;aeo spell, center is cursor location
+  ld    (MonsterThatIsBeingAttacked),ix
+  ld    iy,FrostRingAnimation
+  call  AnimateSpell
 
   call  GetFrostRingDMGAmount            ;out: hl=ice bolt damage amount
   ld    (AEOSpellDamage),hl
@@ -8287,7 +8378,8 @@ SpellMagicArrowsRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellMagicArrows
+  ld    iy,MagicArrowsAnimation
+  call  AnimateSpell
 
   call  GetMagicArrowsDMGAmount             ;out: hl=magic arrows damage amount
   ld    (AEOSpellDamage),hl             ;used for the battletext
@@ -8311,7 +8403,8 @@ SpellsunstrikeRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
   jp    z,EndSpellSelectedAndSpellGetsSpellBubbled
 
-  call  AnimateSpellsunstrike
+  ld    iy,sunstrikeAnimation
+  call  AnimateSpell
 
   call  GetsunstrikeDMGAmount             ;out: hl=magic arrows damage amount
   ld    (AEOSpellDamage),hl             ;used for the battletext
@@ -8332,7 +8425,8 @@ GetCureAmount:                          ;out: hl=damage: 20+(power x 5)
   ret
 
 SpellCureRoutine:
-  call  AnimateSpellCure
+  ld    iy,CureAnimation
+  call  AnimateSpell
 
   call  GetCureAmount                   ;out: a=cure amount
   ld    a,l
@@ -8375,7 +8469,8 @@ GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP
   ret
 
 SpellResurrectionRoutine:
-  call  AnimateSpellResurrection
+  ld    iy,ResurrectionAnimation
+  call  AnimateSpell
 
   call  GetResurrectionAmount          ;out: a=resurrection amount
   push  af
@@ -8611,7 +8706,8 @@ SpellTeleportRoutine:
   ld    (iy+2),a                        ;x destination teleport 
 
   ld    (MonsterThatIsBeingAttacked),ix
-  call  AnimateSpellTeleport
+  ld    iy,TeleportAnimation
+  call  AnimateSpell
 
   ld    ix,(MonsterThatIsBeingAttacked)
   ld    a,24                            ;1=wait, 2=defend, 3=deal damage, 4=units dead, 5=next round, 6=earth bound
@@ -8896,712 +8992,6 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
 
   call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-LenghtSpellAnimationStep: equ 4
-
-                      db  SpellAnimationsBlock ;animation gfx block
-                      db 1  ;animation speed (1=fast, 3=medium, 7=slow)
-CureAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*0)*128) + ((022*0)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*1)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*2)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*3)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*4)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*5)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*6)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*7)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*8)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*9)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*10)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*1)*128) + ((022*0)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*1)*128) + ((022*1)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*1)*128) + ((022*2)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*1)*128) + ((022*3)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*1)*128) + ((022*4)/2) - 128 | db 032,022/2
-                      dw $4000 + ((032*0)*128) + ((022*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0
-
-                      db  SpellAnimations16Block ;animation gfx block
-                      db 0  ;animation speed (1=fast, 3=medium, 7=slow)
-HasteAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((040*0)*128) + ((050*0)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*1)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*2)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*3)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*4)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*0)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*1)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*2)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*3)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*4)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*0)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*1)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*2)/2) - 128 | db 040,050/2
-                      dw $4000 + ((040*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((040*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations2Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-EarthShockAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*1)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*2)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*3)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*0)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*1)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*2)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*3)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*2)*128) + ((064*0)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*2)*128) + ((064*1)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations2Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-MagicArrowsAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*3)*128) + ((040*0)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*1)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*2)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*3)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*4)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*5)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*5)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*3)*128) + ((040*5)/2) - 128 | db 064,040/2
-                      dw $4000 + ((064*0)*128) + ((040*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations3Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-sunstrikeAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*1)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*2)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*3)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*4)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*0)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*1)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*2)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*3)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*4)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations4Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-IceBoltAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((032*0)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*1)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*2)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*3)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*4)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*5)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*6)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((032*7)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*1)*128) + ((032*0)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*1)*128) + ((032*1)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*1)*128) + ((032*2)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*1)*128) + ((032*3)/2) - 128 | db 064,032/2
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations5Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-implosionAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*1)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*2)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*3)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*4)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*0)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*1)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*2)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*3)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*1)*128) + ((050*4)/2) - 128 | db 064,050/2
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((064*0)*128) + ((050*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations6Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-EarthBoundAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*1)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*2)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*3)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*4)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*5)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*1)*128) + ((042*0)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*1)*128) + ((042*1)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*1)*128) + ((042*2)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*1)*128) + ((042*3)/2) - 128 | db 026,042/2
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations6Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-FrostRingAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((030*0+52)*128) + ((054*0)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*0+52)*128) + ((054*1)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*0+52)*128) + ((054*2)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*0+52)*128) + ((054*3)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*1+52)*128) + ((054*0)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*1+52)*128) + ((054*1)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*1+52)*128) + ((054*2)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*1+52)*128) + ((054*3)/2) - 128 | db 030,054/2
-                      dw $4000 + ((030*1+52)*128) + ((054*3)/2) - 128 | db 030,054/2
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((026*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations8Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-ShieldBreakerAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*1)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*2)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*3)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*4)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*5)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*5)/2) - 128 | db 032,042/2
-                      dw $4000 + ((032*0)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations16Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-CurseAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((033*0+40)*128) + ((048*0)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0+40)*128) + ((048*0)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0+40)*128) + ((048*1)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0+40)*128) + ((048*2)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0+40)*128) + ((048*3)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0+40)*128) + ((048*4)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*1+40)*128) + ((048*0)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*1+40)*128) + ((048*1)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*1+40)*128) + ((048*2)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*1+40)*128) + ((048*3)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*1+40)*128) + ((048*4)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*2+40)*128) + ((048*0)/2) - 128 | db 033,048/2
-                      dw $4000 + ((033*0)*128) + ((048*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations8Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-PlateArmorAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*1)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*2)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*3)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*4)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*5)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*6)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*7)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((028*0)/2) - 128 | db 032,028/2
-                      dw $4000 + ((032*1)*128) + ((042*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations9Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-InnerBeastAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*1)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*2)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*3)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*0)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*1)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*1)*128) + ((064*2)/2) - 128 | db 064,064/2
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((064*0)*128) + ((064*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations10Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-TeleportAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations10Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-FrenzyAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*3)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations11Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-ResurrectionAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations12Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-SpellBubbleAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*5)/2) - 128 | db 042,036/2
-                      
-                      dw $4000 + ((042*0)*128) + ((036*6)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*5)/2) - 128 | db 042,036/2
-
-                      dw $4000 + ((042*0)*128) + ((036*6)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*5)/2) - 128 | db 042,036/2
-
-                      dw $4000 + ((042*0)*128) + ((036*6)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*5)/2) - 128 | db 042,036/2
-
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations12Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-SpellBubbleActivatedAndPoppedAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*5)/2) - 128 | db 042,036/2                    
-                      dw $4000 + ((042*0)*128) + ((036*6)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*1)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*0)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*1)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*2)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*3)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*4)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*5)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*2)*128) + ((036*6)/2) - 128 | db 042,036/2
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((042*0)*128) + ((036*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations13Block ;animation gfx block
-                      db  0  ;animation speed (1=fast, 3=medium, 7=slow)
-hypnosisAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((061*0)*128) + ((060*0)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*1)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*2)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*3)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*0)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*1)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*2)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*3)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*2)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*3)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*0)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*1)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*1)*128) + ((060*2)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*1)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*0)/2) - 128 | db 061,060/2
-                      dw $4000 + ((061*0)*128) + ((060*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw $4000 + ((061*0)*128) + ((060*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations14Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-ClawBackAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((026*0)*128) + ((030*0)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*1)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*2)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*3)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*4)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*5)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*6)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*7)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*1)*128) + ((030*0)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*1)*128) + ((030*1)/2) - 128 | db 026,030/2
-                      dw $4000 + ((026*0)*128) + ((030*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-                      db  SpellAnimations15Block ;animation gfx block
-                      db  1  ;animation speed (1=fast, 3=medium, 7=slow)
-BlindingFogAnimation:
-                                  ;sy,        sx(/2),           ny, nx(/2)
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*2)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*3)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*4)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*5)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*6)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*1)*128) + ((032*7)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*0)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*2)*128) + ((032*1)/2) - 128 | db 032,032/2
-                      dw $4000 + ((032*0)*128) + ((032*0)/2) - 128 | db 002,002/2 ;empty copy
-                      dw 0  ;end
-
-AnimateSpellBlindingFog: ;claw back
-  ld    iy,BlindingFogAnimation
-  jp    AnimateSpell
-
-AnimateSpellClawBack: ;claw back
-  ld    iy,ClawBackAnimation
-  jp    AnimateSpell
-
-AnimateSpellhypnosis: ;hypnosis
-  ld    iy,hypnosisAnimation
-  jp    AnimateSpell
-
-AnimateSpellSpellBubbleActivatedAndPopped:
-  ld    iy,SpellBubbleActivatedAndPoppedAnimation
-  jp    AnimateSpell
-
-AnimateSpellSpellBubble:
-  ld    iy,SpellBubbleAnimation
-  jp    AnimateSpell
-
-AnimateSpellResurrection:
-  ld    iy,ResurrectionAnimation
-  jp    AnimateSpell
-
-AnimateSpellFrenzy:
-  ld    iy,FrenzyAnimation
-  jp    AnimateSpell
-
-AnimateSpellTeleport:
-  ld    iy,TeleportAnimation
-  jp    AnimateSpell
-
-AnimateSpellInnerBeast:
-  ld    iy,InnerBeastAnimation
-  jp    AnimateSpell
-
-AnimateSpellPlateArmor:
-  ld    iy,PlateArmorAnimation
-  jp    AnimateSpell
-
-AnimateSpellCurse:
-  ld    iy,CurseAnimation
-  jp    AnimateSpell
-
-AnimateSpellShieldBreaker:
-  ld    iy,ShieldBreakerAnimation
-  jp    AnimateSpell
-
-AnimateSpellFrostRing:
-  ld    ix,Monster0                           ;aeo spell, center is cursor location
-  ld    (MonsterThatIsBeingAttacked),ix
-  ld    iy,FrostRingAnimation
-  jp    AnimateSpell
-
-AnimateSpellEarthBound:
-  ld    iy,EarthBoundAnimation
-  jp    AnimateSpell
-
-AnimateSpellimplosion:
-  ld    iy,implosionAnimation
-  jp    AnimateSpell
-
-AnimateSpellMagicArrows:
-  ld    iy,MagicArrowsAnimation
-  jp    AnimateSpell
-
-AnimateSpellIceBolt:
-  ld    iy,IceBoltAnimation
-  jp    AnimateSpell
-
-AnimateSpellsunstrike:
-  ld    iy,sunstrikeAnimation
-  jp    AnimateSpell
-
-AnimateSpellEarthShock:
-  ld    ix,Monster0                           ;aeo spell, center is cursor location
-  ld    (MonsterThatIsBeingAttacked),ix
-  ld    iy,EarthShockAnimation
-  jp    AnimateSpell
-
-AnimateSpellHaste:
-  ld    iy,HasteAnimation
-  jp    AnimateSpell
-
-AnimateSpellCure:
-  ld    iy,CureAnimation
-  jp    AnimateSpell
 
 AnimateSpell:
-  xor   a
-	ld		(activepage),a                        ;we will copy to the page which was active the previous frame
-  call  SwapAndSetPage                        ;swap and set page 1
-  ld    hl,CheckVictoryOrDefeat.CopyPage1toPage0
-  call  docopy
-
-  xor   a
-  ld    (SpellAnimationStep),a
-  ld    (SpellAnimationSpeed),a
-  ld    (BackupImagePage0Ready?),a
-  ld    (BackupImagePage1Ready?),a
-  ld    a,(iy-1)                              ;animation speed (1=fast, 3=medium, 7=slow)
-  ld    (SpellAnimationSpeed+1),a
-  ld    a,(iy-2)                              ;spell animation gfx block
-  ld    (SpellAnimationGfxBlock),a
-
-  .AnimationLoop:
-  ;put spell animation gfx at (0,188) page 3  
-  ld    l,(iy)
-  ld    h,(iy+1)                              ;sx animation in rom
-  ld    a,l
-  or    h
-  ret   z                                     ;animation end ?
-  ld    de,$8000 + (188*128) + (000/2) - 128  ;dy,dx
-  ld    b,(iy+2)                              ;ny
-  ld    c,(iy+3)                              ;nx/2
-  ld    a,(SpellAnimationGfxBlock)
-  ld    (AddressToWriteFrom),hl
-  ld    (AddressToWriteTo),de                 ;address to write to in page 3
-  ld    (NXAndNY),bc
-  ld    (BlockToReadFrom),a
-  call  CopyRamToVramPage3ForBattleEngine     ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-  ;source animation graphics in page 3 at (0,188)
-  ld    a,188
-  ld    (TransparantImageBattle+sy),a         ;sy in page 3
-  xor   a
-  ld    (TransparantImageBattle+sx),a         ;sx
-  ;animation size (ny,nx)
-  ld    a,(iy+2)                              ;ny
-  ld    (TransparantImageBattle+ny),a
-  ld    a,(iy+3)                              ;nx/2
-  add   a,a
-  ld    (TransparantImageBattle+nx),a
-  ;monster location
-  ld    ix,(MonsterThatIsBeingAttacked)
-  ld    a,(ix+MonsterY)
-  add   a,(ix+MonsterNY)
-  sub   (iy+2)                                ;ny spell animation
-  ld    (TransparantImageBattle+dy),a         ;dy
-
-  ld    a,(ix+MonsterNX)                      ;for dx of animation, take the middle of the monster, and subtract half of the spell animation width
-	srl		a				                              ;/2
-  add   a,(ix+MonsterX)                       ;middle of monster
-  sub   a,(iy+3)                              ;nx/2
-  res   0,a
-  jp    nc,.EndCheckOverFlowLeft
-
-  neg
-  ld    b,a
-  ld    (TransparantImageBattle+sx),a         ;sx
-  ld    a,(TransparantImageBattle+nx)
-  sub   a,b
-  ld    (TransparantImageBattle+nx),a
-
-
-  xor   a
-  .EndCheckOverFlowLeft:
-  ld    (TransparantImageBattle+dx),a         ;dx
-
-
-  ;put animation graphics in buffer page
-	ld		a,(activepage)
-  xor   1
-	ld    (TransparantImageBattle+dPage),a  
-
-  ;before we copy first recover the background and make a new backup of the background
-  call  Recoverbackground                     ;recover the background behind the spell animation we places last frame
-;  call  MoveAnimation                   ;some animation may have movement to them
-  call  BackupImage                           ;before we put an image we first need to make a backup of the background
-
-  ld    hl,TransparantImageBattle
-  call  docopy
-  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
-  call  DoCopy
-  halt
-  call  SwapAndSetPage                        ;swap and set page
-
-  ld    a,(SpellAnimationSpeed+1)
-  ld    b,a
-  ld    a,(SpellAnimationSpeed)
-  inc   a
-  and   b
-  ld    (SpellAnimationSpeed),a
-  jp    nz,.AnimationLoop
-  ld    de,LenghtSpellAnimationStep
-  add   iy,de                                 ;next animation step
-  jp    .AnimationLoop
-
-Recoverbackground:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-  or    a
-  ld    b,128
-  ld    ix,FreeToUseFastCopy1           ;use FreeToUseFastCopy1 for copying from and to page 1
-  jr    z,.RecoveryPageFound
-  ld    b,064
-  ld    ix,FreeToUseFastCopy0           ;use FreeToUseFastCopy0 for copying from and to page 0
-  .RecoveryPageFound:
-  bit   0,(ix-1)                        ;is backup ready ?
-  ret   z
-
-  ld    a,(ix+sy)
-  ld    (ix+dy),a
-  ld    a,(ix+sx)
-  ld    (ix+dx),a
-
-  ld    a,b
-  ld    (ix+sx),a                       ;source x is x=064 for page 0 and x=128 for page 1
-  ld    a,188
-  ld    (ix+sy),a                       ;source y is y=188 in page 3
-
-	ld		a,(activepage)                  ;destination page is our buffer page
-  xor   1
-  ld    (ix+dpage),a
-
-  ld    a,3                             ;source page is page 3
-  ld    (ix+spage),a
-
-  push  ix
-  pop   hl
-  jp    docopy
-
-BackupImage:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-  or    a
-  ld    a,128
-  ld    ix,FreeToUseFastCopy1           ;use FreeToUseFastCopy1 for copying from and to page 1
-  jr    z,.SetDx
-  ld    a,064
-  ld    ix,FreeToUseFastCopy0           ;use FreeToUseFastCopy0 for copying from and to page 0
-  .SetDx:
-  ld    (ix+dx),a                       ;backup to dx=64 if we backup an image from page 0 and backup to dx=128 if we backup an image from page 1
-  set   0,(ix-1)                        ;backup is now ready in this page to be used next frame
-
-  ld    a,3
-  ld    (ix+dpage),a
-  ld    a,(TransparantImageBattle+ny)
-  ld    (ix+ny),a
-  ld    a,(TransparantImageBattle+nx)
-  ld    (ix+nx),a
-
-  ld    a,(TransparantImageBattle+dy)
-  ld    (ix+sy),a
-  ld    a,(TransparantImageBattle+dx)
-  ld    (ix+sx),a
-
-  ld    a,188
-  ld    (ix+dy),a
-
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-  xor   1
-  ld    (ix+spage),a
-
-  push  ix
-  pop   hl
-  jp    docopy
-
-
-
-
-
+  jp    GoAnimateSpell

@@ -4607,7 +4607,7 @@ SkillArmourerBasic:
                           db  "reduced by 5%                    ",255
 SkillArmourerAdvanced:
                           db  "Advanced Armorer                 ",255
-                          db  "Advanced Armo rer                ",254
+                          db  "Advanced Armorer                 ",254
                           db  "Damage inflicted on your army is ",254
                           db  "reduced by 10%                   ",255
 SkillArmourerExpert:

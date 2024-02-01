@@ -31,7 +31,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
@@ -338,7 +338,7 @@ Wait1FrameBeforeWePutGridTile?: db  0
 SpellExplanationDisplayed?: db  0
 SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
 CastSpell?: db  0 ;selected spell has been used on enemy monster/friendly monster/battle field
-SpellBookButtonPressed?: db  1
+SpellBookButtonPressed?: db  0
 SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
 LeftPlayerAlreadyCastSpellThisRound?: ds  1
 RightPlayerAlreadyCastSpellThisRound?: ds  1
@@ -357,6 +357,9 @@ MovementLenghtMonsters: equ 8
 RepairAmountAboveMonster?: db 1
 AmountMonsterBeforeBeingAttacked: ds  2
 
+BufferCursorSpriteChar: ds  2
+BufferCursorSpriteCol: ds  2
+
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
   db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
@@ -365,7 +368,7 @@ ListOfMonstersToPut:
 
   db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
   db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
-  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
+  db  006 | dw 900 | db 012 + (14*08), 056 + (07*16) + 16
 
 ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
 ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (26*08), 056 + (01*16) + 16
