@@ -1051,7 +1051,7 @@ dephase
 ;
 RetreatBlock:  equ   $6b
 phase	$4000
-  incbin "..\grapx\Battlefield\Retreat.SC5",7,117 * 128      ;212 lines
+  incbin "..\grapx\Battlefield\Retreat.SC5",7,117 * 128      ;117 lines
 	ds		$c000-$,$ff
 dephase
 

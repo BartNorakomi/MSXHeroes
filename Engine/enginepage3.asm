@@ -856,11 +856,11 @@ ClearMapPage0AndMapPage1:
   ldir
   ret
 
-copyfont:
-	db		0,0,155,0
-	db		0,0,212,0
-	db		0,1,5,0
-	db		0,0,$90	
+;copyfont:
+;	db		0,0,155,0
+;	db		0,0,212,0
+;	db		0,1,5,0
+;	db		0,0,$90	
 CopyPage0To1:
 	db		0,0,0,0
 	db		0,0,0,1
@@ -2622,9 +2622,8 @@ LoadHud:
   ld    a,HudNewBlock                   ;block to copy graphics from  
   call  CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
-	ld		hl,copyfont	                    ;put font at (0,212)
-	call	docopy
-
+;	ld		hl,copyfont	                    ;put font at (0,212)
+;	call	docopy
 
   ld    hl,CreateMiniMap                ;using worldtiles from page 3 and worldmap, we can generate minimap  
   call  ExecuteLoaderRoutine
@@ -2634,9 +2633,28 @@ LoadHud:
   ld    hl,SetCastlesInMiniMap          ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
 
+	ld		hl,CopyMovementArrows	          ;put movement arrows at (0,246)
+	call	docopy
+
   ld    hl,CopyPage0To1
 	call	docopy
+
+
+;  ld    a,60 ;vertical offset register (battlescreen is 16 pixels shifted down)
+;  di
+;  out   ($99),a
+;  ld    a,23+128
+;  ei
+;  out   ($99),a
+;call ScreenOn
+;.kut: jp .kut
   ret
+
+CopyMovementArrows:
+	db		10,0,13,0
+	db		0,0,246,0
+	db		0,1,20,0
+	db		0,0,$d0
 
 RepairDecorationEdgesHud:	
   ld    hl,$4000 + (005*128) + (202/2) - 128

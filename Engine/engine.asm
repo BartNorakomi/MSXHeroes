@@ -1,6 +1,5 @@
 LevelEngine:
   call  HandleAIWorldMap
-
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
@@ -2859,7 +2858,7 @@ putmovementstars:
 	add		a,b
 	ld		(ystar),a
 	inc		hl
-	ld		c,(hl)				;dy
+	ld		c,(hl)				;dx
 	ld		a,(xstar)
 	add		a,c
 	ld		(xstar),a
@@ -2867,6 +2866,44 @@ putmovementstars:
 	ld		a,c
 	or		b
 	ret		z
+
+  ;translate dy,dx into arrow direction
+  bit   7,c
+  jr    nz,.ArrowLeft
+  bit   0,c
+  jr    nz,.ArrowRight
+
+  .ArrowVertically:
+  bit   7,b  
+  ld    a,1*10 - 10
+  jr    nz,.GoPutArrow
+  ld    a,5*10 - 10
+  jr    .GoPutArrow
+
+  .ArrowRight:
+  bit   7,b
+  ld    a,2*10 - 10
+  jr    nz,.GoPutArrow
+  bit   0,b
+  ld    a,3*10 - 10
+  jr    z,.GoPutArrow
+  ld    a,4*10 - 10
+  jr    .GoPutArrow
+
+  .ArrowLeft:
+  bit   7,b
+  ld    a,8*10 - 10
+  jr    nz,.GoPutArrow
+  bit   0,b
+  ld    a,7*10 - 10
+  jr    z,.GoPutArrow
+  ld    a,6*10 - 10
+  jr    .GoPutArrow
+
+
+  .GoPutArrow:
+	ld		(putstar+sx),a
+
 	push	hl
 	call	doputstar
 	pop		hl
@@ -2952,16 +2989,19 @@ doputstar:
 	ld		hl,putstar
 	jp		docopy
 .behindtree:
-.behindheroorcastle:	
-	ld		a,(putstar+dx)
-	ld		(putstarbehindobject+dx),a
-	ld		a,(putstar+dy)
-	ld		(putstarbehindobject+dy),a
-	ld		hl,putstarbehindobject
-	jp		docopy	
-;	ret
+.behindheroorcastle:
+	ld		a,(putstar+sx)
+	add   a,80
+	ld		(putstar+sx),a
+	ld		hl,putstar
+	jp		docopy
 ;/check if star is behind a tree	
 
+putstar:
+	db		0,0,246,0
+	db		255,0,255,0
+	db		10,0,10,0
+	db		0,%0000 0000,$98	
 
 EnterCastle?: db  0
 CheckEnterHeroCastle:
@@ -5222,7 +5262,7 @@ buildupscreen:
 	ld		(putcastle+dpage),a
 	ld		(putbackgroundoverhero+dpage),a
 	ld		(putstar+dpage),a
-	ld		(putstarbehindobject+dpage),a
+;	ld		(putstarbehindobject+dpage),a
 ;	ld		(blackrectangle+dpage),a
 	ld		(putlettre+dpage),a
 	xor		1                               ;now we switch and set our page
@@ -5404,18 +5444,6 @@ putcastle:
 	db		16,0,16,0
 	db		0,%0000 0000,$98	
 ;	db		0,%0000 1000,$98	
-
-putstar:
-	db		208,0,192,3
-	db		255,0,255,0
-	db		10,0,8,0
-	db		0,%0000 0000,$98	
-
-putstarbehindobject:
-	db		208,0,200,3
-	db		255,0,255,0
-	db		10,0,8,0
-	db		0,%0000 0000,$98	
 
 putlettre:
 	db		0,0,212,1
