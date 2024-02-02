@@ -9,8 +9,8 @@ ShowNewlyBoughtBuildingFadingIn?:  db  1
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleWinterMap01
-WorldPointer: dw GentleDesertMap01
-;WorldPointer: dw GentleMap03
+;WorldPointer: dw GentleDesertMap01
+WorldPointer: dw GentleMap03
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -50,7 +50,7 @@ StartGame:
   call  SetBattleScreenBlock
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
   call  SetScreenOff
-  call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
+  call  LoadHud                         ;load the hud and movement arrows (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
@@ -2633,12 +2633,17 @@ LoadHud:
   ld    hl,SetCastlesInMiniMap          ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
 
-	ld		hl,CopyMovementArrows	          ;put movement arrows at (0,246)
-	call	docopy
-
   ld    hl,CopyPage0To1
 	call	docopy
 
+	ld		hl,CopyMovementArrows1          ;put movement arrows at (0,222) page 0
+	call	docopy
+	ld		hl,CopyMovementArrows2          ;put movement arrows at (0,246) page 0
+	call	docopy
+	ld		hl,CopyMovementBlackArrows1     ;put black movement arrows at (0,222) page 1
+	call	docopy
+	ld		hl,CopyMovementBlackArrows2     ;put black movement arrows at (0,246) page 1
+	call	docopy
 
 ;  ld    a,60 ;vertical offset register (battlescreen is 16 pixels shifted down)
 ;  di
@@ -2650,11 +2655,30 @@ LoadHud:
 ;.kut: jp .kut
   ret
 
-CopyMovementArrows:
+CopyMovementArrows1:
 	db		10,0,13,0
-	db		0,0,246,0
-	db		0,1,20,0
+	db		20,0,222,0
+	db		0,1,10,0
 	db		0,0,$d0
+
+CopyMovementArrows2:
+	db		10,0,23,0
+	db		20,0,246,0
+	db		0,1,10,0
+	db		0,0,$d0
+
+CopyMovementBlackArrows1:
+	db		10,0,33,0
+	db		20,0,222,1
+	db		0,1,10,0
+	db		0,0,$d0
+
+CopyMovementBlackArrows2:
+	db		10,0,43,0
+	db		20,0,246,1
+	db		0,1,10,0
+	db		0,0,$d0
+
 
 RepairDecorationEdgesHud:	
   ld    hl,$4000 + (005*128) + (202/2) - 128

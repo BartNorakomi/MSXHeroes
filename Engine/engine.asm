@@ -1,4 +1,15 @@
 LevelEngine:
+
+
+;  ld    a,60 ;vertical offset register (battlescreen is 16 pixels shifted down)
+;  di
+;  out   ($99),a
+;  ld    a,23+128
+;  ei
+;  out   ($99),a
+;call ScreenOn
+;.kut: jp .kut
+
   call  HandleAIWorldMap
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
@@ -2293,10 +2304,10 @@ ActivateFirstActiveHeroForCurrentPlayer:
 
 CheckIfCurrentPlayerIsDisabled:         ;out: carry flag=player is out of the game
   ld		a,(whichplayernowplaying?)      ;check if current player has a castle
-  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle2 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle3 | cp (ix+CastlePlayer) | ret z
-  ld    ix,Castle4 | cp (ix+CastlePlayer) | ret z
+  ld    ix,Castle1 | cp (ix+CastlePlayer) | ret   z
+  ld    ix,Castle2 | cp (ix+CastlePlayer) | ret   z
+  ld    ix,Castle3 | cp (ix+CastlePlayer) | ret   z
+  ld    ix,Castle4 | cp (ix+CastlePlayer) | ret   z
 
   call  SetHero1ForCurrentPlayerInIX    ;check if current player has an active hero
 
@@ -2840,6 +2851,7 @@ SetHeroPoseInVram:
   otir
   ret
 
+RemainingMovementPointsHero:  db  6
 putmovementstars:
 	ld		a,(putmovementstars?)
 	or		a
@@ -2852,7 +2864,15 @@ putmovementstars:
 	ld		(xstar),a
 
 	ld		hl,movementpath+2
-.loop:
+	
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroMove)
+  inc   a
+	ld    (RemainingMovementPointsHero),a
+	xor   a
+	ld    (putstar+sPage),a
+	
+  .loop:
 	ld		b,(hl)				;dy
 	ld		a,(ystar)
 	add		a,b
@@ -2867,49 +2887,24 @@ putmovementstars:
 	or		b
 	ret		z
 
-  ;translate dy,dx into arrow direction
-  bit   7,c
-  jr    nz,.ArrowLeft
-  bit   0,c
-  jr    nz,.ArrowRight
-
-  .ArrowVertically:
-  bit   7,b  
-  ld    a,1*10 - 10
-  jr    nz,.GoPutArrow
-  ld    a,5*10 - 10
-  jr    .GoPutArrow
-
-  .ArrowRight:
-  bit   7,b
-  ld    a,2*10 - 10
-  jr    nz,.GoPutArrow
-  bit   0,b
-  ld    a,3*10 - 10
-  jr    z,.GoPutArrow
-  ld    a,4*10 - 10
-  jr    .GoPutArrow
-
-  .ArrowLeft:
-  bit   7,b
-  ld    a,8*10 - 10
-  jr    nz,.GoPutArrow
-  bit   0,b
-  ld    a,7*10 - 10
-  jr    z,.GoPutArrow
-  ld    a,6*10 - 10
-  jr    .GoPutArrow
-
-
-  .GoPutArrow:
+  call  FindArrowDirection
 	ld		(putstar+sx),a
+  ;/translate dy,dx into arrow direction
+
+	ld    a,(RemainingMovementPointsHero)
+	dec   a
+	ld    (RemainingMovementPointsHero),a
+  jr    nz,.EndCheckOutOfMovementPoints
+  ld    a,1
+	ld    (putstar+sPage),a
+  .EndCheckOutOfMovementPoints:
 
 	push	hl
 	call	doputstar
 	pop		hl
 	inc		hl
 	jp		.loop
-	
+
 doputstar:
 	ld		a,(activepage)	;check mirror page to mark background star position as 'dirty'
 	or		a
@@ -2986,22 +2981,157 @@ doputstar:
 	cp		255
 	jp		z,.behindheroorcastle
 
+  ld    a,222
+	ld		(putstar+sy),a
 	ld		hl,putstar
 	jp		docopy
 .behindtree:
 .behindheroorcastle:
-	ld		a,(putstar+sx)
-	add   a,80
-	ld		(putstar+sx),a
+  ld    a,246
+	ld		(putstar+sy),a
 	ld		hl,putstar
 	jp		docopy
 ;/check if star is behind a tree	
 
 putstar:
-	db		0,0,246,0
+	db		0,0,212,0
 	db		255,0,255,0
 	db		10,0,10,0
 	db		0,%0000 0000,$98	
+
+FindArrowDirection:
+  ;translate dy,dx into arrow direction
+  bit   7,c
+  jp    nz,.ArrowLeft
+  bit   0,c
+  jp    nz,.ArrowRight
+  bit   7,b
+  jp    nz,.ArrowUpConfirmed
+
+  .ArrowDownConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c  
+  bit   7,c
+  ld    a,13*10 + 10    ;we are going down now, and the next step is down and left
+  ret   nz
+  bit   0,c
+  ld    a,12*10 + 10    ;we are going down now, and the next step is down and right
+  ret   nz
+  ld    a,5*10 + 10
+  ret
+
+  .ArrowUpConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c  
+  bit   7,c
+  ld    a,15*10 + 10    ;we are going up now, and the next step is up and left
+  ret   nz
+  bit   0,c
+  ld    a,10*10 + 10    ;we are going up now, and the next step is up and right
+  ret   nz
+  ld    a,1*10 + 10
+  ret
+
+  .ArrowRight:
+  bit   7,b
+  jp    nz,.ArrowRightUpConfirmed
+  bit   0,b
+  jp    z,.ArrowRightConfirmed
+
+  .ArrowRightDownConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c
+	ld		a,c
+	or		b
+  ld    a,4*10 + 10
+  ret   z
+  bit   0,b
+  ld    a,03*10 + 10    ;we are going right down now, and the next step is right
+  ret   z
+  bit   0,c
+  ld    a,05*10 + 10    ;we are going right down now, and the next step is down
+  ret   z
+  ld    a,4*10 + 10
+  ret
+
+  .ArrowRightUpConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c
+	ld		a,c
+	or		b
+  ld    a,2*10 + 10
+  ret   z
+  bit   7,b
+  ld    a,03*10 + 10    ;we are going right up now, and the next step is right
+  ret   z
+  bit   0,c
+  ld    a,01*10 + 10    ;we are going right up now, and the next step is up
+  ret   z
+  ld    a,2*10 + 10
+  ret
+  
+  .ArrowRightConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c  
+  bit   7,b
+  ld    a,09*10 + 10    ;we are going right now, and the next step is right and up
+  ret   nz
+  bit   0,b
+  ld    a,11*10 + 10    ;we are going right now, and the next step is right and down
+  ret   nz
+  ld    a,3*10 + 10
+  ret
+
+  .ArrowLeft:
+  bit   7,b
+  jp    nz,.ArrowLeftUpConfirmed
+  bit   0,b
+  jp    z,.ArrowLeftConfirmed
+
+  .ArrowLeftDownConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c
+	ld		a,c
+	or		b
+  ld    a,6*10 + 10
+  ret   z
+  bit   0,b
+  ld    a,07*10 + 10    ;we are going left down now, and the next step is left
+  ret   z
+  bit   7,c
+  ld    a,05*10 + 10    ;we are going left down now, and the next step is down
+  ret   z
+  ld    a,6*10 + 10
+  ret
+
+  .ArrowLeftUpConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c
+	ld		a,c
+	or		b
+  ld    a,8*10 + 10
+  ret   z
+  bit   7,b
+  ld    a,07*10 + 10    ;we are going left up now, and the next step is left
+  ret   z
+  bit   7,c
+  ld    a,01*10 + 10    ;we are going left up now, and the next step is up
+  ret   z
+  ld    a,8*10 + 10
+  ret
+
+  .ArrowLeftConfirmed:
+  call  .CheckNextStep  ;puts next step's dy,dx in b,c  
+  bit   7,b
+  ld    a,16*10 + 10    ;we are going left now, and the next step is left and up
+  ret   nz
+  bit   0,b
+  ld    a,14*10 + 10    ;we are going left now, and the next step is left and down
+  ret   nz
+  ld    a,7*10 + 10
+  ret
+
+  .CheckNextStep:
+  inc   hl
+	ld		b,(hl)				;dy
+	inc		hl
+	ld		c,(hl)				;dx
+  dec   hl
+  dec   hl
+  ret
 
 EnterCastle?: db  0
 CheckEnterHeroCastle:
@@ -4501,10 +4631,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret
 
   .SetCastleCentreMousePointsToInIX:
-  ld    ix,Castle1 | call .check | ret z
-  ld    ix,Castle2 | call .check | ret z
-  ld    ix,Castle3 | call .check | ret z
-  ld    ix,Castle4;| call .check | ret z
+  ld    ix,Castle1 | call .check | ret   z
+  ld    ix,Castle2 | call .check | ret   z
+  ld    ix,Castle3 | call .check | ret   z
+  ld    ix,Castle4;| call .check | ret   z
   ret
   .check:
   ld    a,(mouseposx) ;2
@@ -4517,10 +4647,10 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret
 
   .SetCastleEntranceMousePointsToInIX:
-  ld    ix,Castle1 | call .check2 | ret z
-  ld    ix,Castle2 | call .check2 | ret z
-  ld    ix,Castle3 | call .check2 | ret z
-  ld    ix,Castle4;| call .check2 | ret z
+  ld    ix,Castle1 | call .check2 | ret   z
+  ld    ix,Castle2 | call .check2 | ret   z
+  ld    ix,Castle3 | call .check2 | ret   z
+  ld    ix,Castle4;| call .check2 | ret   z
   ret
   .check2:
   ld    a,(mouseposx) ;2
