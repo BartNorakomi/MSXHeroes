@@ -164,7 +164,7 @@ vblank:
 
   ld    a,(AreWeWritingToVram?)
   or    a
-	call	z,setspritecharacter              ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
+	call	z,setspritecharacter            ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
 
   ld    a,(page1bank)                   ;put the bank back in page 1 which was there before we ran setspritecharacter
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
@@ -178,7 +178,7 @@ vblank:
 	
   ld    a,(AreWeWritingToVram?)
   or    a
-	call	z,putsprite                       ;out spat data
+	call	z,putsprite                     ;out spat data
 
   ld    a,(vblankintflag)
   inc   a                               ;vblank flag gets incremented
@@ -3038,188 +3038,86 @@ checktriggermapscreen:
 
 	ld		a,(movehero?)
 	or		a
-	jp		nz,.stopheromovement	          ;hero was moving, mouse clicked-> stop hero
+	jr		z,.EndCheckStopHeroMovement	    ;hero was moving, mouse clicked-> stop hero
+	xor		a
+	ld		(movehero?),a                   ;mouse clicked, hero is already moving, stop hero
+	ret
+  .EndCheckStopHeroMovement:
 
   call  CheckEnterHeroOverviewMenu
   call  CheckEnterHeroCastle
 
-	ld		a,(putmovementstars?)
-	or		a
-	jp		z,.initputstars			            ;mouse clicked. put stars in screen
-
-;mouse clicked, stars are already in screen
-	ld		a,(movehero?)
-	or		a
-	jp		z,.movehero
-
-;mouse clicked, hero is already moving, stop hero
-.stopheromovement:
-	xor		a
-	ld		(movehero?),a
-	ret
-			
-.movehero:
-;mouse clicked, should hero move over path ?
-	ld		a,(spat+1)		                  ;x	(mouse)pointer
-;	add		a,addxtomouse	                  ;centre mouse in grid
-
-;  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
-
-  add   a,1
-	
-	and		%1111 0000
-	srl		a				                        ;/2
-	srl		a				                        ;/4
-	srl		a				                        ;/8
-	srl		a				                        ;/16
-	ld		c,a
-	ld		a,(mappointerx)
-	add		a,c
-	ld		c,a
-	ld		a,(mouseclickx)
-	cp		c
-	jp		nz,.cancel
-
-	ld		a,(spat)		                    ;y	(mouse)pointer
-;	sub		a,subyfrommouse	                ;centre mouse in grid
-;  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
-
-;  add   a,AddYToMouse                   ;centre mouse in grid
-
-  sub   a,12
-
-	jp		nc,.notcarry
-	xor		a
-.notcarry:
-	and		%1111 0000
-	srl		a				                        ;/2
-	srl		a				                        ;/4
-	srl		a				                        ;/8
-	srl		a				                        ;/16
-	ld		d,a
-	ld		a,(mappointery)
-	add		a,d
-	ld		d,a
-	ld		a,(mouseclicky)
-	cp		d
-	jp		nz,.cancel
-
-	xor		a
-	ld		(putmovementstars?),a
-	ld		(movementpathpointer),a
-	ld		a,1
-	ld		(movehero?),a
-	ret
-
-.cancel:					                      ;dont move hero, mouse click was not accurately on path
-;mouse clicked, set star path
-.initputstars:
+  .initputstars:                        ;mouse clicked, set star path
   ld    ix,(plxcurrentheroAddress)
-	ld		a,(ix+HeroStatus)			                    ;pl1hero?status
+	ld		a,(ix+HeroStatus)			          ;pl1hero?status
   or    a
   ret   m                               ;current hero could be in castle (a=254) or inactive (a=255 / no heroes at all for this player), in which case we won't move
 
 	ld		a,1
 	ld		(putmovementstars?),a
 
-	ld		a,(ix+HeroY)			                    ;pl1hero?y
-	ld		(.setpl1hero?y),a
-	ld		(heroymirror),a
-	ld		a,(ix+HeroX)			                    ;pl1hero?y
-	ld		(.setpl1hero?x),a
-	ld		(heroxmirror),a
-	ld		hl,movementpath+2
+	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
+  ld    d,a
+	ld		a,(mouseclicky)                 ;mouse pointer x in tiles
+  ld    e,a
 
-;movementpath:		ds	64	;1stbyte:y star,	2ndbyte:x star (the movement path consists of stars, they have each their y and x coordinates. The hero will move to these coordinates when moving)
-
-.initloop:
-	call	.init			                      ;out c=dx, d=dy
-	ld		a,c
-	or		d
-	ret		z
-
-	ld		a,(heroxmirror)
-	add		a,c
-	ld		(heroxmirror),a
-	ld		a,(heroymirror)
-	add		a,d
-	ld		(heroymirror),a
-	jp		.initloop
-	ret
-
-.init:
+  ;set x,y where mouse is clicked on the worldmap
 	ld		a,(spat+1)		                  ;x (mouse)pointer
-;	add		a,addxtomouse	                  ;centre mouse in grid
-
-;  sub   a,buildupscreenXoffset          ;map in screen starts at (6,5) due to the frame around the map  	
-
-  add   a,1
-	
+  inc   a
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
 	srl		a				                        ;/16
-	ld		c,a
+	ld		b,a                             ;pointer x in tiles relative to camera position
 	ld		a,(mappointerx)
-	add		a,c
-	ld		c,a
-	ld		(mouseclickx),a
+	add		a,b
+	ld		(mouseclickx),a                 ;mouse pointer x in tiles
+  ld    c,a
 
 	ld		a,(spat)		                    ;y (mouse)pointer
-;	sub		a,subyfrommouse	                ;centre mouse in grid
-;  sub   a,buildupscreenYoffset          ;map in screen starts at (6,5) due to the frame around the map  	
-
-;  add   a,AddYToMouse                   ;centre mouse in grid
-
   sub   a,12
-
 	jp		nc,.notcarry2
 	xor		a
-.notcarry2:
+  .notcarry2:
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
 	srl		a				                        ;/8
 	srl		a				                        ;/16
-	ld		d,a
+	ld		b,a                             ;pointer y in tiles relative to camera position
 	ld		a,(mappointery)
-	add		a,d
-	ld		d,a
-	ld		(mouseclicky),a
+	add		a,b
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
+  
+  ;check if the same spot is clicked as previously
+  cp    e
+  jp    nz,CheckReverseRoute
+  ld    a,c
+  cp    d
+  jp    nz,CheckReverseRoute
 
+  ;same spot is clicked, remove stars and move hero
+	xor		a
+	ld		(putmovementstars?),a
+	ld		(movementpathpointer),a
+	ld		a,1
+	ld		(movehero?),a
+	ret  
+
+CheckNormalRoute:  
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
+	ld		(heroymirror),a
+	ld		a,(ix+HeroX)			              ;pl1hero?y
+	ld		(movementpath+1),a              ;movement path starts with hero's initial y,x
+	ld		(heroxmirror),a
+
+	ld		hl,movementpath+2               ;movementpath:		ds	64	;heroy,herox,movementy,movementx,movementy,movementx,movementy,movementx.....,0
+
+  .loop:
 ;check if there is an obstacle. Can star be put here ?
-	push	hl
-	push	de
-
-	;setmappointer
-		;setxpointer
-	ld		hl,mapdata
-	ld		a,(heroxmirror)
-	ld		e,a
-	ld		d,0
-	add		hl,de
-		;/setxpointer
-	
-		;setypointer	
-	ld		a,(heroymirror)
-	inc		a
-	or		a
-	jp		z,.endsetmappointer
-	ld		b,a
-
-	ld		de,(maplenght)
-.setypointerloop:	
-	add		hl,de
-	djnz	.setypointerloop
-		;/setypointer
-.endsetmappointer:
-	;/setmappointer
-	ld		a,(hl)
-
-	pop		de
-	pop		hl
-
+  call  GetTileNrAtHeroMirrorYX
 	cp		16
 	jr		c,.noobstacle
 	cp		24
@@ -3231,43 +3129,179 @@ checktriggermapscreen:
 	dec		hl
 	ld		c,0
 	ld		d,0
-	jp		.dosetstarpath
+	jr		.EndSetVerticalMovement
 
 .noobstacle:
 ;/check if there is an obstacle. Can star be put here ?
 	
+	ld		a,(mouseclickx)
+  ld    e,a
 	ld		a,(heroxmirror)
-	cp		c
+  cp    e
 	ld		c,0				                      ;dont move horizontally
-	jp		z,.checkvertical
-	ld		c,1
-	jp		c,.checkvertical
-	ld		c,-1	
-.checkvertical:
+	jp		z,.EndSetHorizontalMovement
+	ld		c,1                             ;move right
+	jp		c,.EndSetHorizontalMovement
+	ld		c,-1                            ;move left
+  .EndSetHorizontalMovement:
 
+	ld		a,(mouseclicky)
+  ld    e,a
 	ld		a,(heroymirror)
-	cp		d
-	ld		d,0				                      ;dont move horizontally
-	jp		z,.dosetstarpath
-	ld		d,1
-	jp		c,.dosetstarpath
-	ld		d,-1	
-.dosetstarpath:
+  cp    e
+	ld		d,0				                      ;dont move vertically
+	jp		z,.EndSetVerticalMovement
+	ld		d,1                             ;move down
+	jp		c,.EndSetVerticalMovement
+	ld		d,-1                            ;move up
+  .EndSetVerticalMovement:
 
-.setpl1hero?y:	equ	$+1
-	ld		a,255
-	ld		(movementpath+0),a
-.setpl1hero?x:	equ	$+1
-	ld		a,255
-	ld		(movementpath+1),a
+	ld		(hl),d                          ;dy
+	inc		hl
+	ld		(hl),c                          ;dx
+	inc		hl
 
-	ld		a,d				                      ;dy
-	ld		(hl),a
+	ld		a,c
+	or		d
+	ret		z
+
+;  ld    a,(hl)
+;  cp    128                             ;end table
+;  ret   z
+
+	ld		a,(heroxmirror)
+	add		a,c
+	ld		(heroxmirror),a
+	ld		a,(heroymirror)
+	add		a,d
+	ld		(heroymirror),a
+	jp		.loop
+
+InvertReverseRoute:
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
+	ld		a,(ix+HeroX)			              ;pl1hero?y
+	ld		(movementpath+1),a              ;movement path starts with hero's initial y,x
+
+  ld    de,movementpath+2               ;dy
+
+  dec   hl                              ;dx
+  dec   hl                              ;dy
+  dec   hl                              ;dx
+  dec   hl                              ;dy
+
+  call  .loop
+  dec   de
+  dec   de
+  xor   a
+  ld    (de),a                          ;dy
+  inc   de                              ;dx
+  ld    (de),a                          ;dx
+  ret
+
+  .loop:
+  ld    a,(hl)                          ;dy
+  cp    128
+  ret   z
+  neg
+  ld    (de),a                          ;dy
+  
+  inc   hl                              ;dx
+  inc   de                              ;dx
+
+  ld    a,(hl)                          ;dx
+  neg
+  ld    (de),a                          ;dx
+
+  dec   hl                              ;dy
+  dec   hl                              ;dx
+  dec   hl                              ;dy
+  inc   de                              ;dy
+  jr    .loop
+
+CheckReverseRoute:
+	ld		a,(mouseclicky)
+	ld		(movementpathReverse+0),a              ;movement path starts with hero's initial y,x
+	ld		(heroymirror),a
+	ld		a,(mouseclickx)
+	ld		(movementpathReverse+1),a              ;movement path starts with hero's initial y,x
+	ld		(heroxmirror),a
+	ld		hl,movementpathReverse+2               ;movementpath:		ds	64	;heroy,herox,movementy,movementx,movementy,movementx,movementy,movementx.....,0
+
+  .loop:
+;check if there is an obstacle. Can star be put here ?
+  call  GetTileNrAtHeroMirrorYX
+	cp		16
+	jr		c,.noobstacle
+	cp		24
+	jp		c,CheckNormalRoute
+	cp		UnwalkableTerrainPieces         ;tiles 149 and up are unwalkable terrain
+	jp		nc,CheckNormalRoute
+  .noobstacle:
+;/check if there is an obstacle. Can star be put here ?
+	
+	ld		a,(ix+HeroX)			              ;pl1hero?y
+  ld    e,a
+	ld		a,(heroxmirror)
+  cp    e
+	ld		c,0				                      ;dont move horizontally
+	jp		z,.EndSetHorizontalMovement
+	ld		c,1                             ;move right
+	jp		c,.EndSetHorizontalMovement
+	ld		c,-1                            ;move left
+  .EndSetHorizontalMovement:
+
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+  ld    e,a
+	ld		a,(heroymirror)
+  cp    e
+	ld		d,0				                      ;dont move vertically
+	jp		z,.EndSetVerticalMovement
+	ld		d,1                             ;move down
+	jp		c,.EndSetVerticalMovement
+	ld		d,-1                            ;move up
+  .EndSetVerticalMovement:
+
+	ld		(hl),d                          ;dy
 	inc		hl
-	ld		a,c				                      ;dx
-	ld		(hl),a
+	ld		(hl),c                          ;dx
 	inc		hl
-	ret
+
+	ld		a,c
+	or		d
+  jp    z,InvertReverseRoute
+
+	ld		a,(heroxmirror)
+	add		a,c
+	ld		(heroxmirror),a
+	ld		a,(heroymirror)
+	add		a,d
+	ld		(heroymirror),a
+	jp		.loop
+
+GetTileNrAtHeroMirrorYX:
+	push	hl
+	;setmappointer
+		;setypointer	
+	ld		a,(heroymirror)
+	inc		a
+  ld    l,a
+  ld    h,0
+	ld		de,(maplenght)
+  call  MultiplyHlWithDE                ;Out: HL = result
+	ld		de,mapdata
+	add		hl,de
+		;/setypointer
+		;setxpointer
+	ld		a,(heroxmirror)
+	ld		e,a
+	ld		d,0
+	add		hl,de
+		;/setxpointer
+	;/setmappointer
+	ld		a,(hl)                          ;a=tilenumber at this location on the map
+	pop		hl
+  ret
 
 ;Castle1:	db	04 | castlepl1x:	db	01
 ;Castle2:	db	14 | castlepl2x:	db	19
@@ -5835,6 +5869,8 @@ db 255 | TavernHeroesPlayer2:        db  011,012,013,014,015,016,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
 
+
+
 AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
@@ -5875,7 +5911,9 @@ movehero?:				ds	1
 movementspeed:			ds	1
 
 putmovementstars?:	db	0
-movementpath:		ds	64	;1stbyte:yhero,	2ndbyte:xhero
+movementpath:		ds	48*2 ;| db 128	;1stbyte:yhero,	2ndbyte:xhero, then x movement, y movement (0=end movement) (128=end table)
+                        db 128,128
+movementpathReverse:		ds	48*2 ;| db 128	;1stbyte:yhero,	2ndbyte:xhero, then x movement, y movement (0=end movement) (128=end table)
 ystar:				ds	1
 xstar:				ds	1
 

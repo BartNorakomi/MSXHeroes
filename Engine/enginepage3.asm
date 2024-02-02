@@ -9,8 +9,8 @@ ShowNewlyBoughtBuildingFadingIn?:  db  1
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleWinterMap01
-;WorldPointer: dw GentleDesertMap01
-WorldPointer: dw GentleMap03
+WorldPointer: dw GentleDesertMap01
+;WorldPointer: dw GentleMap03
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -3250,13 +3250,13 @@ PopulateControls:
 
 PopulateControlsOnInterrupt:	
 	ld		a,15		                        ; select joystick port 1
-	di
+;	di
 	out		($a0),a
 	ld		a,$8f
 	out		($a1),a
 	ld		a,14		                        ; read joystick data
 	out		($a0),a
-	ei
+;	ei
 	in		a,($a2)
 	cpl
 	and		$3f			                        ; 00BARLDU
