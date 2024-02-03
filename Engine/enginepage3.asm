@@ -5,12 +5,12 @@ UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleAutumnMap01
-;WorldPointer: dw GentleJungleMap01
-;WorldPointer: dw GentleWinterMap01
+;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap01
-WorldPointer: dw GentleMap03
+;WorldPointer: dw GentleJungleMap01
+;WorldPointer: dw GentleMap04
+WorldPointer: dw GentleWinterMap03
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -871,6 +871,13 @@ CopyPage1To0:
 	db		0,0,0,0
 	db		0,1,212,0
 	db		0,0,$d0	
+
+CopyPage0To1PlayingField:
+	db		0,0,0,0
+	db		0,0,0,1
+	db		0,1,212,0
+	db		0,0,$d0	
+
 
 ;Text8bitNumberStored: ds  1
 TextNumber: ;ds  10
@@ -2337,6 +2344,8 @@ EnterHeroOverviewMenu:
   ld    (vblankintflag),a
   ;if there were movement stars before entering Hero Overview, then remove them
 	ld		(putmovementstars?),a
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
 ;	ld		(movementpathpointer),a
 ;	ld		(movehero?),a	
 ;
@@ -2401,6 +2410,8 @@ EnterCastle:
   ld    (vblankintflag),a
   ;if there were movement stars before entering Hero Overview, then remove them
 	ld		(putmovementstars?),a
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
   ld    (framecounter),a
 ;	ld		(movementpathpointer),a
 	ld		(movehero?),a	
@@ -2495,6 +2506,8 @@ EnterCombat:
   ld    (vblankintflag),a
   ;if there were movement stars before entering Hero Overview, then remove them
 	ld		(putmovementstars?),a
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
   ld    (framecounter),a
 	ld		(movehero?),a	
 

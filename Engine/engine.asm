@@ -17,13 +17,13 @@ LevelEngine:
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  DisplayEnemyStatsRightClick     ;when rightclicking on the map on an enemy, show their stats window
   call  DisplayEnemyHeroStatsRightClick ;when rightclicking on the map on an enemy hero, show their stats window
-  
+  call  CheckEnterTradeMenuBetween2FriendlyHeroes
   call  GoCheckEnterHeroOverviewMenu    ;check if pointer is on hero (hand icon) and mouse button is pressed
+
   call  PopulateControls                ;read out keys
 	call	PopulateKeyMatrix               ;only used to read out CTRL and SHIFT
 	call	scrollscreen                    ;scroll screen if cursor is on the edges or if you press the minimap
   call  MiniMapSquareIconInteraction
-  call  CheckEnterTradeMenuBetween2FriendlyHeroes
 	call	movehero                        ;moves hero if needed. Also centers screen around hero. Sets HeroSYSX
   call  SetHeroPoseInVram               ;copy current pose from Rom to Vram
 	call	buildupscreen                   ;build up the visible map in page 0/1 and switches page when done
@@ -123,6 +123,16 @@ vblank:
   push  de
   push  hl
 
+
+
+;  ld    a,colorwhite
+;  out   ($99),a
+;  ld    a,7+128
+;  out   ($99),a	
+
+
+
+
   ;add a slowdown to the mousemovement during minimap scrolling
   ld    a,(LockMiniMapOn?)
   or    a
@@ -167,6 +177,15 @@ vblank:
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 	call	checktriggermapscreen           ;this needs to be on the interrupt for accurate readout of keypresses per frame
+
+
+;  ld    a,colorblack
+;  out   ($99),a
+;  ld    a,7+128
+;  out   ($99),a	
+
+
+
   call  checktriggerhud                 ;this needs to be on the interrupt for accurate readout of keypresses per frame
 
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
@@ -1482,7 +1501,7 @@ CastleCodeSetAdditionalStatFromInventoryItemsInHL:
 
 DisplayStartOfTurnMessage?: db  3
 DisplayQuickTips?: db  1
-Date: dw  6                          ;days, weeks, months
+Date: dw  0                          ;days, weeks, months
 DisplayStartOfTurnMessage:
   if    StartOfTurnMessageOn?
   else
@@ -1493,7 +1512,7 @@ DisplayStartOfTurnMessage:
   dec   a
   ret   m
   ld    (DisplayStartOfTurnMessage?),a
-  jp    nz,DisableScrollScreen
+  ret   nz
 
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
@@ -1525,23 +1544,6 @@ EnableScrollScreen:
 HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
   ld    hl,HudCode
   jp    EnterSpecificRoutineInCastleOverviewCode
-
-EnterTradeMenuBetween2FriendlyHeroes:
-  ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
-
-  ld    hl,TradeMenuCode
-  call  EnterSpecificRoutineInCastleOverviewCode
-
-  xor   a
-  ld    (vblankintflag),a
-	ld		(putmovementstars?),a           ;if there were movement stars before entering trade menu, remove them
-  ld    (framecounter),a
-	ld		(movehero?),a                   ;stop hero movement
-  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
-  ld    hl,CursorBoots
-  ld    (CurrentCursorSpriteCharacter),hl
-  ret
 
 EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters:
   ld    (.SelfModifyingCodeRoutine),hl
@@ -1687,7 +1689,29 @@ CheckEnterTradeMenuBetween2FriendlyHeroes:
   ret   m
   ld    (HeroCollidesWithFriendlyHero?),a
   jp    nz,DisableScrollScreen
-  jp    EnterTradeMenuBetween2FriendlyHeroes
+;  jp    EnterTradeMenuBetween2FriendlyHeroes
+
+;EnterTradeMenuBetween2FriendlyHeroes:
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+
+  ld    hl,TradeMenuCode
+  call  EnterSpecificRoutineInCastleOverviewCode
+
+  xor   a
+  ld    (vblankintflag),a
+	ld		(putmovementstars?),a           ;if there were movement stars before entering trade menu, remove them
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
+  ld    (framecounter),a
+	ld		(movehero?),a                   ;stop hero movement
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+  ld    hl,CursorBoots
+  ld    (CurrentCursorSpriteCharacter),hl
+  ret
+
+
+
 
 CheckHeroCollidesWithFriendlyHero:      ;out: carry=Hero Collides With Friendly Hero
   ld    ix,(plxcurrentheroAddress)
@@ -2279,6 +2303,10 @@ ActivateFirstActiveHeroForCurrentPlayer:
 	ld		(ButtonCastleWindow2+ButtonLit?),a
 	ld		(ButtonCastleWindow3+ButtonLit?),a
 
+;  xor   a
+;	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+;	ld		(mouseclicky),a                 ;mouse pointer y in tiles
+
   ld    ix,(plxcurrentheroAddress)
   call  centrescreenforthishero.GoCenter
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -2463,6 +2491,8 @@ centrescreenforthishero:
   .AnotherHeroIsSelectedOrMappointerIsDifferent:
 	xor		a
 	ld		(putmovementstars?),a
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
 	ld		(movementpathpointer),a
 	ld		(movehero?),a
   ret
@@ -3226,6 +3256,7 @@ checktriggermapscreen:
 	ld		a,1
 	ld		(putmovementstars?),a
 
+  ;store previously clicked location on the map
 	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
   ld    d,a
 	ld		a,(mouseclicky)                 ;mouse pointer x in tiles
@@ -3271,6 +3302,8 @@ checktriggermapscreen:
 	xor		a
 	ld		(putmovementstars?),a
 	ld		(movementpathpointer),a
+	ld		(mouseclickx),a                 ;mouse pointer y in tiles
+	ld		(mouseclicky),a                 ;mouse pointer y in tiles
 	ld		a,1
 	ld		(movehero?),a
 	ret  
@@ -5686,13 +5719,13 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
 
-pl1hero2y:		db	2
-pl1hero2x:		db	4
+pl1hero2y:		db	70
+pl1hero2x:		db	12
 pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -5861,16 +5894,16 @@ pl2hero1x:		db	6
 ;pl2hero1x:		db	100
 pl2hero1xp: dw 0000
 pl2hero1move:	db	20,20
-pl2hero1mana:	dw	66,10
-pl2hero1manarec:db	2		                ;recover x mana every turn
+pl2hero1mana:	dw	10,10
+pl2hero1manarec:db	5		                ;recover x mana every turn
 pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db 1 | dw 5000 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 |      db 0 | dw 0 ;unit,amount
+;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 ;Pl2Hero1Units:  db 1 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-.HeroStatSpellDamage:  db 7  ;amount of spell damage
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  1,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
@@ -6010,10 +6043,10 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
-Castle2:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
-Castle3:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "   Junker HQ",255
-Castle4:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "    Zanzibar",255
+Castle1:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle2:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle3:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "   Junker HQ",255
+Castle4:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "    Zanzibar",255
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
@@ -6041,7 +6074,7 @@ ResourcesPlayer1:
 ResourcesPlayer2:
 .Gold:    dw  20000 ;60000 ;20000
 .Wood:    dw  20 ;900;20
-.Ore:     dw  20 ;900;20
+.Ore:     dw  20 ;900;20 
 .Gems:    dw  10 ;900;10
 .Rubies:  dw  10 ;900;10
 ResourcesPlayer3:
@@ -6059,7 +6092,7 @@ ResourcesPlayer4:
 
 amountofplayers:		db	2
 player1human?:			db	1
-player2human?:			db	0
+player2human?:			db	1
 player3human?:			db	0
 player4human?:			db	0
 whichplayernowplaying?:	db	1

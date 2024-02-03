@@ -1246,7 +1246,7 @@ HudCode:
   ret
 
 EndTurn:
-  ld    a,3
+  ld    a,2
   ld    (DisplayStartOfTurnMessage?),a
 
   call  SetHero1ForCurrentPlayerInIX
@@ -1302,12 +1302,19 @@ EndTurn:
   call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
   call  ClearAlreadyBuiltThisTurnCastles;At start of player 1's turn, clear all these bytes
   .EndCheckIncreaseDate:  
+
+  ld    hl,(Date)                       ;don't add income on day 1
+  ld    a,h
+  or    l
+  jr    z,.EndCheckNoIncomeDay1
   
   call  AddCastlesIncomeToPlayer        ;add total income of castles
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
   call  AddKingsGarmentIncomeToPlayer   ;add 125 income to hero with Kings Garment to player
+  .EndCheckNoIncomeDay1:
+
   call  ActivateFirstActiveHeroForCurrentPlayer
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
@@ -4738,8 +4745,14 @@ QuickTipsButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bi
 
 
 
-
-
+CopyInactivePageToActivePage:
+  ld    a,(activepage)
+  or    a
+  ld    hl,CopyPage1To0
+  jp    z,DoCopy
+  ld    hl,CopyPage0To1PlayingField
+  jp    DoCopy
+  
 
 DisplayStartOfTurnMessageCode:
 call ScreenOn
@@ -4747,11 +4760,11 @@ call ScreenOn
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
   call  SetPlayerStartTurnText
-;  call  SetTradingHeroesInventoryIcons
-  call  SwapAndSetPage                  ;swap and set page
-  call  SetPlayerStartTurnGraphics     ;put gfx at (24,30)
-  call  SetPlayerStartTurnText
-;  call  SetTradingHeroesInventoryIcons
+  call  CopyInactivePageToActivePage
+
+;  call  SwapAndSetPage                  ;swap and set page
+;  call  SetPlayerStartTurnGraphics     ;put gfx at (24,30)
+;  call  SetPlayerStartTurnText
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -10328,6 +10341,13 @@ SpellDescriptionsMagicGuild:
 .DescriptionFire3:        db  "Blur",254
                           db  "Target ranged unit deals 50% less",254
                           db  "damage.",255
+
+
+;.DescriptionFire3:        db  "Human or CPU",254
+;                          db  "Associated Creatures",254
+;                          db  "Map Difficulty Show Advanced Options",255
+
+
 
 .DescriptionFire2:        db  "Fireball",254
                           db  "Deals damage to target unit and",254
