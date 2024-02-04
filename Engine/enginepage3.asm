@@ -3,14 +3,15 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
+StartAtTitleScreen?:      equ  1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-;WorldPointer: dw GentleAutumnMap01
+;WorldPointer: dw GentleAutumnMap02
 ;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap01
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleMap04
-WorldPointer: dw GentleWinterMap03
+WorldPointer: dw GentleWinterMap01
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -32,6 +33,10 @@ InitiateGame:
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
 ;  ld    (EnterCombat?),a
+
+  if  StartAtTitleScreen?
+  call  TitleScreen
+  endif
 
 StartGame:
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
@@ -66,6 +71,13 @@ StartGame:
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+TitleScreen:
+  ld    a,(slot.page1rom)             ;all RAM except page 1
+  out   ($a8),a      
+  ld    a,TitleScreenCodeblock        ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  jp    HandleTitleScreenCode
 
 ExecuteLoaderRoutine:
   ld    a,(slot.page1rom)             ;all RAM except page 1
@@ -2441,7 +2453,7 @@ EnterCastle:
   ld    (ReloadAllObjectsInVram?),a     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
 
   ld    hl,InGamePalette
-  call  SetPalette  
+  call  SetPalette
   call  LoadHud                         ;load the hud (all the windows and frames and buttons etc) in page 0 and copy it to page 1
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)

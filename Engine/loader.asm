@@ -13,41 +13,42 @@ World12: db  World12MapBlock | dw World12Map | db World12ObjectLayerMapBlock | d
 World13: db  World13MapBlock | dw World13Map | db World13ObjectLayerMapBlock | dw World13ObjectLayerMap | db TilesGentleJungleBlock   |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | dw World14ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 
-GentleMap01: db  GentleMap01MapBlock | dw GentleMap01Map | db GentleMap01ObjectLayerMapBlock | dw GentleMap01ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock
-GentleMap02: db  GentleMap02MapBlock | dw GentleMap02Map | db GentleMap02ObjectLayerMapBlock | dw GentleMap02ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock
-GentleMap03: db  GentleMap03MapBlock | dw GentleMap03Map | db GentleMap03ObjectLayerMapBlock | dw GentleMap03ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock
-GentleMap04: db  GentleMap04MapBlock | dw GentleMap04Map | db GentleMap04ObjectLayerMapBlock | dw GentleMap04ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock
-GentleMap05: db  GentleMap05MapBlock | dw GentleMap05Map | db GentleMap05ObjectLayerMapBlock | dw GentleMap05ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock
+GentleAutumnMap01: db  GentleAutumnMap01MapBlock | dw GentleAutumnMap01Map | db GentleAutumnMap01ObjectLayerMapBlock | dw GentleAutumnMap01ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (000/2) - 128
+GentleAutumnMap02: db  GentleAutumnMap02MapBlock | dw GentleAutumnMap02Map | db GentleAutumnMap02ObjectLayerMapBlock | dw GentleAutumnMap02ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (050/2) - 128
+GentleAutumnMap03: db  GentleAutumnMap03MapBlock | dw GentleAutumnMap03Map | db GentleAutumnMap03ObjectLayerMapBlock | dw GentleAutumnMap03ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (100/2) - 128
+GentleAutumnMap04: db  GentleAutumnMap04MapBlock | dw GentleAutumnMap04Map | db GentleAutumnMap04ObjectLayerMapBlock | dw GentleAutumnMap04ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (150/2) - 128
+GentleAutumnMap05: db  GentleAutumnMap05MapBlock | dw GentleAutumnMap05Map | db GentleAutumnMap05ObjectLayerMapBlock | dw GentleAutumnMap05ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (200/2) - 128
 
-GentleDesertMap01: db  GentleDesertMap01MapBlock | dw GentleDesertMap01Map | db GentleDesertMap01ObjectLayerMapBlock | dw GentleDesertMap01ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock
-GentleDesertMap02: db  GentleDesertMap02MapBlock | dw GentleDesertMap02Map | db GentleDesertMap02ObjectLayerMapBlock | dw GentleDesertMap02ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock
-GentleDesertMap03: db  GentleDesertMap03MapBlock | dw GentleDesertMap03Map | db GentleDesertMap03ObjectLayerMapBlock | dw GentleDesertMap03ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock
-GentleDesertMap04: db  GentleDesertMap04MapBlock | dw GentleDesertMap04Map | db GentleDesertMap04ObjectLayerMapBlock | dw GentleDesertMap04ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock
-GentleDesertMap05: db  GentleDesertMap05MapBlock | dw GentleDesertMap05Map | db GentleDesertMap05ObjectLayerMapBlock | dw GentleDesertMap05ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock
+GentleCaveMap01: db  GentleCaveMap01MapBlock | dw GentleCaveMap01Map | db GentleCaveMap01ObjectLayerMapBlock | dw GentleCaveMap01ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (000/2) - 128
+GentleCaveMap02: db  GentleCaveMap02MapBlock | dw GentleCaveMap02Map | db GentleCaveMap02ObjectLayerMapBlock | dw GentleCaveMap02ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (050/2) - 128
+GentleCaveMap03: db  GentleCaveMap03MapBlock | dw GentleCaveMap03Map | db GentleCaveMap03ObjectLayerMapBlock | dw GentleCaveMap03ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (100/2) - 128
+GentleCaveMap04: db  GentleCaveMap04MapBlock | dw GentleCaveMap04Map | db GentleCaveMap04ObjectLayerMapBlock | dw GentleCaveMap04ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (150/2) - 128
+GentleCaveMap05: db  GentleCaveMap05MapBlock | dw GentleCaveMap05Map | db GentleCaveMap05ObjectLayerMapBlock | dw GentleCaveMap05ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (200/2) - 128
 
-GentleWinterMap01: db  GentleWinterMap01MapBlock | dw GentleWinterMap01Map | db GentleWinterMap01ObjectLayerMapBlock | dw GentleWinterMap01ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock
-GentleWinterMap02: db  GentleWinterMap02MapBlock | dw GentleWinterMap02Map | db GentleWinterMap02ObjectLayerMapBlock | dw GentleWinterMap02ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock
-GentleWinterMap03: db  GentleWinterMap03MapBlock | dw GentleWinterMap03Map | db GentleWinterMap03ObjectLayerMapBlock | dw GentleWinterMap03ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock
-GentleWinterMap04: db  GentleWinterMap04MapBlock | dw GentleWinterMap04Map | db GentleWinterMap04ObjectLayerMapBlock | dw GentleWinterMap04ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock
-GentleWinterMap05: db  GentleWinterMap05MapBlock | dw GentleWinterMap05Map | db GentleWinterMap05ObjectLayerMapBlock | dw GentleWinterMap05ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock
+GentleDesertMap01: db  GentleDesertMap01MapBlock | dw GentleDesertMap01Map | db GentleDesertMap01ObjectLayerMapBlock | dw GentleDesertMap01ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (000/2) - 128
+GentleDesertMap02: db  GentleDesertMap02MapBlock | dw GentleDesertMap02Map | db GentleDesertMap02ObjectLayerMapBlock | dw GentleDesertMap02ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (050/2) - 128
+GentleDesertMap03: db  GentleDesertMap03MapBlock | dw GentleDesertMap03Map | db GentleDesertMap03ObjectLayerMapBlock | dw GentleDesertMap03ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (100/2) - 128
+GentleDesertMap04: db  GentleDesertMap04MapBlock | dw GentleDesertMap04Map | db GentleDesertMap04ObjectLayerMapBlock | dw GentleDesertMap04ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (150/2) - 128
+GentleDesertMap05: db  GentleDesertMap05MapBlock | dw GentleDesertMap05Map | db GentleDesertMap05ObjectLayerMapBlock | dw GentleDesertMap05ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (200/2) - 128
 
-GentleJungleMap01: db  GentleJungleMap01MapBlock | dw GentleJungleMap01Map | db GentleJungleMap01ObjectLayerMapBlock | dw GentleJungleMap01ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock
-GentleJungleMap02: db  GentleJungleMap02MapBlock | dw GentleJungleMap02Map | db GentleJungleMap02ObjectLayerMapBlock | dw GentleJungleMap02ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock
-GentleJungleMap03: db  GentleJungleMap03MapBlock | dw GentleJungleMap03Map | db GentleJungleMap03ObjectLayerMapBlock | dw GentleJungleMap03ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock
-GentleJungleMap04: db  GentleJungleMap04MapBlock | dw GentleJungleMap04Map | db GentleJungleMap04ObjectLayerMapBlock | dw GentleJungleMap04ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock
-GentleJungleMap05: db  GentleJungleMap05MapBlock | dw GentleJungleMap05Map | db GentleJungleMap05ObjectLayerMapBlock | dw GentleJungleMap05ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock
+GentleJungleMap01: db  GentleJungleMap01MapBlock | dw GentleJungleMap01Map | db GentleJungleMap01ObjectLayerMapBlock | dw GentleJungleMap01ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock | db GentleJungleMiniMapsBlock | dw $4000 + (142*128) + (000/2) - 128
+GentleJungleMap02: db  GentleJungleMap02MapBlock | dw GentleJungleMap02Map | db GentleJungleMap02ObjectLayerMapBlock | dw GentleJungleMap02ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock | db GentleJungleMiniMapsBlock | dw $4000 + (142*128) + (050/2) - 128
+GentleJungleMap03: db  GentleJungleMap03MapBlock | dw GentleJungleMap03Map | db GentleJungleMap03ObjectLayerMapBlock | dw GentleJungleMap03ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock | db GentleJungleMiniMapsBlock | dw $4000 + (142*128) + (100/2) - 128
+GentleJungleMap04: db  GentleJungleMap04MapBlock | dw GentleJungleMap04Map | db GentleJungleMap04ObjectLayerMapBlock | dw GentleJungleMap04ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock | db GentleJungleMiniMapsBlock | dw $4000 + (142*128) + (150/2) - 128
+GentleJungleMap05: db  GentleJungleMap05MapBlock | dw GentleJungleMap05Map | db GentleJungleMap05ObjectLayerMapBlock | dw GentleJungleMap05ObjectLayerMap | db TilesGentleJungleBlock     |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4 | db BattleFieldJungleBlock | db GentleJungleMiniMapsBlock | dw $4000 + (142*128) + (200/2) - 128
 
-GentleAutumnMap01: db  GentleAutumnMap01MapBlock | dw GentleAutumnMap01Map | db GentleAutumnMap01ObjectLayerMapBlock | dw GentleAutumnMap01ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock
-GentleAutumnMap02: db  GentleAutumnMap02MapBlock | dw GentleAutumnMap02Map | db GentleAutumnMap02ObjectLayerMapBlock | dw GentleAutumnMap02ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock
-GentleAutumnMap03: db  GentleAutumnMap03MapBlock | dw GentleAutumnMap03Map | db GentleAutumnMap03ObjectLayerMapBlock | dw GentleAutumnMap03ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock
-GentleAutumnMap04: db  GentleAutumnMap04MapBlock | dw GentleAutumnMap04Map | db GentleAutumnMap04ObjectLayerMapBlock | dw GentleAutumnMap04ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock
-GentleAutumnMap05: db  GentleAutumnMap05MapBlock | dw GentleAutumnMap05Map | db GentleAutumnMap05ObjectLayerMapBlock | dw GentleAutumnMap05ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock
+GentleMap01: db  GentleMap01MapBlock | dw GentleMap01Map | db GentleMap01ObjectLayerMapBlock | dw GentleMap01ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (190*128) + (000/2) - 128
+GentleMap02: db  GentleMap02MapBlock | dw GentleMap02Map | db GentleMap02ObjectLayerMapBlock | dw GentleMap02ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (190*128) + (050/2) - 128
+GentleMap03: db  GentleMap03MapBlock | dw GentleMap03Map | db GentleMap03ObjectLayerMapBlock | dw GentleMap03ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (190*128) + (100/2) - 128
+GentleMap04: db  GentleMap04MapBlock | dw GentleMap04Map | db GentleMap04ObjectLayerMapBlock | dw GentleMap04ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (190*128) + (150/2) - 128
+GentleMap05: db  GentleMap05MapBlock | dw GentleMap05Map | db GentleMap05ObjectLayerMapBlock | dw GentleMap05ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (190*128) + (200/2) - 128
 
-GentleCaveMap01: db  GentleCaveMap01MapBlock | dw GentleCaveMap01Map | db GentleCaveMap01ObjectLayerMapBlock | dw GentleCaveMap01ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock
-GentleCaveMap02: db  GentleCaveMap02MapBlock | dw GentleCaveMap02Map | db GentleCaveMap02ObjectLayerMapBlock | dw GentleCaveMap02ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock
-GentleCaveMap03: db  GentleCaveMap03MapBlock | dw GentleCaveMap03Map | db GentleCaveMap03ObjectLayerMapBlock | dw GentleCaveMap03ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock
-GentleCaveMap04: db  GentleCaveMap04MapBlock | dw GentleCaveMap04Map | db GentleCaveMap04ObjectLayerMapBlock | dw GentleCaveMap04ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock
-GentleCaveMap05: db  GentleCaveMap05MapBlock | dw GentleCaveMap05Map | db GentleCaveMap05ObjectLayerMapBlock | dw GentleCaveMap05ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock
+GentleWinterMap01: db  GentleWinterMap01MapBlock | dw GentleWinterMap01Map | db GentleWinterMap01ObjectLayerMapBlock | dw GentleWinterMap01ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock | db GentleWinterMiniMapsBlock | dw $4000 + (207*128) + (000/2) - 128
+GentleWinterMap02: db  GentleWinterMap02MapBlock | dw GentleWinterMap02Map | db GentleWinterMap02ObjectLayerMapBlock | dw GentleWinterMap02ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock | db GentleWinterMiniMapsBlock | dw $4000 + (207*128) + (050/2) - 128
+GentleWinterMap03: db  GentleWinterMap03MapBlock | dw GentleWinterMap03Map | db GentleWinterMap03ObjectLayerMapBlock | dw GentleWinterMap03ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock | db GentleWinterMiniMapsBlock | dw $4000 + (207*128) + (100/2) - 128
+GentleWinterMap04: db  GentleWinterMap04MapBlock | dw GentleWinterMap04Map | db GentleWinterMap04ObjectLayerMapBlock | dw GentleWinterMap04ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock | db GentleWinterMiniMapsBlock | dw $4000 + (207*128) + (150/2) - 128
+GentleWinterMap05: db  GentleWinterMap05MapBlock | dw GentleWinterMap05Map | db GentleWinterMap05ObjectLayerMapBlock | dw GentleWinterMap05ObjectLayerMap | db TilesGentleWinterBlock     |   incbin"..\grapx\tilesheets\PaletteGentleWinter.pl",0,4 | db BattleFieldWinterBlock | db GentleWinterMiniMapsBlock | dw $4000 + (207*128) + (200/2) - 128
+
 
 
 ;tiles:
@@ -73,99 +74,13 @@ GentleCaveMap05: db  GentleCaveMap05MapBlock | dw GentleCaveMap05Map | db Gentle
 ;minimap is 48x48. Worldmap is 128x128
 ;48:128 = 3:8.. so read tile/pixel 1, 4, 7
 CreateMiniMap:                          ;using worldtiles from page 3 and worldmap, we can generate minimap
-  ld    a,(slot.page1rom)             ;all RAM except page 1
-  out   ($a8),a      
-
-  ld		a,1                             ;set worldmap in bank 1 at $8000
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
-
-  ld    a,YMiniMap
-	ld		(CopyTilePiece+dy),a
-
-  ld    hl,$8000                        ;worldmap mapdata
-  ld    c,16                            ;16*3 pixel y-axis
-  ld    b,16                            ;16*3 pixel x-axis
-
-  .loop:
-  push  bc
-  call  .Copy1Row                       ;row 1 (y-axis)
-  pop   bc
-  ld    de,256
-  add   hl,de
-  push  bc
-  call  .Copy1Row                       ;row 4 (y-axis)
-  pop   bc
-  ld    de,256
-  add   hl,de
-  push  bc
-  call  .Copy1Row                       ;row 7 (y-axis)
-  pop   bc
-  ld    de,128
-  add   hl,de
-  dec   c
-  jr    nz,.loop
-  ret
-
-  .Copy1Row:
-  call  .GoCopyTilePiece                ;pixel 1 (x-axis)
-  inc   hl
-  inc   hl
-  inc   hl
-  call  .GoCopyTilePiece                ;pixel 4 (x-axis)
-  inc   hl
-  inc   hl
-  inc   hl
-  call  .GoCopyTilePiece                ;pixel 7 (x-axis)
-  inc   hl
-  inc   hl
-  djnz  .Copy1Row
-  
-  ld    a,XMiniMap
-	ld		(CopyTilePiece+dx),a
-	ld		a,(CopyTilePiece+dy)
-  inc   a
-	ld		(CopyTilePiece+dy),a
-  ret
-
-  .GoCopyTilePiece:
-  push  bc
-  push  hl
-
-  ld    a,(hl)                          ;tilenr
-
-	;set sx
-	ld		e,a                             ;store tilenr
-	add		a,a				                      ;*2
-	add		a,a				                      ;*4
-	add		a,a				                      ;*8
-	add		a,a				                      ;*16
-	ld		(CopyTilePiece+sx),a
-	;/set sx
-
-	;set sy
-	ld		a,e
-	ld		d,-1
-.setsy:
-	sub		a,16
-	inc		d
-	jp		nc,.setsy
-	ld		a,d
-	add		a,a				                      ;*2
-	add		a,a				                      ;*4
-	add		a,a				                      ;*8
-	add		a,a				                      ;*16
-	ld		(CopyTilePiece+sy),a
-	;/set sy
-  
-  ld    hl,CopyTilePiece
-  call  DoCopy
-
-  ld    a,(CopyTilePiece+dx)
-  inc   a
-  ld    (CopyTilePiece+dx),a
-
-  pop   hl
-  pop   bc
+  ld    ix,(WorldPointer)
+  ld    l,(ix+13)                                 ;block to copy graphics from  
+  ld    h,(ix+14)                                 ;block to copy graphics from  
+  ld    de,$0000 + (YMiniMap*128) + (XMiniMap/2) - 128
+  ld    bc,$0000 + (048*256) + (048/2)
+  ld    a,(ix+12)                                 ;block to copy graphics from  
+  call  CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
   ret
 
 XMiniMap: equ 203

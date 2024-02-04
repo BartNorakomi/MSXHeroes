@@ -632,10 +632,7 @@ dephase
 ;
 ; block $16 - 17
 ;
-;HudBlock:  equ   $16
 phase	$4000
-;  incbin "..\grapx\hud\hud.SC5",7,208 * 128      ;208 lines
-;  incbin "..\grapx\hud\hudBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -655,7 +652,6 @@ dephase
 HeroOverviewGraphicsBlock:  equ   $1a
 phase	$4000
   incbin "..\grapx\HeroOverview\HeroOverviewGraphics.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\HeroOverview\HeroOverviewGraphicsBottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1032,8 +1028,10 @@ dephase
 ; block $67 - 68
 ;
 VictoryBlock:  equ   $67
+GentleWinterMiniMapsBlock:  equ   $67
 phase	$4000
   incbin "..\grapx\Battlefield\Victory.SC5",7,207 * 128      ;212 lines
+  incbin "..\grapx\hud\GentleWinterMiniMaps.SC5",7,048 * 128      ;048 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1470,10 +1468,6 @@ GentleAutumnMap03Map:
   incbin "..\maps\GentleAutumnMap03.map.pck"
 GentleAutumnMap03ObjectLayerMap:
   incbin "..\maps\GentleAutumnMap03objects.map.pck"
-GentleAutumnMap04Map:
-  incbin "..\maps\GentleAutumnMap04.map.pck"
-GentleAutumnMap04ObjectLayerMap:
-  incbin "..\maps\GentleAutumnMap04objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
@@ -1485,6 +1479,10 @@ GentleAutumnMap05MapBlock:  equ   $9c
 GentleAutumnMap05ObjectLayerMapBlock:  equ   $9c
 
 phase	$4000
+GentleAutumnMap04Map:
+  incbin "..\maps\GentleAutumnMap04.map.pck"
+GentleAutumnMap04ObjectLayerMap:
+  incbin "..\maps\GentleAutumnMap04objects.map.pck"
 GentleAutumnMap05Map:
   incbin "..\maps\GentleAutumnMap05.map.pck"
 GentleAutumnMap05ObjectLayerMap:
@@ -1764,6 +1762,41 @@ SpellAnimations16Block:  equ   $bc
 phase	$4000
   incbin "..\grapx\BattleField\SpellAnimations16.SC5",7,128 * 128      ;128 lines
 	ds		$8000-$,$ff
+dephase
+
+;
+; block $bd - $be
+;
+GentleAutumnMiniMapsBlock:  equ   $bd
+GentleCaveMiniMapsBlock:  equ   $bd
+GentleDesertMiniMapsBlock:  equ   $bd
+GentleJungleMiniMapsBlock:  equ   $bd
+GentleMiniMapsBlock:  equ   $bd
+phase	$4000
+  incbin "..\grapx\hud\GentleAutumnMiniMaps.SC5",7,48 * 128      ;048 lines
+  incbin "..\grapx\hud\GentleCaveMiniMaps.SC5",7,048 * 128      ;048 lines
+  incbin "..\grapx\hud\GentleDesertMiniMaps.SC5",7,048 * 128      ;048 lines
+  incbin "..\grapx\hud\GentleJungleMiniMaps.SC5",7,048 * 128      ;048 lines
+  incbin "..\grapx\hud\GentleMiniMaps.SC5",7,048 * 128      ;048 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $bf - $c0
+;
+ScenarioSelectBlock:  equ   $bf
+phase	$4000
+  incbin "..\grapx\TitleScreen\ScenarioSelect.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+;
+; block $c1
+;
+TitleScreenCodeblock:  equ   $c1
+phase	$4000
+	include	"TitleScreenCode.asm"	
+	ds		$c000-$,$ff
 dephase
 
 totallenght:	Equ	$-MSXHeroes
