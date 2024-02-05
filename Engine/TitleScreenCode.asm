@@ -40,6 +40,7 @@ HandleTitleScreenCode:
   ;/scenario select buttons
 
   call  SetNamesInScenarioButtons
+  call  SetTextPage123Buttons
 
   jp    .engine
 
@@ -81,15 +82,31 @@ HandleTitleScreenCode:
 
   .Page123Pressed:
   ld    b,3
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*12+1
   jr    z,.ScenarioPageFound
   cp    17
   ld    b,2
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*11+1
   jr    z,.ScenarioPageFound
   ld    b,1
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*10+1
   .ScenarioPageFound:
+	ld		a,(ScenarioPage)
+	cp    b
+	ret   z
   ld    a,b
 	ld		(ScenarioPage),a
+
+  push  de
+  call  SetAmountOfScenarioPageButtons
+  pop   de
+  ld    hl,.PageButtonConstantlyLit
+  ld    bc,4
+  ldir
   jp    SetAmountOfScenarioButtons
+
+  .PageButtonConstantlyLit:
+  dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
 
   .ScenarioPressed:
   ret
@@ -270,6 +287,36 @@ HandleTitleScreenCode:
   ld    (MenuOptionSelected?),a
   ret
 
+SetTextPage123Buttons:
+  ld    a,(AmountOfMapsUnlocked)
+  cp    11
+  ret   c
+
+  ld    b,035                           ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,069                           ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(AmountOfMapsUnlocked)
+  cp    21
+  ret   c
+
+  ld    b,103                           ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+TextPage1: db "Page 1",255
+TextPage2: db "Page 2",255
+TextPage3: db "Page 3",255
+
+
 SetNamesInScenarioButtons:
   ld    b,020                           ;dx
   ld    c,046                           ;dy
@@ -358,9 +405,32 @@ SetScenarioSelectButtons:
 
   call  SetAmountOfScenarioButtons
   call  SetAmountOfScenarioPageButtons
+  call  SetPage1ButtonConstantlyLit
   ret
 
+SetPage1ButtonConstantlyLit:
+  ld    hl,.PageButtonConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*10+1
+  ld    bc,4
+  ldir
+  ret
+  .PageButtonConstantlyLit:
+  dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
+
 SetAmountOfScenarioPageButtons:
+  ld    hl,.PageButtonsNormal
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*10
+  ld    bc,5
+  ldir
+  ld    hl,.PageButtonsNormal
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*11
+  ld    bc,5
+  ldir
+  ld    hl,.PageButtonsNormal
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*12
+  ld    bc,5
+  ldir
+
   ld    a,(AmountOfMapsUnlocked)
   cp    21
   ret   nc                            ;all 3 pages are unlocked when >20 maps are unlocked
@@ -375,6 +445,9 @@ SetAmountOfScenarioPageButtons:
   xor   a                             ;lock page 3
   ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*12),a
   ret
+
+  .PageButtonsNormal:
+  db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128
 
 SetAmountOfScenarioButtons:
   call  ClearScenarioButtonGraphics
