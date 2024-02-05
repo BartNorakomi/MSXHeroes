@@ -1794,10 +1794,20 @@ dephase
 ; block $c1
 ;
 TitleScreenCodeblock:  equ   $c1
-phase	$4000
+phase	$8000
 	include	"TitleScreenCode.asm"	
 	ds		$c000-$,$ff
 dephase
+
+;
+; block $c2
+;
+ScenarioSelectButtonsBlock:  equ   $c2
+phase	$4000
+  incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,55 * 128      ;55 lines
+	ds		$8000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

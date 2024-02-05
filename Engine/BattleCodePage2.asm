@@ -945,12 +945,12 @@ ClearBattleFieldGridStartOfBattle:
   db  000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255
   db  255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000,255,000, 255,000,255,000,255, 000,255,000
 
-SetFontPage0Y212:                       ;set font at (0,212) page 0
-  ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
-  ld    bc,$0000 + (006*256) + (256/2)
-  ld    a,CastleOverviewFontBlock         ;font graphics block
-  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+;SetFontPage0Y212:                       ;set font at (0,212) page 0
+;  ld    hl,$4000 + (000*128) + (000/2) - 128
+;  ld    de,$0000 + (212*128) + (000/2) - 128
+;  ld    bc,$0000 + (006*256) + (256/2)
+;  ld    a,CastleOverviewFontBlock         ;font graphics block
+;  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetFontPage0Y250:                       ;set font at (0,212) page 0
   ld    hl,$4000 + (000*128) + (000/2) - 128
