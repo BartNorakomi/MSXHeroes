@@ -4,7 +4,11 @@ HandleTitleScreenCode:
   ld    a,1
 	ld		(activepage),a
 ;	ld    a,1
-	ld		(ScenarioPage),a			
+	ld		(ScenarioPage),a
+	ld		(ScenarioSelected),a
+  ld    a,2
+	ld		(Difficulty),a                  ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
+	
   call  SetScenarioSelectGraphics
   xor   a
 	ld		(activepage),a			
@@ -14,8 +18,13 @@ HandleTitleScreenCode:
   call  SetSpatInCastle
   call  SetInterruptHandler             ;set Vblank
   call  SetScenarioSelectButtons
+
   call  SetFontPage0Y212                ;set font at (0,212) page 0
 
+  call  SetAmountOfScenarioButtons
+  call  SetAmountOfScenarioPageButtons
+  call  SetPage1ButtonConstantlyLit
+  call  SetDifficultyButtonConstantlyLit
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -58,17 +67,34 @@ HandleTitleScreenCode:
 
   ld    a,b
   cp    19
-  jr    nc,.ScenarioPressed
+  jp    nc,.ScenarioPressed
   cp    16
-  jr    nc,.Page123Pressed
+  jp    nc,.Page123Pressed
   cp    14
-  jr    nc,.BeginBackPressed
+  jp    nc,.BeginBackPressed
   cp    10
-  jr    nc,.HumanOrCPUPressed
+  jp    nc,.HumanOrCPUPressed
   cp    06
   jp    nc,.StartingTownPressed
 
   .DifficultyPressed:
+  ld    b,1
+  cp    5
+  jr    z,.SetDifficulty
+  ld    b,2
+  cp    4
+  jr    z,.SetDifficulty
+  ld    b,3
+  cp    3
+  jr    z,.SetDifficulty
+  ld    b,4
+  cp    2
+  jr    z,.SetDifficulty
+  ld    b,5
+  .SetDifficulty:
+  ld    a,b
+  ld    (Difficulty),a
+  call  SetDifficultyButtonConstantlyLit
   ret
 
   .StartingTownPressed:
@@ -97,24 +123,79 @@ HandleTitleScreenCode:
   ld    a,b
 	ld		(ScenarioPage),a
 
+  .Here:
   push  de
   call  SetAmountOfScenarioPageButtons
   pop   de
   ld    hl,.PageButtonConstantlyLit
   ld    bc,4
   ldir
+
+  ;first unlit all scenario buttons
+  ld    hl,ScenarioSelectButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*10)
+  ldir
+
+  ld    a,(ScenarioPage)
+  ld    b,a
+  ld    a,(LitScenarioButtonInWhichPage?)
+  cp    b
+  jp    nz,SetAmountOfScenarioButtons
+  call  .LightCurrentActiveScenarioButton
   jp    SetAmountOfScenarioButtons
 
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
 
   .ScenarioPressed:
+  ld    a,(ScenarioPage)
+  ld    (LitScenarioButtonInWhichPage?),a
+  ld    a,28
+  sub   b
+	ld		(ScenarioSelected),a
+
+  .LightCurrentActiveScenarioButton:
+  ;first unlit all scenario buttons
+
+  ld    a,(AmountOfMapsVisibleInCurrentPage)
+  cp    11
+  jr    c,.EndCheckMaxMapsInCurrentPageCheck
+  ld    a,10
+  .EndCheckMaxMapsInCurrentPageCheck:
+
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   bc
+
+  ld    hl,ScenarioSelectButtonTable
+  ld    de,GenericButtonTable
+;  ld    bc,GenericButtonTableLenghtPerButton*10
+  ldir
+
+  ;now constantly light active scenario button
+	ld		a,(ScenarioSelected)
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GenericButtonTable+1
+  add   hl,de
+  ex    de,hl
+  ld    hl,.ScenarioButtonConstantlyLit
+  ld    bc,4
+  ldir
   ret
 
+  .ScenarioButtonConstantlyLit:
+  dw    $4000 + (011*128) + (000/2) - 128, $4000 + (011*128) + (000/2) - 128
+  .ScenarioButtonNormallyLit:
+  dw    $4000 + (000*128) + (000/2) - 128, $4000 + (000*128) + (096/2) - 128
 
-
-
-
+ 
 
 .SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
   ld    a,(ix+GenericButtonGfxBlock)
@@ -402,10 +483,6 @@ SetScenarioSelectButtons:
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*28)
   ldir
-
-  call  SetAmountOfScenarioButtons
-  call  SetAmountOfScenarioPageButtons
-  call  SetPage1ButtonConstantlyLit
   ret
 
 SetPage1ButtonConstantlyLit:
@@ -416,6 +493,91 @@ SetPage1ButtonConstantlyLit:
   ret
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
+
+SetDifficultyButtonConstantlyLit:
+  ld    hl,ScenarioSelectButtonTable.DifficultyButtons
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*23
+  ld    bc,GenericButtonTableLenghtPerButton*5
+  ldir
+
+  ld    a,(Difficulty)
+  dec   a
+  ld    hl,.DifficultyEasyConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*23+1
+  jr    z,.SetDifficultyButtonConstantlyLit
+  dec   a
+  ld    hl,.DifficultyNormalConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*24+1
+  jr    z,.SetDifficultyButtonConstantlyLit
+  dec   a
+  ld    hl,.DifficultyHardConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*25+1
+  jr    z,.SetDifficultyButtonConstantlyLit
+  dec   a
+  ld    hl,.DifficultyExpertConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*26+1
+  jr    z,.SetDifficultyButtonConstantlyLit
+  dec   a
+  ld    hl,.DifficultyImpossibleConstantlyLit
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*27+1
+  jr    z,.SetDifficultyButtonConstantlyLit
+  .SetDifficultyButtonConstantlyLit:
+  ld    bc,4
+  ldir
+
+  call  .SetDifficultyText
+  call  .SetDifficultyText
+  ret
+  .SetDifficultyText:
+  ld    a,(Difficulty)
+  dec   a
+  ld    b,192                           ;dx
+  ld    hl,TextEasy
+  jr    z,.DifficultyFound
+  dec   a
+  ld    b,188                           ;dx
+  ld    hl,TextNormal
+  jr    z,.DifficultyFound
+  dec   a
+  ld    b,192                           ;dx
+  ld    hl,TextHard
+  jr    z,.DifficultyFound
+  dec   a
+  ld    b,189                           ;dx
+  ld    hl,TextExpert
+  jr    z,.DifficultyFound
+  dec   a
+  ld    b,181                           ;dx
+  ld    hl,TextImpossible
+  jr    z,.DifficultyFound
+
+
+  .DifficultyFound:
+  push  bc
+  push  hl
+  call  ClearDifficultyTextGraphics
+  pop   hl
+  pop   bc
+  ld    c,179                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  jp    SwapAndSetPage                  ;swap and set page
+
+  .DifficultyEasyConstantlyLit:
+  dw    $4000 + (022*128) + (016/2) - 128, $4000 + (022*128) + (016/2) - 128
+  .DifficultyNormalConstantlyLit:
+  dw    $4000 + (022*128) + (066/2) - 128, $4000 + (022*128) + (066/2) - 128
+  .DifficultyHardConstantlyLit:
+  dw    $4000 + (022*128) + (118/2) - 128, $4000 + (022*128) + (118/2) - 128
+  .DifficultyExpertConstantlyLit:
+  dw    $4000 + (022*128) + (168/2) - 128, $4000 + (022*128) + (168/2) - 128
+  .DifficultyImpossibleConstantlyLit:
+  dw    $4000 + (022*128) + (220/2) - 128, $4000 + (022*128) + (220/2) - 128
+
+TextEasy: db  "Easy",255
+TextNormal: db  "Normal",255
+TextHard: db  "Hard",255
+TextExpert: db  "Expert",255
+TextImpossible: db  "Impossible",255
 
 SetAmountOfScenarioPageButtons:
   ld    hl,.PageButtonsNormal
@@ -700,11 +862,19 @@ ScenarioSelectButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
   db  %1100 0011 | dw $4000 + (000*128) + (192/2) - 128 | dw $4000 + (011*128) + (192/2) - 128 | dw $4000 + (040*128) + (114/2) - 128 | db ScenarioSelectButton22Ytop,ScenarioSelectButton22YBottom,ScenarioSelectButton22XLeft,ScenarioSelectButton22XRight | dw $0000 + (ScenarioSelectButton22Ytop*128) + (ScenarioSelectButton22XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (000*128) + (192/2) - 128 | dw $4000 + (011*128) + (192/2) - 128 | dw $4000 + (040*128) + (114/2) - 128 | db ScenarioSelectButton23Ytop,ScenarioSelectButton23YBottom,ScenarioSelectButton23XLeft,ScenarioSelectButton23XRight | dw $0000 + (ScenarioSelectButton23Ytop*128) + (ScenarioSelectButton23XLeft/2) - 128
   ;difficulty buttons
+  .DifficultyButtons:
   db  %1100 0011 | dw $4000 + (022*128) + (000/2) - 128 | dw $4000 + (022*128) + (016/2) - 128 | dw $4000 + (022*128) + (032/2) - 128 | db ScenarioSelectButton24Ytop,ScenarioSelectButton24YBottom,ScenarioSelectButton24XLeft,ScenarioSelectButton24XRight | dw $0000 + (ScenarioSelectButton24Ytop*128) + (ScenarioSelectButton24XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (048/2) - 128 | dw $4000 + (022*128) + (066/2) - 128 | dw $4000 + (022*128) + (084/2) - 128 | db ScenarioSelectButton25Ytop,ScenarioSelectButton25YBottom,ScenarioSelectButton25XLeft,ScenarioSelectButton25XRight | dw $0000 + (ScenarioSelectButton25Ytop*128) + (ScenarioSelectButton25XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (102/2) - 128 | dw $4000 + (022*128) + (118/2) - 128 | dw $4000 + (022*128) + (134/2) - 128 | db ScenarioSelectButton26Ytop,ScenarioSelectButton26YBottom,ScenarioSelectButton26XLeft,ScenarioSelectButton26XRight | dw $0000 + (ScenarioSelectButton26Ytop*128) + (ScenarioSelectButton26XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (150/2) - 128 | dw $4000 + (022*128) + (168/2) - 128 | dw $4000 + (022*128) + (186/2) - 128 | db ScenarioSelectButton27Ytop,ScenarioSelectButton27YBottom,ScenarioSelectButton27XLeft,ScenarioSelectButton27XRight | dw $0000 + (ScenarioSelectButton27Ytop*128) + (ScenarioSelectButton27XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (204/2) - 128 | dw $4000 + (022*128) + (220/2) - 128 | dw $4000 + (022*128) + (236/2) - 128 | db ScenarioSelectButton28Ytop,ScenarioSelectButton28YBottom,ScenarioSelectButton28XLeft,ScenarioSelectButton28XRight | dw $0000 + (ScenarioSelectButton28Ytop*128) + (ScenarioSelectButton28XLeft/2) - 128
+
+ClearDifficultyTextGraphics:
+  ld    hl,$4000 + (179*128) + (168/2) - 128
+  ld    de,$0000 + (179*128) + (168/2) - 128
+  ld    bc,$0000 + (006*256) + (068/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 ClearScenarioButtonGraphics:
   ld    hl,$4000 + (043*128) + (020/2) - 128

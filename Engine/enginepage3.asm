@@ -3770,7 +3770,10 @@ HeroPortrait16x30SYSXJamieSeed:         equ $8000+(090*128)+(160/2)-128 ;(dy*128
 HeroPortrait16x30SYSXArmoredSnatcher:   equ $8000+(090*128)+(176/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXDruid:             equ $8000+(090*128)+(192/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+Difficulty: ds  1                   ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
 ScenarioPage: ds  1
+LitScenarioButtonInWhichPage?: ds  1
+ScenarioSelected: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
 AmountOfMapsUnlocked: db  25
 
