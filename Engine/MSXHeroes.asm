@@ -1452,8 +1452,6 @@ GentleAutumnMap02MapBlock:  equ   $9b
 GentleAutumnMap02ObjectLayerMapBlock:  equ   $9b
 GentleAutumnMap03MapBlock:  equ   $9b
 GentleAutumnMap03ObjectLayerMapBlock:  equ   $9b
-GentleAutumnMap04MapBlock:  equ   $9b
-GentleAutumnMap04ObjectLayerMapBlock:  equ   $9b
 
 phase	$4000
 GentleAutumnMap01Map:
@@ -1475,6 +1473,8 @@ dephase
 ;
 ; block $9c
 ;
+GentleAutumnMap04MapBlock:  equ   $9c
+GentleAutumnMap04ObjectLayerMapBlock:  equ   $9c
 GentleAutumnMap05MapBlock:  equ   $9c
 GentleAutumnMap05ObjectLayerMapBlock:  equ   $9c
 

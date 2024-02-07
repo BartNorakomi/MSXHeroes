@@ -3,15 +3,15 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ  1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-;WorldPointer: dw GentleAutumnMap02
+WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap01
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleMap04
-WorldPointer: dw GentleWinterMap01
+;WorldPointer: dw GentleWinterMap01
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -2666,7 +2666,7 @@ LoadHud:
 ;	ld		hl,copyfont	                    ;put font at (0,212)
 ;	call	docopy
 
-  ld    hl,CreateMiniMap                ;using worldtiles from page 3 and worldmap, we can generate minimap  
+  ld    hl,LoadMiniMap                  ;load the minimap
   call  ExecuteLoaderRoutine
 
 	call  RepairDecorationEdgesHud
@@ -3775,7 +3775,7 @@ ScenarioPage: ds  1
 LitScenarioButtonInWhichPage?: ds  1
 ScenarioSelected: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
-AmountOfMapsUnlocked: db  25
+AmountOfMapsUnlocked: db  30
 
 endenginepage3:
 dephase

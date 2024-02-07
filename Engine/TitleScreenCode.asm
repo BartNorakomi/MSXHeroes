@@ -25,6 +25,8 @@ HandleTitleScreenCode:
   call  SetAmountOfScenarioPageButtons
   call  SetPage1ButtonConstantlyLit
   call  SetDifficultyButtonConstantlyLit
+  ld    b,28
+  call  .ScenarioPressed
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -50,16 +52,102 @@ HandleTitleScreenCode:
 
   call  SetNamesInScenarioButtons
   call  SetTextPage123Buttons
+  call  SetTextHumanOrCPUButtons
+  call  SetTextStartingTownButtons
 
   jp    .engine
 
   .EndTitleScreenEngine:
+  call  .SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
+  call  .SetAmountOfPlayers
+  call  .SetStartingTown
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
   ret
 
+.SetStartingTown:
+  ld    a,(player1StartingTown)
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle1+CastleName
+  ld    bc,TownNameLenght
+  ldir
+  ret
+
+.SetAmountOfPlayers:
+  ld    a,2
+  ld    (amountofplayers),a
+  ld    a,(player3human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  ret   z
+  ld    a,3
+  ld    (amountofplayers),a
+  ld    a,(player4human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  ret   z
+  ld    a,4
+  ld    (amountofplayers),a
+  ret
+
+.SortHumanCPUOFFPlayersAndTown:
+  ;check if player 3 is off while player 4 is on. if so, move player 4 to the player 3 spot
+  ld    a,(player4human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.EndCheckMovePlayer4Up
+  ld    a,(player3human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.MovePlayer4Up
+  .EndCheckMovePlayer4Up:
+
+  ;check if player 2 is off while player 3 is on. if so, move player 3 to the player 2 spot
+  ld    a,(player3human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.EndCheckMovePlayer3Up
+  ld    a,(player2human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.MovePlayer3Up
+  .EndCheckMovePlayer3Up:
+
+  ;check if player 1 is off while player 2 is on. if so, move player 2 to the player 1 spot
+  ld    a,(player2human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.EndCheckMovePlayer2Up
+  ld    a,(player1human?)               ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  jr    z,.MovePlayer2Up
+  .EndCheckMovePlayer2Up:
+  ret
+
+  .MovePlayer2Up:                       ;player 1 is off while player 2 is on. move player 2 to the player 1 spot
+  ld    a,(player2human?)               ;0=CPU, 1=Human, 2=OFF
+  ld    (player1human?),a               ;0=CPU, 1=Human, 2=OFF
+  ld    a,2
+  ld    (player2human?),a               ;0=CPU, 1=Human, 2=OFF
+
+  ld    a,(player2StartingTown)         ;0=random, 1=DS4, 2=CastleVania
+  ld    (player1StartingTown),a         ;0=random, 1=DS4, 2=CastleVania
+  jp    .SortHumanCPUOFFPlayersAndTown
+
+  .MovePlayer3Up:                       ;player 2 is off while player 3 is on. move player 3 to the player 2 spot
+  ld    a,(player3human?)               ;0=CPU, 1=Human, 2=OFF
+  ld    (player2human?),a               ;0=CPU, 1=Human, 2=OFF
+  ld    a,2
+  ld    (player3human?),a               ;0=CPU, 1=Human, 2=OFF
+
+  ld    a,(player3StartingTown)         ;0=random, 1=DS4, 2=CastleVania
+  ld    (player2StartingTown),a         ;0=random, 1=DS4, 2=CastleVania
+  jp    .SortHumanCPUOFFPlayersAndTown
+
+  .MovePlayer4Up:                       ;player 3 is off while player 4 is on. move player 4 to the player 3 spot
+  ld    a,(player4human?)               ;0=CPU, 1=Human, 2=OFF
+  ld    (player3human?),a               ;0=CPU, 1=Human, 2=OFF
+  ld    a,2
+  ld    (player4human?),a               ;0=CPU, 1=Human, 2=OFF
+
+  ld    a,(player4StartingTown)         ;0=random, 1=DS4, 2=CastleVania
+  ld    (player3StartingTown),a         ;0=random, 1=DS4, 2=CastleVania
+  jp    .SortHumanCPUOFFPlayersAndTown
 
 
 .CheckScenarioSelectButtonClicked:      ;in: carry=button clicked, b=button number
@@ -98,13 +186,139 @@ HandleTitleScreenCode:
   ret
 
   .StartingTownPressed:
+  ld    a,b
+  cp    9
+  ld    hl,player1StartingTown
+  jr    z,.StartingTownFound
+  cp    8
+  ld    hl,player2StartingTown
+  jr    z,.StartingTownFound
+  cp    7
+  ld    hl,player3StartingTown
+  jr    z,.StartingTownFound
+  ld    hl,player4StartingTown
+  .StartingTownFound:
+  ld    a,(hl)
+  inc   a
+  ld    (hl),a
+  cp    16
+  ret   nz
+  ld    (hl),0
   ret
 
   .HumanOrCPUPressed:
+  ld    a,b
+  cp    13
+  ld    hl,player1human?
+  jr    z,.HumanOrCPUPPressed
+  cp    12
+  ld    hl,player2human?
+  jr    z,.HumanOrCPUPPressed
+  cp    11
+  ld    hl,player3human?
+  jr    z,.HumanOrCPUPPressed
+  ld    hl,player4human?
+
+  .HumanOrCPUPPressed:
+  ;we are unable to change the Human if there is ONLY 1 button set to Human
+  ld    a,(hl)              ;0=CPU, 1=Human, 2=OFF
+  dec   a
+  jr    nz,.EndCheckCurrentButtonPressedIsHuman
+  ;button pressed is set to Human, check if there is more than 1 button set to human
+  ld    c,1                 ;0=CPU, 1=Human, 2=OFF
+  call  .CheckAmountOfButtonsCPUorHuman
+  ld    a,b                 ;amount of buttons found
+  cp    1                   ;only 1 button set to human ?
+  ret   z
+  .EndCheckCurrentButtonPressedIsHuman:
+
+  ;we are able to change the CPU button if we have 2 or more buttons set to Human or CPU
+  ld    a,(hl)              ;0=CPU, 1=Human, 2=OFF
+  or    a
+  jr    nz,.EndCheckCurrentButtonPressedIsCPU
+  ;button pressed is set to CPU, check if there is more than 1 button set to human
+  ld    c,1                 ;0=CPU, 1=Human, 2=OFF
+  call  .CheckAmountOfButtonsCPUorHuman
+  ld    a,b                 ;amount of buttons found
+  cp    2                   ;only 1 button set to human ?
+  jr    nc,.EndCheckCurrentButtonPressedIsCPU
+  ;button pressed is set to CPU, check if there is more than 1 button set to cpu
+  ld    c,0                 ;0=CPU, 1=Human, 2=OFF
+  call  .CheckAmountOfButtonsCPUorHuman
+  ld    a,b                 ;amount of buttons found
+  cp    2                   ;only 1 button set to human ?
+  jr    nc,.EndCheckCurrentButtonPressedIsCPU
+  ld    (hl),1              ;0=CPU, 1=Human, 2=OFF
+  ret
+  .EndCheckCurrentButtonPressedIsCPU:
+
+  ld    a,(hl)
+  dec   a
+  ld    (hl),a
+  cp    255
+  ret   nz
+  ld    (hl),2              ;0=CPU, 1=Human, 2=OFF
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*19),a ;starting town buttons player 1
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*20),a ;starting town buttons player 2
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  ret   z
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*21),a ;starting town buttons player 3
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  ret   z
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*22),a ;starting town buttons player 4
+  ret
+
+  .CheckAmountOfButtonsCPUorHuman:
+  ld    b,0                 ;amount of buttons found
+  ld    a,(player1human?)
+  cp    c
+  jr    nz,.EndCheckButtonPlayer1
+  inc   b
+  .EndCheckButtonPlayer1:
+  ld    a,(player2human?)
+  cp    c
+  jr    nz,.EndCheckButtonPlayer2
+  inc   b
+  .EndCheckButtonPlayer2:
+  
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  ret   z  
+
+  ld    a,(player3human?)
+  cp    c
+  jr    nz,.EndCheckButtonPlayer3
+  inc   b
+  .EndCheckButtonPlayer3:
+
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  ret   z
+
+  ld    a,(player4human?)
+  cp    c
+  ret   nz
+  inc   b
   ret
 
   .BeginBackPressed:
+  ld    a,b
+  cp    15
+  jr    z,.BeginPressed
   ret
+
+  .BeginPressed:
+  pop   af
+  jp    .EndTitleScreenEngine
 
   .Page123Pressed:
   ld    b,3
@@ -148,6 +362,9 @@ HandleTitleScreenCode:
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
 
+
+
+
   .ScenarioPressed:
   ld    a,(ScenarioPage)
   ld    (LitScenarioButtonInWhichPage?),a
@@ -157,7 +374,6 @@ HandleTitleScreenCode:
 
   .LightCurrentActiveScenarioButton:
   ;first unlit all scenario buttons
-
   ld    a,(AmountOfMapsVisibleInCurrentPage)
   cp    11
   jr    c,.EndCheckMaxMapsInCurrentPageCheck
@@ -188,13 +404,115 @@ HandleTitleScreenCode:
   ld    hl,.ScenarioButtonConstantlyLit
   ld    bc,4
   ldir
+
+  ;set worldpointer
+  ld    a,(ScenarioPage)
+  dec   a
+  ld    b,0
+  jr    z,.PageFound
+  dec   a
+  ld    b,10
+  jr    z,.PageFound
+  ld    b,20
+  .PageFound:
+	ld		a,(ScenarioSelected)
+  add   a,b                             ;a=scenario selected (0 - 29)
+  ld    d,0
+  ld    e,a
+  ld    hl,LenghtMapData
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GentleAutumnMap01
+  add   hl,de
+  ld    (WorldPointer),hl
+  
+  ;put minimap and set palette accordingly
+  call  PutMiniMapScenarioSelectScreen
+  call  PutMiniMapScenarioSelectScreen
+
+  ;set selected scenario name righttop of screen
+  call  .SetSelectedScenarioNameRightTopOfScreen
+  call  .SetSelectedScenarioNameRightTopOfScreen
+
+  ;set max amount of player buttons (Human/CPU & Starting Town buttons)
+  call  .SetMaxAmountOfPlayerButtons
+  call  .SetMaxAmountOfPlayerButtons
+
+  ld    a,1
+  ld    (player1human?),a
+  xor   a
+  ld    (player2human?),a
+  ld    (player3human?),a
+  ld    (player4human?),a
+  ld    (player1StartingTown),a
+  ld    (player2StartingTown),a
+  ld    (player3StartingTown),a
+  ld    (player4StartingTown),a
   ret
+
+  .SetMaxAmountOfPlayerButtons:
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*15),a ;human or cpu buttons player 1
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*16),a ;human or cpu buttons player 2
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*19),a ;starting town buttons player 1
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*20),a ;starting town buttons player 2
+
+  call  ClearPlayerButtons
+  call  PutPlayer1and2Buttons
+
+  xor   a                             
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*17),a ;human or cpu buttons player 3
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*18),a ;human or cpu buttons player 4
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*21),a ;starting town buttons player 3
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*22),a ;starting town buttons player 4
+  
+  ld    ix,(WorldPointer)
+  ld    a,2
+  ld    (amountofplayers),a
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  jp    z,.SetTextInPlayerButtons
+
+  call  PutPlayer3Buttons
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*17),a ;human or cpu buttons player 3
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*21),a ;starting town buttons player 3
+
+  ld    a,3
+  ld    (amountofplayers),a
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  jp    z,.SetTextInPlayerButtons
+
+  call  PutPlayer4Buttons
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*18),a ;human or cpu buttons player 4
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*22),a ;starting town buttons player 4
+  ld    a,4
+  ld    (amountofplayers),a
+  
+  .SetTextInPlayerButtons:
+  call  SetTextHumanOrCPUButtons
+  call  SetTextStartingTownButtons
+  jp    SwapAndSetPage                  ;swap and set page
+
+  .SetSelectedScenarioNameRightTopOfScreen:
+  call  ClearScenarioNameRightTopOfScreen
+  ld    b,158                           ;dx
+  ld    c,021                           ;dy
+
+  ld    hl,(WorldPointer)
+  ld    de,ScenarioNameAddress+4
+  add   hl,de
+
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  jp    SwapAndSetPage                  ;swap and set page
 
   .ScenarioButtonConstantlyLit:
   dw    $4000 + (011*128) + (000/2) - 128, $4000 + (011*128) + (000/2) - 128
   .ScenarioButtonNormallyLit:
   dw    $4000 + (000*128) + (000/2) - 128, $4000 + (000*128) + (096/2) - 128
 
+  
  
 
 .SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
@@ -368,6 +686,138 @@ HandleTitleScreenCode:
   ld    (MenuOptionSelected?),a
   ret
 
+SetTextStartingTownButtons:
+  ld    a,(player1human?)
+  cp    2                               ;0=CPU, 1=Human, 2=OFF
+  jr    z,.EndSetTextStartingTownPlayer1
+  ld    a,(player1StartingTown)
+  call  .SetTownNameInHl
+  ld    b,189                           ;dx
+  ld    c,106                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  .EndSetTextStartingTownPlayer1:
+
+  ld    a,(player2human?)
+  cp    2                               ;0=CPU, 1=Human, 2=OFF
+  jr    z,.EndSetTextStartingTownPlayer2
+  ld    a,(player2StartingTown)
+  call  .SetTownNameInHl
+  ld    b,189                           ;dx
+  ld    c,118                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  .EndSetTextStartingTownPlayer2:
+
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  ret   z
+
+  ld    a,(player3human?)
+  cp    2                               ;0=CPU, 1=Human, 2=OFF
+  jr    z,.EndSetTextStartingTownPlayer3
+  ld    a,(player3StartingTown)
+  call  .SetTownNameInHl
+  ld    b,189                           ;dx
+  ld    c,130                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  .EndSetTextStartingTownPlayer3:
+
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  ret   z
+
+  ld    a,(player4human?)
+  cp    2                               ;0=CPU, 1=Human, 2=OFF
+  ret   z
+  ld    a,(player4StartingTown)
+  call  .SetTownNameInHl
+  ld    b,189                           ;dx
+  ld    c,142                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+  .SetTownNameInHl:
+  ld    d,0
+  ld    e,a
+  ld    hl,TownNameLenght
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,TextTownRandom
+  add   hl,de  
+  ret
+
+TownNameLenght: equ TextTown1-TextTownRandom
+TextTownRandom:   db "Random      ",255 ;0=random, 1=DS4, 2=CastleVania
+TextTown1:        db "Drasle Lair ",255
+TextTown2:        db "CastleVania ",255
+TextTown3:        db "Outer Heaven",255
+TextTown4:        db "Town 04     ",255
+TextTown5:        db "Town 05     ",255
+TextTown6:        db "Town 06     ",255
+TextTown7:        db "Town 07     ",255
+TextTown8:        db "Town 08     ",255
+TextTown9:        db "Town 09     ",255
+TextTown10:       db "Town 10     ",255
+TextTown11:       db "Town 11     ",255
+TextTown12:       db "Town 12     ",255
+TextTown13:       db "Town 13     ",255
+TextTown14:       db "Town 14     ",255
+TextTown15:       db "Town 15     ",255
+  
+SetTextHumanOrCPUButtons:
+  ld    c,106                           ;dy
+  ld    hl,player1human?
+  call  .SetTextHumanOrCPU
+
+  ld    c,118                           ;dy
+  ld    hl,player2human?
+  call  .SetTextHumanOrCPU
+
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  ret   z
+
+  ld    c,130                           ;dy
+  ld    hl,player3human?
+  call  .SetTextHumanOrCPU
+
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  ret   z
+
+  ld    c,142                           ;dy
+  ld    hl,player4human?
+;  call  .SetTextHumanOrCPU
+;  ret
+
+  .SetTextHumanOrCPU:
+  ld    a,(hl)
+  or    a
+  jp    z,.PlayerCPU
+  dec   a
+  jp    z,.PlayerHuman
+;  jp    .PlayerOFF
+
+  .PlayerOFF:
+  ld    b,166                           ;dx
+  ld    hl,TextOFF
+  jp    SetText                         ;in: b=dx, c=dy, hl->text
+
+  .PlayerCPU:
+  ld    b,166                           ;dx
+  ld    hl,TextCPU
+  jp    SetText                         ;in: b=dx, c=dy, hl->text
+
+  .PlayerHuman:
+  ld    b,161                           ;dx
+  ld    hl,TextHuman
+  jp    SetText                         ;in: b=dx, c=dy, hl->text
+
+
+TextHuman:  db "Human",255
+TextCPU:    db "CPU",255
+TextOFF:    db "OFF",255
+
 SetTextPage123Buttons:
   ld    a,(AmountOfMapsUnlocked)
   cp    11
@@ -397,19 +847,21 @@ TextPage1: db "Page 1",255
 TextPage2: db "Page 2",255
 TextPage3: db "Page 3",255
 
-
+ScenarioNameAddress:  equ 15
 SetNamesInScenarioButtons:
   ld    b,020                           ;dx
   ld    c,046                           ;dy
 
+  ld    hl,GentleAutumnMap01+ScenarioNameAddress
+  ld    de,LenghtMapData*10
+
   ld    a,(ScenarioPage)
   dec   a
-  ld    hl,TextScenario001
   jr    z,.PageFound
+  add   hl,de
   dec   a
-  ld    hl,TextScenario011
   jr    z,.PageFound
-  ld    hl,TextScenario021
+  add   hl,de
   .PageFound:
 
   ld    a,(AmountOfMapsVisibleInCurrentPage)
@@ -437,46 +889,12 @@ SetNamesInScenarioButtons:
   ld    a,c
   add   a,13
   ld    c,a
-  ld    de,LengthScenarioDescription
+  ld    de,LenghtMapData
   add   hl,de
   pop   af
   dec   a
   jr    nz,.loop
   ret
-
-LengthScenarioDescription:  equ TextScenario002-TextScenario001
-TextScenario001: db "2",255,"S",255,"scenario description 1",255
-TextScenario002: db "3",255,"S",255,"scenario description 2",255
-TextScenario003: db "4",255,"S",255,"scenario description 3",255
-TextScenario004: db "4",255,"M",255,"scenario description 4",255
-TextScenario005: db "3",255,"M",255,"scenario description 5",255
-TextScenario006: db "4",255,"S",255,"scenario description 6",255
-TextScenario007: db "2",255,"M",255,"scenario description 7",255
-TextScenario008: db "2",255,"M",255,"scenario description 8",255
-TextScenario009: db "3",255,"S",255,"scenario description 9",255
-TextScenario010: db "4",255,"S",255,"scenario description10",255
-
-TextScenario011: db "2",255,"M",255,"scenario description11",255
-TextScenario012: db "2",255,"M",255,"scenario description12",255
-TextScenario013: db "3",255,"M",255,"scenario description13",255
-TextScenario014: db "4",255,"M",255,"scenario description14",255
-TextScenario015: db "2",255,"S",255,"scenario description15",255
-TextScenario016: db "3",255,"M",255,"scenario description16",255
-TextScenario017: db "4",255,"M",255,"scenario description17",255
-TextScenario018: db "2",255,"M",255,"scenario description18",255
-TextScenario019: db "2",255,"L",255,"scenario description19",255
-TextScenario020: db "3",255,"M",255,"scenario description20",255
-
-TextScenario021: db "3",255,"L",255,"scenario description21",255
-TextScenario022: db "4",255,"M",255,"scenario description22",255
-TextScenario023: db "2",255,"L",255,"scenario description23",255
-TextScenario024: db "3",255,"L",255,"scenario description24",255
-TextScenario025: db "4",255,"M",255,"scenario description25",255
-TextScenario026: db "4",255,"L",255,"scenario description26",255
-TextScenario027: db "4",255,"L",255,"scenario description27",255
-TextScenario028: db "2",255,"L",255,"scenario description28",255
-TextScenario029: db "3",255,"L",255,"scenario description29",255
-TextScenario030: db "3",255,"L",255,"scenario description30",255
 
 SetScenarioSelectButtons:
   ld    hl,ScenarioSelectButtonTable-2
@@ -868,6 +1286,41 @@ ScenarioSelectButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
   db  %1100 0011 | dw $4000 + (022*128) + (102/2) - 128 | dw $4000 + (022*128) + (118/2) - 128 | dw $4000 + (022*128) + (134/2) - 128 | db ScenarioSelectButton26Ytop,ScenarioSelectButton26YBottom,ScenarioSelectButton26XLeft,ScenarioSelectButton26XRight | dw $0000 + (ScenarioSelectButton26Ytop*128) + (ScenarioSelectButton26XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (150/2) - 128 | dw $4000 + (022*128) + (168/2) - 128 | dw $4000 + (022*128) + (186/2) - 128 | db ScenarioSelectButton27Ytop,ScenarioSelectButton27YBottom,ScenarioSelectButton27XLeft,ScenarioSelectButton27XRight | dw $0000 + (ScenarioSelectButton27Ytop*128) + (ScenarioSelectButton27XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (204/2) - 128 | dw $4000 + (022*128) + (220/2) - 128 | dw $4000 + (022*128) + (236/2) - 128 | db ScenarioSelectButton28Ytop,ScenarioSelectButton28YBottom,ScenarioSelectButton28XLeft,ScenarioSelectButton28XRight | dw $0000 + (ScenarioSelectButton28Ytop*128) + (ScenarioSelectButton28XLeft/2) - 128
+
+PutPlayer4Buttons:
+  ld    hl,$4000 + (139*128) + (158/2) - 128
+  ld    de,$0000 + (139*128) + (158/2) - 128
+  ld    bc,$0000 + (011*256) + (084/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+PutPlayer1and2Buttons:
+  ld    hl,$4000 + (103*128) + (158/2) - 128
+  ld    de,$0000 + (103*128) + (158/2) - 128
+  ld    bc,$0000 + (023*256) + (084/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+PutPlayer3Buttons:
+  ld    hl,$4000 + (127*128) + (158/2) - 128
+  ld    de,$0000 + (127*128) + (158/2) - 128
+  ld    bc,$0000 + (011*256) + (084/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+ClearPlayerButtons:
+  ld    hl,$4000 + (075*128) + (024/2) - 128
+  ld    de,$0000 + (103*128) + (158/2) - 128
+  ld    bc,$0000 + (047*256) + (084/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+ClearScenarioNameRightTopOfScreen:
+  ld    hl,$4000 + (019*128) + (158/2) - 128
+  ld    de,$0000 + (019*128) + (158/2) - 128
+  ld    bc,$0000 + (009*256) + (084/2)
+  ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 ClearDifficultyTextGraphics:
   ld    hl,$4000 + (179*128) + (168/2) - 128

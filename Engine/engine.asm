@@ -571,7 +571,7 @@ DisplayEnemyHeroStatsRightClick:
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 
   ld    hl,DisplayEnemyHeroStatsWindowCode
   jp    EnterSpecificRoutineHeroOverviewCode
@@ -628,7 +628,7 @@ MiniMapSquareIconInteraction:
 SetMiniMap?: db  0
 LockMiniMapOn?: db  0  
 MiniMapSquareIconInteractionOnInterrupt:
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   or    a
   ret   nz
 ;
@@ -732,7 +732,7 @@ Backdrop:
 
 WhichHudButtonClicked?: db  0
 checktriggerhud:
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   or    a
   ret   nz
 
@@ -1015,7 +1015,7 @@ SetHeroMaxMovementPoints:
 SetText:                                ;in: b=dx, c=dy, hl->text
   ld    a,212
   ld    (PutLetter+sy),a                ;set dx of text
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   cp    3
   jr    nz,.GoSetText
   ld    a,250
@@ -1459,7 +1459,7 @@ DisplayHeroLevelUp:
   jp    nz,DisableScrollScreen
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,HeroLevelUpCode
@@ -1475,7 +1475,7 @@ DisplayChestFound:
   jp    nz,DisableScrollScreen
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplayChestCode
@@ -1490,7 +1490,7 @@ DisplayScrollFound:
   jp    nz,DisableScrollScreen
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplayScrollCode
@@ -1515,7 +1515,7 @@ DisplayStartOfTurnMessage:
   ret   nz
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplayStartOfTurnMessageCode
@@ -1526,7 +1526,7 @@ DisplayStartOfTurnMessage:
   ret   z
 
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 
   ld    hl,DisplayQuickTipsCode
   jp    EnterSpecificRoutineInCastleOverviewCode
@@ -1600,7 +1600,7 @@ EnterSpecificRoutineHeroOverviewCode:
 
   xor   a
   ld    (vblankintflag),a
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
   call  EnableScrollScreen
@@ -1634,7 +1634,7 @@ EnterSpecificRoutineInCastleOverviewCode:
 
   xor   a
   ld    (vblankintflag),a
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
   call  EnableScrollScreen
@@ -1668,7 +1668,7 @@ EnterSpecificRoutineInBattleCode:
 
   xor   a
   ld    (vblankintflag),a
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
   call  EnableScrollScreen
@@ -1693,7 +1693,7 @@ CheckEnterTradeMenuBetween2FriendlyHeroes:
 
 ;EnterTradeMenuBetween2FriendlyHeroes:
   ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 
   ld    hl,TradeMenuCode
   call  EnterSpecificRoutineInCastleOverviewCode
@@ -3212,7 +3212,7 @@ GoCheckEnterHeroOverviewMenu:
 ;addxtomouse:	equ	8
 ;subyfrommouse:	equ	4
 checktriggermapscreen:
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   or    a
   ret   nz
 
@@ -4051,8 +4051,12 @@ MSEPRT:	ds 1 ;EQU	$FC82
 
 ;ycoordinateStartPlayfield:  equ 16
 MovePointer:					                  ;move mouse pointer (set mouse coordinates in spat)
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  cp    4
+  jr    z,.EndCheckFreezePointer
 	call	checkcurrentplayerhuman	        ;out zero flag, current player is computer
 	ret		z
+  .EndCheckFreezePointer:
 
   ld    a,(MOUSID)
   or    a
@@ -4078,7 +4082,7 @@ RDPADL:
 	LD	E,A
 
 ;Set x borders depending on what playing field we are in
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   cp    2
   ld    h,240                           ;right border (castle overview)
   ld    l,000                           ;left border (castle overview)
@@ -4129,7 +4133,7 @@ RDPADL:
 ;/move left
 
 ;Set y borders depending on what playing field we are in
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   cp    3
   ld    h,016                           ;top border (castle overview)
   ld    l,218                           ;bottom border (castle overview)
@@ -4266,7 +4270,7 @@ WR_PSG:	DI
 
 movecursory:                            ;move cursor up(a=-1)/down(a=+1)
   ex    af,af'
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 
   ld    e,016                           ;top border
   cp    3
@@ -4309,7 +4313,7 @@ movecursory:                            ;move cursor up(a=-1)/down(a=+1)
 
 movecursorx:
   ex    af,af'
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   cp    2
   ld    d,256-16
   ld    e,000
@@ -4426,11 +4430,11 @@ xcoordinateStartPlayfield:  equ 06
 ycoorspritebottom:	equ	180
 xcoorspriteright:	equ	239
 
-GameStatus: db  0                       ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+GameStatus: db  0                       ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 SX_Hud:  equ 196                        ;to check if mousepointer is in the hud (x>196)
 spritecharacter:	db	255	              ;0=d,1=u,2=ur,3=ul,4=r,5=l,6=dr,7=dl,8=shoe,9=shoeaction,10=swords,11=hand,12=change arrows
 setspritecharacter:                     ;check if pointer is on creature or enemy hero (show swords) or on friendly hero (show switch units symbol) or on own hero (show hand) or none=boots
-  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
+  ld    a,(GameStatus)                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   or    a
   jr    z,.Ingame
   dec   a
@@ -6043,8 +6047,8 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
-Castle2:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heaven",255
+Castle1:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heave1",255
+Castle2:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heave2",255
 Castle3:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "   Junker HQ",255
 Castle4:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "    Zanzibar",255
 Castle5:  db  255,  255,  255
@@ -6090,10 +6094,15 @@ ResourcesPlayer4:
 .Gems:    dw  60
 .Rubies:  dw  30
 
-amountofplayers:		db	2
-player1human?:			db	1
+player1StartingTown:			db	0 ;0=random, 1=DS4, 2=CastleVania
+player2StartingTown:			db	1 ;0=random, 1=DS4, 2=CastleVania
+player3StartingTown:			db	7 ;0=random, 1=DS4, 2=CastleVania
+player4StartingTown:			db	2 ;0=random, 1=DS4, 2=CastleVania
+
+amountofplayers:		db	3
+player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
 player2human?:			db	1
-player3human?:			db	0
+player3human?:			db	1
 player4human?:			db	0
 whichplayernowplaying?:	db	1
 
