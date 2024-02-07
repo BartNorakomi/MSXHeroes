@@ -2685,19 +2685,19 @@ SetCastlesInWindows:                    ;erase castle windows, then put the cast
 	jp		.setCastlewindow
 
   .setCastlewindow:
-  ld    a,(ix+CastleTerrainSY)      ;terrain 0=grassland,1=swamp,2=hell,3=snow
-  or    a
+ ; ld    a,(ix+CastleTerrainSY)      ;terrain 0=grassland,1=swamp,2=hell,3=snow
+ ; or    a
   ld    hl,CastleButtonGrassLand
-  jr    z,.EndCheckTerrain
-  dec   a
-  ld    hl,CastleButtonSwamp
-  jr    z,.EndCheckTerrain
-  dec   a
-  ld    hl,CastleButtonHell
-  jr    z,.EndCheckTerrain
-  ld    hl,CastleButtonSnow
+ ; jr    z,.EndCheckTerrain
+ ; dec   a
+ ; ld    hl,CastleButtonSwamp
+ ; jr    z,.EndCheckTerrain
+ ; dec   a
+ ; ld    hl,CastleButtonHell
+ ; jr    z,.EndCheckTerrain
+ ; ld    hl,CastleButtonSnow
 
-  .EndCheckTerrain:
+ ; .EndCheckTerrain:
   ld    bc,7
   ldir
 	ret

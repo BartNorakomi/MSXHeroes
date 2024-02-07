@@ -277,8 +277,6 @@ FindAndSetCastles:                      ;castles on the map have to be assigned 
  ; out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
   
   ld    hl,$8000-1
-  ld    ix,Castle1                      ;first castle in castle list
-
   .SetCastleTileNrAndGoloop:
   ld    a,CastleTileNr
   .loop:
@@ -291,17 +289,30 @@ FindAndSetCastles:                      ;castles on the map have to be assigned 
   ld    a,l                             ;x value castle
   and   127
   dec   a
-  ld    (ix+CastleX),a
+  ld    e,a                             ;x value castle
 
   push  hl
-
   push  hl
   pop   bc
 
   inc   hl                              ;player that owns this castle
   ld    a,(hl)
   sub   a,Number1Tile-1
+  
+  cp    1
+  ld    ix,Castle1
+  jr    z,.CastleNrFound
+  cp    2
+  ld    ix,Castle2  
+  jr    z,.CastleNrFound
+  cp    3
+  ld    ix,Castle3
+  jr    z,.CastleNrFound
+  ld    ix,Castle4
+  .CastleNrFound:
+  
   ld    (ix+CastlePlayer),a
+  ld    (ix+CastleX),e
   ld    (hl),0                          ;remove number from object map
 
   ld    de,128
@@ -312,8 +323,6 @@ FindAndSetCastles:                      ;castles on the map have to be assigned 
   ld    (ix+CastleY),a  
 
   pop   hl
-  ld    de,LenghtCastleTable
-  add   ix,de  
   jp    .SetCastleTileNrAndGoloop
 
 PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle

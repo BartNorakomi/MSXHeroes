@@ -6028,7 +6028,9 @@ CastleMageGuildLevel:   equ CastleMarket+1
 CastleBarracksLevel:    equ CastleMageGuildLevel+1
 CastleSawmillLevel:     equ CastleBarracksLevel+1
 CastleMineLevel:        equ CastleSawmillLevel+1
-CastleLevel1Units:      equ CastleMineLevel+1
+AlreadyBuiltThisTurn?:  equ CastleMineLevel+1
+CastleName:             equ AlreadyBuiltThisTurn?+1
+CastleLevel1Units:      equ CastleName+13
 CastleLevel2Units:      equ CastleLevel1Units+1
 CastleLevel3Units:      equ CastleLevel2Units+1
 CastleLevel4Units:      equ CastleLevel3Units+1
@@ -6040,17 +6042,15 @@ CastleLevel3UnitsAvail: equ CastleLevel2UnitsAvail+2
 CastleLevel4UnitsAvail: equ CastleLevel3UnitsAvail+2
 CastleLevel5UnitsAvail: equ CastleLevel4UnitsAvail+2
 CastleLevel6UnitsAvail: equ CastleLevel5UnitsAvail+2
-CastleTerrainSY:        equ CastleLevel6UnitsAvail+2
-AlreadyBuiltThisTurn?:  equ CastleTerrainSY+1
-CastleName:             equ AlreadyBuiltThisTurn?+1
+
 AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth     | db  000       , 0                , "Outer Heave1",255
-Castle2:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "Outer Heave2",255
-Castle3:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "   Junker HQ",255
-Castle4:  db  255,  255,  255,      1,          0,        0,        4,              0,            0,            0,        DragonSlayerUnitLevel1Number,                DragonSlayerUnitLevel2Number,         DragonSlayerUnitLevel3Number,         DragonSlayerUnitLevel4Number,         DragonSlayerUnitLevel5Number,         DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,              DragonSlayerUnitLevel2Growth,             DragonSlayerUnitLevel3Growth,            DragonSlayerUnitLevel4Growth,            DragonSlayerUnitLevel5Growth,           DragonSlayerUnitLevel6Growth     | db  000       , 0                , "    Zanzibar",255
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
+Castle1:  db  255,  255,  255,      1,          0,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle2:  db  255,  255,  255,      1,          0,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle3:  db  255,  255,  255,      1,          0,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle4:  db  255,  255,  255,      1,          0,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
@@ -6063,8 +6063,6 @@ db 255 | TavernHeroesPlayer1:        db  006,008,010,039,041,026,000,000,000,000
 db 255 | TavernHeroesPlayer2:        db  011,012,013,014,015,016,000,000,000,000
 db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
 db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
-
-
 
 AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
@@ -6101,8 +6099,8 @@ player4StartingTown:			db	2 ;0=random, 1=DS4, 2=CastleVania
 
 amountofplayers:		db	3
 player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
-player2human?:			db	1
-player3human?:			db	1
+player2human?:			db	0
+player3human?:			db	0
 player4human?:			db	0
 whichplayernowplaying?:	db	1
 

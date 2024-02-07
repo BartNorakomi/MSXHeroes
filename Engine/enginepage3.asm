@@ -3,7 +3,7 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 0
+StartAtTitleScreen?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 WorldPointer: dw GentleAutumnMap01

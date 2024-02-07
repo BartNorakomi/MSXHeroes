@@ -8,6 +8,8 @@ HandleTitleScreenCode:
 	ld		(ScenarioSelected),a
   ld    a,2
 	ld		(Difficulty),a                  ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
+
+
 	
   call  SetScenarioSelectGraphics
   xor   a
@@ -61,28 +63,125 @@ HandleTitleScreenCode:
   call  .SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
   call  .SetAmountOfPlayers
   call  .SetStartingTown
+  call  .SetStartingResources
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
   ret
 
+.SetStartingResources:
+  ld    a,(Difficulty)
+  dec   a
+  ld    hl,.ResourcesEasy
+  jr    z,.DifficultyFound
+  dec   a
+  ld    hl,.ResourcesNormal
+  jr    z,.DifficultyFound
+  dec   a
+  ld    hl,.ResourcesHard
+  jr    z,.DifficultyFound
+  dec   a
+  ld    hl,.ResourcesExpert
+  jr    z,.DifficultyFound
+;  dec   a
+  ld    hl,.ResourcesImpossible
+;  jr    z,.DifficultyFound
+  
+  .DifficultyFound:
+  push  hl
+  ld    de,ResourcesPlayer1
+  call  .SetResources
+  pop   hl
+  push  hl
+  ld    de,ResourcesPlayer2
+  call  .SetResources
+  pop   hl
+  push  hl
+  ld    de,ResourcesPlayer3
+  call  .SetResources
+  pop   hl
+  push  hl
+  ld    de,ResourcesPlayer4
+  call  .SetResources
+  pop   hl
+  ret
+
+  .SetResources:
+  ld    bc,10
+  ldir
+  ret
+                            ;gold,wood,ore,gems,rubies
+  .ResourcesEasy:       dw  30000, 30,30,15,15
+  .ResourcesNormal:     dw  20000, 20,20,10,10
+  .ResourcesHard:       dw  15000, 15,15,07,07
+  .ResourcesExpert:     dw  10000, 10,10,04,04
+  .ResourcesImpossible: dw  00000, 00,00,00,00
+
 .SetStartingTown:
   ld    a,(player1StartingTown)
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle1+CastleName
-  ld    bc,TownNameLenght
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 1 and all creatures units belonging to that faction
+
+  ld    a,(player2StartingTown)
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle2+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
+
+  ld    a,(player3StartingTown)
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle3+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
+
+  ld    a,(player4StartingTown)
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle4+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 4 and all creatures units belonging to that faction
+  
+  ld    de,Castle1+CastleLevel
+  call  .ResetAllBuildings
+  ld    de,Castle2+CastleLevel
+  call  .ResetAllBuildings
+  ld    de,Castle3+CastleLevel
+  call  .ResetAllBuildings
+  ld    de,Castle4+CastleLevel
+  call  .ResetAllBuildings
+  ret
+
+  .ResetAllBuildings:
+  ld    hl,.ResetBuildings
+  ld    bc,8
   ldir
   ret
+
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
+.ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
 
 .SetAmountOfPlayers:
   ld    a,2
   ld    (amountofplayers),a
+
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "2"
+  ret   z
+  
   ld    a,(player3human?)               ;0=CPU, 1=Human, 2=OFF
   cp    2
   ret   z
   ld    a,3
   ld    (amountofplayers),a
+
+  ld    ix,(WorldPointer)
+  ld    a,(ix+ScenarioNameAddress)
+  cp    "3"
+  ret   z  
+
   ld    a,(player4human?)               ;0=CPU, 1=Human, 2=OFF
   cp    2
   ret   z
@@ -739,30 +838,30 @@ SetTextStartingTownButtons:
   .SetTownNameInHl:
   ld    d,0
   ld    e,a
-  ld    hl,TownNameLenght
+  ld    hl,InfoTownLenght
   call  MultiplyHlWithDE                ;Out: HL = result
-  ld    de,TextTownRandom
+  ld    de,InfoTownRandom
   add   hl,de  
   ret
 
-TownNameLenght: equ TextTown1-TextTownRandom
-TextTownRandom:   db "Random      ",255 ;0=random, 1=DS4, 2=CastleVania
-TextTown1:        db "Drasle Lair ",255
-TextTown2:        db "CastleVania ",255
-TextTown3:        db "Outer Heaven",255
-TextTown4:        db "Town 04     ",255
-TextTown5:        db "Town 05     ",255
-TextTown6:        db "Town 06     ",255
-TextTown7:        db "Town 07     ",255
-TextTown8:        db "Town 08     ",255
-TextTown9:        db "Town 09     ",255
-TextTown10:       db "Town 10     ",255
-TextTown11:       db "Town 11     ",255
-TextTown12:       db "Town 12     ",255
-TextTown13:       db "Town 13     ",255
-TextTown14:       db "Town 14     ",255
-TextTown15:       db "Town 15     ",255
-  
+InfoTownLenght: equ InfoTown1-InfoTownRandom
+InfoTownRandom:   db "Random      ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown1:        db "Drasle Lair ",255,DragonSlayerUnitLevel1Number,    DragonSlayerUnitLevel2Number,    DragonSlayerUnitLevel3Number,    DragonSlayerUnitLevel4Number,    DragonSlayerUnitLevel5Number,    DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,   DragonSlayerUnitLevel2Growth,    DragonSlayerUnitLevel3Growth,    DragonSlayerUnitLevel4Growth,    DragonSlayerUnitLevel5Growth,    DragonSlayerUnitLevel6Growth
+InfoTown2:        db "Castlevania ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown3:        db "Outer Heaven",255,SDSnatcherUnitLevel1Number,    SDSnatcherUnitLevel2Number,    SDSnatcherUnitLevel3Number,    SDSnatcherUnitLevel4Number,    SDSnatcherUnitLevel5Number,    SDSnatcherUnitLevel6Number   | dw   SDSnatcherUnitLevel1Growth,   SDSnatcherUnitLevel2Growth,    SDSnatcherUnitLevel3Growth,    SDSnatcherUnitLevel4Growth,    SDSnatcherUnitLevel5Growth,    SDSnatcherUnitLevel6Growth
+InfoTown4:        db "Town 04     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown5:        db "Town 05     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown6:        db "Town 06     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown7:        db "Town 07     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown8:        db "Town 08     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown9:        db "Town 09     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown10:       db "Town 10     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown11:       db "Town 11     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown12:       db "Town 12     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown13:       db "Town 13     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown14:       db "Town 14     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown15:       db "Town 15     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+
 SetTextHumanOrCPUButtons:
   ld    c,106                           ;dy
   ld    hl,player1human?
