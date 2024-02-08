@@ -270,6 +270,20 @@ ConvertMonstersObjectLayer:
 CastleTileNr: equ 254
 Number1Tile:  equ 192
 FindAndSetCastles:                      ;castles on the map have to be assigned to their players, and coordinates have to be set
+  ld    a,255
+  ld    (Castle1+CastlePlayer),a        ;reset who owns which castle
+  ld    (Castle2+CastlePlayer),a
+  ld    (Castle3+CastlePlayer),a
+  ld    (Castle4+CastlePlayer),a
+  ld    (Castle1+CastleY),a        ;reset who owns which castle
+  ld    (Castle2+CastleY),a
+  ld    (Castle3+CastleY),a
+  ld    (Castle4+CastleY),a
+  ld    (Castle1+CastleX),a        ;reset who owns which castle
+  ld    (Castle2+CastleX),a
+  ld    (Castle3+CastleX),a
+  ld    (Castle4+CastleX),a
+
  ; ld    a,(slot.page1rom)             ;all RAM except page 1
  ; out   ($a8),a      
 
@@ -327,29 +341,22 @@ FindAndSetCastles:                      ;castles on the map have to be assigned 
 
 PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
   ld    ix,Castle1
-  call  .PlaceHero
+  ld    iy,pl1hero1y
+  call  .SetHeroInCastle
+
   ld    ix,Castle2
-  call  .PlaceHero
+  ld    iy,pl2hero1y
+  call  .SetHeroInCastle
+
   ld    ix,Castle3
-  call  .PlaceHero
+  ld    iy,pl3hero1y
+  call  .SetHeroInCastle
+
   ld    ix,Castle4
-  call  .PlaceHero
+  ld    iy,pl4hero1y
+  call  .SetHeroInCastle
   ret
 
-  .PlaceHero:
-  ld    a,(ix+CastlePlayer)
-  ld    iy,pl1hero1y
-  cp    1
-  jr    z,.SetHeroInCastle
-  ld    iy,pl2hero1y
-  cp    2
-  jr    z,.SetHeroInCastle
-  ld    iy,pl3hero1y
-  cp    3
-  jr    z,.SetHeroInCastle
-  ld    iy,pl4hero1y
-  cp    4
-  jr    z,.SetHeroInCastle
   .SetHeroInCastle:
   ld    a,(ix+CastleY)
   dec   a

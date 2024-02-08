@@ -64,11 +64,184 @@ HandleTitleScreenCode:
   call  .SetAmountOfPlayers
   call  .SetStartingTown
   call  .SetStartingResources
+  call  .SetStartingHeroes
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
   ret
+
+.SetStartingHeroes:
+  ld    ix,pl1hero1y
+  ld    iy,Castle1
+  ld    a,(player1StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
+  call  .SetStartingHeroForThisPlayer
+  ld    ix,pl2hero1y
+  ld    iy,Castle2
+  ld    a,(player2StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
+  call  .SetStartingHeroForThisPlayer
+  ld    ix,pl3hero1y
+  ld    iy,Castle3
+  ld    a,(player3StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
+  call  .SetStartingHeroForThisPlayer
+  ld    ix,pl4hero1y
+  ld    iy,Castle4
+  ld    a,(player4StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
+  call  .SetStartingHeroForThisPlayer
+  ret
+
+  .SetStartingHeroForThisPlayer:
+  push  ix
+  ld    b,a
+  add   a,a
+  add   a,b                             ;starting town * 3
+  ld    d,0
+  ld    e,a
+  ld    ix,.ListOfHeroAddressesAndAmounts-3
+  add   ix,de
+
+  ;we divide a random number by the amount of heroes of this MSX game
+  ld    e,(ix+2)                        ;Amount of available heroes of this MSX game
+  ld    d,0                             ;Amount of heroes in de
+  ld    a,r
+  ld    b,0
+  ld    c,a                             ;random number in bc
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ;we add the rest of this random number to the first hero of this MSX game
+  ld    e,(ix)
+  ld    d,(ix+1)                        ;first hero of the MSX game in the ListOfUnlockedHeroes  
+  add   hl,de
+  ;and the result will be a random hero from this MSX game
+  ld    b,(hl)                          ;random hero of this MSX game
+
+;  ld    b,8                             ;hero number (maia / intelligence)
+;  ld    b,7                             ;hero number (snake / logistics)
+
+  pop   ix
+  call  .SetHero
+  ret
+
+  .ListOfHeroAddressesAndAmounts:
+  dw  DragonSlayer4Heroes | db DragonSlayer4HeroesAmount
+  dw  CastlevaniaHeroes | db CastlevaniaHeroesAmount
+  dw  SDSnatcherHeroes | db SDSnatcherHeroesAmount
+
+  .SetHero:
+  push  bc                              ;hero number
+  call  .ClearHeroSlot
+  call  .SetYX                          ;place hero in the castle
+  pop   bc                              ;hero number
+  call  .SetHeroSpecificInfo
+  call  .SetManaAndMovementToMax         ;in: ix->hero
+  ret
+
+  .SetManaAndMovementToMax:
+  call  SetHeroMaxMovementPoints.IxAlreadySet
+	ld		(ix+HeroMove),a		        ;reset total movement
+
+  ld    de,ItemIntelligencePointsTable
+  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet
+  push  ix
+  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+  pop   ix
+  call  SetTotalManaHero.SetAdditionalStatFromInventoryItemsInHLDone
+  ld    l,(ix+HeroTotalMana+0)
+  ld    h,(ix+HeroTotalMana+1)
+  ld    (ix+HeroMana+0),l
+  ld    (ix+HeroMana+1),h
+  ret
+
+  .SetHeroSpecificInfo:                 ;in: b=hero number
+  ;set hero specific info
+  ld    hl,HeroAddressesAdol-heroAddressesLenght
+  ld    de,heroAddressesLenght          ;search hero specific info address
+  .loop3:
+  add   hl,de
+  djnz  .loop3
+  ld    (ix+HeroSpecificInfo+0),l
+  ld    (ix+HeroSpecificInfo+1),h
+
+  ;set hero skill
+  ld    de,HeroInfoSkill
+  add   hl,de
+  ld    a,(hl)
+  ld    (ix+HeroSkills),a
+
+  ;set hero primairy skills
+  inc   hl                              ;hero number
+  ld    a,(hl)
+  dec   a
+  ld    b,0
+  ld    c,a
+  ld    de,11
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ;there are 11 hero classes, we divide hero number by 11, the rest is then our class
+  add   hl,hl                           ;*2
+  add   hl,hl                           ;*4
+  ld    de,.HeroSkillPerClassTable
+  add   hl,de
+  ld    a,(hl)
+  ld    (ix+HeroStatAttack),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatDefense),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatKnowledge),a
+  inc   hl
+  ld    a,(hl)
+  ld    (ix+HeroStatSpellDamage),a
+
+  ;give the hero "unitgrowthLevel1" amount of level 1 units, which is the same as the level 1 units in this castle. Then the same for level 2 units
+  ld    a,(iy+CastleLevel1Units)          ;level 1 units in this castle
+  ld    (ix+HeroUnits),a
+  ld    l,(iy+CastleLevel1UnitsAvail)     ;level 1 units growth
+  ld    h,(iy+CastleLevel1UnitsAvail+1)
+  ld    (ix+HeroUnits+1),l
+  ld    (ix+HeroUnits+2),h
+
+  ld    a,(iy+CastleLevel2Units)          ;level 2 units in this castle
+  ld    (ix+HeroUnits+3),a
+  ld    l,(iy+CastleLevel2UnitsAvail)     ;level 2 units growth
+  ld    h,(iy+CastleLevel2UnitsAvail+1)
+  ld    (ix+HeroUnits+4),l
+  ld    (ix+HeroUnits+5),h
+  ret
+
+  .HeroSkillPerClassTable:
+;       A D I S
+  db    2,1,1,1                         ;knight (Archery)
+  db    3,1,1,0                         ;barbarian (Offence)
+  db    1,3,1,0                         ;shieldbearer(Armourer)
+  db    1,2,1,1                         ;overlord (Resistance)
+  
+  db    1,2,1,1                         ;alchemist (Estates)
+  db    1,1,2,1                         ;sage (Learning)
+  db    2,1,1,1                         ;ranger (Logistics)
+  
+  db    0,0,3,2                         ;wizzard (Intelligence)
+  db    1,0,1,3                         ;battle mage (Sorcery)
+  db    0,1,2,2                         ;scholar (Wisdom)
+  db    1,1,2,1                         ;necromancer (Necromancy)
+
+  .ClearHeroSlot:
+  ld    hl,EmptyHeroRecruitedAtTavern
+  push  ix
+  pop   de
+  ld    bc,lenghtherotable-2            ;don't copy .HeroDYDX:  dw $ffff 
+  ldir
+  ret
+
+  .SetYX:
+  ld    a,(iy+CastleY)                  ;castle y
+  dec   a
+  ld    (ix+HeroY),a                    ;set hero y  
+  ld    a,(iy+Castlex)                  ;castle x
+  inc   a
+  inc   a
+  ld    (ix+HeroX),a                    ;set hero x
+  ret
+
 
 .SetStartingResources:
   ld    a,(Difficulty)
@@ -118,26 +291,31 @@ HandleTitleScreenCode:
   .ResourcesExpert:     dw  10000, 10,10,04,04
   .ResourcesImpossible: dw  00000, 00,00,00,00
 
+
 .SetStartingTown:
-  ld    a,(player1StartingTown)
+  ld    hl,player1StartingTown
+  call  .ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle1+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 1 and all creatures units belonging to that faction
 
-  ld    a,(player2StartingTown)
+  ld    hl,player2StartingTown
+  call  .ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle2+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
 
-  ld    a,(player3StartingTown)
+  ld    hl,player3StartingTown
+  call  .ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle3+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
 
-  ld    a,(player4StartingTown)
+  ld    hl,player4StartingTown
+  call  .ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle4+CastleName
   ld    bc,InfoTownLenght
@@ -153,6 +331,13 @@ HandleTitleScreenCode:
   call  .ResetAllBuildings
   ret
 
+  .ChangeTownInCaseRandomIsSelected:
+  ld    a,(hl)
+  or    a
+  ret   nz
+  ld    a,1
+  ld    (hl),a
+  ret
   .ResetAllBuildings:
   ld    hl,.ResetBuildings
   ld    bc,8
@@ -846,9 +1031,9 @@ SetTextStartingTownButtons:
 
 InfoTownLenght: equ InfoTown1-InfoTownRandom
 InfoTownRandom:   db "Random      ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown1:        db "Drasle Lair ",255,DragonSlayerUnitLevel1Number,    DragonSlayerUnitLevel2Number,    DragonSlayerUnitLevel3Number,    DragonSlayerUnitLevel4Number,    DragonSlayerUnitLevel5Number,    DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,   DragonSlayerUnitLevel2Growth,    DragonSlayerUnitLevel3Growth,    DragonSlayerUnitLevel4Growth,    DragonSlayerUnitLevel5Growth,    DragonSlayerUnitLevel6Growth
+InfoTown1:        db "Drasle's Den",255,DragonSlayerUnitLevel1Number,    DragonSlayerUnitLevel2Number,    DragonSlayerUnitLevel3Number,    DragonSlayerUnitLevel4Number,    DragonSlayerUnitLevel5Number,    DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,   DragonSlayerUnitLevel2Growth,    DragonSlayerUnitLevel3Growth,    DragonSlayerUnitLevel4Growth,    DragonSlayerUnitLevel5Growth,    DragonSlayerUnitLevel6Growth
 InfoTown2:        db "Castlevania ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown3:        db "Outer Heaven",255,SDSnatcherUnitLevel1Number,    SDSnatcherUnitLevel2Number,    SDSnatcherUnitLevel3Number,    SDSnatcherUnitLevel4Number,    SDSnatcherUnitLevel5Number,    SDSnatcherUnitLevel6Number   | dw   SDSnatcherUnitLevel1Growth,   SDSnatcherUnitLevel2Growth,    SDSnatcherUnitLevel3Growth,    SDSnatcherUnitLevel4Growth,    SDSnatcherUnitLevel5Growth,    SDSnatcherUnitLevel6Growth
+InfoTown3:        db "Junker HQ   ",255,SDSnatcherUnitLevel1Number,    SDSnatcherUnitLevel2Number,    SDSnatcherUnitLevel3Number,    SDSnatcherUnitLevel4Number,    SDSnatcherUnitLevel5Number,    SDSnatcherUnitLevel6Number   | dw   SDSnatcherUnitLevel1Growth,   SDSnatcherUnitLevel2Growth,    SDSnatcherUnitLevel3Growth,    SDSnatcherUnitLevel4Growth,    SDSnatcherUnitLevel5Growth,    SDSnatcherUnitLevel6Growth
 InfoTown4:        db "Town 04     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
 InfoTown5:        db "Town 05     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
 InfoTown6:        db "Town 06     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth

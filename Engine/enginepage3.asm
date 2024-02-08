@@ -3477,7 +3477,39 @@ outix8:
 
 
 
+ListOfUnlockedHeroes:
 
+DragonSlayer4HeroesAmount:  equ CastlevaniaHeroes-DragonSlayer4Heroes
+DragonSlayer4Heroes:
+;dragon slayer 4
+db  04  ;Royas Worzen
+db  06  ;Lyll Worzen
+db  08  ;Maia Worzen
+db  10  ;Xemn Worzen
+db  26  ;Pochi Worzen
+db  39  ;Geera Worzen
+db  41  ;Dawel Worzen
+
+CastlevaniaHeroesAmount:  equ SDSnatcherHeroes-CastlevaniaHeroes
+CastlevaniaHeroes:
+;Castlevania
+db  28  ;Trevor Belmont
+db  30  ;Simon Belmont
+db  32  ;Richter Belmont
+
+SDSnatcherHeroesAmount:  equ EndListHeroes-SDSnatcherHeroes
+SDSnatcherHeroes:
+;SD Snatcher
+db  21  ;Jan Jack Gibson
+db  22  ;Gillian Seed
+db  23  ;Snatcher
+db  57  ;Random Hajile
+db  58  ;Benson Cunningham
+db  59  ;Jamie Seed
+db  60  ;Armored Snatcher
+
+EndListHeroes:
+db  00  ;end of list
 
 
 
@@ -3533,7 +3565,7 @@ HeroAddressesPochi:           db "Pochi Worzen",255,"     ","Overlord    ",255,P
 HeroAddressesGreyFox:         db "Grey Fox",255,"         ","Alchemist   ",255,GreyFoxSpriteBlock| dw HeroSYSXGreyFox,HeroPortrait10x18SYSXGreyFox,HeroButton20x11SYSXGreyFox,HeroPortrait16x30SYSXGreyFox                                    | db 13 | db 027 |
 HeroAddressesTrevorBelmont:   db "Trevor Belmont",255,"   ","Sage        ",255,TrevorBelmontSpriteBlock| dw HeroSYSXTrevorBelmont,HeroPortrait10x18SYSXTrevorBelmont,HeroButton20x11SYSXTrevorBelmont,HeroPortrait16x30SYSXTrevorBelmont      | db 16 | db 028 |
 HeroAddressesBigBoss:         db "Big Boss",255,"         ","Ranger      ",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
-HeroAddressesSimonBelmont:    db "simon Belmont",255,"    ","Wizzard     ",255,SimonBelmontSpriteBlock | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont          | db 22 | db 030 |
+HeroAddressesSimonBelmont:    db "Simon Belmont",255,"    ","Wizzard     ",255,SimonBelmontSpriteBlock | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont          | db 22 | db 030 |
 HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,   "Battle Mage ",255,DrPettrovichSpriteBlock | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich          | db 25 | db 031 |
 HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Scholar     ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 | db 032 |
 
