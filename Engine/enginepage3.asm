@@ -3497,7 +3497,7 @@ db  28  ;Trevor Belmont
 db  30  ;Simon Belmont
 db  32  ;Richter Belmont
 
-SDSnatcherHeroesAmount:  equ EndListHeroes-SDSnatcherHeroes
+SDSnatcherHeroesAmount:  equ UsasHeroes-SDSnatcherHeroes
 SDSnatcherHeroes:
 ;SD Snatcher
 db  21  ;Jan Jack Gibson
@@ -3507,6 +3507,66 @@ db  57  ;Random Hajile
 db  58  ;Benson Cunningham
 db  59  ;Jamie Seed
 db  60  ;Armored Snatcher
+
+UsasHeroesAmount:  equ GoemonHeroes-UsasHeroes
+UsasHeroes:
+;Usas
+db  19  ;Wit
+db  47  ;Cles
+
+GoemonHeroesAmount:  equ Ys3Heroes-GoemonHeroes
+GoemonHeroes:
+;Goemon
+db  02  ;Goemon
+db  15  ;Ebisumaru
+
+Ys3HeroesAmount:  equ PsychoWorldHeroes-Ys3Heroes
+Ys3Heroes:
+;Ys3
+db  01  ;Adol
+
+PsychoWorldHeroesAmount:  equ KingKongHeroes-PsychoWorldHeroes
+PsychoWorldHeroes:
+;PsychoWorld
+db  13  ;Lucia
+
+KingKongHeroesAmount:  equ ContraGroupAHeroes-KingKongHeroes
+KingKongHeroes:
+;KingKong
+db  20  ;Mitchell
+
+ContraGroupAHeroesAmount:  equ ContraGroupBHeroes-ContraGroupAHeroes
+ContraGroupAHeroes:
+;ContraGroupA
+db  25  ;Bill Rizer
+
+;####################### random hero ##########################
+YieArKungFuHeroesAmount:   equ GolvelliusHeroes-YieArKungFuHeroes
+YieArKungFuHeroes:
+BubbleBobbleGroupAHeroesAmount:   equ GolvelliusHeroes-BubbleBobbleGroupAHeroes
+BubbleBobbleGroupAHeroes:
+BubbleBobbleGroupBHeroesAmount:   equ GolvelliusHeroes-BubbleBobbleGroupBHeroes
+BubbleBobbleGroupBHeroes:
+AkanbeDragonGroupAHeroesAmount:   equ GolvelliusHeroes-AkanbeDragonGroupAHeroes
+AkanbeDragonGroupAHeroes:
+AkanbeDragonGroupBHeroesAmount:   equ GolvelliusHeroes-AkanbeDragonGroupBHeroes
+AkanbeDragonGroupBHeroes:
+ContraGroupBHeroesAmount:         equ GolvelliusHeroes-ContraGroupBHeroes
+ContraGroupBHeroes:
+;YieArKungFu
+;BubbleBobbleGroupA
+;BubbleBobbleGroupB
+;AkanbeDragonGroupA
+;AkanbeDragonGroupB
+;ContraGroupB
+db  61  ;random hero
+;####################### random hero ##########################
+
+GolvelliusHeroesAmount:  equ EndListHeroes-GolvelliusHeroes
+GolvelliusHeroes:
+;Golvellius
+db  24  ;Kelesis
+db  43  ;Kelesis The Cook
 
 EndListHeroes:
 db  00  ;end of list

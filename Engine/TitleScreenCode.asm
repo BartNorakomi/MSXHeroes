@@ -65,11 +65,119 @@ HandleTitleScreenCode:
   call  .SetStartingTown
   call  .SetStartingResources
   call  .SetStartingHeroes
+  call  .SetTavernHeroes
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
   ret
+
+.SetTavernHeroes:
+  call  .SetMaxAmountOfTavernSlots      ;out: b=max amount of tavern slots
+  ld    hl,ListOfUnlockedHeroes         ;set first starting hero in the list in hl
+  ld    a,r
+  call  .IncreaseLoop                   ;jump to next random entry in the list (we increase with the amount set in a)
+  ;ld b,5
+  ld    iy,TavernHeroesPlayer1
+
+  .FillSlotsLoop:
+  push  iy
+  call  .SetTavernHeroesSlot
+  pop   iy
+  inc   iy
+  djnz  .FillSlotsLoop
+  ret
+
+  .SetTavernHeroesSlot:
+  call  .SetTavernHeroLoop
+  ld    de,TavernHeroTableLenght+1
+  add   iy,de
+  call  .SetTavernHeroLoop
+
+  ld    a,(amountofplayers)
+  cp    2
+  ret   z
+
+  ld    de,TavernHeroTableLenght+1
+  add   iy,de
+  call  .SetTavernHeroLoop
+
+  ld    a,(amountofplayers)
+  cp    3
+  ret   z
+
+  ld    de,TavernHeroTableLenght+1
+  add   iy,de
+  call  .SetTavernHeroLoop
+  ret
+
+  .SetMaxAmountOfTavernSlots:
+  ;take the amount of unlocked heroes
+  call  .CheckAmountOfUnlockedHeroes    ;out: c=amount of unlocked heroes
+  ;reduce this by the amount of players for this map (since they all get 1 random starting hero).
+  ld    a,(amountofplayers)
+  ld    b,a
+  ld    a,c
+  sub   a,b
+  ld    b,0
+  ld    c,a                             ;bc=amount of unlocked heroes - amount of players
+  ;then divide the remaining heroes by the amount of players.
+  ld    a,(amountofplayers)
+  ld    d,0
+  ld    e,a                             ;de=amount of player
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ;we can only put a maximum of 7 heroes in each tavern
+  ld    a,c
+  cp    8
+  jr    c,.EndCheckOverFlow
+  ld    a,7
+  .EndCheckOverFlow:
+  ld    b,a                             ;amount of slots per tavern that we will fill with heroes
+  ret
+
+  .CheckAmountOfUnlockedHeroes:         ;out: c=amount of unlocked heroes
+  ld    hl,ListOfUnlockedHeroes
+  ld    c,0                             ;amounf of unlocked heroes
+  .CheckAmountOfUnlockedHeroesLoop:
+  ld    a,(hl)
+  or    a
+  ret   z
+  inc   c
+  inc   hl
+  jr    .CheckAmountOfUnlockedHeroesLoop
+
+  .StartOfList:
+  ld    hl,ListOfUnlockedHeroes
+
+  .SetTavernHeroLoop:  
+  ld    a,(hl)
+  or    a
+  jr    z,.StartOfList
+  bit   7,(hl)
+  jr    z,.TavernHeroFound
+  call  .IncreaseListWithRandomAmount   ;search next hero in list
+  jr    .SetTavernHeroLoop
+  .TavernHeroFound:
+  ld    a,(hl)
+  set   7,(hl)                          ;bit 7=this hero is now in use (and cannot be put in taverns anymore)
+  ld    (iy),a                          ;player's tavern hero
+  .IncreaseListWithRandomAmount:        ;search next hero in list
+  ld    a,r
+  and   15 ;7
+
+  .IncreaseLoop:                        ;jump to next 'random' entry in the list (we increase with the amount set in a)
+  push  af
+  inc   hl
+  ld    a,(hl)
+  or    a                               ;check end of list
+  jr    nz,.EndCheckEndOfList
+  ld    hl,ListOfUnlockedHeroes
+  .EndCheckEndOfList:
+  pop   af
+  dec   a
+  jr    nz,.IncreaseLoop
+  ret
+
 
 .SetStartingHeroes:
   ld    ix,pl1hero1y
@@ -80,10 +188,20 @@ HandleTitleScreenCode:
   ld    iy,Castle2
   ld    a,(player2StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
   call  .SetStartingHeroForThisPlayer
+
+  ld    a,(amountofplayers)
+  cp    2
+  ret   z
+
   ld    ix,pl3hero1y
   ld    iy,Castle3
   ld    a,(player3StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
   call  .SetStartingHeroForThisPlayer
+
+  ld    a,(amountofplayers)
+  cp    3
+  ret   z
+
   ld    ix,pl4hero1y
   ld    iy,Castle4
   ld    a,(player4StartingTown)         ;1=dragon slayer 4, 2=castlevania, 3=sd snatcher
@@ -97,7 +215,7 @@ HandleTitleScreenCode:
   add   a,b                             ;starting town * 3
   ld    d,0
   ld    e,a
-  ld    ix,.ListOfHeroAddressesAndAmounts-3
+  ld    ix,ListOfHeroAddressesAndAmounts-3
   add   ix,de
 
   ;we divide a random number by the amount of heroes of this MSX game
@@ -113,6 +231,7 @@ HandleTitleScreenCode:
   add   hl,de
   ;and the result will be a random hero from this MSX game
   ld    b,(hl)                          ;random hero of this MSX game
+  set   7,(hl)                          ;bit 7=this hero is now in use (and cannot be put in taverns anymore)
 
 ;  ld    b,8                             ;hero number (maia / intelligence)
 ;  ld    b,7                             ;hero number (snake / logistics)
@@ -120,11 +239,6 @@ HandleTitleScreenCode:
   pop   ix
   call  .SetHero
   ret
-
-  .ListOfHeroAddressesAndAmounts:
-  dw  DragonSlayer4Heroes | db DragonSlayer4HeroesAmount
-  dw  CastlevaniaHeroes | db CastlevaniaHeroesAmount
-  dw  SDSnatcherHeroes | db SDSnatcherHeroesAmount
 
   .SetHero:
   push  bc                              ;hero number
@@ -345,7 +459,7 @@ HandleTitleScreenCode:
   ret
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
-.ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
+.ResetBuildings: db                        1,       1,        0,              0,             6,           0,          0,           0
 
 .SetAmountOfPlayers:
   ld    a,2
@@ -485,7 +599,7 @@ HandleTitleScreenCode:
   ld    a,(hl)
   inc   a
   ld    (hl),a
-  cp    16
+  cp    TotalAmountOfTowns+1
   ret   nz
   ld    (hl),0
   ret
@@ -1034,18 +1148,38 @@ InfoTownRandom:   db "Random      ",255,CastleVaniaUnitLevel1Number,    CastleVa
 InfoTown1:        db "Drasle's Den",255,DragonSlayerUnitLevel1Number,    DragonSlayerUnitLevel2Number,    DragonSlayerUnitLevel3Number,    DragonSlayerUnitLevel4Number,    DragonSlayerUnitLevel5Number,    DragonSlayerUnitLevel6Number   | dw   DragonSlayerUnitLevel1Growth,   DragonSlayerUnitLevel2Growth,    DragonSlayerUnitLevel3Growth,    DragonSlayerUnitLevel4Growth,    DragonSlayerUnitLevel5Growth,    DragonSlayerUnitLevel6Growth
 InfoTown2:        db "Castlevania ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
 InfoTown3:        db "Junker HQ   ",255,SDSnatcherUnitLevel1Number,    SDSnatcherUnitLevel2Number,    SDSnatcherUnitLevel3Number,    SDSnatcherUnitLevel4Number,    SDSnatcherUnitLevel5Number,    SDSnatcherUnitLevel6Number   | dw   SDSnatcherUnitLevel1Growth,   SDSnatcherUnitLevel2Growth,    SDSnatcherUnitLevel3Growth,    SDSnatcherUnitLevel4Growth,    SDSnatcherUnitLevel5Growth,    SDSnatcherUnitLevel6Growth
-InfoTown4:        db "Town 04     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown5:        db "Town 05     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown6:        db "Town 06     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown7:        db "Town 07     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown8:        db "Town 08     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown9:        db "Town 09     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown10:       db "Town 10     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown11:       db "Town 11     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown12:       db "Town 12     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown13:       db "Town 13     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown14:       db "Town 14     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
-InfoTown15:       db "Town 15     ",255,CastleVaniaUnitLevel1Number,    CastleVaniaUnitLevel2Number,    CastleVaniaUnitLevel3Number,    CastleVaniaUnitLevel4Number,    CastleVaniaUnitLevel5Number,    CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,   CastleVaniaUnitLevel2Growth,    CastleVaniaUnitLevel3Growth,    CastleVaniaUnitLevel4Growth,    CastleVaniaUnitLevel5Growth,    CastleVaniaUnitLevel6Growth
+InfoTown4:        db "Usas        ",255,UsasUnitLevel1Number,    UsasUnitLevel2Number,    UsasUnitLevel3Number,    UsasUnitLevel4Number,    UsasUnitLevel5Number,    UsasUnitLevel6Number   | dw   UsasUnitLevel1Growth,   UsasUnitLevel2Growth,    UsasUnitLevel3Growth,    UsasUnitLevel4Growth,    UsasUnitLevel5Growth,    UsasUnitLevel6Growth
+InfoTown5:        db "Goemon      ",255,GoemonUnitLevel1Number,    GoemonUnitLevel2Number,    GoemonUnitLevel3Number,    GoemonUnitLevel4Number,    GoemonUnitLevel5Number,    GoemonUnitLevel6Number   | dw   GoemonUnitLevel1Growth,   GoemonUnitLevel2Growth,    GoemonUnitLevel3Growth,    GoemonUnitLevel4Growth,    GoemonUnitLevel5Growth,    GoemonUnitLevel6Growth
+InfoTown6:        db "Ys3         ",255,Ys3UnitLevel1Number,    Ys3UnitLevel2Number,    Ys3UnitLevel3Number,    Ys3UnitLevel4Number,    Ys3UnitLevel5Number,    Ys3UnitLevel6Number   | dw   Ys3UnitLevel1Growth,   Ys3UnitLevel2Growth,    Ys3UnitLevel3Growth,    Ys3UnitLevel4Growth,    Ys3UnitLevel5Growth,    Ys3UnitLevel6Growth
+InfoTown7:        db "Psycho World",255,PsychoWorldUnitLevel1Number,    PsychoWorldUnitLevel2Number,    PsychoWorldUnitLevel3Number,    PsychoWorldUnitLevel4Number,    PsychoWorldUnitLevel5Number,    PsychoWorldUnitLevel6Number   | dw   PsychoWorldUnitLevel1Growth,   PsychoWorldUnitLevel2Growth,    PsychoWorldUnitLevel3Growth,    PsychoWorldUnitLevel4Growth,    PsychoWorldUnitLevel5Growth,    PsychoWorldUnitLevel6Growth
+InfoTown8:        db "King Kong   ",255,KingKongUnitLevel1Number,    KingKongUnitLevel2Number,    KingKongUnitLevel3Number,    KingKongUnitLevel4Number,    KingKongUnitLevel5Number,    KingKongUnitLevel6Number   | dw   KingKongUnitLevel1Growth,   KingKongUnitLevel2Growth,    KingKongUnitLevel3Growth,    KingKongUnitLevel4Growth,    KingKongUnitLevel5Growth,    KingKongUnitLevel6Growth
+InfoTown9:        db "Contra Den 1",255,ContraGroupAUnitLevel1Number,    ContraGroupAUnitLevel2Number,    ContraGroupAUnitLevel3Number,    ContraGroupAUnitLevel4Number,    ContraGroupAUnitLevel5Number,    ContraGroupAUnitLevel6Number   | dw   ContraGroupAUnitLevel1Growth,   ContraGroupAUnitLevel2Growth,    ContraGroupAUnitLevel3Growth,    ContraGroupAUnitLevel4Growth,    ContraGroupAUnitLevel5Growth,    ContraGroupAUnitLevel6Growth
+InfoTown10:       db "Contra Den 2",255,ContraGroupBUnitLevel1Number,    ContraGroupBUnitLevel2Number,    ContraGroupBUnitLevel3Number,    ContraGroupBUnitLevel4Number,    ContraGroupBUnitLevel5Number,    ContraGroupBUnitLevel6Number   | dw   ContraGroupBUnitLevel1Growth,   ContraGroupBUnitLevel2Growth,    ContraGroupBUnitLevel3Growth,    ContraGroupBUnitLevel4Growth,    ContraGroupBUnitLevel5Growth,    ContraGroupBUnitLevel6Growth
+InfoTown11:       db "Golvellius  ",255,GolvelliusUnitLevel1Number,    GolvelliusUnitLevel2Number,    GolvelliusUnitLevel3Number,    GolvelliusUnitLevel4Number,    GolvelliusUnitLevel5Number,    GolvelliusUnitLevel6Number   | dw   GolvelliusUnitLevel1Growth,   GolvelliusUnitLevel2Growth,    GolvelliusUnitLevel3Growth,    GolvelliusUnitLevel4Growth,    GolvelliusUnitLevel5Growth,    GolvelliusUnitLevel6Growth
+InfoTown12:       db "Akanbe Den 1",255,AkanbeDragonGroupAUnitLevel1Number,    AkanbeDragonGroupAUnitLevel2Number,    AkanbeDragonGroupAUnitLevel3Number,    AkanbeDragonGroupAUnitLevel4Number,    AkanbeDragonGroupAUnitLevel5Number,    AkanbeDragonGroupAUnitLevel6Number   | dw   AkanbeDragonGroupAUnitLevel1Growth,   AkanbeDragonGroupAUnitLevel2Growth,    AkanbeDragonGroupAUnitLevel3Growth,    AkanbeDragonGroupAUnitLevel4Growth,    AkanbeDragonGroupAUnitLevel5Growth,    AkanbeDragonGroupAUnitLevel6Growth
+InfoTown13:       db "Akanbe Den 2",255,AkanbeDragonGroupBUnitLevel1Number,    AkanbeDragonGroupBUnitLevel2Number,    AkanbeDragonGroupBUnitLevel3Number,    AkanbeDragonGroupBUnitLevel4Number,    AkanbeDragonGroupBUnitLevel5Number,    AkanbeDragonGroupBUnitLevel6Number   | dw   AkanbeDragonGroupBUnitLevel1Growth,   AkanbeDragonGroupBUnitLevel2Growth,    AkanbeDragonGroupBUnitLevel3Growth,    AkanbeDragonGroupBUnitLevel4Growth,    AkanbeDragonGroupBUnitLevel5Growth,    AkanbeDragonGroupBUnitLevel6Growth
+InfoTown14:       db "YieArKungFu ",255,YieArKungFuUnitLevel1Number,    YieArKungFuUnitLevel2Number,    YieArKungFuUnitLevel3Number,    YieArKungFuUnitLevel4Number,    YieArKungFuUnitLevel5Number,    YieArKungFuUnitLevel6Number   | dw   YieArKungFuUnitLevel1Growth,   YieArKungFuUnitLevel2Growth,    YieArKungFuUnitLevel3Growth,    YieArKungFuUnitLevel4Growth,    YieArKungFuUnitLevel5Growth,    YieArKungFuUnitLevel6Growth
+InfoTown15:       db "Bubble Den 1",255,BubbleBobbleGroupAUnitLevel1Number,    BubbleBobbleGroupAUnitLevel2Number,    BubbleBobbleGroupAUnitLevel3Number,    BubbleBobbleGroupAUnitLevel4Number,    BubbleBobbleGroupAUnitLevel5Number,    BubbleBobbleGroupAUnitLevel6Number   | dw   BubbleBobbleGroupAUnitLevel1Growth,   BubbleBobbleGroupAUnitLevel2Growth,    BubbleBobbleGroupAUnitLevel3Growth,    BubbleBobbleGroupAUnitLevel4Growth,    BubbleBobbleGroupAUnitLevel5Growth,    BubbleBobbleGroupAUnitLevel6Growth
+InfoTown16:       db "Bubble Den 2",255,BubbleBobbleGroupBUnitLevel1Number,    BubbleBobbleGroupBUnitLevel2Number,    BubbleBobbleGroupBUnitLevel3Number,    BubbleBobbleGroupBUnitLevel4Number,    BubbleBobbleGroupBUnitLevel5Number,    BubbleBobbleGroupBUnitLevel6Number   | dw   BubbleBobbleGroupBUnitLevel1Growth,   BubbleBobbleGroupBUnitLevel2Growth,    BubbleBobbleGroupBUnitLevel3Growth,    BubbleBobbleGroupBUnitLevel4Growth,    BubbleBobbleGroupBUnitLevel5Growth,    BubbleBobbleGroupBUnitLevel6Growth
+TotalAmountOfTowns: equ 16
+
+ListOfHeroAddressesAndAmounts:
+  dw  DragonSlayer4Heroes | db DragonSlayer4HeroesAmount
+  dw  CastlevaniaHeroes | db CastlevaniaHeroesAmount
+  dw  SDSnatcherHeroes | db SDSnatcherHeroesAmount
+  dw  UsasHeroes | db UsasHeroesAmount
+  dw  GoemonHeroes | db GoemonHeroesAmount
+  dw  Ys3Heroes | db Ys3HeroesAmount
+  dw  PsychoWorldHeroes | db PsychoWorldHeroesAmount
+  dw  KingKongHeroes | db KingKongHeroesAmount
+  dw  ContraGroupAHeroes | db ContraGroupAHeroesAmount
+  dw  ContraGroupBHeroes | db ContraGroupBHeroesAmount
+  dw  GolvelliusHeroes | db GolvelliusHeroesAmount
+  dw  AkanbeDragonGroupAHeroes | db AkanbeDragonGroupAHeroesAmount
+  dw  AkanbeDragonGroupBHeroes | db AkanbeDragonGroupBHeroesAmount
+  dw  YieArKungFuHeroes | db YieArKungFuHeroesAmount
+  dw  BubbleBobbleGroupAHeroes | db BubbleBobbleGroupAHeroesAmount
+  dw  BubbleBobbleGroupBHeroes | db BubbleBobbleGroupBHeroesAmount
 
 SetTextHumanOrCPUButtons:
   ld    c,106                           ;dy

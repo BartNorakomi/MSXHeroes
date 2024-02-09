@@ -6059,10 +6059,10 @@ TempVariableCastleX:	ds	1
 
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
-db 255 | TavernHeroesPlayer1:        db  006,008,010,039,041,026,000,000,000,000
-db 255 | TavernHeroesPlayer2:        db  011,012,013,014,015,016,000,000,000,000
-db 255 | TavernHeroesPlayer3:        db  011,012,000,000,000,000,000,000,000,000
-db 255 | TavernHeroesPlayer4:        db  016,017,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer1:        db  001,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer2:        db  002,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer3:        db  003,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer4:        db  004,000,000,000,000,000,000,000,000,000
 
 AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
