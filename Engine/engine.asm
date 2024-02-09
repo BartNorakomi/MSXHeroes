@@ -6092,10 +6092,10 @@ ResourcesPlayer4:
 .Gems:    dw  60
 .Rubies:  dw  30
 
-player1StartingTown:			db	0 ;0=random, 1=DS4, 2=CastleVania
-player2StartingTown:			db	1 ;0=random, 1=DS4, 2=CastleVania
-player3StartingTown:			db	7 ;0=random, 1=DS4, 2=CastleVania
-player4StartingTown:			db	2 ;0=random, 1=DS4, 2=CastleVania
+player1StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
 amountofplayers:		db	3
 player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF

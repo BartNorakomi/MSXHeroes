@@ -3468,17 +3468,7 @@ outix8:
 	outi	outi	outi	outi	outi	outi	outi	outi	
 	ret	
 
-
-
-
-
-
-
-
-
-
 ListOfUnlockedHeroes:
-
 DragonSlayer4HeroesAmount:  equ CastlevaniaHeroes-DragonSlayer4Heroes
 DragonSlayer4Heroes:
 ;dragon slayer 4
@@ -3540,18 +3530,100 @@ ContraGroupAHeroes:
 ;ContraGroupA
 db  25  ;Bill Rizer
 
+GolvelliusHeroesAmount:  equ HeroesWithoutCastle-GolvelliusHeroes
+GolvelliusHeroes:
+;Golvellius
+db  24  ;Kelesis
+db  43  ;Kelesis The Cook
+
+HeroesWithoutCastle:
+;xak
+db  03  ;Pixy
+db  05  ;Latok
+db  17  ;Fray
+
+;solid snake
+db  07  ;Snake1
+db  09  ;Snake2
+db  18  ;Black color
+db  27  ;Grey Fox
+db  29  ;Big Boss
+db  31  ;Doctor Pettrovich
+db  33  ;Ultrabox
+db  35  ;Holly White
+db  37  ;Nastasha
+
+;undeadline
+db  12  ;Leon
+db  16  ;Dino
+db  14  ;Ruika
+
+;ashguine
+db  11  ;Ashguine
+
+;dragon slayer 6
+db  34  ;Logan Serios
+
+;whats the name again ?
+db  36  ;Mercies
+db  38  ;Ruth
+
+;whats the name again ?
+db  40  ;Young Noble
+
+;pocky & rocky
+db  42  ;Pocky
+
+;eggerland
+db  44  ;Lolo
+
+;pippols
+db  45  ;Pippols
+
+;randar 3
+db  46  ;Randar
+
+;whats the name again ?
+db  48  ;Luice
+db  49  ;Dick
+
+;maze of gallious
+db  50  ;Aphrodite
+db  52  ;Popolon
+
+;illusion city
+db  51  ;Tien Ren
+db  53  ;Ho Mei
+db  55  ;Mei Hong
+
+;The return of Ishtar
+db  54  ;Priestess Ki
+db  56  ;Prince Gilgamesh
+
+db  61  ;Druid
+
+EndListHeroes:
+db  00  ;end of list
+
+;still to do, WIP:
+;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)
+;2. then player unlocks 1 random hero without castle per remaining 14 campaigns, thats 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
+;3. then last 6 campaigns will unlock castles: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
+;4. then player can unlock remaining heroes without castle in normal game by finding/collecting their cards
+;5. player can also unlock all remaining neutral monsters by finding their cards
+
 ;####################### random hero ##########################
-YieArKungFuHeroesAmount:   equ GolvelliusHeroes-YieArKungFuHeroes
+YieArKungFuHeroesAmount:          equ 1
 YieArKungFuHeroes:
-BubbleBobbleGroupAHeroesAmount:   equ GolvelliusHeroes-BubbleBobbleGroupAHeroes
+BubbleBobbleGroupAHeroesAmount:   equ 1
 BubbleBobbleGroupAHeroes:
-BubbleBobbleGroupBHeroesAmount:   equ GolvelliusHeroes-BubbleBobbleGroupBHeroes
+BubbleBobbleGroupBHeroesAmount:   equ 1
 BubbleBobbleGroupBHeroes:
-AkanbeDragonGroupAHeroesAmount:   equ GolvelliusHeroes-AkanbeDragonGroupAHeroes
+AkanbeDragonGroupAHeroesAmount:   equ 1
 AkanbeDragonGroupAHeroes:
-AkanbeDragonGroupBHeroesAmount:   equ GolvelliusHeroes-AkanbeDragonGroupBHeroes
+AkanbeDragonGroupBHeroesAmount:   equ 1
 AkanbeDragonGroupBHeroes:
-ContraGroupBHeroesAmount:         equ GolvelliusHeroes-ContraGroupBHeroes
+ContraGroupBHeroesAmount:         equ 1
 ContraGroupBHeroes:
 ;YieArKungFu
 ;BubbleBobbleGroupA
@@ -3559,19 +3631,8 @@ ContraGroupBHeroes:
 ;AkanbeDragonGroupA
 ;AkanbeDragonGroupB
 ;ContraGroupB
-db  61  ;random hero
+db  255  ;random hero
 ;####################### random hero ##########################
-
-GolvelliusHeroesAmount:  equ EndListHeroes-GolvelliusHeroes
-GolvelliusHeroes:
-;Golvellius
-db  24  ;Kelesis
-db  43  ;Kelesis The Cook
-
-EndListHeroes:
-db  00  ;end of list
-
-
 
 HeroInfoName:               equ 0
 HeroInfoClass:              equ HeroInfoName+18
@@ -3601,7 +3662,7 @@ HeroAddressesLatok:           db "Latok",255,"            ","Alchemist   ",255,L
 HeroAddressesDrasle2:         db "Lyll Worzen",255,"      ","Sage        ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
 HeroAddressesSnake1:          db "Snake1",255,"           ","Ranger      ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
 HeroAddressesDrasle3:         db "Maia Worzen",255,"      ","Wizzard     ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 | db 008 |
-;dawel geera
+
 HeroAddressesSnake2:          db "Snake2",255,"           ","Battle Mage ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
 HeroAddressesDrasle4:         db "Xemn Worzen",255,"      ","Scholar     ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
 HeroAddressesAshguine:        db "Ashguine",255,"         ","Necromancer ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |

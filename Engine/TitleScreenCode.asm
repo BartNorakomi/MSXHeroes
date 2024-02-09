@@ -230,6 +230,28 @@ HandleTitleScreenCode:
   ld    d,(ix+1)                        ;first hero of the MSX game in the ListOfUnlockedHeroes  
   add   hl,de
   ;and the result will be a random hero from this MSX game
+  bit   7,(hl)                          ;check for 255 = this castle has no hero, so pick a random hero
+  jr    z,.EndCheckPickRandomHero
+  ;search a random hero from the list HeroesWithoutCastle.
+
+  .PickRandomHero:
+  ld    hl,HeroesWithoutCastle
+  ld    a,r
+  and   31                              ;take a hero out of the first 32
+
+;still to do, WIP:
+;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)
+;2. then player unlocks 1 random hero without castle per remaining 14 campaigns, thats 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
+;3. then last 6 campaigns will unlock castles: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
+;4. then player can unlock remaining heroes without castle in normal game by finding/collecting their cards
+;5. player can also unlock all remaining neutral monsters by finding their cards
+
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  bit   7,(hl)                          ;check if this hero is already taken
+  jr    nz,.PickRandomHero
+  .EndCheckPickRandomHero:
   ld    b,(hl)                          ;random hero of this MSX game
   set   7,(hl)                          ;bit 7=this hero is now in use (and cannot be put in taverns anymore)
 
@@ -407,6 +429,32 @@ HandleTitleScreenCode:
 
 
 .SetStartingTown:
+  ;First set all towns
+  ld    hl,player1StartingTown
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle1+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 1 and all creatures units belonging to that faction
+
+  ld    hl,player2StartingTown
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle2+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
+
+  ld    hl,player3StartingTown
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle3+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
+
+  ld    hl,player4StartingTown
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  ld    de,Castle4+CastleName
+  ld    bc,InfoTownLenght
+  ldir                                  ;this sets the name for castle 4 and all creatures units belonging to that faction
+
+  ;Then set towns again, and change a town in case random is selected
   ld    hl,player1StartingTown
   call  .ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
@@ -449,9 +497,40 @@ HandleTitleScreenCode:
   ld    a,(hl)
   or    a
   ret   nz
-  ld    a,1
-  ld    (hl),a
+
+  .SetRandomTown:
+  ;we divide a random number by the amount of unlocked towns
+  ld    a,(TotalAmountOfUnlockedTowns)
+  ld    e,a
+  ld    d,0                             ;Amount of unlocked towns in de
+  ld    a,r
+  ld    b,0
+  ld    c,a                             ;random number in bc
+  push  hl
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ;the rest is now a random number between 0 and TotalAmountOfUnlockedTowns-1
+  ld    a,l
+  inc   a                               ;random town number
+  pop   hl
+  ld    b,a                             ;store random town number in b
+  
+  ld    a,(player1StartingTown)
+  cp    b
+  jr    z,.SetRandomTown
+  ld    a,(player2StartingTown)
+  cp    b
+  jr    z,.SetRandomTown
+  ld    a,(player3StartingTown)
+  cp    b
+  jr    z,.SetRandomTown
+  ld    a,(player4StartingTown)
+  cp    b
+  jr    z,.SetRandomTown
+
+  ld    (hl),b
+  ld    a,b                             ;town number is used in the next routine
   ret
+
   .ResetAllBuildings:
   ld    hl,.ResetBuildings
   ld    bc,8
@@ -599,7 +678,37 @@ HandleTitleScreenCode:
   ld    a,(hl)
   inc   a
   ld    (hl),a
-  cp    TotalAmountOfTowns+1
+  
+  ;check if this town is already taken by another player
+  ld    b,0                       ;amount of times this town is in 'use'
+  ld    a,(player1StartingTown)
+  cp    (hl)
+  jr    nz,.EndCheckInUseByPlayer1
+  inc   b
+  .EndCheckInUseByPlayer1:
+  ld    a,(player2StartingTown)
+  cp    (hl)
+  jr    nz,.EndCheckInUseByPlayer2
+  inc   b
+  .EndCheckInUseByPlayer2:
+  ld    a,(player3StartingTown)
+  cp    (hl)
+  jr    nz,.EndCheckInUseByPlayer3
+  inc   b
+  .EndCheckInUseByPlayer3:
+  ld    a,(player4StartingTown)
+  cp    (hl)
+  jr    nz,.EndCheckInUseByPlayer4
+  inc   b
+  .EndCheckInUseByPlayer4:
+  bit   0,b
+  jr    z,.StartingTownFound    ;set next town if this town is already in 'use' 2x
+  ;/check if this town is already taken by another player  
+
+  ld    a,(TotalAmountOfUnlockedTowns)
+  inc   a
+  cp    (hl)
+
   ret   nz
   ld    (hl),0
   ret
@@ -1153,15 +1262,23 @@ InfoTown5:        db "Goemon      ",255,GoemonUnitLevel1Number,    GoemonUnitLev
 InfoTown6:        db "Ys3         ",255,Ys3UnitLevel1Number,    Ys3UnitLevel2Number,    Ys3UnitLevel3Number,    Ys3UnitLevel4Number,    Ys3UnitLevel5Number,    Ys3UnitLevel6Number   | dw   Ys3UnitLevel1Growth,   Ys3UnitLevel2Growth,    Ys3UnitLevel3Growth,    Ys3UnitLevel4Growth,    Ys3UnitLevel5Growth,    Ys3UnitLevel6Growth
 InfoTown7:        db "Psycho World",255,PsychoWorldUnitLevel1Number,    PsychoWorldUnitLevel2Number,    PsychoWorldUnitLevel3Number,    PsychoWorldUnitLevel4Number,    PsychoWorldUnitLevel5Number,    PsychoWorldUnitLevel6Number   | dw   PsychoWorldUnitLevel1Growth,   PsychoWorldUnitLevel2Growth,    PsychoWorldUnitLevel3Growth,    PsychoWorldUnitLevel4Growth,    PsychoWorldUnitLevel5Growth,    PsychoWorldUnitLevel6Growth
 InfoTown8:        db "King Kong   ",255,KingKongUnitLevel1Number,    KingKongUnitLevel2Number,    KingKongUnitLevel3Number,    KingKongUnitLevel4Number,    KingKongUnitLevel5Number,    KingKongUnitLevel6Number   | dw   KingKongUnitLevel1Growth,   KingKongUnitLevel2Growth,    KingKongUnitLevel3Growth,    KingKongUnitLevel4Growth,    KingKongUnitLevel5Growth,    KingKongUnitLevel6Growth
-InfoTown9:        db "Contra Den 1",255,ContraGroupAUnitLevel1Number,    ContraGroupAUnitLevel2Number,    ContraGroupAUnitLevel3Number,    ContraGroupAUnitLevel4Number,    ContraGroupAUnitLevel5Number,    ContraGroupAUnitLevel6Number   | dw   ContraGroupAUnitLevel1Growth,   ContraGroupAUnitLevel2Growth,    ContraGroupAUnitLevel3Growth,    ContraGroupAUnitLevel4Growth,    ContraGroupAUnitLevel5Growth,    ContraGroupAUnitLevel6Growth
-InfoTown10:       db "Contra Den 2",255,ContraGroupBUnitLevel1Number,    ContraGroupBUnitLevel2Number,    ContraGroupBUnitLevel3Number,    ContraGroupBUnitLevel4Number,    ContraGroupBUnitLevel5Number,    ContraGroupBUnitLevel6Number   | dw   ContraGroupBUnitLevel1Growth,   ContraGroupBUnitLevel2Growth,    ContraGroupBUnitLevel3Growth,    ContraGroupBUnitLevel4Growth,    ContraGroupBUnitLevel5Growth,    ContraGroupBUnitLevel6Growth
-InfoTown11:       db "Golvellius  ",255,GolvelliusUnitLevel1Number,    GolvelliusUnitLevel2Number,    GolvelliusUnitLevel3Number,    GolvelliusUnitLevel4Number,    GolvelliusUnitLevel5Number,    GolvelliusUnitLevel6Number   | dw   GolvelliusUnitLevel1Growth,   GolvelliusUnitLevel2Growth,    GolvelliusUnitLevel3Growth,    GolvelliusUnitLevel4Growth,    GolvelliusUnitLevel5Growth,    GolvelliusUnitLevel6Growth
+InfoTown9:        db "Golvellius  ",255,GolvelliusUnitLevel1Number,    GolvelliusUnitLevel2Number,    GolvelliusUnitLevel3Number,    GolvelliusUnitLevel4Number,    GolvelliusUnitLevel5Number,    GolvelliusUnitLevel6Number   | dw   GolvelliusUnitLevel1Growth,   GolvelliusUnitLevel2Growth,    GolvelliusUnitLevel3Growth,    GolvelliusUnitLevel4Growth,    GolvelliusUnitLevel5Growth,    GolvelliusUnitLevel6Growth
+InfoTown10:       db "Contra Den 1",255,ContraGroupAUnitLevel1Number,    ContraGroupAUnitLevel2Number,    ContraGroupAUnitLevel3Number,    ContraGroupAUnitLevel4Number,    ContraGroupAUnitLevel5Number,    ContraGroupAUnitLevel6Number   | dw   ContraGroupAUnitLevel1Growth,   ContraGroupAUnitLevel2Growth,    ContraGroupAUnitLevel3Growth,    ContraGroupAUnitLevel4Growth,    ContraGroupAUnitLevel5Growth,    ContraGroupAUnitLevel6Growth
+;castles without heroes
+InfoTown11:       db "Contra Den 2",255,ContraGroupBUnitLevel1Number,    ContraGroupBUnitLevel2Number,    ContraGroupBUnitLevel3Number,    ContraGroupBUnitLevel4Number,    ContraGroupBUnitLevel5Number,    ContraGroupBUnitLevel6Number   | dw   ContraGroupBUnitLevel1Growth,   ContraGroupBUnitLevel2Growth,    ContraGroupBUnitLevel3Growth,    ContraGroupBUnitLevel4Growth,    ContraGroupBUnitLevel5Growth,    ContraGroupBUnitLevel6Growth
 InfoTown12:       db "Akanbe Den 1",255,AkanbeDragonGroupAUnitLevel1Number,    AkanbeDragonGroupAUnitLevel2Number,    AkanbeDragonGroupAUnitLevel3Number,    AkanbeDragonGroupAUnitLevel4Number,    AkanbeDragonGroupAUnitLevel5Number,    AkanbeDragonGroupAUnitLevel6Number   | dw   AkanbeDragonGroupAUnitLevel1Growth,   AkanbeDragonGroupAUnitLevel2Growth,    AkanbeDragonGroupAUnitLevel3Growth,    AkanbeDragonGroupAUnitLevel4Growth,    AkanbeDragonGroupAUnitLevel5Growth,    AkanbeDragonGroupAUnitLevel6Growth
 InfoTown13:       db "Akanbe Den 2",255,AkanbeDragonGroupBUnitLevel1Number,    AkanbeDragonGroupBUnitLevel2Number,    AkanbeDragonGroupBUnitLevel3Number,    AkanbeDragonGroupBUnitLevel4Number,    AkanbeDragonGroupBUnitLevel5Number,    AkanbeDragonGroupBUnitLevel6Number   | dw   AkanbeDragonGroupBUnitLevel1Growth,   AkanbeDragonGroupBUnitLevel2Growth,    AkanbeDragonGroupBUnitLevel3Growth,    AkanbeDragonGroupBUnitLevel4Growth,    AkanbeDragonGroupBUnitLevel5Growth,    AkanbeDragonGroupBUnitLevel6Growth
 InfoTown14:       db "YieArKungFu ",255,YieArKungFuUnitLevel1Number,    YieArKungFuUnitLevel2Number,    YieArKungFuUnitLevel3Number,    YieArKungFuUnitLevel4Number,    YieArKungFuUnitLevel5Number,    YieArKungFuUnitLevel6Number   | dw   YieArKungFuUnitLevel1Growth,   YieArKungFuUnitLevel2Growth,    YieArKungFuUnitLevel3Growth,    YieArKungFuUnitLevel4Growth,    YieArKungFuUnitLevel5Growth,    YieArKungFuUnitLevel6Growth
 InfoTown15:       db "Bubble Den 1",255,BubbleBobbleGroupAUnitLevel1Number,    BubbleBobbleGroupAUnitLevel2Number,    BubbleBobbleGroupAUnitLevel3Number,    BubbleBobbleGroupAUnitLevel4Number,    BubbleBobbleGroupAUnitLevel5Number,    BubbleBobbleGroupAUnitLevel6Number   | dw   BubbleBobbleGroupAUnitLevel1Growth,   BubbleBobbleGroupAUnitLevel2Growth,    BubbleBobbleGroupAUnitLevel3Growth,    BubbleBobbleGroupAUnitLevel4Growth,    BubbleBobbleGroupAUnitLevel5Growth,    BubbleBobbleGroupAUnitLevel6Growth
 InfoTown16:       db "Bubble Den 2",255,BubbleBobbleGroupBUnitLevel1Number,    BubbleBobbleGroupBUnitLevel2Number,    BubbleBobbleGroupBUnitLevel3Number,    BubbleBobbleGroupBUnitLevel4Number,    BubbleBobbleGroupBUnitLevel5Number,    BubbleBobbleGroupBUnitLevel6Number   | dw   BubbleBobbleGroupBUnitLevel1Growth,   BubbleBobbleGroupBUnitLevel2Growth,    BubbleBobbleGroupBUnitLevel3Growth,    BubbleBobbleGroupBUnitLevel4Growth,    BubbleBobbleGroupBUnitLevel5Growth,    BubbleBobbleGroupBUnitLevel6Growth
-TotalAmountOfTowns: equ 16
+TotalAmountOfUnlockedTowns: db  16
+
+;still to do, WIP:
+;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)
+;2. then player unlocks 1 random hero without castle per remaining 14 campaigns, thats 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
+;3. then last 6 campaigns will unlock castles: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
+;4. then player can unlock remaining heroes without castle in normal game by finding/collecting their cards
+;5. player can also unlock all remaining neutral monsters by finding their cards
 
 ListOfHeroAddressesAndAmounts:
   dw  DragonSlayer4Heroes | db DragonSlayer4HeroesAmount
@@ -1172,9 +1289,10 @@ ListOfHeroAddressesAndAmounts:
   dw  Ys3Heroes | db Ys3HeroesAmount
   dw  PsychoWorldHeroes | db PsychoWorldHeroesAmount
   dw  KingKongHeroes | db KingKongHeroesAmount
-  dw  ContraGroupAHeroes | db ContraGroupAHeroesAmount
-  dw  ContraGroupBHeroes | db ContraGroupBHeroesAmount
   dw  GolvelliusHeroes | db GolvelliusHeroesAmount
+  dw  ContraGroupAHeroes | db ContraGroupAHeroesAmount
+;castles without heroes
+  dw  ContraGroupBHeroes | db ContraGroupBHeroesAmount
   dw  AkanbeDragonGroupAHeroes | db AkanbeDragonGroupAHeroesAmount
   dw  AkanbeDragonGroupBHeroes | db AkanbeDragonGroupBHeroesAmount
   dw  YieArKungFuHeroes | db YieArKungFuHeroesAmount
