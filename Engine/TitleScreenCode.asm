@@ -8,8 +8,28 @@ HandleTitleScreenCode:
 	ld		(ScenarioSelected),a
   ld    a,2
 	ld		(Difficulty),a                  ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
-
-
+  ld    a,255
+  ld    (player1StartingTown),a
+  ld    (player2StartingTown),a
+  ld    (player3StartingTown),a
+  ld    (player4StartingTown),a
+  ;reset tavern table
+  ld    hl,TavernHeroesReset
+  ld    de,TavernHeroesTable
+  ld    bc,EndTavernHeroesReset-TavernHeroesReset
+  ldir
+	;free all unlocked heroes (that were used in previous game)
+	ld    hl,ListOfUnlockedHeroes-1
+  .FreeNextHero:
+  inc   hl
+	ld    a,(hl)
+	or    a
+	jr    z,.EndFreeAllUnlockedHeroes
+  cp    255
+  jr    z,.FreeNextHero
+  res   7,(hl)
+  jr    .FreeNextHero
+	.EndFreeAllUnlockedHeroes:
 	
   call  SetScenarioSelectGraphics
   xor   a
@@ -178,7 +198,6 @@ HandleTitleScreenCode:
   jr    nz,.IncreaseLoop
   ret
 
-
 .SetStartingHeroes:
   ld    ix,pl1hero1y
   ld    iy,Castle1
@@ -234,7 +253,7 @@ HandleTitleScreenCode:
   jr    z,.EndCheckPickRandomHero
   ;search a random hero from the list HeroesWithoutCastle.
 
-  .PickRandomHero:
+  .PickRandomHeroWithoutCastle:
   ld    hl,HeroesWithoutCastle
   ld    a,r
   and   31                              ;take a hero out of the first 32
@@ -250,7 +269,7 @@ HandleTitleScreenCode:
   ld    e,a
   add   hl,de
   bit   7,(hl)                          ;check if this hero is already taken
-  jr    nz,.PickRandomHero
+  jr    nz,.PickRandomHeroWithoutCastle
   .EndCheckPickRandomHero:
   ld    b,(hl)                          ;random hero of this MSX game
   set   7,(hl)                          ;bit 7=this hero is now in use (and cannot be put in taverns anymore)
@@ -470,14 +489,18 @@ HandleTitleScreenCode:
   ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
 
   ld    hl,player3StartingTown
-  call  .ChangeTownInCaseRandomIsSelected
+  ld    a,(amountofplayers)
+  cp    3
+  call  nc,.ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle3+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
 
   ld    hl,player4StartingTown
-  call  .ChangeTownInCaseRandomIsSelected
+  ld    a,(amountofplayers)
+  cp    4
+  call  nc,.ChangeTownInCaseRandomIsSelected
   call  SetTextStartingTownButtons.SetTownNameInHl
   ld    de,Castle4+CastleName
   ld    bc,InfoTownLenght
@@ -1193,6 +1216,13 @@ HandleTitleScreenCode:
   ld    (MenuOptionSelected?),a
   ret
 
+TavernHeroesReset:
+db 255 | .TavernHeroesPlayer1:        db  001,000,000,000,000,000,000,000,000,000
+db 255 | .TavernHeroesPlayer2:        db  002,000,000,000,000,000,000,000,000,000
+db 255 | .TavernHeroesPlayer3:        db  003,000,000,000,000,000,000,000,000,000
+db 255 | .TavernHeroesPlayer4:        db  004,000,000,000,000,000,000,000,000,000
+EndTavernHeroesReset:
+
 SetTextStartingTownButtons:
   ld    a,(player1human?)
   cp    2                               ;0=CPU, 1=Human, 2=OFF
@@ -1271,7 +1301,7 @@ InfoTown13:       db "Akanbe Den 2",255,AkanbeDragonGroupBUnitLevel1Number,    A
 InfoTown14:       db "YieArKungFu ",255,YieArKungFuUnitLevel1Number,    YieArKungFuUnitLevel2Number,    YieArKungFuUnitLevel3Number,    YieArKungFuUnitLevel4Number,    YieArKungFuUnitLevel5Number,    YieArKungFuUnitLevel6Number   | dw   YieArKungFuUnitLevel1Growth,   YieArKungFuUnitLevel2Growth,    YieArKungFuUnitLevel3Growth,    YieArKungFuUnitLevel4Growth,    YieArKungFuUnitLevel5Growth,    YieArKungFuUnitLevel6Growth
 InfoTown15:       db "Bubble Den 1",255,BubbleBobbleGroupAUnitLevel1Number,    BubbleBobbleGroupAUnitLevel2Number,    BubbleBobbleGroupAUnitLevel3Number,    BubbleBobbleGroupAUnitLevel4Number,    BubbleBobbleGroupAUnitLevel5Number,    BubbleBobbleGroupAUnitLevel6Number   | dw   BubbleBobbleGroupAUnitLevel1Growth,   BubbleBobbleGroupAUnitLevel2Growth,    BubbleBobbleGroupAUnitLevel3Growth,    BubbleBobbleGroupAUnitLevel4Growth,    BubbleBobbleGroupAUnitLevel5Growth,    BubbleBobbleGroupAUnitLevel6Growth
 InfoTown16:       db "Bubble Den 2",255,BubbleBobbleGroupBUnitLevel1Number,    BubbleBobbleGroupBUnitLevel2Number,    BubbleBobbleGroupBUnitLevel3Number,    BubbleBobbleGroupBUnitLevel4Number,    BubbleBobbleGroupBUnitLevel5Number,    BubbleBobbleGroupBUnitLevel6Number   | dw   BubbleBobbleGroupBUnitLevel1Growth,   BubbleBobbleGroupBUnitLevel2Growth,    BubbleBobbleGroupBUnitLevel3Growth,    BubbleBobbleGroupBUnitLevel4Growth,    BubbleBobbleGroupBUnitLevel5Growth,    BubbleBobbleGroupBUnitLevel6Growth
-TotalAmountOfUnlockedTowns: db  16
+;TotalAmountOfUnlockedTowns: db  16
 
 ;still to do, WIP:
 ;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)

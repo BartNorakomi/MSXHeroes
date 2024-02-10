@@ -23,19 +23,15 @@ als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft
 castle:
 
 title screen:
-ListOfUnlockedHeroes bit 7 moet gewist worden aan het begin
 rightclick difficulty 
 rightclick castle
 
 ;still to do, WIP:
-;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)
-;2. then player unlocks 1 random hero without castle per remaining 14 campaigns, thats 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
-;3. then last 6 campaigns will unlock castles: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
-;4. then player can unlock remaining heroes without castle in normal game by finding/collecting their cards
-;5. player can also unlock all remaining neutral monsters by finding their cards
-
-
-
+;campaign 1-9: unlocks ALL heroes (and their castles) that HAVE a castle (1st campain unlocks 2 castles)
+;campaign 10-24: each unlocks 1 random hero without castle. 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
+;campaign 25-30: each unlocks 1 castle: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
+;then (from map 10 and upwards) player can unlock remaining heroes without castle in normal game by finding/collecting their cards
+;neutral monsters should be unlocked gradually after each campaign
 
 general:
 muziek

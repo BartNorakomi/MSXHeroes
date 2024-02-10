@@ -6057,6 +6057,7 @@ WhichCastleIsPointerPointingAt?:  ds  2
 TempVariableCastleY:	ds	1
 TempVariableCastleX:	ds	1
 
+TavernHeroesTable:
 TavernHero1:  equ 0 | TavernHero2:  equ 1 | TavernHero3:  equ 2
 TavernHeroTableLenght:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
 db 255 | TavernHeroesPlayer1:        db  001,000,000,000,000,000,000,000,000,000

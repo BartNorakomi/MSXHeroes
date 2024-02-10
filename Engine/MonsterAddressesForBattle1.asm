@@ -728,7 +728,8 @@ Monster030Table:                        ;Piglet (piggy red nose) (Dragon Slayer 
   db    DragonSlayerUnitLevel1Defense         ;defense
   db    DragonSlayerUnitLevel1Growth          ;growth
   db    000                             ;special ability
-  db    "Piglet",255,"     "
+  db    "Dawg",255,"       "
+;  db    "Piglet",255,"     "
 
 Monster031Table:                        ;Gers (white grey flat head) (Dragon Slayer IV)
   dw    Monster031Idle
