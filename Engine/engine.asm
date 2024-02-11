@@ -6093,6 +6093,13 @@ ResourcesPlayer4:
 .Gems:    dw  60
 .Rubies:  dw  30
 
+StartingTownLevel1Unit: ds  1
+StartingTownLevel2Unit: ds  1
+StartingTownLevel3Unit: ds  1
+StartingTownLevel4Unit: ds  1
+StartingTownLevel5Unit: ds  1
+StartingTownLevel6Unit: ds  1
+
 player1StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania

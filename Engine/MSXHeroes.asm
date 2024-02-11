@@ -1800,12 +1800,12 @@ phase	$8000
 dephase
 
 ;
-; block $c2
+; block $c2 - $c3
 ;
 ScenarioSelectButtonsBlock:  equ   $c2
 phase	$4000
-  incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,55 * 128      ;55 lines
-	ds		$8000-$,$ff
+  incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,172 * 128      ;172 lines
+	ds		$c000-$,$ff
 dephase
 
 

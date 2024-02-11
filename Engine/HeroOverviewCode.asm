@@ -995,6 +995,38 @@ SetArmyIconsAndAmount:
   ld    bc,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
 
+DisplayTownAllignmentAssociatedCreatures:
+  ld    a,(StartingTownLevel1Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit1TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+
+  ld    a,(StartingTownLevel2Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit2TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+
+  ld    a,(StartingTownLevel3Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit3TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+
+  ld    a,(StartingTownLevel4Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit4TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+
+  ld    a,(StartingTownLevel5Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit5TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+
+  ld    a,(StartingTownLevel6Unit)
+  call  SetArmyIconsAndAmount.SetSYSX
+  ld    de,DYDXUnit6TownAllignment    ;(dy*128 + dx/2) = (204,153)
+  call  CopyTransparantImageHeroOverviewCode  ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY   
+  ret
+
 NXAndNY14x24CharaterPortraits:      equ 024*256 + (014/2)            ;(ny*256 + nx/2) = (14x14)
 DYDXUnit1WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+32)
 DYDXUnit2WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+52)
@@ -1002,6 +1034,14 @@ DYDXUnit3WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (Her
 DYDXUnit4WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+92)
 DYDXUnit5WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+112)
 DYDXUnit6WindowInHud14x24:          equ 256*(HeroOverViewArmyWindowDY+30) + (HeroOverViewArmyWindowDX+132)
+
+DYDXUnit1TownAllignment:          equ 256*(056) + (051)
+DYDXUnit2TownAllignment:          equ 256*(056) + (103)
+DYDXUnit3TownAllignment:          equ 256*(056) + (155)
+DYDXUnit4TownAllignment:          equ 256*(100) + (051)
+DYDXUnit5TownAllignment:          equ 256*(100) + (103)
+DYDXUnit6TownAllignment:          equ 256*(100) + (155)
+
 
                         ;(sy*128 + sx/2)-128        (sy*128 + sx/2)-128
 UnitSYSXTable14x24Portraits:  

@@ -3470,7 +3470,7 @@ MonsterLevel4Pointer: dw  ListOfUnlockedMonstersLevel4
 MonsterLevel5Pointer: dw  ListOfUnlockedMonstersLevel5
 MonsterLevel6Pointer: dw  ListOfUnlockedMonstersLevel6
 
-TotalAmountOfUnlockedTowns: db  4 ; 16
+TotalAmountOfUnlockedTowns: db  16 ;4 ; 16
 
 ListOfUnlockedHeroes:
 DragonSlayer4HeroesAmount:  equ CastlevaniaHeroes-DragonSlayer4Heroes

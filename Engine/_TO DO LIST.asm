@@ -23,8 +23,7 @@ als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft
 castle:
 
 title screen:
-rightclick difficulty 
-rightclick castle
+
 
 ;still to do, WIP:
 ;campaign 1-9: unlocks ALL heroes (and their castles) that HAVE a castle (1st campain unlocks 2 castles)
@@ -43,7 +42,6 @@ titel scherm:
 plaatje: MSX Legends
 
 - Single Scenario (locked)
-- MultiPlayer (locked)
 - Campaign
 - Load Game
 - Game Options

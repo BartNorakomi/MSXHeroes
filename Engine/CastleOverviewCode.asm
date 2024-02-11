@@ -249,8 +249,43 @@ ShowRecruitWindowForSelectedUnit:       ;in b=which level unit is selected ?
 
 
 
+DisplayMonsterNames:
+  ld    a,(StartingTownLevel1Unit)
+  ld    b,058+(0*48)                    ;dx
+  ld    c,086                           ;dy
+  call  .SetMonsterName
+  ld    a,(StartingTownLevel2Unit)
+  ld    b,062+(1*48)                    ;dx
+  ld    c,086                           ;dy
+  call  .SetMonsterName
+  ld    a,(StartingTownLevel3Unit)
+  ld    b,066+(2*48)                    ;dx
+  ld    c,086                           ;dy
+  call  .SetMonsterName
 
+  ld    a,(StartingTownLevel4Unit)
+  ld    b,058+(0*48)                    ;dx
+  ld    c,130                           ;dy
+  call  .SetMonsterName
+  ld    a,(StartingTownLevel5Unit)
+  ld    b,062+(1*48)                    ;dx
+  ld    c,130                           ;dy
+  call  .SetMonsterName
+  ld    a,(StartingTownLevel6Unit)
+  ld    b,066+(2*48)                    ;dx
+  ld    c,130                           ;dy
+;  call  .SetMonsterName
+;  ret
 
+  .SetMonsterName:
+  call  SetMonsterTableInIXCastleOverview ;in: a=creature nr. pushes and pops bc
+  push  ix
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+
+  call  CenterHeroNameHasGainedALevel
+  jp    SetText
 
 
 

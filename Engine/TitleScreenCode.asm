@@ -59,9 +59,9 @@ HandleTitleScreenCode:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  jr    nz,.EndTitleScreenEngine
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  jr    nz,.EndTitleScreenEngine
 
   ;scenario select buttons
   ld    ix,GenericButtonTable
@@ -76,6 +76,8 @@ HandleTitleScreenCode:
   call  SetTextPage123Buttons
   call  SetTextHumanOrCPUButtons
   call  SetTextStartingTownButtons
+  call  CheckRightClickDifficulty
+  call  CheckRightClickTownAllignment
 
   jp    .engine
 
@@ -1222,6 +1224,222 @@ db 255 | .TavernHeroesPlayer2:        db  002,000,000,000,000,000,000,000,000,00
 db 255 | .TavernHeroesPlayer3:        db  003,000,000,000,000,000,000,000,000,000
 db 255 | .TavernHeroesPlayer4:        db  004,000,000,000,000,000,000,000,000,000
 EndTavernHeroesReset:
+                                  ;sx,sx+nx ,   sy ,sy+ny
+CoordinatesEasyButton:        db  157,157+17,   159,159+20, "  Difficulty: Easy"    ,254,254,"Players start with:",254,"   30.000 Gold",254,"   30 Wood",254,"   30 Ore",254,"   15 Gems",254,"   15 Rubies",255
+CoordinatesNormalButton:      db  174,174+17,   159,159+20, " Difficulty: Normal"   ,254,254,"Players start with:",254,"   20.000 Gold",254,"   20 Wood",254,"   20 Ore",254,"   10 Gems",254,"   10 Rubies",255
+CoordinatesHardButton:        db  191,191+17,   159,159+20, "  Difficulty: Hard"    ,254,254,"Players start with:",254,"   15.000 Gold",254,"   15 Wood",254,"   15 Ore",254,"   7 Gems",254,"   7 Rubies",255
+CoordinatesExpertButton:      db  208,208+17,   159,159+20, " Difficulty: Expert"   ,254,254,"Players start with:",254,"   10.000 Gold",254,"   10 Wood",254,"   10 Ore",254,"   4 Gems",254,"   4 Rubies",255
+CoordinatesImpossibleButton:  db  225,225+17,   159,159+20, "Difficulty: Impossible",254,254,"Players start with:",254,"   0 Gold",254,"   0 Wood",254,"   0 Ore",254,"   0 Gems",254,"   0 Rubies",255
+
+CoordinatesCastle1Button:     db  186,186+56,   102,102+12
+CoordinatesCastle2Button:     db  186,186+56,   114,114+12
+CoordinatesCastle3Button:     db  186,186+56,   126,126+12
+CoordinatesCastle4Button:     db  186,186+56,   138,138+12
+
+CheckRightClickTownAllignment:
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  ret   z
+
+  ld    ix,CoordinatesCastle1Button
+  ld    hl,player1StartingTown
+  ld    de,player1human?                ;0=CPU, 1=Human, 2=OFF
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetTownAllignmentWindow
+
+  ld    ix,CoordinatesCastle2Button
+  ld    hl,player2StartingTown
+  ld    de,player2human?                ;0=CPU, 1=Human, 2=OFF
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetTownAllignmentWindow
+
+  ld    ix,CoordinatesCastle3Button
+  ld    hl,player3StartingTown
+  ld    de,player3human?                ;0=CPU, 1=Human, 2=OFF
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetTownAllignmentWindow
+
+  ld    ix,CoordinatesCastle4Button
+  ld    hl,player4StartingTown
+  ld    de,player4human?                ;0=CPU, 1=Human, 2=OFF
+  call  CheckMouseOverRegion
+  bit   0,b
+  ret   z
+
+  .SetTownAllignmentWindow:             ;display town allignment window
+  ld    a,(hl)
+  or    a
+  ret   z
+
+  ld    a,(de)                          ;0=CPU, 1=Human, 2=OFF
+  cp    2
+  ret   z
+  
+  push  hl                              ;starting town
+
+  ld    hl,$4000 + (055*128) + (092/2) - 128
+  ld    de,$0000 + (026*128) + (028/2) - 128
+  ld    bc,$0000 + (117*256) + (164/2)
+  ld    a,ScenarioSelectButtonsBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,.TextTownAllignment
+  ld    b,051                           ;dx
+  ld    c,032                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    hl,.TextAssociatedCreatures
+  ld    b,071                           ;dx
+  ld    c,043                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  pop   hl                              ;starting town
+  ld    a,(hl)
+  call  SetTextStartingTownButtons.SetTownNameInHl
+  push  hl
+  pop   iy                              ;starting town
+  ld    b,118                           ;dx
+  ld    c,032                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(iy+13)                       ;starting town's level 1 unit
+  ld    (StartingTownLevel1Unit),a
+  ld    a,(iy+14)                       ;starting town's level 2 unit
+  ld    (StartingTownLevel2Unit),a
+  ld    a,(iy+15)                       ;starting town's level 3 unit
+  ld    (StartingTownLevel3Unit),a
+  ld    a,(iy+16)                       ;starting town's level 4 unit
+  ld    (StartingTownLevel4Unit),a
+  ld    a,(iy+17)                       ;starting town's level 5 unit
+  ld    (StartingTownLevel5Unit),a
+  ld    a,(iy+18)                       ;starting town's level 6 unit
+  ld    (StartingTownLevel6Unit),a
+
+  ld    hl,DisplayTownAllignmentAssociatedCreatures
+  call  EnterSpecificRoutineHeroOverviewCode
+
+  ld    hl,DisplayMonsterNames
+  call  EnterSpecificRoutineInCastleOverviewCode
+
+  ld    a,4
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+
+  jp    WaitKeyPressToGoBackToGame2
+
+
+
+
+
+
+.TextTownAllignment:  db  "Town Allignment:",255
+.TextAssociatedCreatures:  db  "Associated Creatures:",255
+
+CheckRightClickDifficulty:
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed 
+  ret   z
+
+  ld    ix,CoordinatesEasyButton
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetDifficultyWindow
+  ld    ix,CoordinatesNormalButton
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetDifficultyWindow
+  ld    ix,CoordinatesHardButton
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetDifficultyWindow
+  ld    ix,CoordinatesExpertButton
+  call  CheckMouseOverRegion
+  bit   0,b
+  jp    nz,.SetDifficultyWindow
+  ld    ix,CoordinatesImpossibleButton
+  call  CheckMouseOverRegion
+  bit   0,b
+  ret   z
+
+  .SetDifficultyWindow:                 ;display difficulty window
+  ld    hl,$4000 + (055*128) + (000/2) - 128
+  ld    de,$0000 + (083*128) + (120/2) - 128
+  ld    bc,$0000 + (068*256) + (092/2)
+  ld    a,ScenarioSelectButtonsBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    de,4
+  add   ix,de
+  push  ix
+  pop   hl
+  ld    b,129                           ;dx
+  ld    c,089                           ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+
+  jp    WaitKeyPressToGoBackToGame2
+  
+CheckMouseOverRegion:
+  res   0,b
+
+	ld		a,(spat+1)			                ;x cursor
+
+  add   a,06
+
+  cp    (ix)
+  ret   c
+  cp    (ix+1)
+  ret   nc
+
+	ld		a,(spat+0)			                ;y cursor
+  cp    (ix+2)
+  ret   c
+  cp    (ix+3)
+  ret   nc
+
+  set   0,b
+  ret
+
+WaitKeyPressToGoBackToGame2:
+  call  SwapAndSetPage                  ;swap and set page 1
+  .loop:
+  call  PopulateControls                ;read out keys
+  
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed
+  jr    nz,.End
+  ld    a,(NewPrContr)
+  bit   4,a                             ;check ontrols to see if space is pressed
+  jr    z,.loop
+
+  .End:
+  xor   a
+  ld    (NewPrContr),a
+
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    hl,.RestorePage0
+  jp    z,docopy
+  ld    hl,.RestorePage1
+  jp    docopy
+
+.RestorePage0:
+	db		000,000,000,001
+	db		000,000,000,000
+	db		000,001,191,000
+	db		000,000,$d0	
+.RestorePage1:
+	db		000,000,000,000
+	db		000,000,000,001
+	db		000,001,191,000
+	db		000,000,$d0	
+
 
 SetTextStartingTownButtons:
   ld    a,(player1human?)
