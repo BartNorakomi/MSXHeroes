@@ -1,4 +1,244 @@
 HandleTitleScreenCode:
+  jp    CampaignSelectCode
+  jp    ScenarioSelectCode
+
+CampaignSelectCode:
+  ld    a,4
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  ld    a,1
+	ld		(activepage),a
+;	ld    a,1
+	ld		(ScenarioPage),a
+	ld		(ScenarioSelected),a
+  ld    a,2
+	ld		(Difficulty),a                  ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
+  ld    a,255
+  ld    (player1StartingTown),a
+  ld    (player2StartingTown),a
+  ld    (player3StartingTown),a
+  ld    (player4StartingTown),a
+  ;reset tavern table
+  ld    hl,TavernHeroesReset
+  ld    de,TavernHeroesTable
+  ld    bc,EndTavernHeroesReset-TavernHeroesReset
+  ldir
+	;free all unlocked heroes (that were used in previous game)
+	ld    hl,ListOfUnlockedHeroes-1
+  .FreeNextHero:
+  inc   hl
+	ld    a,(hl)
+	or    a
+	jr    z,.EndFreeAllUnlockedHeroes
+  cp    255
+  jr    z,.FreeNextHero
+  res   7,(hl)
+  jr    .FreeNextHero
+	.EndFreeAllUnlockedHeroes:
+	
+  call  SetCampaignSelectGraphics
+  xor   a
+	ld		(activepage),a			
+  call  SetCampaignSelectGraphics
+  ld    hl,InGamePalette
+  call  SetPalette
+  call  SetSpatInCastle
+  call  SetInterruptHandler             ;set Vblank
+  call  SetCampaignSelectButtons
+  call  SetFontPage0Y212                ;set font at (0,212) page 0
+
+  call  SetAmountOfCampaignButtons
+  call  SetAmountOfScenarioPageButtons
+  call  SetPage1ButtonConstantlyLit
+  ld    b,28
+;  call  .ScenarioPressed
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ;scenario select buttons
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
+  call  CheckCampaignSelectButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+  ;/scenario select buttons
+
+  call  SetNamesInCampaignButtons
+  call  SetTextPage123Buttons
+  jp    .engine
+
+CheckCampaignSelectButtonClicked:
+  ret   nc
+
+  ld    a,b
+  cp    6
+  jp    nc,.ScenarioPressed
+  cp    3
+  jp    nc,.Page123Pressed
+  cp    1
+;  jp    nc,.BeginBackPressed
+
+
+
+
+
+
+
+
+
+  .ScenarioPressed:
+  ld    a,(ScenarioPage)
+  ld    (LitScenarioButtonInWhichPage?),a
+  ld    a,15
+  sub   b
+	ld		(ScenarioSelected),a
+
+  .LightCurrentActiveScenarioButton:
+  ;first unlit all scenario buttons
+  ld    a,(AmountOfMapsVisibleInCurrentPage)
+  cp    11
+  jr    c,.EndCheckMaxMapsInCurrentPageCheck
+  ld    a,10
+  .EndCheckMaxMapsInCurrentPageCheck:
+
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  push  hl
+  pop   bc
+
+  ld    hl,CampaignSelectButtonTable
+  ld    de,GenericButtonTable
+;  ld    bc,GenericButtonTableLenghtPerButton*10
+  ldir
+
+  ;now constantly light active scenario button
+	ld		a,(ScenarioSelected)
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GenericButtonTable+1
+  add   hl,de
+  ex    de,hl
+  ld    hl,.ScenarioButtonConstantlyLit
+  ld    bc,4
+  ldir
+
+  ;set worldpointer
+  ld    a,(ScenarioPage)
+  dec   a
+  ld    b,0
+  jr    z,.PageFound
+  dec   a
+  ld    b,10
+  jr    z,.PageFound
+  ld    b,20
+  .PageFound:
+	ld		a,(ScenarioSelected)
+  add   a,b                             ;a=scenario selected (0 - 29)
+  ld    d,0
+  ld    e,a
+  ld    hl,LenghtMapData
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GentleAutumnMap01
+  add   hl,de
+  ld    (WorldPointer),hl
+  
+  ;set selected scenario name righttop of screen
+  call  .SetSelectedCampaignNameRightTopOfScreen
+;  call  .SetSelectedCampaignNameRightTopOfScreen
+;  ret
+
+  .SetSelectedCampaignNameRightTopOfScreen:
+  call  ClearCampaignNameRightTopOfScreen
+  ld    b,152                           ;dx
+  ld    c,021                           ;dy
+
+  ld    hl,(WorldPointer)
+  ld    de,ScenarioNameAddress+4
+  add   hl,de
+
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  jp    SwapAndSetPage                  ;swap and set page
+
+  .ScenarioButtonConstantlyLit:
+  dw    $4000 + (011*128) + (000/2) - 128, $4000 + (011*128) + (000/2) - 128
+  .ScenarioButtonNormallyLit:
+  dw    $4000 + (000*128) + (000/2) - 128, $4000 + (000*128) + (096/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .Page123Pressed:
+  ld    b,3
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*12+1
+  jr    z,.ScenarioPageFound
+  cp    4
+  ld    b,2
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*11+1
+  jr    z,.ScenarioPageFound
+  ld    b,1
+  ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*10+1
+  .ScenarioPageFound:
+	ld		a,(ScenarioPage)
+	cp    b
+	ret   z
+  ld    a,b
+	ld		(ScenarioPage),a
+
+  push  de
+  call  SetAmountOfScenarioPageButtons
+  pop   de
+  ld    hl,.PageButtonConstantlyLit
+  ld    bc,4
+  ldir
+
+  ;first unlit all scenario buttons
+  ld    hl,CampaignSelectButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*10)
+  ldir
+
+  ld    a,(ScenarioPage)
+  ld    b,a
+  ld    a,(LitScenarioButtonInWhichPage?)
+  cp    b
+  jp    nz,SetAmountOfCampaignButtons
+  call  .LightCurrentActiveScenarioButton
+  jp    SetAmountOfCampaignButtons
+
+  .PageButtonConstantlyLit:
+  dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
+
+
+
+
+
+
+
+
+
+
+ScenarioSelectCode:
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
@@ -652,6 +892,8 @@ HandleTitleScreenCode:
   jp    .SortHumanCPUOFFPlayersAndTown
 
 
+
+
 .CheckScenarioSelectButtonClicked:      ;in: carry=button clicked, b=button number
   ret   nc
 
@@ -869,7 +1111,6 @@ HandleTitleScreenCode:
   ld    a,b
 	ld		(ScenarioPage),a
 
-  .Here:
   push  de
   call  SetAmountOfScenarioPageButtons
   pop   de
@@ -1680,10 +1921,55 @@ SetNamesInScenarioButtons:
   jr    nz,.loop
   ret
 
+SetNamesInCampaignButtons:
+  ld    b,020                           ;dx
+  ld    c,046                           ;dy
+
+  ld    hl,GentleAutumnMap01+ScenarioNameAddress+4
+  ld    de,LenghtMapData*10
+
+  ld    a,(ScenarioPage)
+  dec   a
+  jr    z,.PageFound
+  add   hl,de
+  dec   a
+  jr    z,.PageFound
+  add   hl,de
+  .PageFound:
+
+  ld    a,(AmountOfMapsVisibleInCurrentPage)
+  cp    11
+  jr    c,.loop
+  ld    a,10
+
+  .loop:
+  push  af
+  push  hl
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  pop   bc
+  pop   hl
+  ld    a,c
+  add   a,13
+  ld    c,a
+  ld    de,LenghtMapData
+  add   hl,de
+  pop   af
+  dec   a
+  jr    nz,.loop
+  ret
+
 SetScenarioSelectButtons:
   ld    hl,ScenarioSelectButtonTable-2
   ld    de,GenericButtonTable-2
   ld    bc,2+(GenericButtonTableLenghtPerButton*28)
+  ldir
+  ret
+
+SetCampaignSelectButtons:
+  ld    hl,CampaignSelectButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*15)
   ldir
   ret
 
@@ -1813,11 +2099,18 @@ SetAmountOfScenarioPageButtons:
   .PageButtonsNormal:
   db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128
 
+SetAmountOfCampaignButtons:
+  call  ClearCampaignButtonGraphics
+  call  SwapAndSetPage                  ;swap and set page
+  call  ClearCampaignButtonGraphics
+  jr    SetAmountOfScenarioButtons.go
+
 SetAmountOfScenarioButtons:
   call  ClearScenarioButtonGraphics
   call  SwapAndSetPage                  ;swap and set page
   call  ClearScenarioButtonGraphics
   
+  .go:
   ld    a,%1100 0011
   ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*0),a
   ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*1),a
@@ -2071,6 +2364,109 @@ ScenarioSelectButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched
   db  %1100 0011 | dw $4000 + (022*128) + (150/2) - 128 | dw $4000 + (022*128) + (168/2) - 128 | dw $4000 + (022*128) + (186/2) - 128 | db ScenarioSelectButton27Ytop,ScenarioSelectButton27YBottom,ScenarioSelectButton27XLeft,ScenarioSelectButton27XRight | dw $0000 + (ScenarioSelectButton27Ytop*128) + (ScenarioSelectButton27XLeft/2) - 128
   db  %1100 0011 | dw $4000 + (022*128) + (204/2) - 128 | dw $4000 + (022*128) + (220/2) - 128 | dw $4000 + (022*128) + (236/2) - 128 | db ScenarioSelectButton28Ytop,ScenarioSelectButton28YBottom,ScenarioSelectButton28XLeft,ScenarioSelectButton28XRight | dw $0000 + (ScenarioSelectButton28Ytop*128) + (ScenarioSelectButton28XLeft/2) - 128
 
+
+
+
+
+  ;10 visible scenarios (per page)
+CampaignSelectButton1Ytop:           equ 043 + (0*13)
+CampaignSelectButton1YBottom:        equ CampaignSelectButton1Ytop + 011
+CampaignSelectButton1XLeft:          equ 018
+CampaignSelectButton1XRight:         equ CampaignSelectButton1XLeft + 096
+
+CampaignSelectButton2Ytop:           equ 043 + (1*13)
+CampaignSelectButton2YBottom:        equ CampaignSelectButton2Ytop + 011
+CampaignSelectButton2XLeft:          equ 018
+CampaignSelectButton2XRight:         equ CampaignSelectButton2XLeft + 096
+
+CampaignSelectButton3Ytop:           equ 043 + (2*13)
+CampaignSelectButton3YBottom:        equ CampaignSelectButton3Ytop + 011
+CampaignSelectButton3XLeft:          equ 018
+CampaignSelectButton3XRight:         equ CampaignSelectButton3XLeft + 096
+
+CampaignSelectButton4Ytop:           equ 043 + (3*13)
+CampaignSelectButton4YBottom:        equ CampaignSelectButton4Ytop + 011
+CampaignSelectButton4XLeft:          equ 018
+CampaignSelectButton4XRight:         equ CampaignSelectButton4XLeft + 096
+
+CampaignSelectButton5Ytop:           equ 043 + (4*13)
+CampaignSelectButton5YBottom:        equ CampaignSelectButton5Ytop + 011
+CampaignSelectButton5XLeft:          equ 018
+CampaignSelectButton5XRight:         equ CampaignSelectButton5XLeft + 096
+
+CampaignSelectButton6Ytop:           equ 043 + (5*13)
+CampaignSelectButton6YBottom:        equ CampaignSelectButton6Ytop + 011
+CampaignSelectButton6XLeft:          equ 018
+CampaignSelectButton6XRight:         equ CampaignSelectButton6XLeft + 096
+
+CampaignSelectButton7Ytop:           equ 043 + (6*13)
+CampaignSelectButton7YBottom:        equ CampaignSelectButton7Ytop + 011
+CampaignSelectButton7XLeft:          equ 018
+CampaignSelectButton7XRight:         equ CampaignSelectButton7XLeft + 096
+
+CampaignSelectButton8Ytop:           equ 043 + (7*13)
+CampaignSelectButton8YBottom:        equ CampaignSelectButton8Ytop + 011
+CampaignSelectButton8XLeft:          equ 018
+CampaignSelectButton8XRight:         equ CampaignSelectButton8XLeft + 096
+
+CampaignSelectButton9Ytop:           equ 043 + (8*13)
+CampaignSelectButton9YBottom:        equ CampaignSelectButton9Ytop + 011
+CampaignSelectButton9XLeft:          equ 018
+CampaignSelectButton9XRight:         equ CampaignSelectButton9XLeft + 096
+
+CampaignSelectButton10Ytop:           equ 043 + (9*13)
+CampaignSelectButton10YBottom:        equ CampaignSelectButton10Ytop + 011
+CampaignSelectButton10XLeft:          equ 018
+CampaignSelectButton10XRight:         equ CampaignSelectButton10XLeft + 096
+  ;page 1,2,3
+CampaignSelectButton11Ytop:           equ 173
+CampaignSelectButton11YBottom:        equ CampaignSelectButton11Ytop + 011
+CampaignSelectButton11XLeft:          equ 032
+CampaignSelectButton11XRight:         equ CampaignSelectButton11XLeft + 032
+
+CampaignSelectButton12Ytop:           equ 173
+CampaignSelectButton12YBottom:        equ CampaignSelectButton12Ytop + 011
+CampaignSelectButton12XLeft:          equ 066
+CampaignSelectButton12XRight:         equ CampaignSelectButton12XLeft + 032
+
+CampaignSelectButton13Ytop:           equ 173
+CampaignSelectButton13YBottom:        equ CampaignSelectButton13Ytop + 011
+CampaignSelectButton13XLeft:          equ 100
+CampaignSelectButton13XRight:         equ CampaignSelectButton13XLeft + 032
+  ;begin / back buttons
+CampaignSelectButton14Ytop:           equ 191
+CampaignSelectButton14YBottom:        equ CampaignSelectButton14Ytop + 015
+CampaignSelectButton14XLeft:          equ 106
+CampaignSelectButton14XRight:         equ CampaignSelectButton14XLeft + 020
+
+CampaignSelectButton15Ytop:           equ 191
+CampaignSelectButton15YBottom:        equ CampaignSelectButton15Ytop + 015
+CampaignSelectButton15XLeft:          equ 132
+CampaignSelectButton15XRight:         equ CampaignSelectButton15XLeft + 018
+
+CampaignSelectButtonTableGfxBlock:  db  ScenarioSelectButtonsBlock
+CampaignSelectButtonTableAmountOfButtons:  db  15
+CampaignSelectButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;10 visible Campaigns (per page)
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton1Ytop,CampaignSelectButton1YBottom,CampaignSelectButton1XLeft,CampaignSelectButton1XRight | dw $0000 + (CampaignSelectButton1Ytop*128) + (CampaignSelectButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton2Ytop,CampaignSelectButton2YBottom,CampaignSelectButton2XLeft,CampaignSelectButton2XRight | dw $0000 + (CampaignSelectButton2Ytop*128) + (CampaignSelectButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton3Ytop,CampaignSelectButton3YBottom,CampaignSelectButton3XLeft,CampaignSelectButton3XRight | dw $0000 + (CampaignSelectButton3Ytop*128) + (CampaignSelectButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton4Ytop,CampaignSelectButton4YBottom,CampaignSelectButton4XLeft,CampaignSelectButton4XRight | dw $0000 + (CampaignSelectButton4Ytop*128) + (CampaignSelectButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton5Ytop,CampaignSelectButton5YBottom,CampaignSelectButton5XLeft,CampaignSelectButton5XRight | dw $0000 + (CampaignSelectButton5Ytop*128) + (CampaignSelectButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton6Ytop,CampaignSelectButton6YBottom,CampaignSelectButton6XLeft,CampaignSelectButton6XRight | dw $0000 + (CampaignSelectButton6Ytop*128) + (CampaignSelectButton6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton7Ytop,CampaignSelectButton7YBottom,CampaignSelectButton7XLeft,CampaignSelectButton7XRight | dw $0000 + (CampaignSelectButton7Ytop*128) + (CampaignSelectButton7XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton8Ytop,CampaignSelectButton8YBottom,CampaignSelectButton8XLeft,CampaignSelectButton8XRight | dw $0000 + (CampaignSelectButton8Ytop*128) + (CampaignSelectButton8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton9Ytop,CampaignSelectButton9YBottom,CampaignSelectButton9XLeft,CampaignSelectButton9XRight | dw $0000 + (CampaignSelectButton9Ytop*128) + (CampaignSelectButton9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db CampaignSelectButton10Ytop,CampaignSelectButton10YBottom,CampaignSelectButton10XLeft,CampaignSelectButton10XRight | dw $0000 + (CampaignSelectButton10Ytop*128) + (CampaignSelectButton10XLeft/2) - 128
+  ;page 1,2,3
+  db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128 | dw $4000 + (011*128) + (160/2) - 128 | db CampaignSelectButton11Ytop,CampaignSelectButton11YBottom,CampaignSelectButton11XLeft,CampaignSelectButton11XRight | dw $0000 + (CampaignSelectButton11Ytop*128) + (CampaignSelectButton11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128 | dw $4000 + (011*128) + (160/2) - 128 | db CampaignSelectButton12Ytop,CampaignSelectButton12YBottom,CampaignSelectButton12XLeft,CampaignSelectButton12XRight | dw $0000 + (CampaignSelectButton12Ytop*128) + (CampaignSelectButton12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128 | dw $4000 + (011*128) + (160/2) - 128 | db CampaignSelectButton13Ytop,CampaignSelectButton13YBottom,CampaignSelectButton13XLeft,CampaignSelectButton13XRight | dw $0000 + (CampaignSelectButton13Ytop*128) + (CampaignSelectButton13XLeft/2) - 128
+  ;begin / back buttons
+  db  %1100 0011 | dw $4000 + (040*128) + (000/2) - 128 | dw $4000 + (040*128) + (020/2) - 128 | dw $4000 + (040*128) + (040/2) - 128 | db CampaignSelectButton14Ytop,CampaignSelectButton14YBottom,CampaignSelectButton14XLeft,CampaignSelectButton14XRight | dw $0000 + (CampaignSelectButton14Ytop*128) + (CampaignSelectButton14XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (078/2) - 128 | dw $4000 + (040*128) + (096/2) - 128 | db CampaignSelectButton15Ytop,CampaignSelectButton15YBottom,CampaignSelectButton15XLeft,CampaignSelectButton15XRight | dw $0000 + (CampaignSelectButton15Ytop*128) + (CampaignSelectButton15XLeft/2) - 128
+
+
 PutPlayer4Buttons:
   ld    hl,$4000 + (139*128) + (158/2) - 128
   ld    de,$0000 + (139*128) + (158/2) - 128
@@ -2102,8 +2498,15 @@ ClearPlayerButtons:
 ClearScenarioNameRightTopOfScreen:
   ld    hl,$4000 + (019*128) + (158/2) - 128
   ld    de,$0000 + (019*128) + (158/2) - 128
-  ld    bc,$0000 + (009*256) + (084/2)
+  ld    bc,$0000 + (009*256) + (088/2)
   ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+ClearCampaignNameRightTopOfScreen:
+  ld    hl,$4000 + (019*128) + (152/2) - 128
+  ld    de,$0000 + (019*128) + (152/2) - 128
+  ld    bc,$0000 + (009*256) + (094/2)
+  ld    a,CampaignSelectBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 ClearDifficultyTextGraphics:
@@ -2120,6 +2523,13 @@ ClearScenarioButtonGraphics:
   ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
+ClearCampaignButtonGraphics:
+  ld    hl,$4000 + (040*128) + (018/2) - 128
+  ld    de,$0000 + (040*128) + (018/2) - 128
+  ld    bc,$0000 + (131*256) + (116/2)
+  ld    a,CampaignSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
 SetScenarioSelectGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
   ld    de,$0000 + (000*128) + (000/2) - 128
@@ -2133,4 +2543,14 @@ SetFontPage0Y212:                       ;set font at (0,212) page 0
   ld    bc,$0000 + (006*256) + (256/2)
   ld    a,CastleOverviewFontBlock         ;font graphics block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetCampaignSelectGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,CampaignSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+
+
 
