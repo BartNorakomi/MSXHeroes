@@ -180,7 +180,8 @@ EndCampaignScreenEngine:
 
 ;Pochi is lost: start with royas, tavern filled with worzen family, except pochi, enemy town empty
 ;Crossroads of Courage: start without hero, tavern filled with worzen family, enemy town's have both 1 hero (snatcher and a belmont) and several units
-
+;From Dunes to Darkness: start without heroes. tavern filled with cles and wit. enemy town has trevor belmont and several units. loss condition: lose both with and cles.
+;An Arctic Alliance: start without heroes. start with 2 castles, goemon and castlevania. tavern filled with heroes of those castles. enemy towns are dragon slayer 4 and junkery hq. loss condition: lose all heroes.
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
@@ -265,7 +266,7 @@ CheckCampaignSelectButtonClicked:
   ld    e,a
   ld    hl,LenghtMapData
   call  MultiplyHlWithDE                ;Out: HL = result
-  ld    de,GentleAutumnMap01
+  ld    de,GentleMaps
   add   hl,de
   ld    (WorldPointer),hl
   
@@ -1305,7 +1306,7 @@ ScenarioSelectCode:
   ld    e,a
   ld    hl,LenghtMapData
   call  MultiplyHlWithDE                ;Out: HL = result
-  ld    de,GentleAutumnMap01
+  ld    de,GentleMaps
   add   hl,de
   ld    (WorldPointer),hl
   
@@ -1988,7 +1989,7 @@ SetNamesInScenarioButtons:
   ld    b,020                           ;dx
   ld    c,046                           ;dy
 
-  ld    hl,GentleAutumnMap01+ScenarioNameAddress
+  ld    hl,GentleMaps+ScenarioNameAddress
   ld    de,LenghtMapData*10
 
   ld    a,(ScenarioPage)
@@ -2036,7 +2037,7 @@ SetNamesInCampaignButtons:
   ld    b,020                           ;dx
   ld    c,046                           ;dy
 
-  ld    hl,GentleAutumnMap01+ScenarioNameAddress+4
+  ld    hl,GentleMaps+ScenarioNameAddress+4
   ld    de,LenghtMapData*10
 
   ld    a,(ScenarioPage)
