@@ -1043,17 +1043,17 @@ SetText:                                ;in: b=dx, c=dy, hl->text
 	xor		1                               ;now we switch and set our page
   ld    (PutLetter+dPage),a             ;set page where to put text
 
-  ld    a,-1
-  ld    (TextPointer),a                 ;increase text pointer
+  ld    de,-1
+  ld    (TextPointer),de                ;increase text pointer
   .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
+  ld    de,(TextPointer)
+  inc   de
+  ld    (TextPointer),de                ;increase text pointer
 
   ld    hl,(TextAddresspointer)
 
-  ld    d,0
-  ld    e,a
+;  ld    d,0
+;  ld    e,a
   add   hl,de
 
   ld    a,(hl)                          ;letter

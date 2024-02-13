@@ -1,6 +1,6 @@
 HandleTitleScreenCode:
   jp    CampaignSelectCode
-  jp    ScenarioSelectCode
+;  jp    ScenarioSelectCode
 
 CampaignSelectCode:
   ld    a,4
@@ -47,7 +47,7 @@ CampaignSelectCode:
   call  SetFontPage0Y212                ;set font at (0,212) page 0
 
   call  SetAmountOfCampaignButtons
-  call  SetAmountOfScenarioPageButtons
+  call  SetAmountOfCampaignPageButtons
   call  SetPage1ButtonConstantlyLit
   ld    b,28
 ;  call  .ScenarioPressed
@@ -72,8 +72,121 @@ CampaignSelectCode:
   ;/scenario select buttons
 
   call  SetNamesInCampaignButtons
-  call  SetTextPage123Buttons
+  call  SetVButtonsNextToNames
+  call  SetTextPage123ButtonsCampaign
   jp    .engine
+
+SetTextPage123ButtonsCampaign:
+  ld    a,(AmountOfMapsUnlocked)
+  cp    11-1
+  ret   c
+
+  ld    b,035-6                         ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,069-6                         ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(AmountOfMapsUnlocked)
+  cp    21-1
+  ret   c
+
+  ld    b,103-6                         ;dx
+  ld    c,176                           ;dy
+  ld    hl,TextPage3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+SetVButtonsNextToNames:
+  ld    a,(AmountOfMapsVisibleInCurrentPage)
+  cp    11
+  jr    c,.EndCheckMaxMapsInCurrentPageCheck
+  ld    a,10
+  .EndCheckMaxMapsInCurrentPageCheck:
+
+  ld    b,a
+  ld    de,$0000 + (028*128) + (120/2) - 128
+
+  .loop:
+  ld    hl,13*128
+  add   hl,de
+  ex    de,hl
+
+  push  de
+  push  bc
+  call  .SetVbutton
+  pop   bc
+  pop   de
+  djnz  .loop
+
+  ;if there are less than 10 buttons visible in current page, the last one is always a map which is NOT finished yet
+  ld    a,(AmountOfMapsVisibleInCurrentPage)
+  cp    11
+  jp    c,.SetNoVbutton
+
+  ;at this point there are 10 buttons visible in current page, check if the 10th map is finished
+  ld    a,(ScenarioPage)
+  dec   a
+;  jr    z,.WeAreInPage1
+
+  ld    b,0
+  jr    z,.PageFound
+  dec   a
+  ld    b,10
+  jr    z,.PageFound
+  ld    b,20
+  .PageFound:
+	ld		a,(ScenarioSelected)
+
+  
+  ret
+
+  .PageButtonConstantlyLit:
+  dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
+
+.SetVbutton:
+  ld    hl,$4000 + (123*128) + (000/2) - 128
+  ld    bc,$0000 + (013*256) + (014/2)
+  ld    a,ScenarioSelectButtonsBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+.SetNoVbutton:
+  ld    hl,$4000 + (123*128) + (014/2) - 128
+  ld    bc,$0000 + (013*256) + (014/2)
+  ld    a,ScenarioSelectButtonsBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+
+
+
+
+
+
+
+
+
+EndCampaignScreenEngine:
+;  call  .SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
+;  call  .SetAmountOfPlayers
+;  call  .SetStartingTown
+;  call  .SetStartingResources
+;  call  .SetStartingHeroes
+;  call  .SetTavernHeroes
+
+
+;Pochi is lost: start with royas, tavern filled with worzen family, except pochi, enemy town empty
+;Crossroads of Courage: start without hero, tavern filled with worzen family, enemy town's have both 1 hero (snatcher and a belmont) and several units
+
+
+  call  SetTempisr                      ;end the current interrupt handler used in the engine
+  call  SetSpatInGame
+  xor   a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
+  ret
 
 CheckCampaignSelectButtonClicked:
   ret   nc
@@ -83,16 +196,18 @@ CheckCampaignSelectButtonClicked:
   jp    nc,.ScenarioPressed
   cp    3
   jp    nc,.Page123Pressed
-  cp    1
+;  cp    1
 ;  jp    nc,.BeginBackPressed
 
+  .BeginBackPressed:
+  ld    a,b
+  cp    2
+  jr    z,.BeginPressed
+  ret
 
-
-
-
-
-
-
+  .BeginPressed:
+  pop   af
+  jp    EndCampaignScreenEngine
 
   .ScenarioPressed:
   ld    a,(ScenarioPage)
@@ -160,7 +275,7 @@ CheckCampaignSelectButtonClicked:
 ;  ret
 
   .SetSelectedCampaignNameRightTopOfScreen:
-  call  ClearCampaignNameRightTopOfScreen
+  call  ClearCampaignNameAndDescriptionRightTopOfScreen
   ld    b,152                           ;dx
   ld    c,021                           ;dy
 
@@ -168,6 +283,12 @@ CheckCampaignSelectButtonClicked:
   ld    de,ScenarioNameAddress+4
   add   hl,de
 
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ;set campaign description
+  ld    b,149                           ;dx
+  ld    c,036                           ;dy
+  inc   hl
   call  SetText                         ;in: b=dx, c=dy, hl->text
   jp    SwapAndSetPage                  ;swap and set page
 
@@ -206,7 +327,7 @@ CheckCampaignSelectButtonClicked:
 	ld		(ScenarioPage),a
 
   push  de
-  call  SetAmountOfScenarioPageButtons
+  call  SetAmountOfCampaignPageButtons
   pop   de
   ld    hl,.PageButtonConstantlyLit
   ld    bc,4
@@ -222,21 +343,11 @@ CheckCampaignSelectButtonClicked:
   ld    b,a
   ld    a,(LitScenarioButtonInWhichPage?)
   cp    b
-  jp    nz,SetAmountOfCampaignButtons
-  call  .LightCurrentActiveScenarioButton
+  call  z,.LightCurrentActiveScenarioButton
   jp    SetAmountOfCampaignButtons
 
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
-
-
-
-
-
-
-
-
-
 
 ScenarioSelectCode:
   ld    a,4
@@ -2067,6 +2178,19 @@ TextHard: db  "Hard",255
 TextExpert: db  "Expert",255
 TextImpossible: db  "Impossible",255
 
+SetAmountOfCampaignPageButtons:
+;we show 1 more campaign than the amount of maps that are unlocked (in scenario mode)
+  ld    a,(AmountOfMapsUnlocked)
+  inc   a
+  ld    (AmountOfMapsUnlocked),a
+
+  call  SetAmountOfScenarioPageButtons
+
+  ld    a,(AmountOfMapsUnlocked)
+  dec   a
+  ld    (AmountOfMapsUnlocked),a
+  ret
+
 SetAmountOfScenarioPageButtons:
   ld    hl,.PageButtonsNormal
   ld    de,GenericButtonTable+GenericButtonTableLenghtPerButton*10
@@ -2100,10 +2224,20 @@ SetAmountOfScenarioPageButtons:
   db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128
 
 SetAmountOfCampaignButtons:
+;we show 1 more campaign than the amount of maps that are unlocked (in scenario mode)
+  ld    a,(AmountOfMapsUnlocked)
+  inc   a
+  ld    (AmountOfMapsUnlocked),a
+
   call  ClearCampaignButtonGraphics
   call  SwapAndSetPage                  ;swap and set page
   call  ClearCampaignButtonGraphics
-  jr    SetAmountOfScenarioButtons.go
+  call  SetAmountOfScenarioButtons.go
+
+  ld    a,(AmountOfMapsUnlocked)
+  dec   a
+  ld    (AmountOfMapsUnlocked),a
+  ret
 
 SetAmountOfScenarioButtons:
   call  ClearScenarioButtonGraphics
@@ -2421,17 +2555,17 @@ CampaignSelectButton10XRight:         equ CampaignSelectButton10XLeft + 096
   ;page 1,2,3
 CampaignSelectButton11Ytop:           equ 173
 CampaignSelectButton11YBottom:        equ CampaignSelectButton11Ytop + 011
-CampaignSelectButton11XLeft:          equ 032
+CampaignSelectButton11XLeft:          equ 032-6
 CampaignSelectButton11XRight:         equ CampaignSelectButton11XLeft + 032
 
 CampaignSelectButton12Ytop:           equ 173
 CampaignSelectButton12YBottom:        equ CampaignSelectButton12Ytop + 011
-CampaignSelectButton12XLeft:          equ 066
+CampaignSelectButton12XLeft:          equ 066-6
 CampaignSelectButton12XRight:         equ CampaignSelectButton12XLeft + 032
 
 CampaignSelectButton13Ytop:           equ 173
 CampaignSelectButton13YBottom:        equ CampaignSelectButton13Ytop + 011
-CampaignSelectButton13XLeft:          equ 100
+CampaignSelectButton13XLeft:          equ 100-6
 CampaignSelectButton13XRight:         equ CampaignSelectButton13XLeft + 032
   ;begin / back buttons
 CampaignSelectButton14Ytop:           equ 191
@@ -2502,10 +2636,10 @@ ClearScenarioNameRightTopOfScreen:
   ld    a,ScenarioSelectBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
-ClearCampaignNameRightTopOfScreen:
-  ld    hl,$4000 + (019*128) + (152/2) - 128
-  ld    de,$0000 + (019*128) + (152/2) - 128
-  ld    bc,$0000 + (009*256) + (094/2)
+ClearCampaignNameAndDescriptionRightTopOfScreen:
+  ld    hl,$4000 + (019*128) + (148/2) - 128
+  ld    de,$0000 + (019*128) + (148/2) - 128
+  ld    bc,$0000 + (166*256) + (098/2)
   ld    a,CampaignSelectBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 

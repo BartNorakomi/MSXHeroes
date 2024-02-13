@@ -2321,7 +2321,7 @@ ButtonTableSkillsSYSX:
 
 BCStored: ds 2
 TextAddresspointer: ds 2
-TextPointer:  db  0
+TextPointer:  ds 2
 TextDX:  ds 1
 
 PutLetter:
