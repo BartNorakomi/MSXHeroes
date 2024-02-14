@@ -3568,11 +3568,11 @@ db  11  ;Ashguine
 ;dragon slayer 6
 db  34  ;Logan Serios
 
-;whats the name again ?
+;herzog ?
 db  36  ;Mercies
 db  38  ;Ruth
 
-;whats the name again ?
+;Rune Worth ?
 db  40  ;Young Noble
 
 ;pocky & rocky

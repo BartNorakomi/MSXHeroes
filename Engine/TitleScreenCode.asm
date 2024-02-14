@@ -192,9 +192,10 @@ EndCampaignScreenEngine:
 ;The Soldier's Path: start with solid snake, start with 1 castle. no heroes in tavern. northwest castle is contra 2 castle with Bill Rizer in tavern. win condition: conquer 2 castles in the south. loss condition: lose snake without having conquered the castle in the northwest, or lose both snake and bill rizer. (castles in the south have no heroes in tavern)
 ;Westward and Eastward: start with solid snake in 1 castle and fray in the other. no heroes in tavern. Dino is in the middle of the map. Win condition: kill dino. lose condition: lose both heroes
 ;Three Reigns Fallen: start with ashguine in 1 castle. no heroes in tavern. 3 enemy castle, no heroes in taverns. win condition: conquer all castles. lose condition: lose ashguine
-
-
-
+;Prince Logan's Odyssey: start with logan in 1 castle. no heroes in tavern. 2 enemy castles, ashguine in enemy castle 1 with 3 members of worzen family in tavern. Kelesis the cook in castle 2 with 3 members of worzen family in tavern. win condition: defeat both castles, loss condition: lose all heroes in play and in tavern.
+;Chronicles of Herzog: start with 1 castle, 0 heroes. ruth and mercies in tavern. 3 castles, each castle has no heroes in tavern. defending heroes in those castles: Lucia, Adol, Prince Logan.
+;Reign of the Druid: start without castle. start with hero: young noble in the middle bottom part of the map. 4 empty castles. taverns empty. In the middle of the map is druid, level 18 with a huge army who needs to be defeated. win condition: defeat druid, loss condition: lose young noble
+;Pocky's Castle Crusade: start with 1 castle. start with pocky. tavern empty. Young Noble in enemy castle. win condition: defeat young noble. lose condition: lose pocky 
 
 
 
