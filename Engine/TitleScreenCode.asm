@@ -188,6 +188,16 @@ EndCampaignScreenEngine:
 ;A Jungle Retreat: Start with bill rizer. start with 1 castle. no heroes in tavern. Enemy castle is empty, but pochi stands at the exit of the cave. win condition: reach the town in the south, loss condition: lose bill rizer.
 ;Rally Against Rizer: start without heroes. start with 3 castles, castlevania, goemon and usas. win condition: defeat bill rizer (level 15, with HUGE army). lose condition: lose all heroes.
 
+;Into the Fray: start with fray, start with 1 caslte. no heroes in tavern. win condition: defeat 2 castles. lose condition: lose fray
+;The Soldier's Path: start with solid snake, start with 1 castle. no heroes in tavern. northwest castle is contra 2 castle with Bill Rizer in tavern. win condition: conquer 2 castles in the south. loss condition: lose snake without having conquered the castle in the northwest, or lose both snake and bill rizer. (castles in the south have no heroes in tavern)
+;Westward and Eastward: start with solid snake in 1 castle and fray in the other. no heroes in tavern. Dino is in the middle of the map. Win condition: kill dino. lose condition: lose both heroes
+;Three Reigns Fallen: start with ashguine in 1 castle. no heroes in tavern. 3 enemy castle, no heroes in taverns. win condition: conquer all castles. lose condition: lose ashguine
+
+
+
+
+
+
 ;Dragons' Deliverance: start without heroes. start with contra castle 2. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
 ;Hunting Dr. Mitchell: start without heroes. start with castlevania castle. tavern filled with 3 belmots. 2nd castle is empty and this is golvellius castle. both kelesis in tavern. win condition: defeat hank mitchell. lose condition: lose all belmonts if you own 1 castle. lose all heroes if you own 2 castles.
 
