@@ -177,11 +177,20 @@ EndCampaignScreenEngine:
 ;  call  .SetStartingHeroes
 ;  call  .SetTavernHeroes
 
-
 ;Pochi is lost: start with royas, tavern filled with worzen family, except pochi, enemy town empty
 ;Crossroads of Courage: start without hero, tavern filled with worzen family, enemy town's have both 1 hero (snatcher and a belmont) and several units
 ;From Dunes to Darkness: start without heroes. tavern filled with cles and wit. enemy town has trevor belmont and several units. loss condition: lose both with and cles.
 ;An Arctic Alliance: start without heroes. start with 2 castles, goemon and castlevania. tavern filled with heroes of those castles. enemy towns are dragon slayer 4 and junkery hq. loss condition: lose all heroes.
+;Felghana's Champion: start with Adol at level 5. start with 1 castle. tavern is empty. enemy towns are junkery hq, castlevania & goemon. win condition: conquer all 3 castles. loss condition: lose adol.
+;Mildew and Moonlight: start with Lucia at level 5. start with 1 castle. tavern is empty. enemy town is Adol town. win condition: conquer adols castle. loss condition: lose lucia.
+;A Jungle Expedition: Start with Mitchell at level 1. start with 1 castle. king kong. tavern is empty. 1 enemy town is with lucia, psycho world. 1 enemy town is empty and the other is Usas castle and has with and cles in tavern. win condition. conquer lucia castle. loss condition: lose adol without having usas castle. Or lose adol, wit and cles.
+;The Valley of Doom: Start with Kelesis. start with 1 castle. kelesis the cook in tavern. 1 enemy castle with mitchel and a strong army (incl. king kong). win condition: conquest the castle. loss condition: lose both heroes or reach day 60.
+;A Jungle Retreat: Start with bill rizer. start with 1 castle. no heroes in tavern. Enemy castle is empty, but pochi stands at the exit of the cave. win condition: reach the town in the south, loss condition: lose bill rizer.
+;Rally Against Rizer: start without heroes. start with 3 castles, castlevania, goemon and usas. win condition: defeat bill rizer (level 15, with HUGE army). lose condition: lose all heroes.
+
+;Dragons' Deliverance: start without heroes. start with contra castle 2. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
+;Hunting Dr. Mitchell: start without heroes. start with castlevania castle. tavern filled with 3 belmots. 2nd castle is empty and this is golvellius castle. both kelesis in tavern. win condition: defeat hank mitchell. lose condition: lose all belmonts if you own 1 castle. lose all heroes if you own 2 castles.
+
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
