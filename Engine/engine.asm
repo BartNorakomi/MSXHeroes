@@ -5729,7 +5729,7 @@ pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1

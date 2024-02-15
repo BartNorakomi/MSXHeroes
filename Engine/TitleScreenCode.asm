@@ -2,6 +2,9 @@ HandleTitleScreenCode:
   jp    ScenarioSelectCode
   jp    CampaignSelectCode
 
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
+ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
+
 CampaignSelectCode:
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
@@ -938,13 +941,10 @@ ScenarioSelectCode:
   ret
 
   .ResetAllBuildings:
-  ld    hl,.ResetBuildings
+  ld    hl,ResetBuildings
   ld    bc,8
   ldir
   ret
-
-;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
-.ResetBuildings: db                        1,       1,        0,              0,             6,           0,          0,           0
 
 .SetAmountOfPlayers:
   ld    a,2
