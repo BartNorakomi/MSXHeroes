@@ -3587,7 +3587,7 @@ db  45  ;Pippols
 ;randar 3
 db  46  ;Randar
 
-;whats the name again ?
+;Dixdeaf
 db  48  ;Luice
 db  49  ;Dick
 

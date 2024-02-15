@@ -1,6 +1,6 @@
 HandleTitleScreenCode:
+  jp    ScenarioSelectCode
   jp    CampaignSelectCode
-;  jp    ScenarioSelectCode
 
 CampaignSelectCode:
   ld    a,4
@@ -196,11 +196,20 @@ EndCampaignScreenEngine:
 ;Chronicles of Herzog: start with 1 castle, 0 heroes. ruth and mercies in tavern. 3 castles, each castle has no heroes in tavern. defending heroes in those castles: Lucia, Adol, Prince Logan.
 ;Reign of the Druid: start without castle. start with hero: young noble in the middle bottom part of the map. 4 empty castles. taverns empty. In the middle of the map is druid, level 18 with a huge army who needs to be defeated. win condition: defeat druid, loss condition: lose young noble
 ;Pocky's Castle Crusade: start with 1 castle. start with pocky. tavern empty. Young Noble in enemy castle. win condition: defeat young noble. lose condition: lose pocky 
+;Lololand: start with 1 castle, start with lolo, tavern empty. enemy castle 1: pocky, enemy castle 2: fray. both taverns filled with random heroes. win condition: defeat both castles. lose condition: lose all heroes in play and in taverns
+;Comical Cavern Clash: start with 1 castle. start with pippols. tavern empty. enemy castle has lolo. win condition: defeat lolo, lose condition: lose pippols
 
-
-
-;Dragons' Deliverance: start without heroes. start with contra castle 2. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
+;Randar's Last Stand: start with 3 castles, no heroes. all taverns are filled with random heroes. enemy castle has randar with a huge army. win condition: defeat randar. lose condition, run out of time (4 months)
+;A Desert Blood Moon: start with 1 caslte. castle of YS. no heroes. tavern filled with lucia and dick. enemy castles are castlevania, usas and golvellius, but are defended by the 3 belmonts. taverns are empty. win condition: defeat all castles. lose condition: lose all heroes.
+;A Beloved Journey: start with 1 castle. start with popolon and aphrodite (both level 3) in front of the castle. tavern empty. castle is psycho world. 2nd castle is empty. castle is junker hq. tavern filled with random heroes. Ruika is in a corner of the map in front of emerald gloves. win condition: capture emerald gloves. lose condition: lose either popolon or aphrodite.
+;Amber Skies, Rogue AI: start with 1 castle. no heroes. Tien Ren, Ho Mei, and Mei Hong in tavern. Junker HQ is castle. enemy castle has Snatcher defending it with a huge snatcher army. win condition: defeat snatcher. lose condition: lose all heroes.
+;last 6 campaigns unlock these castles: akanbe 1, akanbe 2, contra 2, yiearekungfu, bubble bobble 1, bubble bobble 2
+;Dragons' Deliverance: start without heroes. start with goemon castle. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
 ;Hunting Dr. Mitchell: start without heroes. start with castlevania castle. tavern filled with 3 belmots. 2nd castle is empty and this is golvellius castle. both kelesis in tavern. win condition: defeat hank mitchell. lose condition: lose all belmonts if you own 1 castle. lose all heroes if you own 2 castles.
+;Heart of the Jungle: start with bill rizer level 5. start with contra 1 castle. tavern filled with random heroes. enemy castle 1 has big boss and contra level 2 castle and units and random heroes in tavern. castle 2 the same, but with grey fox.
+;Dawn of the Ninja: start with ruika level 7, yiearkungfu castle. tavern filled with random heroes. enemy castle 1: akanbe dragon 1 units with dr. mitchell. tavern with random heroes. enemy castle 2: lolo with akanbe draong 2 units. tavern with random heroes. win condition: defeat lolo and mitchell. lose condition: lose ruika.
+;Pixy's Bubble Symphony: start with pixy level 5, bubble bobble 1 castle. tavern empty. enemy castle: dr pettrovich with a snatcher army. win condition: defeat dr pettrovich. lose condition: lose pixy.
+;A Worzen Family Epic: start with bubble bobble 2 castle castle. no heroes. tavern filled with worzen family. 3 enemy castles with random heroes and randomly filled taverns. win condition: defeat all castles, lose condition: lose all heroes and castles.
 
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine

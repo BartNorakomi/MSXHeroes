@@ -30,7 +30,7 @@ title screen:
 ;campaign 10-24: each unlocks 1 random hero without castle. 14 heroes in total. A hero without castle that is still locked will have nr 255 in the HeroesWithoutCastle list 
 ;campaign 25-30: each unlocks 1 castle: YieArKungFu, BubbleBobbleGroupA, BubbleBobbleGroupB, AkanbeDragonGroupA, AkanbeDragonGroupB and ContraGroupB
 ;then (from map 10 and upwards) player can unlock remaining heroes without castle in normal game by finding/collecting their cards
-;neutral monsters should be unlocked gradually after each campaign
+;neutral monsters should be unlocked gradually (automatically) after each campaign
 
 general:
 muziek
