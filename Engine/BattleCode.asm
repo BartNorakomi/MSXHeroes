@@ -3280,7 +3280,7 @@ TextCountless:  db "Countless",255
 ListOfMonsters:
   db    021                               ;128 Spear Guard (Castlevania)
   db    022                               ;129 Medusa Head (Castlevania)
-  db    025                               ;130 Skeleton (Castlevania)
+  db    019                               ;130 Zombie (Castlevania)
   db    091                               ;131 Running Man (Metal Gear)
   db    092                               ;132 Trooper (Metal Gear)
   db    093                               ;133 Antigas Man (Metal Gear)

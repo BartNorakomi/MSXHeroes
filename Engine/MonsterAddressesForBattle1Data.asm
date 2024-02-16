@@ -186,7 +186,7 @@ SDSnatcherUnitLevel6CostGems:         equ 02+Level6Unit
 SDSnatcherUnitLevel6CostRubies:       equ 0
 
 
-CastleVaniaUnitLevel1Number:           equ 19
+CastleVaniaUnitLevel1Number:           equ 25
 CastleVaniaUnitLevel1Attack:           equ 2
 CastleVaniaUnitLevel1Defense:          equ 3
 CastleVaniaUnitLevel1HP:               equ 4
@@ -1022,3 +1022,284 @@ BubbleBobbleGroupBUnitLevel6Growth:           equ 1
 BubbleBobbleGroupBUnitLevel6CostGold:         equ 800/10
 BubbleBobbleGroupBUnitLevel6CostGems:         equ 03+Level6Unit
 BubbleBobbleGroupBUnitLevel6CostRubies:       equ 0
+
+
+
+
+;Scavenger (rat)
+SolidSnakeUnitLevel1Number:           equ 90 
+SolidSnakeUnitLevel1Attack:           equ 2
+SolidSnakeUnitLevel1Defense:          equ 5
+SolidSnakeUnitLevel1HP:               equ 6
+SolidSnakeUnitLevel1Speed:            equ 6
+SolidSnakeUnitLevel1Growth:           equ 11
+SolidSnakeUnitLevel1CostGold:         equ 60/10
+SolidSnakeUnitLevel1CostGems:         equ 00+Level1Unit
+SolidSnakeUnitLevel1CostRubies:       equ 0
+;Running Man
+SolidSnakeUnitLevel2Number:           equ 91
+SolidSnakeUnitLevel2Attack:           equ 5
+SolidSnakeUnitLevel2Defense:          equ 6
+SolidSnakeUnitLevel2HP:               equ 13
+SolidSnakeUnitLevel2Speed:            equ 8
+SolidSnakeUnitLevel2Growth:           equ 9
+SolidSnakeUnitLevel2CostGold:         equ 110/10
+SolidSnakeUnitLevel2CostGems:         equ 00+Level2Unit
+SolidSnakeUnitLevel2CostRubies:       equ 0
+;Footman
+SolidSnakeUnitLevel3Number:           equ 94
+SolidSnakeUnitLevel3Attack:           equ 4
+SolidSnakeUnitLevel3Defense:          equ 7
+SolidSnakeUnitLevel3HP:               equ 21
+SolidSnakeUnitLevel3Speed:            equ 5
+SolidSnakeUnitLevel3Growth:           equ 8
+SolidSnakeUnitLevel3CostGold:         equ 250/10
+SolidSnakeUnitLevel3CostGems:         equ 00+Level3Unit
+SolidSnakeUnitLevel3CostRubies:       equ 0
+;Trooper
+SolidSnakeUnitLevel4Number:           equ 92
+SolidSnakeUnitLevel4Attack:           equ 6
+SolidSnakeUnitLevel4Defense:          equ 10
+SolidSnakeUnitLevel4HP:               equ 40
+SolidSnakeUnitLevel4Speed:            equ 5
+SolidSnakeUnitLevel4Growth:           equ 4
+SolidSnakeUnitLevel4CostGold:         equ 340/10
+SolidSnakeUnitLevel4CostGems:         equ 00+Level4Unit
+SolidSnakeUnitLevel4CostRubies:       equ 0
+;Antigas Man
+SolidSnakeUnitLevel5Number:           equ 93
+SolidSnakeUnitLevel5Attack:           equ 8
+SolidSnakeUnitLevel5Defense:          equ 12
+SolidSnakeUnitLevel5HP:               equ 120
+SolidSnakeUnitLevel5Speed:            equ 5
+SolidSnakeUnitLevel5Growth:           equ 3
+SolidSnakeUnitLevel5CostGold:         equ 530/10
+SolidSnakeUnitLevel5CostGems:         equ 01+Level5Unit
+SolidSnakeUnitLevel5CostRubies:       equ 0
+
+;Spectroll
+DevaUnitLevel2Number:           equ 136
+DevaUnitLevel2Attack:           equ 5
+DevaUnitLevel2Defense:          equ 6
+DevaUnitLevel2HP:               equ 13
+DevaUnitLevel2Speed:            equ 4
+DevaUnitLevel2Growth:           equ 9
+DevaUnitLevel2CostGold:         equ 110/10
+DevaUnitLevel2CostGems:         equ 00+Level2Unit
+DevaUnitLevel2CostRubies:       equ 0
+;Yurei Kage
+DevaUnitLevel3Number:           equ 137
+DevaUnitLevel3Attack:           equ 4
+DevaUnitLevel3Defense:          equ 7
+DevaUnitLevel3HP:               equ 21
+DevaUnitLevel3Speed:            equ 5
+DevaUnitLevel3Growth:           equ 4
+DevaUnitLevel3CostGold:         equ 250/10
+DevaUnitLevel3CostGems:         equ 00+Level3Unit
+DevaUnitLevel3CostRubies:       equ 0
+;deva
+DevaUnitLevel4Number:           equ 135
+DevaUnitLevel4Attack:           equ 9
+DevaUnitLevel4Defense:          equ 12
+DevaUnitLevel4HP:               equ 35
+DevaUnitLevel4Speed:            equ 6
+DevaUnitLevel4Growth:           equ 4
+DevaUnitLevel4CostGold:         equ 340/10
+DevaUnitLevel4CostGems:         equ 00+Level4Unit
+DevaUnitLevel4CostRubies:       equ 0
+
+;Emir Mystic
+Usas2UnitLevel4Number:           equ 139
+Usas2UnitLevel4Attack:           equ 10
+Usas2UnitLevel4Defense:          equ 7
+Usas2UnitLevel4HP:               equ 30
+Usas2UnitLevel4Speed:            equ 3
+Usas2UnitLevel4Growth:           equ 4
+Usas2UnitLevel4CostGold:         equ 300/10
+Usas2UnitLevel4CostGems:         equ 00+Level4Unit
+Usas2UnitLevel4CostRubies:       equ 0
+;Huge Blob
+Usas2UnitLevel5Number:           equ 138
+Usas2UnitLevel5Attack:           equ 17
+Usas2UnitLevel5Defense:          equ 7
+Usas2UnitLevel5HP:               equ 35
+Usas2UnitLevel5Speed:            equ 6
+Usas2UnitLevel5Growth:           equ 3
+Usas2UnitLevel5CostGold:         equ 500/10
+Usas2UnitLevel5CostGems:         equ 00+Level5Unit
+Usas2UnitLevel5CostRubies:       equ 0
+
+
+;slouman
+KingsValley2UnitLevel1Number:           equ 151
+KingsValley2UnitLevel1Attack:           equ 4
+KingsValley2UnitLevel1Defense:          equ 3
+KingsValley2UnitLevel1HP:               equ 5
+KingsValley2UnitLevel1Speed:            equ 4
+KingsValley2UnitLevel1Growth:           equ 14
+KingsValley2UnitLevel1CostGold:         equ 50/10
+KingsValley2UnitLevel1CostGems:         equ 00+Level1Unit
+KingsValley2UnitLevel1CostRubies:       equ 0
+;Pyoncy
+KingsValley2UnitLevel2Number:           equ 152
+KingsValley2UnitLevel2Attack:           equ 6
+KingsValley2UnitLevel2Defense:          equ 5
+KingsValley2UnitLevel2HP:               equ 14
+KingsValley2UnitLevel2Speed:            equ 6
+KingsValley2UnitLevel2Growth:           equ 8
+KingsValley2UnitLevel2CostGold:         equ 130/10
+KingsValley2UnitLevel2CostGems:         equ 00+Level2Unit
+KingsValley2UnitLevel2CostRubies:       equ 0
+;Rock Roll
+KingsValley2UnitLevel3Number:           equ 150
+KingsValley2UnitLevel3Attack:           equ 9
+KingsValley2UnitLevel3Defense:          equ 7
+KingsValley2UnitLevel3HP:               equ 22
+KingsValley2UnitLevel3Speed:            equ 5
+KingsValley2UnitLevel3Growth:           equ 7
+KingsValley2UnitLevel3CostGold:         equ 250/10
+KingsValley2UnitLevel3CostGems:         equ 00+Level3Unit
+KingsValley2UnitLevel3CostRubies:       equ 0
+;Vic Viper
+KingsValley2UnitLevel4Number:           equ 149
+KingsValley2UnitLevel4Attack:           equ 10
+KingsValley2UnitLevel4Defense:          equ 7
+KingsValley2UnitLevel4HP:               equ 30
+KingsValley2UnitLevel4Speed:            equ 3
+KingsValley2UnitLevel4Growth:           equ 4
+KingsValley2UnitLevel4CostGold:         equ 300/10
+KingsValley2UnitLevel4CostGems:         equ 00+Level4Unit
+KingsValley2UnitLevel4CostRubies:       equ 0
+
+
+
+
+
+
+
+
+RandomAUnitLevel1Number:           equ 30
+RandomAUnitLevel1Attack:           equ 4
+RandomAUnitLevel1Defense:          equ 5
+RandomAUnitLevel1HP:               equ 9
+RandomAUnitLevel1Speed:            equ 4
+RandomAUnitLevel1Growth:           equ 14
+RandomAUnitLevel1CostGold:         equ 80/10
+RandomAUnitLevel1CostGems:         equ 00+Level1Unit
+RandomAUnitLevel1CostRubies:       equ 0
+
+RandomAUnitLevel2Number:           equ 27
+RandomAUnitLevel2Attack:           equ 7
+RandomAUnitLevel2Defense:          equ 6
+RandomAUnitLevel2HP:               equ 11
+RandomAUnitLevel2Speed:            equ 4
+RandomAUnitLevel2Growth:           equ 9
+RandomAUnitLevel2CostGold:         equ 100/10
+RandomAUnitLevel2CostGems:         equ 00+Level2Unit
+RandomAUnitLevel2CostRubies:       equ 0
+
+RandomAUnitLevel3Number:           equ 29
+RandomAUnitLevel3Attack:           equ 8
+RandomAUnitLevel3Defense:          equ 8
+RandomAUnitLevel3HP:               equ 24
+RandomAUnitLevel3Speed:            equ 5
+RandomAUnitLevel3Growth:           equ 7
+RandomAUnitLevel3CostGold:         equ 200/10
+RandomAUnitLevel3CostGems:         equ 00+Level3Unit
+RandomAUnitLevel3CostRubies:       equ 0
+
+RandomAUnitLevel4Number:           equ 31
+RandomAUnitLevel4Attack:           equ 10
+RandomAUnitLevel4Defense:          equ 13
+RandomAUnitLevel4HP:               equ 35
+RandomAUnitLevel4Speed:            equ 5
+RandomAUnitLevel4Growth:           equ 4
+RandomAUnitLevel4CostGold:         equ 300/10
+RandomAUnitLevel4CostGems:         equ 00+Level4Unit
+RandomAUnitLevel4CostRubies:       equ 0
+
+RandomAUnitLevel5Number:           equ 35
+RandomAUnitLevel5Attack:           equ 11
+RandomAUnitLevel5Defense:          equ 13
+RandomAUnitLevel5HP:               equ 45
+RandomAUnitLevel5Speed:            equ 5
+RandomAUnitLevel5Growth:           equ 2
+RandomAUnitLevel5CostGold:         equ 400/10
+RandomAUnitLevel5CostGems:         equ 00+Level5Unit
+RandomAUnitLevel5CostRubies:       equ 0
+
+RandomAUnitLevel6Number:           equ 33
+RandomAUnitLevel6Attack:           equ 15
+RandomAUnitLevel6Defense:          equ 16
+RandomAUnitLevel6HP:               equ 90
+RandomAUnitLevel6Speed:            equ 7
+RandomAUnitLevel6Growth:           equ 1
+RandomAUnitLevel6CostGold:         equ 1000/10
+RandomAUnitLevel6CostGems:         equ 00+Level6Unit
+RandomAUnitLevel6CostRubies:       equ 2
+
+
+
+
+
+RandomBUnitLevel1Number:           equ 51
+RandomBUnitLevel1Attack:           equ 5
+RandomBUnitLevel1Defense:          equ 4
+RandomBUnitLevel1HP:               equ 7
+RandomBUnitLevel1Speed:            equ 6
+RandomBUnitLevel1Growth:           equ 14
+RandomBUnitLevel1CostGold:         equ 70/10
+RandomBUnitLevel1CostGems:         equ 00+Level1Unit
+RandomBUnitLevel1CostRubies:       equ 0
+
+RandomBUnitLevel2Number:           equ 52
+RandomBUnitLevel2Attack:           equ 6
+RandomBUnitLevel2Defense:          equ 7
+RandomBUnitLevel2HP:               equ 17
+RandomBUnitLevel2Speed:            equ 3
+RandomBUnitLevel2Growth:           equ 8
+RandomBUnitLevel2CostGold:         equ 120/10
+RandomBUnitLevel2CostGems:         equ 00+Level2Unit
+RandomBUnitLevel2CostRubies:       equ 0
+
+RandomBUnitLevel3Number:           equ 54
+RandomBUnitLevel3Attack:           equ 9
+RandomBUnitLevel3Defense:          equ 8
+RandomBUnitLevel3HP:               equ 25
+RandomBUnitLevel3Speed:            equ 6
+RandomBUnitLevel3Growth:           equ 7
+RandomBUnitLevel3CostGold:         equ 200/10
+RandomBUnitLevel3CostGems:         equ 00+Level3Unit
+RandomBUnitLevel3CostRubies:       equ 0
+
+RandomBUnitLevel4Number:           equ 48
+RandomBUnitLevel4Attack:           equ 9
+RandomBUnitLevel4Defense:          equ 8
+RandomBUnitLevel4HP:               equ 32
+RandomBUnitLevel4Speed:            equ 8
+RandomBUnitLevel4Growth:           equ 5
+RandomBUnitLevel4CostGold:         equ 250/10
+RandomBUnitLevel4CostGems:         equ 00+Level4Unit
+RandomBUnitLevel4CostRubies:       equ 0
+
+RandomBUnitLevel5Number:           equ 49
+RandomBUnitLevel5Attack:           equ 10
+RandomBUnitLevel5Defense:          equ 12
+RandomBUnitLevel5HP:               equ 60
+RandomBUnitLevel5Speed:            equ 4
+RandomBUnitLevel5Growth:           equ 2
+RandomBUnitLevel5CostGold:         equ 425/10
+RandomBUnitLevel5CostGems:         equ 00+Level5Unit
+RandomBUnitLevel5CostRubies:       equ 1
+
+RandomBUnitLevel6Number:           equ 50
+RandomBUnitLevel6Attack:           equ 15
+RandomBUnitLevel6Defense:          equ 14
+RandomBUnitLevel6HP:               equ 95
+RandomBUnitLevel6Speed:            equ 7
+RandomBUnitLevel6Growth:           equ 1
+RandomBUnitLevel6CostGold:         equ 850/10
+RandomBUnitLevel6CostGems:         equ 02+Level6Unit
+RandomBUnitLevel6CostRubies:       equ 0
+
+

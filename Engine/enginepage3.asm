@@ -3,12 +3,12 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-WorldPointer: dw GentleAutumnMap01
+;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap01
-;WorldPointer: dw GentleDesertMap01
+WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleMap04
 ;WorldPointer: dw GentleWinterMap01
@@ -3380,86 +3380,75 @@ outix8:
 ListOfUnlockedMonstersLevel1:
   db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
   db    130                               ;130 Skeleton (Castlevania)
-
-;  db    000                               ;end
-
-  db    131                               ;131 Running Man (Metal Gear)
-  db    132                               ;132 Trooper (Metal Gear)
-  db    133                               ;133 Antigas Man (Metal Gear)
-  db    134                               ;134 Footman (Metal Gear)
-  db    135                               ;135 Emir Mystic (Usas2)
-  db    136                               ;136 Spectroll (deva)
+  db    167                               ;167 Scavenger (Metal Gear)
+  db    170                               ;170 Slouman (kings valley 2)
+  db    145                               ;145 Anna Lee (cabage patch kids)
+  db    147                               ;147 Lurcher (undeadline)
+  db    148                               ;148 sofia (sofia)
+  db    163                               ;163 Bonefin (Usas)
+  db    166                               ;166 Slime (Ys 3)
+  db    164                               ;164 OptiLeaper (1 eyes white blue jumper) (Psycho World)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel2:
   db    161                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
   db    129                               ;129 Medusa Head (Castlevania)
-
+  db    131                               ;131 Running Man (Metal Gear)
+  db    136                               ;136 Spectroll (deva)
+  db    171                               ;171 Pyoncy (kings valley 2)
 ;  db    000                               ;end
-
-  db    137                               ;137 Thexder (Thexder)
-  db    138                               ;138 Andorogynus (Andorogynus)
   db    139                               ;139 Limb Linger (mon mon monster)
-  db    140                               ;140 Monmon (mon mon monster)
-  db    141                               ;141 Cob Crusher (mon mon monster)
-  db    142                               ;142 Green Lupin (arsene lupin)
-  db    143                               ;143 Red Lupin (arsene lupin)
   db    144                               ;144 Major Mirth (arsene lupin)
+  db    146                               ;146 JungleBrute (undeadline)
+  db    150                               ;150 Schaefer (predator)
+  db    153                               ;153 Pastry Chef (comic bakery)
+  db    154                               ;154 Indy Brave (magical tree)
+  db    165                               ;165 Fernling (green little plant) (Psycho World)
+  db    173                               ;173 GooGoo (quinpl)
+  db    175                               ;175 Ghosty (spooky)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel3:
   db    162                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
   db    128                               ;128 Spear Guard (Castlevania)
-
-;  db    000                               ;end
-
-  db    145                               ;145 Anna Lee (cabage patch kids)
-  db    146                               ;146 JungleBrute (undeadline)
-  db    147                               ;147 Lurcher (undeadline)
-  db    148                               ;148 sofia (sofia)
+  db    134                               ;134 Footman (Metal Gear)
+  db    169                               ;169 Rock Roll (kings valley 2)
+  db    141                               ;141 Cob Crusher (mon mon monster)
+  db    142                               ;142 Green Lupin (arsene lupin)
   db    149                               ;149 SuperRunner (SuperRunner)
-  db    150                               ;150 Schaefer (predator)
   db    151                               ;151 Jon Sparkle (malaya no hihou)
   db    152                               ;152 KuGyoku Den (legendly 9 gems)
+  db    156                               ;156 Headless (Golvellius)
+  db    168                               ;168 BounceBot (Thexder)
+  db    143                               ;143 Red Lupin (arsene lupin)
+  db    174                               ;174 Spooky (Spooky)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel4:
 ;  db    255                               ;255=no level 4 monsters unlocked
 
-  db    153                               ;153 Pastry Chef (comic bakery)
-  db    154                               ;154 Indy Brave (magical tree)
+  db    132                               ;132 Trooper (Metal Gear)
+  db    172                               ;172 Vic Viper (kings valley 2)
+  db    140                               ;140 Monmon (mon mon monster)
   db    155                               ;155 Seraph (Golvellius)
-  db    156                               ;156 Headless (Golvellius)
-  db    157                               ;157 BlasterBot
-  db    0                                 ;158
-  db    0                                 ;159
-  db    160                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
+  db    135                               ;135 Emir Mystic (Usas2)
+  db    138                               ;138 Andorogynus (Andorogynus)
+  db    176                               ;176 Visage (undeadline)
+  db    159                               ;159 Biolumia (core dump)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel5:
 ;  db    255                               ;255=no level 5 monsters unlocked
 
-  db    161                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
-  db    162                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
-  db    163                               ;163 Bonefin (Usas)
-  db    164                               ;164 OptiLeaper (1 eyes white blue jumper) (Psycho World)
-  db    165                               ;165 Fernling (green little plant) (Psycho World)
-  db    166                               ;166 Slime (Ys 3)
-  db    167                               ;167 Scavenger (Metal Gear)
-  db    168                               ;168 BounceBot (Thexder)
+  db    133                               ;133 Antigas Man (Metal Gear)
+  db    158                               ;158 duncan seven (core dump)
+  db    157                               ;157 BlasterBot
+  db    137                               ;137 Thexder (Thexder)
+  db    000                               ;end
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel6:
-;  db    255                               ;255=no level 6 monsters unlocked
-
-  db    169                               ;169 Rock Roll (kings valley 2)
-  db    170                               ;170 Slouman (kings valley 2)
-  db    171                               ;171 Pyoncy (kings valley 2)
-  db    172                               ;172 Vic Viper (kings valley 2)
-  db    173                               ;173 GooGoo (quinpl)
-  db    174                               ;174 Spooky (Spooky)
-  db    175                               ;175 Ghosty (spooky)
-  db    176                               ;176 Visage (undeadline)
+  db    255                               ;255=no level 6 monsters unlocked
 
   db    000                               ;end
 

@@ -591,10 +591,10 @@ Monster025Table:                        ;Skeleton (Castlevania)
   dw    Monster025Move
   dw    Monster025AttackPatternRight
   dw    Monster025AttackPatternLeft
-  dw    Monster025AttackPatternLeft
-  dw    Monster025AttackPatternLeft
-  dw    Monster025AttackPatternRight
-  dw    Monster025AttackPatternRight
+  dw    Monster025AttackPatternLeftUp
+  dw    Monster025AttackPatternLeftDown
+  dw    Monster025AttackPatternRightUp
+  dw    Monster025AttackPatternRightDown
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    32+08                           ;ny
@@ -606,7 +606,7 @@ Monster025Table:                        ;Skeleton (Castlevania)
   db    CastleVaniaUnitLevel1Attack          ;attack
   db    CastleVaniaUnitLevel1Defense         ;defense
   db    CastleVaniaUnitLevel1Growth          ;growth
-  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    000                             ;special ability
   db    "Skeleton",255,"   "
 
 Monster026Table:                        ;Axe man (Castlevania)
@@ -1977,14 +1977,14 @@ Monster084Table:                        ;Headless (Golvellius)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    GolvelliusUnitLevel4CostGold        ;cost (gold)
-  db    GolvelliusUnitLevel4CostGems        ;cost (gems)
-  db    GolvelliusUnitLevel4CostRubies      ;cost (rubies)
-  db    GolvelliusUnitLevel4HP              ;hp
-  db    GolvelliusUnitLevel4Speed           ;speed
-  db    GolvelliusUnitLevel4Attack          ;attack
-  db    GolvelliusUnitLevel4Defense         ;defense
-  db    GolvelliusUnitLevel4Growth          ;growth
+  db    GolvelliusUnitLevel3CostGold        ;cost (gold)
+  db    GolvelliusUnitLevel3CostGems        ;cost (gems)
+  db    GolvelliusUnitLevel3CostRubies      ;cost (rubies)
+  db    GolvelliusUnitLevel3HP              ;hp
+  db    GolvelliusUnitLevel3Speed           ;speed
+  db    GolvelliusUnitLevel3Attack          ;attack
+  db    GolvelliusUnitLevel3Defense         ;defense
+  db    GolvelliusUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Headless",255,"   "
 
@@ -2000,14 +2000,14 @@ Monster085Table:                        ;Seraph (Golvellius)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    GolvelliusUnitLevel5CostGold        ;cost (gold)
-  db    GolvelliusUnitLevel5CostGems        ;cost (gems)
-  db    GolvelliusUnitLevel5CostRubies      ;cost (rubies)
-  db    GolvelliusUnitLevel5HP              ;hp
-  db    GolvelliusUnitLevel5Speed           ;speed
-  db    GolvelliusUnitLevel5Attack          ;attack
-  db    GolvelliusUnitLevel5Defense         ;defense
-  db    GolvelliusUnitLevel5Growth          ;growth
+  db    GolvelliusUnitLevel4CostGold        ;cost (gold)
+  db    GolvelliusUnitLevel4CostGems        ;cost (gems)
+  db    GolvelliusUnitLevel4CostRubies      ;cost (rubies)
+  db    GolvelliusUnitLevel4HP              ;hp
+  db    GolvelliusUnitLevel4Speed           ;speed
+  db    GolvelliusUnitLevel4Attack          ;attack
+  db    GolvelliusUnitLevel4Defense         ;defense
+  db    GolvelliusUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Seraph",255,"     "
 
@@ -2049,14 +2049,14 @@ Monster087Table:                        ;Visage (undeadline)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel4CostGold        ;cost (gold)
+  db    RandomAUnitLevel4CostGems        ;cost (gems)
+  db    RandomAUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel4HP              ;hp
+  db    RandomAUnitLevel4Speed           ;speed
+  db    RandomAUnitLevel4Attack          ;attack
+  db    RandomAUnitLevel4Defense         ;defense
+  db    RandomAUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Visage",255,"     "
   
@@ -2072,14 +2072,14 @@ Monster088Table:                        ;JungleBrute (undeadline)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel2CostGold        ;cost (gold)
+  db    RandomAUnitLevel2CostGems        ;cost (gems)
+  db    RandomAUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel2HP              ;hp
+  db    RandomAUnitLevel2Speed           ;speed
+  db    RandomAUnitLevel2Attack          ;attack
+  db    RandomAUnitLevel2Defense         ;defense
+  db    RandomAUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "JungleBrute",255
   
@@ -2120,14 +2120,14 @@ Monster090Table:                        ;Scavenger (Metal Gear)
   db    BattleMonsterSpriteSheet5Block
   db    16                              ;nx  
   db    08+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    SolidSnakeUnitLevel1CostGold        ;cost (gold)
+  db    SolidSnakeUnitLevel1CostGems        ;cost (gems)
+  db    SolidSnakeUnitLevel1CostRubies      ;cost (rubies)
+  db    SolidSnakeUnitLevel1HP              ;hp
+  db    SolidSnakeUnitLevel1Speed           ;speed
+  db    SolidSnakeUnitLevel1Attack          ;attack
+  db    SolidSnakeUnitLevel1Defense         ;defense
+  db    SolidSnakeUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Scavenger",255,"  "
 
@@ -2143,14 +2143,14 @@ Monster091Table:                        ;Running Man (Metal Gear)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    SolidSnakeUnitLevel2CostGold        ;cost (gold)
+  db    SolidSnakeUnitLevel2CostGems        ;cost (gems)
+  db    SolidSnakeUnitLevel2CostRubies      ;cost (rubies)
+  db    SolidSnakeUnitLevel2HP              ;hp
+  db    SolidSnakeUnitLevel2Speed           ;speed
+  db    SolidSnakeUnitLevel2Attack          ;attack
+  db    SolidSnakeUnitLevel2Defense         ;defense
+  db    SolidSnakeUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Running Man",255
   
@@ -2166,14 +2166,14 @@ Monster092Table:                        ;Trooper (Metal Gear)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    SolidSnakeUnitLevel4CostGold        ;cost (gold)
+  db    SolidSnakeUnitLevel4CostGems        ;cost (gems)
+  db    SolidSnakeUnitLevel4CostRubies      ;cost (rubies)
+  db    SolidSnakeUnitLevel4HP              ;hp
+  db    SolidSnakeUnitLevel4Speed           ;speed
+  db    SolidSnakeUnitLevel4Attack          ;attack
+  db    SolidSnakeUnitLevel4Defense         ;defense
+  db    SolidSnakeUnitLevel4Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Trooper",255,"    "
 
@@ -2189,14 +2189,14 @@ Monster093Table:                        ;Antigas Man (Metal Gear)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    SolidSnakeUnitLevel5CostGold        ;cost (gold)
+  db    SolidSnakeUnitLevel5CostGems        ;cost (gems)
+  db    SolidSnakeUnitLevel5CostRubies      ;cost (rubies)
+  db    SolidSnakeUnitLevel5HP              ;hp
+  db    SolidSnakeUnitLevel5Speed           ;speed
+  db    SolidSnakeUnitLevel5Attack          ;attack
+  db    SolidSnakeUnitLevel5Defense         ;defense
+  db    SolidSnakeUnitLevel5Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Antigas Man",255
   
@@ -2212,14 +2212,14 @@ Monster094Table:                        ;Footman (Metal Gear)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    003                             ;hp
-  db    009                             ;speed
-  db    004                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    SolidSnakeUnitLevel3CostGold        ;cost (gold)
+  db    SolidSnakeUnitLevel3CostGems        ;cost (gems)
+  db    SolidSnakeUnitLevel3CostRubies      ;cost (rubies)
+  db    SolidSnakeUnitLevel3HP              ;hp
+  db    SolidSnakeUnitLevel3Speed           ;speed
+  db    SolidSnakeUnitLevel3Attack          ;attack
+  db    SolidSnakeUnitLevel3Defense         ;defense
+  db    SolidSnakeUnitLevel3Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Footman",255,"    "
 
@@ -2879,14 +2879,14 @@ Monster122Table:                        ;Spooky (Spooky)
   db    BattleMonsterSpriteSheet11Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Spooky",255,"     "
 
@@ -2902,14 +2902,14 @@ Monster123Table:                        ;Ghosty (spooky)
   db    BattleMonsterSpriteSheet11Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Ghosty",255,"     "
 
@@ -2925,14 +2925,14 @@ Monster124Table:                        ;KuGyoku Den (legendly 9 gems)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel3CostGold        ;cost (gold)
+  db    RandomAUnitLevel3CostGems        ;cost (gems)
+  db    RandomAUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel3HP              ;hp
+  db    RandomAUnitLevel3Speed           ;speed
+  db    RandomAUnitLevel3Attack          ;attack
+  db    RandomAUnitLevel3Defense         ;defense
+  db    RandomAUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "KuGyoku Den",255
   
@@ -2948,14 +2948,14 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "GooGoo",255,"     "
 
@@ -2971,14 +2971,14 @@ Monster126Table:                        ;sofia (sofia)
   db    BattleMonsterSpriteSheet11Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Sofia",255,"      "
 
@@ -3017,14 +3017,14 @@ Monster128Table:                        ;BlasterBot
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel5CostGold        ;cost (gold)
+  db    RandomAUnitLevel5CostGems        ;cost (gems)
+  db    RandomAUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel5HP              ;hp
+  db    RandomAUnitLevel5Speed           ;speed
+  db    RandomAUnitLevel5Attack          ;attack
+  db    RandomAUnitLevel5Defense         ;defense
+  db    RandomAUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "BlasterBot",255," "
 
@@ -3063,14 +3063,14 @@ Monster130Table:                        ;Schaefer (predator)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Schaefer",255,"   "
 
@@ -3086,14 +3086,14 @@ Monster131Table:                        ;Jon Sparkle (malaya no hihou)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel3CostGold        ;cost (gold)
+  db    RandomAUnitLevel3CostGems        ;cost (gems)
+  db    RandomAUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel3HP              ;hp
+  db    RandomAUnitLevel3Speed           ;speed
+  db    RandomAUnitLevel3Attack          ;attack
+  db    RandomAUnitLevel3Defense         ;defense
+  db    RandomAUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Jon Sparkle",255
 
@@ -3109,14 +3109,14 @@ Monster132Table:                        ;Monmon (mon mon monster)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Monmon",255,"     "
   
@@ -3132,14 +3132,14 @@ Monster133Table:                        ;Cob Crusher (mon mon monster)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Cob Crusher",255
   
@@ -3155,14 +3155,14 @@ Monster134Table:                        ;Limb Linger (mon mon monster)
   db    BattleMonsterSpriteSheet11Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel2CostGold        ;cost (gold)
+  db    RandomAUnitLevel2CostGems        ;cost (gems)
+  db    RandomAUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel2HP              ;hp
+  db    RandomAUnitLevel2Speed           ;speed
+  db    RandomAUnitLevel2Attack          ;attack
+  db    RandomAUnitLevel2Defense         ;defense
+  db    RandomAUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Limb Linger",255
   
@@ -3178,14 +3178,14 @@ Monster135Table:                        ;deva (deva)
   db    BattleMonsterSpriteSheet14Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DevaUnitLevel4CostGold        ;cost (gold)
+  db    DevaUnitLevel4CostGems        ;cost (gems)
+  db    DevaUnitLevel4CostRubies      ;cost (rubies)
+  db    DevaUnitLevel4HP              ;hp
+  db    DevaUnitLevel4Speed           ;speed
+  db    DevaUnitLevel4Attack          ;attack
+  db    DevaUnitLevel4Defense         ;defense
+  db    DevaUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Deva",255,"       "
   
@@ -3201,14 +3201,14 @@ Monster136Table:                        ;Spectroll (deva)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DevaUnitLevel2CostGold        ;cost (gold)
+  db    DevaUnitLevel2CostGems        ;cost (gems)
+  db    DevaUnitLevel2CostRubies      ;cost (rubies)
+  db    DevaUnitLevel2HP              ;hp
+  db    DevaUnitLevel2Speed           ;speed
+  db    DevaUnitLevel2Attack          ;attack
+  db    DevaUnitLevel2Defense         ;defense
+  db    DevaUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Spectroll",255,"  "
   
@@ -3224,18 +3224,18 @@ Monster137Table:                        ;Yurei Kage (deva)
   db    BattleMonsterSpriteSheet12Block
   db    32                              ;nx  
   db    48+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    DevaUnitLevel3CostGold        ;cost (gold)
+  db    DevaUnitLevel3CostGems        ;cost (gems)
+  db    DevaUnitLevel3CostRubies      ;cost (rubies)
+  db    DevaUnitLevel3HP              ;hp
+  db    DevaUnitLevel3Speed           ;speed
+  db    DevaUnitLevel3Attack          ;attack
+  db    DevaUnitLevel3Defense         ;defense
+  db    DevaUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Yurei Kage",255," "
   
-Monster138Table:                        ;Blob (usas2)
+Monster138Table:                        ;Huge Blob (usas2)
   dw    Monster138Idle
   dw    Monster138Move
   dw    GeneralMonsterAttackPatternRight
@@ -3247,14 +3247,14 @@ Monster138Table:                        ;Blob (usas2)
   db    BattleMonsterSpriteSheet12Block
   db    48                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    Usas2UnitLevel5CostGold        ;cost (gold)
+  db    Usas2UnitLevel5CostGems        ;cost (gems)
+  db    Usas2UnitLevel5CostRubies      ;cost (rubies)
+  db    Usas2UnitLevel5HP              ;hp
+  db    Usas2UnitLevel5Speed           ;speed
+  db    Usas2UnitLevel5Attack          ;attack
+  db    Usas2UnitLevel5Defense         ;defense
+  db    Usas2UnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Blob",255,"       "
 
@@ -3270,14 +3270,14 @@ Monster139Table:                        ;Emir Mystic (usas2)
   db    BattleMonsterSpriteSheet12Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    Usas2UnitLevel4CostGold        ;cost (gold)
+  db    Usas2UnitLevel4CostGems        ;cost (gems)
+  db    Usas2UnitLevel4CostRubies      ;cost (rubies)
+  db    Usas2UnitLevel4HP              ;hp
+  db    Usas2UnitLevel4Speed           ;speed
+  db    Usas2UnitLevel4Attack          ;attack
+  db    Usas2UnitLevel4Defense         ;defense
+  db    Usas2UnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Emir Mystic",255
   
@@ -3293,14 +3293,14 @@ Monster140Table:                        ;duncan seven (core dump)
   db    BattleMonsterSpriteSheet14Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel5CostGold        ;cost (gold)
+  db    RandomAUnitLevel5CostGems        ;cost (gems)
+  db    RandomAUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel5HP              ;hp
+  db    RandomAUnitLevel5Speed           ;speed
+  db    RandomAUnitLevel5Attack          ;attack
+  db    RandomAUnitLevel5Defense         ;defense
+  db    RandomAUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Duncan 7",255,"   "
 
@@ -3339,14 +3339,14 @@ Monster142Table:                        ;Biolumia (core dump)
   db    BattleMonsterSpriteSheet7Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel4CostGold        ;cost (gold)
+  db    RandomAUnitLevel4CostGems        ;cost (gems)
+  db    RandomAUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel4HP              ;hp
+  db    RandomAUnitLevel4Speed           ;speed
+  db    RandomAUnitLevel4Attack          ;attack
+  db    RandomAUnitLevel4Defense         ;defense
+  db    RandomAUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Biolumia",255,"   "
 
@@ -3362,14 +3362,14 @@ Monster143Table:                        ;Anna Lee (cabage patch kids)
   db    BattleMonsterSpriteSheet14Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel1CostGold        ;cost (gold)
+  db    RandomAUnitLevel1CostGems        ;cost (gems)
+  db    RandomAUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel1HP              ;hp
+  db    RandomAUnitLevel1Speed           ;speed
+  db    RandomAUnitLevel1Attack          ;attack
+  db    RandomAUnitLevel1Defense         ;defense
+  db    RandomAUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Anna Lee",255,"   "
 
@@ -3385,14 +3385,14 @@ Monster144Table:                        ;Pastry Chef (comic bakery)
   db    BattleMonsterSpriteSheet14Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Pastry Chef",255
 
@@ -3408,14 +3408,14 @@ Monster145Table:                        ;Indy Brave (magical tree)
   db    BattleMonsterSpriteSheet14Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Indy Brave",255," "
 
@@ -3431,14 +3431,14 @@ Monster146Table:                        ;Red Lupin (arsene lupin)
   db    BattleMonsterSpriteSheet14Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel3CostGold        ;cost (gold)
+  db    RandomAUnitLevel3CostGems        ;cost (gems)
+  db    RandomAUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel3HP              ;hp
+  db    RandomAUnitLevel3Speed           ;speed
+  db    RandomAUnitLevel3Attack          ;attack
+  db    RandomAUnitLevel3Defense         ;defense
+  db    RandomAUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Red Lupin",255,"  "
 
@@ -3454,14 +3454,14 @@ Monster147Table:                        ;Green Lupin (arsene lupin)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Green Lupin",255
   
@@ -3477,14 +3477,14 @@ Monster148Table:                        ;Major Mirth (arsene lupin)
   db    BattleMonsterSpriteSheet14Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel2CostGold        ;cost (gold)
+  db    RandomAUnitLevel2CostGems        ;cost (gems)
+  db    RandomAUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel2HP              ;hp
+  db    RandomAUnitLevel2Speed           ;speed
+  db    RandomAUnitLevel2Attack          ;attack
+  db    RandomAUnitLevel2Defense         ;defense
+  db    RandomAUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Major Mirth",255
   
@@ -3500,14 +3500,14 @@ Monster149Table:                        ;Vic Viper (kings valley 2)
   db    BattleMonsterSpriteSheet13Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    KingsValley2UnitLevel4CostGold        ;cost (gold)
+  db    KingsValley2UnitLevel4CostGems        ;cost (gems)
+  db    KingsValley2UnitLevel4CostRubies      ;cost (rubies)
+  db    KingsValley2UnitLevel4HP              ;hp
+  db    KingsValley2UnitLevel4Speed           ;speed
+  db    KingsValley2UnitLevel4Attack          ;attack
+  db    KingsValley2UnitLevel4Defense         ;defense
+  db    KingsValley2UnitLevel4Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Vic Viper",255,"  "
 
@@ -3523,14 +3523,14 @@ Monster150Table:                        ;Rock Roll (kings valley 2)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    KingsValley2UnitLevel3CostGold        ;cost (gold)
+  db    KingsValley2UnitLevel3CostGems        ;cost (gems)
+  db    KingsValley2UnitLevel3CostRubies      ;cost (rubies)
+  db    KingsValley2UnitLevel3HP              ;hp
+  db    KingsValley2UnitLevel3Speed           ;speed
+  db    KingsValley2UnitLevel3Attack          ;attack
+  db    KingsValley2UnitLevel3Defense         ;defense
+  db    KingsValley2UnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Rock Roll",255,"  "
 
@@ -3546,14 +3546,14 @@ Monster151Table:                        ;Slouman (kings valley 2)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    KingsValley2UnitLevel1CostGold        ;cost (gold)
+  db    KingsValley2UnitLevel1CostGems        ;cost (gems)
+  db    KingsValley2UnitLevel1CostRubies      ;cost (rubies)
+  db    KingsValley2UnitLevel1HP              ;hp
+  db    KingsValley2UnitLevel1Speed           ;speed
+  db    KingsValley2UnitLevel1Attack          ;attack
+  db    KingsValley2UnitLevel1Defense         ;defense
+  db    KingsValley2UnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Slouman",255,"    "
 
@@ -3569,14 +3569,14 @@ Monster152Table:                        ;Pyoncy (kings valley 2)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    050                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    KingsValley2UnitLevel2CostGold        ;cost (gold)
+  db    KingsValley2UnitLevel2CostGems        ;cost (gems)
+  db    KingsValley2UnitLevel2CostRubies      ;cost (rubies)
+  db    KingsValley2UnitLevel2HP              ;hp
+  db    KingsValley2UnitLevel2Speed           ;speed
+  db    KingsValley2UnitLevel2Attack          ;attack
+  db    KingsValley2UnitLevel2Defense         ;defense
+  db    KingsValley2UnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Pyoncy",255,"     "
 
@@ -3598,14 +3598,14 @@ Monster153Table:                        ;Andorogynus (Andorogynus)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Andorogynus",255
   
@@ -3621,14 +3621,14 @@ Monster154Table:                        ;Thexder (Thexder)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel5CostGold        ;cost (gold)
+  db    RandomBUnitLevel5CostGems        ;cost (gems)
+  db    RandomBUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel5HP              ;hp
+  db    RandomBUnitLevel5Speed           ;speed
+  db    RandomBUnitLevel5Attack          ;attack
+  db    RandomBUnitLevel5Defense         ;defense
+  db    RandomBUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Thexder",255,"    "
 
@@ -3644,14 +3644,14 @@ Monster155Table:                        ;BounceBot (Thexder)
   db    BattleMonsterSpriteSheet6Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel3CostGold        ;cost (gold)
+  db    RandomAUnitLevel3CostGems        ;cost (gems)
+  db    RandomAUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel3HP              ;hp
+  db    RandomAUnitLevel3Speed           ;speed
+  db    RandomAUnitLevel3Attack          ;attack
+  db    RandomAUnitLevel3Defense         ;defense
+  db    RandomAUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "BounceBot",255,"  "
 
@@ -3667,14 +3667,14 @@ Monster156Table:                        ;ColossalBot (Thexder)
   db    BattleMonsterSpriteSheet11Block
   db    32                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel6CostGold        ;cost (gold)
+  db    RandomBUnitLevel6CostGems        ;cost (gems)
+  db    RandomBUnitLevel6CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel6HP              ;hp
+  db    RandomBUnitLevel6Speed           ;speed
+  db    RandomBUnitLevel6Attack          ;attack
+  db    RandomBUnitLevel6Defense         ;defense
+  db    RandomBUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "ColossalBot",255
 
@@ -3690,14 +3690,14 @@ Monster157Table:                        ;SuperRunner (SuperRunner)
   db    BattleMonsterSpriteSheet12Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel3CostGold        ;cost (gold)
+  db    RandomAUnitLevel3CostGems        ;cost (gems)
+  db    RandomAUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel3HP              ;hp
+  db    RandomAUnitLevel3Speed           ;speed
+  db    RandomAUnitLevel3Attack          ;attack
+  db    RandomAUnitLevel3Defense         ;defense
+  db    RandomAUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "SuperRunner",255
   
@@ -3742,14 +3742,14 @@ Monster159Table:                        ;Senko Kyu (shooting head) (hinotori)
   db    BattleMonsterSpriteSheet9Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Senko Kyu",255,"  "
 
@@ -3765,14 +3765,14 @@ Monster160Table:                        ;Chucklehook (higemaru)
   db    BattleMonsterSpriteSheet9Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Chucklehook",255
   
@@ -3788,14 +3788,14 @@ Monster161Table:                        ;Sir Oji (castle excellent)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Sir Oji",255,"    "
 
@@ -3811,14 +3811,14 @@ Monster162Table:                        ;Pentaro (parodius)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Pentaro",255,"    "
 
@@ -3834,14 +3834,14 @@ Monster163Table:                        ;Moai (parodius)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    000                             ;special ability
   db    "Moai",255,"       "
 
@@ -3857,14 +3857,14 @@ Monster164Table:                        ;Thomas (kung fu master)
   db    BattleMonsterSpriteSheet7Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Thomas",255,"     "
 
@@ -3880,14 +3880,14 @@ Monster165Table:                        ;BlueSteel (knight with sword) (maze of 
   db    BattleMonsterSpriteSheet15Block
   db    32                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "BlueSteel",255,"  "
 
@@ -3903,14 +3903,14 @@ Monster166Table:                        ;HikoDrone (space manbow)
   db    BattleMonsterSpriteSheet12Block
   db    16                              ;nx  
   db    40+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Hikodrone",255,"  "
 
@@ -3926,14 +3926,14 @@ Monster167Table:                        ;Wonder Boy (Wonder Boy)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Wonder Boy",255," "
 
@@ -3949,14 +3949,14 @@ Monster168Table:                        ;Ninja Kun (Ninja Kun)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Ninja Kun",255,"  "
 
@@ -3972,14 +3972,14 @@ Monster169Table:                        ;Kubiwatari (jumping head statue) (hinot
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Kubiwatari",255," "
   
@@ -3995,14 +3995,14 @@ Monster170Table:                        ;butterfly (maze of gallious)
   db    BattleMonsterSpriteSheet10Block
   db    32                              ;nx  
   db    24+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel5CostGold        ;cost (gold)
+  db    RandomBUnitLevel5CostGems        ;cost (gems)
+  db    RandomBUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel5HP              ;hp
+  db    RandomBUnitLevel5Speed           ;speed
+  db    RandomBUnitLevel5Attack          ;attack
+  db    RandomBUnitLevel5Defense         ;defense
+  db    RandomBUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Kubiwatari",255," "
 
@@ -4618,10 +4618,24 @@ Monster025Idle:
   dw    LIdle1Monster025
   dw    LIdle2Monster025
 
+
+
 Monster025AttackPatternRight:
-  db    AnimateAttack | dw Rattack1Monster025 | db 000,000,000,000,000,AnimateAttack | dw RIdle1Monster025 | db ShootProjectile,WaitImpactProjectile
+  db    000,AnimateAttack | dw Rattack1Monster025 | db 000,000,000,003,ShowBeingHitSprite,000,007,000,000,InitiateAttack
+Monster025AttackPatternRightUp:
+  db    000,AnimateAttack | dw Rattack1Monster025 | db 000,000,000,002,ShowBeingHitSprite,000,006,000,000,InitiateAttack
+Monster025AttackPatternRightDown:
+  db    000,AnimateAttack | dw Rattack1Monster025 | db 000,000,000,004,ShowBeingHitSprite,000,008,000,000,InitiateAttack
 Monster025AttackPatternLeft:
-  db    AnimateAttack | dw Lattack1Monster025 | db 000,000,000,000,000,AnimateAttack | dw LIdle1Monster025 | db ShootProjectile,WaitImpactProjectile
+  db    000,AnimateAttack | dw Lattack1Monster025 | db 000,000,000,007,ShowBeingHitSprite,000,003,000,000,InitiateAttack
+Monster025AttackPatternLeftUp:
+  db    000,AnimateAttack | dw Lattack1Monster025 | db 000,000,000,008,ShowBeingHitSprite,000,004,000,000,InitiateAttack
+Monster025AttackPatternLeftDown:
+  db    000,AnimateAttack | dw Lattack1Monster025 | db 000,000,000,006,ShowBeingHitSprite,000,002,000,000,InitiateAttack
+
+
+
+
 ;######################################################################################
 ;Axe man (Castlevania)
 
