@@ -3,15 +3,15 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 0
+StartAtTitleScreen?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap01
-WorldPointer: dw GentleDesertMap03
+;WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap01
 ;WorldPointer: dw GentleMap04
-;WorldPointer: dw GentleWinterMap01
+WorldPointer: dw GentleWinterMap05
 
 InitiateGame:
   ld    hl,CHMOUS
