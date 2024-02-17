@@ -3498,9 +3498,9 @@ db  19  ;Wit
 db  47  ;Cles
 
 GoemonHeroesAmount:  equ Ys3Heroes-GoemonHeroes
-GoemonHeroes:
-;Goemon
-db  0 ;02  ;Goemon
+GoemonHeroes: ;The Legend of the Mystical Ninja (SNES)
+
+db  02  ;Goemon
 db  15  ;Ebisumaru
 
 Ys3HeroesAmount:  equ PsychoWorldHeroes-Ys3Heroes

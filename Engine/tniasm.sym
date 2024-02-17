@@ -1642,7 +1642,7 @@ RAttack1Monster134: equ 0AFD0h ; last def. pass 3
 MenuOptionSelected?: equ 0CF63h ; last def. pass 3
 GolvelliusUnitLevel2Growth: equ 08h ; last def. pass 3
 LIdle1Monster129: equ 097F0h ; last def. pass 3
-GentleDesertMap04Map: equ 06C71h ; last def. pass 3
+GentleDesertMap04Map: equ 06E08h ; last def. pass 3
 CheckButtonMouseInteractionCastleMainScreen.EndCheckExit: equ 0B771h ; last def. pass 3
 AkanbeDragonGroupAUnitLevel2Number: equ 071h ; last def. pass 3
 Monster12.statusEffect4: equ 0C5BBh ; last def. pass 3
@@ -5558,7 +5558,7 @@ HandleProjectileSprite.SetCoordinates: equ 08F45h ; last def. pass 3
 InventoryItem09MouseOverSY: equ 03Ch ; last def. pass 3
 LIdle1Monster079: equ 073B8h ; last def. pass 3
 MarketPlaceCost.Gold: equ 0A5E5h ; last def. pass 3
-GentleDesertMap05ObjectLayerMap: equ 0740Bh ; last def. pass 3
+GentleDesertMap05ObjectLayerMap: equ 075A2h ; last def. pass 3
 Monster090Table: equ 08DE8h ; last def. pass 3
 SettavernHeroNames: equ 07F66h ; last def. pass 3
 Monster021AttackPatternRightUp: equ 09C6Dh ; last def. pass 3
@@ -8300,7 +8300,7 @@ Monster075Move: equ 0A1FCh ; last def. pass 3
 MonsterTableHp: equ 016h ; last def. pass 3
 Monster135AttackPatternRightDown: equ 0AE95h ; last def. pass 3
 ButtonTableSpellIconsAirSYSX: equ 0CEB2h ; last def. pass 3
-GentleDesertMap05Map: equ 07093h ; last def. pass 3
+GentleDesertMap05Map: equ 0722Ah ; last def. pass 3
 DevaUnitLevel4Attack: equ 09h ; last def. pass 3
 LIdle2Monster061: equ 08FB0h ; last def. pass 3
 HeroPortrait16x30SYSXDrasle3: equ 07FB8h ; last def. pass 3
@@ -9364,7 +9364,7 @@ checktriggerhud.MouseOverButtonAndSpacePressedOverButtonNotYetLit: equ 0477h ; l
 HeroLevel: equ 028h ; last def. pass 3
 pl1hero3manarec: equ 0327Ah ; last def. pass 3
 InventoryItem12DY: equ 07Dh ; last def. pass 3
-GentleDesertMap04ObjectLayerMap: equ 07079h ; last def. pass 3
+GentleDesertMap04ObjectLayerMap: equ 07210h ; last def. pass 3
 HeroOverViewSpellIconButton10OffSX: equ 0E0h ; last def. pass 3
 TurboOn?: equ 0E793h ; last def. pass 3
 Monster141Idle: equ 0B14Bh ; last def. pass 3

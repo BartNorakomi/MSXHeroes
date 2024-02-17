@@ -3162,9 +3162,6 @@ SetEnemyStatsWindow:
   pop   af
   exx
 
-
-
-
   call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   pop   bc                              ;x,y coordinates of window
@@ -3180,7 +3177,7 @@ SetEnemyStatsWindow:
 
   push  bc
 
-  call  SetMonsterTableInIYNeutralMonster
+  call  SetMonsterTableInIYNeutralMonster ;
   push  iy
   pop   hl
   ld    de,MonsterTableName
@@ -3308,8 +3305,8 @@ ListOfMonsters:
   db    085                               ;155 Seraph (Golvellius)
   db    084                               ;156 Headless (Golvellius)
   db    128                               ;157 BlasterBot
-  db    0                                 ;158
-  db    0                                 ;159
+  db    140                               ;158 Duncan 7 (core dump)
+  db    142                               ;159 Biolumia (core dump)
   db    030                               ;160 Piglet (piggy red nose) (Dragon Slayer IV)
   db    032                               ;161 Yashinotkin (red fish like creature) (Dragon Slayer IV)
   db    034                               ;162 Crawler (blue 3 legs) (Dragon Slayer IV)
