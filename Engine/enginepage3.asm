@@ -380,7 +380,7 @@ ListOfMonstersToPut:
 
   db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
   db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
-  db  006 | dw 900 | db 012 + (14*08), 056 + (07*16) + 16
+  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
 
 ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
 ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (26*08), 056 + (01*16) + 16

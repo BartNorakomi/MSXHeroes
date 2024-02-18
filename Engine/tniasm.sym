@@ -6568,7 +6568,7 @@ LIdle3Monster147: equ 0ABE8h ; last def. pass 3
 SetSpellExplanation_Earth: equ 06248h ; last def. pass 3
 CastleLevel3UnitsAvail: equ 022h ; last def. pass 3
 Monster4.hp: equ 0C511h ; last def. pass 3
-GentleMap04ObjectLayerMap: equ 06135h ; last def. pass 3
+GentleMap04ObjectLayerMap: equ 06160h ; last def. pass 3
 SetGraphicsElementalSpells.HeroOverViewSpell4backdropDY: equ 06Fh ; last def. pass 3
 CheckHeroCollidesWithFriendlyHero.checkpointerFriendlyloop: equ 0A92h ; last def. pass 3
 Monster058Idle: equ 0A09Eh ; last def. pass 3
@@ -8269,7 +8269,7 @@ HandleSpellBook.MenuOptionSelected: equ 0AAA1h ; last def. pass 3
 SolidSnakeUnitLevel5Number: equ 05Dh ; last def. pass 3
 HeroPortrait10x18SYSXDrPettrovich: equ 04899h ; last def. pass 3
 MarketPlaceButton4XRight: equ 0B8h ; last def. pass 3
-GentleMap05Map: equ 0615Dh ; last def. pass 3
+GentleMap05Map: equ 063DFh ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.Castle: equ 09CA8h ; last def. pass 3
 SetNumber16BitCastle.Check1000Folds: equ 07F7h ; last def. pass 3
 Monster12: equ 0C5ABh ; last def. pass 3
@@ -8550,7 +8550,7 @@ PlaceFireSpellsInSpellBook.EndPlaceFireSpell1: equ 0554Dh ; last def. pass 3
 WaterLevel2Button: equ 091B5h ; last def. pass 3
 ContraGroupAUnitLevel3Growth: equ 07h ; last def. pass 3
 SetCampaignSelectGraphics: equ 09673h ; last def. pass 3
-GentleMap05ObjectLayerMap: equ 073EDh ; last def. pass 3
+GentleMap05ObjectLayerMap: equ 0766Fh ; last def. pass 3
 CheckButtonMouseInteractionGenericButtons: equ 090E5h ; last def. pass 3
 SkillTextestatesExpert: equ 05F22h ; last def. pass 3
 RIdle1Monster087: equ 07FC0h ; last def. pass 3
