@@ -484,5 +484,3 @@ CHMOUS:
 	CALL	RD_PSG
 	AND	$0F
 	RET	
-	
-	kut:

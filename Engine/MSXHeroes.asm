@@ -1819,6 +1819,5 @@ phase	$4000
 dephase
 
 
-
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

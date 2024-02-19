@@ -201,6 +201,7 @@ InventoryItem14Dx:      equ HeroOverViewInventoryWindowDX + 096
 InventoryItem15DY:      equ HeroOverViewInventoryWindowDY + 101
 InventoryItem15Dx:      equ HeroOverViewInventoryWindowDX + 118
 
+ScrollIconNR: equ 46
 InventoryIconTableSYSX: 
                     dw $4000 + (InventoryItem00ButtonOffSY*128) + (InventoryItem00ButtonOffSX/2) - 128  ;sword 1
                     dw $4000 + (InventoryItem00MouseOverSY*128) + (InventoryItem00MouseOverSX/2) - 128
@@ -305,6 +306,9 @@ InventoryIconTableSYSX:
 
                     dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
                     dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
+
+                    dw $4000 + (InventoryItem46ButtonOffSY*128) + (InventoryItem46ButtonOffSX/2) - 128  ;scroll
+                    dw $4000 + (InventoryItem46MouseOverSY*128) + (InventoryItem46MouseOverSX/2) - 128
 
 InventoryItem00ButtonOffSY:   equ 000 ;sword 1
 InventoryItem00ButtonOffSX:   equ 146
@@ -499,6 +503,11 @@ InventoryItem45ButtonOffSY:   equ 236 ;empty slot
 InventoryItem45ButtonOffSX:   equ 200
 InventoryItem45MouseOverSY:   equ 236
 InventoryItem45MouseOverSX:   equ 180
+
+InventoryItem46ButtonOffSY:   equ 236 ;scroll
+InventoryItem46ButtonOffSX:   equ 140
+InventoryItem46MouseOverSY:   equ 236
+InventoryItem46MouseOverSX:   equ 160
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1128,8 +1137,6 @@ HeroOverviewInventoryWindowCode:
   or    a
   jp    nz,.InventoryIconPressed
 
-
-
 ;  call  SetHeroOverViewFontPage0Y212    ;set font at (0,212) page 0
   call  SetTextInventoryItem            ;when clicking on an item, the explanation will appear
 
@@ -1399,6 +1406,11 @@ InventoryDescriptionList:
   dw    DescriptionNecklace1, DescriptionNecklace2, DescriptionNecklace3, DescriptionNecklace4, DescriptionNecklace5
   dw    DescriptionRobe1, DescriptionRobe2, DescriptionRobe3, DescriptionRobe4, DescriptionRobe5
   dw    DescriptionEmpty
+  dw    DescriptionScrollEarth1, DescriptionScrollEarth2, DescriptionScrollEarth3, DescriptionScrollEarth4
+  dw    DescriptionScrollFire1, DescriptionScrollFire2, DescriptionScrollFire3, DescriptionScrollFire4
+  dw    DescriptionScrollAir1, DescriptionScrollAir2, DescriptionScrollAir3, DescriptionScrollAir4
+  dw    DescriptionScrollWater1, DescriptionScrollWater2, DescriptionScrollWater3, DescriptionScrollWater4
+  dw    DescriptionScrollUniversal1, DescriptionScrollUniversal2, DescriptionScrollUniversal3, DescriptionScrollUniversal4
 
                           ;item 000
 DescriptionSword1:        db  "Dagger Time",254 | DaggerTimeAttack: equ 4               
@@ -1616,8 +1628,34 @@ DescriptionRobe5:        db  "Labcoat",254 | LabCoatSpellPower: equ 7 | LabcoatU
                           db  "Spell power +7",254
                           db  "Max hp units -2",255
 
-                          ;item 000
+                          ;item 045
 DescriptionEmpty:        db  255
+
+                          ;item 046
+DescriptionScrollEarth1:        db  "SpellScroll: Earthbound",255
+DescriptionScrollEarth2:        db  "SpellScroll: Plate Armor",255
+DescriptionScrollEarth3:        db  "SpellScroll: Resurrection",255
+DescriptionScrollEarth4:        db  "SpellScroll: Earthshock",255
+
+DescriptionScrollFire1:        db  "SpellScroll: Curse",255
+DescriptionScrollFire2:        db  "SpellScroll: Blinding Fog",255
+DescriptionScrollFire3:        db  "SpellScroll: Implosion",255
+DescriptionScrollFire4:        db  "SpellScroll: Sunstrike",255
+
+DescriptionScrollAir1:        db  "SpellScroll: Haste",255
+DescriptionScrollAir2:        db  "SpellScroll: ShieldBreaker",255
+DescriptionScrollAir3:        db  "SpellScroll: Claw Back",255
+DescriptionScrollAir4:        db  "SpellScroll: Spell Bubble",255
+
+DescriptionScrollWater1:        db  "SpellScroll: Cure",255
+DescriptionScrollWater2:        db  "SpellScroll: Ice Peak",255
+DescriptionScrollWater3:        db  "SpellScroll: Hypnosis",255
+DescriptionScrollWater4:        db  "SpellScroll: Frost Ring",255
+
+DescriptionScrollUniversal1:        db  "SpellScroll: Magic Arrows",255
+DescriptionScrollUniversal2:        db  "SpellScroll: Frenzy",255
+DescriptionScrollUniversal3:        db  "SpellScroll: Teleport",255
+DescriptionScrollUniversal4:        db  "SpellScroll: Primal Instinct",255
 
 CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonTableInventoryIconsSYSX
   ld    ix,(plxcurrentheroAddress)
@@ -1627,6 +1665,7 @@ CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonT
 
   .loop:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  call  CheckScrollIcon                 ;scroll icons have nr 46-65 (but all use the same icon)
   add   a,a                             ;*2
   add   a,a                             ;*4
   ld    d,0
@@ -1634,23 +1673,28 @@ CreateInventoryListForCurrHero:         ;writes icon coordinates to list:ButtonT
   ld    hl,InventoryIconTableSYSX
   add   hl,de
   ld    a,(hl)
-  ld    (iy+0),a
+  ld    (iy+0),a                        ;sy
   inc   hl
   ld    a,(hl)
-  ld    (iy+1),a
+  ld    (iy+1),a                        ;sy
   inc   hl
   ld    a,(hl)
-  ld    (iy+2),a
+  ld    (iy+2),a                        ;sx
   inc   hl
   ld    a,(hl)
-  ld    (iy+3),a
+  ld    (iy+3),a                        ;sx
   ld    de,6
   add   iy,de                           ;next button in ButtonTableInventoryIconsSYSX
   inc   ix                              ;next hero-inventory item
   djnz  .loop
   ret
 
-                    
+CheckScrollIcon:
+  cp    ScrollIconNR
+  ret   c
+  ld    a,ScrollIconNR
+  ret
+
 SetInventoryIcons:
   ld    ix,(plxcurrentheroAddress)
 
@@ -1718,6 +1762,7 @@ SetInventoryIcons:
 
   .SetIconHLBCandA:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  call  CheckScrollIcon                 ;scroll icons have nr 46-65 (but all use the same icon)
   add   a,a                             ;*2
   add   a,a                             ;*2
   ld    iy,InventoryIconTableSYSX
@@ -1736,10 +1781,14 @@ PlaceWaterSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
   ;water spells
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Water + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
+  ld    a,58                          ;spell scroll water level 1
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpellLevel1
   bit   0,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell1
+  .PlaceWaterSpellLevel1:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Water + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1755,10 +1804,14 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell1:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Water + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
+  ld    a,59                          ;spell scroll water level 2
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpellLevel2
   bit   1,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell2
+  .PlaceWaterSpellLevel2:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Water + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1774,10 +1827,14 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell2:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Water + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
+  ld    a,60                          ;spell scroll water level 3
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpellLevel3
   bit   2,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell3
+  .PlaceWaterSpellLevel3:  
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Water + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1793,11 +1850,14 @@ PlaceWaterSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell3:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Water + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a    
-
+  ld    a,61                          ;spell scroll water level 4
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpellLevel4
   bit   3,(ix+HeroWaterSpells)
   jr    z,.EndPlaceWaterSpell4
+  .PlaceWaterSpellLevel4:  
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Water + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1818,10 +1878,14 @@ PlaceAirSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
   ;air spells
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Air + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ld    a,54                          ;spell scroll air level 1
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpellLevel1
   bit   0,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell1
+  .PlaceAirSpellLevel1:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Air + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1837,10 +1901,14 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell1:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Air + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ld    a,55                          ;spell scroll air level 2
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpellLevel2
   bit   1,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell2
+  .PlaceAirSpellLevel2:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Air + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
 
@@ -1856,10 +1924,14 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell2:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Air + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ld    a,56                          ;spell scroll air level 3
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpellLevel3
   bit   2,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell3
+  .PlaceAirSpellLevel3:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Air + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
 
@@ -1875,10 +1947,14 @@ PlaceAirSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell3:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Air + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a  
+  ld    a,57                          ;spell scroll air level 4
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpellLevel4
   bit   3,(ix+HeroAirSpells)
   jr    z,.EndPlaceAirSpell4
+  .PlaceAirSpellLevel4:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Air + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
 
@@ -1899,10 +1975,14 @@ PlaceFireSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
   ;fire spells
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Fire + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,50                          ;spell scroll fire level 1
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpellLevel1
   bit   0,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell1
+  .PlaceFireSpellLevel1:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Fire + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   
@@ -1918,10 +1998,14 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell1:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Fire + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,51                          ;spell scroll fire level 2
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpellLevel2
   bit   1,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell2
+  .PlaceFireSpellLevel2:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Fire + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
     
@@ -1937,10 +2021,14 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell2:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Fire + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,52                          ;spell scroll fire level 3
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpellLevel3
   bit   2,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell3
+  .PlaceFireSpellLevel3:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Fire + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   
@@ -1956,10 +2044,14 @@ PlaceFireSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell3:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Fire + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,53                          ;spell scroll fire level 4
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpellLevel4
   bit   3,(ix+HeroFireSpells)
   jr    z,.EndPlaceFireSpell4
+  .PlaceFireSpellLevel4:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Fire + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
 
@@ -1977,14 +2069,32 @@ PlaceFireSpellsInSpellBook:
   jp    PlaceAllSpellSchoolSpellsInSpellBook
 
 
+CheckSpellScrollAvailable: ;out: z=scroll found
+  cp    (ix+HeroInventory+9)
+  ret   z
+  cp    (ix+HeroInventory+10)
+  ret   z
+  cp    (ix+HeroInventory+11)
+  ret   z
+  cp    (ix+HeroInventory+12)
+  ret   z
+  cp    (ix+HeroInventory+13)
+  ret   z
+  cp    (ix+HeroInventory+14)
+  ret
+  
 PlaceEarthSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
 
   ;earth spells
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,46                          ;spell scroll earth level 1
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpellLevel1
   bit   0,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell1
+  .PlaceEarthSpellLevel1:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (0 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
@@ -1999,10 +2109,14 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell1:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,47                          ;spell scroll earth level 2
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpellLevel2
   bit   1,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell2
+  .PlaceEarthSpellLevel2:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (1 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
@@ -2012,15 +2126,19 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   ld    hl,$4000 + (Spell02IconSY*128) + (Spell02IconSX/2) -128
   ld    de,$0000 + (Spell2DY*128) + (Spell2DX/2)
-  ld    bc,$0000 + (SpellIconNY*256) + (SpellIconNX/2)
+  ld    bc,$0000 + (SpellIconNY*   256) + (SpellIconNX/2)
   ld    a,SpellBookGraphicsBlock        ;Map block
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell2:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,48                          ;spell scroll earth level 3
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpellLevel3
   bit   2,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell3
+  .PlaceEarthSpellLevel3:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (2 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
@@ -2035,10 +2153,14 @@ PlaceEarthSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell3:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
+  ld    a,49                          ;spell scroll earth level 4
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpellLevel4
   bit   3,(ix+HeroEarthSpells)
   jr    z,.EndPlaceEarthSpell4
+  .PlaceEarthSpellLevel4:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (3 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
   ld    hl,$4000 + (HeroOverViewSpellBackdropSY*128) + (HeroOverViewSpellBackdropSX/2) -128
@@ -2058,13 +2180,17 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    ix,(plxcurrentheroAddress)
   ;all spellschools
   
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Air + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Water+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    a,62                          ;spell scroll universal level 1
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpellLevel1
   bit   0,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell1  
+  .PlaceUniversalSpellLevel1:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
@@ -2083,13 +2209,17 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell1:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Air + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Water+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    a,63                          ;spell scroll universal level 2
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpellLevel2
   bit   1,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell2  
+  .PlaceUniversalSpellLevel2:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
@@ -2108,13 +2238,17 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell2:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Air + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Water+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    a,64                          ;spell scroll universal level 3
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpellLevel3
   bit   2,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell3  
+  .PlaceUniversalSpellLevel3:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
@@ -2133,13 +2267,17 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell3:
 
-  ld    a,%0000 0000
+  xor   a
   ld    (HeroOverviewSpellIconButtonTable_Earth + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Air + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Water+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
+  ld    a,65                          ;spell scroll universal level 4
+  call  CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpellLevel3
   bit   3,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell4
+  .PlaceUniversalSpellLevel4:
   ld    a,%1000 0011
   ld    (HeroOverviewSpellIconButtonTable_Earth + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    (HeroOverviewSpellIconButtonTable_Fire+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
@@ -2581,8 +2719,7 @@ SetWhiteWindow:
 
 SpellDescriptions:
 
-
-.DescriptionEarth4:       db  "Ethereal Chains",254
+.DescriptionEarth4:       db  "Earthbound",254
                           db  "Reduces the speed of the selected",254
                           db  "enemy unit by 50%",255
 
@@ -2591,10 +2728,10 @@ SpellDescriptions:
                           db  "friendly unit by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates 40 HP of killed living",254
+                          db  "Reanimates     HP of killed living",254
                           db  "friendly creatures.",255
 
-.DescriptionEarth1:       db  "Meteor Shower",254
+.DescriptionEarth1:       db  "Earthshock",254
                           db  "Deals damage to all creatures in target",254
                           db  "and adjacent hexes.",255
 
@@ -2603,47 +2740,46 @@ SpellDescriptions:
                           db  "Causes the selected enemy unit to deal",254
                           db  "-3 damage when attacking.",255
 
-.DescriptionFire3:        db  "Blur",254
+.DescriptionFire3:        db  "Blinding Fog",254
                           db  "Target ranged unit deals 50% less",254
                           db  "damage.",255
 
-.DescriptionFire2:        db  "Fireball",254
-                          db  "Deals damage to target unit and",254
+.DescriptionFire2:        db  "Implosion",254
+                          db  "Deals damage to enemy unit and",254
                           db  "adjecent units.",255
 
-.DescriptionFire1:        db  "Inferno",254
-                          db  "Deals damage to a single enemy unit",255
-;                          db  "effect.",255
-
+.DescriptionFire1:        db  "Sunstrike",254
+                          db  "Calls down a solar beam to incinerate",254
+                          db  "a single enemy unit.",255
 
 .Descriptionair4:         db  "Haste",254
                           db  "Increases the speed of the selected",254
                           db  "friendly unit by 3.",255
 
-.Descriptionair3:         db  "Disrupting Ray",254
+.Descriptionair3:         db  "Shieldbreaker",254
                           db  "Reduces the defense of the selected ",254
-                          db  "unit by 4.",255
+                          db  "enemy unit by 4.",255
 
-.Descriptionair2:         db  "Counterstrike",254
+.Descriptionair2:         db  "Claw Back",254
                           db  "Target allied unit has unlimited",254
                           db  "retaliations each round.",255
 
-.Descriptionair1:         db  "Deflect",254
+.Descriptionair1:         db  "Spell Bubble",254
                           db  "Target friendly unit has a 75% chance",254
-                          db  "to deflect enemy spells.",255
+                          db  "to deflect a single enemy spell.",255
 
 
 .Descriptionwater4:       db  "Cure",254
                           db  "Removes all negative spell effects",254
-                          db  "and heals for 20 HP",255
+                          db  "and heals for     HP.",255
 
-.Descriptionwater3:       db  "Ice Bolt",254
-                          db  "Deals damage to a single enemy unit.",254
-                          db  " ",255
+.Descriptionwater3:       db  "Ice Peak",254
+                          db  "Conjures an ice shard from the ground,",254
+                          db  "impaling a single enemy.",255
 
-.Descriptionwater2:       db  "Ice Trap",254
+.Descriptionwater2:       db  "Hypnosis",254
                           db  "Enemy unit cant attack until attacked,",254
-                          db  "dispelled or effect wears off",255
+                          db  "dispelled or effect wears off.",255
 
 
 .Descriptionwater1:       db  "Frost Ring",254
@@ -2651,21 +2787,22 @@ SpellDescriptions:
                           db  "the central hex.",255
 
 
-DescriptionAllSpellSchools4:  db  "Magic Arrow",254
-                              db  "Deals damage to selected enemy unit.",254
-                              db  " ",255
+.DescriptionAllSpellSchools4:  db  "magic arrows",254
+                              db  "Unleashes a relentless volley of arrows",254
+                              db  "at a single enemy unit.",255
 
-DescriptionAllSpellSchools3:  db  "Frenzy",254
-                              db  "Friendly unit's attack increases by 5",254
+.DescriptionAllSpellSchools3:  db  "Frenzy",254
+                              db  "Friendly unit's damage increases by 5",254
                               db  "while its defense decreases by 5.",255
 
-DescriptionAllSpellSchools2:  db  "Teleport",254
-                              db  "Teleport allied troop to an unoccupied",254
-                              db  "space.",255
+.DescriptionAllSpellSchools2:  db  "Teleport",254
+                              db  "Instantaneously displaces an allied",254
+                              db  "troop to an an unoccupied space.",255
 
-DescriptionAllSpellSchools1:  db  "Inner Beast",254
-                              db  "Friendly unit receives +3 attack,",254
+.DescriptionAllSpellSchools1:  db  "Primal Instinct",254
+                              db  "Friendly unit receives +3 damage,",254
                               db  "+3 defense and +3 speed.",255
+
 
 SetSpellExplanation_Water:
   ld    a,(SetSkillsDescription?)
@@ -2771,16 +2908,16 @@ SetSpellExplanation_Water:
   ld    a,(MenuOptionSelected?Backup)
 
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools1
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools1
   jp    z,.SetText
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools2
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools2
   jp    z,.SetText
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools3
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools3
   jp    z,.SetText
   cp    4
-  ld    hl,DescriptionAllSpellSchools4
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools4
   jp    z,.SetText
 
 
@@ -2912,16 +3049,16 @@ SetSpellExplanation_Air:
   ld    a,(MenuOptionSelected?Backup)
 
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools1
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools1
   jp    z,.SetText
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools2
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools2
   jp    z,.SetText
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools3
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools3
   jp    z,.SetText
   cp    4
-  ld    hl,DescriptionAllSpellSchools4
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools4
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -3067,16 +3204,16 @@ SetSpellExplanation_Fire:
   .GoSetText:
   ld    a,(MenuOptionSelected?Backup)
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools1
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools1
   jp    z,.SetText
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools2
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools2
   jp    z,.SetText
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools3
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools3
   jp    z,.SetText
   cp    4
-  ld    hl,DescriptionAllSpellSchools4
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools4
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -3254,16 +3391,16 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   ld    a,(MenuOptionSelected?Backup)
 
   cp    1                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools1
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools1
   jp    z,.SetText
   cp    2                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools2
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools2
   jp    z,.SetText
   cp    3                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    hl,DescriptionAllSpellSchools3
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools3
   jp    z,.SetText
   cp    4
-  ld    hl,DescriptionAllSpellSchools4
+  ld    hl,SpellDescriptions.DescriptionAllSpellSchools4
   jp    z,.SetText
 
   cp    5                               ;a = (ix+HeroOverviewWindowAmountOfButtons)
@@ -3734,207 +3871,8 @@ SetStatusTextAttack:
   ret
 
 
-SetNumber16Bit:                         ;in hl=number (16bit)
-  ld    a,b                             ;dx
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c                             ;dy
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    a,h
-  cp    l
-  ret   z
-
-  call  .ConvertToDecimal16bit
-
-  ld    hl,TextNumber
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-
-  .ConvertToDecimal16bit:
-  ld    iy,TextNumber
-  ld    e,0                             ;e=has an xfold already been set prior ?
-
-  .Check10000Folds:
-  ld    d,$30                           ;10000folds in d ($30 = 0)
-
-  .Loop10000Fold:
-  or    a
-  ld    bc,10000
-  sbc   hl,bc                           ;check for 10000 folds
-  jr    c,.Set10000Fold
-  inc   d
-  jr  .Loop10000Fold
-
-  .Set10000Fold:
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet10000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 1000fold
-  inc   iy
-  .EndSet10000Fold:
-
-  add   hl,bc
-
-  .Check1000Folds:
-  ld    d,$30                           ;1000folds in d ($30 = 0)
-
-  .Loop1000Fold:
-  or    a
-  ld    bc,1000
-  sbc   hl,bc                           ;check for 1000 folds
-  jr    c,.Set1000Fold
-  inc   d
-  jr  .Loop1000Fold
-
-  .Set1000Fold:
-  bit   0,e
-  jr    nz,.DoSet1000Fold    
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet1000Fold  
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  .DoSet1000Fold:
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet1000Fold:
-
-  add   hl,bc
-
-  .Check100Folds:
-  ld    d,$30                           ;100folds in d ($30 = 0)
-
-  .Loop100Fold:
-  or    a
-  ld    bc,100
-  sbc   hl,bc                           ;check for 100 folds
-  jr    c,.Set100Fold
-  inc   d
-  jr  .Loop100Fold
-
-  .Set100Fold:
-  bit   0,e
-  jr    nz,.DoSet100Fold  
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet100Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,4
-  ld    (PutLetter+dx),a                ;set dx of text
 
 
-  jr    .EndSet100Fold  
-
-  .DoSet100Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet100Fold:
-
-  add   hl,bc
-
-  .Check10Folds:
-  ld    d,$30                           ;10folds in d ($30 = 0)
-
-  .Loop10Fold:
-  or    a
-  ld    bc,10
-  sbc   hl,bc                           ;check for 10 folds
-  jr    c,.Set10Fold
-  inc   d
-  jr  .Loop10Fold
-
-  .Set10Fold:
-  bit   0,e
-  jr    nz,.DoSet10Fold
-  ld    a,d
-  cp    $30
-  jr    nz,.DoSet10Fold  
-
-  ld    a,(PutLetter+dx)                ;set dx of text
-  add   a,3
-  ld    (PutLetter+dx),a                ;set dx of text
-
-  jr    .EndSet10Fold  
-
-  .DoSet10Fold:
-  ld    e,1                             ;e=has an xfold already been set prior ?
-  ld    (iy),d                          ;set 10fold
-  inc   iy
-  .EndSet10Fold:
-
-  .Check1Fold:
-  ld    bc,10 + $30
-  add   hl,bc
-  
-;  add   a,10 + $30
-  ld    (iy),l                          ;set 1 fold
-  ld    (iy+1),255                      ;end text
-  ret
-
-SetNumber8Bit:                          ;in a=number (8bit)
-  call  ConvertToDecimal                ;converts 8 bit number to decimal and stores it in (TextNumber)
-
-  ld    a,b                             ;dx
-  ld    (PutLetter+dx),a                ;set dx of text
-  ld    (TextDX),a
-  ld    a,c                             ;dy
-  ld    (PutLetter+dy),a                ;set dy of text
-
-  ld    hl,TextNumber
-  ld    (TextAddresspointer),hl  
-  call  SetTextInButton.go
-  ret
-
-ConvertToDecimal:
-  ld    iy,TextNumber
-  .Check100Folds:
-  ld    d,$30                           ;100folds in d ($30 = 0)
-
-  .Loop100Fold:
-  sub   100                             ;check for 100 folds
-  jr    c,.Set100Fold
-  inc   d
-  jr  .Loop100Fold
-
-  .Set100Fold:
-  push  af
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet100Fold  
-  ld    (iy),d                          ;set 100fold
-  inc   iy
-  .EndSet100Fold:
-  pop   af
-
-  add   a,100
-  .Check10Folds:
-  ld    d,$30                           ;10folds in d ($30 = 0)
-
-  .Loop10Fold:
-  sub   10                              ;check for 10 folds
-  jr    c,.Set10Fold
-  inc   d
-  jr  .Loop10Fold
-
-  .Set10Fold:
-  push  af
-  ld    a,d
-  cp    $30
-  jr    z,.EndSet10Fold  
-  ld    (iy),d                          ;set 10fold
-  inc   iy
-  .EndSet10Fold:
-  pop   af
-
-  .Check1Fold:
-  add   a,10 + $30
-  ld    (iy),a                          ;set 1 fold
-  ld    (iy+1),255                      ;end text
-  ret
 
 CheckEndHeroOverviewArmy:
 	ld		a,(NewPrContr)
@@ -4451,113 +4389,7 @@ SetTextInButton:
   add   a,3
 ;  ld    (PutLetter+dx),a                ;set dx of text
   ld    b,a
-  call  SetText
-  ret
-
-  .go:
-	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
-	xor		1                               ;now we switch and set our page
-  ld    (PutLetter+dPage),a             ;set page where to put text
-
-  ld      a,-1
-  ld    (TextPointer),a                 ;increase text pointer
-  .NextLetter:
-  ld    a,(TextPointer)
-  inc   a
-  ld    (TextPointer),a                 ;increase text pointer
-
-  ld    hl,(TextAddresspointer)
-
-  ld    d,0
-  ld    e,a
-  add   hl,de
-
-  ld    a,(hl)                          ;letter
-  cp    255                             ;end
-  ret   z
-  cp    254                             ;next line
-  jr    z,.NextLine
-  cp    TextSpace                       ;space
-  jr    z,.Space
-  cp    TextPercentageSymbol            ;%
-  jr    z,.TextPercentageSymbol
-  cp    TextPlusSymbol                  ;+
-  jr    z,.TextPlusSymbol
-  cp    TextMinusSymbol                 ;-
-  jr    z,.TextMinusSymbol
-
-  cp    TextApostrofeSymbol             ;'
-  jr    z,.TextApostrofeSymbol
-
-
-  cp    TextNumber0+10
-  jr    c,.Number
-
-  sub   $61                             ;hex value of letter "a"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a
-
-  ld    hl,TextCoordinateTable
-  add   hl,de
-  
-  .GoPutLetter:
-  ld    a,(hl)                          ;sx
-  ld    (PutLetter+sx),a                ;set sx of letter
-  inc   hl
-  ld    a,(hl)                          ;nx
-  ld    (PutLetter+nx),a                ;set nx of letter
-
-  ld    hl,PutLetter
-  call  DoCopy
-
-  ld    hl,PutLetter+nx                 ;nx of letter
-  ld    a,(PutLetter+dx)                ;dx of letter we just put
-  add   a,(hl)                          ;add lenght
-  inc   a                               ;+1
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  
-  jp    .NextLetter
-
-.Number:
-  sub   TextNumber0                     ;hex value of number "0"
-  add   a,a                             ;*2
-  ld    d,0
-  ld    e,a  
-
-  ld    hl,TextNumberSymbolsSXNX
-  add   hl,de
-  jr    .GoPutLetter
-  
-.TextPercentageSymbol:
-  ld    hl,TextPercentageSymbolSXNX  
-  jr    .GoPutLetter
-
-.TextPlusSymbol:
-  ld    hl,TextPlusSymbolSXNX  
-  jr    .GoPutLetter
-
-.TextMinusSymbol:
-  ld    hl,TextMinusSymbolSXNX  
-  jr    .GoPutLetter
-
-.TextApostrofeSymbol:
-  ld    hl,TextApostrofeSymbolSXNX  
-  jr    .GoPutLetter
-
-.Space:
-  ld    a,(PutLetter+dx)                ;set dx of next letter
-  add   a,5
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
-
-.NextLine:
-  ld    a,(PutLetter+dy)                ;set dy of next letter
-  add   a,7
-  ld    (PutLetter+dy),a                ;set dy of next letter
-  ld    a,(TextDX)
-  ld    (PutLetter+dx),a                ;set dx of next letter
-  jp    .NextLetter
+  jp    SetText
 
 SetSkillExplanation:
   ld    a,(SetSkillsDescription?)
@@ -4588,15 +4420,6 @@ TextDotSymbol:                equ $2e
 TextOpeningParenthesisSymbol: equ $28
 TextClosingParenthesisSymbol: equ $29
 
-TextNumberSymbolsSXNX: db 121,5,  126,2,  128,4,  132,3,  135,3,  138,4,  142,4,  146,4,  150,4,  154,4,  158,4  
-TextPercentageSymbolSXNX: db  162,4 ;"%"
-TextPlusSymbolSXNX: db  166,5 ;"+"
-TextMinusSymbolSXNX: db  169,5 ;"-"
-TextSlashSymbolSXNX: db  158,4  ;"/"
-TextApostrofeSymbolSXNX: db  114,2  ;"'"
-
-;                         a      b      c      d      e      f      g      h      i      j      k      l      m      n      o      p      q      r      s      t      u      v      w      x      y      z     
-TextCoordinateTable:  db  000,5, 004,5, 009,5, 014,5, 019,5, 024,5, 029,5, 034,5, 039,5, 042,5, 047,4, 051,4, 055,5, 059,5, 063,5, 067,5, 072,5, 076,5, 081,5, 086,5, 091,5, 096,5, 101,5, 106,5, 111,5, 116,5
 TextFirstWindowChoicesButton1:  db  "Skills",255
 TextFirstWindowChoicesButton2:  db  "Inventory",255
 TextFirstWindowChoicesButton3:  db  "Army",255
@@ -4842,3 +4665,6 @@ SetHeroOverViewArmyWindow:
   ld    bc,$0000 + (HeroOverViewArmyWindowNY*256) + (HeroOverViewArmyWindowNX/2)
   ld    a,ArmyGraphicsBlock;Map block
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+

@@ -8992,3 +8992,149 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
 
 AnimateSpell:
   jp    GoAnimateSpell
+
+
+
+
+
+
+
+
+
+
+
+DisplaySpireOfWisdomCOde:
+  call  SetSpireOfWisdomButtons
+  call  SetSpireOfWisdomGraphics               ;put gfx
+  call  SetSpireOfWisdomText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetSpireOfWisdomGraphics               ;put gfx
+  call  SetSpireOfWisdomText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ;Trading Heroes Inventory buttons
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+
+;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+SetSpireOfWisdomButtons:
+  ld    hl,SetSpireOfWisdomButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*05)
+  ldir
+  ret
+
+SetSpireOfWisdomButtonTableGfxBlock:  db  SecondarySkillsButtonsBlock
+SetSpireOfWisdomButtonTableAmountOfButtons:  db  05
+SetSpireOfWisdomButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;attack
+  db  %1100 0011 | dw $4000 + (132*128) + (090/2) - 128 | dw $4000 + (132*128) + (154/2) - 128 | dw $4000 + (000*128) + (240/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;defense
+  db  %1100 0011 | dw $4000 + (132*128) + (106/2) - 128 | dw $4000 + (132*128) + (170/2) - 128 | dw $4000 + (016*128) + (240/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+  ;intelligence
+  db  %1100 0011 | dw $4000 + (132*128) + (122/2) - 128 | dw $4000 + (132*128) + (186/2) - 128 | dw $4000 + (032*128) + (240/2) - 128 | db .Button3Ytop,.Button3YBottom,.Button3XLeft,.Button3XRight | dw $0000 + (.Button3Ytop*128) + (.Button3XLeft/2) - 128 
+  ;spell power
+  db  %1100 0011 | dw $4000 + (132*128) + (138/2) - 128 | dw $4000 + (132*128) + (202/2) - 128 | dw $4000 + (048*128) + (240/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128 
+  ;v button
+  db  %1100 0011 | dw $4000 + (132*128) + (030/2) - 128 | dw $4000 + (132*128) + (050/2) - 128 | dw $4000 + (132*128) + (070/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128 
+
+.Button1Ytop:           equ 026 + 24
+.Button1YBottom:        equ .Button1Ytop + 016
+.Button1XLeft:          equ 028 + 20
+.Button1XRight:         equ .Button1XLeft + 016
+
+.Button2Ytop:           equ 060 + 24
+.Button2YBottom:        equ .Button2Ytop + 016
+.Button2XLeft:          equ 028 + 20
+.Button2XRight:         equ .Button2XLeft + 016
+
+.Button3Ytop:           equ 026 + 24
+.Button3YBottom:        equ .Button3Ytop + 016
+.Button3XLeft:          equ 118 + 20
+.Button3XRight:         equ .Button3XLeft + 016
+
+.Button4Ytop:           equ 060 + 24
+.Button4YBottom:        equ .Button4Ytop + 016
+.Button4XLeft:          equ 118 + 20
+.Button4XRight:         equ .Button4XLeft + 016
+
+.Button5Ytop:           equ 146
+.Button5YBottom:        equ .Button5Ytop + 019
+.Button5XLeft:          equ 154
+.Button5XRight:         equ .Button5XLeft + 020
+
+SetSpireOfWisdomText:
+  call  .SetFontPage0Y212                ;set font at (0,212) page 0
+
+  ld    b,072+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextSpireOfWisdom1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,029+00                        ;dx
+  ld    c,115+00                        ;dy
+  ld    hl,TextSpireOfWisdom2
+  jp    SetText                         ;in: b=dx, c=dy, hl->text
+
+.SetFontPage0Y212:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+TextSpireOfWisdom1:
+                db "Spire Of Wisdom",255
+TextSpireOfWisdom2:
+                db "Within the hallowed walls of the",254
+                db "Spire of Wisdom, you stand poised",254
+                db "to refine your essence.",254
+                db "Choose your path: forge your",254
+                db "attack, bolster your defense, ",254
+                db "sharpen your intellect, or unlock",254
+                db "the arcane depths of spellcraft.",255
+
+SetSpireOfWisdomGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (020/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (139*128) + (044/2) - 128
+  ld    de,$0000 + ((024+53)*128) + ((020+30)/2) - 128
+  ld    bc,$0000 + (060*256) + (104/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (068*128) + (210/2) - 128
+  ld    de,$0000 + ((024+19)*128) + ((020+70)/2) - 128
+  ld    bc,$0000 + (068*256) + (026/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+
+
+
+

@@ -14,6 +14,8 @@ LevelEngine:
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
+  call  DisplayLearningStone            ;Show gfx for learning stone on the adventure map
+  call  DisplaySpireOfWisdom            ;Show gfx for spire of wisdom on the adventure map
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  DisplayEnemyStatsRightClick     ;when rightclicking on the map on an enemy, show their stats window
   call  DisplayEnemyHeroStatsRightClick ;when rightclicking on the map on an enemy hero, show their stats window
@@ -1464,6 +1466,37 @@ DisplayHeroLevelUp:
 
   ld    hl,HeroLevelUpCode
   jp    EnterSpecificRoutineInCastleOverviewCode
+
+DisplaySpireOfWisdom?:  db  0
+DisplaySpireOfWisdom:
+  ld    a,(DisplaySpireOfWisdom?)
+  dec   a
+  ret   m
+  ld    (DisplaySpireOfWisdom?),a
+  jp    nz,DisableScrollScreen
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplaySpireOfWisdomCOde
+  jp    EnterSpecificRoutineInBattleCode
+
+
+DisplayLearningStone?:  db  0
+DisplayLearningStone:
+  ld    a,(DisplayLearningStone?)
+  dec   a
+  ret   m
+  ld    (DisplayLearningStone?),a
+  jp    nz,DisableScrollScreen
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplayLearningStoneCOde
+  jp    EnterSpecificRoutineInCastleOverviewCode
   
 ChestFound?: db  0
 BigChest?: ds  1
@@ -1482,6 +1515,7 @@ DisplayChestFound:
   jp    EnterSpecificRoutineInCastleOverviewCode
 
 ScrollFound?: db  0
+SpellScrollInventoryNumber: ds  1       ;from 46 (earth level 1) - 65 (universal level 4)
 DisplayScrollFound:
   ld    a,(ScrollFound?)
   dec   a
@@ -1895,9 +1929,9 @@ CheckHeroPicksUpItem:
   cp    72
   jp    z,.WaterWell
   cp    73
-  jp    z,.MagicRefill
+  jp    z,.LearningStone
   cp    74
-  jp    z,.GoodiesBag
+  jp    z,.SpireOfWisdom
   cp    75
   jp    z,.Scroll
   cp    76                              ;right bottom of tower battle
@@ -1930,29 +1964,26 @@ CheckHeroPicksUpItem:
   ld    (hl),a                          ;remove item from object layer map
   ret
 
-.GoodiesBag:
-  ret
-
-.MagicRefill:
-  ld    ix,(plxcurrentheroAddress)
-  ld    a,(ix+HeroTotalMana)
-  cp    (ix+HeroMana)
-  ld    (ix+HeroMana),a
-  ret   z
-	xor		a
-	ld		(movehero?),a                   ;only stop hero movement if hero ACTUALLY stops at magic refill to refill mana
+;.MagicRefill:
+;  ld    ix,(plxcurrentheroAddress)
+;  ld    a,(ix+HeroTotalMana)
+;  cp    (ix+HeroMana)
+;  ld    (ix+HeroMana),a
+;  ret   z
+;	xor		a
+;	ld		(movehero?),a                   ;only stop hero movement if hero ACTUALLY stops at magic refill to refill mana
   ;HeroLooksUp             	
-  ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
-  ld    d,(ix+HeroSpecificInfo+1)
-  push  de
-  pop   ix                              ;hero specific info table in ix
+;  ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
+;  ld    d,(ix+HeroSpecificInfo+1)
+;  push  de
+;  pop   ix                              ;hero specific info table in ix
 
-  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
-  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
-  or    a,128 + (096 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
-  xor   8
-  ld    (ix+HeroinfoSYSX+0),a  
-  ret
+;  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+;  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
+;  or    a,128 + (096 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
+;  xor   8
+;  ld    (ix+HeroinfoSYSX+0),a  
+;  ret
 
 .WaterWell:
   ld    ix,(plxcurrentheroAddress)
@@ -1975,12 +2006,161 @@ CheckHeroPicksUpItem:
   ld    (ix+HeroinfoSYSX+0),a  
   ret
 
-.Scroll:
+.Scroll:  
+  ld    iy,(plxcurrentheroAddress)
+  ld    b,6                             ;check 6 open slots
+  .CheckEmptyOpenSlotLoop:
+  ld    a,(iy+HeroInventory+9)          ;9 body slots (sword, armor, shield, helmet, boots, gloves,ring, necklace, robe) and 6 open slots (045 = empty slot)
+  cp    45
+  jr    z,.EmptySlotFound
+  inc   iy
+  djnz  .CheckEmptyOpenSlotLoop
+  ret
+  .EmptySlotFound:  
+  ld    a,3
+  ld    (ScrollFound?),a  
 	xor		a
 	ld		(movehero?),a
   ld    (hl),a                          ;remove item from object layer map
+  inc   hl
+  ld    a,(hl)                          ;number (192,193,194,195) representing level of scrollspell
+  ld    (hl),0                          ;remove number from object layer map
+  sub   192-46                          ;46=scroll (earth) level 1
+  ld    (iy+HeroInventory+9),a 
+  ;we now take the hero's movement points+date and divide it by 5, the rest will be 0,1,2,3,4 (representing: earth, fire, air, water, universal)
+  ld    ix,(plxcurrentheroAddress)
+  ld    d,0
+  ld    e,(ix+HeroMove)
+  ld    hl,(Date)
+  add   hl,de
+  push  hl
+  pop   bc
+  ld    de,5                            ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,l                             ;random number from 0 to 4
+  add   a,a
+  add   a,a                             ;*4
+  add   a,(iy+HeroInventory+9) 
+  ld    (iy+HeroInventory+9),a
+  ld    (SpellScrollInventoryNumber),a  ;from 46 (earth level 1) - 65 (universal level 4)
+  ret
+
+.SpireOfWisdom:
+  call  .CheckSpireOfWisdomAlreadyVisited
+  ret   nz
+
+	xor		a
+	ld		(movehero?),a
   ld    a,3
-  ld    (ScrollFound?),a  
+  ld    (DisplaySpireOfWisdom?),a
+  ret
+
+.CheckSpireOfWisdomAlreadyVisited:
+  ld    ix,(plxcurrentheroAddress)
+
+  inc   hl
+  ld    a,(hl)                          ;number of learning stone (starting at 192)
+  sub   192
+  jr    z,.SpireOfWisdom1
+  dec   a
+  jr    z,.SpireOfWisdom2
+  dec   a
+  jr    z,.SpireOfWisdom3
+  dec   a
+  jr    z,.SpireOfWisdom4
+  dec   a
+  jr    z,.SpireOfWisdom5
+;  dec   a
+;  jr    z,.SpireOfWisdom6
+   
+  .SpireOfWisdom6:
+  bit   4,(ix+HeroAirSpells)
+  ret   nz
+  set   4,(ix+HeroAirSpells)
+  ret
+  .SpireOfWisdom5:
+  bit   5,(ix+HeroAirSpells)
+  ret   nz
+  set   5,(ix+HeroAirSpells)
+  ret
+  .SpireOfWisdom4:
+  bit   6,(ix+HeroAirSpells)
+  ret   nz
+  set   6,(ix+HeroAirSpells)
+  ret
+  .SpireOfWisdom3:
+  bit   7,(ix+HeroAirSpells)
+  ret   nz
+  set   7,(ix+HeroAirSpells)
+  ret
+  .SpireOfWisdom2:
+  bit   4,(ix+HeroFireSpells)
+  ret   nz
+  set   4,(ix+HeroFireSpells)
+  ret
+  .SpireOfWisdom1:
+  bit   5,(ix+HeroFireSpells)
+  ret   nz
+  set   5,(ix+HeroFireSpells)
+  ret
+
+.LearningStone:
+  call  .CheckLearningStoneAlreadyVisited
+  ret   nz
+
+	xor		a
+	ld		(movehero?),a
+  ld    a,3
+  ld    (DisplayLearningStone?),a
+  ret
+
+.CheckLearningStoneAlreadyVisited:
+  ld    ix,(plxcurrentheroAddress)
+
+  inc   hl
+  ld    a,(hl)                          ;number of learning stone (starting at 192)
+  sub   192
+  jr    z,.LearningStone1
+  dec   a
+  jr    z,.LearningStone2
+  dec   a
+  jr    z,.LearningStone3
+  dec   a
+  jr    z,.LearningStone4
+  dec   a
+  jr    z,.LearningStone5
+;  dec   a
+;  jr    z,.LearningStone6
+   
+  .LearningStone6:
+  bit   6,(ix+HeroFireSpells)
+  ret   nz
+  set   6,(ix+HeroFireSpells)
+  ret
+  .LearningStone5:
+  bit   7,(ix+HeroFireSpells)
+  ret   nz
+  set   7,(ix+HeroFireSpells)
+  ret
+  .LearningStone4:
+  bit   4,(ix+HeroEarthSpells)
+  ret   nz
+  set   4,(ix+HeroEarthSpells)
+  ret
+  .LearningStone3:
+  bit   5,(ix+HeroEarthSpells)
+  ret   nz
+  set   5,(ix+HeroEarthSpells)
+  ret
+  .LearningStone2:
+  bit   6,(ix+HeroEarthSpells)
+  ret   nz
+  set   6,(ix+HeroEarthSpells)
+  ret
+  .LearningStone1:
+  bit   7,(ix+HeroEarthSpells)
+  ret   nz
+  set   7,(ix+HeroEarthSpells)
   ret
 
 .TreasureChestSmall:
@@ -5677,11 +5857,11 @@ EmptyHeroRecruitedAtTavern:
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
 .HeroSkills:  db  0,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0000
-.AirSpells:         db  %0000 0000
-.WaterSpells:       db  %0000 0000
-.AllSchoolsSpells:  db  %0000 0000
+.EarthSpells:       db  %0000 0000  ;bit 0-3 earth spells. bit 7-4 learning stone 1-4 visited.
+.FireSpells:        db  %0000 0000  ;bit 0-3 fire spells. bit 7-6 learning stone 5-6 visited. bit 5-4 spire of wisdom 1-2 visited
+.AirSpells:         db  %0000 0000  ;bit 0-3 air spells. bit 7-4 spire of wisdom 3-6 visited
+.WaterSpells:       db  %0000 0000  ;bit 0-3 water spells
+.AllSchoolsSpells:  db  %0000 0000  ;bit 0-3 all school spells
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: ds 2
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
@@ -5712,7 +5892,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  062,053,045,045,047,046 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesGoemon2
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -5723,13 +5903,13 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
 
-pl1hero2y:		db	70
-pl1hero2x:		db	12
+pl1hero2y:		db	60
+pl1hero2x:		db	103
 pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	1	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1

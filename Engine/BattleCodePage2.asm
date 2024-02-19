@@ -3241,8 +3241,25 @@ SetGraphicsElementalSpells:
   ld    a,SpellBookGraphicsBlock        ;Map block
   jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set backdrop
 
+  .CheckSpellScrollAvailable:
+  cp    (ix+HeroInventory+9)
+  ret   z
+  cp    (ix+HeroInventory+10)
+  ret   z
+  cp    (ix+HeroInventory+11)
+  ret   z
+  cp    (ix+HeroInventory+12)
+  ret   z
+  cp    (ix+HeroInventory+13)
+  ret   z
+  cp    (ix+HeroInventory+14)
+  ret
+
 .SetEarthSpells:
   ;earth spells
+  ld    a,46                          ;spell scroll earth level 1
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpell1
   bit   0,(ix+HeroEarthSpells)
   jr    nz,.PlaceEarthSpell1
   call  .EraseElementalSpellLevel1
@@ -3262,6 +3279,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell1:
 
+  ld    a,47                          ;spell scroll earth level 2
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpell2
   bit   1,(ix+HeroEarthSpells)
   jr    nz,.PlaceEarthSpell2
   call  .EraseElementalSpellLevel2
@@ -3281,6 +3301,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell2:
 
+  ld    a,48                          ;spell scroll earth level 3
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpell3
   bit   2,(ix+HeroEarthSpells)
   jr    nz,.PlaceEarthSpell3
   call  .EraseElementalSpellLevel3
@@ -3300,6 +3323,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceEarthSpell3:
 
+  ld    a,49                          ;spell scroll earth level 4
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceEarthSpell4
   bit   3,(ix+HeroEarthSpells)
   jr    nz,.PlaceEarthSpell4
   jp    .EraseElementalSpellLevel4
@@ -3319,6 +3345,9 @@ SetGraphicsElementalSpells:
 
 .SetFireSpells:
   ;fire spells
+  ld    a,50                          ;spell scroll fire level 1
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpell1
   bit   0,(ix+HeroFireSpells)
   jr    nz,.PlaceFireSpell1
   call  .EraseElementalSpellLevel1
@@ -3339,6 +3368,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell1:
 
+  ld    a,51                          ;spell scroll fire level 2
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpell2
   bit   1,(ix+HeroFireSpells)
   jr    nz,.PlaceFireSpell2
   call  .EraseElementalSpellLevel2
@@ -3359,6 +3391,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell2:
 
+  ld    a,52                          ;spell scroll fire level 3
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpell3
   bit   2,(ix+HeroFireSpells)
   jr    nz,.PlaceFireSpell3
   call  .EraseElementalSpellLevel3
@@ -3379,6 +3414,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceFireSpell3:
 
+  ld    a,53                          ;spell scroll fire level 4
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceFireSpell4
   bit   3,(ix+HeroFireSpells)
   jr    nz,.PlaceFireSpell4
   jp    .EraseElementalSpellLevel4
@@ -3400,6 +3438,9 @@ SetGraphicsElementalSpells:
 
 .SetAirSpells:
   ;air spells
+  ld    a,54                          ;spell scroll air level 1
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpell1
   bit   0,(ix+HeroAirSpells)
   jr    nz,.PlaceAirSpell1
   call  .EraseElementalSpellLevel1
@@ -3420,6 +3461,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell1:
 
+  ld    a,55                          ;spell scroll air level 2
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpell2
   bit   1,(ix+HeroAirSpells)
   jr    nz,.PlaceAirSpell2
   call  .EraseElementalSpellLevel2
@@ -3440,6 +3484,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell2:
 
+  ld    a,56                          ;spell scroll air level 3
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpell3
   bit   2,(ix+HeroAirSpells)
   jr    nz,.PlaceAirSpell3
   call  .EraseElementalSpellLevel3
@@ -3460,6 +3507,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAirSpell3:
 
+  ld    a,57                          ;spell scroll air level 4
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceAirSpell4
   bit   3,(ix+HeroAirSpells)
   jr    nz,.PlaceAirSpell4
   jp    .EraseElementalSpellLevel4  
@@ -3480,6 +3530,9 @@ SetGraphicsElementalSpells:
 
 .SetWaterSpells:
   ;water spells
+  ld    a,58                          ;spell scroll water level 1
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpell1
   bit   0,(ix+HeroWaterSpells)
   jr    nz,.PlaceWaterSpell1
   call  .EraseElementalSpellLevel1
@@ -3500,6 +3553,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell1:
 
+  ld    a,59                          ;spell scroll water level 2
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpell2
   bit   1,(ix+HeroWaterSpells)
   jr    nz,.PlaceWaterSpell2
   call  .EraseElementalSpellLevel2
@@ -3520,6 +3576,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell2:
 
+  ld    a,60                          ;spell scroll water level 3
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpell3
   bit   2,(ix+HeroWaterSpells)
   jr    nz,.PlaceWaterSpell3
   call  .EraseElementalSpellLevel3
@@ -3540,6 +3599,9 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceWaterSpell3:
 
+  ld    a,61                          ;spell scroll water level 4
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceWaterSpell4
   bit   3,(ix+HeroWaterSpells)
   jr    nz,.PlaceWaterSpell4
   jp    .EraseElementalSpellLevel4
@@ -3566,8 +3628,12 @@ SetGraphicsElementalSpells:
   ld    (BattleSpellIconButtons + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
 
   ;all spellschools
+  ld    a,62                          ;spell scroll universal level 1
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpell1
   bit   0,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell1  
+  .PlaceUniversalSpell1:
   ld    a,%1000 0011
   ld    (BattleSpellIconButtons + (4 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a
  
@@ -3583,8 +3649,12 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell1:
 
+  ld    a,63                          ;spell scroll universal level 2
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpell2
   bit   1,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell2  
+  .PlaceUniversalSpell2:
   ld    a,%1000 0011
   ld    (BattleSpellIconButtons + (5 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
 
@@ -3600,8 +3670,12 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell2:
 
+  ld    a,64                          ;spell scroll universal level 3
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpell3
   bit   2,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell3  
+  .PlaceUniversalSpell3:
   ld    a,%1000 0011
   ld    (BattleSpellIconButtons + (6 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
 
@@ -3617,8 +3691,12 @@ SetGraphicsElementalSpells:
   call  CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY | Set spell
   .EndPlaceAllSchoolsSpell3:
 
+  ld    a,65                          ;spell scroll universal level 4
+  call  .CheckSpellScrollAvailable  ;out: z=scroll found
+  jr    z,.PlaceUniversalSpell4
   bit   3,(ix+HeroAllSchoolsSpells)
   ret   z
+  .PlaceUniversalSpell4:
   ld    a,%1000 0011
   ld    (BattleSpellIconButtons + (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
 
@@ -4345,3 +4423,4 @@ GoAnimateSpell:
   push  ix
   pop   hl
   jp    docopy
+

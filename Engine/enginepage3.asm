@@ -3,15 +3,15 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap01
-;WorldPointer: dw GentleMap04
-WorldPointer: dw GentleWinterMap05
+WorldPointer: dw GentleMap04
+;WorldPointer: dw GentleWinterMap05
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -351,7 +351,7 @@ SpellExplanationDisplayed?: db  0
 SpellSelected?: db  0 ;in: menu option selected (spell then depends on SelectedElementInSpellBook)
 CastSpell?: db  0 ;selected spell has been used on enemy monster/friendly monster/battle field
 SpellBookButtonPressed?: db  0
-SelectedElementInSpellBook: db 3 ;0=earth, 1=fire, 2=air, 3=water
+SelectedElementInSpellBook: db 0 ;0=earth, 1=fire, 2=air, 3=water
 LeftPlayerAlreadyCastSpellThisRound?: ds  1
 RightPlayerAlreadyCastSpellThisRound?: ds  1
 WaitButtonPressed?: db  0

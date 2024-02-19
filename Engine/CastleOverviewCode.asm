@@ -13,6 +13,8 @@
 ;  call  HeroLevelUpCode
 ;  call  ShowEnemyStats
 ;  call  ShowEnemyHeroStats
+;  call  DisplayLearningStoneCode
+;  call  DisplaySpireOfWisdomCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -1054,8 +1056,6 @@ SetTradingHeroesInventoryIcons:
   ld    de,$0000 + (076*128) + (146/2)
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
-
   ld    ix,(HeroWeTradeWith)            ;which hero are we trading with
   ld    de,9                            ;skip the first 9 equiped inventory items, and go to the 6 open slots
   add   ix,de
@@ -1088,6 +1088,7 @@ SetTradingHeroesInventoryIcons:
 
   .SetIconHLBCandA:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  call  .CheckScrollIcon                ;scroll icons have nr 46-65 (but all use the same icon)
   add   a,a                             ;*2
   add   a,a                             ;*2
   ld    iy,.InventoryIconTableSYSX
@@ -1101,8 +1102,11 @@ SetTradingHeroesInventoryIcons:
   ld    a,InventoryGraphicsBlock;Map block  
   ret
   
-  
-
+  .CheckScrollIcon:
+  cp    ScrollIconNR
+  ret   c
+  ld    a,ScrollIconNR
+  ret  
 
 .InventoryIconTableSYSX: 
                     dw $4000 + (InventoryItem00ButtonOffSY*128) + (InventoryItem00ButtonOffSX/2) - 128  ;sword 1
@@ -1209,6 +1213,8 @@ SetTradingHeroesInventoryIcons:
                     dw $4000 + (InventoryItem45ButtonOffSY*128) + (InventoryItem45ButtonOffSX/2) - 128  ;empty slot
                     dw $4000 + (InventoryItem45MouseOverSY*128) + (InventoryItem45MouseOverSX/2) - 128
 
+                    dw $4000 + (InventoryItem46ButtonOffSY*128) + (InventoryItem46ButtonOffSX/2) - 128  ;scroll
+                    dw $4000 + (InventoryItem46MouseOverSY*128) + (InventoryItem46MouseOverSX/2) - 128
 
 
 
@@ -4195,8 +4201,6 @@ SetPrimairySkillLevelUpInA:
 
 
 
-
-
 DisplayChestCode:
 call ScreenOn
   ld    a,255                           ;reset previous button clicked
@@ -4501,6 +4505,114 @@ SetChestGraphics:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
+DisplayLearningStoneCOde:
+  call  SetScrollVButton
+  
+  call  SetLearningStoneGraphics               ;put gfx
+  call  SetLearningStoneText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetLearningStoneGraphics               ;put gfx
+  call  SetLearningStoneText
+
+  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  ld    hl,1000
+  call  .AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ;add xp
+  ld    e,(ix+HeroXp+0)
+  ld    d,(ix+HeroXp+1)
+  add   hl,de
+  jp    c,DisplayScrollCode.engine
+  ld    (ix+HeroXp+0),l
+  ld    (ix+HeroXp+1),h
+  jp    DisplayScrollCode.engine
+
+.AddXPBoostFromLearning:                 ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillLearning
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillLearning
+  ret
+
+  .CheckSkillLearning:
+  cp    16                              ;Basic Learning  (xp +10%)  
+  jr    z,.BasicLearningFound
+  cp    17                              ;Advanced Learning  (xp +20%)  
+  jr    z,.AdvancedLearningFound
+  cp    18                              ;Expert Learning  (xp +30%)  
+  jr    z,.ExpertLearningFound
+  ret
+
+  .BasicLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    .ApplyPercentBasedBoost
+
+  .AdvancedLearningFound:
+  ld    de,5                            ;divide total attack by 5 to get 20%
+  jp    .ApplyPercentBasedBoost
+
+  .ExpertLearningFound:
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  call  .ApplyPercentBasedBoost
+  add   hl,bc                           ;add that 10% again to get 20%
+  add   hl,bc                           ;add that 10% again to get 30%
+  ret
+
+.ApplyPercentBasedBoost:
+  push  hl                              ;hl=current total attack monster (after applying damage boosts from items)
+  
+  push  hl
+  pop   bc
+;  ld    de,2                            ;divide total attack by 2 to get 50%
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  pop   hl
+  add   hl,bc                           ;add the 50% boost to total attack monster
+  ret
+
+SetLearningStoneText:
+  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,077+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextLearningStone1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,030+00                        ;dx
+  ld    c,114+00                        ;dy
+  ld    hl,TextLearningStone2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,083+00                        ;dx
+  ld    c,160+00                        ;dy
+  ld    hl,TextLearningStone3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    ix,(plxcurrentheroAddress)      ;defending hero
+  ld    hl,1000
+  call  DisplayLearningStoneCOde.AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
+  ld    b,092+00                        ;dx
+  ld    c,160+00                        ;dy
+  jp    SetNumber16BitCastle
+
+TextLearningStone1:
+                db "Learning Stone",255
+TextLearningStone2:
+                db "Peering into the learning stone,",254
+                db "you are amazed to see answers to",254
+                db "questions you have pondered for",254
+                db "years. The stone abruptly stills,",254
+                db "but the realization washes over",254
+                db "you - you have learned much.",255
+TextLearningStone3:
+                db "+     XP",255
 
 DisplayScrollCode:
   call  SetScrollVButton
@@ -4594,6 +4706,28 @@ TextScroll2:
                 db "mystic spell.",255
 TextScroll3:
                 db "Hypnotism",255
+
+EarthSpellLevel1:        db  "  Earthbound   ",255
+EarthSpellLevel2:        db  "  Plate Armor  ",255
+EarthSpellLevel3:        db  " Resurrection  ",255
+EarthSpellLevel4:        db  "  Earthshock   ",255
+FireSpellLevel1:         db  "    Curse      ",255
+FireSpellLevel2:         db  " Blinding Fog  ",255
+FireSpellLevel3:         db  "   Implosion   ",255
+FireSpellLevel4:         db  "   Sunstrike   ",255
+AirSpellLevel1:          db  "    Haste      ",255
+AirSpellLevel2:          db  " ShieldBreaker ",255
+AirSpellLevel3:          db  "   Claw Back   ",255
+AirSpellLevel4:          db  " Spell Bubble  ",255
+WaterSpellLevel1:        db  "     Cure      ",255
+WaterSpellLevel2:        db  "   Ice Peak    ",255
+WaterSpellLevel3:        db  "   Hypnosis    ",255
+WaterSpellLevel4:        db  "   Frost Ring  ",255
+UniversalSpellLevel1:    db  " Magic Arrows  ",255
+UniversalSpellLevel2:    db  "    Frenzy     ",255
+UniversalSpellLevel3:    db  "   Teleport    ",255
+UniversalSpellLevel4:    db  "Primal Instinct",255
+
                 
 SetScrollText:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
@@ -4608,11 +4742,40 @@ SetScrollText:
   ld    hl,TextScroll2
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,083+00                        ;dx
+  ld    a,(SpellScrollInventoryNumber)  ;from 46 (earth level 1) - 65 (universal level 4)
+  sub   a,46
+  ld    h,0
+  ld    l,a
+  ld    de,16
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,EarthSpellLevel1
+  add   hl,de
+
+  ld    b,073+00                        ;dx
   ld    c,147+00                        ;dy
-  ld    hl,TextScroll3
+;  ld    hl,TextScroll3
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
+
+
+SetLearningStoneGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (020/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (139*128) + (044/2) - 128
+  ld    de,$0000 + ((024+53)*128) + ((020+30)/2) - 128
+  ld    bc,$0000 + (060*256) + (104/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (000*128) + (210/2) - 128
+  ld    de,$0000 + ((024+19)*128) + ((020+60)/2) - 128
+  ld    bc,$0000 + (068*256) + (038/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetScrollGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
@@ -6513,11 +6676,9 @@ SetTradingHeroesInventoryButtons:
   add   ix,de
 
   ld    b,6                             ;6 inventory slots
-
-
-
   .loop:
   ld    a,(ix+HeroInventory)            ;body slot 1-9 and open slots 10-15
+  call  SetTradingHeroesInventoryIcons.CheckScrollIcon                ;scroll icons have nr 46-65 (but all use the same icon)
   add   a,a                             ;*2
   add   a,a                             ;*4
   ld    d,0
@@ -10351,8 +10512,7 @@ CastleOverviewMagicGuildCode:
 
 SpellDescriptionsMagicGuild:
 
-
-.DescriptionEarth4:       db  "Ethereal Chains",254
+.DescriptionEarth4:       db  "Earthbound",254
                           db  "Reduces the speed of the selected",254
                           db  "enemy unit by 50%",255
 
@@ -10361,10 +10521,10 @@ SpellDescriptionsMagicGuild:
                           db  "friendly unit by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates and heals a portion of killed living",254
+                          db  "Reanimates     HP of killed living",254
                           db  "friendly creatures.",255
 
-.DescriptionEarth1:       db  "Meteor Shower",254
+.DescriptionEarth1:       db  "Earthshock",254
                           db  "Deals damage to all creatures in target",254
                           db  "and adjacent hexes.",255
 
@@ -10373,67 +10533,51 @@ SpellDescriptionsMagicGuild:
                           db  "Causes the selected enemy unit to deal",254
                           db  "-3 damage when attacking.",255
 
-.DescriptionFire3:        db  "Blur",254
+.DescriptionFire3:        db  "Blinding Fog",254
                           db  "Target ranged unit deals 50% less",254
                           db  "damage.",255
 
-
-;.DescriptionFire3:        db  "Human or CPU",254
-;                          db  "Associated Creatures",254
-;                          db  "Map Difficulty Show Advanced Options",255
-
-
-
-.DescriptionFire2:        db  "Fireball",254
-                          db  "Deals damage to target unit and",254
+.DescriptionFire2:        db  "Implosion",254
+                          db  "Deals damage to enemy unit and",254
                           db  "adjecent units.",255
 
-.DescriptionFire1:        db  "Inferno",254
-                          db  "Deals damage to a single enemy unit",255
-;                          db  "effect.",255
-
+.DescriptionFire1:        db  "Sunstrike",254
+                          db  "Calls down a solar beam to incinerate",254
+                          db  "a single enemy unit.",255
 
 .Descriptionair4:         db  "Haste",254
                           db  "Increases the speed of the selected",254
-                          db  "friendly unit by 4.",255
+                          db  "friendly unit by 3.",255
 
-.Descriptionair3:         db  "Disrupting Ray",254
+.Descriptionair3:         db  "Shieldbreaker",254
                           db  "Reduces the defense of the selected ",254
-                          db  "unit by 4.",255
+                          db  "enemy unit by 4.",255
 
-.Descriptionair2:         db  "Counterstrike",254
+.Descriptionair2:         db  "Claw Back",254
                           db  "Target allied unit has unlimited",254
                           db  "retaliations each round.",255
 
-.Descriptionair1:         db  "Deflect",254
+.Descriptionair1:         db  "Spell Bubble",254
                           db  "Target friendly unit has a 75% chance",254
-                          db  "to deflect enemy spells.",255
+                          db  "to deflect a single enemy spell.",255
 
 
 .Descriptionwater4:       db  "Cure",254
                           db  "Removes all negative spell effects",254
-                          db  "and heals unit.",255
+                          db  "and heals for     HP.",255
 
-.Descriptionwater3:       db  "Ice Bolt",254
-                          db  "Deals damage to a single enemy unit.",254
-                          db  " ",255
+.Descriptionwater3:       db  "Ice Peak",254
+                          db  "Conjures an ice shard from the ground,",254
+                          db  "impaling a single enemy.",255
 
-.Descriptionwater2:       db  "Ice Trap",254
+.Descriptionwater2:       db  "Hypnosis",254
                           db  "Enemy unit cant attack until attacked,",254
-                          db  "dispelled or effect wears off",255
+                          db  "dispelled or effect wears off.",255
 
 
 .Descriptionwater1:       db  "Frost Ring",254
                           db  "Causes damage to all units adjacent to",254
                           db  "the central hex.",255
-
-
-
-
-
-
-
-
 
 
 SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates
@@ -15140,9 +15284,6 @@ SetResourcesPlayer:
   ld    h,(ix+9)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
   ret
-
-
-
 
 
 
