@@ -16,6 +16,7 @@ LevelEngine:
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
   call  DisplayLearningStone            ;Show gfx for learning stone on the adventure map
   call  DisplaySpireOfWisdom            ;Show gfx for spire of wisdom on the adventure map
+  call  DisplayGuardTowerReward         ;Show gfx for guard tower reward on the adventure map
   call  DisplayStartOfTurnMessage       ;at the start of a human player's turn, show start of turn message
   call  DisplayEnemyStatsRightClick     ;when rightclicking on the map on an enemy, show their stats window
   call  DisplayEnemyHeroStatsRightClick ;when rightclicking on the map on an enemy hero, show their stats window
@@ -44,7 +45,7 @@ LevelEngine:
   call  AnimateHeroes                   ;animate the current active hero
   call  CheckEnterCombat                ;
   .EndHeroChecks:
-;  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
+  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
 
 ;  call  SetSpatInGame
 
@@ -1467,6 +1468,22 @@ DisplayHeroLevelUp:
   ld    hl,HeroLevelUpCode
   jp    EnterSpecificRoutineInCastleOverviewCode
 
+DisplayGuardTowerReward?:  db  3
+DisplayGuardTowerReward:
+  ld    a,(DisplayGuardTowerReward?)
+  dec   a
+  ret   m
+  ld    (DisplayGuardTowerReward?),a
+  jp    nz,DisableScrollScreen
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplayGuardTowerRewardCOde
+  call  EnterSpecificRoutineInBattleCode
+  jp    UpdateHUd
+
 DisplaySpireOfWisdom?:  db  0
 DisplaySpireOfWisdom:
   ld    a,(DisplaySpireOfWisdom?)
@@ -1810,6 +1827,57 @@ SetMappositionHero:                     ;adds mappointer x and y to the mapdata,
 	djnz	.setypointerloop
   ret
 
+CheckHeroCollidesWithGuardTower:
+  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+  ld    (page1bank),a
+  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  ld    a,(RemoveDeadMonstersNeutralMonster?)
+  or    a
+  jp    nz,CheckHeroCollidesWithMonster.RemoveDeadMonstersNeutralMonster
+
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroStatus)
+  cp    255
+  ret   z
+
+  Call  SetMappositionHero              ;sets heroes position in mapdata in hl
+
+  ld    a,(hl)
+  cp    76
+  ret   nz
+
+  inc   hl                              ;amount of monsters
+  ld    a,(hl)
+  ld    (MonsterHerocollidedWithOnMapAmount),a
+  or    a
+  ret   z
+
+  inc   hl                              ;monster level
+  ld    a,(hl)
+  sub   191
+  ld    (GuardTowerMonsterLevel),a
+  dec   hl
+  xor   a
+	ld		(movehero?),a
+	ld		(FightGuardTowerMonster?),a
+
+  push  hl
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+  ld    hl,DisplayGuardTowerCOde
+  call  EnterSpecificRoutineInBattleCode
+  pop   hl
+
+	ld		a,(FightGuardTowerMonster?)
+	or    a
+	ret   z
+  
+  dec   hl
+  xor   a                               ;0=guard tower monster nr.
+  jp    CheckHeroCollidesWithMonster.NormalMonster
+
 CheckHeroCollidesWithMonster:
   ld		a,2                             ;set worldmap object layer in bank 2 at $8000
   ld    (page1bank),a
@@ -1830,36 +1898,10 @@ CheckHeroCollidesWithMonster:
   cp    192
   ret   nc                              ;tilenr. 192 and up are top parts of objects
   cp    76
-  jr    z,.GuardTower
+  jr    z,.CheckIfGuardTowerJustDied
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
-  jr    .NormalMonster
 
-  .GuardTower:
-  inc   hl                              ;amount of monsters
-  ld    a,(hl)
-  ld    (MonsterHerocollidedWithOnMapAmount),a
-  or    a
-  ret   z
-
-  inc   hl                              ;monster level
-  ld    a,(hl)
-  sub   191
-  ld    (GuardTowerMonsterLevel),a
-  dec   hl
-  xor   a
-	ld		(movehero?),a
-
-  push  hl
-  ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
-  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
-  ld    hl,DisplayGuardTowerCOde
-  call  EnterSpecificRoutineInBattleCode
-  pop   hl
-
-  dec   hl
-  xor   a                               ;0=guard tower monster nr.
   .NormalMonster:
   ld    (MonsterHerocollidedWithOnMap),a
   ld    a,l
@@ -1886,6 +1928,11 @@ CheckHeroCollidesWithMonster:
   ret
 
   .ThisEnemyJustDied:
+  .CheckIfGuardTowerJustDied:
+  ld    a,(NeutralEnemyDied?)
+  or    a
+  ret   z
+
   xor   a
   ld    (NeutralEnemyDied?),a
 
@@ -1913,6 +1960,8 @@ CheckHeroCollidesWithMonster:
   ld    (hl),0                          ;remove monster level
   inc   hl
   ld    (hl),0                          ;backup of monster amount (required for handing out appropriate reward)
+  ld    a,3
+  ld    (DisplayGuardTowerReward?),a
   ret
 
 SetResourcesCurrentPlayerinIX:
@@ -2857,7 +2906,7 @@ movehero:
 	or		a                               ;if hero stopped moving, check if he should enter castle
   jp    z,CheckHeroEntersCastle  
   call  .GoMove
-  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
+  call  CheckHeroCollidesWithGuardTower ;only check when actively moving, otherwise you keep checking guard tower when standing still on it
   jp    CenterScreenForCurrentHero
 
   .GoMove:
@@ -4944,6 +4993,8 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    a,(hl)
   cp    192
   ret   nc                              ;tilenr. 192 and up are top parts of objects
+;  cp    76
+;  jr    z,.GuardTower
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
 

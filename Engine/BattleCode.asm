@@ -9302,13 +9302,25 @@ SetSpireOfWisdomGraphics:
   ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-DisplayGuardTowerCOde:
-  call  SetGuardTowerButtons
-  call  SetGuardTowerGraphics               ;put gfx
-  call  SetGuardTowerText
+CopyActivePageToInactivePage:
+  ld    a,(activepage)
+  or    a
+  ld    hl,CopyPage1To0
+  jp    nz,DoCopy
+  ld    hl,CopyPage0To1PlayingField
+  jp    DoCopy
+
+DisplayGuardTowerRewardCOde:
+call screenon
+;The dust of battle settles, revealing a reward within the conquered tower:
+;Emerging victorious from the guard tower's trials, you claim your reward:
+
+  call  SetGuardTowerRewardGraphics               ;put gfx
+  call  SetGuardTowerRewardText
   call  SwapAndSetPage                  ;swap and set page
-  call  SetGuardTowerGraphics               ;put gfx
-  call  SetGuardTowerText
+  call  CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -9319,14 +9331,86 @@ DisplayGuardTowerCOde:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-;  ld    a,(NewPrContr)
-;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-;  ret   nz
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+;  ld    ix,GenericButtonTable
+;  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+
+;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+;  ld    ix,GenericButtonTable
+;  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+SetGuardTowerRewardText:
+  call  SetSpireOfWisdomText.SetFontPage0Y212                ;set font at (0,212) page 0
+
+  ld    b,078+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextGuardTower1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,027+00                        ;dx
+  ld    c,041+00                        ;dy
+  ld    hl,TextGuardTower2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+TextGuardTowerReward1:
+                db "Guard Tower",255
+TextGuardTowerReward2:
+                db "A majestic ancient guard tower rises  ",254
+                db "before you, concealing treasures ",254
+                db "untold. But defended by",254
+                db "level  ",255
+
+
+
+
+
+
+
+
+SetGuardTowerRewardGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (44*128) + (030/2) - 128
+  ld    bc,$0000 + (095*256) + (144/2)
+  ld    a,PlayerStartTurnBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+DisplayGuardTowerCOde:
+  call  SetGuardTowerButtons
+  call  SetGuardTowerGraphics               ;put gfx
+  call  SetGuardTowerText
+  call  SwapAndSetPage                  ;swap and set page
+  call  CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+;  call  SetGuardTowerGraphics               ;put gfx
+;  call  SetGuardTowerText
+  
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
 
   ld    ix,GenericButtonTable
   call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
 
-;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
   call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
@@ -9336,12 +9420,13 @@ DisplayGuardTowerCOde:
 
   .CheckButtonClicked:
   ret   nc
-  ld    a,%1100 0011
-  ld    (GenericButtonTable+(4*GenericButtonTableLenghtPerButton)),a          ;enable the V button once any other button is pressed
+  pop   af                              ;end DisplayGuardTowerCOde
 
   ld    a,b
-  cp    1                               ;V button pressed ?
-;  jr    z,.VButton
+  cp    1
+  ret   nz                              ;return when 'x' pressed
+  ld    a,1                             ;fight when 'v' pressed
+	ld		(FightGuardTowerMonster?),a  
   ret
 
 SetGuardTowerButtons:
@@ -9370,7 +9455,7 @@ SetGuardTowerButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched)
 .Button2XRight:         equ .Button2XLeft + 020
 
 SetGuardTowerText:
-  call  .SetFontPage0Y212                ;set font at (0,212) page 0
+  call  SetSpireOfWisdomText.SetFontPage0Y212                ;set font at (0,212) page 0
 
   ld    b,078+00                        ;dx
   ld    c,031+00                        ;dy
@@ -9406,17 +9491,25 @@ SetGuardTowerText:
   add   hl,de
   ld    b,057+00                        ;dx
   ld    c,062+00                        ;dy
-  call  SetText                         ;in: b=dx, c=dy, hl->text  
+;  call  SetText                         ;in: b=dx, c=dy, hl->text  
+
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ret   z
+
+  ld    hl,.TextS
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+;  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+;  pop   bc
   ret
-
-
-.SetFontPage0Y212:                       ;set font at (0,212) page 0
-  ld    hl,$4000 + (000*128) + (000/2) - 128
-  ld    de,$0000 + (212*128) + (000/2) - 128
-  ld    bc,$0000 + (006*256) + (256/2)
-  ld    a,CastleOverviewFontBlock         ;font graphics block
-  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
+.TextS: db "s.",255
 
 TextGuardTower1:
                 db "Guard Tower",255

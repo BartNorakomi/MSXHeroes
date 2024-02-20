@@ -311,6 +311,7 @@ BattleTextQ: db 255 | dw 255 | db 255    ,"           ",255  ;1=wait, 2=defend, 
 RemoveDeadMonstersNeutralMonster?: ds  1
 AddressOfMonsterAmountHerocollidedWithOnMap: ds  2
 
+FightGuardTowerMonster?: ds  1
 GuardTowerMonsterLevel: ds  1
 MonsterHerocollidedWithOnMap: ds  1
 XAddressOfMonsterHerocollidedWithOnMap: ds  1

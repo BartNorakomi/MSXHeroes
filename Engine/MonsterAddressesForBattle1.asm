@@ -7571,7 +7571,7 @@ LIdle2Monster141:   equ $4000 + (068*128) + (128/2) - 128  ;(y*128) + (x/2)
 
 Monster141Move:
 Monster141Idle:
-  db    08                              ;animation speed (x frames per animation frame)
+  db    04                              ;animation speed (x frames per animation frame)
   db    2                               ;amount of animation frames
   dw    RIdle1Monster141
   dw    RIdle2Monster141
