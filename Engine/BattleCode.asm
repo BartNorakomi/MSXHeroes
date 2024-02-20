@@ -9359,20 +9359,20 @@ SetGuardTowerButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched)
   ;v button
   db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
 
-.Button1Ytop:           equ 146
+.Button1Ytop:           equ 148
 .Button1YBottom:        equ .Button1Ytop + 018
-.Button1XLeft:          equ 114
+.Button1XLeft:          equ 072
 .Button1XRight:         equ .Button1XLeft + 020
 
-.Button2Ytop:           equ 146
+.Button2Ytop:           equ 147
 .Button2YBottom:        equ .Button2Ytop + 019
-.Button2XLeft:          equ 154
+.Button2XLeft:          equ 112
 .Button2XRight:         equ .Button2XLeft + 020
 
 SetGuardTowerText:
   call  .SetFontPage0Y212                ;set font at (0,212) page 0
 
-  ld    b,072+00                        ;dx
+  ld    b,078+00                        ;dx
   ld    c,031+00                        ;dy
   ld    hl,TextGuardTower1
   call  SetText                         ;in: b=dx, c=dy, hl->text
@@ -9382,7 +9382,7 @@ SetGuardTowerText:
   ld    hl,TextGuardTower2
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,027+00                        ;dx
+  ld    b,040+00                        ;dx
   ld    c,140+00                        ;dy
   ld    hl,TextGuardTower3
   call  SetText                         ;in: b=dx, c=dy, hl->text
@@ -9404,7 +9404,7 @@ SetGuardTowerText:
   pop   hl
   ld    de,MonsterTableName
   add   hl,de
-  ld    b,058+00                        ;dx
+  ld    b,057+00                        ;dx
   ld    c,062+00                        ;dy
   call  SetText                         ;in: b=dx, c=dy, hl->text  
   ret

@@ -186,7 +186,7 @@ endengine: equ 03D68h ; last def. pass 3
 TradingHeroesButtonTable.Button12XLeft: equ 072h ; last def. pass 3
 GoemonUnitLevel5HP: equ 028h ; last def. pass 3
 endLoader: equ 07D7Eh ; last def. pass 3
-SetGuardTowerButtonTable.Button2Ytop: equ 092h ; last def. pass 3
+SetGuardTowerButtonTable.Button2Ytop: equ 093h ; last def. pass 3
 GolvelliusUnitLevel6CostGems: equ 0A0h ; last def. pass 3
 pl1hero8y.pl1hero6xp: equ 034FFh ; last def. pass 3
 AirLevel4Touched: equ 097F8h ; last def. pass 3
@@ -792,7 +792,7 @@ RecruitButton6XRight: equ 0FAh ; last def. pass 3
 CheckButtonMouseInteractionBuildButtons.check: equ 0A467h ; last def. pass 3
 RAttack2Monster140: equ 03FD0h ; last def. pass 3
 GentleMap01Map: equ 063E1h ; last def. pass 3
-SetGuardTowerButtonTable.Button1XRight: equ 086h ; last def. pass 3
+SetGuardTowerButtonTable.Button1XRight: equ 05Ch ; last def. pass 3
 HeroPortrait16x30SYSXLatok: equ 07FA0h ; last def. pass 3
 RIdle3Monster013: equ 077B0h ; last def. pass 3
 World2ObjectLayerMapBlock: equ 05h ; last def. pass 3
@@ -1890,7 +1890,7 @@ Wait1FrameBeforeWePutGridTile?: equ 0C28Dh ; last def. pass 3
 LIdle2Monster070: equ 09BF0h ; last def. pass 3
 ScenarioSelectButton27Ytop: equ 0A0h ; last def. pass 3
 SetBuildButtons.loop: equ 0B4E0h ; last def. pass 3
-SetGuardTowerButtonTable.Button1Ytop: equ 092h ; last def. pass 3
+SetGuardTowerButtonTable.Button1Ytop: equ 094h ; last def. pass 3
 LIdle1Monster096: equ 04F90h ; last def. pass 3
 RIdle1Monster148: equ 097F0h ; last def. pass 3
 Monster116AttackPatternLeft: equ 0A8A2h ; last def. pass 3
@@ -2498,7 +2498,7 @@ TradeMenuCode.EndCheck1b: equ 06D0Ah ; last def. pass 3
 LIdle2Monster086: equ 03FD4h ; last def. pass 3
 Usas2UnitLevel4HP: equ 01Eh ; last def. pass 3
 TilesGentleJungleBlock: equ 092h ; last def. pass 3
-SetGuardTowerButtonTable.Button1YBottom: equ 0A4h ; last def. pass 3
+SetGuardTowerButtonTable.Button1YBottom: equ 0A6h ; last def. pass 3
 CastleOverviewMarketPlaceCode.SetTextResourceInHL: equ 08BD8h ; last def. pass 3
 DescriptionScrollFire1: equ 05363h ; last def. pass 3
 RIdle2Monster001: equ 03F88h ; last def. pass 3
@@ -2723,7 +2723,7 @@ Monster10.RomBlock: equ 0C585h ; last def. pass 3
 xstar: equ 03D66h ; last def. pass 3
 BuildUpBattleFieldAndPutMonsters.PutAllMonsters: equ 05FACh ; last def. pass 3
 page2ram: equ 0C0C3h ; last def. pass 3
-SetGuardTowerButtonTable.Button1XLeft: equ 072h ; last def. pass 3
+SetGuardTowerButtonTable.Button1XLeft: equ 048h ; last def. pass 3
 Monster121Idle: equ 0A991h ; last def. pass 3
 PlaceWaterSpellsInSpellBook.EndPlaceWaterSpell4: equ 05687h ; last def. pass 3
 RAttack1Monster062: equ 067E0h ; last def. pass 3
@@ -3970,7 +3970,7 @@ RIdle2Monster110: equ 0A390h ; last def. pass 3
 InventoryItem00ButtonOffSY: equ 00h ; last def. pass 3
 Monster065Idle: equ 0A18Ah ; last def. pass 3
 SetTextHumanOrCPUButtons.PlayerOFF: equ 09101h ; last def. pass 3
-SetGuardTowerButtonTable.Button2XLeft: equ 09Ah ; last def. pass 3
+SetGuardTowerButtonTable.Button2XLeft: equ 070h ; last def. pass 3
 pl3hero7y: equ 038E4h ; last def. pass 3
 CheckRightClickToDisplayInfo.SetSYSX: equ 04E14h ; last def. pass 3
 pl2hero1x: equ 0354Bh ; last def. pass 3
@@ -6753,7 +6753,7 @@ CastleOverviewPalette: equ 0D510h ; last def. pass 3
 LIdle2Monster141: equ 061C0h ; last def. pass 3
 CursorYWhereSpellWasCast: equ 0C284h ; last def. pass 3
 GentleJungleMiniMapsBlock: equ 0BDh ; last def. pass 3
-SetGuardTowerButtonTable.Button2XRight: equ 0AEh ; last def. pass 3
+SetGuardTowerButtonTable.Button2XRight: equ 084h ; last def. pass 3
 ClearBattleFieldGrid.SetTo000: equ 06953h ; last def. pass 3
 ScenarioSelectCode.DifficultyFound: equ 084CAh ; last def. pass 3
 InventoryItem11ButtonOffSX: equ 0A6h ; last def. pass 3
@@ -7583,7 +7583,7 @@ Monster053Table: equ 08820h ; last def. pass 3
 WaitButtonPressed?: equ 0C295h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button11XRight: equ 0CBh ; last def. pass 3
 CheckButtonMouseInteraction4ElementalButtons.MouseOverButtonAndSpacePressed: equ 0AB22h ; last def. pass 3
-SetGuardTowerButtonTable.Button2YBottom: equ 0A5h ; last def. pass 3
+SetGuardTowerButtonTable.Button2YBottom: equ 0A6h ; last def. pass 3
 SetNumber16BitCastle.Check100Folds: equ 0818h ; last def. pass 3
 CastleWindownX: equ 014h ; last def. pass 3
 TradeMenuCode.EndCheck12b: equ 073DBh ; last def. pass 3
