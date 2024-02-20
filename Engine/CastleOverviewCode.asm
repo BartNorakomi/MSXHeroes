@@ -452,8 +452,6 @@ SetAvailableRecruitArmy:
   ld    (RecruitButtonTable+5*RecruitButtonTableLenghtPerButton),a 
   ret
 
-
-
 .Rubiescost:
   ld    a,(iy+CastleLevel1Units+00)
   ld    b,005+45                       ;dx

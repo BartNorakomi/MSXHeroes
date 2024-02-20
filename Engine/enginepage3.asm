@@ -311,6 +311,7 @@ BattleTextQ: db 255 | dw 255 | db 255    ,"           ",255  ;1=wait, 2=defend, 
 RemoveDeadMonstersNeutralMonster?: ds  1
 AddressOfMonsterAmountHerocollidedWithOnMap: ds  2
 
+GuardTowerMonsterLevel: ds  1
 MonsterHerocollidedWithOnMap: ds  1
 XAddressOfMonsterHerocollidedWithOnMap: ds  1
 MonsterHerocollidedWithOnMapAmount: ds  1
@@ -3388,6 +3389,8 @@ ListOfUnlockedMonstersLevel1:
   db    163                               ;163 Bonefin (Usas)
   db    166                               ;166 Slime (Ys 3)
   db    164                               ;164 OptiLeaper (1 eyes white blue jumper) (Psycho World)
+  db    177                               ;177 JadeWormlet (white worm) (Golvellius)
+  db    182                               ;182 Chucklehook (higemaru)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel2:
@@ -3406,6 +3409,10 @@ ListOfUnlockedMonstersLevel2:
   db    165                               ;165 Fernling (green little plant) (Psycho World)
   db    173                               ;173 GooGoo (quinpl)
   db    175                               ;175 Ghosty (spooky)
+  db    178                               ;178 Olive Boa (green snake) (Golvellius)
+  db    180                               ;180 Senko Kyu (shooting head) (hinotori)
+  db    185                               ;185 Moai (parodius)
+  db    186                               ;186 Ninja Kun (Ninja Kun)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel3:
@@ -3418,10 +3425,14 @@ ListOfUnlockedMonstersLevel3:
   db    149                               ;149 SuperRunner (SuperRunner)
   db    151                               ;151 Jon Sparkle (malaya no hihou)
   db    152                               ;152 KuGyoku Den (legendly 9 gems)
-  db    156                               ;156 Headless (Golvellius)
   db    168                               ;168 BounceBot (Thexder)
   db    143                               ;143 Red Lupin (arsene lupin)
   db    174                               ;174 Spooky (Spooky)
+  db    179                               ;179 Bat (Golvellius)
+  db    181                               ;181 Kubiwatari (jumping head statue) (hinotori)
+  db    183                               ;183 Sir Oji (castle excellent)
+  db    184                               ;184 Pentaro (parodius)
+  db    156                               ;156 Wonder Boy (Wonder Boy)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel4:
@@ -3430,11 +3441,11 @@ ListOfUnlockedMonstersLevel4:
   db    132                               ;132 Trooper (Metal Gear)
   db    172                               ;172 Vic Viper (kings valley 2)
   db    140                               ;140 Monmon (mon mon monster)
-  db    155                               ;155 Seraph (Golvellius)
   db    135                               ;135 Emir Mystic (Usas2)
   db    138                               ;138 Andorogynus (Andorogynus)
   db    176                               ;176 Visage (undeadline)
   db    159                               ;159 Biolumia (core dump)
+  db    155                               ;155 Thomas (kung fu master)
 
   db    000                               ;end
 ListOfUnlockedMonstersLevel5:

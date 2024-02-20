@@ -44,7 +44,7 @@ LevelEngine:
   call  AnimateHeroes                   ;animate the current active hero
   call  CheckEnterCombat                ;
   .EndHeroChecks:
-  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
+;  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
 
 ;  call  SetSpatInGame
 
@@ -1480,8 +1480,8 @@ DisplaySpireOfWisdom:
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplaySpireOfWisdomCOde
-  jp    EnterSpecificRoutineInBattleCode
-
+  call  EnterSpecificRoutineInBattleCode
+  jp    UpdateHUd
 
 DisplayLearningStone?:  db  0
 DisplayLearningStone:
@@ -1829,9 +1829,38 @@ CheckHeroCollidesWithMonster:
   ld    a,(hl)
   cp    192
   ret   nc                              ;tilenr. 192 and up are top parts of objects
+  cp    76
+  jr    z,.GuardTower
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
+  jr    .NormalMonster
 
+  .GuardTower:
+  inc   hl                              ;amount of monsters
+  ld    a,(hl)
+  ld    (MonsterHerocollidedWithOnMapAmount),a
+  or    a
+  ret   z
+
+  inc   hl                              ;monster level
+  ld    a,(hl)
+  sub   191
+  ld    (GuardTowerMonsterLevel),a
+  dec   hl
+  xor   a
+	ld		(movehero?),a
+
+  push  hl
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+  ld    hl,DisplayGuardTowerCOde
+  call  EnterSpecificRoutineInBattleCode
+  pop   hl
+
+  dec   hl
+  xor   a                               ;0=guard tower monster nr.
+  .NormalMonster:
   ld    (MonsterHerocollidedWithOnMap),a
   ld    a,l
   ld    (XAddressOfMonsterHerocollidedWithOnMap),a
@@ -1859,19 +1888,31 @@ CheckHeroCollidesWithMonster:
   .ThisEnemyJustDied:
   xor   a
   ld    (NeutralEnemyDied?),a
-  ld    (hl),a                          ;remove monster from object layer map
 
   inc   hl                              ;monster amount on object map
   ld    (hl),a                          ;remove amount
   dec   hl
 
-;  or    a
+  ld    a,(hl)
+  cp    76
+  jr    z,.GuardTowerDied
+  ld    (hl),0                          ;remove monster from object layer map
+
+  or    a
   sbc   hl,de                           ;check if monster has a top part
   ld    a,(hl)
 
   cp    192
   ret   c
   ld    (hl),0                          ;remove top part monster from object layer map  
+  ret
+
+  .GuardTowerDied:                      ;guard tower doesnt get removed (only the amount and monster level)
+  inc   hl
+  inc   hl
+  ld    (hl),0                          ;remove monster level
+  inc   hl
+  ld    (hl),0                          ;backup of monster amount (required for handing out appropriate reward)
   ret
 
 SetResourcesCurrentPlayerinIX:
@@ -1934,11 +1975,9 @@ CheckHeroPicksUpItem:
   jp    z,.SpireOfWisdom
   cp    75
   jp    z,.Scroll
-  cp    76                              ;right bottom of tower battle
+  cp    76
+;  jp    z,.GuardTower
   ret   z
-  cp    77                              ;alternative water well
-  ret   z
-
 
 .InventoryItems:
   ;items 83-127 are our inventory items
@@ -2818,6 +2857,7 @@ movehero:
 	or		a                               ;if hero stopped moving, check if he should enter castle
   jp    z,CheckHeroEntersCastle  
   call  .GoMove
+  call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
   jp    CenterScreenForCurrentHero
 
   .GoMove:

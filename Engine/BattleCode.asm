@@ -3197,28 +3197,7 @@ SetEnemyStatsWindow:
   add   a,8-22
   ld    b,a  
 
-  ;now look at the amount of neutral army and set the text accordingly
-  call  SetAllMonstersInMonsterTable.SetAmountInA
-  cp    5
-  ld    hl,TextAFew
-  jr    c,.AmountFound
-  cp    13
-  ld    hl,TextSeveral
-  jr    c,.AmountFound
-  cp    29
-  ld    hl,TextMany
-  jr    c,.AmountFound
-  cp    61
-  ld    hl,TextNumerous
-  jr    c,.AmountFound
-  cp    93
-  ld    hl,TextAHorde
-  jr    c,.AmountFound
-;  cp    93
-  ld    hl,TextCountless
-;  jr    z,.AmountFound
-  .AmountFound:
-
+  call  SetAmountInHL
 
   push  bc
   call  SetText                         ;in: b=dx, c=dy, hl->text  
@@ -3255,6 +3234,29 @@ SetEnemyStatsWindow:
   cp    Level6Unit
   ld    hl,6
   jp    z,SetNumber16BitCastle
+
+SetAmountInHL:  
+  ;now look at the amount of neutral army and set the text accordingly
+  call  SetAllMonstersInMonsterTable.SetAmountInA
+  cp    5
+  ld    hl,TextAFew
+  ret   c
+  cp    13
+  ld    hl,TextSeveral
+  ret   c
+  cp    29
+  ld    hl,TextMany
+  ret   c
+  cp    61
+  ld    hl,TextNumerous
+  ret   c
+  cp    93
+  ld    hl,TextAHorde
+  ret   c
+;  cp    93
+  ld    hl,TextCountless
+  ret
+
 
 TextAFew:       db " A Few",255
 TextSeveral:    db "Several",255
@@ -3302,8 +3304,8 @@ ListOfMonsters:
   db    124                               ;152 KuGyoku Den (legendly 9 gems)
   db    144                               ;153 Pastry Chef (comic bakery)
   db    145                               ;154 Indy Brave (magical tree)
-  db    085                               ;155 Seraph (Golvellius)
-  db    084                               ;156 Headless (Golvellius)
+  db    164                               ;155 Thomas (kung fu master)
+  db    167                               ;156 Wonder Boy (Wonder Boy)
   db    128                               ;157 BlasterBot
   db    140                               ;158 Duncan 7 (core dump)
   db    142                               ;159 Biolumia (core dump)
@@ -3324,9 +3326,89 @@ ListOfMonsters:
   db    122                               ;174 Spooky (Spooky)
   db    123                               ;175 Ghosty (spooky)
   db    087                               ;176 Visage (undeadline)
+  db    082                               ;177 JadeWormlet (white worm) (Golvellius)
+  db    079                               ;178 Olive Boa (green snake) (Golvellius)
+  db    078                               ;179 Bat (Golvellius)
+  db    159                               ;180 Senko Kyu (shooting head) (hinotori)
+  db    169                               ;181 Kubiwatari (jumping head statue) (hinotori)
+  db    160                               ;182 Chucklehook (higemaru)
+  db    161                               ;183 Sir Oji (castle excellent)
+  db    162                               ;184 Pentaro (parodius)
+  db    163                               ;185 Moai (parodius)
+  db    168                               ;186 Ninja Kun (Ninja Kun)
+  
+ListOfGuardTowerMonsters:
+.level1:
+  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
+  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
+  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
+  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
+
+.level2:
+  db    057                               ;Kasa-obake (jumping freaky) (Goemon)
+  db    057                               ;Kasa-obake (jumping freaky) (Goemon)
+  db    108                               ;Mei Ling (yie ar kung fu)
+  db    129                               ;Screech
+
+.level3:
+  db    107                               ;Wei Chin (yie ar kung fu)
+  db    127                               ;Rastan (rastan saga)
+  db    137                               ;Yurei Kage (deva)
+  db    165                               ;BlueSteel (knight with sword) (maze of gallious)
+
+.level4:
+  db    109                               ;Han Chen (bomb thrower) (yie ar kung fu)
+  db    135                               ;deva (deva)
+  db    166                               ;HikoDrone (space manbow)
+  db    166                               ;HikoDrone (space manbow)
+
+.level5:
+  db    138                               ;Huge Blob (usas2)
+  db    138                               ;Huge Blob (usas2)
+  db    170                               ;butterfly (maze of gallious)
+  db    170                               ;butterfly (maze of gallious)
+
+.level6:
+  db    141                               ;Monstrilla (core dump)
+  db    141                               ;Monstrilla (core dump)
+  db    156                               ;ColossalBot (Thexder)
+  db    156                               ;ColossalBot (Thexder)
+
+GuardTowerMonster:
+  call  .GetMonsterInHL
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroX)
+  and   3
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    a,(hl)
+  ret
+
+  .GetMonsterInHL:
+  ld    a,(GuardTowerMonsterLevel)
+  dec   a
+  ld    hl,ListOfGuardTowerMonsters.level1
+  ret   z
+  dec   a
+  ld    hl,ListOfGuardTowerMonsters.level2
+  ret   z
+  dec   a
+  ld    hl,ListOfGuardTowerMonsters.level3
+  ret   z
+  dec   a
+  ld    hl,ListOfGuardTowerMonsters.level4
+  ret   z
+  dec   a
+  ld    hl,ListOfGuardTowerMonsters.level5
+  ret   z
+  ld    hl,ListOfGuardTowerMonsters.level6
+  ret
 
 SetNeutralMonsterHeroCollidedWithInA:
   ld    a,(MonsterHerocollidedWithOnMap)
+  or    a
+  jr    z,GuardTowerMonster
   sub   a,128                             ;monsters start at tile 128
   ld    d,0
   ld    e,a
@@ -8993,17 +9075,12 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
 AnimateSpell:
   jp    GoAnimateSpell
 
-
-
-
-
-
-
-
-
-
-
 DisplaySpireOfWisdomCOde:
+  ld    a,255                           ;reset previous button clicked
+  ld    (PreviousButtonClicked),a  
+  ld    ix,GenericButtonTable
+  ld    (PreviousButtonClickedIX),ix
+
   call  SetSpireOfWisdomButtons
   call  SetSpireOfWisdomGraphics               ;put gfx
   call  SetSpireOfWisdomText
@@ -9020,21 +9097,79 @@ DisplaySpireOfWisdomCOde:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-  ld    a,(NewPrContr)
-  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
-  ret   nz
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ret   nz
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
   call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
 
-;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ;we mark previous button clicked
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    a,(ix+GenericButtonStatus)
+  push  af
+  ld    a,(PreviousButtonClicked)
+  cp    255
+  jr    z,.EndMarkButton               ;skip if no button was pressed previously
+  ld    (ix+GenericButtonStatus),%1010 0011
+  .EndMarkButton:
+  ;we mark previous button clicked
 
   ld    ix,GenericButtonTable
   call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
 
+  ;and unmark it after we copy all the buttons in their state
+  pop   af
+  ld    ix,(PreviousButtonClickedIX) 
+  ld    (ix+GenericButtonStatus),a
+  ;/and unmark it after we copy all the buttons in their state
+
   halt
   jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+(4*GenericButtonTableLenghtPerButton)),a          ;enable the V button once any other button is pressed
+
+  ld    a,b
+  cp    1                               ;V button pressed ?
+  jr    z,.VButton
+  ld    (PreviousButtonClicked),a
+  ld    (PreviousButtonClickedIX),ix
+  ret
+
+  .VButton:
+  pop   af                              ;end DisplayLevelUpCode
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(PreviousButtonClicked)
+  cp    2
+  jr    z,.SpellPowerSelected
+  cp    3
+  jr    z,.IntelligenceSelected
+  cp    4
+  jr    z,.DefenseSelected
+;  cp    5
+;  jr    z,.AttackSelected
+
+  .AttackSelected:
+  inc   (ix+HeroStatAttack)
+  ret
+
+  .DefenseSelected:
+  inc   (ix+HeroStatDefense)
+  ret
+
+  .IntelligenceSelected:
+  inc   (ix+HeroStatKnowledge)
+  ret
+
+  .SpellPowerSelected:
+  inc   (ix+HeroStatSpellDamage)
+  ret
 
 SetSpireOfWisdomButtons:
   ld    hl,SetSpireOfWisdomButtonTable-2
@@ -9055,7 +9190,7 @@ SetSpireOfWisdomButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouch
   ;spell power
   db  %1100 0011 | dw $4000 + (132*128) + (138/2) - 128 | dw $4000 + (132*128) + (202/2) - 128 | dw $4000 + (048*128) + (240/2) - 128 | db .Button4Ytop,.Button4YBottom,.Button4XLeft,.Button4XRight | dw $0000 + (.Button4Ytop*128) + (.Button4XLeft/2) - 128 
   ;v button
-  db  %1100 0011 | dw $4000 + (132*128) + (030/2) - 128 | dw $4000 + (132*128) + (050/2) - 128 | dw $4000 + (132*128) + (070/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128 
+  db  %0000 0000 | dw $4000 + (132*128) + (030/2) - 128 | dw $4000 + (132*128) + (050/2) - 128 | dw $4000 + (132*128) + (070/2) - 128 | db .Button5Ytop,.Button5YBottom,.Button5XLeft,.Button5XRight | dw $0000 + (.Button5Ytop*128) + (.Button5XLeft/2) - 128 
 
 .Button1Ytop:           equ 026 + 24
 .Button1YBottom:        equ .Button1Ytop + 016
@@ -9090,8 +9225,28 @@ SetSpireOfWisdomText:
   ld    hl,TextSpireOfWisdom1
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
+  ld    b,035+00                        ;dx
+  ld    c,069+00                        ;dy
+  ld    hl,TextPlus1Attack
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,034+00                        ;dx
+  ld    c,103+00                        ;dy
+  ld    hl,TextPlus1Defense
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,120+00                        ;dx
+  ld    c,069+00                        ;dy
+  ld    hl,TextPlus1Intelligence
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,119+00                        ;dx
+  ld    c,103+00                        ;dy
+  ld    hl,TextPlus1SpellPower
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
   ld    b,029+00                        ;dx
-  ld    c,115+00                        ;dy
+  ld    c,116+00                        ;dy
   ld    hl,TextSpireOfWisdom2
   jp    SetText                         ;in: b=dx, c=dy, hl->text
 
@@ -9113,6 +9268,14 @@ TextSpireOfWisdom2:
                 db "attack, bolster your defense, ",254
                 db "sharpen your intellect, or unlock",254
                 db "the arcane depths of spellcraft.",255
+TextPlus1Attack:
+                db "+1 attack",255
+TextPlus1Defense:
+                db "+1 defense",255
+TextPlus1Intelligence:
+                db "+1 intelligence",255
+TextPlus1SpellPower:
+                db "+1 spell power",255
 
 SetSpireOfWisdomGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128
@@ -9131,10 +9294,158 @@ SetSpireOfWisdomGraphics:
   ld    de,$0000 + ((024+19)*128) + ((020+70)/2) - 128
   ld    bc,$0000 + (068*256) + (026/2)
   ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  ;grey v button
+  ld    hl,$4000 + (132*128) + (218/2) - 128
+  ld    de,$0000 + (146*128) + (154/2) - 128
+  ld    bc,$0000 + (019*256) + (020/2)
+  ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+DisplayGuardTowerCOde:
+  call  SetGuardTowerButtons
+  call  SetGuardTowerGraphics               ;put gfx
+  call  SetGuardTowerText
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetGuardTowerGraphics               ;put gfx
+  call  SetGuardTowerText
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+;  ld    a,(NewPrContr)
+;  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+;  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+
+;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+(4*GenericButtonTableLenghtPerButton)),a          ;enable the V button once any other button is pressed
+
+  ld    a,b
+  cp    1                               ;V button pressed ?
+;  jr    z,.VButton
+  ret
+
+SetGuardTowerButtons:
+  ld    hl,SetGuardTowerButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*02)
+  ldir
+  ret
+
+SetGuardTowerButtonTableGfxBlock:  db  RetreatBlock
+SetGuardTowerButtonTableAmountOfButtons:  db  02
+SetGuardTowerButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;x button
+  db  %1100 0011 | dw $4000 + (057*128) + (228/2) - 128 | dw $4000 + (075*128) + (228/2) - 128 | dw $4000 + (093*128) + (228/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;v button
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+
+.Button1Ytop:           equ 146
+.Button1YBottom:        equ .Button1Ytop + 018
+.Button1XLeft:          equ 114
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 146
+.Button2YBottom:        equ .Button2Ytop + 019
+.Button2XLeft:          equ 154
+.Button2XRight:         equ .Button2XLeft + 020
+
+SetGuardTowerText:
+  call  .SetFontPage0Y212                ;set font at (0,212) page 0
+
+  ld    b,072+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextGuardTower1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,027+00                        ;dx
+  ld    c,041+00                        ;dy
+  ld    hl,TextGuardTower2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,027+00                        ;dx
+  ld    c,140+00                        ;dy
+  ld    hl,TextGuardTower3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  call  SetAmountInHL
+  ld    b,121+00                        ;dx
+  ld    c,055+00                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  
+  ld    a,(GuardTowerMonsterLevel)
+  ld    l,a
+  ld    h,0
+  ld    b,047+00                        ;dx
+  ld    c,062+00                        ;dy
+  call  SetNumber16BitCastle
+  
+  call  SetMonsterTableInIYNeutralMonster
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  ld    b,058+00                        ;dx
+  ld    c,062+00                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  ret
 
 
+.SetFontPage0Y212:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+TextGuardTower1:
+                db "Guard Tower",255
+TextGuardTower2:
+                db "A majestic ancient guard tower rises  ",254
+                db "before you, concealing treasures ",254
+                db "untold. But defended by",254
+                db "level  ",255
+TextGuardTower3:
+                db "Dare you face them in combat?",255
+
+SetGuardTowerGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (020/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (139*128) + (044/2) - 128
+  ld    de,$0000 + ((024+53)*128) + ((020+30)/2) - 128
+  ld    bc,$0000 + (060*256) + (104/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (000*128) + (150/2) - 128
+  ld    de,$0000 + ((024+44)*128) + ((020+56)/2) - 128
+  ld    bc,$0000 + (070*256) + (064/2)
+  ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 

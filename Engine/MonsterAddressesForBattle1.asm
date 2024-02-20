@@ -1290,7 +1290,7 @@ Monster054Table:                        ;Zomblet (Usas)
   db    000                             ;special ability
   db    "Zomblet",255,"    "
 
-Monster055Table:                        ;Cheek (Goemon)
+Monster055Table:                        ;Cheek (Goemon) (white kimono, long sleeves)
   dw    Monster055Idle
   dw    Monster055Move
   dw    Monster055AttackPatternRight
@@ -1977,14 +1977,14 @@ Monster084Table:                        ;Headless (Golvellius)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    GolvelliusUnitLevel3CostGold        ;cost (gold)
-  db    GolvelliusUnitLevel3CostGems        ;cost (gems)
-  db    GolvelliusUnitLevel3CostRubies      ;cost (rubies)
-  db    GolvelliusUnitLevel3HP              ;hp
-  db    GolvelliusUnitLevel3Speed           ;speed
-  db    GolvelliusUnitLevel3Attack          ;attack
-  db    GolvelliusUnitLevel3Defense         ;defense
-  db    GolvelliusUnitLevel3Growth          ;growth
+  db    GolvelliusUnitLevel4CostGold        ;cost (gold)
+  db    GolvelliusUnitLevel4CostGems        ;cost (gems)
+  db    GolvelliusUnitLevel4CostRubies      ;cost (rubies)
+  db    GolvelliusUnitLevel4HP              ;hp
+  db    GolvelliusUnitLevel4Speed           ;speed
+  db    GolvelliusUnitLevel4Attack          ;attack
+  db    GolvelliusUnitLevel4Defense         ;defense
+  db    GolvelliusUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Headless",255,"   "
 
@@ -2000,14 +2000,14 @@ Monster085Table:                        ;Seraph (Golvellius)
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    GolvelliusUnitLevel4CostGold        ;cost (gold)
-  db    GolvelliusUnitLevel4CostGems        ;cost (gems)
-  db    GolvelliusUnitLevel4CostRubies      ;cost (rubies)
-  db    GolvelliusUnitLevel4HP              ;hp
-  db    GolvelliusUnitLevel4Speed           ;speed
-  db    GolvelliusUnitLevel4Attack          ;attack
-  db    GolvelliusUnitLevel4Defense         ;defense
-  db    GolvelliusUnitLevel4Growth          ;growth
+  db    GolvelliusUnitLevel5CostGold        ;cost (gold)
+  db    GolvelliusUnitLevel5CostGems        ;cost (gems)
+  db    GolvelliusUnitLevel5CostRubies      ;cost (rubies)
+  db    GolvelliusUnitLevel5HP              ;hp
+  db    GolvelliusUnitLevel5Speed           ;speed
+  db    GolvelliusUnitLevel5Attack          ;attack
+  db    GolvelliusUnitLevel5Defense         ;defense
+  db    GolvelliusUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Seraph",255,"     "
 
@@ -2994,14 +2994,14 @@ Monster127Table:                        ;Rastan (rastan saga)
   db    BattleMonsterSpriteSheet13Block
   db    32                              ;nx  
   db    38+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Rastan",255,"     "
 
@@ -3040,14 +3040,14 @@ Monster129Table:                        ;Screech
   db    BattleMonsterSpriteSheet13Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel2CostGold        ;cost (gold)
+  db    RandomAUnitLevel2CostGems        ;cost (gems)
+  db    RandomAUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel2HP              ;hp
+  db    RandomAUnitLevel2Speed           ;speed
+  db    RandomAUnitLevel2Attack          ;attack
+  db    RandomAUnitLevel2Defense         ;defense
+  db    RandomAUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Screech",255,"    "
 
@@ -3316,14 +3316,14 @@ Monster141Table:                        ;Monstrilla (core dump)
   db    BattleMonsterSpriteSheet7Block
   db    64                              ;nx  
   db    64+04                           ;ny
-  db    004                             ;cost (gold)
-  db    001+Level1Unit                  ;cost (gems)
-  db    000                             ;cost (rubies)
-  db    053                             ;hp
-  db    011                             ;speed
-  db    060                             ;attack
-  db    012                             ;defense
-  db    012                             ;growth
+  db    RandomAUnitLevel6CostGold        ;cost (gold)
+  db    RandomAUnitLevel6CostGems        ;cost (gems)
+  db    RandomAUnitLevel6CostRubies      ;cost (rubies)
+  db    RandomAUnitLevel6HP              ;hp
+  db    RandomAUnitLevel6Speed           ;speed
+  db    RandomAUnitLevel6Attack          ;attack
+  db    RandomAUnitLevel6Defense         ;defense
+  db    RandomAUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "Monstrilla",255," "
 
@@ -7449,19 +7449,19 @@ Monster138Move:
 Monster138Idle:
   db    02                              ;animation speed (x frames per animation frame)
   db    6                               ;amount of animation frames
+  dw    RIdle6Monster138
   dw    RIdle1Monster138
   dw    RIdle2Monster138
   dw    RIdle3Monster138
   dw    RIdle4Monster138
   dw    RIdle5Monster138
-  dw    RIdle6Monster138
   ;facing left
+  dw    LIdle6Monster138
   dw    LIdle1Monster138
   dw    LIdle2Monster138
   dw    LIdle3Monster138
   dw    LIdle4Monster138
   dw    LIdle5Monster138
-  dw    LIdle6Monster138
 
 ;######################################################################################
 ;Emir Mystic (usas2)
