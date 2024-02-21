@@ -589,10 +589,12 @@ DisplayEnemyStatsRightClick:
 
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
   ld    hl,ShowEnemyStats
-  jp    EnterSpecificRoutineInBattleCode
+  ld    a,(MonsterHerocollidedWithOnMap)
+  cp    128
+  jp    nc,EnterSpecificRoutineInBattleCode
 
-
-
+  ld    hl,ShowItemStats
+  jp    EnterSpecificRoutineInExtraRoutines
 
 ; right limit mouse = 235
 MiniMapSquareIconInteraction:
@@ -603,7 +605,7 @@ MiniMapSquareIconInteraction:
 
   ld    a,(spat+1)                      ;x mouse
   sub   200
-  ret   c
+  ret   c 
   ld    b,a
   add   a,a                             ;*2
   add   a,b                             ;*3
@@ -1468,7 +1470,8 @@ DisplayHeroLevelUp:
   ld    hl,HeroLevelUpCode
   jp    EnterSpecificRoutineInCastleOverviewCode
 
-DisplayGuardTowerReward?:  db  3
+DisplayGuardTowerReward?:  db  0
+GuardTowerReward: dw 3000
 DisplayGuardTowerReward:
   ld    a,(DisplayGuardTowerReward?)
   dec   a
@@ -1637,6 +1640,40 @@ EnterSpecificRoutineHeroOverviewCode:
   out   ($a8),a
 
   ld    a,HeroOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  .SelfModifyingCodeRoutine:	equ	$+1
+  call  $ffff
+
+  pop   af
+  out   ($a8),a                         ;restore ram/rom page settings     
+  pop   af
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  pop   af
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom    
+
+  xor   a
+  ld    (vblankintflag),a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  ld    hl,0
+  ld    (CurrentCursorSpriteCharacter),hl
+  call  EnableScrollScreen
+  ret
+
+EnterSpecificRoutineInExtraRoutines:
+  ld    (.SelfModifyingCodeRoutine),hl
+
+	ld		a,(memblocks.1)                 ;save page 1 block settings
+	push  af
+	ld		a,(memblocks.2)                 ;save page 2 block settings
+	push  af
+  in    a,($a8)      
+  push  af                              ;save ram/rom page settings 
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+  ld    a,ExtraRoutinesCodeBlock       ;Map block
   call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   .SelfModifyingCodeRoutine:	equ	$+1
@@ -1957,6 +1994,10 @@ CheckHeroCollidesWithMonster:
   .GuardTowerDied:                      ;guard tower doesnt get removed (only the amount and monster level)
   inc   hl
   inc   hl
+
+  ld    de,2000
+  ld    (GuardTowerReward),de
+
   ld    (hl),0                          ;remove monster level
   inc   hl
   ld    (hl),0                          ;backup of monster amount (required for handing out appropriate reward)
@@ -4984,6 +5025,16 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret   z
 
 	pop		af				                      ;pop call
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrControlsOnInterrupt)
+	bit		5,a						                  ;trig-b pressed ?
+  jr    nz,.TrigBPressed
+
   ld    hl,CursorWalkingBoots
 	jp		.setcharacter
 

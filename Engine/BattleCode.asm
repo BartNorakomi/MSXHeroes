@@ -3062,10 +3062,8 @@ CheckDefendButtonPressed:
 
 
 
-
-
 ShowEnemyStats:
-call screenon
+;call screenon
   call  SetEnemyStatsWindow             ;show window of enemy stats
   call  SwapAndSetPage                  ;swap and set page
   
@@ -3084,7 +3082,7 @@ call screenon
 
   .end:
   ld    a,%0011 0000
-	ld		(ControlsOnInterrupt),a                  ;reset trigger a
+	ld		(ControlsOnInterrupt),a                  ;reset trigger a+b
   ret
 
 SetEnemyStatsWindow:
@@ -9314,6 +9312,7 @@ DisplayGuardTowerRewardCOde:
 call screenon
 ;The dust of battle settles, revealing a reward within the conquered tower:
 ;Emerging victorious from the guard tower's trials, you claim your reward:
+  call  SetGuardTowerRewardVButton
 
   call  SetGuardTowerRewardGraphics               ;put gfx
   call  SetGuardTowerRewardText
@@ -9335,38 +9334,92 @@ call screenon
   bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
   ret   nz
 
-;  ld    ix,GenericButtonTable
-;  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  ret   c
 
-;  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
 
-;  ld    ix,GenericButtonTable
-;  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
 
   halt
   jp  .engine
 
+
+  .CheckEndWindow:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    044                             ;dy
+  jr    c,.Exit
+  cp    044+095                         ;dy+ny
+  jr    nc,.Exit
+  
+  ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
+  cp    030                             ;dx
+  jr    c,.Exit
+  cp    030+144                         ;dx+nx
+  ret   c
+
+  .Exit:
+  pop   af
+  ret
+
+SetGuardTowerRewardVButton:
+  ld    hl,SetGuardTowerRewardVButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+SetGuardTowerRewardVButtonTableGfxBlock:  db  PlayerStartTurnBlock
+SetGuardTowerRewardVButtonTableAmountOfButtons:  db  01
+SetGuardTowerRewardVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 113
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 146
+.Button1XRight:         equ .Button1XLeft + 020
+
 SetGuardTowerRewardText:
   call  SetSpireOfWisdomText.SetFontPage0Y212                ;set font at (0,212) page 0
 
-  ld    b,078+00                        ;dx
-  ld    c,031+00                        ;dy
-  ld    hl,TextGuardTower1
+  ld    b,060+00                        ;dx
+  ld    c,051+00                        ;dy
+  ld    hl,TextGuardTowerReward1
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    b,027+00                        ;dx
-  ld    c,041+00                        ;dy
-  ld    hl,TextGuardTower2
+  ld    b,040+00                        ;dx
+  ld    c,064+00                        ;dy
+  ld    hl,TextGuardTowerReward2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    hl,(GuardTowerReward)
+  ld    b,080+00                        ;dx
+  ld    c,100+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ld    b,106+00                        ;dx
+  ld    c,100+00                        ;dy
+  ld    hl,TextGuardTowerReward3
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
 
 TextGuardTowerReward1:
-                db "Guard Tower",255
+                db "Guard Tower Reward",255
 TextGuardTowerReward2:
-                db "A majestic ancient guard tower rises  ",254
-                db "before you, concealing treasures ",254
-                db "untold. But defended by",254
-                db "level  ",255
+                db "The dust of battle settles,",254
+                db "revealing a reward within the",254
+                db "conquered tower:",255
+TextGuardTowerReward3:
+                db "Gold",255
 
 
 
@@ -9484,6 +9537,9 @@ SetGuardTowerText:
   ld    c,062+00                        ;dy
   call  SetNumber16BitCastle
   
+  xor   a                               ;set guard tower monster
+  ld    (MonsterHerocollidedWithOnMap),a
+
   call  SetMonsterTableInIYNeutralMonster
   push  iy
   pop   hl

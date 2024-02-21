@@ -1818,6 +1818,14 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $c6
+;
+ExtraRoutinesCodeBlock:  equ   $c6
+phase	$4000
+	include	"ExtraRoutines.asm"	
+	ds		$8000-$,$ff
+dephase
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

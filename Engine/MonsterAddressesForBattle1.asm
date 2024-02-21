@@ -5789,13 +5789,13 @@ Monster079Idle:
   dw    LIdle1Monster079
   dw    LIdle2Monster079
 ;######################################################################################
-;SilkenLarva (Golvellius)
+;SilkenLarva (green caterpillar) (Golvellius)
 
-RIdle1Monster080:   equ $4000 + (080*128) + (240/2) - 128
-RIdle2Monster080:   equ $4000 + (160*128) + (240/2) - 128
+RIdle1Monster080:   equ $4000 + (240*128) + (032/2) - 128
+RIdle2Monster080:   equ $4000 + (240*128) + (048/2) - 128
 
-LIdle1Monster080:   equ $4000 + (240*128) + (016/2) - 128
-LIdle2Monster080:   equ $4000 + (240*128) + (000/2) - 128
+LIdle1Monster080:   equ $4000 + (240*128) + (080/2) - 128
+LIdle2Monster080:   equ $4000 + (240*128) + (064/2) - 128
 
 Monster080Move:                     
 Monster080Idle:
@@ -5825,13 +5825,13 @@ Monster081Idle:
   dw    LIdle1Monster081
   dw    LIdle2Monster081
 ;######################################################################################
-;JadeWormlet (Golvellius)
+;JadeWormlet (white worm) (Golvellius)
 
-RIdle1Monster082:   equ $4000 + (240*128) + (032/2) - 128
-RIdle2Monster082:   equ $4000 + (240*128) + (048/2) - 128
+RIdle1Monster082:   equ $4000 + (080*128) + (240/2) - 128
+RIdle2Monster082:   equ $4000 + (160*128) + (240/2) - 128
 
-LIdle1Monster082:   equ $4000 + (240*128) + (080/2) - 128
-LIdle2Monster082:   equ $4000 + (240*128) + (064/2) - 128
+LIdle1Monster082:   equ $4000 + (240*128) + (016/2) - 128
+LIdle2Monster082:   equ $4000 + (240*128) + (000/2) - 128
 
 Monster082Move:                     
 Monster082Idle:
