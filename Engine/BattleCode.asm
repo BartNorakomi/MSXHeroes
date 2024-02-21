@@ -9310,6 +9310,18 @@ CopyActivePageToInactivePage:
 
 DisplayGuardTowerRewardCOde:
 call screenon
+
+  call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;gold
+  ld    de,(GuardTowerReward)
+  add   hl,de
+  jr    c,.EndCheckOverFlow
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;gold   
+  .EndCheckOverFlow:
+  
 ;The dust of battle settles, revealing a reward within the conquered tower:
 ;Emerging victorious from the guard tower's trials, you claim your reward:
   call  SetGuardTowerRewardVButton

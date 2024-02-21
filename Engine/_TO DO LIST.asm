@@ -13,17 +13,16 @@ AI
 options/settings/save menu
 
 low prio:
-round tower battles
 shift click unit moet nog gemaakt worden om units te splitsen
 units splitsen op hud
 units in hud nog een beetje finetunen
 picked up inventory items should be equiped directly
 als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft van het scherm opgebouwd ziet, en de andere helft is nog van de mirror page (w/e?)
+als je xp >20000 dan zie je het / teken niet in het status scherm
 
 castle:
 
 title screen:
-
 
 ;still to do, WIP:
 ;campaign 1-9: unlocks ALL heroes (and their castles) that HAVE a castle (1st campain unlocks 2 castles)

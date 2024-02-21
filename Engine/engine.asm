@@ -1471,7 +1471,7 @@ DisplayHeroLevelUp:
   jp    EnterSpecificRoutineInCastleOverviewCode
 
 DisplayGuardTowerReward?:  db  0
-GuardTowerReward: dw 3000
+GuardTowerReward: ds 2
 DisplayGuardTowerReward:
   ld    a,(DisplayGuardTowerReward?)
   dec   a
@@ -1995,13 +1995,56 @@ CheckHeroCollidesWithMonster:
   inc   hl
   inc   hl
 
-  ld    de,2000
-  ld    (GuardTowerReward),de
-
+  ld    d,0
+  ld    a,(hl)                          ;monster level
+  sub   191                             ;amount number starts at tilenr. 192
+  ld    e,a
   ld    (hl),0                          ;remove monster level
   inc   hl
+  ld    a,(hl)                          ;monster amount
   ld    (hl),0                          ;backup of monster amount (required for handing out appropriate reward)
-  ld    a,3
+
+  sub   191                             ;amount number starts at tilenr. 192
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,250
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    (GuardTowerReward),hl
+
+;reward=(monster level*250) * monster amount
+;level      amount    reward
+;1          1         0250*1=0250
+;2          1         0500*1=0500
+;3          1         0750*1=0750
+;4          1         1000*1=1000
+;5          1         1250*1=1250
+;6          1         1500*1=1500
+
+;level      amount    reward
+;1          2         0250*2=0500
+;2          2         0500*2=1000
+;3          2         0750*2=1500
+;4          2         1000*2=2000
+;5          2         1250*2=2500
+;6          2         1500*2=3000
+
+;level      amount    reward
+;1          3         0250*3=0750
+;2          3         0500*3=1500
+;3          3         0750*3=2250
+;4          3         1000*3=3000
+;5          3         1250*3=3750
+;6          3         1500*3=4500
+
+;level      amount    reward
+;1          4         0250*4=1000
+;2          4         0500*4=2000
+;3          4         0750*4=3000
+;4          4         1000*4=4000
+;5          4         1250*4=5000
+;6          4         1500*4=6000
+  ld    a,5
   ld    (DisplayGuardTowerReward?),a
   ret
 
@@ -6017,7 +6060,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6034,7 +6077,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,045,045,  062,053,045,045,047,046 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesGoemon2
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -6051,7 +6094,7 @@ pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	16,20
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
