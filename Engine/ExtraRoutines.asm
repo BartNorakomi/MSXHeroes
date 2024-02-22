@@ -212,10 +212,10 @@ CheckGuardTowerAlreadyVisited:
 
 LenghtTextItem: equ TextChestGems-TextChestRuby
 TextChestRuby:      db    "     Chest      ",254,254 ;item 65
-                    db  " Chest with Rubies",255
+                    db  " Chest with Riches",255
 
 TextChestGems:      db    "     Chest      ",254,254 ;item 66
-                    db  " Chest with Gems  ",255
+                    db  " Chest with Gold  ",255
 
 TextWood:           db    "     Wood       ",254,254 ;item 67
                     db  " 5 Pieces of Wood ",255
@@ -233,7 +233,7 @@ TextBagOfGold:      db    "   Bag of Gold  ",254,254 ;item 71
                     db  " Contains 500 Gold",255
 
 TextWaterWell:      db    "   Water Well   ",254,254 ;item 72
-                    db  "  Refreshes Mana  ",255
+                    db  " Restores Mobility",255
 
 TextLearningStone:  db    "  Learning Stone",254,254 ;item 73
                     db  "+1000 XP once only",255

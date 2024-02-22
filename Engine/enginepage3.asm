@@ -6,12 +6,12 @@ DisplayNumbers1to6?:      equ 1
 StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
-;WorldPointer: dw GentleAutumnMap01
+;WorldPointer: dw GentleAutumnMap03
 ;WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap03
-;WorldPointer: dw GentleJungleMap01
-WorldPointer: dw GentleMap04
-;WorldPointer: dw GentleWinterMap05
+WorldPointer: dw GentleJungleMap04
+;WorldPointer: dw GentleMap04
+;WorldPointer: dw GentleWinterMap03
 
 InitiateGame:
   ld    hl,CHMOUS

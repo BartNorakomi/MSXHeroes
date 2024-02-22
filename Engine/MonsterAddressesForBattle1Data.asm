@@ -865,7 +865,7 @@ YieArKungFuUnitLevel3CostGems:         equ 00+Level3Unit
 YieArKungFuUnitLevel3CostRubies:       equ 0
 
 YieArKungFuUnitLevel4Number:           equ 105
-YieArKungFuUnitLevel4Attack:           equ 11
+YieArKungFuUnitLevel4Attack:           equ 8
 YieArKungFuUnitLevel4Defense:          equ 9
 YieArKungFuUnitLevel4HP:               equ 37
 YieArKungFuUnitLevel4Speed:            equ 5

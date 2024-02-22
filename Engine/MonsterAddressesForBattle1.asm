@@ -3728,7 +3728,15 @@ Monster158Table:                        ;Queen Sora (green bird) (akanbe dragon)
 
 
 
-
+SenkoKyuLevel2Number:           equ 52
+SenkoKyuLevel2Attack:           equ 3
+SenkoKyuLevel2Defense:          equ 7
+SenkoKyuLevel2HP:               equ 18
+SenkoKyuLevel2Speed:            equ 3
+SenkoKyuLevel2Growth:           equ 8
+SenkoKyuLevel2CostGold:         equ 120/10
+SenkoKyuLevel2CostGems:         equ 00+Level2Unit
+SenkoKyuLevel2CostRubies:       equ 0
 
 Monster159Table:                        ;Senko Kyu (shooting head) (hinotori)
   dw    Monster159Idle
@@ -3742,14 +3750,14 @@ Monster159Table:                        ;Senko Kyu (shooting head) (hinotori)
   db    BattleMonsterSpriteSheet9Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
+  db    SenkoKyuLevel2CostGold        ;cost (gold)
+  db    SenkoKyuLevel2CostGems        ;cost (gems)
+  db    SenkoKyuLevel2CostRubies      ;cost (rubies)
+  db    SenkoKyuLevel2HP              ;hp
+  db    SenkoKyuLevel2Speed           ;speed
+  db    SenkoKyuLevel2Attack          ;attack
+  db    SenkoKyuLevel2Defense         ;defense
+  db    SenkoKyuLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Senko Kyu",255,"  "
 
@@ -3937,6 +3945,16 @@ Monster167Table:                        ;Wonder Boy (Wonder Boy)
   db    000                             ;special ability
   db    "Wonder Boy",255," "
 
+NinjaKunLevel2Number:           equ 52
+NinjaKunLevel2Attack:           equ 4
+NinjaKunLevel2Defense:          equ 7
+NinjaKunLevel2HP:               equ 17
+NinjaKunLevel2Speed:            equ 3
+NinjaKunLevel2Growth:           equ 8
+NinjaKunLevel2CostGold:         equ 120/10
+NinjaKunLevel2CostGems:         equ 00+Level2Unit
+NinjaKunLevel2CostRubies:       equ 0
+
 Monster168Table:                        ;Ninja Kun (Ninja Kun)
   dw    Monster168Idle
   dw    Monster168Move
@@ -3949,14 +3967,14 @@ Monster168Table:                        ;Ninja Kun (Ninja Kun)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
+  db    NinjaKunLevel2CostGold        ;cost (gold)
+  db    NinjaKunLevel2CostGems        ;cost (gems)
+  db    NinjaKunLevel2CostRubies      ;cost (rubies)
+  db    NinjaKunLevel2HP              ;hp
+  db    NinjaKunLevel2Speed           ;speed
+  db    NinjaKunLevel2Attack          ;attack;
+  db    NinjaKunLevel2Defense         ;defense
+  db    NinjaKunLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Ninja Kun",255,"  "
 

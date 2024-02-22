@@ -6472,7 +6472,7 @@ player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
 amountofplayers:		db	3
 player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
-player2human?:			db	1
+player2human?:			db	0
 player3human?:			db	1
 player4human?:			db	0
 whichplayernowplaying?:	db	1
