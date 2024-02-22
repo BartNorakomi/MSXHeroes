@@ -52,7 +52,7 @@ Monster6.yprevious: equ 0C52Eh ; last def. pass 3
 HandleAllHeroesLearnMagicGuildSpells.loop: equ 0B5ECh ; last def. pass 3
 RAttack1Monster159: equ 097F8h ; last def. pass 3
 YieArKungFuUnitLevel3CostRubies: equ 00h ; last def. pass 3
-GentleJungleMap05ObjectLayerMap: equ 05B82h ; last def. pass 3
+GentleJungleMap05ObjectLayerMap: equ 05E30h ; last def. pass 3
 SetTotalMonsterAttackInHL.EndCheckFrenzy: equ 05042h ; last def. pass 3
 Monster103AttackPatternRightUp: equ 0A560h ; last def. pass 3
 InventoryItem32ButtonOffSY: equ 0C4h ; last def. pass 3
@@ -586,7 +586,7 @@ UsasUnitLevel3Speed: equ 06h ; last def. pass 3
 SpellDescriptionsMagicGuild.DescriptionFire3: equ 090ACh ; last def. pass 3
 SetAmountUnderMonsterIn3Pages: equ 0622Bh ; last def. pass 3
 RAttack1Monster132: equ 08390h ; last def. pass 3
-GentleJungleMap05Map: equ 05472h ; last def. pass 3
+GentleJungleMap05Map: equ 05720h ; last def. pass 3
 ScenarioSelectCode.FreeNextHero: equ 08236h ; last def. pass 3
 CheckButtonMouseInteractionSingleBuildButton.Sawmill: equ 0A02Eh ; last def. pass 3
 BattleSpellIconButton8DX: equ 0ACh ; last def. pass 3
@@ -8401,7 +8401,7 @@ HeroOverViewSpellIconButton20OffSY: equ 0A8h ; last def. pass 3
 Div8: equ 0415h ; last def. pass 3
 Monster073Table: equ 08B40h ; last def. pass 3
 Monster119AttackPatternLeft: equ 0A96Fh ; last def. pass 3
-GentleJungleMap04ObjectLayerMap: equ 0544Ah ; last def. pass 3
+GentleJungleMap04ObjectLayerMap: equ 0549Ch ; last def. pass 3
 InitiateBattle.engine: equ 0415Bh ; last def. pass 3
 GenericButtonTable3.Button3Ytop: equ 04Dh ; last def. pass 3
 BubbleBobbleGroupAUnitLevel2Number: equ 0Fh ; last def. pass 3
