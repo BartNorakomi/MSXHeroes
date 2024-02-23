@@ -510,9 +510,9 @@ ContraGroupBUnitLevel6CostRubies:       equ 2
 
 GoemonUnitLevel1Number:           equ 62
 GoemonUnitLevel1Attack:           equ 2
-GoemonUnitLevel1Defense:          equ 2
-GoemonUnitLevel1HP:               equ 3
-GoemonUnitLevel1Speed:            equ 7
+GoemonUnitLevel1Defense:          equ 3
+GoemonUnitLevel1HP:               equ 6
+GoemonUnitLevel1Speed:            equ 3
 GoemonUnitLevel1Growth:           equ 20
 GoemonUnitLevel1CostGold:         equ 30/10
 GoemonUnitLevel1CostGems:         equ 00+Level1Unit

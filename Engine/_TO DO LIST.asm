@@ -11,6 +11,8 @@ autocombat moet een sprite worden
 worldmap:
 AI
 options/settings/save menu
+als je een item oppakt dat intelligence geeft, dan moet de total int gezet worden,
+anders krijg je geen mana bij aan het begin van je nieuwe turn
 
 low prio:
 shift click unit moet nog gemaakt worden om units te splitsen

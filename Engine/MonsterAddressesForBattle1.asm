@@ -4022,7 +4022,9 @@ Monster170Table:                        ;butterfly (maze of gallious)
   db    RandomBUnitLevel5Defense         ;defense
   db    RandomBUnitLevel5Growth          ;growth
   db    000                             ;special ability
-  db    "Kubiwatari",255," "
+;  db    "Lepidoptera",255
+  db    "Flutterbane",255
+
 
 
 
