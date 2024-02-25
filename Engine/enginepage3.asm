@@ -7,10 +7,10 @@ StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap05
-;WorldPointer: dw GentleCaveMap05
-;WorldPointer: dw GentleDesertMap01
-;WorldPointer: dw GentleJungleMap04
-WorldPointer: dw GentleMap01
+;WorldPointer: dw GentleCaveMap03
+WorldPointer: dw GentleDesertMap01
+;WorldPointer: dw GentleJungleMap01
+;WorldPointer: dw GentleMap01
 ;WorldPointer: dw GentleWinterMap02
 
 InitiateGame:
