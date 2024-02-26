@@ -1,4 +1,4 @@
-GentleWinterMap03ObjectLayerMap: equ 071B8h ; last def. pass 3
+GentleWinterMap03ObjectLayerMap: equ 073B8h ; last def. pass 3
 YieArKungFuUnitLevel6Attack: equ 0Fh ; last def. pass 3
 Monster155Idle: equ 0B335h ; last def. pass 3
 pl1hero5manarec: equ 034FCh ; last def. pass 3
@@ -1063,7 +1063,7 @@ AkanbeDragonGroupBUnitLevel3Defense: equ 07h ; last def. pass 3
 WhichHudButtonClicked?: equ 0431h ; last def. pass 3
 Pl3Hero1Units.HeroStatKnowledge: equ 03836h ; last def. pass 3
 HeroPortrait10x18SYSXDrasle3: equ 03FA3h ; last def. pass 3
-GentleDesertMap03Map: equ 0684Dh ; last def. pass 3
+GentleDesertMap03Map: equ 06B9Fh ; last def. pass 3
 SetGraphicsElementalSpells.Spell2DX: equ 066h ; last def. pass 3
 UsasUnitLevel4Number: equ 030h ; last def. pass 3
 Monster126Table: equ 09388h ; last def. pass 3
@@ -1267,7 +1267,7 @@ MarketPlaceCost.Ore: equ 0A936h ; last def. pass 3
 Monster083Table: equ 08CD0h ; last def. pass 3
 ScenarioSelectCode.DifficultyPressed: equ 086AEh ; last def. pass 3
 outix176: equ 0DB75h ; last def. pass 3
-GentleDesertMap03ObjectLayerMap: equ 07007h ; last def. pass 3
+GentleDesertMap03ObjectLayerMap: equ 07359h ; last def. pass 3
 ClearScenarioNameRightTopOfScreen: equ 09611h ; last def. pass 3
 CastleVaniaUnitLevel4Defense: equ 0Ah ; last def. pass 3
 Monster114Idle: equ 0A857h ; last def. pass 3
@@ -1672,7 +1672,7 @@ RAttack1Monster134: equ 0AFD0h ; last def. pass 3
 MenuOptionSelected?: equ 0CF65h ; last def. pass 3
 GolvelliusUnitLevel2Growth: equ 08h ; last def. pass 3
 LIdle1Monster129: equ 097F0h ; last def. pass 3
-GentleDesertMap04Map: equ 07228h ; last def. pass 3
+GentleDesertMap04Map: equ 0757Ah ; last def. pass 3
 CheckButtonMouseInteractionCastleMainScreen.EndCheckExit: equ 0BABEh ; last def. pass 3
 AkanbeDragonGroupAUnitLevel2Number: equ 071h ; last def. pass 3
 Monster12.statusEffect4: equ 0C5BDh ; last def. pass 3
@@ -3501,7 +3501,7 @@ LAttack1Monster025: equ 07798h ; last def. pass 3
 SetVisitingOrDefendingHeroInIX.DoCheckHero: equ 08620h ; last def. pass 3
 Monster143AttackPatternRight: equ 0B175h ; last def. pass 3
 PutTile: equ 03295h ; last def. pass 3
-GentleWinterMap03Map: equ 06708h ; last def. pass 3
+GentleWinterMap03Map: equ 06908h ; last def. pass 3
 Monster7.statusEffect2: equ 0C552h ; last def. pass 3
 HeroButton20x11SYSXPochi: equ 055BCh ; last def. pass 3
 RAttack1Monster112: equ 09FC0h ; last def. pass 3
@@ -5366,7 +5366,7 @@ SpellIconNX: equ 010h ; last def. pass 3
 Monster101Move: equ 0A471h ; last def. pass 3
 RIdle1Monster083: equ 073E0h ; last def. pass 3
 AirSelected: equ 06683h ; last def. pass 3
-GentleWinterMap01ObjectLayerMap: equ 04F8Ch ; last def. pass 3
+GentleWinterMap01ObjectLayerMap: equ 04FD6h ; last def. pass 3
 CampaignSelectButton2XLeft: equ 012h ; last def. pass 3
 InventoryItem02ButtonOffSY: equ 00h ; last def. pass 3
 SetText.TextClosingParenthesisSymbolSXNX: equ 070Fh ; last def. pass 3
@@ -5669,7 +5669,7 @@ HandleProjectileSprite.SetCoordinates: equ 08F45h ; last def. pass 3
 InventoryItem09MouseOverSY: equ 03Ch ; last def. pass 3
 LIdle1Monster079: equ 073B8h ; last def. pass 3
 MarketPlaceCost.Gold: equ 0A932h ; last def. pass 3
-GentleDesertMap05ObjectLayerMap: equ 079C2h ; last def. pass 3
+GentleDesertMap05ObjectLayerMap: equ 07D14h ; last def. pass 3
 Monster090Table: equ 08DE8h ; last def. pass 3
 SettavernHeroNames: equ 08279h ; last def. pass 3
 SetSpireOfWisdomButtonTable.Button2XRight: equ 040h ; last def. pass 3
@@ -5682,7 +5682,7 @@ HeroOverViewSpellIconButton6DX: equ 090h ; last def. pass 3
 LuiceSpriteBlock: equ 0Bh ; last def. pass 3
 TavernButton1Ytop: equ 076h ; last def. pass 3
 RemoveSpell: equ 04F24h ; last def. pass 3
-GentleWinterMap04Map: equ 0736Fh ; last def. pass 3
+GentleWinterMap04Map: equ 0756Fh ; last def. pass 3
 Monster5.statusEffect1: equ 0C527h ; last def. pass 3
 RIdle7Monster169: equ 06BB0h ; last def. pass 3
 Monster100Move: equ 0A467h ; last def. pass 3
@@ -6403,7 +6403,7 @@ SetNameCastleAndDailyIncome: equ 0B578h ; last def. pass 3
 LIdle4Monster168: equ 05FD0h ; last def. pass 3
 SetDifficultyButtonConstantlyLit.DifficultyEasyConstantlyLit: equ 09286h ; last def. pass 3
 World8ObjectLayerMap: equ 07EA4h ; last def. pass 3
-GentleWinterMap02ObjectLayerMap: equ 065A4h ; last def. pass 3
+GentleWinterMap02ObjectLayerMap: equ 067A4h ; last def. pass 3
 HeroPortrait10x18SYSXMercies: equ 048B2h ; last def. pass 3
 MonsterMovementPathPointer: equ 0C241h ; last def. pass 3
 LIdle2Monster021: equ 0ABD0h ; last def. pass 3
@@ -7478,7 +7478,7 @@ TavernButton2XRight: equ 0A6h ; last def. pass 3
 CheckVictoryOrDefeat.CopyActivePageToInactivePage: equ 04BFBh ; last def. pass 3
 RandomAUnitLevel1Growth: equ 0Eh ; last def. pass 3
 Monster11.RomBlock: equ 0C59Bh ; last def. pass 3
-GentleDesertMap02ObjectLayerMap: equ 06824h ; last def. pass 3
+GentleDesertMap02ObjectLayerMap: equ 06882h ; last def. pass 3
 PopolonSpriteBlock: equ 0Ch ; last def. pass 3
 SingleBuildButtonTableAmountOfButtons: equ 0C813h ; last def. pass 3
 SetGraphicsElementalSpells.EndPlaceWaterSpell1: equ 0AECEh ; last def. pass 3
@@ -7840,7 +7840,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons.buttonIsStillLit: equ 0990Bh ; l
 World6Map: equ 071FFh ; last def. pass 3
 SkillTextnecromancyBasic: equ 060CFh ; last def. pass 3
 SurrenderButtonPressed.CheckSurrenderButtonClicked: equ 044AEh ; last def. pass 3
-totallenght: equ 031C000h ; last def. pass 3
+totallenght: equ 031C1EBh ; last def. pass 3
 RIdle2Monster135: equ 06790h ; last def. pass 3
 TextSkillsWindowButton4: equ 0D107h ; last def. pass 3
 Monster046Move: equ 09FA8h ; last def. pass 3
@@ -8475,7 +8475,7 @@ Monster075Move: equ 0A1FCh ; last def. pass 3
 MonsterTableHp: equ 016h ; last def. pass 3
 Monster135AttackPatternRightDown: equ 0AE95h ; last def. pass 3
 ButtonTableSpellIconsAirSYSX: equ 0CEB4h ; last def. pass 3
-GentleDesertMap05Map: equ 0764Ah ; last def. pass 3
+GentleDesertMap05Map: equ 0799Ch ; last def. pass 3
 DevaUnitLevel4Attack: equ 09h ; last def. pass 3
 LIdle2Monster061: equ 08FB0h ; last def. pass 3
 HeroPortrait16x30SYSXDrasle3: equ 07FB8h ; last def. pass 3
@@ -9328,7 +9328,7 @@ SetBattleText.IcePeak: equ 09E27h ; last def. pass 3
 SetGraphicsElementalSpells.EndPlaceAllSchoolsSpell1: equ 0AFA0h ; last def. pass 3
 Monster135AttackPatternRightUp: equ 0AE84h ; last def. pass 3
 Monster136AttackPatternRightDown: equ 0AF39h ; last def. pass 3
-GentleWinterMap02Map: equ 04FA8h ; last def. pass 3
+GentleWinterMap02Map: equ 051A8h ; last def. pass 3
 ScenarioSelectButton20YBottom: equ 072h ; last def. pass 3
 pl3hero9y.pl1hero6xp: equ 03A20h ; last def. pass 3
 Set9BuildButtons.BarracksTower: equ 0A183h ; last def. pass 3
@@ -9566,7 +9566,7 @@ checktriggerhud.MouseOverButtonAndSpacePressedOverButtonNotYetLit: equ 048Bh ; l
 HeroLevel: equ 028h ; last def. pass 3
 pl1hero3manarec: equ 0347Ah ; last def. pass 3
 InventoryItem12DY: equ 07Dh ; last def. pass 3
-GentleDesertMap04ObjectLayerMap: equ 07630h ; last def. pass 3
+GentleDesertMap04ObjectLayerMap: equ 07982h ; last def. pass 3
 HeroOverViewSpellIconButton10OffSX: equ 0E0h ; last def. pass 3
 TurboOn?: equ 0E79Fh ; last def. pass 3
 Monster141Idle: equ 0B14Bh ; last def. pass 3
@@ -9910,7 +9910,7 @@ UsasUnitLevel2Number: equ 034h ; last def. pass 3
 RandomBUnitLevel4CostGems: equ 060h ; last def. pass 3
 GentleMap01MapBlock: equ 089h ; last def. pass 3
 Monster132AttackPatternRightDown: equ 0ACF3h ; last def. pass 3
-GentleWinterMap04ObjectLayerMap: equ 07E44h ; last def. pass 3
+GentleWinterMap04ObjectLayerMap: equ 08044h ; last def. pass 3
 TradingHeroesButtonTable.Button14XLeft: equ 09Ah ; last def. pass 3
 Monster150AttackPatternLeftUp: equ 0B285h ; last def. pass 3
 HeroPortrait16x30SYSXLolo: equ 09DD8h ; last def. pass 3
