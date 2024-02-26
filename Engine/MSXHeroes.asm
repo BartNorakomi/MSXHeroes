@@ -1361,8 +1361,6 @@ GentleWinterMap02MapBlock:  equ   $97
 GentleWinterMap02ObjectLayerMapBlock:  equ   $97
 GentleWinterMap03MapBlock:  equ   $97
 GentleWinterMap03ObjectLayerMapBlock:  equ   $97
-GentleWinterMap04MapBlock:  equ   $97
-GentleWinterMap04ObjectLayerMapBlock:  equ   $97
 
 phase	$4000
 GentleWinterMap01Map:
@@ -1377,20 +1375,22 @@ GentleWinterMap03Map:
   incbin "..\maps\GentleWinterMap03.map.pck"
 GentleWinterMap03ObjectLayerMap:
   incbin "..\maps\GentleWinterMap03objects.map.pck"
-GentleWinterMap04Map:
-  incbin "..\maps\GentleWinterMap04.map.pck"
-GentleWinterMap04ObjectLayerMap:
-  incbin "..\maps\GentleWinterMap04objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
 ;
 ; block $98
 ;
+GentleWinterMap04MapBlock:  equ   $98
+GentleWinterMap04ObjectLayerMapBlock:  equ   $98
 GentleWinterMap05MapBlock:  equ   $98
 GentleWinterMap05ObjectLayerMapBlock:  equ   $98
 
 phase	$4000
+GentleWinterMap04Map:
+  incbin "..\maps\GentleWinterMap04.map.pck"
+GentleWinterMap04ObjectLayerMap:
+  incbin "..\maps\GentleWinterMap04objects.map.pck"
 GentleWinterMap05Map:
   incbin "..\maps\GentleWinterMap05.map.pck"
 GentleWinterMap05ObjectLayerMap:
