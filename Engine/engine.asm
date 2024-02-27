@@ -3617,7 +3617,11 @@ checktriggermapscreen:
 
   ;set x,y where mouse is clicked on the worldmap
 	ld		a,(spat+1)		                  ;x (mouse)pointer
-  inc   a
+;  inc   a
+
+  sub   a,6
+
+
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -3630,7 +3634,7 @@ checktriggermapscreen:
   ld    c,a
 
 	ld		a,(spat)		                    ;y (mouse)pointer
-  sub   a,12
+  sub   a,18 ;20
 	jp		nc,.notcarry2
 	xor		a
   .notcarry2:
@@ -4910,8 +4914,7 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
 ;set relative mouse position
 	ld		a,(spat+1)		                  ;x	(mouse)pointer
-;	add		a,addxtomouse	                  ;centre mouse in grid
-;	add		a,addxtomouse	                  ;centre mouse in grid
+  add   a,addxtomouseDiagonalPointer    ;centery x mouse in grid
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -4925,10 +4928,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
 
 	ld		a,(spat)		                    ;y	(mouse)pointer
 ;	sub		a,subyfrommouse	                ;centre mouse in grid
+  add   a,addytomouseDiagonalPointer    ;centery y mouse in grid
 
-  add a,addytomouse                     ;centery y mouse in grid
-
-	jp		nc,.notcarry2
+	jp		c,.notcarry2
 	xor		a
 .notcarry2:
 	and		%1111 0000
@@ -5396,7 +5398,7 @@ CursorArrowDownLeft:    equ SpriteCharCursorSprites + (05 * 32*3)
 CursorArrowLeft:        equ SpriteCharCursorSprites + (06 * 32*3)
 CursorArrowLeftUp:      equ SpriteCharCursorSprites + (07 * 32*3)
 CursorSwitchingArrows:  equ SpriteCharCursorSprites + (08 * 32*3)
-CursorBoots:            equ SpriteCharCursorSprites + (09 * 32*3)
+CursorBoots:            equ SpriteCharCursorHandDiagonal ;SpriteCharCursorSprites + (09 * 32*3)
 CursorWalkingBoots:     equ SpriteCharCursorSprites + (10 * 32*3)
 CursorHand:             equ SpriteCharCursorSprites + (11 * 32*3)
 CursorSwords:           equ SpriteCharCursorSprites + (12 * 32*3)
@@ -5405,6 +5407,9 @@ CursorProhibitionSign:  equ SpriteProhibitionSignChar
 CursorBowAndArrow:      equ SpriteBowAndArrowChar
 CursorBrokenArrow:      equ SpriteBowAndArrowChar + (01 * 32*3)
 CursorPointerIncastle:  equ SpritePoiterInCastleChar
+
+CursorBootsOld:         equ SpriteCharCursorSprites + (09 * 32*3)
+
 
 CursorSwordLeftUp:      equ SpriteCharSword8DirectionsSprites + (00 * 32*3)
 CursorSwordLeftDown:    equ SpriteCharSword8DirectionsSprites + (01 * 32*3)
@@ -5429,6 +5434,11 @@ colorwhite:         equ 12
 colorblack:         equ 13
 colordarklightgrey: equ 14
 colordarkDarkgrey:  equ 15
+
+
+SpriteCharCursorHandDiagonal:
+	incbin "../sprites/sprconv FOR SINGLE SPRITES/HandPointerDiagonal.spr",0,32*3 * 1
+
 
 SpriteCharCursorSprites:
 	incbin "../sprites/sprconv FOR SINGLE SPRITES/CursorSprites.spr",0,32*3 * 14
@@ -5994,8 +6004,10 @@ mouseposx:		ds	1
 mouseclicky:	ds	1
 mouseclickx:	ds	1
 addxtomouse:	equ	8
-subyfrommouse:	equ	4
+addxtomouseDiagonalPointer:	equ	-6
+;subyfrommouse:	equ	4
 addytomouse:	equ	4
+addytomouseDiagonalPointer:	equ	-2
 
 amountofheroesperplayer:	equ	8
 plxcurrentheroAddress:	dw  pl1hero1y
@@ -6412,10 +6424,10 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
-Castle2:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
-Castle3:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
-Castle4:  db  255,  255,  255,      1,          1,        0,        4,              6,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
+Castle1:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle2:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
+Castle3:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
+Castle4:  db  255,  255,  255,      1,          0,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
@@ -6470,11 +6482,11 @@ player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
-amountofplayers:		db	3
-player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
-player2human?:			db	0
-player3human?:			db	1
-player4human?:			db	0
+amountofplayers:		db	2
+player1human?:			db	2 ;0=CPU, 1=Human, 2=OFF
+player2human?:			db	2
+player3human?:			db	2
+player4human?:			db	2
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	

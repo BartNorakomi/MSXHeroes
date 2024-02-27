@@ -359,9 +359,17 @@ PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
   ld    iy,pl2hero1y
   call  .SetHeroInCastle
 
+  ld    a,(amountofplayers)
+  cp    2
+  ret   z
+
   ld    ix,Castle3
   ld    iy,pl3hero1y
   call  .SetHeroInCastle
+
+  ld    a,(amountofplayers)
+  cp    3
+  ret   z
 
   ld    ix,Castle4
   ld    iy,pl4hero1y

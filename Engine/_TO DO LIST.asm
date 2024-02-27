@@ -1,14 +1,3 @@
-bugs:
-
-pointer is onduidelijk, moet gewoon een pijltje worden
-2nd hero heeft spells, ondanks geen mage guild
-soms kun je niks meer bouwen terwijl je nog niet gebouwd hebt die beurt
-als je het spel start met player 3 en 4 off, dan verschijnen ze alsnog bij starten spel
-als je een gebouw upgrade, misschien een coin pickup animatie, of een + symbool (samen met het sfx)
-
-
-
-
 battle:
 options menu
 
@@ -34,6 +23,10 @@ als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft
 als je xp >20000 dan zie je het / teken niet in het status scherm
 
 castle:
+
+low prio:
+als je een gebouw upgrade, misschien een coin pickup animatie, of een + symbool (samen met het sfx)
+
 
 title screen:
 

@@ -5492,7 +5492,7 @@ CheckSpaceToMoveMonster:
   ld    (BrokenArrow?),a
 
   ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
-  ld    de,CursorBoots
+  ld    de,CursorBootsOld
   call  CompareHLwithDE
   ld    c,EndMovement                  ;255=end movement (dont attack at end of movement)
   jp    z,.BootsFoundSetMovementPath
@@ -6986,7 +6986,7 @@ SetcursorWhenGridTileIsActive:
   ret
   
   .SetBoots:
-  ld    hl,CursorBoots
+  ld    hl,CursorBootsOld
   ld    (BufferCursorSpriteChar),hl
   ld    hl,SpriteColCursorSprites
   ld    (BufferCursorSpriteCol),hl

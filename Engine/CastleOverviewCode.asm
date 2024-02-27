@@ -1336,6 +1336,7 @@ EndTurn:
   ld    hl,(Date)
   inc   hl
   ld    (Date),hl
+
   call  AddCreaturesToPools             ;At start of player 1's turn first day of the week, add all creatures to all castles
   call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
   call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
@@ -8598,11 +8599,6 @@ CastleOverviewTavernCode:
   pop   af                              ;pop the call to this routine
   jp    CastleOverviewTavernCode.engine
 
-
-
-
-
-
   .SetHeroStats:                        ;set status=2, set y, set x, herospecific address
   push  af                              ;a,(iy+TavernHeroxDayRemain)
   call  .CheckIsHeroAHeroThatHasFled?
@@ -8751,9 +8747,24 @@ CastleOverviewTavernCode:
   call  SetManaAndMovementToMax         ;in: ix->hero
 
   call  .SetYX
+  call  .FaceHeroLookingDown
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
+
   pop   af
-  
+  ret  
+
+  .FaceHeroLookingDown:
+  ;face hero looking down
+  ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
+  ld    d,(ix+HeroSpecificInfo+1)
+  push  de
+  pop   ix                              ;hero specific info table in ix
+
+  ld    a,(ix+HeroinfoSYSX+0)           ;get SXSY for this hero from the hero specific info table (which gives info about which direction hero is facing)
+  and   %0100 1000                      ;check if hero is on right side of screen in HeroesSprites.bmp
+  or    a,128 + (064 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
+  xor   8
+  ld    (ix+HeroinfoSYSX+0),a
   ret
 
 
@@ -14095,7 +14106,7 @@ HandleAllHeroesLearnMagicGuildSpells:
   ld    de,lenghtherotable
   add   ix,de
   djnz  .loop
-
+  ret
 
   .CheckHero:  
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -14130,26 +14141,38 @@ HandleAllHeroesLearnMagicGuildSpells:
   ret   nz
   ;castle found
   pop   af                              ;no need to check the other castles
+
+  ld    b,(iy+CastleMageGuildLevel)     ;b=mage guild level
+  
   push  ix
+
+
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+;Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+;Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+;Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+;Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
+
+
   call  SetCastleSpellsInIX             ;ix=castle spells
   pop   iy                              ;iy=heroy
 
-  ld    c,(ix+0)
+  ld    c,(ix+0)                        ;earth spell belonging to this castle's mage guild
   call  .CheckLevel234SpellsPossibleToLearn
   ld    a,c
   or    (iy+HeroEarthSpells)
   ld    (iy+HeroEarthSpells),a
-  ld    c,(ix+1)
+  ld    c,(ix+1)                        ;fire spell belonging to this castle's mage guild
   call  .CheckLevel234SpellsPossibleToLearn
   ld    a,c
   or    (iy+HeroFireSpells)
   ld    (iy+HeroFireSpells),a
-  ld    c,(ix+2)
+  ld    c,(ix+2)                        ;air spell belonging to this castle's mage guild
   call  .CheckLevel234SpellsPossibleToLearn
   ld    a,c
   or    (iy+HeroAirSpells)
   ld    (iy+HeroAirSpells),a
-  ld    c,(ix+3)
+  ld    c,(ix+3)                        ;water spell belonging to this castle's mage guild
   call  .CheckLevel234SpellsPossibleToLearn
   ld    a,c
   or    (iy+HeroWaterSpells)
@@ -14159,7 +14182,9 @@ HandleAllHeroesLearnMagicGuildSpells:
   pop   ix                              ;back to heroy in ix, and go check next hero
   ret
 
-.CheckLevel234SpellsPossibleToLearn:
+.CheckLevel234SpellsPossibleToLearn:    ;in: c=spells belonging to this castle's mage guild (;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1)
+  call  .CheckMageGuildLevel
+
   ;CAUTION IY=Heroy
   ld    a,30                            ;expert wisdom skill
   cp    (iy+HeroSkills+0)
@@ -14210,6 +14235,25 @@ HandleAllHeroesLearnMagicGuildSpells:
   res   1,c                             ;without basic wisdom level 2 spells are not possible to learn
   ret
 
+.CheckMageGuildLevel:
+  ld    a,b                             ;b=mage guild level
+  cp    4
+  ret   z
+  res   3,c                             ;without mage guild level 4, level 4 spells are not possible to learn
+
+  cp    3
+  ret   z
+  res   2,c                             ;without mage guild level 3, level 3 spells are not possible to learn
+
+  cp    2
+  ret   z
+  res   1,c                             ;without mage guild level 2, level 2 spells are not possible to learn
+  
+  cp    1
+  ret   z
+  res   0,c                             ;without mage guild level 1, level 1 spells are not possible to learn
+  ret
+
                       ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
 ;Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
 ;Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
@@ -14219,7 +14263,6 @@ HandleAllHeroesLearnMagicGuildSpells:
 
 CastleOverviewCode:                     ;in: iy-castle
   call  SetInterruptHandler             ;normal ingame interrupt handler
-  call  HandleAllHeroesLearnMagicGuildSpells
 
   ld    a,3
 	ld		(SetResources?),a
@@ -14295,6 +14338,7 @@ CastleOverviewCode:                     ;in: iy-castle
   
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
+  call  HandleAllHeroesLearnMagicGuildSpells
 
   .engine:
   call  SwapAndSetPage                  ;swap and set page
