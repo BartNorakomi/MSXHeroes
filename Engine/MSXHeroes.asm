@@ -884,7 +884,7 @@ dephase
 ;
 LevelUpBlock:  equ   $4a
 phase	$4000
-  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,173 * 128      ;148 lines
+  incbin "..\grapx\HeroOverview\LevelUp.SC5",7,173 * 128      ;173 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1806,8 +1806,10 @@ dephase
 ; block $c2 - $c3
 ;
 ScenarioSelectButtonsBlock:  equ   $c2
+TitleScreenButtonsBlock:  equ   $c2
 phase	$4000
   incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,172 * 128      ;172 lines
+  incbin "..\grapx\TitleScreen\TitleScreenButtons.SC5",7,76 * 128      ;76 lines
 	ds		$c000-$,$ff
 dephase
 

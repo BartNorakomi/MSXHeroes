@@ -22,14 +22,7 @@ TitleScreenCode:
   call  SetPalette
   call  SetSpatInCastle
   call  SetInterruptHandler             ;set Vblank
-;  call  SetCampaignSelectButtons
-;  call  SetFontPage0Y212                ;set font at (0,212) page 0
-
-;  call  SetAmountOfCampaignButtons
-;  call  SetAmountOfCampaignPageButtons
-;  call  SetPage1ButtonConstantlyLit
-;  ld    b,28
-;  call  .ScenarioPressed
+  call  SetTitleScreenButtons
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -41,15 +34,69 @@ TitleScreenCode:
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
 
-  ;scenario select buttons
+  ;title screen select buttons
   ld    ix,GenericButtonTable
-;  call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
+  call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
 ;  call  CheckCampaignSelectButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
-;  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
-  ;/scenario select buttons
+  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+  ;/title screen select buttons
   jp    .engine
+
+SetTitleScreenButtons:
+  ld    hl,TitleScreenButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*5)
+  ldir
+  ret
+
+TitleScreenButton1Ytop:           equ 043 + (0*13)
+TitleScreenButton1YBottom:        equ TitleScreenButton1Ytop + 011
+TitleScreenButton1XLeft:          equ 018
+TitleScreenButton1XRight:         equ TitleScreenButton1XLeft + 096
+
+TitleScreenButton2Ytop:           equ 043 + (1*13)
+TitleScreenButton2YBottom:        equ TitleScreenButton2Ytop + 011
+TitleScreenButton2XLeft:          equ 018
+TitleScreenButton2XRight:         equ TitleScreenButton2XLeft + 096
+
+TitleScreenButton3Ytop:           equ 043 + (2*13)
+TitleScreenButton3YBottom:        equ TitleScreenButton3Ytop + 011
+TitleScreenButton3XLeft:          equ 018
+TitleScreenButton3XRight:         equ TitleScreenButton3XLeft + 096
+
+TitleScreenButton4Ytop:           equ 043 + (3*13)
+TitleScreenButton4YBottom:        equ TitleScreenButton4Ytop + 011
+TitleScreenButton4XLeft:          equ 018
+TitleScreenButton4XRight:         equ TitleScreenButton4XLeft + 096
+
+TitleScreenButton5Ytop:           equ 043 + (4*13)
+TitleScreenButton5YBottom:        equ TitleScreenButton5Ytop + 011
+TitleScreenButton5XLeft:          equ 018
+TitleScreenButton5XRight:         equ TitleScreenButton5XLeft + 096
+
+TitleScreenButtonTableGfxBlock:  db  TitleScreenButtonsBlock
+TitleScreenButtonTableAmountOfButtons:  db  5
+TitleScreenButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton1Ytop,TitleScreenButton1YBottom,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + (TitleScreenButton1Ytop*128) + (TitleScreenButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton2Ytop,TitleScreenButton2YBottom,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + (TitleScreenButton2Ytop*128) + (TitleScreenButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 CampaignSelectCode:
   ld    a,4
