@@ -1125,6 +1125,7 @@ HeroOverviewInventoryWindowCode:
 
   .engine:
   call  PopulateControls                ;read out keys
+  call  SetTotalManaHero
 
   ld    a,(Controls)
   bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)

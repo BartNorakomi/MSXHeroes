@@ -11,14 +11,12 @@ autocombat moet een sprite worden
 worldmap:
 AI
 options/settings/save menu
-als je een item oppakt dat intelligence geeft, dan moet de total int gezet worden,
-anders krijg je geen mana bij aan het begin van je nieuwe turn
+
 
 low prio:
 shift click unit moet nog gemaakt worden om units te splitsen
 units splitsen op hud
 units in hud nog een beetje finetunen
-picked up inventory items should be equiped directly
 als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft van het scherm opgebouwd ziet, en de andere helft is nog van de mirror page (w/e?)
 als je xp >20000 dan zie je het / teken niet in het status scherm
 

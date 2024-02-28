@@ -1,9 +1,55 @@
 HandleTitleScreenCode:
+  jp    TitleScreenCode
   jp    ScenarioSelectCode
   jp    CampaignSelectCode
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
 ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
+
+TitleScreenPalette:
+  incbin"..\grapx\TitleScreen\TitleScreenPalette.pl"
+
+TitleScreenCode:
+  ld    a,4
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  ld    a,1
+	ld		(activepage),a
+  call  SetTitleScreenGraphics
+  xor   a
+	ld		(activepage),a			
+  call  SetTitleScreenGraphics
+  ld    hl,TitleScreenPalette
+  call  SetPalette
+  call  SetSpatInCastle
+  call  SetInterruptHandler             ;set Vblank
+;  call  SetCampaignSelectButtons
+;  call  SetFontPage0Y212                ;set font at (0,212) page 0
+
+;  call  SetAmountOfCampaignButtons
+;  call  SetAmountOfCampaignPageButtons
+;  call  SetPage1ButtonConstantlyLit
+;  ld    b,28
+;  call  .ScenarioPressed
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ;scenario select buttons
+  ld    ix,GenericButtonTable
+;  call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
+;  call  CheckCampaignSelectButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+;  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+  ;/scenario select buttons
+  jp    .engine
 
 CampaignSelectCode:
   ld    a,4
@@ -2716,6 +2762,12 @@ SetCampaignSelectGraphics:
   ld    a,CampaignSelectBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
+SetTitleScreenGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,TitleScreenGraphicsBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 
 

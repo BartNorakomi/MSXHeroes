@@ -1323,8 +1323,6 @@ GentleDesertMap03MapBlock:  equ   $96
 GentleDesertMap03ObjectLayerMapBlock:  equ   $96
 GentleDesertMap04MapBlock:  equ   $96
 GentleDesertMap04ObjectLayerMapBlock:  equ   $96
-GentleDesertMap05MapBlock:  equ   $96
-GentleDesertMap05ObjectLayerMapBlock:  equ   $96
 
 phase	$4000
 GentleDesertMap01Map:
@@ -1343,10 +1341,6 @@ GentleDesertMap04Map:
   incbin "..\maps\GentleDesertMap04.map.pck"
 GentleDesertMap04ObjectLayerMap:
   incbin "..\maps\GentleDesertMap04objects.map.pck"
-GentleDesertMap05Map:
-  incbin "..\maps\GentleDesertMap05.map.pck"
-GentleDesertMap05ObjectLayerMap:
-  incbin "..\maps\GentleDesertMap05objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
@@ -1361,8 +1355,15 @@ GentleWinterMap02MapBlock:  equ   $97
 GentleWinterMap02ObjectLayerMapBlock:  equ   $97
 GentleWinterMap03MapBlock:  equ   $97
 GentleWinterMap03ObjectLayerMapBlock:  equ   $97
+GentleDesertMap05MapBlock:  equ   $97
+GentleDesertMap05ObjectLayerMapBlock:  equ   $97
 
 phase	$4000
+GentleDesertMap05Map:
+  incbin "..\maps\GentleDesertMap05.map.pck"
+GentleDesertMap05ObjectLayerMap:
+  incbin "..\maps\GentleDesertMap05objects.map.pck"
+
 GentleWinterMap01Map:
   incbin "..\maps\GentleWinterMap01.map.pck"
 GentleWinterMap01ObjectLayerMap:
@@ -1826,6 +1827,15 @@ ExtraRoutinesCodeBlock:  equ   $c6
 phase	$4000
 	include	"ExtraRoutines.asm"	
 	ds		$8000-$,$ff
+dephase
+
+;
+; block $c7 - $c8
+;
+TitleScreenGraphicsBlock:  equ   $c7
+phase	$4000
+  incbin "..\grapx\TitleScreen\TitleScreen.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
 dephase
 
 totallenght:	Equ	$-MSXHeroes

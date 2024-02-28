@@ -2947,7 +2947,10 @@ HeroButton20x11SYSXDruid:             db  %1100 0011 | dw $4000 + (165*128) + (0
 
 
 HeroLevelUpCode:
-call ScreenOn
+;call ScreenOn
+  ld    ix,(plxcurrentheroAddress)
+  ld    a,(ix+HeroTotalMana)
+  ld    (HeroTotalManaBeforeLevelingUp),a
 
   ld    a,r
   ld    (framecounter),a                ;sloppy code to randomise framecounter, which then provides us our random Primairy Skill Up
@@ -3124,6 +3127,17 @@ SetLevelUpHeroSkillsInTable:
 
 
 AddThisSkillToHero:
+  call  .goAdd
+  call  SetTotalManaHero
+  ld    a,(HeroTotalManaBeforeLevelingUp)
+  ld    b,a
+  ld    a,(ix+HeroTotalMana)
+  sub   a,b                         ;check the difference between total mana before and after leveling up
+  add   a,(ix+HeroMana)             ;add this difference to current mana pool
+  ld    (ix+HeroMana),a
+  ret
+
+  .goAdd:
   cp    1
   jr    z,.HeroSlot1
   cp    2

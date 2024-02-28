@@ -2108,15 +2108,22 @@ CheckHeroPicksUpItem:
   jp    z,.SpireOfWisdom
   cp    75
   jp    z,.Scroll
-  cp    76
-;  jp    z,.GuardTower
-  ret   z
+  cp    76                              ;guard tower
+  ret   z                               ;guard tower is handled separately
 
 .InventoryItems:
   ;items 83-127 are our inventory items
   sub   83
   ld    c,a
-  
+  ld    ix,(plxcurrentheroAddress)
+
+  .CheckAll9SlotsLoop:
+  sub   5
+  jr    c,.AppropriateInvventorySlotFound
+  inc   ix                              ;next slot
+  jr    .CheckAll9SlotsLoop
+
+  .SetItemInExtraSlots:
   ld    ix,(plxcurrentheroAddress)
   ld    b,6                             ;amount of extra inventory slots
 
@@ -2130,11 +2137,37 @@ CheckHeroPicksUpItem:
   
   .SetItem:
   ld    (ix+HeroInventory+9),c
+  jr    .EndInventoryPickupRoutineAndUpdateHud
 
+  .AppropriateInvventorySlotFound:
+  ld    a,(ix+HeroInventory+0)
+  cp    45                              ;45=empty slot
+  jp    nz,.SetItemInExtraSlots         ;if appropriate slot for item is taken, put it in one of the 6 extra slots
+  ld    (ix+HeroInventory+0),c
+  .EndInventoryPickupRoutineAndUpdateHud:
 	xor		a
 	ld		(movehero?),a
   ld    (hl),a                          ;remove item from object layer map
-  ret
+  ld    a,3
+	ld		(SetHeroArmyAndStatusInHud?),a
+  call  SetHeroMaxMovementPoints
+  jp    SetTotalManaHero
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ;.MagicRefill:
 ;  ld    ix,(plxcurrentheroAddress)
@@ -6009,6 +6042,7 @@ addxtomouseDiagonalPointer:	equ	-6
 addytomouse:	equ	4
 addytomouseDiagonalPointer:	equ	-2
 
+HeroTotalManaBeforeLevelingUp:  ds  1
 amountofheroesperplayer:	equ	8
 plxcurrentheroAddress:	dw  pl1hero1y
 lenghtherotable:	equ	pl1hero2y-pl1hero1y
@@ -6079,7 +6113,7 @@ Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
 ;.HeroSkills:  db  25,18,3,33,9,0
-.HeroSkills:  db  1,0,0,0,0,0
+.HeroSkills:  db  22,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 0000
@@ -6090,7 +6124,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesGoemon2
+.HeroSpecificInfo: dw HeroAddressesDrasle3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -6104,7 +6138,7 @@ pl1hero2y:		db	60
 pl1hero2x:		db	103
 pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
-pl1hero2mana:	dw	16,20
+pl1hero2mana:	dw	10,10
 pl1hero2manarec:db	5		                ;recover x mana every turn
 pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
@@ -6127,7 +6161,7 @@ pl1hero3y:		db	01	                ;
 pl1hero3x:		db	03
 pl1hero3xp: dw 0000
 pl1hero3move:	db	20,20
-pl1hero3mana:	dw	04,20
+pl1hero3mana:	dw	10,10
 pl1hero3manarec:db	5		                ;recover x mana every turn
 pl1hero3status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
