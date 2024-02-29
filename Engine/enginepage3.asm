@@ -3,7 +3,7 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
@@ -32,7 +32,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
   if  StartAtTitleScreen?
   call  TitleScreen
@@ -3930,10 +3930,10 @@ HeroPortrait16x30SYSXDruid:             equ $8000+(090*128)+(192/2)-128 ;(dy*128
 
 Difficulty: ds  1                   ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
 ScenarioPage: ds  1
-LitScenarioButtonInWhichPage?: ds  1
 ScenarioSelected: ds  1
+LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
-AmountOfMapsUnlocked: db  30
+AmountOfMapsUnlocked: db 30
 
 endenginepage3:
 dephase

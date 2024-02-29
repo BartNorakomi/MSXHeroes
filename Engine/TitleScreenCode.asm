@@ -37,12 +37,47 @@ TitleScreenCode:
   ;title screen select buttons
   ld    ix,GenericButtonTable
   call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
-;  call  CheckCampaignSelectButtonClicked       ;in: carry=button clicked, b=button number
+  call  .CheckButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
   call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
   ;/title screen select buttons
   jp    .engine
+
+.CheckButtonClicked:
+  ret   nc
+
+  ld    a,b
+  cp    1
+  jp    z,.CollectionPressed
+  cp    2
+  jp    z,.OptionsPressed
+  cp    3
+  jp    z,.LoadGamePressed
+  cp    4
+  jp    z,.CampaignPressed
+;  cp    5
+;  jp    z,.NewGamePressed
+
+  .NewGamePressed:
+  pop   af
+  jp    ScenarioSelectCode
+
+  .CampaignPressed:
+  pop   af
+  jp    CampaignSelectCode
+
+  .LoadGamePressed:
+  ret
+
+  .OptionsPressed:
+  ret
+
+  .CollectionPressed:
+  ret
+
+
+
 
 SetTitleScreenButtons:
   ld    hl,TitleScreenButtonTable-2
@@ -51,39 +86,39 @@ SetTitleScreenButtons:
   ldir
   ret
 
-TitleScreenButton1Ytop:           equ 043 + (0*13)
-TitleScreenButton1YBottom:        equ TitleScreenButton1Ytop + 011
-TitleScreenButton1XLeft:          equ 018
-TitleScreenButton1XRight:         equ TitleScreenButton1XLeft + 096
+TitleScreenButton1Ytop:           equ 128
+TitleScreenButton1YBottom:        equ TitleScreenButton1Ytop + 014
+TitleScreenButton1XLeft:          equ 094
+TitleScreenButton1XRight:         equ TitleScreenButton1XLeft + 070
 
-TitleScreenButton2Ytop:           equ 043 + (1*13)
-TitleScreenButton2YBottom:        equ TitleScreenButton2Ytop + 011
-TitleScreenButton2XLeft:          equ 018
-TitleScreenButton2XRight:         equ TitleScreenButton2XLeft + 096
+TitleScreenButton2Ytop:           equ 143
+TitleScreenButton2YBottom:        equ TitleScreenButton2Ytop + 016
+TitleScreenButton2XLeft:          equ 098
+TitleScreenButton2XRight:         equ TitleScreenButton2XLeft + 062
 
-TitleScreenButton3Ytop:           equ 043 + (2*13)
-TitleScreenButton3YBottom:        equ TitleScreenButton3Ytop + 011
-TitleScreenButton3XLeft:          equ 018
-TitleScreenButton3XRight:         equ TitleScreenButton3XLeft + 096
+TitleScreenButton3Ytop:           equ 159
+TitleScreenButton3YBottom:        equ TitleScreenButton3Ytop + 015
+TitleScreenButton3XLeft:          equ 092
+TitleScreenButton3XRight:         equ TitleScreenButton3XLeft + 072
 
-TitleScreenButton4Ytop:           equ 043 + (3*13)
-TitleScreenButton4YBottom:        equ TitleScreenButton4Ytop + 011
-TitleScreenButton4XLeft:          equ 018
-TitleScreenButton4XRight:         equ TitleScreenButton4XLeft + 096
+TitleScreenButton4Ytop:           equ 175
+TitleScreenButton4YBottom:        equ TitleScreenButton4Ytop + 016
+TitleScreenButton4XLeft:          equ 104
+TitleScreenButton4XRight:         equ TitleScreenButton4XLeft + 050
 
-TitleScreenButton5Ytop:           equ 043 + (4*13)
-TitleScreenButton5YBottom:        equ TitleScreenButton5Ytop + 011
-TitleScreenButton5XLeft:          equ 018
-TitleScreenButton5XRight:         equ TitleScreenButton5XLeft + 096
+TitleScreenButton5Ytop:           equ 191
+TitleScreenButton5YBottom:        equ TitleScreenButton5Ytop + 015
+TitleScreenButton5XLeft:          equ 094
+TitleScreenButton5XRight:         equ TitleScreenButton5XLeft + 068
 
 TitleScreenButtonTableGfxBlock:  db  TitleScreenButtonsBlock
 TitleScreenButtonTableAmountOfButtons:  db  5
 TitleScreenButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
-  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton1Ytop,TitleScreenButton1YBottom,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + (TitleScreenButton1Ytop*128) + (TitleScreenButton1XLeft/2) - 128 
-  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton2Ytop,TitleScreenButton2YBottom,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + (TitleScreenButton2Ytop*128) + (TitleScreenButton2XLeft/2) - 128 
-  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
-  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((172+000)*128) + (000/2) - 128 | dw $4000 + ((172+000)*128) + (070/2) - 128 | dw $4000 + ((172+000)*128) + (140/2) - 128 | db TitleScreenButton1Ytop,TitleScreenButton1YBottom,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + (TitleScreenButton1Ytop*128) + (TitleScreenButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + ((172+014)*128) + (000/2) - 128 | dw $4000 + ((172+014)*128) + (062/2) - 128 | dw $4000 + ((172+014)*128) + (124/2) - 128 | db TitleScreenButton2Ytop,TitleScreenButton2YBottom,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + (TitleScreenButton2Ytop*128) + (TitleScreenButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((172+045)*128) + (000/2) - 128 | dw $4000 + ((172+045)*128) + (050/2) - 128 | dw $4000 + ((172+045)*128) + (100/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
 
 
 
@@ -106,6 +141,13 @@ CampaignSelectCode:
 ;	ld    a,1
 	ld		(ScenarioPage),a
 	ld		(ScenarioSelected),a
+	
+	xor   a
+	ld		(LitScenarioButtonInWhichPage?),a
+	ld		(AmountOfMapsVisibleInCurrentPage),a
+	ld    hl,0
+  ld    (WorldPointer),hl
+	
   ld    a,2
 	ld		(Difficulty),a                  ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
   ld    a,255
@@ -275,7 +317,7 @@ EndCampaignScreenEngine:
 
 ;Pochi is lost: start with royas, tavern filled with worzen family, except pochi, enemy town empty
 ;Crossroads of Courage: start without hero, tavern filled with worzen family, enemy town's have both 1 hero (snatcher and a belmont) and several units
-;From Dunes to Darkness: start without heroes. tavern filled with cles and wit. enemy town has trevor belmont and several units. loss condition: lose both with and cles.
+;Whispers in the Sand: start without heroes. tavern filled with cles and wit. enemy town has trevor belmont and several units. loss condition: lose both with and cles.
 ;An Arctic Alliance: start without heroes. start with 2 castles, goemon and castlevania. tavern filled with heroes of those castles. enemy towns are dragon slayer 4 and junkery hq. loss condition: lose all heroes.
 ;Felghana's Champion: start with Adol at level 5. start with 1 castle. tavern is empty. enemy towns are junkery hq, castlevania & goemon. win condition: conquer all 3 castles. loss condition: lose adol.
 ;Mildew and Moonlight: start with Lucia at level 5. start with 1 castle. tavern is empty. enemy town is Adol town. win condition: conquer adols castle. loss condition: lose lucia.
@@ -286,7 +328,7 @@ EndCampaignScreenEngine:
 
 ;Into the Fray: start with fray, start with 1 caslte. no heroes in tavern. win condition: defeat 2 castles. lose condition: lose fray
 ;The Soldier's Path: start with solid snake, start with 1 castle. no heroes in tavern. northwest castle is contra 2 castle with Bill Rizer in tavern. win condition: conquer 2 castles in the south. loss condition: lose snake without having conquered the castle in the northwest, or lose both snake and bill rizer. (castles in the south have no heroes in tavern)
-;Westward and Eastward: start with solid snake in 1 castle and fray in the other. no heroes in tavern. Dino is in the middle of the map. Win condition: kill dino. lose condition: lose both heroes
+;Where East Meets West: start with solid snake in 1 castle and fray in the other. no heroes in tavern. Dino is in the middle of the map. Win condition: kill dino. lose condition: lose both heroes
 ;Three Reigns Fallen: start with ashguine in 1 castle. no heroes in tavern. 3 enemy castle, no heroes in taverns. win condition: conquer all castles. lose condition: lose ashguine
 ;Prince Logan's Odyssey: start with logan in 1 castle. no heroes in tavern. 2 enemy castles, ashguine in enemy castle 1 with 3 members of worzen family in tavern. Kelesis the cook in castle 2 with 3 members of worzen family in tavern. win condition: defeat both castles, loss condition: lose all heroes in play and in tavern.
 ;Chronicles of Herzog: start with 1 castle, 0 heroes. ruth and mercies in tavern. 3 castles, each castle has no heroes in tavern. defending heroes in those castles: Lucia, Adol, Prince Logan.
@@ -322,16 +364,21 @@ CheckCampaignSelectButtonClicked:
   jp    nc,.ScenarioPressed
   cp    3
   jp    nc,.Page123Pressed
-;  cp    1
-;  jp    nc,.BeginBackPressed
-
-  .BeginBackPressed:
-  ld    a,b
   cp    2
   jr    z,.BeginPressed
-  ret
+;  cp    1
+;  jr    z,.BackPressed
+
+  .BackPressed:
+  pop   af
+  jp    TitleScreenCode
 
   .BeginPressed:
+  ld    hl,(WorldPointer)
+  ld    a,h
+  or    l
+  ret   z
+
   pop   af
   jp    EndCampaignScreenEngine
 
@@ -1137,7 +1184,9 @@ ScenarioSelectCode:
   cp    16
   jp    nc,.Page123Pressed
   cp    14
-  jp    nc,.BeginBackPressed
+  jp    z,.BackPressed
+  cp    15
+  jp    z,.BeginPressed
   cp    10
   jp    nc,.HumanOrCPUPressed
   cp    06
@@ -1164,7 +1213,7 @@ ScenarioSelectCode:
   ret
 
   .StartingTownPressed:
-  ld    a,b
+;  ld    a,b
   cp    9
   ld    hl,player1StartingTown
   jr    z,.StartingTownFound
@@ -1215,7 +1264,7 @@ ScenarioSelectCode:
   ret
 
   .HumanOrCPUPressed:
-  ld    a,b
+;  ld    a,b
   cp    13
   ld    hl,player1human?
   jr    z,.HumanOrCPUPPressed
@@ -1318,11 +1367,9 @@ ScenarioSelectCode:
   inc   b
   ret
 
-  .BeginBackPressed:
-  ld    a,b
-  cp    15
-  jr    z,.BeginPressed
-  ret
+  .BackPressed:
+  pop   af
+  jp    TitleScreenCode
 
   .BeginPressed:
   pop   af
@@ -1368,9 +1415,6 @@ ScenarioSelectCode:
 
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
-
-
-
 
   .ScenarioPressed:
   ld    a,(ScenarioPage)

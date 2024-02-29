@@ -4000,10 +4000,10 @@ Monster169Table:                        ;Kubiwatari (jumping head statue) (hinot
   db    RandomBUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Kubiwatari",255," "
-  
-Monster170Table:                        ;butterfly (maze of gallious)
-;  dw    Monster170Idle
-;  dw    Monster170Move
+
+Monster170Table:                        ;Flutterbane (maze of gallious)
+  dw    Monster170Idle
+  dw    Monster170Move
   dw    GeneralMonsterAttackPatternRight
   dw    GeneralMonsterAttackPatternLeft
   dw    GeneralMonsterAttackPatternLeftUp
@@ -4025,13 +4025,396 @@ Monster170Table:                        ;butterfly (maze of gallious)
 ;  db    "Lepidoptera",255
   db    "Flutterbane",255
 
+Monster171Table:                        ;Topple Zip (Topple Zip)
+  dw    Monster171Idle
+  dw    Monster171Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet8Block
+  db    16                              ;nx  
+  db    24+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    000                             ;special ability
+  db    "Topple Zip",255," "
 
+Monster172Table:                        ;Topplane (Topple Zip)
+  dw    Monster172Idle
+  dw    Monster172Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet12Block
+  db    16                              ;nx  
+  db    24+08                           ;ny
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    000                             ;special ability
+  db    "Topplane",255,"   "
 
+Monster173Table:                        ;Nyancle (Nyancle racing)
+  dw    Monster173Idle
+  dw    Monster173Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    32+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    000                             ;special ability
+  db    "Nyancle",255,"    "
 
+Monster174Table:                        ;Ashguine (Ashguine 2)
+  dw    Monster174Idle
+  dw    Monster174Move
+  dw    Monster174AttackPatternRight
+  dw    Monster174AttackPatternLeft
+  dw    Monster174AttackPatternLeft
+  dw    Monster174AttackPatternLeft
+  dw    Monster174AttackPatternRight
+  dw    Monster174AttackPatternRight
+  db    BattleMonsterSpriteSheet15Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
+  db    000                             ;special ability
+  db    "Ashguine",255,"   "
 
+Monster175Table:                        ;Hard Boiled (Hard Boiled)
+  dw    Monster175Idle
+  dw    Monster175Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    32                              ;nx  
+  db    48+08                           ;ny
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
+  db    000                             ;special ability
+  db    "Hard Boiled",255
 
+Monster176Table:                        ;Pingo (Doki Doki Penguin Land)
+  dw    Monster176Idle
+  dw    Monster176Move
+  dw    Monster176AttackPatternRight
+  dw    Monster176AttackPatternLeft
+  dw    Monster176AttackPatternLeft
+  dw    Monster176AttackPatternLeft
+  dw    Monster176AttackPatternRight
+  dw    Monster176AttackPatternRight
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    000                             ;special ability
+  db    "Pingo",255,"      "
 
+Monster177Table:                        ;Doki Bear (Doki Doki Penguin Land)
+  dw    Monster177Idle
+  dw    Monster177Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    000                             ;special ability
+  db    "Doki Bear",255,"  "
 
+Monster178Table:                        ;InspecteurZ (Inspecteur Z)
+  dw    Monster178Idle
+  dw    Monster178Move
+  dw    Monster178AttackPatternRight
+  dw    Monster178AttackPatternLeft
+  dw    Monster178AttackPatternLeft
+  dw    Monster178AttackPatternLeft
+  dw    Monster178AttackPatternRight
+  dw    Monster178AttackPatternRight
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    000                             ;special ability
+  db    "InspecteurZ",255
+  
+Monster179Table:                        ;Thug (Inspecteur Z) (dog with eye patch)
+  dw    Monster179Idle
+  dw    Monster179Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    000                             ;special ability
+  db    "Thug",255,"       "
+
+Monster180Table:                        ;Goblin (Ys 2) (green monster)
+  dw    Monster180Idle
+  dw    Monster180Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    000                             ;special ability
+  db    "Goblin",255,"     "
+
+Monster181Table:                        ;Emberhorn (Ys 2) (red horned monster)
+  dw    Monster181Idle
+  dw    Monster181Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    16                              ;nx  
+  db    16+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    000                             ;special ability
+  db    "Emberhorn",255,"  "
+
+Monster182Table:                        ;Kanton Man (chuka taisen) (bird man)
+  dw    Monster182Idle
+  dw    Monster182Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet16Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    000                             ;special ability
+  db    "Kanton Man",255," "
+
+Monster183Table:                        ;Sun Wukong (chuka taisen) (main character)
+  dw    Monster183Idle
+  dw    Monster183Move
+  dw    Monster183AttackPatternRight
+  dw    Monster183AttackPatternLeft
+  dw    Monster183AttackPatternLeft
+  dw    Monster183AttackPatternLeft
+  dw    Monster183AttackPatternRight
+  dw    Monster183AttackPatternRight
+  db    BattleMonsterSpriteSheet16Block
+  db    32                              ;nx  
+  db    32+08                           ;ny
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    "Sun Wukong",255," "
+
+Monster184Table:                        ;Shock Scout (chuka taisen) (boy with green hair)
+  dw    Monster184Idle
+  dw    Monster184Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet16Block
+  db    32                              ;nx  
+  db    40+08                           ;ny
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
+  db    000                             ;special ability
+  db    "Shock Scout",255
+  
+Monster185Table:                        ;Evil Hermit (chuka taisen) (old man with staff and crown)
+  dw    Monster185Idle
+  dw    Monster185Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet16Block
+  db    32                              ;nx  
+  db    40+08                           ;ny
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
+  db    000                             ;special ability
+  db    "Evil Hermit",255
+
+Monster186Table:                        ;Bad Buddha (chuka taisen) (blue dress and mustache)
+  dw    Monster186Idle
+  dw    Monster186Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet16Block
+  db    32                              ;nx  
+  db    40+08                           ;ny
+  db    RandomBUnitLevel5CostGold        ;cost (gold)
+  db    RandomBUnitLevel5CostGems        ;cost (gems)
+  db    RandomBUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel5HP              ;hp
+  db    RandomBUnitLevel5Speed           ;speed
+  db    RandomBUnitLevel5Attack          ;attack
+  db    RandomBUnitLevel5Defense         ;defense
+  db    RandomBUnitLevel5Growth          ;growth
+  db    000                             ;special ability
+  db    "Bad Buddha",255," "
+
+Monster187Table:                        ;Dualhorn (chuka taisen) (green demon with 2 heads)
+  dw    Monster187Idle
+  dw    Monster187Move
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
+  db    BattleMonsterSpriteSheet15Block
+  db    32                              ;nx  
+  db    40+08                           ;ny
+  db    RandomBUnitLevel6CostGold        ;cost (gold)
+  db    RandomBUnitLevel6CostGems        ;cost (gems)
+  db    RandomBUnitLevel6CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel6HP              ;hp
+  db    RandomBUnitLevel6Speed           ;speed
+  db    RandomBUnitLevel6Attack          ;attack
+  db    RandomBUnitLevel6Defense         ;defense
+  db    RandomBUnitLevel6Growth          ;growth
+  db    000                             ;special ability
+  db    "Dualhorn",255,"   "
 
 ;######################################################################################
 GeneralMonsterAttackPatternRight:
@@ -8417,5 +8800,456 @@ Monster169Idle:
   dw    RIdle2Monster169
   dw    RIdle1Monster169
 
- 
- 
+;######################################################################################
+;Flutterbane (maze of gallious)
+
+RIdle1Monster170:   equ $4000 + (224*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster170:   equ $4000 + (224*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster170:   equ $4000 + (224*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster170:   equ $4000 + (224*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+Monster170Move:
+Monster170Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster170
+  dw    RIdle2Monster170
+  ;facing left
+  dw    LIdle1Monster170
+  dw    LIdle2Monster170
+
+;######################################################################################
+;Topple Zip (Topple Zip)
+
+RIdle1Monster171:   equ $4000 + (096*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster171:   equ $4000 + (096*128) + (016/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster171:   equ $4000 + (096*128) + (032/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster171:   equ $4000 + (064*128) + (240/2) - 128  ;(y*128) + (x/2)
+
+Monster171Move:
+Monster171Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster171
+  dw    RIdle2Monster171
+  ;facing left
+  dw    LIdle1Monster171
+  dw    LIdle2Monster171
+
+;######################################################################################
+;Topplane (Topple Zip)
+
+RIdle1Monster172:   equ $4000 + (048*128) + (176/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster172:   equ $4000 + (048*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster172:   equ $4000 + (048*128) + (208/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster172:   equ $4000 + (048*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+Monster172Move:
+Monster172Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster172
+  dw    RIdle2Monster172
+  ;facing left
+  dw    LIdle1Monster172
+  dw    LIdle2Monster172
+
+;######################################################################################
+;Nyancle (Nyancle racing)
+
+RIdle1Monster173:   equ $4000 + (144*128) + (160/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster173:   equ $4000 + (144*128) + (176/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster173:   equ $4000 + (144*128) + (208/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster173:   equ $4000 + (144*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+Monster173Move:
+Monster173Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster173
+  dw    RIdle2Monster173
+  ;facing left
+  dw    LIdle1Monster173
+  dw    LIdle2Monster173
+
+;######################################################################################
+;Ashguine (Ashguine 2)
+
+RIdle1Monster174:   equ $4000 + (024*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster174:   equ $4000 + (024*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster174:   equ $4000 + (024*128) + (160/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster174: equ $4000 + (024*128) + (192/2) - 128  ;(y*128) + (x/2)
+RAttack2Monster174: equ $4000 + (024*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster174:   equ $4000 + (144*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster174:   equ $4000 + (144*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster174:   equ $4000 + (144*128) + (064/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster174: equ $4000 + (144*128) + (032/2) - 128  ;(y*128) + (x/2)
+LAttack2Monster174: equ $4000 + (144*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster174Move:
+Monster174Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster174
+  dw    RIdle2Monster174
+  dw    RIdle1Monster174
+  dw    RIdle3Monster174
+  ;facing left
+  dw    LIdle1Monster174
+  dw    LIdle2Monster174
+  dw    LIdle1Monster174
+  dw    LIdle3Monster174
+
+Monster174AttackPatternRight:
+  db    000,003,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,007,InitiateAttack
+Monster174AttackPatternRightUp:
+  db    000,008,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,004,InitiateAttack
+Monster174AttackPatternRightDown:
+  db    000,006,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,002,InitiateAttack
+
+Monster174AttackPatternLeft:
+  db    000,007,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,003,InitiateAttack
+Monster174AttackPatternLeftUp:
+  db    000,002,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,006,InitiateAttack
+Monster174AttackPatternLeftDown:
+  db    000,004,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,008,InitiateAttack
+
+;######################################################################################
+;Hard Boiled (Hard Boiled)
+
+RIdle1Monster175:   equ $4000 + (088*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster175:   equ $4000 + (088*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster175:   equ $4000 + (088*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster175:   equ $4000 + (088*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+Monster175Move:
+Monster175Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster175
+  dw    RIdle2Monster175
+  ;facing left
+  dw    LIdle1Monster175
+  dw    LIdle2Monster175
+
+;######################################################################################
+;Pingo (Doki Doki Penguin Land)
+
+RIdle1Monster176:   equ $4000 + (000*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster176:   equ $4000 + (000*128) + (144/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster176:   equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster176: equ $4000 + (000*128) + (176/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster176:   equ $4000 + (000*128) + (240/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster176:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster176:   equ $4000 + (000*128) + (208/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster176: equ $4000 + (000*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+Monster176Move:
+Monster176Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster176
+  dw    RIdle2Monster176
+  dw    RIdle1Monster176
+  dw    RIdle3Monster176
+  ;facing left
+  dw    LIdle1Monster176
+  dw    LIdle2Monster176
+  dw    LIdle1Monster176
+  dw    LIdle3Monster176
+
+Monster176AttackPatternRight:
+  db    000,003,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,007,InitiateAttack
+Monster176AttackPatternRightUp:
+  db    000,008,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,004,InitiateAttack
+Monster176AttackPatternRightDown:
+  db    000,006,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,002,InitiateAttack
+
+Monster176AttackPatternLeft:
+  db    000,007,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,003,InitiateAttack
+Monster176AttackPatternLeftUp:
+  db    000,002,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,006,InitiateAttack
+Monster176AttackPatternLeftDown:
+  db    000,004,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,008,InitiateAttack
+
+;######################################################################################
+;Doki Bear (Doki Doki Penguin Land)
+
+RIdle1Monster177:   equ $4000 + (120*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster177:   equ $4000 + (120*128) + (016/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster177:   equ $4000 + (120*128) + (048/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster177:   equ $4000 + (120*128) + (032/2) - 128  ;(y*128) + (x/2)
+
+Monster177Move:
+Monster177Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster177
+  dw    RIdle2Monster177
+  ;facing left
+  dw    LIdle1Monster177
+  dw    LIdle2Monster177
+
+;######################################################################################
+;InspecteurZ (Inspecteur Z)
+
+RIdle1Monster178:   equ $4000 + (184*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster178:   equ $4000 + (184*128) + (144/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster178:   equ $4000 + (184*128) + (176/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster178:   equ $4000 + (184*128) + (160/2) - 128  ;(y*128) + (x/2)
+
+Monster178Move:
+Monster178Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster178
+  dw    RIdle2Monster178
+  ;facing left
+  dw    LIdle1Monster178
+  dw    LIdle2Monster178
+
+;######################################################################################
+;Thug (Inspecteur Z) (dog with eye patch)
+
+RIdle1Monster179:   equ $4000 + (120*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster179:   equ $4000 + (120*128) + (080/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster179:   equ $4000 + (120*128) + (112/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster179:   equ $4000 + (120*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster179Move:
+Monster179Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster179
+  dw    RIdle2Monster179
+  ;facing left
+  dw    LIdle1Monster179
+  dw    LIdle2Monster179
+
+;######################################################################################
+;Goblin (Ys 2) (green monster)
+
+RIdle1Monster180:   equ $4000 + (184*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster180:   equ $4000 + (184*128) + (016/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster180:   equ $4000 + (184*128) + (048/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster180:   equ $4000 + (184*128) + (032/2) - 128  ;(y*128) + (x/2)
+
+Monster180Move:
+Monster180Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster180
+  dw    RIdle2Monster180
+  ;facing left
+  dw    LIdle1Monster180
+  dw    LIdle2Monster180
+
+;######################################################################################
+;Emberhorn (Ys 2) (red horned monster)
+
+RIdle1Monster181:   equ $4000 + (184*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster181:   equ $4000 + (184*128) + (080/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster181:   equ $4000 + (184*128) + (112/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster181:   equ $4000 + (184*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster181Move:
+Monster181Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    2                               ;amount of animation frames
+  dw    RIdle1Monster181
+  dw    RIdle2Monster181
+  ;facing left
+  dw    LIdle1Monster181
+  dw    LIdle2Monster181
+
+;######################################################################################
+;Kanton Man (chuka taisen) (bird man)
+
+RIdle1Monster182:   equ $4000 + (080*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster182:   equ $4000 + (080*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster182:   equ $4000 + (080*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle4Monster182:   equ $4000 + (080*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster182:   equ $4000 + (216*128) + (000/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster182:   equ $4000 + (080*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster182:   equ $4000 + (080*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle4Monster182:   equ $4000 + (080*128) + (128/2) - 128  ;(y*128) + (x/2)
+
+Monster182Move:
+Monster182Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster182
+  dw    RIdle2Monster182
+  dw    RIdle3Monster182
+  dw    RIdle4Monster182
+  ;facing left
+  dw    LIdle1Monster182
+  dw    LIdle2Monster182
+  dw    LIdle3Monster182
+  dw    LIdle4Monster182
+
+;######################################################################################
+;Sun Wukong (chuka taisen) (main character)
+
+RIdle1Monster183:   equ $4000 + (000*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster183:   equ $4000 + (000*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster183:   equ $4000 + (000*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle4Monster183:   equ $4000 + (000*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle5Monster183:   equ $4000 + (000*128) + (128/2) - 128  ;(y*128) + (x/2)
+RIdle6Monster183:   equ $4000 + (000*128) + (160/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster183: equ $4000 + (000*128) + (192/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster183:   equ $4000 + (040*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster183:   equ $4000 + (040*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster183:   equ $4000 + (040*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle4Monster183:   equ $4000 + (040*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle5Monster183:   equ $4000 + (040*128) + (064/2) - 128  ;(y*128) + (x/2)
+LIdle6Monster183:   equ $4000 + (040*128) + (032/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster183: equ $4000 + (040*128) + (000/2) - 128  ;(y*128) + (x/2)
+
+Monster183Move:
+Monster183Idle:
+  db    04                              ;animation speed (x frames per animation frame)
+  db    8                               ;amount of animation frames
+  dw    RIdle1Monster183
+  dw    RIdle2Monster183
+  dw    RIdle3Monster183
+  dw    RIdle4Monster183
+  dw    RIdle5Monster183
+  dw    RIdle6Monster183
+  dw    RIdle2Monster183
+  dw    RIdle3Monster183
+  ;facing left
+  dw    LIdle1Monster183
+  dw    LIdle2Monster183
+  dw    LIdle3Monster183
+  dw    LIdle4Monster183
+  dw    LIdle5Monster183
+  dw    LIdle6Monster183
+  dw    LIdle2Monster183
+  dw    LIdle3Monster183
+
+Monster183AttackPatternRight:
+  db    AnimateAttack | dw Rattack1Monster183 | db 000,ShootProjectile,000,WaitImpactProjectile
+Monster183AttackPatternLeft:
+  db    AnimateAttack | dw Lattack1Monster183 | db 000,ShootProjectile,000,WaitImpactProjectile
+
+;######################################################################################
+;Shock Scout (chuka taisen) (boy with green hair)
+
+RIdle1Monster184:   equ $4000 + (120*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster184:   equ $4000 + (120*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster184:   equ $4000 + (120*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster184:   equ $4000 + (120*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster184:   equ $4000 + (120*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster184:   equ $4000 + (120*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster184Move:
+Monster184Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster184
+  dw    RIdle2Monster184
+  dw    RIdle3Monster184
+  dw    RIdle2Monster184
+  ;facing left
+  dw    LIdle1Monster184
+  dw    LIdle2Monster184
+  dw    LIdle3Monster184
+  dw    LIdle2Monster184
+
+;######################################################################################
+;Evil Hermit (chuka taisen) (old man with staff and crown)
+
+RIdle1Monster185:   equ $4000 + (168*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster185:   equ $4000 + (168*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster185:   equ $4000 + (168*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster185:   equ $4000 + (168*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster185:   equ $4000 + (168*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster185:   equ $4000 + (168*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster185Move:
+Monster185Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster185
+  dw    RIdle2Monster185
+  dw    RIdle3Monster185
+  dw    RIdle2Monster185
+  ;facing left
+  dw    LIdle1Monster185
+  dw    LIdle2Monster185
+  dw    LIdle3Monster185
+  dw    LIdle2Monster185
+
+;######################################################################################
+;Bad Buddha (chuka taisen) (blue dress and mustache)
+
+RIdle1Monster186:   equ $4000 + (168*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster186:   equ $4000 + (168*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster186:   equ $4000 + (168*128) + (064/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster186:   equ $4000 + (168*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster186:   equ $4000 + (168*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster186:   equ $4000 + (168*128) + (096/2) - 128  ;(y*128) + (x/2)
+
+Monster186Move:
+Monster186Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster186
+  dw    RIdle2Monster186
+  dw    RIdle3Monster186
+  dw    RIdle2Monster186
+  ;facing left
+  dw    LIdle1Monster186
+  dw    LIdle2Monster186
+  dw    LIdle3Monster186
+  dw    LIdle2Monster186
+
+;######################################################################################
+;Dualhorn (chuka taisen) (green demon with 2 heads)
+
+RIdle1Monster187:   equ $4000 + (120*128) + (192/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster187:   equ $4000 + (120*128) + (224/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster187:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+LIdle1Monster187:   equ $4000 + (168*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster187:   equ $4000 + (168*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster187:   equ $4000 + (048*128) + (224/2) - 128  ;(y*128) + (x/2)
+
+Monster187Move:
+Monster187Idle:
+  db    06                              ;animation speed (x frames per animation frame)
+  db    4                               ;amount of animation frames
+  dw    RIdle1Monster187
+  dw    RIdle2Monster187
+  dw    RIdle3Monster187
+  dw    RIdle2Monster187
+  ;facing left
+  dw    LIdle1Monster187
+  dw    LIdle2Monster187
+  dw    LIdle3Monster187
+  dw    LIdle2Monster187
+
+
+
+
+
+
+

@@ -7,6 +7,7 @@ mogelijk stond het monster waar ie op schoot naast 'm, waardoor het projectiel a
 
 low prio
 autocombat moet een sprite worden
+footman meervoud wordt footmans in battle ipv footmen. naam wijzigen
 
 worldmap:
 AI
@@ -41,13 +42,12 @@ sfx
 
 
 titel scherm:
-
-plaatje: MSX Legends
-
 - Single Scenario (locked)
 - Campaign
 - Load Game
 - Game Options
 - Collection
 
-MSX Legends
+
+
+
