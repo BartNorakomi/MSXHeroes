@@ -8,6 +8,7 @@ mogelijk stond het monster waar ie op schoot naast 'm, waardoor het projectiel a
 low prio
 autocombat moet een sprite worden
 footman meervoud wordt footmans in battle ipv footmen. naam wijzigen
+als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of net voordat er text in het textvak geplaatst wordt), dan wordt de text niet goed geplaatst in beide pages. oplossing: je kunt niet de stats kijken als puttext? of hoe dat dan ook heet actief is.
 
 worldmap:
 AI

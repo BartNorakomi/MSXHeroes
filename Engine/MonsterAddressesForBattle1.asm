@@ -4099,10 +4099,10 @@ Monster174Table:                        ;Ashguine (Ashguine 2)
   dw    Monster174Move
   dw    Monster174AttackPatternRight
   dw    Monster174AttackPatternLeft
-  dw    Monster174AttackPatternLeft
-  dw    Monster174AttackPatternLeft
-  dw    Monster174AttackPatternRight
-  dw    Monster174AttackPatternRight
+  dw    Monster174AttackPatternLeftUp
+  dw    Monster174AttackPatternLeftDown
+  dw    Monster174AttackPatternRightUp
+  dw    Monster174AttackPatternRightDown
   db    BattleMonsterSpriteSheet15Block
   db    32                              ;nx  
   db    32+08                           ;ny
@@ -4145,10 +4145,10 @@ Monster176Table:                        ;Pingo (Doki Doki Penguin Land)
   dw    Monster176Move
   dw    Monster176AttackPatternRight
   dw    Monster176AttackPatternLeft
-  dw    Monster176AttackPatternLeft
-  dw    Monster176AttackPatternLeft
-  dw    Monster176AttackPatternRight
-  dw    Monster176AttackPatternRight
+  dw    Monster176AttackPatternLeftUp
+  dw    Monster176AttackPatternLeftDown
+  dw    Monster176AttackPatternRightUp
+  dw    Monster176AttackPatternRightDown
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
@@ -4191,10 +4191,10 @@ Monster178Table:                        ;InspecteurZ (Inspecteur Z)
   dw    Monster178Move
   dw    Monster178AttackPatternRight
   dw    Monster178AttackPatternLeft
-  dw    Monster178AttackPatternLeft
-  dw    Monster178AttackPatternLeft
-  dw    Monster178AttackPatternRight
-  dw    Monster178AttackPatternRight
+  dw    Monster178AttackPatternLeftUp
+  dw    Monster178AttackPatternLeftDown
+  dw    Monster178AttackPatternRightUp
+  dw    Monster178AttackPatternRightDown
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
@@ -4288,7 +4288,7 @@ Monster182Table:                        ;Kanton Man (chuka taisen) (bird man)
   dw    GeneralMonsterAttackPatternRightUp
   dw    GeneralMonsterAttackPatternRightDown
   db    BattleMonsterSpriteSheet16Block
-  db    32                              ;nx  
+  db    48                              ;nx  
   db    32+08                           ;ny
   db    RandomBUnitLevel1CostGold        ;cost (gold)
   db    RandomBUnitLevel1CostGems        ;cost (gems)
@@ -8897,27 +8897,27 @@ Monster174Idle:
   db    4                               ;amount of animation frames
   dw    RIdle1Monster174
   dw    RIdle2Monster174
-  dw    RIdle1Monster174
   dw    RIdle3Monster174
+  dw    RIdle2Monster174
   ;facing left
   dw    LIdle1Monster174
   dw    LIdle2Monster174
-  dw    LIdle1Monster174
   dw    LIdle3Monster174
+  dw    LIdle2Monster174
 
 Monster174AttackPatternRight:
-  db    000,003,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,007,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster174 | db 000,003,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack2Monster174 | db 000,AnimateAttack | dw Rattack1Monster174 | db 000,AnimateAttack | dw RIdle2Monster174 | db 000,007,InitiateAttack
 Monster174AttackPatternRightUp:
-  db    000,008,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,004,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster174 | db 000,008,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack2Monster174 | db 000,AnimateAttack | dw Rattack1Monster174 | db 000,AnimateAttack | dw RIdle2Monster174 | db 000,004,InitiateAttack
 Monster174AttackPatternRightDown:
-  db    000,006,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster174 | db 000,002,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster174 | db 000,006,000,AnimateAttack | dw Rattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Rattack2Monster174 | db 000,AnimateAttack | dw Rattack1Monster174 | db 000,AnimateAttack | dw RIdle2Monster174 | db 000,002,InitiateAttack
 
 Monster174AttackPatternLeft:
-  db    000,007,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,003,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster174 | db 000,007,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack2Monster174 | db 000,AnimateAttack | dw Lattack1Monster174 | db 000,AnimateAttack | dw LIdle2Monster174 | db 000,003,InitiateAttack
 Monster174AttackPatternLeftUp:
-  db    000,002,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,006,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster174 | db 000,002,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack2Monster174 | db 000,AnimateAttack | dw Lattack1Monster174 | db 000,AnimateAttack | dw LIdle2Monster174 | db 000,006,InitiateAttack
 Monster174AttackPatternLeftDown:
-  db    000,004,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster174 | db 000,008,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster174 | db 000,004,000,AnimateAttack | dw Lattack1Monster174 | db 000,ShowBeingHitSprite,AnimateAttack | dw Lattack2Monster174 | db 000,AnimateAttack | dw Lattack1Monster174 | db 000,AnimateAttack | dw LIdle2Monster174 | db 000,008,InitiateAttack
 
 ;######################################################################################
 ;Hard Boiled (Hard Boiled)
@@ -8966,18 +8966,18 @@ Monster176Idle:
   dw    LIdle3Monster176
 
 Monster176AttackPatternRight:
-  db    000,003,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,007,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster176 | db 003,000,AnimateAttack | dw RAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,007,InitiateAttack
 Monster176AttackPatternRightUp:
-  db    000,008,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,004,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster176 | db 008,000,AnimateAttack | dw RAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,004,InitiateAttack
 Monster176AttackPatternRightDown:
-  db    000,006,000,AnimateAttack | dw Rattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,002,InitiateAttack
+  db    AnimateAttack | dw RIdle1Monster176 | db 006,000,AnimateAttack | dw RAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster176 | db 000,002,InitiateAttack
 
 Monster176AttackPatternLeft:
-  db    000,007,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,003,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster176 | db 007,000,AnimateAttack | dw LAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,003,InitiateAttack
 Monster176AttackPatternLeftUp:
-  db    000,002,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,006,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster176 | db 002,000,AnimateAttack | dw LAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,006,InitiateAttack
 Monster176AttackPatternLeftDown:
-  db    000,004,000,AnimateAttack | dw Lattack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,008,InitiateAttack
+  db    AnimateAttack | dw LIdle1Monster176 | db 004,000,AnimateAttack | dw LAttack1Monster176 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster176 | db 000,008,InitiateAttack
 
 ;######################################################################################
 ;Doki Bear (Doki Doki Penguin Land)
@@ -9001,21 +9001,38 @@ Monster177Idle:
 ;######################################################################################
 ;InspecteurZ (Inspecteur Z)
 
-RIdle1Monster178:   equ $4000 + (184*128) + (128/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster178:   equ $4000 + (184*128) + (144/2) - 128  ;(y*128) + (x/2)
+RIdle1Monster178:   equ $4000 + (064*128) + (224/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster178:   equ $4000 + (064*128) + (240/2) - 128  ;(y*128) + (x/2)
+RAttack1Monster178: equ $4000 + (184*128) + (128/2) - 128  ;(y*128) + (x/2)
 
 LIdle1Monster178:   equ $4000 + (184*128) + (176/2) - 128  ;(y*128) + (x/2)
 LIdle2Monster178:   equ $4000 + (184*128) + (160/2) - 128  ;(y*128) + (x/2)
+LAttack1Monster178: equ $4000 + (184*128) + (144/2) - 128  ;(y*128) + (x/2)
 
 Monster178Move:
 Monster178Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    04                              ;animation speed (x frames per animation frame)
   db    2                               ;amount of animation frames
   dw    RIdle1Monster178
   dw    RIdle2Monster178
   ;facing left
   dw    LIdle1Monster178
   dw    LIdle2Monster178
+
+Monster178AttackPatternRight:
+  db    AnimateAttack | dw RIdle1Monster178 | db 003,000,AnimateAttack | dw RAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster178 | db 000,007,InitiateAttack
+Monster178AttackPatternRightUp:
+  db    AnimateAttack | dw RIdle1Monster178 | db 008,000,AnimateAttack | dw RAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster178 | db 000,004,InitiateAttack
+Monster178AttackPatternRightDown:
+  db    AnimateAttack | dw RIdle1Monster178 | db 006,000,AnimateAttack | dw RAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw RIdle2Monster178 | db 000,002,InitiateAttack
+
+Monster178AttackPatternLeft:
+  db    AnimateAttack | dw LIdle1Monster178 | db 007,000,AnimateAttack | dw LAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster178 | db 000,003,InitiateAttack
+Monster178AttackPatternLeftUp:
+  db    AnimateAttack | dw LIdle1Monster178 | db 002,000,AnimateAttack | dw LAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster178 | db 000,006,InitiateAttack
+Monster178AttackPatternLeftDown:
+  db    AnimateAttack | dw LIdle1Monster178 | db 004,000,AnimateAttack | dw LAttack1Monster178 | db 000,ShowBeingHitSprite,000,AnimateAttack | dw LIdle2Monster178 | db 000,008,InitiateAttack
+
 
 ;######################################################################################
 ;Thug (Inspecteur Z) (dog with eye patch)
@@ -9078,18 +9095,18 @@ Monster181Idle:
 ;Kanton Man (chuka taisen) (bird man)
 
 RIdle1Monster182:   equ $4000 + (080*128) + (000/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster182:   equ $4000 + (080*128) + (032/2) - 128  ;(y*128) + (x/2)
-RIdle3Monster182:   equ $4000 + (080*128) + (064/2) - 128  ;(y*128) + (x/2)
-RIdle4Monster182:   equ $4000 + (080*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster182:   equ $4000 + (080*128) + (048/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster182:   equ $4000 + (080*128) + (096/2) - 128  ;(y*128) + (x/2)
+RIdle4Monster182:   equ $4000 + (080*128) + (144/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster182:   equ $4000 + (216*128) + (000/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster182:   equ $4000 + (080*128) + (192/2) - 128  ;(y*128) + (x/2)
-LIdle3Monster182:   equ $4000 + (080*128) + (160/2) - 128  ;(y*128) + (x/2)
-LIdle4Monster182:   equ $4000 + (080*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster182:   equ $4000 + (216*128) + (144/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster182:   equ $4000 + (216*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster182:   equ $4000 + (216*128) + (048/2) - 128  ;(y*128) + (x/2)
+LIdle4Monster182:   equ $4000 + (216*128) + (000/2) - 128  ;(y*128) + (x/2)
 
 Monster182Move:
 Monster182Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    03                              ;animation speed (x frames per animation frame)
   db    4                               ;amount of animation frames
   dw    RIdle1Monster182
   dw    RIdle2Monster182
@@ -9122,7 +9139,7 @@ LAttack1Monster183: equ $4000 + (040*128) + (000/2) - 128  ;(y*128) + (x/2)
 
 Monster183Move:
 Monster183Idle:
-  db    04                              ;animation speed (x frames per animation frame)
+  db    03                              ;animation speed (x frames per animation frame)
   db    8                               ;amount of animation frames
   dw    RIdle1Monster183
   dw    RIdle2Monster183
@@ -9130,8 +9147,8 @@ Monster183Idle:
   dw    RIdle4Monster183
   dw    RIdle5Monster183
   dw    RIdle6Monster183
-  dw    RIdle2Monster183
   dw    RIdle3Monster183
+  dw    RIdle4Monster183
   ;facing left
   dw    LIdle1Monster183
   dw    LIdle2Monster183
@@ -9139,8 +9156,8 @@ Monster183Idle:
   dw    LIdle4Monster183
   dw    LIdle5Monster183
   dw    LIdle6Monster183
-  dw    LIdle2Monster183
   dw    LIdle3Monster183
+  dw    LIdle4Monster183
 
 Monster183AttackPatternRight:
   db    AnimateAttack | dw Rattack1Monster183 | db 000,ShootProjectile,000,WaitImpactProjectile
@@ -9160,7 +9177,7 @@ LIdle3Monster184:   equ $4000 + (120*128) + (096/2) - 128  ;(y*128) + (x/2)
 
 Monster184Move:
 Monster184Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    04                              ;animation speed (x frames per animation frame)
   db    4                               ;amount of animation frames
   dw    RIdle1Monster184
   dw    RIdle2Monster184
@@ -9185,7 +9202,7 @@ LIdle3Monster185:   equ $4000 + (168*128) + (096/2) - 128  ;(y*128) + (x/2)
 
 Monster185Move:
 Monster185Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    04                              ;animation speed (x frames per animation frame)
   db    4                               ;amount of animation frames
   dw    RIdle1Monster185
   dw    RIdle2Monster185
@@ -9200,17 +9217,17 @@ Monster185Idle:
 ;######################################################################################
 ;Bad Buddha (chuka taisen) (blue dress and mustache)
 
-RIdle1Monster186:   equ $4000 + (168*128) + (000/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster186:   equ $4000 + (168*128) + (032/2) - 128  ;(y*128) + (x/2)
-RIdle3Monster186:   equ $4000 + (168*128) + (064/2) - 128  ;(y*128) + (x/2)
+RIdle1Monster186:   equ $4000 + (120*128) + (192/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster186:   equ $4000 + (120*128) + (224/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster186:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster186:   equ $4000 + (168*128) + (160/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster186:   equ $4000 + (168*128) + (128/2) - 128  ;(y*128) + (x/2)
-LIdle3Monster186:   equ $4000 + (168*128) + (096/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster186:   equ $4000 + (168*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster186:   equ $4000 + (168*128) + (192/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster186:   equ $4000 + (048*128) + (224/2) - 128  ;(y*128) + (x/2)
 
 Monster186Move:
 Monster186Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    04                              ;animation speed (x frames per animation frame)
   db    4                               ;amount of animation frames
   dw    RIdle1Monster186
   dw    RIdle2Monster186
@@ -9225,17 +9242,17 @@ Monster186Idle:
 ;######################################################################################
 ;Dualhorn (chuka taisen) (green demon with 2 heads)
 
-RIdle1Monster187:   equ $4000 + (120*128) + (192/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster187:   equ $4000 + (120*128) + (224/2) - 128  ;(y*128) + (x/2)
-RIdle3Monster187:   equ $4000 + (000*128) + (224/2) - 128  ;(y*128) + (x/2)
+RIdle1Monster187:   equ $4000 + (208*128) + (000/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster187:   equ $4000 + (208*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle3Monster187:   equ $4000 + (208*128) + (064/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster187:   equ $4000 + (168*128) + (224/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster187:   equ $4000 + (168*128) + (192/2) - 128  ;(y*128) + (x/2)
-LIdle3Monster187:   equ $4000 + (048*128) + (224/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster187:   equ $4000 + (208*128) + (160/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster187:   equ $4000 + (208*128) + (128/2) - 128  ;(y*128) + (x/2)
+LIdle3Monster187:   equ $4000 + (208*128) + (096/2) - 128  ;(y*128) + (x/2)
 
 Monster187Move:
 Monster187Idle:
-  db    06                              ;animation speed (x frames per animation frame)
+  db    03                              ;animation speed (x frames per animation frame)
   db    4                               ;amount of animation frames
   dw    RIdle1Monster187
   dw    RIdle2Monster187
