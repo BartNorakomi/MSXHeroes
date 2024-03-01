@@ -989,8 +989,18 @@ SetArmyIconsAndAmount:
   ret
 
   .SetSYSX:                             ;out: bc,$4000+(28*128)+(42/2)-128    ;(sy*128 + sx/2) = (42,28)  
-  ld    h,0
+  cp    180
+  jr    c,.EndCheckOverFlow
+  sub   180
   ld    l,a
+  ld    a,Enemy14x24PortraitsBlockPart2      ;Map block
+  jr    .EntryPart2
+
+  .EndCheckOverFlow:
+  ld    l,a
+  ld    a,Enemy14x24PortraitsBlock      ;Map block
+  .EntryPart2:
+  ld    h,0
   add   hl,hl                           ;Unit*2
   ld    de,UnitSYSXTable14x24Portraits
   add   hl,de
@@ -1000,7 +1010,6 @@ SetArmyIconsAndAmount:
   push  bc
   pop   hl
 
-  ld    a,Enemy14x24PortraitsBlock      ;Map block
   ld    bc,NXAndNY14x24CharaterPortraits;(ny*256 + nx/2) = (14x14)
   ret
 

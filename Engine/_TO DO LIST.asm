@@ -13,6 +13,7 @@ als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of ne
 worldmap:
 AI
 options/settings/save menu
+shortest movement path
 
 
 low prio:

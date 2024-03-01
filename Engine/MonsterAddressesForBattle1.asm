@@ -4290,14 +4290,14 @@ Monster182Table:                        ;Kanton Man (chuka taisen) (bird man)
   db    BattleMonsterSpriteSheet16Block
   db    48                              ;nx  
   db    32+08                           ;ny
-  db    RandomBUnitLevel1CostGold        ;cost (gold)
-  db    RandomBUnitLevel1CostGems        ;cost (gems)
-  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel1HP              ;hp
-  db    RandomBUnitLevel1Speed           ;speed
-  db    RandomBUnitLevel1Attack          ;attack
-  db    RandomBUnitLevel1Defense         ;defense
-  db    RandomBUnitLevel1Growth          ;growth
+  db    ChukaTaisenUnitLevel1CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel1CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel1CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel1HP              ;hp
+  db    ChukaTaisenUnitLevel1Speed           ;speed
+  db    ChukaTaisenUnitLevel1Attack          ;attack
+  db    ChukaTaisenUnitLevel1Defense         ;defense
+  db    ChukaTaisenUnitLevel1Growth          ;growth
   db    000                             ;special ability
   db    "Kanton Man",255," "
 
@@ -4313,14 +4313,14 @@ Monster183Table:                        ;Sun Wukong (chuka taisen) (main charact
   db    BattleMonsterSpriteSheet16Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
+  db    ChukaTaisenUnitLevel2CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel2CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel2CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel2HP              ;hp
+  db    ChukaTaisenUnitLevel2Speed           ;speed
+  db    ChukaTaisenUnitLevel2Attack          ;attack
+  db    ChukaTaisenUnitLevel2Defense         ;defense
+  db    ChukaTaisenUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Sun Wukong",255," "
 
@@ -4336,14 +4336,14 @@ Monster184Table:                        ;Shock Scout (chuka taisen) (boy with gr
   db    BattleMonsterSpriteSheet16Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    RandomBUnitLevel3CostGold        ;cost (gold)
-  db    RandomBUnitLevel3CostGems        ;cost (gems)
-  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel3HP              ;hp
-  db    RandomBUnitLevel3Speed           ;speed
-  db    RandomBUnitLevel3Attack          ;attack
-  db    RandomBUnitLevel3Defense         ;defense
-  db    RandomBUnitLevel3Growth          ;growth
+  db    ChukaTaisenUnitLevel3CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel3CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel3CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel3HP              ;hp
+  db    ChukaTaisenUnitLevel3Speed           ;speed
+  db    ChukaTaisenUnitLevel3Attack          ;attack
+  db    ChukaTaisenUnitLevel3Defense         ;defense
+  db    ChukaTaisenUnitLevel3Growth          ;growth
   db    000                             ;special ability
   db    "Shock Scout",255
   
@@ -4359,14 +4359,14 @@ Monster185Table:                        ;Evil Hermit (chuka taisen) (old man wit
   db    BattleMonsterSpriteSheet16Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    RandomBUnitLevel4CostGold        ;cost (gold)
-  db    RandomBUnitLevel4CostGems        ;cost (gems)
-  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel4HP              ;hp
-  db    RandomBUnitLevel4Speed           ;speed
-  db    RandomBUnitLevel4Attack          ;attack
-  db    RandomBUnitLevel4Defense         ;defense
-  db    RandomBUnitLevel4Growth          ;growth
+  db    ChukaTaisenUnitLevel4CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel4CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel4CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel4HP              ;hp
+  db    ChukaTaisenUnitLevel4Speed           ;speed
+  db    ChukaTaisenUnitLevel4Attack          ;attack
+  db    ChukaTaisenUnitLevel4Defense         ;defense
+  db    ChukaTaisenUnitLevel4Growth          ;growth
   db    000                             ;special ability
   db    "Evil Hermit",255
 
@@ -4382,14 +4382,14 @@ Monster186Table:                        ;Bad Buddha (chuka taisen) (blue dress a
   db    BattleMonsterSpriteSheet16Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    RandomBUnitLevel5CostGold        ;cost (gold)
-  db    RandomBUnitLevel5CostGems        ;cost (gems)
-  db    RandomBUnitLevel5CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel5HP              ;hp
-  db    RandomBUnitLevel5Speed           ;speed
-  db    RandomBUnitLevel5Attack          ;attack
-  db    RandomBUnitLevel5Defense         ;defense
-  db    RandomBUnitLevel5Growth          ;growth
+  db    ChukaTaisenUnitLevel5CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel5CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel5CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel5HP              ;hp
+  db    ChukaTaisenUnitLevel5Speed           ;speed
+  db    ChukaTaisenUnitLevel5Attack          ;attack
+  db    ChukaTaisenUnitLevel5Defense         ;defense
+  db    ChukaTaisenUnitLevel5Growth          ;growth
   db    000                             ;special ability
   db    "Bad Buddha",255," "
 
@@ -4405,14 +4405,14 @@ Monster187Table:                        ;Dualhorn (chuka taisen) (green demon wi
   db    BattleMonsterSpriteSheet15Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    RandomBUnitLevel6CostGold        ;cost (gold)
-  db    RandomBUnitLevel6CostGems        ;cost (gems)
-  db    RandomBUnitLevel6CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel6HP              ;hp
-  db    RandomBUnitLevel6Speed           ;speed
-  db    RandomBUnitLevel6Attack          ;attack
-  db    RandomBUnitLevel6Defense         ;defense
-  db    RandomBUnitLevel6Growth          ;growth
+  db    ChukaTaisenUnitLevel6CostGold        ;cost (gold)
+  db    ChukaTaisenUnitLevel6CostGems        ;cost (gems)
+  db    ChukaTaisenUnitLevel6CostRubies      ;cost (rubies)
+  db    ChukaTaisenUnitLevel6HP              ;hp
+  db    ChukaTaisenUnitLevel6Speed           ;speed
+  db    ChukaTaisenUnitLevel6Attack          ;attack
+  db    ChukaTaisenUnitLevel6Defense         ;defense
+  db    ChukaTaisenUnitLevel6Growth          ;growth
   db    000                             ;special ability
   db    "Dualhorn",255,"   "
 

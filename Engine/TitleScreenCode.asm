@@ -2039,7 +2039,8 @@ InfoTown13:       db "Akanbe Den 2",255,AkanbeDragonGroupBUnitLevel1Number,    A
 InfoTown14:       db "YieArKungFu ",255,YieArKungFuUnitLevel1Number,    YieArKungFuUnitLevel2Number,    YieArKungFuUnitLevel3Number,    YieArKungFuUnitLevel4Number,    YieArKungFuUnitLevel5Number,    YieArKungFuUnitLevel6Number   | dw   YieArKungFuUnitLevel1Growth,   YieArKungFuUnitLevel2Growth,    YieArKungFuUnitLevel3Growth,    YieArKungFuUnitLevel4Growth,    YieArKungFuUnitLevel5Growth,    YieArKungFuUnitLevel6Growth
 InfoTown15:       db "Bubble Den 1",255,BubbleBobbleGroupAUnitLevel1Number,    BubbleBobbleGroupAUnitLevel2Number,    BubbleBobbleGroupAUnitLevel3Number,    BubbleBobbleGroupAUnitLevel4Number,    BubbleBobbleGroupAUnitLevel5Number,    BubbleBobbleGroupAUnitLevel6Number   | dw   BubbleBobbleGroupAUnitLevel1Growth,   BubbleBobbleGroupAUnitLevel2Growth,    BubbleBobbleGroupAUnitLevel3Growth,    BubbleBobbleGroupAUnitLevel4Growth,    BubbleBobbleGroupAUnitLevel5Growth,    BubbleBobbleGroupAUnitLevel6Growth
 InfoTown16:       db "Bubble Den 2",255,BubbleBobbleGroupBUnitLevel1Number,    BubbleBobbleGroupBUnitLevel2Number,    BubbleBobbleGroupBUnitLevel3Number,    BubbleBobbleGroupBUnitLevel4Number,    BubbleBobbleGroupBUnitLevel5Number,    BubbleBobbleGroupBUnitLevel6Number   | dw   BubbleBobbleGroupBUnitLevel1Growth,   BubbleBobbleGroupBUnitLevel2Growth,    BubbleBobbleGroupBUnitLevel3Growth,    BubbleBobbleGroupBUnitLevel4Growth,    BubbleBobbleGroupBUnitLevel5Growth,    BubbleBobbleGroupBUnitLevel6Growth
-;TotalAmountOfUnlockedTowns: db  16
+InfoTown17:       db "Cloud Palace",255,ChukaTaisenUnitLevel1Number,    ChukaTaisenUnitLevel2Number,    ChukaTaisenUnitLevel3Number,    ChukaTaisenUnitLevel4Number,    ChukaTaisenUnitLevel5Number,    ChukaTaisenUnitLevel6Number   | dw   ChukaTaisenUnitLevel1Growth,   ChukaTaisenUnitLevel2Growth,    ChukaTaisenUnitLevel3Growth,    ChukaTaisenUnitLevel4Growth,    ChukaTaisenUnitLevel5Growth,    ChukaTaisenUnitLevel6Growth
+;TotalAmountOfUnlockedTowns: db  17
 
 ;still to do, WIP:
 ;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)
@@ -2066,6 +2067,7 @@ ListOfHeroAddressesAndAmounts:
   dw  YieArKungFuHeroes | db YieArKungFuHeroesAmount
   dw  BubbleBobbleGroupAHeroes | db BubbleBobbleGroupAHeroesAmount
   dw  BubbleBobbleGroupBHeroes | db BubbleBobbleGroupBHeroesAmount
+  dw  ChukaTaisenHeroes | db ChukaTaisenHeroesAmount
 
 SetTextHumanOrCPUButtons:
   ld    c,106                           ;dy

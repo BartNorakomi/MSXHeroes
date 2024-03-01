@@ -1173,6 +1173,68 @@ KingsValley2UnitLevel4CostRubies:       equ 0
 
 
 
+;Kanton Man (chuka taisen) (bird man)
+ChukaTaisenUnitLevel1Number:           equ 182
+ChukaTaisenUnitLevel1Attack:           equ 4
+ChukaTaisenUnitLevel1Defense:          equ 3
+ChukaTaisenUnitLevel1HP:               equ 5
+ChukaTaisenUnitLevel1Speed:            equ 4
+ChukaTaisenUnitLevel1Growth:           equ 14
+ChukaTaisenUnitLevel1CostGold:         equ 50/10
+ChukaTaisenUnitLevel1CostGems:         equ 00+Level1Unit
+ChukaTaisenUnitLevel1CostRubies:       equ 0
+;Sun Wukong (chuka taisen) (main character)
+ChukaTaisenUnitLevel2Number:           equ 183
+ChukaTaisenUnitLevel2Attack:           equ 4
+ChukaTaisenUnitLevel2Defense:          equ 5
+ChukaTaisenUnitLevel2HP:               equ 13
+ChukaTaisenUnitLevel2Speed:            equ 5
+ChukaTaisenUnitLevel2Growth:           equ 8
+ChukaTaisenUnitLevel2CostGold:         equ 130/10
+ChukaTaisenUnitLevel2CostGems:         equ 00+Level2Unit
+ChukaTaisenUnitLevel2CostRubies:       equ 0
+;Shock Scout (chuka taisen) (boy with green hair)
+ChukaTaisenUnitLevel3Number:           equ 184
+ChukaTaisenUnitLevel3Attack:           equ 9
+ChukaTaisenUnitLevel3Defense:          equ 7
+ChukaTaisenUnitLevel3HP:               equ 22
+ChukaTaisenUnitLevel3Speed:            equ 5
+ChukaTaisenUnitLevel3Growth:           equ 7
+ChukaTaisenUnitLevel3CostGold:         equ 250/10
+ChukaTaisenUnitLevel3CostGems:         equ 00+Level3Unit
+ChukaTaisenUnitLevel3CostRubies:       equ 0
+;Evil Hermit (chuka taisen) (old man with staff and crown)
+ChukaTaisenUnitLevel4Number:           equ 185
+ChukaTaisenUnitLevel4Attack:           equ 10
+ChukaTaisenUnitLevel4Defense:          equ 7
+ChukaTaisenUnitLevel4HP:               equ 30
+ChukaTaisenUnitLevel4Speed:            equ 3
+ChukaTaisenUnitLevel4Growth:           equ 4
+ChukaTaisenUnitLevel4CostGold:         equ 300/10
+ChukaTaisenUnitLevel4CostGems:         equ 00+Level4Unit
+ChukaTaisenUnitLevel4CostRubies:       equ 0
+;Bad Buddha (chuka taisen) (blue dress and mustache)
+ChukaTaisenUnitLevel5Number:           equ 186
+ChukaTaisenUnitLevel5Attack:           equ 10
+ChukaTaisenUnitLevel5Defense:          equ 12
+ChukaTaisenUnitLevel5HP:               equ 120
+ChukaTaisenUnitLevel5Speed:            equ 5
+ChukaTaisenUnitLevel5Growth:           equ 3
+ChukaTaisenUnitLevel5CostGold:         equ 530/10
+ChukaTaisenUnitLevel5CostGems:         equ 01+Level5Unit
+ChukaTaisenUnitLevel5CostRubies:       equ 0
+;Dualhorn (chuka taisen) (green demon with 2 heads) 
+ChukaTaisenUnitLevel6Number:           equ 187
+ChukaTaisenUnitLevel6Attack:           equ 13
+ChukaTaisenUnitLevel6Defense:          equ 13
+ChukaTaisenUnitLevel6HP:               equ 185
+ChukaTaisenUnitLevel6Speed:            equ 6
+ChukaTaisenUnitLevel6Growth:           equ 1
+ChukaTaisenUnitLevel6CostGold:         equ 800/10
+ChukaTaisenUnitLevel6CostGems:         equ 03+Level6Unit
+ChukaTaisenUnitLevel6CostRubies:       equ 0
+
+
 
 
 
