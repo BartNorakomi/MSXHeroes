@@ -3375,17 +3375,26 @@ doputstar:
 		;/setxpointer
 	
 		;setypointer	
+
+
+  push  hl
 	ld		de,TilesPerRow
+  ld    h,0
+  ld    l,b
+  call  MultiplyHlWithDE                ;Out: HL = result
+  pop   de
+  add   hl,de
 
-	ld		a,b
-	or		a
-	jp		z,.endsetmappointer
 
-.setypointerloop:	
-	add		hl,de
-	djnz	.setypointerloop
+;	ld		de,TilesPerRow
+;	ld		a,b
+;	or		a
+;	jp		z,.endsetmappointer
+;.setypointerloop:	
+;	add		hl,de
+;	djnz	.setypointerloop
 		;/setypointer
-.endsetmappointer:
+;.endsetmappointer:
 	;/setmappointer
 	ld		a,(hl)
 	ld		(hl),255
@@ -3698,7 +3707,61 @@ checktriggermapscreen:
 	ld		(movehero?),a
 	ret  
 
-CheckNormalRoute:  
+CheckNormalRouteShortestPath:
+	;setmappointer
+		;setypointer	
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+  sub   a,5
+  ld    h,0
+  ld    l,a
+	ld		de,(maplenght)
+  call  MultiplyHlWithDE                ;Out: HL = result
+	ld		de,mapdata
+	add		hl,de
+		;/setypointer
+		;setxpointer
+	ld		a,(ix+HeroX)			              ;pl1hero?x
+  sub   a,5
+	ld		e,a
+	ld		d,0
+	add		hl,de
+		;/setxpointer
+	;/setmappointer
+
+  ;at this point our mappointer is positioned 5 tiles left of hero and 5 tiles above hero
+  ld    a,11                            ;11 rows in total
+  ld    de,ShortestPathBuffer
+  .CopyColumn:
+  ld    b,11                            ;11 tiles per row
+  .CopyRow:
+  ex    af,af'
+  ld    a,(hl)
+  cp    149
+  jr    nc,.ForeGroundFound
+  xor   a
+  .ForeGroundFound:
+  ld    (de),a
+  ex    af,af'
+  inc   hl
+  inc   de
+  djnz  .CopyRow
+  ld    bc,128-11                       ;go to beginning of next row
+  add   hl,bc
+  dec   a
+  jp    nz,.CopyColumn
+  
+  ;we have now made a (11x11) copy of the tilemap to ShortestPathBuffer
+  ;this copy starts 5 tiles above and 5 tiles left of our hero
+  ;all the background tiles are number 0, all the foreground tiles are number>149 and left unchanged  
+  ;now we fill this tilemap with movement distances for our hero
+
+  
+  
+  ret
+
+CheckNormalRoute:
+  jp    CheckNormalRouteShortestPath
+
 	ld		a,(ix+HeroY)			              ;pl1hero?y
 	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
 	ld		(heroymirror),a
@@ -4067,16 +4130,26 @@ putbottomcastles:
 		;/setxpointer
 	
 		;setypointer	
-	ld		de,TilesPerRow
-	ld		a,b
-	or		a
-	jp		z,.endsetmappointer2
 
-  .setypointerloop2:	
-	add		hl,de
-	djnz	.setypointerloop2
+  push  hl
+	ld		de,TilesPerRow
+  ld    h,0
+  ld    l,b
+  call  MultiplyHlWithDE                ;Out: HL = result
+  pop   de
+  add   hl,de
+
+
+;	ld		de,TilesPerRow
+;	ld		a,b
+;	or		a
+;	jp		z,.endsetmappointer2
+
+;  .setypointerloop2:	
+;	add		hl,de
+;	djnz	.setypointerloop2
 		;/setypointer
-  .endsetmappointer2:
+;  .endsetmappointer2:
 	;/setmappointer
 	ld		(hl),255
 ;/mark background hero position as 'dirty'
@@ -4206,15 +4279,27 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	ld		hl,0000
 	add		hl,de                           ;this points to x of tile in map where we put our hero piece. Let's mark this tile as 'dirty' so it will be overwritten when hero moves
 	
+
+  push  hl
 	ld		de,TilesPerRow
-	ld		a,c				                      ;relative y hero (in tiles)
-	or		a
-	jr		z,.endsetmappointer1
-	ld		b,a
-  .setypointerloop1:	
-	add		hl,de
-	djnz	.setypointerloop1
-  .endsetmappointer1:                   ;hl now points to the tile in the map where this hero piece will be put
+  ld    h,0
+  ld    l,c
+  call  MultiplyHlWithDE                ;Out: HL = result
+  pop   de
+  add   hl,de
+      
+  
+
+	
+;	ld		de,TilesPerRow
+;	ld		a,c				                      ;relative y hero (in tiles)
+;	or		a
+;	jr		z,.endsetmappointer1
+;	ld		b,a
+;  .setypointerloop1:	
+;	add		hl,de
+;	djnz	.setypointerloop1
+;  .endsetmappointer1:                   ;hl now points to the tile in the map where this hero piece will be put
 
 	ld    a,(hl)                          ;tile at mappointer at position of hero
 	cp		254				                      ;is there a hero already here, AND is this hero behind an object ??
@@ -4319,15 +4404,28 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	;setypointer	
 	ld		a,(mappointery)
 	add		a,c
-	jp		z,.endsetmappointer2
-	ld		b,a
 
+
+;NEW SHIT NOT TESTED YET
+  push  hl
 	ld		de,(maplenght)
-.setypointerloop2:	
-	add		hl,de
-	djnz	.setypointerloop2
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+  pop   de
+  add   hl,de
+;/NEW SHIT NOT TESTED YET
+
+
+
+;	jp		z,.endsetmappointer2
+;	ld		b,a
+;	ld		de,(maplenght)
+;.setypointerloop2:	
+;	add		hl,de
+;	djnz	.setypointerloop2
 	;/setypointer
-.endsetmappointer2:
+;.endsetmappointer2:
 ;/setmappointer
 	ld    	a,(hl)			                  ;partnumber 'mappointer at position of hero'
 ;/retrace the partnumber

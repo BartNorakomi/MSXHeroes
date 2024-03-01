@@ -3,7 +3,7 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
@@ -290,6 +290,11 @@ CopyRamToVramPage3ForBattleEngine:
   ei
   ret
 
+ShortestPathTileHandler:
+  ds  2*50
+
+ShortestPathBuffer:
+  ds  11 * 11
 
 ;coordinates of monsters on the grid:
 ;(     )(20,24)(     )(36,24)(     )(52,24)
@@ -3643,8 +3648,6 @@ AkanbeDragonGroupAHeroesAmount:   equ 1
 AkanbeDragonGroupAHeroes:
 AkanbeDragonGroupBHeroesAmount:   equ 1
 AkanbeDragonGroupBHeroes:
-ContraGroupBHeroesAmount:         equ 1
-ContraGroupBHeroes:
 ContraGroupBHeroesAmount:         equ 1
 ContraGroupBHeroes:
 ChukaTaisenHeroesAmount:          equ 1
