@@ -3692,10 +3692,10 @@ checktriggermapscreen:
   
   ;check if the same spot is clicked as previously
   cp    e
-  jp    nz,CheckReverseRoute
+  jp    nz,CheckNormalRouteShortestPath
   ld    a,c
   cp    d
-  jp    nz,CheckReverseRoute
+  jp    nz,CheckNormalRouteShortestPath
 
   ;same spot is clicked, remove stars and move hero
 	xor		a
@@ -3707,61 +3707,7 @@ checktriggermapscreen:
 	ld		(movehero?),a
 	ret  
 
-CheckNormalRouteShortestPath:
-	;setmappointer
-		;setypointer	
-	ld		a,(ix+HeroY)			              ;pl1hero?y
-  sub   a,5
-  ld    h,0
-  ld    l,a
-	ld		de,(maplenght)
-  call  MultiplyHlWithDE                ;Out: HL = result
-	ld		de,mapdata
-	add		hl,de
-		;/setypointer
-		;setxpointer
-	ld		a,(ix+HeroX)			              ;pl1hero?x
-  sub   a,5
-	ld		e,a
-	ld		d,0
-	add		hl,de
-		;/setxpointer
-	;/setmappointer
-
-  ;at this point our mappointer is positioned 5 tiles left of hero and 5 tiles above hero
-  ld    a,11                            ;11 rows in total
-  ld    de,ShortestPathBuffer
-  .CopyColumn:
-  ld    b,11                            ;11 tiles per row
-  .CopyRow:
-  ex    af,af'
-  ld    a,(hl)
-  cp    149
-  jr    nc,.ForeGroundFound
-  xor   a
-  .ForeGroundFound:
-  ld    (de),a
-  ex    af,af'
-  inc   hl
-  inc   de
-  djnz  .CopyRow
-  ld    bc,128-11                       ;go to beginning of next row
-  add   hl,bc
-  dec   a
-  jp    nz,.CopyColumn
-  
-  ;we have now made a (11x11) copy of the tilemap to ShortestPathBuffer
-  ;this copy starts 5 tiles above and 5 tiles left of our hero
-  ;all the background tiles are number 0, all the foreground tiles are number>149 and left unchanged  
-  ;now we fill this tilemap with movement distances for our hero
-
-  
-  
-  ret
-
 CheckNormalRoute:
-  jp    CheckNormalRouteShortestPath
-
 	ld		a,(ix+HeroY)			              ;pl1hero?y
 	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
 	ld		(heroymirror),a

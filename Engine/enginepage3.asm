@@ -87,6 +87,288 @@ StartGame:
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
+
+
+
+
+
+CheckNormalRouteShortestPath:
+  ;check if we clicked with 5 tiles from hero
+;	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
+;	sub   a,(ix+HeroX)			              ;pl1hero?x
+;  jp    p,.EndCheckNegativeX
+;  neg
+;  .EndCheckNegativeX:
+;  cp    6
+;  jp    nc,CheckReverseRoute
+
+;	ld		a,(mouseclicky)                 ;mouse pointer y in tiles
+;	sub   a,(ix+HeroY)			              ;pl1hero?x
+;  jp    p,.EndCheckNegativeY
+;  neg
+;  .EndCheckNegativeY:
+;  cp    6
+;  jp    nc,CheckReverseRoute
+
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
+	ld		a,(ix+HeroX)			              ;pl1hero?y
+	ld		(movementpath+1),a              ;movement path starts with hero's initial y,x
+
+	;setmappointer
+		;setypointer	
+	ld		a,(ix+HeroY)			              ;pl1hero?y
+  sub   a,5-1                           ;we start at hero's feet, not at head
+  ld    h,0
+  ld    l,a
+	ld		de,(maplenght)
+  call  MultiplyHlWithDE                ;Out: HL = result
+	ld		de,mapdata
+	add		hl,de
+		;/setypointer
+		;setxpointer
+	ld		a,(ix+HeroX)			              ;pl1hero?x
+  sub   a,5
+	ld		e,a
+	ld		d,0
+	add		hl,de
+		;/setxpointer
+	;/setmappointer
+
+  ;at this point our mappointer is positioned 5 tiles left of hero and 5 tiles above hero
+  ld    a,11                            ;11 rows in total
+  ld    de,ShortestPathBuffer
+  .CopyColumn:
+  ld    b,11                            ;11 tiles per row
+  .CopyRow:
+  ex    af,af'
+  ld    a,(hl)
+  cp    149
+  jr    nc,.ForeGroundFound
+  xor   a
+  .ForeGroundFound:
+  ld    (de),a
+  ex    af,af'
+  inc   hl
+  inc   de
+  djnz  .CopyRow
+  ld    bc,128-11                       ;go to beginning of next row
+  add   hl,bc
+  inc   de                              ;1 extra foreground tile is fixed in our grid
+  dec   a
+  jp    nz,.CopyColumn
+  
+  ;we have now made a (11x11) copy of the tilemap to ShortestPathBuffer
+  ;this copy starts 5 tiles above and 5 tiles left of our hero
+  ;all the background tiles are number 0, all the foreground tiles are number>149 and left unchanged  
+  ;now we fill this tilemap with movement distances for our hero
+
+  ld    hl,ShortestPathBuffer+5+(5*12)  ;position of hero in the shortest path grid
+  ld    (hl),64                         ;mark hero position with nr. 64
+  ld    (ShortestPathTileHandlerQueue),hl   ;put this position in queue
+  ld    a,1                             ;next number (representing distance in tiles from hero)
+  ld    (.SelfModifyingCodeDistanceNumber),a
+  ld    b,1                             ;amount of tile that have next number
+  ld    c,0                             ;amount of new tiles to handle after current number is finished
+
+  ld    ix,ShortestPathTileHandlerQueue ;current tile in queue
+  ld    iy,ShortestPathTileHandlerQueue ;last tile in queue
+
+  .HandleTileLoop:
+  call  .HandleTile
+  inc   ix
+  inc   ix
+  ld    l,(ix)
+  ld    h,(ix+1)                        ;set new queue value in hl 
+  djnz  .HandleTileLoop
+
+  ld    a,(.SelfModifyingCodeDistanceNumber)
+  inc   a                               ;next number (representing distance in tiles from hero)
+  ld    (.SelfModifyingCodeDistanceNumber),a
+  ld    a,c
+  or    a
+  ld    b,a
+  ld    c,0
+  jp    nz,.HandleTileLoop
+
+  .End:
+  xor   a
+  ld    (ShortestPathBuffer+5+(5*12)),a ;position of hero in the shortest path grid
+  
+  ld    ix,(plxcurrentheroAddress)
+
+  ;we have now filled the shortest path grid with the distance numbers. Check if the clicked on tile has a path that leads from the hero to it
+	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
+  ld    h,0
+  ld    l,a
+	ld    a,(ix+HeroX)			              ;pl1hero?x
+  sub   a,5
+  ld    d,0
+  ld    e,a
+  or    a
+  sbc   hl,de                           ;x increase from left part of shortest path grid
+  push  hl
+
+	ld		a,(mouseclicky)                 ;mouse pointer y in tiles
+  ld    h,0
+  ld    l,a
+	ld    a,(ix+HeroY)			              ;pl1hero?y
+  sub   a,5
+  ld    d,0
+  ld    e,a
+  or    a
+  sbc   hl,de                           ;y increase from top part of shortest path grid
+  ld    de,12                           ;multiply by 12, cuz a row is 12 bytes long
+  call  MultiplyHlWithDE                ;Out: HL = result
+  pop   de
+  add   hl,de
+  ld    de,ShortestPathBuffer
+  add   hl,de                           ;hl-> tile we clicked on
+  ld    a,(hl)                          ;number (representing distance in tiles from hero)
+  or    a
+  ret   z
+  ret   m
+
+  add   a,a                             ;number * 2 (number representing distance in tiles from hero)
+  ld    d,0
+  ld    e,a
+  ld    ix,movementpath
+  add   ix,de
+  ;set end movement
+	ld		(ix+2),0                        ;dy
+	ld		(ix+3),0                        ;dx
+  ;set movement path (in reverse)
+  .NextStepLoop:
+  ex    af,af'
+  call  .FindDirectionForThisStep
+  ex    af,af'
+	ld		(ix),b                          ;dy
+	ld		(ix+1),c                        ;dx
+  dec   ix
+  dec   ix                              ;next step (in reverse)
+  sub   a,2
+  jr    nz,.NextStepLoop
+  ret
+
+  .FindDirectionForThisStep:
+  ld    a,(hl)                          ;number (representing distance in tiles from hero)
+  dec   a                               ;we are going to look for the next number (from high to low)
+
+  dec   hl                              ;tile left of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,+0                            ;dy
+	ld		c,+1                            ;dx
+  ret   z
+
+  inc   hl
+  inc   hl                              ;tile right of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,+0                            ;dy
+	ld		c,-1                            ;dx
+  ret   z
+
+  ld    de,11
+  add   hl,de                           ;tile below current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,-1                            ;dy
+	ld		c,+0                            ;dx
+  ret   z
+
+  ld    de,-24
+  add   hl,de                           ;tile above current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,+1                            ;dy
+	ld		c,+0                            ;dx
+  ret   z
+
+  dec   hl                              ;tile left top of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,+1                            ;dy
+	ld		c,+1                            ;dx
+  ret   z
+
+  inc   hl
+  inc   hl                              ;tile right top of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,+1                            ;dy
+	ld		c,-1                            ;dx
+  ret   z
+
+  ld    de,24
+  add   hl,de                           ;tile right bottom of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,-1                            ;dy
+	ld		c,-1                            ;dx
+  ret   z
+
+  dec   hl
+  dec   hl                              ;tile left bottom of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
+	ld		b,-1                            ;dy
+	ld		c,+1                            ;dx
+  ret   z
+  ret
+
+   .HandleTile:
+  ;we check the tile left top of hero/current tile, and set next number if this is background
+  ld    de,-13
+  add   hl,de                           ;tile left top of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+  
+  inc   hl                              ;tile top of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  inc   hl                              ;tile right top of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  ld    de,10
+  add   hl,de                           ;tile left of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  inc   hl                              ;current tile
+  inc   hl                              ;tile right of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  add   hl,de                           ;tile left bottom of current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  inc   hl                              ;tile below current tile
+  ld    a,(hl)
+  or    a
+  call  z,.MarkTileAndPutInQueue
+
+  inc   hl                              ;tile right bottom of current tile
+  ld    a,(hl)
+  or    a
+  ret   nz
+
+  .MarkTileAndPutInQueue:
+  inc   iy
+  inc   iy                              ;next tile in queue address
+  ld    (iy),l
+  ld    (iy+1),h                        ;put this tile's address in the queue
+  .SelfModifyingCodeDistanceNumber:	equ	$+1
+  ld    (hl),255
+  inc   c                               ;amount of new tiles to handle after current number is finished
+  ret
+
+
+
+
+
+
 TitleScreen:
   ld    a,(slot.page12rom)            ;all RAM except page 1
   out   ($a8),a      
@@ -290,11 +572,14 @@ CopyRamToVramPage3ForBattleEngine:
   ei
   ret
 
-ShortestPathTileHandler:
-  ds  2*50
+ShortestPathTileHandlerQueue:
+  ds  2*50,0
 
-ShortestPathBuffer:
-  ds  11 * 11
+  ds  12,255        ;1 additional foreground row above our grid
+ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of each row
+  ds  11 * 12,255
+
+  ds  12,255        ;1 additional foreground row below our grid
 
 ;coordinates of monsters on the grid:
 ;(     )(20,24)(     )(36,24)(     )(52,24)
