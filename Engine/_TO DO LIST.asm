@@ -1,6 +1,13 @@
 battle:
-options menu
+options menu: 
+1 view walkable grid/movement shadow
+2 animation speed (normal/fast)
+3 load game
+4 main menu
+5 return to combat
 battle field stones/objects
+MONSTER AUTO DROP SPELLSCROLL CURE, WHICH HERO AUTOPICKS UP
+hardware sprite monster ranged weapons
 
 toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.
@@ -13,9 +20,11 @@ als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of ne
 
 worldmap:
 AI
-options/settings/save menu
-shortest movement path
-
+options/settings/save menu:
+Show day/week/month
+1 save game
+2 load game
+3 main menu
 
 low prio:
 shift click unit moet nog gemaakt worden om units te splitsen

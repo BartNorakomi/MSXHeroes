@@ -179,15 +179,17 @@ vblank:
   ld		a,1                             ;set worldmap in bank 1 at $8000
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-	call	checktriggermapscreen           ;this needs to be on the interrupt for accurate readout of keypresses per frame
+;  ld    a,colorwhite
+;  out   ($99),a
+;  ld    a,7+128
+;  out   ($99),a	
 
+	call	checktriggermapscreen           ;this needs to be on the interrupt for accurate readout of keypresses per frame
 
 ;  ld    a,colorblack
 ;  out   ($99),a
 ;  ld    a,7+128
 ;  out   ($99),a	
-
-
 
   call  checktriggerhud                 ;this needs to be on the interrupt for accurate readout of keypresses per frame
 
@@ -6167,7 +6169,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  044,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrasle3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 

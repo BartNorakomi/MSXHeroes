@@ -2,16 +2,16 @@ phase	$c000
 
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
-DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 0
+DisplayNumbers1to6?:      equ 0
+StartAtTitleScreen?:      equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap02
-WorldPointer: dw GentleDesertMap03
+;WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
-;WorldPointer: dw GentleWinterMap01
+WorldPointer: dw GentleWinterMap04
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -90,30 +90,41 @@ StartGame:
 
 
 
+ShortestPathTileHandlerQueue:
+  ds  2*100,0
+
+  ds  12,255        ;1 additional foreground row above our grid
+ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of each row
+  ds  11 * 12,255
+
+  ds  12,255        ;1 additional foreground row below our grid
 
 
 CheckNormalRouteShortestPath:
-  ;check if we clicked with 5 tiles from hero
-;	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
-;	sub   a,(ix+HeroX)			              ;pl1hero?x
-;  jp    p,.EndCheckNegativeX
-;  neg
-;  .EndCheckNegativeX:
-;  cp    6
-;  jp    nc,CheckReverseRoute
-
-;	ld		a,(mouseclicky)                 ;mouse pointer y in tiles
-;	sub   a,(ix+HeroY)			              ;pl1hero?x
-;  jp    p,.EndCheckNegativeY
-;  neg
-;  .EndCheckNegativeY:
-;  cp    6
-;  jp    nc,CheckReverseRoute
-
 	ld		a,(ix+HeroY)			              ;pl1hero?y
 	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
 	ld		a,(ix+HeroX)			              ;pl1hero?y
 	ld		(movementpath+1),a              ;movement path starts with hero's initial y,x
+  xor   a
+	ld		(movementpath+2),a              ;reset first movement
+	ld		(movementpath+3),a              ;reset first movement
+
+  ;check if we clicked with 5 tiles from hero
+	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
+	sub   a,(ix+HeroX)			              ;pl1hero?x
+  jp    p,.EndCheckNegativeX
+  neg
+  .EndCheckNegativeX:
+  cp    6
+  jp    nc,CheckReverseRoute
+
+	ld		a,(mouseclicky)                 ;mouse pointer y in tiles
+	sub   a,(ix+HeroY)			              ;pl1hero?x
+  jp    p,.EndCheckNegativeY
+  neg
+  .EndCheckNegativeY:
+  cp    6
+  jp    nc,CheckReverseRoute
 
 	;setmappointer
 		;setypointer	
@@ -226,8 +237,13 @@ CheckNormalRouteShortestPath:
   add   hl,de                           ;hl-> tile we clicked on
   ld    a,(hl)                          ;number (representing distance in tiles from hero)
   or    a
-  ret   z
-  ret   m
+;  ret   z
+;  ret   m
+
+  jp    z,CheckReverseRoute
+  jp    m,CheckReverseRoute
+
+
 
   add   a,a                             ;number * 2 (number representing distance in tiles from hero)
   ld    d,0
@@ -247,66 +263,68 @@ CheckNormalRouteShortestPath:
   dec   ix
   dec   ix                              ;next step (in reverse)
   sub   a,2
-  jr    nz,.NextStepLoop
+  jp    nz,.NextStepLoop
   ret
 
   .FindDirectionForThisStep:
   ld    a,(hl)                          ;number (representing distance in tiles from hero)
   dec   a                               ;we are going to look for the next number (from high to low)
 
-  dec   hl                              ;tile left of current tile
-  cp    (hl)                            ;check if we found next number (from high to low)
 	ld		b,+0                            ;dy
 	ld		c,+1                            ;dx
+  dec   hl                              ;tile left of current tile
+  cp    (hl)                            ;check if we found next number (from high to low)
   ret   z
 
+;	ld		b,+0                            ;dy
+	ld		c,-1                            ;dx
   inc   hl
   inc   hl                              ;tile right of current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,+0                            ;dy
-	ld		c,-1                            ;dx
   ret   z
 
+;	ld		b,-1                            ;dy
+  dec   b
+	ld		c,+0                            ;dx
   ld    de,11
   add   hl,de                           ;tile below current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,-1                            ;dy
-	ld		c,+0                            ;dx
   ret   z
 
+	ld		b,+1                            ;dy
+;	ld		c,+0                            ;dx
   ld    de,-24
   add   hl,de                           ;tile above current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,+1                            ;dy
-	ld		c,+0                            ;dx
   ret   z
 
+;	ld		b,+1                            ;dy
+;	ld		c,+1                            ;dx
+  inc   c
   dec   hl                              ;tile left top of current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,+1                            ;dy
-	ld		c,+1                            ;dx
   ret   z
 
+;	ld		b,+1                            ;dy
+	ld		c,-1                            ;dx
   inc   hl
   inc   hl                              ;tile right top of current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,+1                            ;dy
-	ld		c,-1                            ;dx
   ret   z
 
+	ld		b,-1                            ;dy
+;	ld		c,-1                            ;dx
   ld    de,24
   add   hl,de                           ;tile right bottom of current tile
   cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,-1                            ;dy
-	ld		c,-1                            ;dx
   ret   z
 
+;	ld		b,-1                            ;dy
+	ld		c,+1                            ;dx
   dec   hl
   dec   hl                              ;tile left bottom of current tile
-  cp    (hl)                            ;check if we found next number (from high to low)
-	ld		b,-1                            ;dy
-	ld		c,+1                            ;dx
-  ret   z
+;  cp    (hl)                            ;check if we found next number (from high to low)
+;  ret   z
   ret
 
    .HandleTile:
@@ -572,14 +590,6 @@ CopyRamToVramPage3ForBattleEngine:
   ei
   ret
 
-ShortestPathTileHandlerQueue:
-  ds  2*50,0
-
-  ds  12,255        ;1 additional foreground row above our grid
-ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of each row
-  ds  11 * 12,255
-
-  ds  12,255        ;1 additional foreground row below our grid
 
 ;coordinates of monsters on the grid:
 ;(     )(20,24)(     )(36,24)(     )(52,24)

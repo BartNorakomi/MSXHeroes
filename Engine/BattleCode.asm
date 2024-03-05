@@ -9038,7 +9038,55 @@ DeactivateHeroThatAttacks:
   ld    (hl),255                        ;255 = inactive
   ret
   
+SetHero1ForPlayerThatGotAttackedInIX:           ;sets hero 1 of player in IX
+  ld    a,(PlayerThatGetsAttacked)              ;check if player that gets attacked is human
+	dec		a
+	ld		ix,pl1hero1y
+  ret   z
+	dec		a
+	ld		ix,pl2hero1y
+  ret   z
+	dec		a
+	ld		ix,pl3hero1y
+  ret   z
+	ld		ix,pl4hero1y
+  ret
+  
 DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros below this one, one position up 
+ ;we are going to find how many heroes are below the hero that got attacked
+	ld		de,lenghtherotable
+	ld		hl,lenghtherotable*(amountofheroesperplayer-1)
+
+  call  SetHero1ForPlayerThatGotAttackedInIX
+  push  ix
+  pop   iy                              ;hero 1 for player that got attacked in iy
+  ld    ix,(HeroThatGetsAttacked)       ;hero that got attacked in ix
+ 
+	ld		b,amountofheroesperplayer
+  .loop:
+	ld		a,(iy+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  inc   a                               ;check if status is inactive
+  jp    z,.endcheck1                    ;hero is inactive
+
+	ld		a,(ix+HeroY)
+	cp		(iy+HeroY)
+	jp		nz,.endcheck1
+
+	ld		a,(ix+HeroX)
+	cp		(iy+HeroX)
+	jp		z,.HeroTouchesEnemyHero
+  .endcheck1:
+	add   iy,de
+  or    a
+  sbc   hl,de                           ;amount of heroes (*lenghtherotable) below hero we are checking
+	djnz	.loop
+	ret
+
+  .HeroTouchesEnemyHero:
+  ld    (AmountHeroesTimesLenghtHerotableBelowHeroThatGetsAttacked),hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
 
   push  ix

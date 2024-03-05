@@ -2000,8 +2000,8 @@ ItemSpellDamagePointsTable:
   db    0
   db    0
 ;helmet (15)
-  db    YattaShiNeSpellDamage ;(2)
-  db    FireHoodSpellDamage ;(4)
+  db    YattaShiNeSpellDamage ;(1)
+  db    FireHoodSpellDamage ;(2)
   db    0
   db    0
   db    0
@@ -2018,7 +2018,7 @@ ItemSpellDamagePointsTable:
   db    0
   db    0
 ;ring (30)
-  db    SmallRingSpellDamage ;(3)
+  db    SmallRingSpellDamage ;(1)
   db    0
   db    ScarletRingSpellPower ;(2)
   db    0
@@ -2026,13 +2026,13 @@ ItemSpellDamagePointsTable:
 ;neclace (35)
   db    0
   db    0
-  db    NegligeeOfTeethSpellPower ;(3)
+  db    NegligeeOfTeethSpellPower ;(2)
   db    0
   db    TheChokerSpellPower ;(6)
 ;robe (40)
   db    0
   db    0
-  db    EnchantedRobeSpellPower ;(4)
+  db    EnchantedRobeSpellPower ;(3)
   db    0
   db    LabCoatSpellPower ;(7)
   
@@ -2058,7 +2058,7 @@ ItemIntelligencePointsTable:
 ;helmet (15)
   db    0
   db    0
-  db    CerebroIntelligence ;(6)
+  db    CerebroIntelligence ;(3)
   db    0
   db    0
 ;boots (20)
@@ -2072,22 +2072,22 @@ ItemIntelligencePointsTable:
   db    0
   db    0
   db    0
-  db    EmeraldGlovesIntelligence ;(3)
+  db    EmeraldGlovesIntelligence ;(5)
 ;ring (30)
   db    0
-  db    CyclopsIntelligence ;(4)
+  db    CyclopsIntelligence ;(2)
   db    ScarletRingSpellPower ;(2)
   db    0
   db    0
 ;neclace (35)
   db    0
   db    0
-  db    NegligeeOfTeethIntelligence ;(3)
+  db    NegligeeOfTeethIntelligence ;(1)
   db    0
   db    0
 ;robe (40)
   db    0
-  db    PriestsCopeIntelligence ;(1)
+  db    PriestsCopeIntelligence ;(2)
   db    0
   db    0
   db    0
@@ -2100,23 +2100,23 @@ ItemDefencePointsTable:
   db    ButterflyDefence ;(1)
   db    0
 ;armor (5)
-  db    RegaliaDiPlebDefence ;(3)
-  db    YoungBloodsArmorDefence ;(4)
+  db    RegaliaDiPlebDefence ;(1)
+  db    YoungBloodsArmorDefence ;(2)
   db    TheJuggernautDefence ;(4)
-  db    YojumboTheRoninDefence ;(3)
-  db    CeasarsChestplateDefence ;(3)
+  db    YojumboTheRoninDefence ;(4)
+  db    CeasarsChestplateDefence ;(5)
 ;shield (10)
   db    0
-  db    WoodenShieldDefence ;(4)
+  db    WoodenShieldDefence ;(2)
   db    TheBramStokerDefence ;(3)
   db    0
-  db    TrainingShieldDefence ;(3)
+  db    TrainingShieldDefence ;(5)
 ;helmet (15)
-  db    YattaShiNeDefence ;(2)
+  db    YattaShiNeDefence ;(1)
   db    0
   db    0
   db    TheViridescentDefence ;(3)
-  db    PikemensHelmetDefence ;(2)
+  db    PikemensHelmetDefence ;(5)
 ;boots (20)
   db    0
   db    0
@@ -2150,11 +2150,11 @@ ItemDefencePointsTable:
   
 ItemAttackPointsTable:
 ;sword (0)
-  db    DaggerTimeAttack ;(4)
-  db    SwordOfBahrainAttack;(5)
-  db    HellSlayerAttack;(7)
+  db    DaggerTimeAttack ;(1)
+  db    SwordOfBahrainAttack;(2)
+  db    HellSlayerAttack;(6)
   db    ButterflyAttack;(1)
-  db    SwiftbladeAttack;(3)
+  db    SwiftbladeAttack;(5)
 ;armor (5)
   db    0
   db    0
@@ -2230,7 +2230,7 @@ ItemUnitSpeedPointsTable:
   db    0
   db    PikemensHelmetUnitSpeed;(+1)
 ;boots (20)
-  db    ShadowTramperUnitSpeed;(+2)
+  db    ShadowTramperUnitSpeed;(+1)
   db    0
   db    0
   db    0
@@ -2313,7 +2313,7 @@ ItemUnitHpPointsTable:
   db    0
   db    0
   db    0
-  db    RuralVestUnitHp;(+3)
+  db    RuralVestUnitHp;(+4)
   db    LabcoatUnitHp;(-2)
 
 
