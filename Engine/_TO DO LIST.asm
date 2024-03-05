@@ -1,3 +1,21 @@
+properly handle amount of players after a player is defeated
+  call  SetNextPlayersTurn
+  ;set next player's turn
+SetNextPlayersTurn:
+	ld		a,(amountofplayers)       ;set next player to have their turn
+	ld		b,a
+	ld		a,(whichplayernowplaying?)
+	cp		b
+	jp		nz,.endchecklastplayer
+	xor		a
+  .endchecklastplayer:	
+	inc		a
+	ld		(whichplayernowplaying?),a
+  ret
+
+
+set random spells in castles at start of game.. shuffle castles' spells
+
 battle:
 options menu: 
 1 view walkable grid/movement shadow

@@ -9053,6 +9053,14 @@ SetHero1ForPlayerThatGotAttackedInIX:           ;sets hero 1 of player in IX
   ret
   
 DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros below this one, one position up 
+  ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
+
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jr    z,.NeutralEnemyDied
+
  ;we are going to find how many heroes are below the hero that got attacked
 	ld		de,lenghtherotable
 	ld		hl,lenghtherotable*(amountofheroesperplayer-1)
@@ -9089,11 +9097,11 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
 
   ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
 
-  push  ix
-  pop   hl
-  ld    a,l
-  or    h
-  jr    z,.NeutralEnemyDied
+;  push  ix
+;  pop   hl
+;  ld    a,l
+;  or    h
+;  jr    z,.NeutralEnemyDied
 
   ld    (ix+HeroStatus),255             ;255 = inactive
 
