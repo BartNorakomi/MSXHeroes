@@ -1347,6 +1347,9 @@ EndTurn:
   ld    a,h
   or    l
   jr    z,.EndCheckNoIncomeDay1
+
+  call  CheckCurrentPlayerEliminated    ;if current player is eliminated, go set next player
+  
   
   call  AddCastlesIncomeToPlayer        ;add total income of castles
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
@@ -1359,6 +1362,43 @@ EndTurn:
   xor   a
   ld    (SetHeroOverViewMenu?),a        ;hackjob
   ret
+
+CheckCurrentPlayerEliminated:           ;if current player is eliminated, go set next player
+	ld		a,(whichplayernowplaying?)
+  ld    b,a
+  dec   a
+  ld    hl,pl1hero1y+HeroStatus         ;check if this player has active heroes
+  jr    z,.PlayerFound
+  dec   a
+  ld    hl,pl1hero2y+HeroStatus         ;check if this player has active heroes
+  jr    z,.PlayerFound
+  dec   a
+  ld    hl,pl1hero3y+HeroStatus         ;check if this player has active heroes
+  jr    z,.PlayerFound
+;  dec   a
+  ld    hl,pl1hero4y+HeroStatus         ;check if this player has active heroes
+;  jr    z,.PlayerFound
+
+  .PlayerFound:
+  ld    a,(hl)                          ;check if this player has active heroes
+  inc   a                               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  ret   nz
+  ;at this point this player has no active heroes. Check if he owns any castles
+  ld    a,(Castle1+CastlePlayer)
+  cp    b
+  ret   z
+  ld    a,(Castle2+CastlePlayer)
+  cp    b
+  ret   z
+  ld    a,(Castle3+CastlePlayer)
+  cp    b
+  ret   z
+  ld    a,(Castle4+CastlePlayer)
+  cp    b
+  ret   z
+  ;at this point this player has no active heroes nor castles, switch to next player
+  call  SetNextPlayersTurn
+  jp    CheckCurrentPlayerEliminated
 
 AddCreaturesToPools:                    ;add creatures to pool. bonus 50% for citadel, and 100% for capitol
   ;set day
@@ -10822,15 +10862,6 @@ AirLevel4Button:
   db  %1100 0011 | dw AirLevel4Untouched     | dw AirLevel4Touched      | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildAirLevel4Y ,  MagicGuildAirLevel4Y+16 ,  MagicGuildAirLevel4X ,  MagicGuildAirLevel4X+16    | dw $0000 + (MagicGuildAirLevel4Y*128)  +   (MagicGuildAirLevel4X/2)  - 128   |
 WaterLevel4Button:
   db  %1100 0011 | dw WaterLevel4Untouched   | dw WaterLevel4Touched    | dw $4000 + (150*128) + (192/2) - 128 | db MagicGuildWaterLevel4Y, MagicGuildWaterLevel4Y+16, MagicGuildWaterLevel4X, MagicGuildWaterLevel4X+16  | dw $0000 + (MagicGuildWaterLevel4Y*128) +  (MagicGuildWaterLevel4X/2) - 128  | 
-
-                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
-Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
-Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
-Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
-Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
-
-
-
 
 SetCastleSpellsInIX:
   push  iy

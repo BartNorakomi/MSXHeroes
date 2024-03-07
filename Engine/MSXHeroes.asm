@@ -931,7 +931,7 @@ dephase
 ;
 BattleFieldObjectsBlock:  equ   $52
 phase	$4000
-  incbin "..\grapx\MonsterSprites\BattleFieldObjects.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\Battlefield\BattleFieldObjects.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 

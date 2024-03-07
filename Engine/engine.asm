@@ -6152,7 +6152,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db 179 | dw CastleVaniaUnitLevel1Growth |      db 180 | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 179 | dw CastleVaniaUnitLevel1Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6401,7 +6401,7 @@ pl3hero1move:	db	20,20
 pl3hero1mana:	dw	20,20
 pl3hero1manarec:db	2		                ;recover x mana every turn
 pl3hero1status:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-Pl3Hero1Units:  db 033 | dw 003 |      db 044 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl3Hero1Units:  db 033 | dw 103 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6550,6 +6550,12 @@ ResourcesPlayer4:
 .Gems:    dw  60
 .Rubies:  dw  30
 
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
+
 StartingTownLevel1Unit: ds  1
 StartingTownLevel2Unit: ds  1
 StartingTownLevel3Unit: ds  1
@@ -6562,11 +6568,11 @@ player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
-amountofplayers:		db	2
+amountofplayers:		db	3
 player1human?:			db	2 ;0=CPU, 1=Human, 2=OFF
-player2human?:			db	2
-player3human?:			db	2
-player4human?:			db	2
+player2human?:			db	1
+player3human?:			db	1
+player4human?:			db	0
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	

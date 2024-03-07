@@ -2279,7 +2279,7 @@ PlaceAllSpellSchoolSpellsInSpellBook:
   ld    (HeroOverviewSpellIconButtonTable_Water+ (7 * ButtonTableLenght) + HeroOverviewWindowButtonStatus),a 
   ld    a,65                          ;spell scroll universal level 4
   call  CheckSpellScrollAvailable  ;out: z=scroll found
-  jr    z,.PlaceUniversalSpellLevel3
+  jr    z,.PlaceUniversalSpellLevel4
   bit   3,(ix+HeroAllSchoolsSpells)
   jr    z,.EndPlaceAllSchoolsSpell4
   .PlaceUniversalSpellLevel4:

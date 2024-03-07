@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 0
+StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 0
 StartAtTitleScreen?:      equ 1
@@ -8,29 +8,20 @@ ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap02
-;WorldPointer: dw GentleDesertMap03
+WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
-WorldPointer: dw GentleWinterMap04
+;WorldPointer: dw GentleWinterMap04
 
 InitiateGame:
   ld    hl,CHMOUS
   call  ExecuteLoaderRoutine            ;check if there is a mouse present
 
 
-
-
-
 ;ld a,(pl1hero1y+HeroUnits)
 ;ld (pl2hero1y+HeroUnits),a
 ;ld a,(pl1hero1y+HeroUnits+3)
 ;ld (pl2hero1y+HeroUnits+3),a
-
-
-
-
-
-
 
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
@@ -61,6 +52,8 @@ StartGame:
   call  ExecuteLoaderRoutine
   ld    hl,ConvertMonstersObjectLayer   ;monsters on the object map are just values from (level) 1 to 6. Convert them to actual monsters
   call  ExecuteLoaderRoutine
+  ld    hl,ShuffleCastleMageGuildSpells ;mage guild has 2 random spells per level
+  call  ExecuteLoaderRoutine
 
   .WhenExitingCombat:
   call  CenterMousePointer
@@ -82,6 +75,12 @@ StartGame:
 ;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
 ;  ld    a,1 | ld    (SetHeroOverViewMenu?),a
+
+;ld a,255
+;ld (pl1hero1y+HeroStatus),a
+;ld (pl1hero1y),a
+;ld a,2
+;ld (Castle1+CastlePlayer),a
 
 
 ;jp SetHeroOverviewMenuInPage1ROM

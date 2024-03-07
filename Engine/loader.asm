@@ -77,9 +77,7 @@ GentleCaveMap02: db  GentleCaveMap02MapBlock | dw GentleCaveMap02Map | db Gentle
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 048,128, 080,144, 048,160, 080,128, 064,176, 064,192, 000,000, 000,000
 ;  db    064,000, 064,016, 064,032, 064,048, 064,064, 064,080, 064,096, 064,112, 064,128, 064,144, 064,160, 080,160, 080,176, 080,192, 048,224, 048,240
 ;  db    080,000, 080,016, 080,032, 080,048, 080,064, 080,080, 080,096, 080,112, 000,000, 000,000, 000,000, 000,000, 080,192, 080,208, 000,000, 000,000
-  
-  
-  
+    
 MiniMapBlock: equ 12  
 MiniMapAddress: equ 13
   
@@ -109,6 +107,37 @@ PutMiniMapScenarioSelectScreen:
   ld    ix,(WorldPointer)
   call  SetMapPalette
   jp    SwapAndSetPage                  ;swap and set page
+
+ShuffleCastleMageGuildSpells:           ;ShuffleCastleMageGuildSpells
+  ld    a,r
+  and   3
+  ld    hl,.Castle1Spells
+  jr    z,.SpellsFound
+  dec   a
+  ld    hl,.Castle2Spells
+  jr    z,.SpellsFound
+  dec   a
+  ld    hl,.Castle3Spells
+  jr    z,.SpellsFound
+;  dec   a
+  ld    hl,.Castle4Spells
+;  jr    z,.SpellsFound
+
+  .SpellsFound:
+  ld    de,Castle1Spells
+  ld    bc,4*4                          ;4 elemental spells per castle
+  ldir
+  ret
+
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+.Castle1Spells:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+.Castle2Spells:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+.Castle3Spells:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+.Castle4Spells:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
+.Castle5Spells:   db  % 0 1 0 1, % 1 0 1 0, % 0 0 1 1, % 1 1 0 0
+.Castle6Spells:   db  % 1 0 1 0, % 0 1 0 1, % 1 0 0 1, % 0 1 1 0
+.Castle7Spells:   db  % 0 1 0 1, % 1 0 1 0, % 1 1 0 0, % 0 0 1 1
+.Castle8Spells:   db  % 1 0 1 0, % 0 1 0 1, % 0 1 1 0, % 1 0 0 1
 
 SetCastlesInMiniMap:
   ld    ix,Castle1

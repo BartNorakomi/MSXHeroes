@@ -4826,12 +4826,15 @@ BuildUpBattleFieldAndPutMonsters:
   xor   a
 	ld		(activepage),a			            ;page 0
   call  SetBattleFieldGraphics          ;set battle field in page 1 ram->vram
+  ld    a,r
+  push  af                              ;store rockformation randomizer
   call  .SetRocks
   call  .SetHeroes
   ld    hl,.CopyPage1To2
   call  DoCopy                          ;copy battle field to page 2 vram->vram
   call  SwapAndSetPage                  ;swap and set page 1
   call  SetBattleFieldGraphics          ;set battle field in page 0 ram->vram
+  pop   af                              ;recall rockformation randomizer
   call  .SetRocks
   call  .SetHeroes
   ld    hl,.CopyPage1To3
@@ -5090,8 +5093,38 @@ BuildUpBattleFieldAndPutMonsters:
 	db		0,0,$d0	
 
   .SetRocks:
-  ld    ix,RocksVersion1
-  ld    b,5
+  and   7
+  ld    hl,RocksVersion1+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion2+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion3+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion4+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion5+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion6+1
+  jr    z,.RocksFormationFound
+  dec   a
+  ld    hl,RocksVersion7+1
+  jr    z,.RocksFormationFound
+;  dec   a
+  ld    hl,RocksVersion8+1
+;  jr    z,.RocksFormationFound
+  .RocksFormationFound:
+  push  hl
+  pop   ix
+;  ld    ix,RocksVersion8+1
+  ld    b,(ix-1)                        ;amount of rocks
+  ld    a,b
+  or    a
+  ret   z
 
   .RockLoop:
   push  bc
@@ -5112,7 +5145,25 @@ BuildUpBattleFieldAndPutMonsters:
   ret
 
   .GoSetRock:
-  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    a,(BattleGraphicsBlock)              ;block to copy graphics from
+  cp    BattleFieldWinterBlock
+  ld    hl,$4000 + (000*128) + (016/2) - 128  ;winter tile
+  jr    z,.BattleFieldTileFound
+  cp    BattleFieldDesertBlock
+  ld    hl,$4000 + (000*128) + (064/2) - 128  ;desert tile
+  jr    z,.BattleFieldTileFound
+  cp    BattleFieldCaveBlock
+  ld    hl,$4000 + (000*128) + (112/2) - 128  ;cave tile
+  jr    z,.BattleFieldTileFound
+  cp    BattleFieldGentleBlock
+  ld    hl,$4000 + (000*128) + (048/2) - 128  ;gentle tile
+  jr    z,.BattleFieldTileFound
+  cp    BattleFieldAutumnBlock
+  ld    hl,$4000 + (000*128) + (000/2) - 128  ;autumn tile
+  jr    z,.BattleFieldTileFound
+  ld    hl,$4000 + (000*128) + (080/2) - 128  ;jungle tile
+
+  .BattleFieldTileFound:
   ld    bc,$0000 + (016*256) + (016/2)
   ld    a,BattleFieldObjectsBlock           ;block to copy graphics from
 
@@ -5120,22 +5171,56 @@ BuildUpBattleFieldAndPutMonsters:
   exx
   pop   de
   exx
-  call  BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-ret
-
-  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-
-  ld    de,256*(100) + (100)
-
-
+  jp    BuildUpBattleFieldAndPutMonsters.CopyTransparantImage           ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 RocksVersion1:
+  db    0
   dw    $0000 + ((00*16+056)*256) + ((07*08 + 12)), BattleFieldGrid+007 + 00*LenghtBattleField
-  dw    $0000 + ((01*16+056)*256) + ((08*08 + 12)), BattleFieldGrid+008 + 01*LenghtBattleField
-  dw    $0000 + ((04*16+056)*256) + ((09*08 + 12)), BattleFieldGrid+009 + 04*LenghtBattleField
+
+RocksVersion2:
+  db    1
+  dw    $0000 + ((03*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+014 + 03*LenghtBattleField
+
+RocksVersion3:
+  db    2
+  dw    $0000 + ((03*16+056)*256) + ((12*08 + 12)), BattleFieldGrid+012 + 03*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((16*08 + 12)), BattleFieldGrid+016 + 05*LenghtBattleField
+
+RocksVersion4:
+  db    3
+  dw    $0000 + ((01*16+056)*256) + ((12*08 + 12)), BattleFieldGrid+012 + 01*LenghtBattleField
+  dw    $0000 + ((01*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+014 + 01*LenghtBattleField
+  dw    $0000 + ((02*16+056)*256) + ((15*08 + 12)), BattleFieldGrid+015 + 02*LenghtBattleField
+
+RocksVersion5:
+  db    3
+  dw    $0000 + ((05*16+056)*256) + ((12*08 + 12)), BattleFieldGrid+014 + 05*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+016 + 05*LenghtBattleField
   dw    $0000 + ((04*16+056)*256) + ((11*08 + 12)), BattleFieldGrid+011 + 04*LenghtBattleField
-  dw    $0000 + ((05*16+056)*256) + ((10*08 + 12)), BattleFieldGrid+010 + 05*LenghtBattleField
+
+RocksVersion6:
+  db    4
+  dw    $0000 + ((02*16+056)*256) + ((15*08 + 12)), BattleFieldGrid+015 + 02*LenghtBattleField
+  dw    $0000 + ((03*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+014 + 03*LenghtBattleField
+  dw    $0000 + ((04*16+056)*256) + ((13*08 + 12)), BattleFieldGrid+013 + 04*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+014 + 05*LenghtBattleField
+
+RocksVersion7:
+  db    5
+  dw    $0000 + ((02*16+056)*256) + ((11*08 + 12)), BattleFieldGrid+011 + 02*LenghtBattleField
+  dw    $0000 + ((03*16+056)*256) + ((10*08 + 12)), BattleFieldGrid+010 + 03*LenghtBattleField
+  dw    $0000 + ((04*16+056)*256) + ((15*08 + 12)), BattleFieldGrid+015 + 04*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((14*08 + 12)), BattleFieldGrid+014 + 05*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((16*08 + 12)), BattleFieldGrid+016 + 05*LenghtBattleField
+
+RocksVersion8:
+  db    6
+  dw    $0000 + ((02*16+056)*256) + ((11*08 + 12)), BattleFieldGrid+011 + 02*LenghtBattleField
+  dw    $0000 + ((02*16+056)*256) + ((13*08 + 12)), BattleFieldGrid+013 + 02*LenghtBattleField
+  dw    $0000 + ((01*16+056)*256) + ((16*08 + 12)), BattleFieldGrid+016 + 01*LenghtBattleField
+  dw    $0000 + ((03*16+056)*256) + ((10*08 + 12)), BattleFieldGrid+010 + 03*LenghtBattleField
+  dw    $0000 + ((05*16+056)*256) + ((16*08 + 12)), BattleFieldGrid+016 + 05*LenghtBattleField
+  dw    $0000 + ((06*16+056)*256) + ((15*08 + 12)), BattleFieldGrid+015 + 06*LenghtBattleField
 
 Set255WhereMonsterStandsInBattleFieldGrid:
   call  FindMonsterInBattleFieldGrid    ;hl now points to Monster in grid
@@ -9675,5 +9760,5 @@ SetGuardTowerGraphics:
   ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
-
+kut:
 

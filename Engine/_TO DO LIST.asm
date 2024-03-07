@@ -1,20 +1,7 @@
-properly handle amount of players after a player is defeated
-  call  SetNextPlayersTurn
-  ;set next player's turn
-SetNextPlayersTurn:
-	ld		a,(amountofplayers)       ;set next player to have their turn
-	ld		b,a
-	ld		a,(whichplayernowplaying?)
-	cp		b
-	jp		nz,.endchecklastplayer
-	xor		a
-  .endchecklastplayer:	
-	inc		a
-	ld		(whichplayernowplaying?),a
-  ret
+hardware sprite monster ranged weapons
+add item abilities like: x% less damage from spells, +5% chance to block spells etc...
 
 
-set random spells in castles at start of game.. shuffle castles' spells
 
 battle:
 options menu: 
@@ -23,9 +10,7 @@ options menu:
 3 load game
 4 main menu
 5 return to combat
-battle field stones/objects
 MONSTER AUTO DROP SPELLSCROLL CURE, WHICH HERO AUTOPICKS UP
-hardware sprite monster ranged weapons
 
 toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.
@@ -35,6 +20,7 @@ low prio
 autocombat moet een sprite worden
 footman meervoud wordt footmans in battle ipv footmen. naam wijzigen
 als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of net voordat er text in het textvak geplaatst wordt), dan wordt de text niet goed geplaatst in beide pages. oplossing: je kunt niet de stats kijken als puttext? of hoe dat dan ook heet actief is.
+battle field for castle + castle walls
 
 worldmap:
 AI
@@ -56,7 +42,6 @@ castle:
 low prio:
 als je een gebouw upgrade, misschien een coin pickup animatie, of een + symbool (samen met het sfx)
 
-
 title screen:
 
 ;still to do, WIP:
@@ -70,14 +55,9 @@ general:
 muziek
 sfx
 
-
 titel scherm:
 - Single Scenario (locked)
 - Campaign
 - Load Game
 - Game Options
 - Collection
-
-
-
-
