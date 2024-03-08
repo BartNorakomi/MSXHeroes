@@ -90,7 +90,7 @@ StartGame:
 
 
 ShortestPathTileHandlerQueue:
-  ds  2*100,0
+  ds  2*144,0
 
   ds  12,255        ;1 additional foreground row above our grid
 ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of each row
@@ -178,7 +178,7 @@ CheckNormalRouteShortestPath:
   ld    (ShortestPathTileHandlerQueue),hl   ;put this position in queue
   ld    a,1                             ;next number (representing distance in tiles from hero)
   ld    (.SelfModifyingCodeDistanceNumber),a
-  ld    b,1                             ;amount of tile that have next number
+  ld    b,1                             ;amount of tiles that have current number
   ld    c,0                             ;amount of new tiles to handle after current number is finished
 
   ld    ix,ShortestPathTileHandlerQueue ;current tile in queue

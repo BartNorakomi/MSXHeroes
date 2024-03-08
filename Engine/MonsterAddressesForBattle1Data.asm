@@ -715,7 +715,7 @@ AkanbeDragonGroupAUnitLevel1CostGems:         equ 00+Level1Unit
 AkanbeDragonGroupAUnitLevel1CostRubies:       equ 0
 
 AkanbeDragonGroupAUnitLevel2Number:           equ 113
-AkanbeDragonGroupAUnitLevel2Attack:           equ 7
+AkanbeDragonGroupAUnitLevel2Attack:           equ 4
 AkanbeDragonGroupAUnitLevel2Defense:          equ 4
 AkanbeDragonGroupAUnitLevel2HP:               equ 12
 AkanbeDragonGroupAUnitLevel2Speed:            equ 6

@@ -1328,30 +1328,13 @@ EndTurn:
 	add		ix,de				              ;next hero
 	djnz	.loop
 
-  call  SetNextPlayersTurn
+  call  SetNextPlayersTurnAndCheckPlayerEliminated
   
-	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
-  dec   a
-  jr    nz,.EndCheckIncreaseDate
-  ld    hl,(Date)
-  inc   hl
-  ld    (Date),hl
-
-  call  AddCreaturesToPools             ;At start of player 1's turn first day of the week, add all creatures to all castles
-  call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
-  call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
-  call  ClearAlreadyBuiltThisTurnCastles;At start of player 1's turn, clear all these bytes
-  .EndCheckIncreaseDate:  
-
   ld    hl,(Date)                       ;don't add income on day 1
   ld    a,h
   or    l
-  jr    z,.EndCheckNoIncomeDay1
-
-  call  CheckCurrentPlayerEliminated    ;if current player is eliminated, go set next player
-  
-  
-  call  AddCastlesIncomeToPlayer        ;add total income of castles
+  jr    z,.EndCheckNoIncomeDay1  
+  call  AddCastlesIncomeToPlayer        ;add total income of castles to player
   call  AddCastlesSawmillResources      ;add sawmill's resources of castles to player
   call  AddCastlesMineResources         ;add mine's resources of castles to player
   call  AddEstatesIncomeToPlayer        ;add total income of heroes with 'estates' to player
@@ -1363,8 +1346,23 @@ EndTurn:
   ld    (SetHeroOverViewMenu?),a        ;hackjob
   ret
 
-CheckCurrentPlayerEliminated:           ;if current player is eliminated, go set next player
-	ld		a,(whichplayernowplaying?)
+IncDatePlayer1AddCreaturesRotateTavernHeroesRefillManaClearAlreadyBuiltThisTurn:
+  ld    hl,(Date)
+  inc   hl
+  ld    (Date),hl
+  call  AddCreaturesToPools             ;At start of player 1's turn first day of the week, add all creatures to all castles
+  call  SetAndRotateTavernHeroes        ;At start of player 1's turn, rotate all tavern heroes
+  call  RefillManaHeroesInCastles       ;At start of player 1's turn, refil mana for all heroes in castles
+  jp    ClearAlreadyBuiltThisTurnCastles;At start of player 1's turn, clear all these bytes
+
+SetNextPlayersTurnAndCheckPlayerEliminated:
+  call  SetNextPlayersTurn
+
+	ld		a,(whichplayernowplaying?)      ;increase the date if it's player 1's turn
+  dec   a
+  call  z,IncDatePlayer1AddCreaturesRotateTavernHeroesRefillManaClearAlreadyBuiltThisTurn
+
+	ld		a,(whichplayernowplaying?)      ;if this player is eliminated, go set next player
   ld    b,a
   dec   a
   ld    hl,pl1hero1y+HeroStatus         ;check if this player has active heroes
@@ -1397,8 +1395,7 @@ CheckCurrentPlayerEliminated:           ;if current player is eliminated, go set
   cp    b
   ret   z
   ;at this point this player has no active heroes nor castles, switch to next player
-  call  SetNextPlayersTurn
-  jp    CheckCurrentPlayerEliminated
+  jr    SetNextPlayersTurnAndCheckPlayerEliminated
 
 AddCreaturesToPools:                    ;add creatures to pool. bonus 50% for citadel, and 100% for capitol
   ;set day
