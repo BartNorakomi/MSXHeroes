@@ -6939,11 +6939,11 @@ Monster109AttackPatternLeft:
 ;######################################################################################
 ;Li Yen (final boss) (yie ar kung fu)
 
-RIdle1Monster110:   equ $4000 + (200*128) + (000/2) - 128  ;(y*128) + (x/2)
-RIdle2Monster110:   equ $4000 + (200*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle1Monster110:   equ $4000 + (200*128) + (032/2) - 128  ;(y*128) + (x/2)
+RIdle2Monster110:   equ $4000 + (200*128) + (000/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster110:   equ $4000 + (200*128) + (096/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster110:   equ $4000 + (200*128) + (064/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster110:   equ $4000 + (200*128) + (064/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster110:   equ $4000 + (200*128) + (096/2) - 128  ;(y*128) + (x/2)
 
 Monster110Move:
   db    4                               ;animation speed (x frames per animation frame)
@@ -6960,9 +6960,9 @@ Monster110Idle:
   dw    LIdle1Monster110
   dw    LIdle2Monster110
 Monster110AttackPatternRight:
-  db    AnimateAttack | dw RIdle2Monster110 | db 000,AnimateAttack | dw RIdle1Monster110 | db 000,ShootProjectile,WaitImpactProjectile
+  db    AnimateAttack | dw RIdle2Monster110 | db 000,AnimateAttack | dw RIdle2Monster110 | db 000,ShootProjectile,WaitImpactProjectile
 Monster110AttackPatternLeft:
-  db    AnimateAttack | dw LIdle2Monster110 | db 000,AnimateAttack | dw LIdle1Monster110 | db 000,ShootProjectile,WaitImpactProjectile
+  db    AnimateAttack | dw LIdle2Monster110 | db 000,AnimateAttack | dw LIdle2Monster110 | db 000,ShootProjectile,WaitImpactProjectile
 
 ;######################################################################################
 

@@ -1478,6 +1478,191 @@ HandleProjectileSprite:
   jp    z,.LiYen                        ;Li Yen (final boss) (yie ar kung fu)
   cp    112
   jp    z,.KingMori
+  cp    113
+  jp    z,.KnightYama
+  cp    115
+  jp    z,.BisshopHeichi
+  cp    119
+  jp    z,.PornHeichi
+  cp    120
+  jp    z,.YamaKnight
+  cp    125
+  jp    z,.GooGoo
+  cp    129
+  jp    z,.Screech
+  cp    144
+  jp    z,.PastryChef
+  cp    149
+  jp    z,.VicViper
+  cp    153
+  jp    z,.Andorogynus
+  cp    158
+  jp    z,.BisshopHeichi                ;Queen Sora (green bird) (akanbe dragon)
+  cp    159
+  jp    z,.GeneralBullet1               ;Senko Kyu (shooting head) (hinotori)
+  cp    168
+  jp    z,.NinjaKun
+  cp    183
+  jp    z,.GeneralBullet1               ;Sun Wukong (chuka taisen) (main character)
+  ret
+
+  .NinjaKun:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+;	srl		a				                        ;/2
+; and   7
+
+  ld    de,6                            ;divide total attack by 10 to get 10%
+  ld    b,0
+  ld    c,a
+  call  DivideBCbyDE                    ;in: BC/DE. Out: BC = result, HL = rest
+  ld    a,l
+	srl		a				                        ;/2
+
+  ld    hl,SpriteCharNinjaKun + 0*96
+  ld    de,SpriteColNinjaKun + 0*48
+  ret   z
+  ld    hl,SpriteCharNinjaKun + 1*96
+  ld    de,SpriteColNinjaKun + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharNinjaKun + 2*96
+  ld    de,SpriteColNinjaKun + 2*48
+  ret
+
+  .Andorogynus:
+  ld    hl,SpriteCharAndorogynus + 0*96
+  ld    de,SpriteColAndorogynus + 0*48
+  ret
+
+  .VicViper:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+;	srl		a				                        ;/2
+; and   7
+
+  ld    de,12                            ;divide total attack by 10 to get 10%
+  ld    b,0
+  ld    c,a
+  call  DivideBCbyDE                    ;in: BC/DE. Out: BC = result, HL = rest
+  ld    a,l
+	srl		a				                        ;/2
+
+  ld    hl,SpriteCharVicViper + 5*96
+  ld    de,SpriteColVicViper + 5*48
+  ret   z
+  ld    hl,SpriteCharVicViper + 4*96
+  ld    de,SpriteColVicViper + 4*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 3*96
+  ld    de,SpriteColVicViper + 3*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 2*96
+  ld    de,SpriteColVicViper + 2*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 1*96
+  ld    de,SpriteColVicViper + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 0*96
+  ld    de,SpriteColVicViper + 0*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 5*96
+  ld    de,SpriteColVicViper + 5*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharVicViper + 5*96
+  ld    de,SpriteColVicViper + 5*48
+  ret
+
+  .PastryChef:
+  ld    hl,SpriteCharPastryChef + 0*96
+  ld    de,SpriteColPastryChef + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharPastryChef + 1*96
+  ld    de,SpriteColPastryChef + 1*48
+  ret
+
+  .Screech:
+  ld    hl,SpriteCharScreech + 0*96
+  ld    de,SpriteColScreech + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharScreech + 1*96
+  ld    de,SpriteColScreech + 1*48
+  ret
+
+  .GooGoo:
+  ld    hl,SpriteCharGooGoo + 0*96
+  ld    de,SpriteColGooGoo + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharGooGoo + 1*96
+  ld    de,SpriteColGooGoo + 1*48
+  ret
+
+  .YamaKnight:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   3
+  ld    hl,SpriteCharYamaKnight + 0*96
+  ld    de,SpriteColYamaKnight + 0*48
+  ret   z
+  ld    hl,SpriteCharYamaKnight + 1*96
+  ld    de,SpriteColYamaKnight + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharYamaKnight + 2*96
+  ld    de,SpriteColYamaKnight + 2*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharYamaKnight + 3*96
+  ld    de,SpriteColYamaKnight + 3*48
+  ret
+
+  .PornHeichi:
+  ld    hl,SpriteCharPornHeichi + 0*96
+  ld    de,SpriteColPornHeichi + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharPornHeichi + 1*96
+  ld    de,SpriteColPornHeichi + 1*48
+  ret
+
+  .BisshopHeichi:
+  ld    hl,SpriteCharBisshopHeichi + 0*96
+  ld    de,SpriteColBisshopHeichi + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharBisshopHeichi + 1*96
+  ld    de,SpriteColBisshopHeichi + 1*48
+  ret
+
+  .KnightYama:
+  ld    hl,SpriteCharKnightYama + 0*96
+  ld    de,SpriteColKnightYama + 0*48
+  ret
+
+  .KingMori:
+  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   1
+  ld    hl,SpriteCharKingMori + 0*96
+  ld    de,SpriteColKingMori + 0*48
+  ret   z
+  ld    hl,SpriteCharKingMori + 1*96
+  ld    de,SpriteColKingMori + 1*48
   ret
   
   .LiYen:
@@ -1615,17 +1800,6 @@ HandleProjectileSprite:
   .Bobblun:
   ld    hl,SpriteCharBubbleBobble + 1*96
   ld    de,SpriteCharBubbleBobble + 1*48
-  ret
-
-  .KingMori:
-  ld    a,(framecounter)
-	srl		a				                        ;/2
-  and   1
-  ld    hl,SpriteCharKingMori + 0*96
-  ld    de,SpriteColKingMori + 0*48
-  ret   z
-  ld    hl,SpriteCharKingMori + 1*96
-  ld    de,SpriteColKingMori + 1*48
   ret
 
   .InvertFrameCounterWhenOnTheRightSide:
@@ -4631,4 +4805,3 @@ GoAnimateSpell:
   push  ix
   pop   hl
   jp    docopy
-

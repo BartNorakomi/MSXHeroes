@@ -1895,8 +1895,46 @@ SpriteCharLiYen:
   include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tgs.gen"
 SpriteColLiYen:
   include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tcs.gen"
-
-
+SpriteCharKnightYama:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tgs.gen"
+SpriteColKnightYama:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tcs.gen"
+SpriteCharBisshopHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tgs.gen"
+SpriteColBisshopHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tcs.gen"
+SpriteCharPornHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tgs.gen"
+SpriteColPornHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tcs.gen"
+SpriteCharYamaKnight:
+  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tgs.gen"
+SpriteColYamaKnight:
+  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tcs.gen"
+SpriteCharGooGoo:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tgs.gen"
+SpriteColGooGoo:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tcs.gen"
+SpriteCharScreech:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tgs.gen"
+SpriteColScreech:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tcs.gen"
+SpriteCharPastryChef:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tgs.gen"
+SpriteColPastryChef:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tcs.gen"
+SpriteCharVicViper:
+  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tgs.gen"
+SpriteColVicViper:
+  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tcs.gen"
+SpriteCharAndorogynus:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tgs.gen"
+SpriteColAndorogynus:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tcs.gen"
+SpriteCharNinjaKun:
+  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tgs.gen"
+SpriteColNinjaKun:
+  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tcs.gen"
 	ds		$8000-$,$ff
 dephase
 

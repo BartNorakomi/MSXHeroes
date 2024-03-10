@@ -9759,6 +9759,3 @@ SetGuardTowerGraphics:
   ld    bc,$0000 + (070*256) + (064/2)
   ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
-kut:
-
