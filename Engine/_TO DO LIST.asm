@@ -1,6 +1,9 @@
 hardware sprite monster ranged weapons
 add item abilities like: x% less damage from spells, +5% chance to block spells etc...
-
+units with 0 movement speed
+quicktips
+reload arrow graphics after displaying a message on worldmap
+stuff like resurrection in spell book says:"resurrects     hp"
 
 
 battle:
@@ -10,7 +13,6 @@ options menu:
 3 load game
 4 main menu
 5 return to combat
-MONSTER AUTO DROP SPELLSCROLL CURE, WHICH HERO AUTOPICKS UP
 
 toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
 Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.

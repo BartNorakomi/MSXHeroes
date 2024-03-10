@@ -3,7 +3,7 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 0
-StartAtTitleScreen?:      equ 1
+StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
@@ -18,10 +18,10 @@ InitiateGame:
   call  ExecuteLoaderRoutine            ;check if there is a mouse present
 
 
-;ld a,(pl1hero1y+HeroUnits)
-;ld (pl2hero1y+HeroUnits),a
-;ld a,(pl1hero1y+HeroUnits+3)
-;ld (pl2hero1y+HeroUnits+3),a
+ld a,(pl1hero1y+HeroUnits)
+ld (pl2hero1y+HeroUnits),a
+ld a,(pl1hero1y+HeroUnits+3)
+ld (pl2hero1y+HeroUnits+3),a
 
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
@@ -38,7 +38,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
   if  StartAtTitleScreen?
   call  TitleScreen

@@ -1247,6 +1247,7 @@ HandleProjectileSprite:
 ;  ret
 
   .HandleProjectile:
+  call  SetCurrentActiveMOnsterInIX
   ld    a,(spat+4*16+1)
   ld    e,a                           ;x1
   ld    a,(spat+4*16)
@@ -1415,7 +1416,12 @@ HandleProjectileSprite:
 	ld		hl,sprcharaddr+(16*32)	;sprite 16 character table in VRAM
 	call	SetVdp_Write
 
-  ld    hl,SpriteCharBeingHit + 0*96
+  ld    a,SpritesWeaponsBlock
+	ld		($6000),a                       ;set battle code block for explosion and projectile routines
+
+  call  .SetCharacterAndColor
+  push  de                              ;sprite color
+
 	ld		c,$98
 	call	outix96			;write sprite character of explosion
 
@@ -1423,9 +1429,211 @@ HandleProjectileSprite:
 	ld		hl,sprcoladdr+(16*16)	;sprite 3 color table in VRAM
 	call	SetVdp_Write
 
-  ld    hl,SpriteColorBeingHit
+  pop   hl                              ;sprite color
 	ld		c,$98
 	call	outix48			;write sprite color of pointer and hand to vram
+
+  ld    a,BattleCodeBlock
+	ld		($6000),a                       ;set battle code block for explosion and projectile routines
+  ret
+
+
+  .SetCharacterAndColor:
+  ld    a,(ix+MonsterNumber)
+  cp    007
+  jp    z,.Bobblun
+  cp    008
+  jp    z,.Bubblun
+  cp    026
+  jp    z,.AxeMan
+  cp    035
+  jp    z,.GeneralBullet1               ;Octo (Dragon Slayer IV)
+  cp    036
+  jp    z,.ContraBullet                 ;Sarge green (Contra)
+  cp    037
+  jp    z,.ContraBullet                 ;Lieutenant red (Contra)
+  cp    039
+  jp    z,.HandGrenade                  ;Grenadier (Contra)
+  cp    040
+  jp    z,.ContraBullet                 ;Sniper (Contra)
+  cp    043
+  jp    z,.ContraBullet                 ;Infiltrant (Contra)
+  cp    047
+  jp    z,.Grenadier                    ;Turret (Contra)
+  cp    049
+  jp    z,.Vanguard                     ;Vanguard (Usas)
+  cp    069
+  jp    z,.GeneralBullet1               ;Spitvine (Psycho World)
+  cp    092
+  jp    z,.ContraBullet                 ;Trooper (Metal Gear)
+  cp    093
+  jp    z,.ContraBullet                 ;Antigas Man (Metal Gear)
+  cp    094
+  jp    z,.ContraBullet                 ;Footman (Metal Gear)
+  cp    104
+  jp    z,.LanFang                      ;Lan Fang (fan thrower) (yie ar kung fu)
+  cp    109
+  jp    z,.HanChen                      ;Han Chen (bomb thrower) (yie ar kung fu)
+  cp    110
+  jp    z,.LiYen                        ;Li Yen (final boss) (yie ar kung fu)
+  cp    112
+  jp    z,.KingMori
+  ret
+  
+  .LiYen:
+  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   1
+  ld    hl,SpriteCharLiYen + 0*96
+  ld    de,SpriteColLiYen + 0*48
+  ret   z
+  ld    hl,SpriteCharLiYen + 1*96
+  ld    de,SpriteColLiYen + 1*48
+  ret
+
+  .HanChen:
+  ld    hl,SpriteCharHanChen + 0*96
+  ld    de,SpriteColHanChen + 0*48
+  ret
+
+  .LanFang:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+;	srl		a				                        ;/2
+  and   7
+  ld    hl,SpriteCharLanFang + 0*96
+  ld    de,SpriteColLanFang + 0*48
+  ret   z
+  ld    hl,SpriteCharLanFang + 1*96
+  ld    de,SpriteColLanFang + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 2*96
+  ld    de,SpriteColLanFang + 2*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 3*96
+  ld    de,SpriteColLanFang + 3*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 4*96
+  ld    de,SpriteColLanFang + 4*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 5*96
+  ld    de,SpriteColLanFang + 5*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 6*96
+  ld    de,SpriteColLanFang + 6*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharLanFang + 7*96
+  ld    de,SpriteColLanFang + 7*48
+  ret
+
+  .HandGrenade:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   3
+  ld    hl,SpriteCharHandGrenade + 0*96
+  ld    de,SpriteColHandGrenade + 0*48
+  ret   z
+  ld    hl,SpriteCharHandGrenade + 1*96
+  ld    de,SpriteColHandGrenade + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharHandGrenade + 2*96
+  ld    de,SpriteColHandGrenade + 2*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharHandGrenade + 3*96
+  ld    de,SpriteColHandGrenade + 3*48
+  ret
+
+  .Vanguard:
+  ld    hl,SpriteCharVanguard + 0*96
+  ld    de,SpriteColVanguard + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharVanguard + 1*96
+  ld    de,SpriteColVanguard + 1*48
+  ret
+
+  .Grenadier:
+  ld    hl,SpriteCharGrenadier + 0*96
+  ld    de,SpriteColGrenadier + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharGrenadier + 1*96
+  ld    de,SpriteColGrenadier + 1*48
+  ret
+
+  .ContraBullet:
+  ld    hl,SpriteCharContraBullet + 0*96
+  ld    de,SpriteColContraBullet + 0*48
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ret   c
+  ld    hl,SpriteCharContraBullet + 1*96
+  ld    de,SpriteColContraBullet + 1*48
+  ret
+
+  .GeneralBullet1:
+  ld    hl,SpriteCharGeneralBullet1 + 0*96
+  ld    de,SpriteCharGeneralBullet1 + 0*48
+  ret
+
+  .AxeMan:
+  call  .InvertFrameCounterWhenOnTheRightSide
+;  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   3
+  ld    hl,SpriteCharAxeMan + 0*96
+  ld    de,SpriteColAxeMan + 0*48
+  ret   z
+  ld    hl,SpriteCharAxeMan + 1*96
+  ld    de,SpriteColAxeMan + 1*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharAxeMan + 2*96
+  ld    de,SpriteColAxeMan + 2*48
+  dec   a
+  ret   z
+  ld    hl,SpriteCharAxeMan + 3*96
+  ld    de,SpriteColAxeMan + 3*48
+  ret
+
+  .Bubblun:
+  ld    hl,SpriteCharBubbleBobble + 0*96
+  ld    de,SpriteCharBubbleBobble + 0*48
+  ret
+
+  .Bobblun:
+  ld    hl,SpriteCharBubbleBobble + 1*96
+  ld    de,SpriteCharBubbleBobble + 1*48
+  ret
+
+  .KingMori:
+  ld    a,(framecounter)
+	srl		a				                        ;/2
+  and   1
+  ld    hl,SpriteCharKingMori + 0*96
+  ld    de,SpriteColKingMori + 0*48
+  ret   z
+  ld    hl,SpriteCharKingMori + 1*96
+  ld    de,SpriteColKingMori + 1*48
+  ret
+
+  .InvertFrameCounterWhenOnTheRightSide:
+  ld    a,(CurrentActiveMonster)
+  cp    7
+  ld    a,(framecounter)
+  ret   c
+  neg
   ret
 
   .MoveY:

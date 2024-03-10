@@ -5997,9 +5997,9 @@ Monster069Idle:
   dw    LIdle1Monster069
   dw    LIdle2Monster069
 Monster069AttackPatternRight:
-  db    000,AnimateAttack | dw RIdle1Monster069 | db 000,ShootProjectile,WaitImpactProjectile
+  db    000,AnimateAttack | dw RIdle2Monster069 | db 000,ShootProjectile,WaitImpactProjectile
 Monster069AttackPatternLeft:
-  db    000,AnimateAttack | dw LIdle1Monster069 | db 000,ShootProjectile,WaitImpactProjectile
+  db    000,AnimateAttack | dw LIdle2Monster069 | db 000,ShootProjectile,WaitImpactProjectile
 ;######################################################################################
 ;OptiLeaper (Psycho World)
 

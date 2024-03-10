@@ -454,7 +454,7 @@ ContraGroupBUnitLevel1CostGems:         equ 00+Level1Unit
 ContraGroupBUnitLevel1CostRubies:       equ 0
 
 ContraGroupBUnitLevel2Number:           equ 36
-ContraGroupBUnitLevel2Attack:           equ 5
+ContraGroupBUnitLevel2Attack:           equ 4
 ContraGroupBUnitLevel2Defense:          equ 6
 ContraGroupBUnitLevel2HP:               equ 14
 ContraGroupBUnitLevel2Speed:            equ 4
@@ -464,7 +464,7 @@ ContraGroupBUnitLevel2CostGems:         equ 00+Level2Unit
 ContraGroupBUnitLevel2CostRubies:       equ 0
 
 ContraGroupBUnitLevel3Number:           equ 43
-ContraGroupBUnitLevel3Attack:           equ 7
+ContraGroupBUnitLevel3Attack:           equ 6
 ContraGroupBUnitLevel3Defense:          equ 6
 ContraGroupBUnitLevel3HP:               equ 20
 ContraGroupBUnitLevel3Speed:            equ 9
@@ -474,7 +474,7 @@ ContraGroupBUnitLevel3CostGems:         equ 00+Level3Unit
 ContraGroupBUnitLevel3CostRubies:       equ 0
 
 ContraGroupBUnitLevel4Number:           equ 37
-ContraGroupBUnitLevel4Attack:           equ 11
+ContraGroupBUnitLevel4Attack:           equ 7
 ContraGroupBUnitLevel4Defense:          equ 11
 ContraGroupBUnitLevel4HP:               equ 35
 ContraGroupBUnitLevel4Speed:            equ 5
@@ -484,9 +484,9 @@ ContraGroupBUnitLevel4CostGems:         equ 00+Level4Unit
 ContraGroupBUnitLevel4CostRubies:       equ 0
 
 ContraGroupBUnitLevel5Number:           equ 39
-ContraGroupBUnitLevel5Attack:           equ 10
+ContraGroupBUnitLevel5Attack:           equ 8
 ContraGroupBUnitLevel5Defense:          equ 14
-ContraGroupBUnitLevel5HP:               equ 70
+ContraGroupBUnitLevel5HP:               equ 50
 ContraGroupBUnitLevel5Speed:            equ 5
 ContraGroupBUnitLevel5Growth:           equ 3
 ContraGroupBUnitLevel5CostGold:         equ 530/10
@@ -494,7 +494,7 @@ ContraGroupBUnitLevel5CostGems:         equ 01+Level5Unit
 ContraGroupBUnitLevel5CostRubies:       equ 0
 
 ContraGroupBUnitLevel6Number:           equ 40
-ContraGroupBUnitLevel6Attack:           equ 14
+ContraGroupBUnitLevel6Attack:           equ 10
 ContraGroupBUnitLevel6Defense:          equ 14
 ContraGroupBUnitLevel6HP:               equ 70
 ContraGroupBUnitLevel6Speed:            equ 7

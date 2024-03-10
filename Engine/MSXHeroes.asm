@@ -1846,5 +1846,59 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $c9
+;
+SpritesWeaponsBlock:  equ   $c9
+phase	$4000
+SpriteCharKingMori:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tgs.gen"
+SpriteColKingMori:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tcs.gen"
+SpriteCharBubbleBobble:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tgs.gen"
+SpriteColBubbleBobble:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tcs.gen"
+SpriteCharAxeMan:
+  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tgs.gen"
+SpriteColAxeMan:
+  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tcs.gen"
+SpriteCharGeneralBullet1:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tgs.gen"
+SpriteColGeneralBullet1:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tcs.gen"
+SpriteCharContraBullet:
+  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tgs.gen"
+SpriteColContraBullet:
+  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tcs.gen"
+SpriteCharGrenadier:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tgs.gen"
+SpriteColGrenadier:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tcs.gen"
+SpriteCharHandGrenade:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tgs.gen"
+SpriteColHandGrenade:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tcs.gen"
+SpriteCharVanguard:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tgs.gen"
+SpriteColVanguard:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tcs.gen"
+SpriteCharLanFang:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tgs.gen"
+SpriteColLanFang:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tcs.gen"
+SpriteCharHanChen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tgs.gen"
+SpriteColHanChen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tcs.gen"
+SpriteCharLiYen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tgs.gen"
+SpriteColLiYen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tcs.gen"
+
+
+	ds		$8000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght
