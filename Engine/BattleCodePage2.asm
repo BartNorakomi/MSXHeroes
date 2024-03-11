@@ -1230,9 +1230,10 @@ HandleProjectileSprite:
   
   ;set starting coordinates
   call  SetCurrentActiveMOnsterInIX
+  call  .SetCharacterAndColor         ;out: b=y offset
+
   ld    a,(ix+MonsterY)
-  add   a,(ix+MonsterNY)
-  sub   a,16
+  add   a,b
   ld    (spat+4*16),a
   ld    (spat+4*17),a
   ld    (spat+4*18),a
@@ -1437,10 +1438,10 @@ HandleProjectileSprite:
 	ld		($6000),a                       ;set battle code block for explosion and projectile routines
   ret
 
-
   .SetCharacterAndColor:
   ld    a,(ix+MonsterNumber)
   cp    007
+  ld    b,08                            ;y offset
   jp    z,.Bobblun
   cp    008
   jp    z,.Bubblun
@@ -1449,34 +1450,44 @@ HandleProjectileSprite:
   cp    035
   jp    z,.GeneralBullet1               ;Octo (Dragon Slayer IV)
   cp    036
+  ld    b,12                            ;y offset
   jp    z,.ContraBullet                 ;Sarge green (Contra)
   cp    037
+  ld    b,06                            ;y offset
   jp    z,.ContraBullet                 ;Lieutenant red (Contra)
   cp    039
+  ld    b,04                            ;y offset
   jp    z,.HandGrenade                  ;Grenadier (Contra)
   cp    040
+  ld    b,10                            ;y offset
   jp    z,.ContraBullet                 ;Sniper (Contra)
   cp    043
+  ld    b,22                            ;y offset
   jp    z,.ContraBullet                 ;Infiltrant (Contra)
   cp    047
+  ld    b,12                            ;y offset
   jp    z,.Grenadier                    ;Turret (Contra)
   cp    049
   jp    z,.Vanguard                     ;Vanguard (Usas)
   cp    069
   jp    z,.GeneralBullet1               ;Spitvine (Psycho World)
   cp    092
+  ld    b,08                            ;y offset
   jp    z,.ContraBullet                 ;Trooper (Metal Gear)
   cp    093
   jp    z,.ContraBullet                 ;Antigas Man (Metal Gear)
   cp    094
   jp    z,.ContraBullet                 ;Footman (Metal Gear)
   cp    104
+  ld    b,16                            ;y offset
   jp    z,.LanFang                      ;Lan Fang (fan thrower) (yie ar kung fu)
   cp    109
+  ld    b,10                            ;y offset
   jp    z,.HanChen                      ;Han Chen (bomb thrower) (yie ar kung fu)
   cp    110
   jp    z,.LiYen                        ;Li Yen (final boss) (yie ar kung fu)
   cp    112
+  ld    b,06                            ;y offset
   jp    z,.KingMori
   cp    113
   jp    z,.KnightYama
@@ -1491,8 +1502,10 @@ HandleProjectileSprite:
   cp    129
   jp    z,.Screech
   cp    144
+  ld    b,22                            ;y offset
   jp    z,.PastryChef
   cp    149
+  ld    b,06                            ;y offset
   jp    z,.VicViper
   cp    153
   jp    z,.Andorogynus
@@ -1503,6 +1516,7 @@ HandleProjectileSprite:
   cp    168
   jp    z,.NinjaKun
   cp    183
+  ld    b,14                            ;y offset
   jp    z,.GeneralBullet1               ;Sun Wukong (chuka taisen) (main character)
   ret
 
@@ -1769,7 +1783,7 @@ HandleProjectileSprite:
 
   .GeneralBullet1:
   ld    hl,SpriteCharGeneralBullet1 + 0*96
-  ld    de,SpriteCharGeneralBullet1 + 0*48
+  ld    de,SpriteColGeneralBullet1 + 0*48
   ret
 
   .AxeMan:
@@ -1794,12 +1808,12 @@ HandleProjectileSprite:
 
   .Bubblun:
   ld    hl,SpriteCharBubbleBobble + 0*96
-  ld    de,SpriteCharBubbleBobble + 0*48
+  ld    de,SpriteColBubbleBobble + 0*48
   ret
 
   .Bobblun:
   ld    hl,SpriteCharBubbleBobble + 1*96
-  ld    de,SpriteCharBubbleBobble + 1*48
+  ld    de,SpriteColBubbleBobble + 1*48
   ret
 
   .InvertFrameCounterWhenOnTheRightSide:

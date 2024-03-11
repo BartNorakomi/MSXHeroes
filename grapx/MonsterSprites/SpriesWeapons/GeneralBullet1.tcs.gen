@@ -3,14 +3,14 @@
   db 255
   db 255
   db 13
-  db 11
-  db 10
-  db 10
-  db 10
-  db 10
-  db 10
-  db 11
-  db 11
+  db 9
+  db 9
+  db 9
+  db 9
+  db 9
+  db 9
+  db 9
+  db 9
   db 13
   db 255
   db 255

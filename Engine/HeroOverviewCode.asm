@@ -7,6 +7,8 @@
 ;  call  HeroOverviewInventoryWindowCode
 ;  call  HeroOverviewArmyWindowCode
 ;  call  HeroOverviewStatusWindowCode
+;  call  DisplayEnemyHeroStatsWindowCode
+
 
 HeroOverViewFirstWindowchoicesSX:   equ 000
 HeroOverViewFirstWindowchoicesSY:   equ 000
@@ -2733,8 +2735,8 @@ SpellDescriptions:
                           db  "friendly unit by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates     HP of killed living",254
-                          db  "friendly creatures.",255
+                          db  "Revives a segment of deceased",254
+                          db  "friendly living creatures.",255
 
 .DescriptionEarth1:       db  "Earthshock",254
                           db  "Deals damage to all creatures in target",254
@@ -2775,8 +2777,8 @@ SpellDescriptions:
 
 
 .Descriptionwater4:       db  "Cure",254
-                          db  "Removes all negative spell effects",254
-                          db  "and heals for     HP.",255
+                          db  "Dissipates all harmful spell effects",254
+                          db  "while restoring a set amount of HP.",255
 
 .Descriptionwater3:       db  "Ice Peak",254
                           db  "Conjures an ice shard from the ground,",254
@@ -2818,7 +2820,7 @@ SetSpellExplanation_Water:
   call  .GoSetText
   call  .SetSpellIcon
   call  .SetCost
-  call  .SetDamage
+;  call  .SetDamage
   ret
 
   .SetDamage:
@@ -2958,7 +2960,7 @@ SetSpellExplanation_Air:
   call  .GoSetText
   call  .SetSpellIcon
   call  .SetCost
-  call  .SetDamage
+;  call  .SetDamage
   ret
 
   .SetDamage:
@@ -3116,7 +3118,7 @@ SetSpellExplanation_Fire:
   call  .GoSetText
   call  .SetSpellIcon
   call  .SetCost
-  call  .SetDamage
+;  call  .SetDamage
   ret
 
   .SetDamage:
@@ -3259,6 +3261,7 @@ DamageAmountFound:
   ld    a,b
   or    a
   ret   z
+
   ld    b,HeroOverViewSpellBookWindowDX + 168
   ld    c,HeroOverViewSpellBookWindowDY + 173
   push  iy
@@ -3291,6 +3294,29 @@ CostAmountFound:
   jp    SetText
   .TextCost: db  "Cost:",255
 
+;GetMagicArrowDMGAmount2:
+;  call  GetSpellPowerForCurrentActiveHero2 ;out: hl=spell power
+;  ld    de,10
+;  call  MultiplyHlWithDE                ;Out: HL = result
+;  ld    de,10
+;  add   hl,de
+
+;  ld    b,l
+;  jp    DamageAmountFound
+
+;GetSpellPowerForCurrentActiveHero2:
+  ;get total spell damage for this hero
+;  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+;  ld    de,ItemSpellDamagePointsTable
+;  ld    hl,SetAdditionalStatFromInventoryItemsInHL.IxAlreadySet      
+;  push  ix
+;  call  EnterSpecificRoutineInCastleOverviewCodeWithoutAlteringRegisters
+;  pop   ix
+;  ld    e,(ix+HeroStatSpelldamage)
+;  ld    d,0
+;  add   hl,de
+;  ret
+
 SetSpellExplanation_Earth:              ;when clicking on a skill, the explanation will appear, the icon will appear and the damage and cost will appear
   ld    a,(SetSkillsDescription?)
   dec   a
@@ -3300,7 +3326,7 @@ SetSpellExplanation_Earth:              ;when clicking on a skill, the explanati
   call  .GoSetText
   call  .SetSpellIcon
   call  .SetCost
-  call  .SetDamage
+;  call  .SetDamage
   ret
 
   .SetDamage:
@@ -4672,4 +4698,4 @@ SetHeroOverViewArmyWindow:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
-
+kut:

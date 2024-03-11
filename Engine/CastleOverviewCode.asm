@@ -4838,9 +4838,12 @@ DisplayQuickTipsCode:
   call  SetQuickTipsButtons
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+  ld    a,r
+  push  af                              ;store random number for quicktips
   call  SetQuickTipsText
   call  SwapAndSetPage                  ;swap and set page
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+  pop   af                              ;recall random number for quicktips
   call  SetQuickTipsText
 
   .engine:  
@@ -4912,51 +4915,40 @@ DisplayQuickTipsCode:
 TextDidYouKnow:       db "Did you know ?",255
 TextShowTipsAtStart:  db "Show tips at start of turn ?",255
 
-TextQuickTip1:  db "As the kingdom's network of",254
-                db "marketplaces in towns expands,",254
-                db "the scales of fortune tilt",254
-                db "increasingly in favor of the",254
-                db "player, unveiling a more",254
-                db "exquisite advantage.",255
+ListOfQuickTips: 
+  dw TextQuickTip1 ,TextQuickTip2 ,TextQuickTip3 ,TextQuickTip4 ,TextQuickTip5 ,TextQuickTip6 ,TextQuickTip7 ,TextQuickTip8 ,TextQuickTip9 ,TextQuickTip10
+  dw TextQuickTip11,TextQuickTip12,TextQuickTip13,TextQuickTip14,TextQuickTip15,TextQuickTip16,TextQuickTip17,TextQuickTip18,TextQuickTip19,TextQuickTip20
+  dw TextQuickTip21,TextQuickTip22,TextQuickTip23,TextQuickTip24,TextQuickTip25,TextQuickTip26,TextQuickTip27,TextQuickTip28,TextQuickTip29,TextQuickTip30
+  dw TextQuickTip31,TextQuickTip32,TextQuickTip33,TextQuickTip34
+  
 
-TextQuickTip2:  db "Press and hold the Shift key to",254
-                db "double the pointer's speed,",254
-                db "and hold the Ctrl key to scroll",254
-                db "directly through the map.",255
-
-TextQuickTip3:  db "Pressing the right mouse button",254
-                db "or 'm' on your keyboard lets you",254
-                db "close the window you're",254
-                db "in or exit the castle screen.",255
-
-TextQuickTip4:  
-                db "When a hero retreats from",254
-                db "battle, they halt their",254
-                db "contribution of experience to the",254
-                db "enemy. Be assured, they shall",254
-                db "soon embark on a graceful",254
-                db "journey back to your tavern.",255
 
 SetQuickTipsText:
 ;  call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
+  push  af                              ;random number
 
   ld    b,069+00                        ;dx
   ld    c,053+00                        ;dy
   ld    hl,TextDidYouKnow
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    a,(framecounter)
-  and   3
-  ld    hl,TextQuickTip1
-  jr    z,.setQuickTip
-  dec   a
-  ld    hl,TextQuickTip2
-  jr    z,.setQuickTip
-  dec   a
-  ld    hl,TextQuickTip3
-  jr    z,.setQuickTip
-  ld    hl,TextQuickTip4
-  .setQuickTip:
+  ld    a,QuickTipsBlock                ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+
+  pop   af                              ;random number
+  ld    b,0
+  ld    c,a
+  ld    de,34                           ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  add   hl,hl
+  ld    de,ListOfQuickTips
+  add   hl,de
+  ld    e,(hl)
+  inc   hl
+  ld    d,(hl)
+  ex    de,hl
+
+;ld hl,TextQuickTip34
 
   ld    b,038+00                        ;dx
   ld    c,064+00                        ;dy
@@ -4966,6 +4958,9 @@ SetQuickTipsText:
   ld    c,115+00                        ;dy
   ld    hl,TextShowTipsAtStart  
   call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,CastleOverviewCodeBlock       ;Map block
+  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
   ret
 
 SetQuickTipsButtons:
@@ -10573,71 +10568,65 @@ CastleOverviewMagicGuildCode:
 SpellDescriptionsMagicGuild:
 
 .DescriptionEarth4:       db  "Earthbound",254
-                          db  "Reduces the speed of the selected",254
-                          db  "enemy unit by 50%",255
+                          db  "Applies a 50% movement speed debuff to the selected",254
+                          db  "enemy unit.",255
 
 .DescriptionEarth3:       db  "Plate Armor",254
-                          db  "Increases the defense of the selected",254
-                          db  "friendly unit by 5.",255
+                          db  "Increases the defense of the selected friendly unit",254
+                          db  "by 5.",255
 
 .DescriptionEarth2:       db  "Resurrection",254
-                          db  "Reanimates     HP of killed living",254
-                          db  "friendly creatures.",255
+                          db  "Revives a segment of deceased friendly living",254
+                          db  "creatures.",255
 
 .DescriptionEarth1:       db  "Earthshock",254
-                          db  "Deals damage to all creatures in target",254
-                          db  "and adjacent hexes.",255
+                          db  "Deals damage to all creatures in target and adjacent",254
+                          db  "hexes.",255
 
 
 .DescriptionFire4:        db  "Curse",254
-                          db  "Causes the selected enemy unit to deal",254
-                          db  "-3 damage when attacking.",255
+                          db  "Causes the selected enemy unit to deal -3 damage",254
+                          db  "when attacking.",255
 
 .DescriptionFire3:        db  "Blinding Fog",254
-                          db  "Target ranged unit deals 50% less",254
-                          db  "damage.",255
+                          db  "Target ranged unit deals 50% less damage.",255
 
 .DescriptionFire2:        db  "Implosion",254
-                          db  "Deals damage to enemy unit and",254
-                          db  "adjecent units.",255
+                          db  "Deals damage to enemy unit and adjecent units.",255
 
 .DescriptionFire1:        db  "Sunstrike",254
-                          db  "Calls down a solar beam to incinerate",254
-                          db  "a single enemy unit.",255
+                          db  "Calls down a solar beam to incinerate a single enemy",254
+                          db  "unit.",255
 
 .Descriptionair4:         db  "Haste",254
-                          db  "Increases the speed of the selected",254
-                          db  "friendly unit by 3.",255
+                          db  "Increases the speed of the selected friendly unit by 3.",255
 
 .Descriptionair3:         db  "Shieldbreaker",254
-                          db  "Reduces the defense of the selected ",254
-                          db  "enemy unit by 4.",255
+                          db  "Reduces the defense of the selected enemy unit by 4.",255
 
 .Descriptionair2:         db  "Claw Back",254
-                          db  "Target allied unit has unlimited",254
-                          db  "retaliations each round.",255
+                          db  "Target allied unit has unlimited retaliations each round.",255
 
 .Descriptionair1:         db  "Spell Bubble",254
-                          db  "Target friendly unit has a 75% chance",254
-                          db  "to deflect a single enemy spell.",255
+                          db  "Target friendly unit has a 75% chance to deflect a",254
+                          db  "single enemy spell.",255
 
 
 .Descriptionwater4:       db  "Cure",254
-                          db  "Removes all negative spell effects",254
-                          db  "and heals for     HP.",255
+                          db  "Dissipates all harmful spell effects while restoring a set",254
+                          db  "amount of HP.",255
 
 .Descriptionwater3:       db  "Ice Peak",254
-                          db  "Conjures an ice shard from the ground,",254
-                          db  "impaling a single enemy.",255
+                          db  "Conjures an ice shard from the ground, impaling a",254
+                          db  "single enemy.",255
 
 .Descriptionwater2:       db  "Hypnosis",254
-                          db  "Enemy unit cant attack until attacked,",254
-                          db  "dispelled or effect wears off.",255
+                          db  "Enemy unit cant attack until attacked, dispelled or",254
+                          db  "effect wears off.",255
 
 
 .Descriptionwater1:       db  "Frost Ring",254
-                          db  "Causes damage to all units adjacent to",254
-                          db  "the central hex.",255
+                          db  "Causes damage to all units adjacent to the central hex.",255
 
 
 SetGenericButtons:                      ;put button in mirror page below screen, then copy that button to the same page at it's coordinates

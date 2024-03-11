@@ -662,7 +662,6 @@ dephase
 HeroOverviewCodeBlock:  equ   $1c
 HeroOverviewFontBlock:  equ   $1c
 phase	$4000
-  incbin "..\grapx\HeroOverview\font.SC5",7,7 * 128      ;5 lines
   include "HeroOverviewCode.asm"
 	ds		$8000-$,$ff
 dephase
@@ -1859,6 +1858,12 @@ SpriteCharBubbleBobble:
   include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tgs.gen"
 SpriteColBubbleBobble:
   include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tcs.gen"
+
+;SpriteCharBubblun:
+;  incbin "..\grapx\MonsterSprites\SpriesWeapons\sprconv FOR SINGLE SPRITES\Bubblun.spr",0,32*3
+;SpriteColBubblun:
+;  incbin "..\grapx\MonsterSprites\SpriesWeapons\sprconv FOR SINGLE SPRITES\Bubblun.spr",32*3,16*3
+
 SpriteCharAxeMan:
   include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tgs.gen"
 SpriteColAxeMan:
@@ -1936,6 +1941,15 @@ SpriteCharNinjaKun:
 SpriteColNinjaKun:
   include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tcs.gen"
 	ds		$8000-$,$ff
+dephase
+
+;
+; block $ca
+;
+phase	$8000
+QuickTipsBlock:  equ   $ca
+  include "QuickTips.asm"
+	ds		$c000-$,$ff
 dephase
 
 totallenght:	Equ	$-MSXHeroes

@@ -2,7 +2,7 @@ phase	$c000
 
 StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
-DisplayNumbers1to6?:      equ 0
+DisplayNumbers1to6?:      equ 1
 StartAtTitleScreen?:      equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
@@ -18,10 +18,10 @@ InitiateGame:
   call  ExecuteLoaderRoutine            ;check if there is a mouse present
 
 
-ld a,(pl1hero1y+HeroUnits)
-ld (pl2hero1y+HeroUnits),a
-ld a,(pl1hero1y+HeroUnits+3)
-ld (pl2hero1y+HeroUnits+3),a
+;ld a,(pl1hero1y+HeroUnits)
+;ld (pl2hero1y+HeroUnits),a
+;ld a,(pl1hero1y+HeroUnits+3)
+;ld (pl2hero1y+HeroUnits+3),a
 
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
@@ -38,7 +38,7 @@ ld (pl2hero1y+HeroUnits+3),a
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
   if  StartAtTitleScreen?
   call  TitleScreen
@@ -82,12 +82,8 @@ StartGame:
 ;ld a,2
 ;ld (Castle1+CastlePlayer),a
 
-
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
-
-
-
 
 ShortestPathTileHandlerQueue:
   ds  2*144,0
@@ -3014,26 +3010,26 @@ LoadHud:
 
 CopyMovementArrows1:
 	db		10,0,13,0
-	db		20,0,222,0
-	db		0,1,10,0
+	db		96,0,222,0
+	db		160,0,10,0
 	db		0,0,$d0
 
 CopyMovementArrows2:
 	db		10,0,23,0
-	db		20,0,246,0
-	db		0,1,10,0
+	db		96,0,246,0
+	db		160,0,10,0
 	db		0,0,$d0
 
 CopyMovementBlackArrows1:
 	db		10,0,33,0
-	db		20,0,222,1
-	db		0,1,10,0
+	db		96,0,222,1
+	db		160,0,10,0
 	db		0,0,$d0
 
 CopyMovementBlackArrows2:
 	db		10,0,43,0
-	db		20,0,246,1
-	db		0,1,10,0
+	db		96,0,246,1
+	db		160,0,10,0
 	db		0,0,$d0
 
 

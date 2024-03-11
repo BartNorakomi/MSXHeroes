@@ -3438,23 +3438,23 @@ FindArrowDirection:
   .ArrowDownConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c  
   bit   7,c
-  ld    a,13*10 + 10    ;we are going down now, and the next step is down and left
+  ld    a,13*10 + 86    ;we are going down now, and the next step is down and left
   ret   nz
   bit   0,c
-  ld    a,12*10 + 10    ;we are going down now, and the next step is down and right
+  ld    a,12*10 + 86    ;we are going down now, and the next step is down and right
   ret   nz
-  ld    a,5*10 + 10
+  ld    a,5*10 + 86
   ret
 
   .ArrowUpConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c  
   bit   7,c
-  ld    a,15*10 + 10    ;we are going up now, and the next step is up and left
+  ld    a,15*10 + 86    ;we are going up now, and the next step is up and left
   ret   nz
   bit   0,c
-  ld    a,10*10 + 10    ;we are going up now, and the next step is up and right
+  ld    a,10*10 + 86    ;we are going up now, and the next step is up and right
   ret   nz
-  ld    a,1*10 + 10
+  ld    a,1*10 + 86
   ret
 
   .ArrowRight:
@@ -3467,41 +3467,41 @@ FindArrowDirection:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c
 	ld		a,c
 	or		b
-  ld    a,4*10 + 10
+  ld    a,4*10 + 86
   ret   z
   bit   0,b
-  ld    a,03*10 + 10    ;we are going right down now, and the next step is right
+  ld    a,03*10 + 86    ;we are going right down now, and the next step is right
   ret   z
   bit   0,c
-  ld    a,05*10 + 10    ;we are going right down now, and the next step is down
+  ld    a,05*10 + 86    ;we are going right down now, and the next step is down
   ret   z
-  ld    a,4*10 + 10
+  ld    a,4*10 + 86
   ret
 
   .ArrowRightUpConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c
 	ld		a,c
 	or		b
-  ld    a,2*10 + 10
+  ld    a,2*10 + 86
   ret   z
   bit   7,b
-  ld    a,03*10 + 10    ;we are going right up now, and the next step is right
+  ld    a,03*10 + 86    ;we are going right up now, and the next step is right
   ret   z
   bit   0,c
-  ld    a,01*10 + 10    ;we are going right up now, and the next step is up
+  ld    a,01*10 + 86    ;we are going right up now, and the next step is up
   ret   z
-  ld    a,2*10 + 10
+  ld    a,2*10 + 86
   ret
   
   .ArrowRightConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c  
   bit   7,b
-  ld    a,09*10 + 10    ;we are going right now, and the next step is right and up
+  ld    a,09*10 + 86    ;we are going right now, and the next step is right and up
   ret   nz
   bit   0,b
-  ld    a,11*10 + 10    ;we are going right now, and the next step is right and down
+  ld    a,11*10 + 86    ;we are going right now, and the next step is right and down
   ret   nz
-  ld    a,3*10 + 10
+  ld    a,3*10 + 86
   ret
 
   .ArrowLeft:
@@ -3514,41 +3514,41 @@ FindArrowDirection:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c
 	ld		a,c
 	or		b
-  ld    a,6*10 + 10
+  ld    a,6*10 + 86
   ret   z
   bit   0,b
-  ld    a,07*10 + 10    ;we are going left down now, and the next step is left
+  ld    a,07*10 + 86    ;we are going left down now, and the next step is left
   ret   z
   bit   7,c
-  ld    a,05*10 + 10    ;we are going left down now, and the next step is down
+  ld    a,05*10 + 86    ;we are going left down now, and the next step is down
   ret   z
-  ld    a,6*10 + 10
+  ld    a,6*10 + 86
   ret
 
   .ArrowLeftUpConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c
 	ld		a,c
 	or		b
-  ld    a,8*10 + 10
+  ld    a,8*10 + 86
   ret   z
   bit   7,b
-  ld    a,07*10 + 10    ;we are going left up now, and the next step is left
+  ld    a,07*10 + 86    ;we are going left up now, and the next step is left
   ret   z
   bit   7,c
-  ld    a,01*10 + 10    ;we are going left up now, and the next step is up
+  ld    a,01*10 + 86    ;we are going left up now, and the next step is up
   ret   z
-  ld    a,8*10 + 10
+  ld    a,8*10 + 86
   ret
 
   .ArrowLeftConfirmed:
   call  .CheckNextStep  ;puts next step's dy,dx in b,c  
   bit   7,b
-  ld    a,16*10 + 10    ;we are going left now, and the next step is left and up
+  ld    a,16*10 + 86    ;we are going left now, and the next step is left and up
   ret   nz
   bit   0,b
-  ld    a,14*10 + 10    ;we are going left now, and the next step is left and down
+  ld    a,14*10 + 86    ;we are going left now, and the next step is left and down
   ret   nz
-  ld    a,7*10 + 10
+  ld    a,7*10 + 86
   ret
 
   .CheckNextStep:
@@ -6152,7 +6152,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db 109 | dw CastleVaniaUnitLevel1Growth |      db 109 | dw CastleVaniaUnitLevel1Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 008 | dw CastleVaniaUnitLevel1Growth |      db 048 | dw CastleVaniaUnitLevel1Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6169,7 +6169,7 @@ Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  044,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrasle3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 

@@ -1,10 +1,4 @@
-hardware sprite monster ranged weapons
 add item abilities like: x% less damage from spells, +5% chance to block spells etc...
-units with 0 movement speed
-quicktips
-reload arrow graphics after displaying a message on worldmap
-stuff like resurrection in spell book says:"resurrects     hp"
-
 
 battle:
 options menu: 
