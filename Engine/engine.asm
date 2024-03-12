@@ -6147,7 +6147,7 @@ pl1hero1y:		db	3
 pl1hero1x:		db	3
 pl1hero1xp: dw 0 ;65000 ;3000 ;999
 pl1hero1move:	db	20,20
-pl1hero1mana:	dw	10,10
+pl1hero1mana:	dw	50,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
@@ -6156,20 +6156,20 @@ Pl1Hero1Units:  db 008 | dw CastleVaniaUnitLevel1Growth |      db 048 | dw Castl
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
-Pl1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
 ;.HeroSkills:  db  25,18,3,33,9,0
 .HeroSkills:  db  22,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0000
-.AirSpells:         db  %0000 0000
-.WaterSpells:       db  %0000 0000
-.AllSchoolsSpells:  db  %0000 0000
+.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1111
+.AirSpells:         db  %0000 1111
+.WaterSpells:       db  %0000 1111
+.AllSchoolsSpells:  db  %0000 1111
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,036,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrasle3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -6355,7 +6355,7 @@ pl2hero1x:		db	6
 ;pl2hero1x:		db	100
 pl2hero1xp: dw 0000
 pl2hero1move:	db	20,20
-pl2hero1mana:	dw	10,10
+pl2hero1mana:	dw	50,10
 pl2hero1manarec:db	5		                ;recover x mana every turn
 pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
@@ -6365,15 +6365,15 @@ Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth 
 .HeroStatDefense:  db 1
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  1,0,0,0,0,0
+.HeroSkills:  db  11,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0000
-.AirSpells:         db  %0000 0000
-.WaterSpells:       db  %0000 0000
-.AllSchoolsSpells:  db  %0000 0000
+.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1111
+.AirSpells:         db  %0000 1111
+.WaterSpells:       db  %0000 1111
+.AllSchoolsSpells:  db  %0000 1111
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
+.Inventory: db  045,008,012,016,021,026,034,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
 .HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -6568,11 +6568,11 @@ player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
-amountofplayers:		db	3
-player1human?:			db	2 ;0=CPU, 1=Human, 2=OFF
+amountofplayers:		db	2
+player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
 player2human?:			db	1
 player3human?:			db	1
-player4human?:			db	0
+player4human?:			db	1
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	

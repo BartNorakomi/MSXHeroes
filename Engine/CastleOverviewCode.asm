@@ -2143,10 +2143,10 @@ ItemDefencePointsTable:
   db    YojumboTheRoninDefence ;(4)
   db    CeasarsChestplateDefence ;(5)
 ;shield (10)
-  db    0
+  db    GreenLeafShieldDefence ;(1)
   db    WoodenShieldDefence ;(2)
   db    TheBramStokerDefence ;(3)
-  db    0
+  db    ImpenetrableShieldDefence ;(4)
   db    TrainingShieldDefence ;(5)
 ;helmet (15)
   db    YattaShiNeDefence ;(1)

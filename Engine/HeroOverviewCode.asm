@@ -1467,7 +1467,7 @@ DescriptionArmor3:        db  "The Juggernaut",254 | TheJuggernautDefence: equ 4
                           ;item 008
 DescriptionArmor4:        db  "Yojimbo the Ronin",254 | YojumboTheRoninDefence: equ 4
                           db  "Defense +4",254
-                          db  "-25% damage from fire",255
+                          db  "-2.5% enemy spell damage",255
 
                           ;item 009
 DescriptionArmor5:        db  "Caesar's Chestplate",254 | CeasarsChestplateDefence: equ 5 | CaesarsChestplateUnitHp: equ 2
@@ -1475,9 +1475,8 @@ DescriptionArmor5:        db  "Caesar's Chestplate",254 | CeasarsChestplateDefen
                           db  "Max hp units +2",255
 
                           ;item 010
-DescriptionShield1:        db  "Greenleaf Shield",254
-                          db  "50% less damage from",254
-                          db  "ranged units",255
+DescriptionShield1:        db  "Greenleaf Shield",254 | GreenleafShieldDefence: equ 1
+                          db  "Defense +1",255
 
                           ;item 011
 DescriptionShield2:        db  "Wooden shield",254 | WoodenShieldDefence: equ 2
@@ -1485,13 +1484,13 @@ DescriptionShield2:        db  "Wooden shield",254 | WoodenShieldDefence: equ 2
 
                           ;item 012
                           db  "Defense +3",254
-DescriptionShield3:        db  "The bram stoker",254 | TheBramStokerDefence: equ 3
-                          db  "-25% damage from earth",255
+DescriptionShield3:        db  "The bram stoker",254 | TheBramStokerDefence: equ 2
+                          db  "Defense +2",255
+                          db  "-5% enemy spell damage",255
 
                           ;item 013
-DescriptionShield4:        db  "Impenetrable shield",254
-                          db  "+10% chance to block any",254
-                          db  "enemy spell cast",255
+DescriptionShield4:        db  "Impenetrable shield",254 | ImpenetrableShieldDefence: equ 4
+                          db  "Defense +4",255
 
                           ;item 014
 DescriptionShield5:        db  "Training shield",254 | TrainingShieldDefence: equ 5
@@ -1505,7 +1504,7 @@ DescriptionHelmet1:        db  "Yatta Shi-ne",254 | YattaShiNeDefence: equ 1 | Y
                           ;item 016
 DescriptionHelmet2:        db  "Fire hood",254
                           db  "Spell power +2",254 | FireHoodSpellDamage: equ 2
-                          db  "+10% fire spell damage",255
+                          db  "+2.5% spell damage",255
 
                           ;item 017
 DescriptionHelmet3:        db  "Cerebro",254
@@ -1521,15 +1520,13 @@ DescriptionHelmet5:        db  "Pikemen's Helmet",254 | PikemensHelmetDefence: e
                           db  "Defense +5",254
                           db  "Unit movement speed +1",255
 
-
                           ;item 020
 DescriptionBoots1:        db  "Shadow Tramper",254 | ShadowTramperUnitSpeed: equ 1
                           db  "Unit movement speed +1",255
 
                           ;item 021
 DescriptionBoots2:        db  "Dusk Rover",254
-                          db  "No terrain penalty",254
-                          db  "for hero on worldmap",255
+                          db  "-2.5% enemy spell damage",255
 
                           ;item 022
 DescriptionBoots3:        db  "Planeswalkers",254
@@ -1538,7 +1535,7 @@ DescriptionBoots3:        db  "Planeswalkers",254
 
                           ;item 023
 DescriptionBoots4:        db  "Knight's Night Slippers",254
-                          db  "-25% damage from water",255
+                          db  "-7.5% enemy spell damage",255
 
                           ;item 024
 DescriptionBoots5:        db  "Sturdy Boots",254 | SturdyBootsUnitSpeed: equ 3
@@ -1551,7 +1548,7 @@ DescriptionGloves1:        db  "Gripfast",254
 
                           ;item 026
 DescriptionGloves2:        db  "Iron Hand",254 | IronHandUnitSpeed: equ -1
-                          db  "-30% damage from air",254
+                          db  "-2.5% enemy spell damage",254
                           db  "Unit movement speed -1",255
 
                           ;item 027
@@ -1561,8 +1558,7 @@ DescriptionGloves3:        db  "Elk Skin Gloves",254 | ElkSkinGlovesUnitHp: equ 
 
                           ;item 028
 DescriptionGloves4:        db  "Venomous gauntlet",254
-                          db  "Melee Attacks deal",254
-                          db  "poison damage '20 dpt'",255
+                          db  "+7.5% spell damage",255
 
                           ;item 029
 DescriptionGloves5:        db  "Emerald Gloves",254 | EmeraldGlovesIntelligence: equ 5
@@ -1583,20 +1579,19 @@ DescriptionRing3:        db  "Scarlet Ring",254 | ScarletRingAttack: equ 1 | Sca
 
                           ;item 033
 DescriptionRing4:        db  "Bronze Ring",254
-                          db  "+20% earth spell damage",255
+                          db  "-7.5% enemy spell damage",255
 
                           ;item 034
 DescriptionRing5:        db  "Hypnotising Ring",254
-                          db  "+25% water spell damage",255
+                          db  "-10% enemy spell damage",255
 
                           ;item 035
 DescriptionNecklace1:        db  "The Blue Topaz",254
-                          db  "-25% damage from water",255
+                          db  "-2.5% enemy spell damage",255
 
                           ;item 036
 DescriptionNecklace2:        db  "Good Luck Charm",254
-                          db  "+5% chance to block any",254
-                          db  "enemy spell cast",255
+                          db  "+5% spell damage",255
 
                           ;item 037
 DescriptionNecklace3:        db  "Negligee of Teeth",254 | NegligeeOfTeethIntelligence: equ 1 | NegligeeOfTeethSpellPower: equ 2
@@ -1619,7 +1614,7 @@ DescriptionRobe1:        db  "The King's Garment",254
 
                           ;item 041
 DescriptionRobe2:        db  "Priest's Cope",254 | PriestsCopeIntelligence: equ 2  
-                          db  "+10% air spell damage",254
+                          db  "-2.5% enemy spell damage",254
                           db  "Intelligence +2",255
 
                           ;item 042
@@ -4512,18 +4507,18 @@ SkillArmourerExpert:
 SkillResistanceBasic:
                           db  "Basic Resistance                 ",255   ;skillnr# 010
                           db  "Basic Resistance                 ",254
-                          db  "Your units have a 5% chance to   ",254
-                          db  "deflect incoming spells.         ",255
+                          db  "Grants your units a 10% chance to",254
+                          db  "block individual targeted spells ",255
 SkillResistanceAdvanced:
                           db  "Advanced Resistance              ",255
                           db  "Advanced Resistance              ",254
-                          db  "Your units have a 10% chance to  ",254
-                          db  "deflect incoming spells.         ",255
+                          db  "Grants your units a 15% chance to",254
+                          db  "block individual targeted spells ",255
 SkillResistanceExpert:
                           db  "Expert Resistance                ",255
                           db  "Expert Resistance                ",254
-                          db  "Your units have a 15% chance to  ",254
-                          db  "deflect incoming spells.         ",255
+                          db  "Grants your units a 20% chance to",254
+                          db  "block individual targeted spells ",255
 
 
 
@@ -4698,4 +4693,3 @@ SetHeroOverViewArmyWindow:
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
-kut:

@@ -4819,3 +4819,246 @@ GoAnimateSpell:
   push  ix
   pop   hl
   jp    docopy
+
+CheckResistanceSkill:                   ;out: zero flag=deflect spell
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+  ld    ix,(HeroThatGetsAttacked)       ;000=no hero, hero that gets attacked
+  jr    c,.HeroThatGetsSpellCastOnFound
+  ld    ix,(plxcurrentheroAddress)
+  .HeroThatGetsSpellCastOnFound:
+
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jr    z,.NeutralEnemy                 ;we don't need to check for resistance with a neutral enemy
+  
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillResistance
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillResistance
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillResistance
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillResistance
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillResistance
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillResistance
+  ret
+
+  .NeutralEnemy:                        ;spell does not get deflected, make sure zero flag is NOT set
+  inc   a                               ;NOT zero
+  ret
+  
+  .CheckSkillResistance:
+  cp    10                              ;Basic Resistance  (units have 5% chance to deflect spells)  
+  jr    z,.BasicResistanceFound
+  cp    11                              ;Advanced Resistance  (units have 10% chance to deflect spells)  
+  jr    z,.AdvancedResistanceFound
+  cp    12                              ;Expert Resistance  (units have 15% chance to deflect spells)  
+  jr    z,.ExpertResistanceFound
+  ret
+
+  .BasicResistanceFound:
+  pop   af                              ;no need to check the other skills
+
+  ;we divide a random number by 10 and check for rest=0 to get a 10% chance
+  ld    a,r
+  ld    b,0
+  ld    c,a
+  ld    de,10
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,l
+  or    a  
+  ret
+
+  .AdvancedResistanceFound:
+  pop   af                              ;no need to check the other skills
+
+  ;we divide a random number by 6 and check for rest=0 to get a 16.6% chance
+  ld    a,r
+  ld    b,0
+  ld    c,a
+  ld    de,6
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,l
+  or    a  
+  ret
+
+  .ExpertResistanceFound:
+  pop   af                              ;no need to check the other skills
+
+  ;we divide a random number by 5 and check for rest=0 to get a 20% chance
+  ld    a,r
+  ld    b,0
+  ld    c,a
+  ld    de,5
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  ld    a,l
+  or    a  
+  ret
+
+AddPositiveSpellDamageFromItemsForActiveHero:
+  push  hl                              ;spell damage
+
+  call  SetCurrentActiveMOnsterInIX
+  
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  jr    .HeroFound
+  .HeroFound:
+
+  pop   hl                              ;spell damage
+
+  call  .CheckItem16                    ;Helmet: Fire hood (+2.5% spell damage)
+  call  .CheckItem28                    ;Gloves: Venomous gauntlet (+7.5% spell damage)
+  call  .CheckItem36                    ;Neclace: Good Luck Charm (+5% spell damage)
+  ret
+
+  .CheckItem16:                         ;Helmet: Fire hood (+2.5% spell damage)
+  ld    a,(ix+HeroInventory+3)          ;Helmet
+  cp    016
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    ApplyPercentBasedBoost
+
+  .CheckItem28:                         ;Gloves: Venomous gauntlet (+7.5% spell damage)
+  ld    a,(ix+HeroInventory+5)          ;Gloves
+  cp    028
+  ret   nz
+  ld    de,13                           ;divide total attack by 13 to get 7.7%
+  jp    ApplyPercentBasedBoost
+
+  .CheckItem36:                         ;Neclace: Good Luck Charm (+5% spell damage)
+  ld    a,(ix+HeroInventory+7)          ;Neclace
+  cp    036
+  ret   nz
+  ld    de,20                           ;divide total attack by 20 to get 5%
+  jp    ApplyPercentBasedBoost  
+  
+ReduceSpellDamageFromItems:
+  push  hl                              ;spell damage
+
+  ld    ix,(MonsterThatIsBeingAttacked) ;we make sure each monster can only be damaged once
+  ;are we checking a monster that belongs to the left or right hero ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  .HeroFound:
+
+  pop   hl                              ;spell damage
+
+  call  .CheckItem08                    ;Armor: Yojimbo the Ronin (-2.5% spell damage)
+  call  .CheckItem12                    ;Shield: The bram stoker (-5% spell damage)
+  call  .CheckItem21                    ;Boots: Dusk Rover (-2.5% spell damage)
+  call  .CheckItem23                    ;Boots: Knight's Night Slippers (-7.5% spell damage)
+  call  .CheckItem26                    ;Gloves: Iron Hand (-2.5% spell damage)
+  call  .CheckItem33                    ;Ring: Bronze Ring (-7.5% spell damage)
+  call  .CheckItem34                    ;Ring: Hypnotising Ring (-10% spell damage)
+  call  .CheckItem35                    ;Neclace: The Blue Topaz (-2.5% spell damage)
+  call  .CheckItem41                    ;Robe: Priest's Cope (-2.5% spell damage)
+  ret
+
+  .CheckItem08:                         ;Armor: Yojimbo the Ronin (-2.5% spell damage)
+  ld    a,(ix+HeroInventory+1)          ;armor
+  cp    008
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    .ReducePercentage
+
+  .CheckItem12:                         ;Shield: The bram stoker (-5% spell damage)
+  ld    a,(ix+HeroInventory+2)          ;Shield
+  cp    012
+  ret   nz
+  ld    de,20                           ;divide total attack by 20 to get 5%
+  jp    .ReducePercentage
+
+  .CheckItem21:                         ;Boots: Dusk Rover (-2.5% spell damage)
+  ld    a,(ix+HeroInventory+4)          ;Boots
+  cp    021
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    .ReducePercentage
+
+  .CheckItem23:                         ;Boots: Knight's Night Slippers (-7.5% spell damage)
+  ld    a,(ix+HeroInventory+4)          ;Boots
+  cp    023
+  ret   nz
+  ld    de,13                           ;divide total attack by 13 to get 7.7%
+  jp    .ReducePercentage
+
+  .CheckItem26:                         ;Gloves: Iron Hand (-2.5% spell damage)
+  ld    a,(ix+HeroInventory+5)          ;Gloves
+  cp    026
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    .ReducePercentage
+
+  .CheckItem33:                         ;Ring: Bronze Ring (-7.5% spell damage)
+  ld    a,(ix+HeroInventory+6)          ;Ring
+  cp    033
+  ret   nz
+  ld    de,13                           ;divide total attack by 13 to get 7.7%
+  jp    .ReducePercentage
+
+  .CheckItem34:                         ;Ring: Hypnotising Ring (-10% spell damage)
+  ld    a,(ix+HeroInventory+6)          ;Ring
+  cp    034
+  ret   nz
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    .ReducePercentage
+
+  .CheckItem35:                         ;Neclace: The Blue Topaz (-2.5% spell damage)
+  ld    a,(ix+HeroInventory+7)          ;Neclace
+  cp    035
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    .ReducePercentage
+
+  .CheckItem41:                         ;Robe: Priest's Cope (-2.5% spell damage)
+  ld    a,(ix+HeroInventory+8)          ;Robe
+  cp    041
+  ret   nz
+  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  jp    .ReducePercentage
+
+  .ReducePercentage:
+  push  hl
+
+  push  hl
+  pop   bc
+  call  DivideBCbyDE                    ;in: BC/DE. Out: BC = result, HL = rest
+  ld    a,b
+  or    c
+  jr    nz,.NotZero
+  inc   c                               ;minimum reduction of 1
+  .NotZero:
+
+  pop   hl
+  or    a
+  sbc   hl,bc
+  ret
+
+
+
+
+
+
+
+
+
+
+
+

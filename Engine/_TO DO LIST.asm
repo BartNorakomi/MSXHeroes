@@ -1,4 +1,5 @@
-add item abilities like: x% less damage from spells, +5% chance to block spells etc...
+add remaining heroes
+add text: PROMO on main page for promo version
 
 battle:
 options menu: 

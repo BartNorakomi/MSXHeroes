@@ -6461,8 +6461,8 @@ RecoverOverwrittenMonsters:
   .EndRepairAmountAboveMonster:
 
   ld    hl,TransparantImageBattle
-  call  docopy
-ret
+  jp    docopy
+
   ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
 ;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
 ;  jp    docopy
@@ -6507,8 +6507,8 @@ PutMonster:
   call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
   ld    hl,TransparantImageBattle
-  call  docopy
-ret
+  jp    docopy
+
   ;unfortunately a row of 12 pixels got corrupted in page 3 from y=188 to y=199
 ;  ld    hl,RepairARowOf12PixelsFromBottomOfPage2ToPage3
 ;  jp    docopy
@@ -8262,6 +8262,9 @@ GetSpellDuration:                         ;out: a=spell duration
   ret
 
 CheckIfSpellGetsSpellBubbleed:
+  call  CheckResistanceSkill            ;out: zero flag=deflect spell
+  ret   z
+
   ld    a,r
   and   3
   jr    z,.DontSpellBubble
@@ -8443,7 +8446,7 @@ GetIceBoltDMGAmount:                    ;out: hl=damage: 30+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,30
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellIceBoltRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
@@ -8453,6 +8456,7 @@ SpellIceBoltRoutine:
   call  AnimateSpell
 
   call  GetIceBoltDMGAmount             ;out: hl=ice bolt damage amount
+  call  ReduceSpellDamageFromItems      ;certain items reduce a % amount of damage
   ld    (AEOSpellDamage),hl             ;used for the battletext
   ld    ix,(MonsterThatIsBeingAttacked)
   call  MoveMonster.DealDamageToMonster
@@ -8466,7 +8470,7 @@ GetEarthShockDMGAmount:               ;out: hl=damage: 50+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,50
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellEarthShockRoutine:
   ld    ix,Monster0                           ;aeo spell, center is cursor location
@@ -8486,7 +8490,7 @@ GetimplosionDMGAmount:                   ;out: hl=damage: 15+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,15
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellimplosionRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
@@ -8507,7 +8511,7 @@ GetFrostRingDMGAmount:                  ;out: hl=damage: 30+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,30
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellFrostRingRoutine:
   ld    ix,Monster0                           ;aeo spell, center is cursor location
@@ -8545,7 +8549,7 @@ GetMagicArrowsDMGAmount:                 ;out: hl=damage: 10+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,10
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellMagicArrowsRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
@@ -8554,7 +8558,8 @@ SpellMagicArrowsRoutine:
   ld    iy,MagicArrowsAnimation
   call  AnimateSpell
 
-  call  GetMagicArrowsDMGAmount             ;out: hl=magic arrows damage amount
+  call  GetMagicArrowsDMGAmount         ;out: hl=magic arrows damage amount
+  call  ReduceSpellDamageFromItems      ;certain items reduce a % amount of damage
   ld    (AEOSpellDamage),hl             ;used for the battletext
 
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8570,7 +8575,7 @@ GetsunstrikeDMGAmount:                    ;out: hl=damage: 80+(powerx10)
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,80
   add   hl,de
-  ret
+  jp    AddPositiveSpellDamageFromItemsForActiveHero
 
 SpellsunstrikeRoutine:
   call  CheckIfSpellGetsSpellBubbleed       ;out: z=spell gets SpellBubbleed
@@ -8580,6 +8585,7 @@ SpellsunstrikeRoutine:
   call  AnimateSpell
 
   call  GetsunstrikeDMGAmount             ;out: hl=magic arrows damage amount
+  call  ReduceSpellDamageFromItems      ;certain items reduce a % amount of damage
   ld    (AEOSpellDamage),hl             ;used for the battletext
 
   ld    ix,(MonsterThatIsBeingAttacked)
@@ -8757,6 +8763,11 @@ GoCastAOESpell:
   ld    (MonsterThatWasDamagedPreviousCheck),de
 
   ld    hl,(AEOSpellDamage)
+
+  ld    a,BattleCodePage2Block          ;Map block
+  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
+  call  ReduceSpellDamageFromItems      ;certain items reduce a % amount of damage
+
   call  MoveMonster.DealDamageToMonster
   call  CheckMonsterDied                ;if monster died, erase it from the battlefield
   .WaitExplosionMonster:
