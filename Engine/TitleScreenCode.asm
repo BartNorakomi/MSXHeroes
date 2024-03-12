@@ -114,13 +114,19 @@ TitleScreenButton5XRight:         equ TitleScreenButton5XLeft + 068
 TitleScreenButtonTableGfxBlock:  db  TitleScreenButtonsBlock
 TitleScreenButtonTableAmountOfButtons:  db  5
 TitleScreenButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+if promo?
+  db  %1100 0011 | dw $4000 + ((172+000)*128) + (000/2) - 128 | dw $4000 + ((172+000)*128) + (070/2) - 128 | dw $4000 + ((172+000)*128) + (140/2) - 128 | db TitleScreenButton1Ytop+10,TitleScreenButton1YBottom+10,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + ((TitleScreenButton1Ytop+10)*128) + (TitleScreenButton1XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + ((172+014)*128) + (000/2) - 128 | dw $4000 + ((172+014)*128) + (062/2) - 128 | dw $4000 + ((172+014)*128) + (124/2) - 128 | db TitleScreenButton2Ytop+10,TitleScreenButton2YBottom+10,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + ((TitleScreenButton2Ytop+10)*128) + (TitleScreenButton2XLeft/2) - 128 
+  db  %0100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + ((172+045)*128) + (000/2) - 128 | dw $4000 + ((172+045)*128) + (050/2) - 128 | dw $4000 + ((172+045)*128) + (100/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
+  db  %0100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
+else
   db  %1100 0011 | dw $4000 + ((172+000)*128) + (000/2) - 128 | dw $4000 + ((172+000)*128) + (070/2) - 128 | dw $4000 + ((172+000)*128) + (140/2) - 128 | db TitleScreenButton1Ytop,TitleScreenButton1YBottom,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + (TitleScreenButton1Ytop*128) + (TitleScreenButton1XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + ((172+014)*128) + (000/2) - 128 | dw $4000 + ((172+014)*128) + (062/2) - 128 | dw $4000 + ((172+014)*128) + (124/2) - 128 | db TitleScreenButton2Ytop,TitleScreenButton2YBottom,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + (TitleScreenButton2Ytop*128) + (TitleScreenButton2XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
   db  %1100 0011 | dw $4000 + ((172+045)*128) + (000/2) - 128 | dw $4000 + ((172+045)*128) + (050/2) - 128 | dw $4000 + ((172+045)*128) + (100/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
   db  %1100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
-
-
+endif
 
 
 

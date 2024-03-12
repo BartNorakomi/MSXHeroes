@@ -2953,8 +2953,8 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    RandomBUnitLevel2CostRubies      ;cost (rubies)
   db    RandomBUnitLevel2HP              ;hp
   db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Attack-2          ;attack
+  db    RandomBUnitLevel2Defense-1         ;defense
   db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "GooGoo",255,"     "
@@ -3045,7 +3045,7 @@ Monster129Table:                        ;Screech
   db    RandomAUnitLevel2CostRubies      ;cost (rubies)
   db    RandomAUnitLevel2HP              ;hp
   db    RandomAUnitLevel2Speed           ;speed
-  db    RandomAUnitLevel2Attack          ;attack
+  db    RandomAUnitLevel2Attack-3          ;attack
   db    RandomAUnitLevel2Defense         ;defense
   db    RandomAUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
@@ -3388,9 +3388,9 @@ Monster144Table:                        ;Pastry Chef (comic bakery)
   db    RandomBUnitLevel2CostGold        ;cost (gold)
   db    RandomBUnitLevel2CostGems        ;cost (gems)
   db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2HP-1              ;hp
   db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Attack-2          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero
@@ -3601,9 +3601,9 @@ Monster153Table:                        ;Andorogynus (Andorogynus)
   db    RandomBUnitLevel4CostGold        ;cost (gold)
   db    RandomBUnitLevel4CostGems        ;cost (gems)
   db    RandomBUnitLevel4CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4HP-2              ;hp
   db    RandomBUnitLevel4Speed           ;speed
-  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Attack-2          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
   db    RangedMonster                   ;special ability, 128=ranged hero

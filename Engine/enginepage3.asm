@@ -3,7 +3,8 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 0
+StartAtTitleScreen?:      equ 1
+Promo?:                   equ 1
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
@@ -4246,7 +4247,12 @@ ScenarioPage: ds  1
 ScenarioSelected: ds  1
 LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
-AmountOfMapsUnlocked: db 30
+AmountOfMapsUnlocked: 
+if promo?
+db 3
+else
+db 30
+endif
 
 endenginepage3:
 dephase

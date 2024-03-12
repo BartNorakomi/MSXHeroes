@@ -1841,7 +1841,11 @@ dephase
 ;
 TitleScreenGraphicsBlock:  equ   $c7
 phase	$4000
+if Promo?
+  incbin "..\grapx\TitleScreen\TitleScreenPromo.SC5",7,212 * 128      ;212 lines
+else
   incbin "..\grapx\TitleScreen\TitleScreen.SC5",7,212 * 128      ;212 lines
+endif
 	ds		$c000-$,$ff
 dephase
 

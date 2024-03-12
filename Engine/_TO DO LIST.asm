@@ -1,5 +1,8 @@
 add remaining heroes
-add text: PROMO on main page for promo version
+fade in/out title screen
+handle sorcery skill
+screen off before entering combat
+
 
 battle:
 options menu: 
