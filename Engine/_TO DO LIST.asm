@@ -1,5 +1,6 @@
-add remaining heroes
-
+add +5 defense when having castle walls and defending in castle
+add +1 defense when defending in castle
+ 
 title screen
 options:
 1 show enable mouse message at start of game
@@ -13,10 +14,6 @@ options menu:
 3 load game
 4 main menu
 5 return to combat
-
-toen axe man aan de rechterrand van het scherm displace and width=32 werd, verscheen ook het monster naast 'm (die zombie uit usas)
-Axe  man kijkt naar links, staat helemaal rechts. Hij krijgt dus geen width=16 aan het eind.
-mogelijk stond het monster waar ie op schoot naast 'm, waardoor het projectiel al verdwenen was voordat de routines db 128+16,WaitImpactProjectile gebeurd waren... ???
 
 low prio
 autocombat moet een sprite worden
@@ -40,6 +37,7 @@ units splitsen op hud
 units in hud nog een beetje finetunen
 als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft van het scherm opgebouwd ziet, en de andere helft is nog van de mirror page (w/e?)
 als je xp >20000 dan zie je het / teken niet in het status scherm
+invisible items
 
 castle:
 

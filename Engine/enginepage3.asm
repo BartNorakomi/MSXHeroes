@@ -1,23 +1,22 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 0
+StartOfTurnMessageOn?:    equ 1
 UnlimitedBuildsPerTurn?:  equ 0
-DisplayNumbers1to6?:      equ 1
+DisplayNumbers1to6?:      equ 0
 StartAtTitleScreen?:      equ 1
 Promo?:                   equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap02
-WorldPointer: dw GentleDesertMap03
+;WorldPointer: dw GentleDesertMap03
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
-;WorldPointer: dw GentleWinterMap04
+WorldPointer: dw GentleWinterMap04
 
 InitiateGame:
   ld    hl,CHMOUS
   call  ExecuteLoaderRoutine            ;check if there is a mouse present
-
 
 ;ld a,(pl1hero1y+HeroUnits)
 ;ld (pl2hero1y+HeroUnits),a
@@ -55,6 +54,8 @@ StartGame:
   call  ExecuteLoaderRoutine
   ld    hl,ShuffleCastleMageGuildSpells ;mage guild has 2 random spells per level
   call  ExecuteLoaderRoutine
+  xor   a
+  ld    (framecounter),a
 
   .WhenExitingCombat:
   call  CenterMousePointer

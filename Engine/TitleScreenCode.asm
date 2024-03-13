@@ -800,7 +800,6 @@ ScenarioSelectCode:
   call  SetTextStartingTownButtons
   call  CheckRightClickDifficulty
   call  CheckRightClickTownAllignment
-
   jp    .engine
 
   .EndTitleScreenEngine:
