@@ -1,10 +1,10 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 1
+StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 1
-Promo?:                   equ 1
+StartAtTitleScreen?:      equ 0
+Promo?:                   equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
 ;WorldPointer: dw GentleAutumnMap01
@@ -39,7 +39,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-;  ld    (EnterCombat?),a
+  ld    (EnterCombat?),a
 
   if  StartAtTitleScreen?
   call  TitleScreen

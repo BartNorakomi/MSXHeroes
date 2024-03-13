@@ -1,8 +1,10 @@
 add remaining heroes
-fade in/out title screen
-handle sorcery skill
-screen off before entering combat
 
+title screen
+options:
+1 show enable mouse message at start of game
+2 frequency: 50/60
+show newly bought buildings animation ?
 
 battle:
 options menu: 
@@ -29,6 +31,8 @@ Show day/week/month
 1 save game
 2 load game
 3 main menu
+4 autosave every 1/2/3/4 turns ?
+show newly bought buildings animation ?
 
 low prio:
 shift click unit moet nog gemaakt worden om units te splitsen
@@ -54,10 +58,3 @@ title screen:
 general:
 muziek
 sfx
-
-titel scherm:
-- Single Scenario (locked)
-- Campaign
-- Load Game
-- Game Options
-- Collection

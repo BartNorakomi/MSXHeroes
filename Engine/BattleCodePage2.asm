@@ -4900,7 +4900,69 @@ CheckResistanceSkill:                   ;out: zero flag=deflect spell
   or    a  
   ret
 
+AddPositiveSpellDamageFromSorcery:
+  push  hl                              ;spell damage
+
+  call  SetCurrentActiveMOnsterInIX
+  
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  jr    .HeroFound
+  .HeroFound:
+
+  pop   hl                              ;spell damage
+  
+  ld    a,(ix+HeroSkills+0)
+  call  .CheckSkillSorcery
+  ld    a,(ix+HeroSkills+1)
+  call  .CheckSkillSorcery
+  ld    a,(ix+HeroSkills+2)
+  call  .CheckSkillSorcery
+  ld    a,(ix+HeroSkills+3)
+  call  .CheckSkillSorcery
+  ld    a,(ix+HeroSkills+4)
+  call  .CheckSkillSorcery
+  ld    a,(ix+HeroSkills+5)
+  call  .CheckSkillSorcery
+  ret
+  
+  .CheckSkillSorcery:
+  cp    25                              ;Basic Sorcery  (+5% spell damage)  
+  jr    z,.BasicSorceryFound
+  cp    26                              ;Advanced Sorcery  (+10% spell damage)    
+  jr    z,.AdvancedSorceryFound
+  cp    27                              ;Expert Sorcery  (+15% spell damage)   
+  jr    z,.ExpertSorceryFound
+  ret
+
+  .BasicSorceryFound:
+  pop   af                              ;no need to check the other skills
+  ld    de,20                           ;divide total attack by 20 to get 5%
+  jp    ApplyPercentBasedBoost  
+
+  .AdvancedSorceryFound:
+  pop   af                              ;no need to check the other skills
+  ld    de,10                           ;divide total attack by 10 to get 10%
+  jp    ApplyPercentBasedBoost  
+
+  .ExpertSorceryFound:
+  pop   af                              ;no need to check the other skills
+  ld    de,06                           ;divide total attack by 6 to get 16.66%
+  jp    ApplyPercentBasedBoost  
+
+
+
+
+
 AddPositiveSpellDamageFromItemsForActiveHero:
+  call  AddPositiveSpellDamageFromSorcery
+
   push  hl                              ;spell damage
 
   call  SetCurrentActiveMOnsterInIX

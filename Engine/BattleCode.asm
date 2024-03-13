@@ -177,7 +177,7 @@ PressMToLookAtPage2And3:
 
 BattleScreenVerticalOffset: equ 16
 InitiateBattle:
-call screenon
+call screenoff
 
 
 
@@ -225,8 +225,6 @@ call screenon
 ;/battle code page 2
 
   call  BuildUpBattleFieldAndPutMonsters
-
-
   .engine:
 ;  ld    a,(activepage)
 ;  call  Backdrop.in
@@ -277,6 +275,7 @@ call screenon
   jr    nc,.checkflag
   ld    (hl),0
   halt
+  call  screenon
   jp  .engine
 
 .CheckBattleButtonClicked:               ;in: carry=button clicked, b=button number

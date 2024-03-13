@@ -1956,5 +1956,14 @@ QuickTipsBlock:  equ   $ca
 	ds		$c000-$,$ff
 dephase
 
+;
+; block $cb
+;
+InsertMouseBlock:  equ   $cb
+phase	$4000
+  incbin "..\grapx\TitleScreen\InsertMouse.SC5",7,112 * 128      ;112 lines
+	ds		$8000-$,$ff
+dephase
+
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

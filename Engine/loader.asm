@@ -416,26 +416,34 @@ PlaceHeroesInCastles:                   ;Place hero nr#1 in their castle
   ret
 
 ; Check/Init Mouse
-CHMOUS:	
+CHMOUS:  
+  call  .go
+	LD	a,(MOUSIDBuffer)
+	LD	(MOUSID),A
+	LD	a,(MSEPRTBuffer)
+	LD	(MSEPRT),A
+  ret
+  .go:
+
   CALL	.MOUSIN
 	LD	A,$10	; first port 1
-	LD	(MSEPRT),A
+	LD	(MSEPRTBuffer),A
 	CALL	.CHMS.0
 	JP	NC,.MOUSIN
 	LD	A,$60	; port 2
-	LD	(MSEPRT),A
+	LD	(MSEPRTBuffer),A
 	CALL	.CHMS.0
 	JP	NC,.MOUSIN
 	
 	XOR	A	; not found
-	LD	(MOUSID),A
-;	LD	(MSEPRT),A
+	LD	(MOUSIDBuffer),A
+;	LD	(MSEPRTBuffer),A
 ;	SCF	
 	RET	
 	
   ; Install Mouse
 .MOUSIN:	LD	A,255
-	LD	(MOUSID),A
+	LD	(MOUSIDBuffer),A
 	LD	HL,DLY_M2	; delay routs
 ;	LD	A,(ComputerID)              ;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
 ;	CP	3
@@ -474,7 +482,7 @@ CHMOUS:
 .RDPADL:	PUSH	BC
 	PUSH	DE
 	
-	LD	DE,(MSEPRT)
+	LD	DE,(MSEPRTBuffer)
 	LD	A,15	; Read PSG r15 port B
 	CALL	RD_PSG
 	AND	%10001111	; interface 1
@@ -512,7 +520,7 @@ CHMOUS:
 	LD	C,6
 .RPDL.2:	LD	A,15
 	CALL	WR_PSG
-	LD	A,(MSEPRT)
+	LD	A,(MSEPRTBuffer)
 	AND	$30
 	XOR	E
 	LD	E,A

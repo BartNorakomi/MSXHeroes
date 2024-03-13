@@ -1,4 +1,5 @@
 HandleTitleScreenCode:
+  jp    InsertMouseCode
   jp    TitleScreenCode
   jp    ScenarioSelectCode
   jp    CampaignSelectCode
@@ -6,10 +7,168 @@ HandleTitleScreenCode:
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
 ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
 
+InsertMousePalette:
+  incbin"..\grapx\TitleScreen\InsertMousePalette.pl"
+InsertMouseCode:
+  ld    a,(MOUSIDBuffer)
+  inc   a
+  jp    z,TitleScreenCode
+  
+  call  screenoff
+
+  ld    a,4
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  ld    a,1
+	ld		(activepage),a
+
+  ld    hl,ClearPage1And2
+  call  DoCopy
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+  
+  call  SetVButton  
+  call  SetInsertMouseGraphics               ;put gfx
+  call  SetInsertMouseText
+  xor   a
+	ld		(activepage),a			
+  call  SetInsertMouseGraphics               ;put gfx
+  call  SetInsertMouseText
+  ld    hl,InsertMousePalette
+  call  SetPalette
+  call  SetSpatInCastle
+  call  SetInterruptHandler             ;set Vblank
+
+  call  screenon
+  .engine:
+  halt
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+  call  CheckMouse
+
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  jp    nz,TitleScreenCode
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+
+  ;title screen select buttons
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.CheckButtonMouseInteractionGenericButtons
+  call  .CheckButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+  ;/title screen select buttons
+  jp    .engine
+
+.CheckButtonClicked:
+  ret   nc
+  pop   af
+  jp    TitleScreenCode
+
+SetInsertMouseText:
+  call  SetInsertMouseFontPage0Y212    ;set font at (0,212) page 0
+
+  ld    b,093+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextInsertMouse1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,080+00                        ;dx
+  ld    c,152+00                        ;dy
+  ld    hl,TextInsertMouse2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+TextInsertMouse1:
+                db "Mouse not detected",255
+TextInsertMouse2:
+                db " For optimal experience,",254
+                db "please connect a mouse...",255
+
+SetInsertMouseFontPage0Y212:           ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetVButton:
+  ld    hl,SetVButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+SetVButtonTableGfxBlock:  db  PlayerStartTurnBlock
+SetVButtonTableAmountOfButtons:  db  01
+SetVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 146
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 184
+.Button1XRight:         equ .Button1XLeft + 020
+
+
+ClearPage1And2:
+  db    000,000,000,000   ;sx,--,sy,spage
+  db    000,000,000,000   ;dx,--,dy,dpage
+  db    000,001,000,002   ;nx,--,ny,--
+  db    13+13*16,000,$C0       ;fill 
+
+SetInsertMouseGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (048/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (139*128) + (044/2) - 128
+  ld    de,$0000 + ((024+53)*128) + ((020+58)/2) - 128
+  ld    bc,$0000 + (060*256) + (104/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + ((024+18)*128) + ((020+60)/2) - 128
+  ld    bc,$0000 + (112*256) + (106/2)
+  ld    a,InsertMouseBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+CheckMouse:
+;  ld    a,(MOUSIDBuffer)
+;  or    a
+  ld    a,(framecounter)
+  and   63
+  ret   nz
+
+  ld    a,(slot.page12rom)             ;all RAM except page 1
+  out   ($a8),a      
+  ld    a,Loaderblock                 ;Map block
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  ld    hl,CHMOUS
+  jp    (hl)
+
+
 TitleScreenPalette:
   incbin"..\grapx\TitleScreen\TitleScreenPalette.pl"
-
 TitleScreenCode:
+  call  screenoff
+
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
@@ -24,7 +183,15 @@ TitleScreenCode:
   call  SetInterruptHandler             ;set Vblank
   call  SetTitleScreenButtons
 
-  .engine:  
+  xor   a
+  ld    (framecounter),a
+  .engine:
+  halt
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+  call  screenonAfter3Frames
+  call  CheckMouse
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
@@ -140,6 +307,8 @@ endif
 
 
 CampaignSelectCode:
+  call  screenoff
+
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
@@ -196,7 +365,15 @@ CampaignSelectCode:
   ld    b,28
 ;  call  .ScenarioPressed
 
-  .engine:  
+  xor   a
+  ld    (framecounter),a
+  .engine:
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+;  halt
+  call  screenonAfter3Frames
+  call  CheckMouse
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 
@@ -528,7 +705,15 @@ CheckCampaignSelectButtonClicked:
   .PageButtonConstantlyLit:
   dw    $4000 + (011*128) + (160/2) - 128, $4000 + (011*128) + (160/2) - 128
 
+screenonAfter3Frames:
+  ld    a,(framecounter)
+  and   3
+  ret   nz
+  jp    screenon
+
 ScenarioSelectCode:
+  call  screenoff
+
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
@@ -579,8 +764,15 @@ ScenarioSelectCode:
   call  SetDifficultyButtonConstantlyLit
   ld    b,28
   call  .ScenarioPressed
-
-  .engine:  
+  xor   a
+  ld    (framecounter),a
+  .engine:
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+;  halt
+  call  screenonAfter3Frames
+  call  CheckMouse
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
 

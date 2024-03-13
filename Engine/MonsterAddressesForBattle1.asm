@@ -3946,7 +3946,7 @@ Monster167Table:                        ;Wonder Boy (Wonder Boy)
   db    "Wonder Boy",255," "
 
 NinjaKunLevel2Number:           equ 52
-NinjaKunLevel2Attack:           equ 4
+NinjaKunLevel2Attack:           equ 3
 NinjaKunLevel2Defense:          equ 7
 NinjaKunLevel2HP:               equ 17
 NinjaKunLevel2Speed:            equ 3

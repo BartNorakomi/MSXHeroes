@@ -4482,6 +4482,9 @@ checkcurrentplayerhuman:	              ;out zero flag, current player is compute
 	ret
 ;/dont react to space / mouse click if current player is a computer
 
+MOUSIDBuffer:	ds 1 ;EQU	$FAFD
+MSEPRTBuffer:	ds 1 ;EQU	$FC82
+
 MOUSID:	ds 1 ;EQU	$FAFD
 MSEPRT:	ds 1 ;EQU	$FC82
 
@@ -6159,7 +6162,7 @@ Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
 ;.HeroSkills:  db  25,18,3,33,9,0
-.HeroSkills:  db  22,0,0,0,0,0
+.HeroSkills:  db  27,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 1111
@@ -6169,7 +6172,7 @@ Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.Inventory: db  045,045,045,045,045,045,045,036,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .HeroSpecificInfo: dw HeroAddressesDrasle3
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
