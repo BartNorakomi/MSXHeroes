@@ -549,20 +549,37 @@ DisplayEnemyHeroStatsWindowCode:
   jp  .engine
 
 .Set16x30HeroIcon:
-  ;SetHeroPortrait16x30:
-  ld    a,Hero16x30PortraitsBlock       ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    ix,(EnemyHeroThatPointerIsOn)
 
-;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;  ld    b,(ix+HeroPortrait16x30SYSX+1)
-  call  SetAddressHeroPortrait16x30SYSXinBC
+  ;defending hero found. ix->defending hero
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
 
-  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
-  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-	ret
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
+  ld    de,DYDX16x30HeroIconArmyWindow     ;(ny*256 + nx/2) = (10x18)
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;SetHeroPortrait16x30:
+;  ld    a,Hero16x30PortraitsBlock       ;Map block
+;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+;  ld    ix,(EnemyHeroThatPointerIsOn)
+
+;  call  SetAddressHeroPortrait16x30SYSXinBC
+
+;  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
+;  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+;  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+;	ret
 
 .SetHeroOverViewArmyWindow:
   ld    hl,$4000 + (066*128) + (HeroOverViewArmyWindowSX/2) -128
@@ -885,20 +902,37 @@ NXAndNY16x30HeroIcon:   equ 030*256 + (016/2)            ;(ny*256 + nx/2) = (14x
 DYDX16x30HeroIconArmyWindow:       equ (HeroOverViewArmyWindowDY+28)*128 + ((HeroOverViewArmyWindowDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
 
 Set16x30HeroIcon:
-  ;SetHeroPortrait16x30:
-  ld    a,Hero16x30PortraitsBlock       ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    ix,(plxcurrentheroAddress)
 
-;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;  ld    b,(ix+HeroPortrait16x30SYSX+1)
-  call  SetAddressHeroPortrait16x30SYSXinBC
+  ;defending hero found. ix->defending hero
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
 
-  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
-  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-	ret
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
+  ld    de,DYDX16x30HeroIconArmyWindow     ;(ny*256 + nx/2) = (10x18)
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;SetHeroPortrait16x30:
+;  ld    a,Hero16x30PortraitsBlock       ;Map block
+;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+;  ld    ix,(plxcurrentheroAddress)
+
+;  call  SetAddressHeroPortrait16x30SYSXinBC
+
+;  ld    hl,DYDX16x30HeroIconArmyWindow  ;(dy*128 + dx/2) = (208,089)
+;  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+;  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+;	ret
 
 SetAddressHeroPortrait16x30SYSXinBC:
   ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
@@ -3645,20 +3679,38 @@ SetTextNameHeroAndLevel:
 
 DYDX16x30HeroIconAtHeroOverview:       equ (HeroOverViewFirstWindowchoicesDY+10)*128 + ((HeroOverViewFirstWindowchoicesDX+10)/2) - 128      ;(dy*128 + dx/2) = (208,089)
 Set16x30HeroIconAtHeroOverviewCode:
-  ;SetHeroPortrait16x30:
-  ld    a,Hero16x30PortraitsBlock       ;Map block
-  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
-
   ld    ix,(plxcurrentheroAddress)
 
-;  ld    c,(ix+HeroPortrait16x30SYSX+0)   ;example: equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-;  ld    b,(ix+HeroPortrait16x30SYSX+1)
-  call  SetAddressHeroPortrait16x30SYSXinBC
+  ;defending hero found. ix->defending hero
+  ld    l,(ix+HeroSpecificInfo+0)         ;get hero specific info
+  ld    h,(ix+HeroSpecificInfo+1)
+  push  hl
+  pop   ix
 
-  ld    hl,DYDX16x30HeroIconAtHeroOverview  ;(dy*128 + dx/2) = (208,089)
-  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
-  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
-	ret
+  ld    l,(ix+HeroInfoPortrait16x30SYSX+0)  ;find hero portrait 16x30 address
+  ld    h,(ix+HeroInfoPortrait16x30SYSX+1)  
+  ld    bc,$4000
+  xor   a
+  sbc   hl,bc
+
+  ld    bc,NXAndNY16x30HeroIcon
+  ld    a,Hero16x30PortraitsBlock        ;block to copy graphics from
+  ld    de,DYDX16x30HeroIconAtHeroOverview     ;(ny*256 + nx/2) = (10x18)
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+  ;SetHeroPortrait16x30:
+;  ld    a,Hero16x30PortraitsBlock       ;Map block
+;  call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom
+
+;  ld    ix,(plxcurrentheroAddress)
+
+;  call  SetAddressHeroPortrait16x30SYSXinBC
+
+;  ld    hl,DYDX16x30HeroIconAtHeroOverview  ;(dy*128 + dx/2) = (208,089)
+;  ld    de,NXAndNY16x30HeroIcon     ;(ny*256 + nx/2) = (10x18)
+;  call  CopyRamToVram                   ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+;	ret
 
 HeroOverviewCode:
 call screenon

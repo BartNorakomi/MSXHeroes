@@ -546,7 +546,23 @@ BensonCunninghamSpriteBlock:  equ HeroesSpritesBlock8
 JamieSeedSpriteBlock:         equ HeroesSpritesBlock8
 ArmoredSnatcherSpriteBlock:   equ HeroesSpritesBlock8
 DruidSpriteBlock:             equ HeroesSpritesBlock8
+MomotaruSpriteBlock:          equ HeroesSpritesBlock8
+LukaSpriteBlock:              equ HeroesSpritesBlock8
+HeiwaAndButakoSpriteBlock:    equ HeroesSpritesBlock8
 
+AceSpriteBlock:               equ HeroesSpritesBlock9
+SpaceExplorer01SpriteBlock:   equ HeroesSpritesBlock9
+FernSpriteBlock:              equ HeroesSpritesBlock9
+HornSpriteBlock:              equ HeroesSpritesBlock9
+PixieSpriteBlock:             equ HeroesSpritesBlock9
+FreyaJerbainSpriteBlock:      equ HeroesSpritesBlock9
+LanceBeanSpriteBlock:         equ HeroesSpritesBlock9
+ThiharisSpriteBlock:          equ HeroesSpritesBlock9
+
+PampasSpriteBlock:            equ HeroesSpritesBlock10
+SeleneSpriteBlock:            equ HeroesSpritesBlock10
+SkooterSpriteBlock:           equ HeroesSpritesBlock10
+JeddaChefSpriteBlock:         equ HeroesSpritesBlock10
 
 
 ;
@@ -596,9 +612,11 @@ dephase
 ;
 ; block $0e - 0f
 ;
-BattleFieldWinterBlock:  equ   $0e
+HeroesSpritesBlock9:  equ   HeroesSpritesBlock1 + 8
+HeroesSpritesBlock10:  equ   HeroesSpritesBlock1 + 9
 phase	$4000
-  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet5.SC5",7,208 * 128      ;208 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet5Bottom48Lines.SC5",7,48 * 128 ;48 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1964,6 +1982,16 @@ phase	$4000
   incbin "..\grapx\TitleScreen\InsertMouse.SC5",7,112 * 128      ;112 lines
 	ds		$8000-$,$ff
 dephase
+
+;
+; block $cc - cd
+;
+BattleFieldWinterBlock:  equ   $cc
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
 
 totallenght:	Equ	$-MSXHeroes
 	ds		(8*$80000)-totallenght

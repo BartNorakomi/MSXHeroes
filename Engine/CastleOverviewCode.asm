@@ -2436,6 +2436,22 @@ HeroPortrait10x18SYSXJamieSeed:         equ $4000+(036*128)+(080/2)-128 ;(dy*128
 HeroPortrait10x18SYSXArmoredSnatcher:   equ $4000+(036*128)+(090/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait10x18SYSXDruid:             equ $4000+(036*128)+(100/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
+HeroPortrait10x18SYSXMomotaru:          equ $4000+(036*128)+(110/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXLuka:              equ $4000+(036*128)+(120/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXHeiwaAndButako:    equ $4000+(036*128)+(130/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXAce:               equ $4000+(036*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXSpaceExplorer01:   equ $4000+(036*128)+(150/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXFern:              equ $4000+(036*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXHorn:              equ $4000+(036*128)+(170/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPixie:             equ $4000+(036*128)+(180/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXFreyaJerbain:      equ $4000+(036*128)+(190/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXLanceBean:         equ $4000+(036*128)+(200/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXThiharis:          equ $4000+(036*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXPampas:            equ $4000+(036*128)+(220/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXSelene:            equ $4000+(036*128)+(230/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXSkooter:           equ $4000+(036*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait10x18SYSXJeddaChef:         equ $4000+(054*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
 
 
 
@@ -2981,6 +2997,24 @@ HeroButton20x11SYSXJamieSeed:         db  %1100 0011 | dw $4000 + (154*128) + (1
 HeroButton20x11SYSXArmoredSnatcher:   db  %1100 0011 | dw $4000 + (154*128) + (180/2) - 128 | dw $4000 + (154*128) + (200/2) - 128 | dw $4000 + (154*128) + (220/2) - 128
 
 HeroButton20x11SYSXDruid:             db  %1100 0011 | dw $4000 + (165*128) + (000/2) - 128 | dw $4000 + (165*128) + (020/2) - 128 | dw $4000 + (165*128) + (040/2) - 128
+HeroButton20x11SYSXMomotaru:          db  %1100 0011 | dw $4000 + (165*128) + (060/2) - 128 | dw $4000 + (165*128) + (080/2) - 128 | dw $4000 + (165*128) + (100/2) - 128
+HeroButton20x11SYSXLuka:              db  %1100 0011 | dw $4000 + (165*128) + (120/2) - 128 | dw $4000 + (165*128) + (140/2) - 128 | dw $4000 + (165*128) + (160/2) - 128
+HeroButton20x11SYSXHeiwaAndButako:    db  %1100 0011 | dw $4000 + (165*128) + (180/2) - 128 | dw $4000 + (165*128) + (200/2) - 128 | dw $4000 + (165*128) + (220/2) - 128
+
+HeroButton20x11SYSXAce:               db  %1100 0011 | dw $4000 + (176*128) + (000/2) - 128 | dw $4000 + (176*128) + (020/2) - 128 | dw $4000 + (176*128) + (040/2) - 128
+HeroButton20x11SYSXSpaceExplorer01:   db  %1100 0011 | dw $4000 + (176*128) + (060/2) - 128 | dw $4000 + (176*128) + (080/2) - 128 | dw $4000 + (176*128) + (100/2) - 128
+HeroButton20x11SYSXFern:              db  %1100 0011 | dw $4000 + (176*128) + (120/2) - 128 | dw $4000 + (176*128) + (140/2) - 128 | dw $4000 + (176*128) + (160/2) - 128
+HeroButton20x11SYSXHorn:              db  %1100 0011 | dw $4000 + (176*128) + (180/2) - 128 | dw $4000 + (176*128) + (200/2) - 128 | dw $4000 + (176*128) + (220/2) - 128
+
+HeroButton20x11SYSXPixie:             db  %1100 0011 | dw $4000 + (187*128) + (000/2) - 128 | dw $4000 + (187*128) + (020/2) - 128 | dw $4000 + (187*128) + (040/2) - 128
+HeroButton20x11SYSXFreyaJerbain:      db  %1100 0011 | dw $4000 + (187*128) + (060/2) - 128 | dw $4000 + (187*128) + (080/2) - 128 | dw $4000 + (187*128) + (100/2) - 128
+HeroButton20x11SYSXLanceBean:         db  %1100 0011 | dw $4000 + (187*128) + (120/2) - 128 | dw $4000 + (187*128) + (140/2) - 128 | dw $4000 + (187*128) + (160/2) - 128
+HeroButton20x11SYSXThiharis:          db  %1100 0011 | dw $4000 + (187*128) + (180/2) - 128 | dw $4000 + (187*128) + (200/2) - 128 | dw $4000 + (187*128) + (220/2) - 128
+
+HeroButton20x11SYSXPampas:            db  %1100 0011 | dw $4000 + (198*128) + (060/2) - 128 | dw $4000 + (198*128) + (080/2) - 128 | dw $4000 + (198*128) + (220/2) - 128
+HeroButton20x11SYSXSelene:            db  %1100 0011 | dw $4000 + (198*128) + (120/2) - 128 | dw $4000 + (198*128) + (140/2) - 128 | dw $4000 + (198*128) + (040/2) - 128
+HeroButton20x11SYSXSkooter:           db  %1100 0011 | dw $4000 + (198*128) + (180/2) - 128 | dw $4000 + (198*128) + (200/2) - 128 | dw $4000 + (198*128) + (100/2) - 128
+HeroButton20x11SYSXJeddaChef:         db  %1100 0011 | dw $4000 + (240*128) + (000/2) - 128 | dw $4000 + (240*128) + (020/2) - 128 | dw $4000 + (240*128) + (160/2) - 128
 
 
 HeroLevelUpCode:

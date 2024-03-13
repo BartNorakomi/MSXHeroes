@@ -2230,8 +2230,8 @@ InfoTown7:        db "Psycho World",255,PsychoWorldUnitLevel1Number,    PsychoWo
 InfoTown8:        db "King Kong   ",255,KingKongUnitLevel1Number,    KingKongUnitLevel2Number,    KingKongUnitLevel3Number,    KingKongUnitLevel4Number,    KingKongUnitLevel5Number,    KingKongUnitLevel6Number   | dw   KingKongUnitLevel1Growth,   KingKongUnitLevel2Growth,    KingKongUnitLevel3Growth,    KingKongUnitLevel4Growth,    KingKongUnitLevel5Growth,    KingKongUnitLevel6Growth
 InfoTown9:        db "Golvellius  ",255,GolvelliusUnitLevel1Number,    GolvelliusUnitLevel2Number,    GolvelliusUnitLevel3Number,    GolvelliusUnitLevel4Number,    GolvelliusUnitLevel5Number,    GolvelliusUnitLevel6Number   | dw   GolvelliusUnitLevel1Growth,   GolvelliusUnitLevel2Growth,    GolvelliusUnitLevel3Growth,    GolvelliusUnitLevel4Growth,    GolvelliusUnitLevel5Growth,    GolvelliusUnitLevel6Growth
 InfoTown10:       db "Contra Den 1",255,ContraGroupAUnitLevel1Number,    ContraGroupAUnitLevel2Number,    ContraGroupAUnitLevel3Number,    ContraGroupAUnitLevel4Number,    ContraGroupAUnitLevel5Number,    ContraGroupAUnitLevel6Number   | dw   ContraGroupAUnitLevel1Growth,   ContraGroupAUnitLevel2Growth,    ContraGroupAUnitLevel3Growth,    ContraGroupAUnitLevel4Growth,    ContraGroupAUnitLevel5Growth,    ContraGroupAUnitLevel6Growth
-;castles without heroes
 InfoTown11:       db "Contra Den 2",255,ContraGroupBUnitLevel1Number,    ContraGroupBUnitLevel2Number,    ContraGroupBUnitLevel3Number,    ContraGroupBUnitLevel4Number,    ContraGroupBUnitLevel5Number,    ContraGroupBUnitLevel6Number   | dw   ContraGroupBUnitLevel1Growth,   ContraGroupBUnitLevel2Growth,    ContraGroupBUnitLevel3Growth,    ContraGroupBUnitLevel4Growth,    ContraGroupBUnitLevel5Growth,    ContraGroupBUnitLevel6Growth
+;castles without heroes
 InfoTown12:       db "Akanbe Den 1",255,AkanbeDragonGroupAUnitLevel1Number,    AkanbeDragonGroupAUnitLevel2Number,    AkanbeDragonGroupAUnitLevel3Number,    AkanbeDragonGroupAUnitLevel4Number,    AkanbeDragonGroupAUnitLevel5Number,    AkanbeDragonGroupAUnitLevel6Number   | dw   AkanbeDragonGroupAUnitLevel1Growth,   AkanbeDragonGroupAUnitLevel2Growth,    AkanbeDragonGroupAUnitLevel3Growth,    AkanbeDragonGroupAUnitLevel4Growth,    AkanbeDragonGroupAUnitLevel5Growth,    AkanbeDragonGroupAUnitLevel6Growth
 InfoTown13:       db "Akanbe Den 2",255,AkanbeDragonGroupBUnitLevel1Number,    AkanbeDragonGroupBUnitLevel2Number,    AkanbeDragonGroupBUnitLevel3Number,    AkanbeDragonGroupBUnitLevel4Number,    AkanbeDragonGroupBUnitLevel5Number,    AkanbeDragonGroupBUnitLevel6Number   | dw   AkanbeDragonGroupBUnitLevel1Growth,   AkanbeDragonGroupBUnitLevel2Growth,    AkanbeDragonGroupBUnitLevel3Growth,    AkanbeDragonGroupBUnitLevel4Growth,    AkanbeDragonGroupBUnitLevel5Growth,    AkanbeDragonGroupBUnitLevel6Growth
 InfoTown14:       db "YieArKungFu ",255,YieArKungFuUnitLevel1Number,    YieArKungFuUnitLevel2Number,    YieArKungFuUnitLevel3Number,    YieArKungFuUnitLevel4Number,    YieArKungFuUnitLevel5Number,    YieArKungFuUnitLevel6Number   | dw   YieArKungFuUnitLevel1Growth,   YieArKungFuUnitLevel2Growth,    YieArKungFuUnitLevel3Growth,    YieArKungFuUnitLevel4Growth,    YieArKungFuUnitLevel5Growth,    YieArKungFuUnitLevel6Growth
@@ -2258,8 +2258,8 @@ ListOfHeroAddressesAndAmounts:
   dw  KingKongHeroes | db KingKongHeroesAmount
   dw  GolvelliusHeroes | db GolvelliusHeroesAmount
   dw  ContraGroupAHeroes | db ContraGroupAHeroesAmount
-;castles without heroes
   dw  ContraGroupBHeroes | db ContraGroupBHeroesAmount
+;castles without heroes
   dw  AkanbeDragonGroupAHeroes | db AkanbeDragonGroupAHeroesAmount
   dw  AkanbeDragonGroupBHeroes | db AkanbeDragonGroupBHeroesAmount
   dw  YieArKungFuHeroes | db YieArKungFuHeroesAmount

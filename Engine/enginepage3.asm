@@ -3,7 +3,7 @@ phase	$c000
 StartOfTurnMessageOn?:    equ 0
 UnlimitedBuildsPerTurn?:  equ 0
 DisplayNumbers1to6?:      equ 1
-StartAtTitleScreen?:      equ 0
+StartAtTitleScreen?:      equ 1
 Promo?:                   equ 0
 ShowNewlyBoughtBuildingFadingIn?:  db  1
 
@@ -39,7 +39,7 @@ InitiateGame:
 ;ld hl,0
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
-  ld    (EnterCombat?),a
+;  ld    (EnterCombat?),a
 
   if  StartAtTitleScreen?
   call  TitleScreen
@@ -1874,9 +1874,9 @@ GenericButtonTable3: ;status (bit 7=off/on, bit 6=button normal (untouched), bit
   db  %1100 0011 | dw $4000 + (139*128) + (156/2) - 128 | dw $4000 + (139*128) + (176/2) - 128 | dw $4000 + (139*128) + (196/2) - 128 | db .Button9Ytop,.Button9YBottom,.Button9XLeft,.Button9XRight | dw $0000 + (.Button9Ytop*128) + (.Button9XLeft/2) - 128
   db  %1100 0011 | dw $4000 + ((128+25+76)*128) + (180/2) - 128 | dw $4000 + ((128+25+76)*128) + (200/2) - 128 | dw $4000 + ((128+25+76)*128) + (220/2) - 128 | db .Button10Ytop,.Button10YBottom,.Button10XLeft,.Button10XRight | dw $0000 + (.Button10Ytop*128) + (.Button10XLeft/2) - 128
   ;end turn
-  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (048/2) - 128 | dw $4000 + ((139+25+76)*128) + (064/2) - 128 | dw $4000 + ((139+25+76)*128) + (080/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (048*128) + (240/2) - 128 | dw $4000 + (064*128) + (240/2) - 128 | dw $4000 + (080*128) + (240/2) - 128 | db .Button11Ytop,.Button11YBottom,.Button11XLeft,.Button11XRight | dw $0000 + (.Button11Ytop*128) + (.Button11XLeft/2) - 128
   ;system/options
-  db  %1100 0011 | dw $4000 + ((139+25+76)*128) + (000/2) - 128 | dw $4000 + ((139+25+76)*128) + (016/2) - 128 | dw $4000 + ((139+25+76)*128) + (032/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (240/2) - 128 | dw $4000 + (016*128) + (240/2) - 128 | dw $4000 + (032*128) + (240/2) - 128 | db .Button12Ytop,.Button12YBottom,.Button12XLeft,.Button12XRight | dw $0000 + (.Button12Ytop*128) + (.Button12XLeft/2) - 128
 
   ;arrow up, 3 hero buttons, arrow down
 .Button1Ytop:           equ 055
@@ -3846,6 +3846,11 @@ ContraGroupAHeroes:
 ;ContraGroupA
 db  25  ;Bill Rizer
 
+ContraGroupBHeroesAmount:  equ GolvelliusHeroes-ContraGroupBHeroes
+ContraGroupBHeroes:
+;ContraGroupA
+db  72  ;Lance Bean
+
 GolvelliusHeroesAmount:  equ HeroesWithoutCastle-GolvelliusHeroes
 GolvelliusHeroes:
 ;Golvellius
@@ -3916,7 +3921,42 @@ db  55  ;Mei Hong
 db  54  ;Priestess Ki
 db  56  ;Prince Gilgamesh
 
+;Druid
 db  61  ;Druid
+
+;Arcus 2
+db  62  ;Jedda Chef
+
+;Higemaru
+db  63  ;Momotaru (Higemaru)
+
+;Moonlight Saga
+db  64  ;Luka (moonlight saga)
+
+;Shalom
+db  65  ;Heiwa and Butako (Shalom)
+
+;TNT
+db  66  ;Ace (TNT)
+
+;Starship Rendezvous
+db  67  ;Space Explorer01 (Starship Rendezvous)
+
+;Xak
+db  68  ;Fern (xak)
+db  69  ;Horn (Xak)
+db  70  ;Pixie (Xak)
+db  71  ;Freya Jerbain (Xak)
+
+;Tiny Magic
+db  73  ;Thiharis (Tiny Magic)
+
+;Pampas & Selene
+db  74  ;Pampas (Pampas & Selene)
+db  75  ;Selene (Pampas & Selene)
+
+;Skooter
+db  76  ;Skooter (Skooter)
 
 EndListHeroes:
 db  00  ;end of list
@@ -3939,8 +3979,6 @@ AkanbeDragonGroupAHeroesAmount:   equ 1
 AkanbeDragonGroupAHeroes:
 AkanbeDragonGroupBHeroesAmount:   equ 1
 AkanbeDragonGroupBHeroes:
-ContraGroupBHeroesAmount:         equ 1
-ContraGroupBHeroes:
 ChukaTaisenHeroesAmount:          equ 1
 ChukaTaisenHeroes:
 
@@ -3975,14 +4013,14 @@ PlaceSkillInLevelUpSlot2IntoWhichHeroSlot?: ds  1
 heroAddressesLenght:  equ HeroAddressesGoemon1 -  HeroAddressesAdol                                                                                                                                                                             ;skill   heroNR
 HeroAddressesAdol:            db "Adol",255,"             ","Knight      ",255,AdolSpriteBlock| dw HeroSYSXAdol,HeroPortrait10x18SYSXAdol,HeroButton20x11SYSXAdol,HeroPortrait16x30SYSXAdol                                                   | db 01 | db 001 |
 HeroAddressesGoemon1:         db "Goemon",255,"           ","Barbarian   ",255,Goemon1SpriteBlock| dw HeroSYSXGoemon1,HeroPortrait10x18SYSXGoemon1,HeroButton20x11SYSXGoemon1,HeroPortrait16x30SYSXGoemon1                                    | db 04 | db 002 |
-HeroAddressesPixy:            db "Pixy",255,"             ","Shieldbearer",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
+HeroAddressesPixy:            db "Faerie Pixie",255,"     ","Shieldbearer",255,PixySpriteBlock| dw HeroSYSXPixy,HeroPortrait10x18SYSXPixy,HeroButton20x11SYSXPixy,HeroPortrait16x30SYSXPixy                                                   | db 07 | db 003 |
 HeroAddressesDrasle1:         db "Royas Worzen",255,"     ","Overlord    ",255,Drasle1SpriteBlock| dw HeroSYSXDrasle1,HeroPortrait10x18SYSXDrasle1,HeroButton20x11SYSXDrasle1,HeroPortrait16x30SYSXDrasle1                                    | db 10 | db 004 |
 HeroAddressesLatok:           db "Latok",255,"            ","Alchemist   ",255,LatokSpriteBlock| dw HeroSYSXLatok,HeroPortrait10x18SYSXLatok,HeroButton20x11SYSXLatok,HeroPortrait16x30SYSXLatok                                              | db 13 | db 005 |
 HeroAddressesDrasle2:         db "Lyll Worzen",255,"      ","Sage        ",255,Drasle2SpriteBlock| dw HeroSYSXDrasle2,HeroPortrait10x18SYSXDrasle2,HeroButton20x11SYSXDrasle2,HeroPortrait16x30SYSXDrasle2                                    | db 16 | db 006 |
-HeroAddressesSnake1:          db "Snake1",255,"           ","Ranger      ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
+HeroAddressesSnake1:          db "Snake",255,"            ","Ranger      ",255,Snake1SpriteBlock| dw HeroSYSXSnake1,HeroPortrait10x18SYSXSnake1,HeroButton20x11SYSXSnake1,HeroPortrait16x30SYSXSnake1                                         | db 19 | db 007 |
 HeroAddressesDrasle3:         db "Maia Worzen",255,"      ","Wizzard     ",255,Drasle3SpriteBlock| dw HeroSYSXDrasle3,HeroPortrait10x18SYSXDrasle3,HeroButton20x11SYSXDrasle3,HeroPortrait16x30SYSXDrasle3                                    | db 22 | db 008 |
 
-HeroAddressesSnake2:          db "Snake2",255,"           ","Battle Mage ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
+HeroAddressesSnake2:          db "Solid Snake",255,"      ","Battle Mage ",255,Snake2SpriteBlock| dw HeroSYSXSnake2,HeroPortrait10x18SYSXSnake2,HeroButton20x11SYSXSnake2,HeroPortrait16x30SYSXSnake2                                         | db 25 | db 009 |
 HeroAddressesDrasle4:         db "Xemn Worzen",255,"      ","Scholar     ",255,Drasle4SpriteBlock| dw HeroSYSXDrasle4,HeroPortrait10x18SYSXDrasle4,HeroButton20x11SYSXDrasle4,HeroPortrait16x30SYSXDrasle4                                    | db 28 | db 010 |
 HeroAddressesAshguine:        db "Ashguine",255,"         ","Necromancer ",255,AshguineSpriteBlock| dw HeroSYSXAshguine,HeroPortrait10x18SYSXAshguine,HeroButton20x11SYSXAshguine,HeroPortrait16x30SYSXAshguine                               | db 31 | db 011 |
 HeroAddressesUndeadline1:     db "Leon",255,"             ","Knight      ",255,Undeadline1SpriteBlock| dw HeroSYSXUndeadline1,HeroPortrait10x18SYSXUndeadline1,HeroButton20x11SYSXUndeadline1,HeroPortrait16x30SYSXUndeadline1                | db 01 | db 012 |
@@ -4040,7 +4078,26 @@ HeroAddressesRandomHajile:    db "Random Hajile",255,"    ","Barbarian   ",255,R
 HeroAddressesBensonCunningham:db "Benson Cunningham",255,   "Shieldbearer",255,BensonCunninghamSpriteBlock| dw HeroSYSXBensonCunningham,HeroPortrait10x18SYSXBensonCunningham,HeroButton20x11SYSXBensonCunningham,HeroPortrait16x30SYSXBensonCunningham  | db 07 | db 058 |
 HeroAddressesJamieSeed:       db "Jamie Seed",255,"       ","Overlord    ",255,JamieSeedSpriteBlock| dw HeroSYSXJamieSeed,HeroPortrait10x18SYSXJamieSeed,HeroButton20x11SYSXJamieSeed,HeroPortrait16x30SYSXJamieSeed                          | db 10 | db 059 |
 HeroAddressesArmoredSnatcher: db "Armored Snatcher",255," ","Alchemist   ",255,ArmoredSnatcherSpriteBlock| dw HeroSYSXArmoredSnatcher,HeroPortrait10x18SYSXArmoredSnatcher,HeroButton20x11SYSXArmoredSnatcher,HeroPortrait16x30SYSXArmoredSnatcher       | db 13 | db 060 |
-HeroAddressesDruid:           db "Druid",255,"            ","Sage        ",255,DruidSpriteBlock| dw HeroSYSXDruid,HeroPortrait10x18SYSXDruid,HeroButton20x11SYSXDruid,HeroPortrait16x30SYSXDruid                                             | db 16 | db 061 |
+HeroAddressesDruid:           db "Druid",255,"            ","Sage        ",255,DruidSpriteBlock| dw HeroSYSXDruid,HeroPortrait10x18SYSXDruid,HeroButton20x11SYSXDruid,HeroPortrait16x30SYSXDruid                                              | db 16 | db 061 |
+HeroAddressesJeddaChef:       db "Jedda Chef",255,"       ","Ranger      ",255,JeddaChefSpriteBlock| dw HeroSYSXJeddaChef,HeroPortrait10x18SYSXJeddaChef,HeroButton20x11SYSXJeddaChef,HeroPortrait16x30SYSXJeddaChef                          | db 19 | db 062 |
+HeroAddressesMomotaru:        db "Momotaru",255,"         ","Wizzard     ",255,MomotaruSpriteBlock| dw HeroSYSXMomotaru,HeroPortrait10x18SYSXMomotaru,HeroButton20x11SYSXMomotaru,HeroPortrait16x30SYSXMomotaru                               | db 22 | db 063 |
+HeroAddressesLuka:            db "Luka",255,"             ","Battle Mage ",255,LukaSpriteBlock| dw HeroSYSXLuka,HeroPortrait10x18SYSXLuka,HeroButton20x11SYSXLuka,HeroPortrait16x30SYSXLuka                                                   | db 25 | db 064 |
+
+HeroAddressesHeiwaAndButako:  db "Heiwa and Butako",255," ","Scholar     ",255,HeiwaAndButakoSpriteBlock| dw HeroSYSXHeiwaAndButako,HeroPortrait10x18SYSXHeiwaAndButako,HeroButton20x11SYSXHeiwaAndButako,HeroPortrait16x30SYSXHeiwaAndButako | db 28 | db 065 |
+HeroAddressesAce:             db "Ace",255,"              ","Necromancer ",255,AceSpriteBlock| dw HeroSYSXAce,HeroPortrait10x18SYSXAce,HeroButton20x11SYSXAce,HeroPortrait16x30SYSXAce                                                        | db 31 | db 066 |
+HeroAddressesSpaceExplorer01: db "Space Explorer 01",255,   "Knight      ",255,SpaceExplorer01SpriteBlock| dw HeroSYSXSpaceExplorer01,HeroPortrait10x18SYSXSpaceExplorer01,HeroButton20x11SYSXSpaceExplorer01,HeroPortrait16x30SYSXSpaceExplorer01  | db 01 | db 067 |
+HeroAddressesFern:            db "Feru",255,"             ","Barbarian   ",255,FernSpriteBlock| dw HeroSYSXFern,HeroPortrait10x18SYSXFern,HeroButton20x11SYSXFern,HeroPortrait16x30SYSXFern                                                   | db 04 | db 068 |
+HeroAddressesHorn:            db "Horn",255,"             ","Shieldbearer",255,HornSpriteBlock| dw HeroSYSXHorn,HeroPortrait10x18SYSXHorn,HeroButton20x11SYSXHorn,HeroPortrait16x30SYSXHorn                                                   | db 07 | db 069 |
+HeroAddressesPixie:           db "Pixie",255,"            ","Overlord    ",255,PixieSpriteBlock| dw HeroSYSXPixie,HeroPortrait10x18SYSXPixie,HeroButton20x11SYSXPixie,HeroPortrait16x30SYSXPixie                                              | db 10 | db 070 |
+HeroAddressesFreyaJerbain:    db "Freya Jerbain",255,"    ","Alchemist   ",255,FreyaJerbainSpriteBlock| dw HeroSYSXFreyaJerbain,HeroPortrait10x18SYSXFreyaJerbain,HeroButton20x11SYSXFreyaJerbain,HeroPortrait16x30SYSXFreyaJerbain           | db 13 | db 071 |
+HeroAddressesLanceBean:       db "Lance Bean",255,"       ","Sage        ",255,LanceBeanSpriteBlock| dw HeroSYSXLanceBean,HeroPortrait10x18SYSXLanceBean,HeroButton20x11SYSXLanceBean,HeroPortrait16x30SYSXLanceBean                          | db 16 | db 072 |
+
+HeroAddressesThiharis:        db "Thiharis",255,"         ","Ranger      ",255,ThiharisSpriteBlock| dw HeroSYSXThiharis,HeroPortrait10x18SYSXThiharis,HeroButton20x11SYSXThiharis,HeroPortrait16x30SYSXThiharis                               | db 19 | db 073 |
+HeroAddressesPampas:          db "Pampas",255,"           ","Wizzard     ",255,PampasSpriteBlock| dw HeroSYSXPampas,HeroPortrait10x18SYSXPampas,HeroButton20x11SYSXPampas,HeroPortrait16x30SYSXPampas                                         | db 22 | db 074 |
+HeroAddressesSelene:          db "Selene",255,"           ","Battle Mage ",255,SeleneSpriteBlock| dw HeroSYSXSelene,HeroPortrait10x18SYSXSelene,HeroButton20x11SYSXSelene,HeroPortrait16x30SYSXSelene                                         | db 25 | db 075 |
+HeroAddressesSkooter:         db "Skooter",255,"          ","Scholar     ",255,SkooterSpriteBlock| dw HeroSYSXSkooter,HeroPortrait10x18SYSXSkooter,HeroButton20x11SYSXSkooter,HeroPortrait16x30SYSXSkooter                                    | db 28 | db 076 |
+
+
 
 
 
@@ -4108,73 +4165,108 @@ HeroSYSXBensonCunningham: equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) 
 HeroSYSXJamieSeed:        equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXArmoredSnatcher:  equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXDruid:            equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXMomotaru:         equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXLuka:             equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXHeiwaAndButako:   equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+
+HeroSYSXAce:              equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSpaceExplorer01:  equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXFern:             equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXHorn:             equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPixie:            equ $4000+(064*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXFreyaJerbain:     equ $4000+(064*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXLanceBean:        equ $4000+(096*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXThiharis:         equ $4000+(096*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXPampas:           equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSelene:           equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXSkooter:          equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+HeroSYSXJeddaChef:        equ $4000+(032*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
+
+
+
 
 
 ;------------------------------------------------------------------------------------------------------------
-HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGoemon1:      equ $4000+(000*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPixy:         equ $4000+(000*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle1:      equ $4000+(000*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXLatok:        equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle2:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSnake1:       equ $4000+(000*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle3:      equ $4000+(000*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSnake2:       equ $4000+(000*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrasle4:      equ $4000+(000*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXAshguine:     equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXUndeadline1:  equ $4000+(000*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPsychoWorld:  equ $4000+(000*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXUndeadline2:  equ $4000+(000*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGoemon2:      equ $4000+(000*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXUndeadline3:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXFray:         equ $4000+(000*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXBlackColor:   equ $4000+(000*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXAdol:         equ $4000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGoemon1:      equ $4000+(000*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPixy:         equ $4000+(000*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDrasle1:      equ $4000+(000*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLatok:        equ $4000+(000*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDrasle2:      equ $4000+(000*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSnake1:       equ $4000+(000*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDrasle3:      equ $4000+(000*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSnake2:       equ $4000+(000*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDrasle4:      equ $4000+(000*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXAshguine:     equ $4000+(000*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXUndeadline1:  equ $4000+(000*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPsychoWorld:  equ $4000+(000*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXUndeadline2:  equ $4000+(000*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGoemon2:      equ $4000+(000*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXUndeadline3:  equ $4000+(000*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXFray:         equ $4000+(000*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXBlackColor:   equ $4000+(000*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
-HeroPortrait14x9SYSXWit:          equ $4000+(009*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXMitchell:     equ $4000+(009*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXJanJackGibson:equ $4000+(009*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGillianSeed:  equ $4000+(009*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSnatcher:     equ $4000+(009*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGolvellius:   equ $4000+(009*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXBillRizer:    equ $4000+(009*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPochi:        equ $4000+(009*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGreyFox:      equ $4000+(009*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXTrevorBelmont:equ $4000+(009*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXBigBoss:      equ $4000+(009*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXSimonBelmont: equ $4000+(009*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDrPettrovich: equ $4000+(009*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXUltrabox:     equ $4000+(009*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXLoganSerios:  equ $4000+(009*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXHollyWhite:   equ $4000+(009*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXMercies:      equ $4000+(009*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXWit:          equ $4000+(009*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXMitchell:     equ $4000+(009*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXJanJackGibson:equ $4000+(009*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGillianSeed:  equ $4000+(009*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSnatcher:     equ $4000+(009*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGolvellius:   equ $4000+(009*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXBillRizer:    equ $4000+(009*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPochi:        equ $4000+(009*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGreyFox:      equ $4000+(009*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXTrevorBelmont:equ $4000+(009*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXBigBoss:      equ $4000+(009*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSimonBelmont: equ $4000+(009*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDrPettrovich: equ $4000+(009*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXRichterBelmont:equ $4000+(009*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXUltrabox:     equ $4000+(009*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLoganSerios:  equ $4000+(009*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXHollyWhite:   equ $4000+(009*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXMercies:      equ $4000+(009*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
-HeroPortrait14x9SYSXNatashaRomanenko: equ $4000+(018*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXRuth:             equ $4000+(018*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXGeera:            equ $4000+(018*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXYoungNoble:       equ $4000+(018*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDawel:            equ $4000+(018*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPocky:            equ $4000+(018*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXKelesisTheCook:   equ $4000+(018*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXLolo:             equ $4000+(018*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPippols:          equ $4000+(018*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXRandar:           equ $4000+(018*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXCles:             equ $4000+(018*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXLuice:            equ $4000+(018*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDick:             equ $4000+(018*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXAphrodite:        equ $4000+(018*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXTienRen:          equ $4000+(018*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPopolon:          equ $4000+(018*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXHoMei:            equ $4000+(018*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPriestessKi:      equ $4000+(018*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXNatashaRomanenko: equ $4000+(018*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXRuth:             equ $4000+(018*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXGeera:            equ $4000+(018*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXYoungNoble:       equ $4000+(018*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDawel:            equ $4000+(018*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPocky:            equ $4000+(018*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXKelesisTheCook:   equ $4000+(018*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLolo:             equ $4000+(018*128)+(098/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPippols:          equ $4000+(018*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXRandar:           equ $4000+(018*128)+(126/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXCles:             equ $4000+(018*128)+(140/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLuice:            equ $4000+(018*128)+(154/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDick:             equ $4000+(018*128)+(168/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXAphrodite:        equ $4000+(018*128)+(182/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXTienRen:          equ $4000+(018*128)+(196/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPopolon:          equ $4000+(018*128)+(210/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXHoMei:            equ $4000+(018*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPriestessKi:      equ $4000+(018*128)+(238/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
-HeroPortrait14x9SYSXMeiHong:          equ $4000+(027*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXPrinceGilgamesh:  equ $4000+(027*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXRandomHajile:     equ $4000+(027*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXBensonCunningham: equ $4000+(027*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXJamieSeed:        equ $4000+(027*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXArmoredSnatcher:  equ $4000+(027*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
-HeroPortrait14x9SYSXDruid:            equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXMeiHong:          equ $4000+(027*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPrinceGilgamesh:  equ $4000+(027*128)+(014/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXRandomHajile:     equ $4000+(027*128)+(028/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXBensonCunningham: equ $4000+(027*128)+(042/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXJamieSeed:        equ $4000+(027*128)+(056/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXArmoredSnatcher:  equ $4000+(027*128)+(070/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXDruid:            equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXMomotaru:         equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLuka:             equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXHeiwaAndButako:   equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+;HeroPortrait14x9SYSXAce:              equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSpaceExplorer01:  equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXFern:             equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXHorn:             equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPixie:            equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXFreyaJerbain:     equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXLanceBean:        equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXThiharis:         equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXPampas:           equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSelene:           equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXSkooter:          equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+;HeroPortrait14x9SYSXJeddaChef:        equ $4000+(027*128)+(084/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 ;------------------------------------------------------------------------------------------------------------
 HeroPortrait16x30SYSXAdol:         equ $8000+(000*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
@@ -4241,6 +4333,22 @@ HeroPortrait16x30SYSXBensonCunningham:  equ $8000+(090*128)+(144/2)-128 ;(dy*128
 HeroPortrait16x30SYSXJamieSeed:         equ $8000+(090*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXArmoredSnatcher:   equ $8000+(090*128)+(176/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 HeroPortrait16x30SYSXDruid:             equ $8000+(090*128)+(192/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+
+HeroPortrait16x30SYSXMomotaru:          equ $8000+(090*128)+(208/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXLuka:              equ $8000+(090*128)+(224/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXHeiwaAndButako:    equ $8000+(090*128)+(240/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXAce:               equ $8000+(120*128)+(000/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSpaceExplorer01:   equ $8000+(120*128)+(016/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXFern:              equ $8000+(120*128)+(032/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXHorn:              equ $8000+(120*128)+(048/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXPixie:             equ $8000+(120*128)+(064/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXFreyaJerbain:      equ $8000+(120*128)+(080/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXLanceBean:         equ $8000+(120*128)+(096/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXThiharis:          equ $8000+(120*128)+(112/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXPampas:            equ $8000+(120*128)+(128/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSelene:            equ $8000+(120*128)+(144/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXSkooter:           equ $8000+(120*128)+(160/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
+HeroPortrait16x30SYSXJeddaChef:         equ $8000+(120*128)+(176/2)-128 ;(dy*128 + dx/2) Destination in Vram page 2
 
 Difficulty: ds  1                   ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
 ScenarioPage: ds  1
