@@ -1850,20 +1850,35 @@ CheckHeroCollidesWithFriendlyHero:      ;out: carry=Hero Collides With Friendly 
 SetMappositionHero:                     ;adds mappointer x and y to the mapdata, gives our current camera location in hl
   ld    ix,(plxcurrentheroAddress)
 
-	ld		hl,mapdata                      ;set map pointer x
-  ld    e,(ix+HeroX)
-  ld    d,0
-	add		hl,de	
   
   ld    a,(ix+HeroY)
   inc   a                               ;items are picked up with the bottom part of hero's body
+;NEW SHIT NOT TESTED YET
+;  push  hl
+	ld		de,(maplenght)
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+;  pop   de
+;  add   hl,de
+;/NEW SHIT NOT TESTED YET
+
+	ld		bc,mapdata                      ;set map pointer x
+  add   hl,bc
+  ld    c,(ix+HeroX)
+  ld    b,0
+	add		hl,bc	
+
+
+
+
 ;	or		a
 ;  ret   z
-	ld		b,a
-	ld		de,(maplenght)
-  .setypointerloop:	
-	add		hl,de
-	djnz	.setypointerloop
+;	ld		b,a
+;	ld		de,(maplenght)
+;  .setypointerloop:	
+;	add		hl,de
+;	djnz	.setypointerloop
   ret
 
 CheckHeroCollidesWithGuardTower:
@@ -3665,7 +3680,6 @@ checktriggermapscreen:
 
   sub   a,6
 
-
 	and		%1111 0000
 	srl		a				                        ;/2
 	srl		a				                        ;/4
@@ -4352,7 +4366,6 @@ doputheros:        ;HeroStatus: 1=active on map, 2=visiting castle,254=defending
 	;setypointer	
 	ld		a,(mappointery)
 	add		a,c
-
 
 ;NEW SHIT NOT TESTED YET
   push  hl
@@ -5210,17 +5223,29 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ret
 
   .SetMappositionMousePointsTo:         ;(mouseposy)=mappointery + mouseposy(/16), (mouseposx)=mappointerx + mouseposx(/16)
-	ld		hl,mapdata                      ;set map pointer x
-	ld		de,(maplenght)
+;	ld		de,(maplenght)
+
+;	ld		a,(mouseposy)                   ;set map pointer y
+;	or		a
+;  jr    z,.SetX
+;	ld		b,a
+
+;  .setypointerloop:	
+;	add		hl,de
+;	djnz	.setypointerloop
 
 	ld		a,(mouseposy)                   ;set map pointer y
-	or		a
-  jr    z,.SetX
-	ld		b,a
 
-  .setypointerloop:	
-	add		hl,de
-	djnz	.setypointerloop
+;NEW SHIT NOT TESTED YET
+;  push  hl
+	ld		de,(maplenght)
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+	ld		de,mapdata                      ;set map pointer x
+;  pop   de
+  add   hl,de
+;/NEW SHIT NOT TESTED YET
 
   .SetX:
   ld    a,(mouseposx)
@@ -5864,17 +5889,33 @@ PutTopObjectFromObjectLayer:            ;hl->points to tile in inactive page, de
   jp    PutTile.go
 
 SetMapposition:                         ;adds mappointer x and y to the mapdata, gives our current camera location in hl
-	ld		hl,mapdata                      ;set map pointer x
+	ld		a,(mappointery)                 ;set map pointer y
+;NEW SHIT NOT TESTED YET
+;  push  hl
+	ld		de,(maplenght)
+  ld    h,0
+  ld    l,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+;  pop   de
+
+
+	ld		de,mapdata                      ;set map pointer x
+  add   hl,de
 	ld		de,(mappointerx)
 	add		hl,de	
-	ld		a,(mappointery)                 ;set map pointer y
-	or		a
-  ret   z
-	ld		b,a
-	ld		de,(maplenght)
-  .setypointerloop:	
-	add		hl,de
-	djnz	.setypointerloop
+
+
+;/NEW SHIT NOT TESTED YET
+
+
+;	ld		a,(mappointery)                 ;set map pointer y
+;	or		a
+;  ret   z
+;	ld		b,a
+;	ld		de,(maplenght)
+;  .setypointerloop:	
+;	add		hl,de
+;	djnz	.setypointerloop
   ret
 
 buildupscreen:

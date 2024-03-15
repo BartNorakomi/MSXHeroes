@@ -2,7 +2,7 @@ phase	$c000
 
 StartOfTurnMessageOn?:              equ 1
 UnlimitedBuildsPerTurn?:            equ 0
-DisplayNumbers1to6?:                equ 1
+DisplayNumbers1to6?:                equ 0
 StartAtTitleScreen?:                equ 1
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
@@ -107,7 +107,7 @@ CheckNormalRouteShortestPath:
 	ld		(movementpath+2),a              ;reset first movement
 	ld		(movementpath+3),a              ;reset first movement
 
-  ;check if we clicked with 5 tiles from hero
+  ;check if we clicked in a 5 tiles radius from hero
 	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
 	sub   a,(ix+HeroX)			              ;pl1hero?x
   jp    p,.EndCheckNegativeX
@@ -122,6 +122,12 @@ CheckNormalRouteShortestPath:
   neg
   .EndCheckNegativeY:
   cp    6
+  jp    nc,CheckReverseRoute
+
+  ;check if we clicked on a background tile
+  call  setspritecharacter.SetMappositionMousePointsTo
+  ld    a,(hl)
+  cp    150                             ;tiles 150 and higher are foreground
   jp    nc,CheckReverseRoute
 
 	;setmappointer

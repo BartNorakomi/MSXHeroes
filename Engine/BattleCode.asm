@@ -3150,6 +3150,8 @@ SetEnemyStatsWindow:
   ld    a,126
   .NoOverFlowRight:
 
+  res   0,a
+
   ld    b,a                             ;b=x
 
 	srl		a				                        ;/2

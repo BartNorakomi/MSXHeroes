@@ -1,4 +1,4 @@
-AAAAAAAAAAAAAH je kan soms door foreground lopen als je daar direct op klikt !
+bij aanvang battle: na het casten van magic arrows, kun je direct door het scherm aan de linker kant een vijand aanvallen rechts in het scherm
 
 
 title screen
