@@ -268,6 +268,39 @@ init:
   ld    a,($180)    ;$c3 = turbo on
   ld    (TurboOn?),a
 
+EXTROM:	equ	0015fh
+REDCLK:	equ	001f5h
+
+	ld	c,$7		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 7 (eenheden day of month)
+	ld    (DayOfMonthEenheden),a
+
+	ld	c,$8		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 8 (tientallen day of month)
+	ld    (DayOfMonthTientallen),a
+
+	ld	c,$9		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 9 (eenheden month)
+	ld    (MonthEenheden),a
+
+	ld	c,$a		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 10 (tientallen month)
+	ld    (MonthTientallen),a
+
+	ld	c,$b		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 11 (eenheden jaar)
+	ld    (YearEenheden),a
+
+	ld	c,$c		; C = block number (bits 5-4) and register (bits 3-0).
+	ld	ix,REDCLK
+	call	EXTROM  ;block 0, register 12 (tientallen jaar)
+	ld    (YearTientallen),a
+
 ;  ld    a,%1000 0001
 ;  ld		ix,$180     ;CHGCPU: A = LED 0 0 0 0 0 x x | ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
 ;  call	$15F

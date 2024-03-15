@@ -292,7 +292,11 @@ else
   db  %1100 0011 | dw $4000 + ((172+014)*128) + (000/2) - 128 | dw $4000 + ((172+014)*128) + (062/2) - 128 | dw $4000 + ((172+014)*128) + (124/2) - 128 | db TitleScreenButton2Ytop,TitleScreenButton2YBottom,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + (TitleScreenButton2Ytop*128) + (TitleScreenButton2XLeft/2) - 128 
   db  %1100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
   db  %1100 0011 | dw $4000 + ((172+045)*128) + (000/2) - 128 | dw $4000 + ((172+045)*128) + (050/2) - 128 | dw $4000 + ((172+045)*128) + (100/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
+if CollectionOptionAvailable?
   db  %1100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
+else
+  db  %0100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
+endif
 endif
 
 
@@ -302,12 +306,19 @@ endif
 
 
 
-
-
-
+DeactivateAllHeroesInHeroList:
+  ld    hl,pl1hero1y+HeroStatus
+  ld    de,lenghtherotable
+  ld    b,amountofheroesperplayer* 4    ;8 heroes per player, and 4 players in total = 32 heroes to deactivate
+  .loop:
+  ld    (hl),255
+  add   hl,de                           ;next hero
+  djnz  .loop
+  ret
 
 CampaignSelectCode:
   call  screenoff
+  call  DeactivateAllHeroesInHeroList   ;set all hero statuses to 255=inactive
 
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
@@ -713,6 +724,7 @@ screenonAfter3Frames:
 
 ScenarioSelectCode:
   call  screenoff
+  call  DeactivateAllHeroesInHeroList   ;set all hero statuses to 255=inactive
 
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen

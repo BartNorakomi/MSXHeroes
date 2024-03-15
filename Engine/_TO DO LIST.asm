@@ -1,11 +1,12 @@
-add +5 defense when having castle walls and defending in castle
-add +1 defense when defending in castle
- 
+AAAAAAAAAAAAAH je kan soms door foreground lopen als je daar direct op klikt !
+
+
 title screen
 options:
 1 show enable mouse message at start of game
 2 frequency: 50/60
-show newly bought buildings animation ?
+3 show newly bought buildings animation ?
+4 show quicktips ingame ?
 
 battle:
 options menu: 
@@ -16,6 +17,7 @@ options menu:
 5 return to combat
 
 low prio
+enemy players moeten spells kunnen gebruiken in combat
 autocombat moet een sprite worden
 footman meervoud wordt footmans in battle ipv footmen. naam wijzigen
 als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of net voordat er text in het textvak geplaatst wordt), dan wordt de text niet goed geplaatst in beide pages. oplossing: je kunt niet de stats kijken als puttext? of hoe dat dan ook heet actief is.
@@ -29,7 +31,8 @@ Show day/week/month
 2 load game
 3 main menu
 4 autosave every 1/2/3/4 turns ?
-show newly bought buildings animation ?
+5 show newly bought buildings animation ?
+6 show quicktips ?
 
 low prio:
 shift click unit moet nog gemaakt worden om units te splitsen

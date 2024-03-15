@@ -4872,7 +4872,19 @@ DisplayQuickTipsCode:
   call  SetQuickTipsButtons
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
+
+  if  Promo?
+  ld    a,(QuickTipsNumber)
+  inc   a
+  cp    LastQuickTip
+  jr    nz,.EndCheckLastQuickTip
+  xor   a
+  .EndCheckLastQuickTip:
+  ld    (QuickTipsNumber),a
+  else
   ld    a,r
+  endif
+
   push  af                              ;store random number for quicktips
   call  SetQuickTipsText
   call  SwapAndSetPage                  ;swap and set page
@@ -4953,8 +4965,10 @@ ListOfQuickTips:
   dw TextQuickTip1 ,TextQuickTip2 ,TextQuickTip3 ,TextQuickTip4 ,TextQuickTip5 ,TextQuickTip6 ,TextQuickTip7 ,TextQuickTip8 ,TextQuickTip9 ,TextQuickTip10
   dw TextQuickTip11,TextQuickTip12,TextQuickTip13,TextQuickTip14,TextQuickTip15,TextQuickTip16,TextQuickTip17,TextQuickTip18,TextQuickTip19,TextQuickTip20
   dw TextQuickTip21,TextQuickTip22,TextQuickTip23,TextQuickTip24,TextQuickTip25,TextQuickTip26,TextQuickTip27,TextQuickTip28,TextQuickTip29,TextQuickTip30
-  dw TextQuickTip31,TextQuickTip32,TextQuickTip33,TextQuickTip34
+  dw TextQuickTip31,TextQuickTip32,TextQuickTip33,TextQuickTip34,TextQuickTip35,TextQuickTip36,TextQuickTip37,TextQuickTip38,TextQuickTip39,TextQuickTip40
+  dw TextQuickTip41,TextQuickTip42,TextQuickTip43,TextQuickTip44,TextQuickTip45
   
+TotalAmountOfQuickTips: equ 45
 
 
 SetQuickTipsText:
@@ -4972,7 +4986,7 @@ SetQuickTipsText:
   pop   af                              ;random number
   ld    b,0
   ld    c,a
-  ld    de,34                           ;divide the days by 7, the rest is the day of the week
+  ld    de,TotalAmountOfQuickTips       ;divide the days by 7, the rest is the day of the week
   call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
   add   hl,hl
   ld    de,ListOfQuickTips
@@ -4982,7 +4996,7 @@ SetQuickTipsText:
   ld    d,(hl)
   ex    de,hl
 
-;ld hl,TextQuickTip34
+;ld hl,TextQuickTip45
 
   ld    b,038+00                        ;dx
   ld    c,064+00                        ;dy
@@ -13959,14 +13973,13 @@ BarracksTowerCost:
 TextCityWalls:        
                           db  "   City Walls",254
                           db  " ",254
-
                           
-                          db  "Enhances your",254
-                          db  "city's security",254
-                          db  "through fortified",254
-                          db  "walls that stand",254
-                          db  "resolute against",254
-                          db  "relentless sieges",254
+                          db  "Strengthens city",254
+                          db  "defenses with",254
+                          db  "fortified walls,",254
+                          db  "granting heroes in",254
+                          db  "the defending hero",254
+                          db  "slot + 5 defense",254
                           
                           db  " ",254
                           db  "Cost:",254
@@ -13984,7 +13997,14 @@ TextCityWallsFinished:
                           db  "through fortified",254
                           db  "walls that stand",254
                           db  "resolute against",254
-                          db  "relentless sieges",255
+                          db  "relentless sieges",254
+                          db  " ",254
+                          db  "The defending hero",254
+                          db  "slot grants heroes",254
+                          db  "+5 defense",255
+
+
+
 
 CityWallsCost:
 .Gold:    dw  2000

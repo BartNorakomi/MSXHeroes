@@ -227,11 +227,11 @@ TextQuickTip31:
                 db "wisdom skill typically needed.",255
 
 TextQuickTip32:
-                db "When your hero finds a scroll",254
-                db "on the world map, they gain the",254
-                db "capability to cast the spell it",254
-                db "contains, even without the",254
-                db "wisdom skill typically needed.",255
+                db "Occupying the defending hero slot",254
+                db "in a castle grants +1 defense.",254
+                db "Additionally, if castle walls exist,",254
+                db "the hero's defense increases by",254
+                db "+5.",255
    
 TextQuickTip33:
                 db "Scattered among scrolls are",254
@@ -245,6 +245,97 @@ TextQuickTip34:
                 db "left, and their total mana",254
                 db "points on the right.",255
 
+;START OF GAME QUICKTIPS    
+StartOfGameQuickTips: equ 35
 
-    
+TextQuickTip35:
+                db "You can double-click on a",254
+                db "location on the adventure map",254
+                db "to move there. When your hero's",254
+                db "movement points are depleted,",254
+                db "click the hourglass to end your",254
+                db "turn and recharge.",255
+
+TextQuickTip36:
+                db "Enter your castle by clicking its",254
+                db "center or double-clicking the",254
+                db "castle icon in the HUD.",254
+                db "Begin constructing new structures",254
+                db "to define your expanding empire.",255
+
+TextQuickTip37:
+                db "You're limited to constructing one",254
+                db "building per turn. Plan ahead to",254
+                db "decide whether to focus on",254
+                db "generating income, enhancing",254
+                db "magic, or summoning creatures.",255
+
+TextQuickTip38:
+                db "Can't find your hero ?",254
+                db "Clicking the hero icon in the HUD",254
+                db "will focus the screen on your",254
+                db "hero's location. Clicking the castle",254
+                db "icon will do the same for your",254
+                db "castle.",255
+
+TextQuickTip39:
+                db "On the adventure map, you can",254
+                db "gather resources necessary for",254
+                db "constructing specific buildings.",254
+                db "Additionally, you may stumble",254
+                db "upon potent artifacts and scrolls",254
+                db "that enhance your hero's prowess.",255
+
+TextQuickTip40:
+                db "Clicking on your hero or double-",254
+                db "clicking your hero's icon in the",254
+                db "HUD will open the hero menu,",254
+                db "allowing you to access your",254
+                db "hero's skills, inventory, army",254
+                db "arrangement, spells, and stats.",255
+
+TextQuickTip41:
+                db "Each hero belongs to a specific",254
+                db "class. This class determines their",254
+                db "starting set of primary skills and",254
+                db "influences the probability of",254
+                db "acquiring new primary and",254
+                db "secondary skills as they level up.",255
+
+TextQuickTip42:
+                db "In the hero menu's army window,",254
+                db "you can rearrange and split your",254
+                db "units. This allows you to create",254
+                db "tactical formations, like using",254
+                db "melee units as a shield for your",254
+                db "ranged attackers.",255
+
+TextQuickTip43:
+                db "Prioritize information.",254
+                db "Before engaging in combat,",254
+                db "right-click on enemies to view",254
+                db "their size and level. This crucial",254
+                db "intel helps you estimate your",254
+                db "odds of success.",255
+
+TextQuickTip44:
+                db "Combat follows a turn-based",254
+                db "system, wherein each creature",254
+                db "has the option to move, attack",254
+                db "if within range, defend for a",254
+                db "+20% defense bonus, or opt to",254
+                db "delay their action until later.",255
+
+TextQuickTip45:
+                db "Each hero belongs to one of 3",254
+                db "categories: Might, Adventure, or",254
+                db "Wizardry.",254
+                db "Plan your city's structures",254
+                db "strategically to best complement",254
+                db "their strengths.",255
+
+LastQuickTip: equ 45
+
+
+
 

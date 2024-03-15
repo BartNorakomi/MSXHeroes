@@ -2393,6 +2393,45 @@ RemoveSpell:                            ;in: b=spell number
   ld    (ix+MonsterStatusEffect5),0     ;bit 0-3=duration, bit 4-7 spell,  spell, duration
   ret
 
+AddDefenseFromDefendingInCastleOrCastleWalls:
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    254
+  ret   nz
+  inc   hl                              ;+1 defense when defending in castle
+  .CheckWhichCastle:                    ;at this point hero is in castle, find castle and put castle in IY
+  ld    iy,Castle1
+  call  .FindCastle
+  ld    iy,Castle2
+  call  .FindCastle
+  ld    iy,Castle3
+  call  .FindCastle
+  ld    iy,Castle4
+  call  .FindCastle
+  ld    iy,Castle5
+  call  .FindCastle
+  ret
+
+  .FindCastle:
+  ld    a,(ix+HeroY)                    ;y hero
+  inc   a                               ;y hero + 1
+  cp    (iy+CastleY)
+  ret   nz
+
+  ld    a,(ix+HeroX)                    ;x hero (2)
+  dec   a                               ;a=x hero-1
+  dec   a                               ;a=x hero-1
+  cp    (iy+CastleX)
+  ret   nz
+  ;castle found
+  pop   af                              ;no need to check the other castles
+
+  ld    a,(iy+CastleLevel)              ;max 6 (=city walls)
+  cp    6
+  ret   nz
+  ld    de,5
+  add   hl,de  
+  ret
+
 SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total defense (including boosts from inventory items, skills and magic)
   push  ix
   ;are we checking a monster that belongs to the left or right hero ?
@@ -2423,6 +2462,7 @@ SetTotalMonsterDefenseInHL: ;in ix->monster, iy->monstertable. out: hl=total def
   ld    d,0
   ld    e,(ix+HeroStatDefense)
   add   hl,de                           ;add defense from hero  
+  call  AddDefenseFromDefendingInCastleOrCastleWalls
 
   bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
   jr    z,.SetDefense
@@ -2725,6 +2765,7 @@ CheckPointerOnDefendingHero:
   ld    e,(ix+HeroStatDefense)           ;attack
   ld    d,0
   add   hl,de
+  call  AddDefenseFromDefendingInCastleOrCastleWalls
 
   bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
   jr    z,.SetDefense
@@ -2837,6 +2878,7 @@ CheckPointerOnAttackingHero:
   ld    e,(ix+HeroStatDefense)           ;attack
   ld    d,0
   add   hl,de
+  call  AddDefenseFromDefendingInCastleOrCastleWalls
 
   bit   7,h                             ;defense is the only stat that can drop below 0 (with hell slayer), if so, set def=0
   jr    z,.SetDefense

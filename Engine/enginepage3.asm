@@ -1,18 +1,19 @@
 phase	$c000
 
-StartOfTurnMessageOn?:    equ 1
-UnlimitedBuildsPerTurn?:  equ 0
-DisplayNumbers1to6?:      equ 0
-StartAtTitleScreen?:      equ 1
-Promo?:                   equ 0
-ShowNewlyBoughtBuildingFadingIn?:  db  1
+StartOfTurnMessageOn?:              equ 1
+UnlimitedBuildsPerTurn?:            equ 0
+DisplayNumbers1to6?:                equ 1
+StartAtTitleScreen?:                equ 1
+Promo?:                             equ 0
+CollectionOptionAvailable?:         equ 0
+ShowNewlyBoughtBuildingFadingIn?:   db  1
 
 ;WorldPointer: dw GentleAutumnMap01
 ;WorldPointer: dw GentleCaveMap02
 ;WorldPointer: dw GentleDesertMap03
-;WorldPointer: dw GentleJungleMap03
+WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
-WorldPointer: dw GentleWinterMap04
+;WorldPointer: dw GentleWinterMap04
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -88,7 +89,7 @@ StartGame:
   jp    LevelEngine
 
 ShortestPathTileHandlerQueue:
-  ds  2*144,0
+  ds  2*169,0
 
   ds  12,255        ;1 additional foreground row above our grid
 ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of each row
@@ -4362,6 +4363,8 @@ db 3
 else
 db 30
 endif
+QuickTipsNumber: db  StartOfGameQuickTips-2
+
 
 endenginepage3:
 dephase
@@ -4398,6 +4401,13 @@ VDP_8:		                  rb    30
 ComputerID:                 rb    1       ;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
 CPUMode:                    rb    1       ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
 TurboOn?:                   rb    1       ;0=no, $c3=yes
+
+DayOfMonthEenheden:         rb    1
+DayOfMonthTientallen:       rb    1
+MonthEenheden:              rb    1
+MonthTientallen:            rb    1
+YearEenheden:               rb    1       ;you still need to add +1980 to the year
+YearTientallen:             rb    1       ;
 
 engaddr:	                  equ	  $03e
 loader.address:             equ   $8000

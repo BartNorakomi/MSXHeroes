@@ -1999,11 +1999,11 @@ CheckHeroCollidesWithMonster:
 
   ld    d,0
   ld    a,(hl)                          ;monster level
-  sub   191                             ;amount number starts at tilenr. 192
+  sub   191                             ;amount level number starts at tilenr. 192
   ld    e,a
-  ld    (hl),0                          ;remove monster level
+  ld    (hl),0                          ;remove monster level number  
   inc   hl
-  ld    a,(hl)                          ;monster amount
+  ld    a,(hl)                          ;monster amount backup
   ld    (hl),0                          ;backup of monster amount (required for handing out appropriate reward)
 
   sub   191                             ;amount number starts at tilenr. 192
@@ -6155,7 +6155,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db 008 | dw CastleVaniaUnitLevel1Growth |      db 048 | dw CastleVaniaUnitLevel1Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db 008 | dw 100 |      db 048 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6183,13 +6183,13 @@ Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
 
 
-pl1hero2y:		db	60
-pl1hero2x:		db	103
+pl1hero2y:		db	$1c
+pl1hero2x:		db	$33
 pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	10,10
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	1	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -6507,7 +6507,7 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle1:  db  255,  255,  255,      6,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
 Castle2:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
 Castle3:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
 Castle4:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
