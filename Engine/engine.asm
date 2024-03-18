@@ -3445,8 +3445,8 @@ doputstar:
 ;check if star is behind a tree	
 	cp		amountoftransparantpieces
 	jp		c,.behindtree
-	cp		255
-	jp		z,.behindheroorcastle
+	cp		254
+	jp		nc,.behindheroorcastle
 
   ld    a,222
 	ld		(putstar+sy),a
@@ -6215,7 +6215,7 @@ EmptyHeroRecruitedAtTavern:
 pl1hero1y:		db	3
 pl1hero1x:		db	3
 pl1hero1xp: dw 0 ;65000 ;3000 ;999
-pl1hero1move:	db	20,20
+pl1hero1move:	db	3,20
 pl1hero1mana:	dw	50,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
