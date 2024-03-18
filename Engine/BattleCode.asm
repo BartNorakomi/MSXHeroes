@@ -2399,6 +2399,7 @@ AddDefenseFromDefendingInCastleOrCastleWalls:
   ret   nz
   inc   hl                              ;+1 defense when defending in castle
   .CheckWhichCastle:                    ;at this point hero is in castle, find castle and put castle in IY
+  push  iy
   ld    iy,Castle1
   call  .FindCastle
   ld    iy,Castle2
@@ -2409,6 +2410,7 @@ AddDefenseFromDefendingInCastleOrCastleWalls:
   call  .FindCastle
   ld    iy,Castle5
   call  .FindCastle
+  pop   iy
   ret
 
   .FindCastle:
@@ -2423,8 +2425,6 @@ AddDefenseFromDefendingInCastleOrCastleWalls:
   cp    (iy+CastleX)
   ret   nz
   ;castle found
-  pop   af                              ;no need to check the other castles
-
   ld    a,(iy+CastleLevel)              ;max 6 (=city walls)
   cp    6
   ret   nz
@@ -5446,8 +5446,7 @@ sub 240
   call  docopy  
 
   ld    hl,PutMonsterAmountOnBattleField
-  call  docopy  
-  ret
+  jp    docopy  
 
 ClearAmountUnderMonster:
   ;if nx=16 add 0 to textbox
@@ -5553,8 +5552,7 @@ SetAmountUnderMonsterIn3Pages:
 	ld		a,2
   ld    (PutMonsterAmountOnBattleField+dpage),a
   ld    hl,PutMonsterAmountOnBattleField
-  call  docopy  
-  ret
+  jp    docopy  
   
 Recover:
   ;recover overwritten monsters. monster0 (grid sprite) gets overwritten hard by all monsters
@@ -5674,8 +5672,7 @@ CheckSpaceToMoveMonster:
   ld    hl,(setspritecharacter.SelfModifyingCodeSpriteCharacterBattle)
   ld    de,CursorBrokenArrow
   call  CompareHLwithDE
-  jp    z,.BrokenArrowFoundSetMovementPath
-  ret
+  ret   nz
 
   .BrokenArrowFoundSetMovementPath:
   ld    a,1
@@ -5704,7 +5701,7 @@ CheckSpaceToMoveMonster:
   ld    de,LenghtBattleField
   add   hl,de
   ld    c,018                           ;initiate attack left
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .SwordLeftDownFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -5713,7 +5710,7 @@ CheckSpaceToMoveMonster:
   or    a
   sbc   hl,de
   ld    c,016                           ;initiate attack left
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .SwordRightUpFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -5721,7 +5718,7 @@ CheckSpaceToMoveMonster:
   ld    de,LenghtBattleField
   add   hl,de
   ld    c,012                           ;initiate attack left
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .SwordRightDownFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -5730,14 +5727,14 @@ CheckSpaceToMoveMonster:
   or    a
   sbc   hl,de
   ld    c,014                           ;initiate attack left
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .SwordLeftFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
   inc   hl
   inc   hl
   ld    c,017                           ;initiate attack left
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .SwordRightFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -5761,7 +5758,7 @@ CheckSpaceToMoveMonster:
   .SwordRightFound:
 
   ld    c,013                           ;initiate attack right
-  jp    .CursorLocationSet
+  jr    .CursorLocationSet
 
   .BootsFoundSetMovementPath:
   call  FindCursorInBattleFieldGrid     ;hl->BattleFieldGrid at cursor location
@@ -6617,7 +6614,6 @@ FillRemaining000sWith254:               ;wherever monster is not able to go, set
   ret
 
 Set001AtCurrentMonstersLocation:
-
   ;Set number 001 in grid where monster is
   ld    a,(ix+MonsterNX)
   ld    (hl),001                        ;set monster in grid
@@ -7873,6 +7869,9 @@ EndSpellSelectedAndReduceManaCost:
   ld    (ix+HeroMana),l
   ld    (ix+HeroMana+1),h
 
+  ld    a,1                             ;when switching to next monster, we actually stay on the same current active monster. We just wanna check if current monster didn't die to an aeo spell, in which case we DO need to switch.
+  ld    (SwitchToNextMonster?),a
+
 EndSpellSelected:
   xor   a
   ld    (SpellSelected?),a
@@ -9107,8 +9106,10 @@ HeroFledSurrendering:                   ;surrendering costs gold, but entire arm
   ret
   
 DeactivateHeroThatAttacks:
-
-
+	ld		a,(whichplayernowplaying?)
+  ld    (PlayerWhoLostAHeroInBattle?),a
+  ld    a,3
+  ld    (PlayerLostHeroInBattle?),a
 
  ;we are going to find how many heroes are below the hero that attacks
 	ld		de,lenghtherotable
@@ -9192,6 +9193,11 @@ SetHero1ForPlayerThatGotAttackedInIX:           ;sets hero 1 of player in IX
   ret
   
 DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros below this one, one position up 
+  ld    a,(PlayerThatGetsAttacked)
+  ld    (PlayerWhoLostAHeroInBattle?),a
+  ld    a,3
+  ld    (PlayerLostHeroInBattle?),a
+
   ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
 
   push  ix
@@ -9268,13 +9274,6 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
   ld    a,1
   ld    (NeutralEnemyDied?),a
   ret
-
-  ld    de,$8000 + (188*128) + (192/2) - 128  ;dy,dx
-  .DestinationAddressInPage3Set:
-  ld    (AddressToWriteTo),de           ;address to write to in page 3
-
-  call  CopyRamToVramPage3ForBattleEngine          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
-
 
 AnimateSpell:
   jp    GoAnimateSpell
@@ -9779,10 +9778,8 @@ SetGuardTowerText:
   ld    hl,.TextS
   ld    a,(PutLetter+dx)                ;set dx of text  
   ld    b,a                             ;dx
-;  push  bc
-  call  SetText                         ;in: b=dx, c=dy, hl->text    
-;  pop   bc
-  ret
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+
 .TextS: db "s.",255
 
 TextGuardTower1:
@@ -9813,3 +9810,5 @@ SetGuardTowerGraphics:
   ld    bc,$0000 + (070*256) + (064/2)
   ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+kut:

@@ -1,6 +1,6 @@
 phase	$c000
 
-StartOfTurnMessageOn?:              equ 1
+StartOfTurnMessageOn?:              equ 0
 UnlimitedBuildsPerTurn?:            equ 0
 DisplayNumbers1to6?:                equ 0
 StartAtTitleScreen?:                equ 1
@@ -9,9 +9,9 @@ CollectionOptionAvailable?:         equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 
 ;WorldPointer: dw GentleAutumnMap01
-;WorldPointer: dw GentleCaveMap02
-;WorldPointer: dw GentleDesertMap03
-WorldPointer: dw GentleJungleMap03
+WorldPointer: dw GentleCaveMap04
+;WorldPointer: dw GentleDesertMap04
+;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
 ;WorldPointer: dw GentleWinterMap04
 
@@ -40,6 +40,9 @@ InitiateGame:
   ld    (HeroThatGetsAttacked),hl       ;000=no hero, hero that gets attacked
   ld    a,1
 ;  ld    (EnterCombat?),a
+
+
+
 
   if  StartAtTitleScreen?
   call  TitleScreen
@@ -85,6 +88,22 @@ StartGame:
 ;ld a,2
 ;ld (Castle1+CastlePlayer),a
 
+
+;ld a,2
+;ld (Castle3+CastlePlayer),a
+
+;ld a,(pl2hero1y)
+;inc a
+;ld (pl2hero1y),a
+
+;  ld    a,255
+;  ld    (Castle1+CastlePlayer),a
+;  ld    (Castle2+CastlePlayer),a
+;  ld    (Castle3+CastlePlayer),a
+;  ld    (Castle4+CastlePlayer),a
+
+
+
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
@@ -127,8 +146,14 @@ CheckNormalRouteShortestPath:
   ;check if we clicked on a background tile
   call  setspritecharacter.SetMappositionMousePointsTo
   ld    a,(hl)
-  cp    150                             ;tiles 150 and higher are foreground
-  jp    nc,CheckReverseRoute
+
+	cp		16
+	jr		c,.noobstacle
+	cp		24
+	jp		c,CheckReverseRoute             ;16-23=foreground (obstacle)
+	cp		UnwalkableTerrainPieces         ;tiles 149 and up are unwalkable terrain
+	jp		nc,CheckReverseRoute            ;149 and up=foreground (obstacle)
+  .noobstacle:
 
 	;setmappointer
 		;setypointer	
@@ -158,9 +183,26 @@ CheckNormalRouteShortestPath:
   .CopyRow:
   ex    af,af'
   ld    a,(hl)
-  cp    149
-  jr    nc,.ForeGroundFound
+
+	cp		16
+	jr		c,.noobstacle2
+	cp		24
+	jr		c,.obstacle2                     ;16-23=foreground (obstacle)
+	cp		UnwalkableTerrainPieces         ;tiles 149 and up are unwalkable terrain
+	jr		c,.noobstacle2                   ;149 and up=foreground (obstacle)
+ 
+  .obstacle2:
+  ld    a,200
+  jp    .ForeGroundFound   
+ 
+  .noobstacle2:
   xor   a
+
+
+
+;  cp    149
+;  jr    nc,.ForeGroundFound
+;  xor   a
   .ForeGroundFound:
   ld    (de),a
   ex    af,af'
@@ -4363,6 +4405,8 @@ ScenarioPage: ds  1
 ScenarioSelected: ds  1
 LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
+PlayerWhoLostAHeroInBattle?: ds   1
+PlayerLostHeroInBattle?: db  0
 AmountOfMapsUnlocked: 
 if promo?
 db 3

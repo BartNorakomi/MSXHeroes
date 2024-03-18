@@ -605,8 +605,8 @@ GolvelliusUnitLevel3CostRubies:       equ 0
 GolvelliusUnitLevel4Number:           equ 84
 GolvelliusUnitLevel4Attack:           equ 12
 GolvelliusUnitLevel4Defense:          equ 10
-GolvelliusUnitLevel4HP:               equ 15
-GolvelliusUnitLevel4Speed:            equ 9
+GolvelliusUnitLevel4HP:               equ 32
+GolvelliusUnitLevel4Speed:            equ 8
 GolvelliusUnitLevel4Growth:           equ 4
 GolvelliusUnitLevel4CostGold:         equ 400/10
 GolvelliusUnitLevel4CostGems:         equ 00+Level4Unit

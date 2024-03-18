@@ -3388,8 +3388,8 @@ Monster144Table:                        ;Pastry Chef (comic bakery)
   db    RandomBUnitLevel2CostGold        ;cost (gold)
   db    RandomBUnitLevel2CostGems        ;cost (gems)
   db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP-1              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2HP-3              ;hp
+  db    RandomBUnitLevel2Speed-1           ;speed
   db    RandomBUnitLevel2Attack-2          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth

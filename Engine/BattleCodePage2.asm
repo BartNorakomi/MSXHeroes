@@ -3121,7 +3121,18 @@ HandleSpellBook:
   call  SetGraphicsSpellBook
   call  SetAmountSpellPoints
 
-  ld    ix,(plxcurrentheroAddress)
+  ;get current active hero
+  call  SetCurrentActiveMOnsterInIX  
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound2
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  .HeroFound2:
+
   call  SetGraphicsElementalSpells
   call  SetGraphicsElementalSpells.SetUniversalSpells
   call  LightUpCurrentActiveElementalButton
@@ -3184,7 +3195,18 @@ HandleSpellBook:
 
   call  .HandleSelectedElementButton
 
-  ld    ix,(plxcurrentheroAddress)
+  ;get current active hero
+  call  SetCurrentActiveMOnsterInIX  
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound3
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  .HeroFound3:
+
   jp    SetGraphicsElementalSpells
 
   .HandleSelectedElementButton:

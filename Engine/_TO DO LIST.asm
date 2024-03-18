@@ -1,3 +1,6 @@
+robert: kan de requirements in een andere kleur ?
+
+
 bij aanvang battle: na het casten van magic arrows, kun je direct door het scherm aan de linker kant een vijand aanvallen rechts in het scherm
 
 

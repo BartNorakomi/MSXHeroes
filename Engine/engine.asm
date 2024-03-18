@@ -1,6 +1,5 @@
 LevelEngine:
 
-
 ;  ld    a,60 ;vertical offset register (battlescreen is 16 pixels shifted down)
 ;  di
 ;  out   ($99),a
@@ -43,7 +42,7 @@ LevelEngine:
   call  CheckHeroCollidesWithEnemyHero  ;check if a fight should happen, when player runs into enemy hero
   call  CheckHeroPicksUpItem
   call  AnimateHeroes                   ;animate the current active hero
-  call  CheckEnterCombat                ;
+  call  CheckEnterCombat
   .EndHeroChecks:
   call  CheckHeroCollidesWithMonster    ;check if a fight should happen, when player runs into enemy monster  
 
@@ -58,6 +57,7 @@ LevelEngine:
 	call	putmovementstars
 
   call  HandleHud                       ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
+  call  CheckPlayerEliminated           ;directly after combat, (when returning back to levelengine) check if a player got eliminated
 
 ;	call	docomputerplayerturn
 ;	call	textwindow
@@ -479,12 +479,22 @@ HandleAIWorldMap:
   jp    EnterSpecificRoutineInCastleOverviewCode	
   ret
 
+CheckPlayerEliminated:
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since text overview is placed on top of the map
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+
+  ld    hl,CheckIfAPlayerGotEliminated
+  jp    EnterSpecificRoutineInExtraRoutines
+  
 EnterCombat?: db    0
 CheckEnterCombat:
   ld    a,(EnterCombat?)
   dec   a
   ret   m
   ld    (EnterCombat?),a
+  pop   af                              ;pop the call from the engine to this routine
   jp    EnterCombat
   
 AnimateHeroes:
@@ -2477,6 +2487,10 @@ SetResources?:  db  3
 SetHeroArmyAndStatusInHud?: db  3
 
 CheckEnterCastle:
+  ld    a,(PlayerLostHeroInBattle?)
+  or    a
+  ret   nz
+
   ld    a,(EnterCastle?)
   or    a
   ret   z
@@ -2513,6 +2527,10 @@ CheckHeroEntersCastle:
 	cp    (iy+CastlePlayer)
   jr    nz,.TakeOverCastle              ;enemy castle entered with no heroes, take control of it !
 
+  ld    a,(PlayerLostHeroInBattle?)
+  or    a
+  ret   nz
+
   ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   cp    002
   ret   z                               ;dont enter castle if hero is visiting
@@ -2540,6 +2558,13 @@ CheckHeroEntersCastle:
   jp    EnterCastle
  
 .TakeOverCastle:                        ;enemy castle entered with no heroes, take control of it !
+  push  af
+  ld    a,(iy+CastlePlayer)
+  ld    (PlayerWhoLostAHeroInBattle?),a
+  ld    a,3
+  ld    (PlayerLostHeroInBattle?),a
+  pop   af
+  
   ld    (iy+CastlePlayer),a
   pop   af                              ;pop the call to this check
   ret
@@ -5242,9 +5267,9 @@ setspritecharacter:                     ;check if pointer is on creature or enem
   ld    h,0
   ld    l,a
   call  MultiplyHlWithDE                ;Out: HL = result
-	ld		de,mapdata                      ;set map pointer x
+	ld		bc,mapdata                      ;set map pointer x
 ;  pop   de
-  add   hl,de
+  add   hl,bc
 ;/NEW SHIT NOT TESTED YET
 
   .SetX:
@@ -6196,7 +6221,7 @@ pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
-Pl1Hero1Units:  db 008 | dw 100 |      db 048 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 1 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 Pl1Hero1StatAttack:  db 1
 Pl1Hero1StatDefense:  db 1
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6214,7 +6239,7 @@ Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 .Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.HeroSpecificInfo: dw HeroAddressesHeiwaAndButako
+.HeroSpecificInfo: dw HeroAddressesSnake1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
@@ -6230,7 +6255,7 @@ pl1hero2xp: dw 0000
 pl1hero2move:	db	06,20
 pl1hero2mana:	dw	10,10
 pl1hero2manarec:db	5		                ;recover x mana every turn
-pl1hero2status:	db	1	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl1hero2status:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -6244,7 +6269,7 @@ Pl1Hero2Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: db  045,045,045,045,045,045,045,045,044,  016,027,033,043,038,039;9 body slots and 6 open slots
-.HeroSpecificInfo: dw HeroAddressesKelesisTheCook
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero3y:		db	01	                ;
@@ -6267,7 +6292,7 @@ Pl1Hero3Units:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0000
 .AllSchoolsSpells:  db  %0000 0000
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesBensonCunningham
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero4y:		db	00		                ;
@@ -6290,7 +6315,7 @@ Pl1Hero4Units:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesDruid
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero5y:		db	00		                ;
@@ -6313,7 +6338,7 @@ Pl1Hero5Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 | 
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesLatok
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero6y:		db	00		                ;
@@ -6336,7 +6361,7 @@ pl1hero6y:		db	00		                ;
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesWit
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero7y:		db	00		                ;
@@ -6359,7 +6384,7 @@ pl1hero7y:		db	00		                ;
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesJanJackGibson
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero8y:		db	00		                ;
@@ -6382,7 +6407,7 @@ pl1hero8y:		db	00		                ;
 .WaterSpells:       db  %0000 0001
 .AllSchoolsSpells:  db  %0000 0001
 .Inventory: ds  lenghtinventorytable,045
-.HeroSpecificInfo: dw HeroAddressesMitchell
+.HeroSpecificInfo: db 255,255
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 pl1hero9y:		db	00		                ;
@@ -6403,7 +6428,7 @@ pl2hero1mana:	dw	50,10
 pl2hero1manarec:db	5		                ;recover x mana every turn
 pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+Pl2Hero1Units:  db 008 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 ;Pl2Hero1Units:  db 1 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 1
 .HeroStatDefense:  db 1
@@ -6615,8 +6640,8 @@ player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 amountofplayers:		db	2
 player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
 player2human?:			db	1
-player3human?:			db	1
-player4human?:			db	1
+player3human?:			db	2
+player4human?:			db	2
 whichplayernowplaying?:	db	1
 
 movementpathpointer:	ds	1	

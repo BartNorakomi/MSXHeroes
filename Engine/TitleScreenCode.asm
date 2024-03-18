@@ -306,7 +306,7 @@ endif
 
 
 
-DeactivateAllHeroesInHeroList:
+DeactivateAllHeroesAndCastles:
   ld    hl,pl1hero1y+HeroStatus
   ld    de,lenghtherotable
   ld    b,amountofheroesperplayer* 4    ;8 heroes per player, and 4 players in total = 32 heroes to deactivate
@@ -314,11 +314,17 @@ DeactivateAllHeroesInHeroList:
   ld    (hl),255
   add   hl,de                           ;next hero
   djnz  .loop
+
+  ld    a,255
+  ld    (Castle1+CastlePlayer),a
+  ld    (Castle2+CastlePlayer),a
+  ld    (Castle3+CastlePlayer),a
+  ld    (Castle4+CastlePlayer),a
   ret
 
 CampaignSelectCode:
   call  screenoff
-  call  DeactivateAllHeroesInHeroList   ;set all hero statuses to 255=inactive
+  call  DeactivateAllHeroesAndCastles   ;set all hero statuses to 255=inactive
 
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
@@ -724,7 +730,7 @@ screenonAfter3Frames:
 
 ScenarioSelectCode:
   call  screenoff
-  call  DeactivateAllHeroesInHeroList   ;set all hero statuses to 255=inactive
+  call  DeactivateAllHeroesAndCastles   ;set all hero statuses to 255=inactive
 
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen

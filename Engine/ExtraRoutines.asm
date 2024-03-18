@@ -262,5 +262,217 @@ TextGuardTowerX:    db    "   Guard Tower  ",254,254 ;item 76
                     db  "  Already Visited ",255
 
 
+CheckIfAPlayerGotEliminated:
+  ;check which player lost a hero
+  call  .CheckWhichPlayerLostAHero      ;out hl->plxHeroStatus
+  ld    a,(hl)                          ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255
+  jr    nz,.PlayerStillHasAHeroOrCastleLeft
+
+  ;at this point player has no more heroes left. Check if player has a castle left
+  ld    a,(PlayerWhoLostAHeroInBattle?)
+  ld    b,a
+  ld    a,(Castle1+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle2+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle3+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle4+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+
+  ;at this point player has no more heroes nor castles left ->Eliminate player
+  ld    a,(PlayerLostHeroInBattle?)
+  dec   a
+  ret   m
+  ld    (PlayerLostHeroInBattle?),a
+  jp    nz,DisableScrollScreen  
+
+  call  SetPlayerEliminatedWindowAndText;show window and text
+  call  SwapAndSetPage                  ;swap and set page
+  
+  .engine:
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  and   %0011 0000
+  jr    nz,.end
+  jr    .engine  
+
+  .end:
+  ld    a,%0011 0000
+	ld		(ControlsOnInterrupt),a                 ;reset trigger a+b
+  jp    CheckIfThereIsAPlayerWhoWonTheGame
+
+.PlayerStillHasAHeroOrCastleLeft:
+  xor   a
+  ld    (PlayerLostHeroInBattle?),a
+  ret
+
+.CheckWhichPlayerLostAHero:
+  ld    a,(PlayerWhoLostAHeroInBattle?)
+  dec   a
+  ld    hl,pl1hero1y+HeroStatus
+  ret   z
+  dec   a
+  ld    hl,pl2hero1y+HeroStatus
+  ret   z
+  dec   a
+  ld    hl,pl3hero1y+HeroStatus
+  ret   z
+  ld    hl,pl4hero1y+HeroStatus
+  ret
 
 
+
+
+CheckIfThereIsAPlayerWhoWonTheGame:
+  ld    c,0                             ;amount of active players
+
+  ld    b,1                             ;player we check
+  ld    a,(pl1hero1y+HeroStatus)        ;hero 1 status
+  call  .CheckPlayer
+  ld    b,2                             ;player we check
+  ld    a,(pl2hero1y+HeroStatus)        ;hero 1 status
+  call  .CheckPlayer
+  ld    b,3                             ;player we check
+  ld    a,(pl3hero1y+HeroStatus)        ;hero 1 status
+  call  .CheckPlayer
+  ld    b,4                             ;player we check
+  ld    a,(pl4hero1y+HeroStatus)        ;hero 1 status
+  call  .CheckPlayer
+
+  dec   c                               ;amount of active players = 1 ?
+  ret   nz
+
+  call  SwapAndSetPage                  ;swap and set page
+  ld    b,60
+  .loop:
+  halt
+  djnz  .loop
+  call  SetPlayerWonGameWindowAndText   ;show window and text
+  call  SwapAndSetPage                  ;swap and set page
+  
+  .engine:
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  and   %0011 0000
+  jr    nz,.end
+  jr    .engine  
+
+  .end:
+  ld    a,%0011 0000
+	ld		(ControlsOnInterrupt),a                 ;reset trigger a+b
+  ret
+  
+  .CheckPlayer:
+  cp    255
+  jr    nz,.PlayerStillHasAHeroOrCastleLeft
+  ;at this point player has no more heroes left. Check if player has a castle left
+  ld    a,(Castle1+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle2+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle3+CastlePlayer)
+  cp    b
+  jr    z,.PlayerStillHasAHeroOrCastleLeft
+  ld    a,(Castle4+CastlePlayer)
+  cp    b
+  ret   nz
+
+  .PlayerStillHasAHeroOrCastleLeft:
+  inc   c                               ;amount of active players
+  ret
+
+
+
+
+
+SetPlayerWonGameWindowAndText:
+  ld    hl,$4000 + (070*128) + (150/2) - 128
+  ld    de,$0000 + (060*128) + (058/2) - 128
+  ld    bc,$0000 + (040*256) + (088/2)
+  ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    b,075                           ;x coordinate text
+  ld    c,067                           ;y coordinate text
+  ld    hl,TextPlayerWonGame1
+  call  SetText
+
+  ld    hl,1
+  ld    a,(pl1hero1y+HeroStatus)        ;hero 1 status
+  cp    255
+  jr    nz,.PlayerStillHasAHeroLeftAndWonTheGame
+  ld    hl,2
+  ld    a,(pl2hero1y+HeroStatus)        ;hero 1 status
+  cp    255
+  jr    nz,.PlayerStillHasAHeroLeftAndWonTheGame
+  ld    hl,3
+  ld    a,(pl2hero1y+HeroStatus)        ;hero 1 status
+  cp    255
+  jr    nz,.PlayerStillHasAHeroLeftAndWonTheGame
+  ld    hl,4
+  .PlayerStillHasAHeroLeftAndWonTheGame:
+  ld    b,115                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  call  SetNumber16BitCastle
+
+  ld    b,078                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  ld    hl,TextPlayerWonGame2
+  jp    SetText
+
+TextPlayerWonGame1:    
+                    db    "Congratulations",255
+TextPlayerWonGame2:    
+                    db    "  Player",254
+                    db    "Is Victorious",255
+
+SetPlayerEliminatedWindowAndText:
+  ld    hl,$4000 + (070*128) + (150/2) - 128
+  ld    de,$0000 + (060*128) + (058/2) - 128
+  ld    bc,$0000 + (040*256) + (088/2)
+  ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    b,066                           ;x coordinate text
+  ld    c,067                           ;y coordinate text
+  ld    hl,TextPlayerEliminated1
+  call  SetText
+
+  ld    a,(PlayerWhoLostAHeroInBattle?)
+  ld    l,a
+  ld    h,0
+  ld    b,115                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  call  SetNumber16BitCastle
+
+  ld    b,078                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  ld    hl,TextPlayerEliminated2
+  jp    SetText
+
+
+TextPlayerEliminated1:    
+                    db    " Player Eliminated",255
+TextPlayerEliminated2:    
+                    db    "  Player",254
+                    db    "Is Eliminated",255
