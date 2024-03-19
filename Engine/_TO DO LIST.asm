@@ -1,9 +1,6 @@
 robert: kan de requirements in een andere kleur ?
 
 
-bij aanvang battle: na het casten van magic arrows, kun je direct door het scherm aan de linker kant een vijand aanvallen rechts in het scherm
-
-
 title screen
 options:
 1 show enable mouse message at start of game

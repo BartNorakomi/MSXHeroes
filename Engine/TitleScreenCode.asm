@@ -167,6 +167,9 @@ CheckMouse:
 TitleScreenPalette:
   incbin"..\grapx\TitleScreen\TitleScreenPalette.pl"
 TitleScreenCode:
+  ld    a,TitleSong
+  ld    (ChangeSong?),a
+  
   call  screenoff
 
   ld    a,4
@@ -182,10 +185,17 @@ TitleScreenCode:
   call  SetSpatInCastle
   call  SetInterruptHandler             ;set Vblank
   call  SetTitleScreenButtons
-
   xor   a
   ld    (framecounter),a
+
+
   .engine:
+
+
+;  call  RePlayer_Tick             ;music routine
+;  call  MusicLoop
+
+
   halt
   ld    a,(framecounter)
   inc   a

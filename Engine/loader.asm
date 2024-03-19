@@ -51,18 +51,6 @@ GentleMap02: db  GentleMap02MapBlock | dw GentleMap02Map | db GentleMap02ObjectL
 GentleDesertMap05: db  GentleDesertMap05MapBlock | dw GentleDesertMap05Map | db GentleDesertMap05ObjectLayerMapBlock | dw GentleDesertMap05ObjectLayerMap | db TilesGentleDesertBlock     |   incbin"..\grapx\tilesheets\PaletteGentleDesert.pl",0,4 | db BattleFieldDesertBlock | db GentleDesertMiniMapsBlock | dw $4000 + (096*128) + (200/2) - 128 | db "2",255,"S",255,"Pixy's Bubble Symphony",255,"In the heart of the   ",254,"scorching desert, Pixy",254,"embarks on her daring ",254,"quest, accompanied by ",254,"the whimsical         ",254,"creatures from the    ",254,"magical realm of      ",254,"Bubble Bobble.        ",254,"                      ",254,"She sets her sights on",254,"the castle to the     ",254,"south, where the      ",254,"nefarious Doctor      ",254,"Pettrovich awaits.    ",254,                         254,"Can she conquer the   ",254,"castle and restore    ",254,"peace to the desert   ",254,"realm?                ",254,"                      ",254,"                      ",255
 GentleCaveMap02: db  GentleCaveMap02MapBlock | dw GentleCaveMap02Map | db GentleCaveMap02ObjectLayerMapBlock | dw GentleCaveMap02ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4 | db BattleFieldCaveBlock | db GentleCaveMiniMapsBlock | dw $4000 + (048*128) + (050/2) - 128                   | db "4",255,"L",255,"A Worzen Family Epic  ",255,"In the depths of the  ",254,"cave dwellings, the   ",254,"Worzen family, under  ",254,"your leadership, faces",254,"relentless adversaries",254,"to reclaim their      ",254,"throne.               ",254,"                      ",254,"With every strike and ",254,"spell, they fight on, ",254,"determined to triumph ",254,"in three palaces and  ",254,"restore their rightful",254,"rule.                 ",254,"                      ",254,"Victory hangs in the  ",254,"balance as they press ",254,"forward, unwavering in",254,"their resolve.        ",254,"                      ",254,                         255
 
-
-
-
-
-
-
-
-;YieArKungFu: Martial Law: Restoring Order in a City Ruled by Brutal Fighters
-;bubble bobble: Bubble Mania Mayhem: Unlimited bubbles create chaotic gameplay and puzzles.
-;bubble bobble: Bubblegum Bonanza: Sticky situations and hilarious slip-ups abound.
-
-
 ;tiles:
 ;000-015 no obstacle, but hero walks behind it, but they are not see through
 ;016-023 obstacle

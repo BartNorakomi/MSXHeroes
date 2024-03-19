@@ -4870,7 +4870,10 @@ SetScrollGraphics:
 
 DisplayQuickTipsCode:
   call  SetQuickTipsButtons
-  
+  halt
+  halt
+  halt
+  halt
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
 
   if  Promo?
@@ -5046,7 +5049,7 @@ CopyInactivePageToActivePage:
   
 
 DisplayStartOfTurnMessageCode:
-call ScreenOn
+;call ScreenOn
   call  SetPlayerStartTurnVButton
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)

@@ -173,6 +173,14 @@ vblank:
   in    a,($a8)      
   push  af                              ;save ram/rom page settings 
 
+  if  Music50PercentSpeed?
+  ld    a,(vblankintflag)
+  bit   0,a
+  call  z,RePlayer_Tick                 ;initialise, load samples
+  else
+  call  RePlayer_Tick                 ;initialise, load samples
+  endif
+
   ld    a,(slot.page1rom)              ;all RAM except page 1 and 2
   out   ($a8),a
 
@@ -480,11 +488,6 @@ HandleAIWorldMap:
   ret
 
 CheckPlayerEliminated:
-  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since text overview is placed on top of the map
-
-  ld    a,1
-  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
-
   ld    hl,CheckIfAPlayerGotEliminated
   jp    EnterSpecificRoutineInExtraRoutines
   
@@ -2561,8 +2564,11 @@ CheckHeroEntersCastle:
   push  af
   ld    a,(iy+CastlePlayer)
   ld    (PlayerWhoLostAHeroInBattle?),a
+  inc   a
+  jr    z,.NeutralCastleFound           ;player=255 means this castle does NOT belongs to a player
   ld    a,3
   ld    (PlayerLostHeroInBattle?),a
+  .NeutralCastleFound:
   pop   af
   
   ld    (iy+CastlePlayer),a
@@ -6215,7 +6221,7 @@ EmptyHeroRecruitedAtTavern:
 pl1hero1y:		db	3
 pl1hero1x:		db	3
 pl1hero1xp: dw 0 ;65000 ;3000 ;999
-pl1hero1move:	db	3,20
+pl1hero1move:	db	20,20
 pl1hero1mana:	dw	50,10
 pl1hero1manarec:db	5		                ;recover x mana every turn
 pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
@@ -6637,10 +6643,10 @@ player2StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player3StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 player4StartingTown:			db	255 ;0=random, 1=DS4, 2=CastleVania
 
-amountofplayers:		db	2
+amountofplayers:		db	3
 player1human?:			db	1 ;0=CPU, 1=Human, 2=OFF
 player2human?:			db	1
-player3human?:			db	2
+player3human?:			db	1
 player4human?:			db	2
 whichplayernowplaying?:	db	1
 

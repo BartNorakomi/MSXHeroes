@@ -4894,10 +4894,6 @@ BuildUpBattleFieldAndPutMonsters:
 ;  jp    docopy
 
 
-;  ld    a,3*32+31
-;  call  SetPageSpecial.setpage
-;.kut: jp .kut
-
 
   xor   a
 ;ld a,1
@@ -9193,11 +9189,6 @@ SetHero1ForPlayerThatGotAttackedInIX:           ;sets hero 1 of player in IX
   ret
   
 DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros below this one, one position up 
-  ld    a,(PlayerThatGetsAttacked)
-  ld    (PlayerWhoLostAHeroInBattle?),a
-  ld    a,3
-  ld    (PlayerLostHeroInBattle?),a
-
   ld    ix,(HeroThatGetsAttacked)       ;hero that was attacked
 
   push  ix
@@ -9205,6 +9196,11 @@ DeactivateHeroThatGetsAttacked:         ;sets Status to 255 and moves all heros 
   ld    a,l
   or    h
   jr    z,.NeutralEnemyDied
+
+  ld    a,(PlayerThatGetsAttacked)
+  ld    (PlayerWhoLostAHeroInBattle?),a
+  ld    a,3
+  ld    (PlayerLostHeroInBattle?),a
 
  ;we are going to find how many heroes are below the hero that got attacked
 	ld		de,lenghtherotable
@@ -9811,4 +9807,3 @@ SetGuardTowerGraphics:
   ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
   
-kut:

@@ -263,34 +263,39 @@ TextGuardTowerX:    db    "   Guard Tower  ",254,254 ;item 76
 
 
 CheckIfAPlayerGotEliminated:
-  ;check which player lost a hero
-  call  .CheckWhichPlayerLostAHero      ;out hl->plxHeroStatus
-  ld    a,(hl)                          ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-  cp    255
-  jr    nz,.PlayerStillHasAHeroOrCastleLeft
-
-  ;at this point player has no more heroes left. Check if player has a castle left
-  ld    a,(PlayerWhoLostAHeroInBattle?)
-  ld    b,a
-  ld    a,(Castle1+CastlePlayer)
-  cp    b
-  jr    z,.PlayerStillHasAHeroOrCastleLeft
-  ld    a,(Castle2+CastlePlayer)
-  cp    b
-  jr    z,.PlayerStillHasAHeroOrCastleLeft
-  ld    a,(Castle3+CastlePlayer)
-  cp    b
-  jr    z,.PlayerStillHasAHeroOrCastleLeft
-  ld    a,(Castle4+CastlePlayer)
-  cp    b
-  jr    z,.PlayerStillHasAHeroOrCastleLeft
-
   ;at this point player has no more heroes nor castles left ->Eliminate player
   ld    a,(PlayerLostHeroInBattle?)
   dec   a
   ret   m
   ld    (PlayerLostHeroInBattle?),a
   jp    nz,DisableScrollScreen  
+
+  ;check which player lost a hero
+  call  .CheckWhichPlayerLostAHero      ;out hl->plxHeroStatus
+  ld    a,(hl)                          ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255
+  ret   nz                              ;return if player still has active heroes
+
+  ;at this point player has no more heroes left. Check if player has a castle left
+  ld    a,(PlayerWhoLostAHeroInBattle?)
+  ld    b,a
+  ld    a,(Castle1+CastlePlayer)
+  cp    b
+  ret   z                               ;return if player still has a castle
+  ld    a,(Castle2+CastlePlayer)
+  cp    b
+  ret   z                               ;return if player still has a castle
+  ld    a,(Castle3+CastlePlayer)
+  cp    b
+  ret   z                               ;return if player still has a castle
+  ld    a,(Castle4+CastlePlayer)
+  cp    b
+  ret   z                               ;return if player still has a castle
+
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since text overview is placed on top of the map
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
 
   call  SetPlayerEliminatedWindowAndText;show window and text
   call  SwapAndSetPage                  ;swap and set page
@@ -313,11 +318,6 @@ CheckIfAPlayerGotEliminated:
 	ld		(ControlsOnInterrupt),a                 ;reset trigger a+b
   jp    CheckIfThereIsAPlayerWhoWonTheGame
 
-.PlayerStillHasAHeroOrCastleLeft:
-  xor   a
-  ld    (PlayerLostHeroInBattle?),a
-  ret
-
 .CheckWhichPlayerLostAHero:
   ld    a,(PlayerWhoLostAHeroInBattle?)
   dec   a
@@ -331,9 +331,6 @@ CheckIfAPlayerGotEliminated:
   ret   z
   ld    hl,pl4hero1y+HeroStatus
   ret
-
-
-
 
 CheckIfThereIsAPlayerWhoWonTheGame:
   ld    c,0                             ;amount of active players

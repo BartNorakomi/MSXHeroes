@@ -1,15 +1,24 @@
 phase	$c000
 
-StartOfTurnMessageOn?:              equ 0
+StartOfTurnMessageOn?:              equ 1
 UnlimitedBuildsPerTurn?:            equ 0
 DisplayNumbers1to6?:                equ 0
-StartAtTitleScreen?:                equ 0
+StartAtTitleScreen?:                equ 1
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
+MusicOn?:                           equ 1
+LoadSamples?:                       equ 1
+Music50PercentSpeed?:               equ 0
 
-;WorldPointer: dw GentleAutumnMap01
-WorldPointer: dw GentleCaveMap04
+TitleSong:  equ 5
+CastleSong: equ 2
+BattleSong: equ 3
+WorldSong:  equ 4
+
+
+WorldPointer: dw GentleAutumnMap01
+;WorldPointer: dw GentleCaveMap04
 ;WorldPointer: dw GentleDesertMap04
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
@@ -42,6 +51,9 @@ InitiateGame:
 ;  ld    (EnterCombat?),a
 
 
+  call  LoadSamplesAndPlaySong0
+  call  CheckSwitchNextSong
+  call  CheckSwitchNextSong
 
 
   if  StartAtTitleScreen?
@@ -60,6 +72,9 @@ StartGame:
   call  ExecuteLoaderRoutine
   xor   a
   ld    (framecounter),a
+
+  ld    a,WorldSong
+  ld    (ChangeSong?),a
 
   .WhenExitingCombat:
   call  CenterMousePointer
@@ -106,6 +121,80 @@ StartGame:
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+
+
+
+CheckSwitchNextSong:
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+;  ld    a,(NewPrContr)	
+;	bit		5,a           ;F1 pressed ?
+;  ret   z
+
+  ld    a,(CurrentSongBeingPlayed)
+  inc   a
+  cp    7
+  jr    nz,.EndCheckLastSong
+  ld    a,1
+  .EndCheckLastSong:
+  ld    (CurrentSongBeingPlayed),a
+  ld    c,a
+  ld    b,0
+  push  bc
+  call  RePlayer_Stop
+  pop   bc                            ;track nr
+;  ld    bc,3                          ;track nr
+  ld    a,usas2repBlock               ;ahl = sound data (after format ID, so +1)
+  ld    hl,$8000+1
+  call  RePlayer_Play                 ;bc = track number, ahl = sound data (after format ID, so +1)
+  call  RePlayer_Tick                 ;initialise, load samples
+  ret
+
+CurrentSongBeingPlayed: db  0
+LoadSamplesAndPlaySong0:
+	ld    a,(RePlayer_playing)
+	and   a
+	ret   nz
+
+  xor   a
+  ld    (CurrentSongBeingPlayed),a
+  call  RePlayer_Stop
+  ld    bc,0                          ;track nr
+  ld    a,usas2repBlock               ;ahl = sound data (after format ID, so +1)
+  ld    hl,$8000+1
+  call  RePlayer_Play                 ;bc = track number, ahl = sound data (after format ID, so +1)
+  call  RePlayer_Tick                 ;initialise, load samples
+  ret
+
+SoundData: equ $8000
+VGMRePlay:
+  ld    a,(slot.page12rom)            ;all RAM except page 1+2
+  out   ($a8),a
+  ei
+  
+  ld    a,FormatOPL4_ID
+  call  RePlayer_Detect               ;detect moonsound
+  ld a,LoadSamples?	;debug function to skip sample load
+  and A
+  ret z
+  ld    bc,0                          ;track nr 0 will alos initialize samples
+  ld    a,usas2repBlock               ;ahl = sound data (after format ID, so +1)
+  ld    hl,$8000+1
+  call  RePlayer_Play                 ;bc = track number, ahl = sound data (after format ID, so +1)
+  call	RePlayer_Tick
+  ret
+
+Main_Loop:
+  halt
+  call  RePlayer_Tick
+  jp    Main_Loop  
+
+INCLUDE "RePlayer.asm"
+
 
 ShortestPathTileHandlerQueue:
   ds  2*169,0
@@ -2763,9 +2852,13 @@ SetSpatInGame:
   ldir
   ret
 
+ChangeSong?:  db 0
 ReloadAllObjectsInVram?:  db  0           
 SetNewBuilding?:  db  0                 ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
 EnterCastle:
+  ld    a,CastleSong
+  ld    (ChangeSong?),a
+
   ld    a,2
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
@@ -2847,12 +2940,14 @@ EnterCastle:
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
 
-  
   pop   bc  
   ld    a,b
 	ld		(mappointery),a
 	ld    a,c
 	ld		(mappointerx),a
+
+  ld    a,WorldSong
+  ld    (ChangeSong?),a
 
   jp    LevelEngine
 
@@ -2869,6 +2964,9 @@ SwapButDontSetPage:
   ret
 
 EnterCombat:
+  ld    a,BattleSong
+  ld    (ChangeSong?),a
+
   ld    a,3
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle
 
@@ -2910,6 +3008,10 @@ EnterCombat:
   out   ($99),a
 
   call  SetTempisr                      ;end the current interrupt handler used in the engine
+
+  ld    a,WorldSong
+  ld    (ChangeSong?),a
+
   jp    StartGame.WhenExitingCombat
 
 SetAllSpriteCoordinatesInPage2:
@@ -4415,6 +4517,10 @@ db 30
 endif
 QuickTipsNumber: db  StartOfGameQuickTips-2
 
+ds 400 ;;################# RED ALERT, WE ARE OVERWRITING VARIABLE DATA WITH INTERSLOT BIOS CALLS TO READ OUT DATE/TIME INFORMATION... MAKE SURE VARIABLE DATA IS NOT IN THOSE NEEDED ADDRESSES... HACK JOB TIME !
+
+
+
 
 endenginepage3:
 dephase
@@ -4448,16 +4554,15 @@ memblocks:
 VDP_0:		                  rb    8
 VDP_8:		                  rb    30
 
-ComputerID:                 rb    1       ;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
-CPUMode:                    rb    1       ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
-TurboOn?:                   rb    1       ;0=no, $c3=yes
-
 DayOfMonthEenheden:         rb    1
 DayOfMonthTientallen:       rb    1
 MonthEenheden:              rb    1
 MonthTientallen:            rb    1
 YearEenheden:               rb    1       ;you still need to add +1980 to the year
 YearTientallen:             rb    1       ;
+ComputerID:                 rb    1       ;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
+;CPUMode:                    rb    1       ;%000 0000 = Z80 (ROM) mode, %0000 0001 = R800 ROM  mode, %0000 0010 = R800 DRAM mode
+TurboOn?:                   rb    1       ;0=no, $c3=yes
 
 engaddr:	                  equ	  $03e
 loader.address:             equ   $8000

@@ -323,7 +323,7 @@ REDCLK:	equ	001f5h
   ld    bc,30
   ldir
 ;/let's copy the copies of the vdp registers to our addresses of choice
-  ld    sp,$fd00
+  ld    sp,$ff00
 ;/then we can set our stack pointer a bit higher, reserving more free space in page 3
 
 	ld		a,(VDP_8+1)	
@@ -392,10 +392,14 @@ REDCLK:	equ	001f5h
 	ld		bc,enlength	        ;load engine
 	ldir
 
-	ld		hl,enginepage3
-	ld		de,enginepage3addr
-	ld		bc,enginepage3length	    ;load enginepage3
+	ld		hl,enginepage3 ;+ (WorldPointer-$c000)
+	ld		de,enginepage3addr ;+ (WorldPointer-$c000)
+	ld		bc,enginepage3length ;- (WorldPointer-$c000)	    ;load enginepage3
 	ldir
+
+if MusicOn?
+  call  VGMRePlay
+endif
 
   jp    InitiateGame
 
@@ -422,6 +426,7 @@ phase	engaddr
 endengine:
 dephase
 enlength:	Equ	$-engine
+
 ;
 ; fill remainder of blocks 00-01
 ;
@@ -440,76 +445,20 @@ dephase
 ;
 ; block $03 - 04
 ;
-World1TilesBlock:  equ   $03
+BattleFieldWinterBlock:  equ   $03
 phase	$4000
-  incbin "..\grapx\tilesheets\world1tiles.SC5",7,208 * 128      ;208 lines
-  incbin "..\grapx\tilesheets\world1tilesBottom48Lines.SC5",7,48 * 128 ;48 lines
+  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
 ; block $05
 ;
-World1MapBlock:  equ   $05
-World1ObjectLayerMapBlock:  equ   $05
-World2MapBlock:  equ   $05
-World2ObjectLayerMapBlock:  equ   $05
-World3MapBlock:  equ   $05
-World3ObjectLayerMapBlock:  equ   $05
-World4MapBlock:  equ   $05
-World4ObjectLayerMapBlock:  equ   $05
-World5MapBlock:  equ   $05
-World5ObjectLayerMapBlock:  equ   $05
-World6MapBlock:  equ   $05
-World6ObjectLayerMapBlock:  equ   $05
-World7MapBlock:  equ   $05
-World7ObjectLayerMapBlock:  equ   $05
-World8MapBlock:  equ   $05
-World8ObjectLayerMapBlock:  equ   $05
-
+InsertMouseBlock:  equ   $05
 phase	$4000
-World1Map:
-  incbin "..\maps\world1.map.pck"
-World1ObjectLayerMap:
-  incbin "..\maps\world1objects.map.pck"
-World2Map:
-  incbin "..\maps\world2.map.pck"
-World2ObjectLayerMap:
-  incbin "..\maps\world2objects.map.pck"
-World3Map:
-  incbin "..\maps\world3.map.pck"
-World3ObjectLayerMap:
-  incbin "..\maps\world3objects.map.pck"
-World4Map:
-  incbin "..\maps\world4.map.pck"
-World4ObjectLayerMap:
-  incbin "..\maps\world4objects.map.pck"
-World5Map:
-  incbin "..\maps\world5.map.pck"
-World5ObjectLayerMap:
-  incbin "..\maps\world5objects.map.pck"
-World6Map:
-  incbin "..\maps\world6.map.pck"
-World6ObjectLayerMap:
-  incbin "..\maps\world6objects.map.pck"
-World7Map:
-  incbin "..\maps\world7.map.pck"
-World7ObjectLayerMap:
-  incbin "..\maps\world7objects.map.pck"
-World8Map:
-  incbin "..\maps\world8.map.pck"
-World8ObjectLayerMap:
-  incbin "..\maps\world8objects.map.pck"
+  incbin "..\grapx\TitleScreen\InsertMouse.SC5",7,112 * 128      ;112 lines
 	ds		$8000-$,$ff
 dephase
-
-
-
-
-
-
-
-
 
 AdolSpriteBlock:              equ HeroesSpritesBlock1
 Goemon1SpriteBlock:           equ HeroesSpritesBlock1
@@ -563,7 +512,7 @@ LoloSpriteBlock:              equ HeroesSpritesBlock6
 PippolsSpriteBlock:           equ HeroesSpritesBlock6
 RandarSpriteBlock:            equ HeroesSpritesBlock6
 ClesSpriteBlock:              equ HeroesSpritesBlock6
-LuiceSpriteBlock:              equ HeroesSpritesBlock6
+LuiceSpriteBlock:             equ HeroesSpritesBlock6
 
 DickSpriteBlock:              equ HeroesSpritesBlock7
 AphroditeSpriteBlock:         equ HeroesSpritesBlock7
@@ -596,7 +545,6 @@ PampasSpriteBlock:            equ HeroesSpritesBlock10
 SeleneSpriteBlock:            equ HeroesSpritesBlock10
 SkooterSpriteBlock:           equ HeroesSpritesBlock10
 JeddaChefSpriteBlock:         equ HeroesSpritesBlock10
-
 
 ;
 ; block $06 - 07
@@ -648,8 +596,7 @@ dephase
 HeroesSpritesBlock9:  equ   HeroesSpritesBlock1 + 8
 HeroesSpritesBlock10:  equ   HeroesSpritesBlock1 + 9
 phase	$4000
-  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet5.SC5",7,208 * 128      ;208 lines
-  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet5Bottom48Lines.SC5",7,48 * 128 ;48 lines
+  incbin "..\grapx\HeroesSprites\HeroesSpritesSheet5.SC5",7,192 * 128      ;192 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -663,11 +610,20 @@ phase	$4000
 dephase
 
 ;
-; block $12 - 13
+; block $12
 ;
 Hero10x18PortraitsBlock:  equ   $12
 phase	$4000
-  incbin "..\grapx\HeroesSprites\10x18Portraits.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\10x18Portraits.SC5",7,72 * 128      ;72 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $13
+;
+phase	$8000
+QuickTipsBlock:  equ   $13
+  include "QuickTips.asm"
 	ds		$c000-$,$ff
 dephase
 
@@ -684,7 +640,13 @@ dephase
 ;
 ; block $16 - 17
 ;
+TitleScreenGraphicsBlock:  equ   $16
 phase	$4000
+if Promo?
+  incbin "..\grapx\TitleScreen\TitleScreenPromo.SC5",7,212 * 128      ;212 lines
+else
+  incbin "..\grapx\TitleScreen\TitleScreen.SC5",7,212 * 128      ;212 lines
+endif
 	ds		$c000-$,$ff
 dephase
 
@@ -703,7 +665,7 @@ dephase
 ;
 HeroOverviewGraphicsBlock:  equ   $1a
 phase	$4000
-  incbin "..\grapx\HeroOverview\HeroOverviewGraphics.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroOverview\HeroOverviewGraphics.SC5",7,171 * 128      ;171 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -711,7 +673,6 @@ dephase
 ; block $1c
 ;
 HeroOverviewCodeBlock:  equ   $1c
-HeroOverviewFontBlock:  equ   $1c
 phase	$4000
   include "HeroOverviewCode.asm"
 	ds		$8000-$,$ff
@@ -768,7 +729,7 @@ dephase
 ;
 Hero16x30PortraitsBlock:  equ   $27
 phase	$4000
-  incbin "..\grapx\HeroesSprites\16x30Portraits.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\HeroesSprites\16x30Portraits.SC5",7,150 * 128      ;150 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -791,14 +752,12 @@ phase	$4000
 	ds		$8000-$,$ff
 dephase
 
-
-
 ;
 ; block $2c - 2d
 ;
 IndividualBuildingsBlock:  equ   $2c
 phase	$4000
-  incbin "..\grapx\CastleOverview\IndividualBuildings.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\IndividualBuildings.SC5",7,188 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -807,7 +766,7 @@ dephase
 ;
 IndividualBuildingsPage2Block:  equ   $2e
 phase	$4000
-  incbin "..\grapx\CastleOverview\IndividualBuildingsPage2.SC5",7,212 * 128      ;212 lines
+  incbin "..\grapx\CastleOverview\IndividualBuildingsPage2.SC5",7,142 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -909,12 +868,104 @@ phase	$4000
 dephase
 
 ;
-; block $44 - 45
+; block $44
 ;
 PlayerStartTurnBlock:  equ   $44
 phase	$4000
   incbin "..\grapx\HeroOverview\PlayerStartTurnWindow.SC5",7,95 * 128      ;95 lines
-	ds		$c000-$,$ff
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $45
+;
+SpritesWeaponsBlock:  equ   $45
+phase	$4000
+SpriteCharKingMori:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tgs.gen"
+SpriteColKingMori:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tcs.gen"
+SpriteCharBubbleBobble:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tgs.gen"
+SpriteColBubbleBobble:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tcs.gen"
+SpriteCharAxeMan:
+  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tgs.gen"
+SpriteColAxeMan:
+  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tcs.gen"
+SpriteCharGeneralBullet1:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tgs.gen"
+SpriteColGeneralBullet1:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tcs.gen"
+SpriteCharContraBullet:
+  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tgs.gen"
+SpriteColContraBullet:
+  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tcs.gen"
+SpriteCharGrenadier:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tgs.gen"
+SpriteColGrenadier:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tcs.gen"
+SpriteCharHandGrenade:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tgs.gen"
+SpriteColHandGrenade:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tcs.gen"
+SpriteCharVanguard:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tgs.gen"
+SpriteColVanguard:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tcs.gen"
+SpriteCharLanFang:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tgs.gen"
+SpriteColLanFang:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tcs.gen"
+SpriteCharHanChen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tgs.gen"
+SpriteColHanChen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tcs.gen"
+SpriteCharLiYen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tgs.gen"
+SpriteColLiYen:
+  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tcs.gen"
+SpriteCharKnightYama:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tgs.gen"
+SpriteColKnightYama:
+  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tcs.gen"
+SpriteCharBisshopHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tgs.gen"
+SpriteColBisshopHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tcs.gen"
+SpriteCharPornHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tgs.gen"
+SpriteColPornHeichi:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tcs.gen"
+SpriteCharYamaKnight:
+  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tgs.gen"
+SpriteColYamaKnight:
+  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tcs.gen"
+SpriteCharGooGoo:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tgs.gen"
+SpriteColGooGoo:
+  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tcs.gen"
+SpriteCharScreech:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tgs.gen"
+SpriteColScreech:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tcs.gen"
+SpriteCharPastryChef:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tgs.gen"
+SpriteColPastryChef:
+  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tcs.gen"
+SpriteCharVicViper:
+  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tgs.gen"
+SpriteColVicViper:
+  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tcs.gen"
+SpriteCharAndorogynus:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tgs.gen"
+SpriteColAndorogynus:
+  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tcs.gen"
+SpriteCharNinjaKun:
+  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tgs.gen"
+SpriteColNinjaKun:
+  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tcs.gen"
+	ds		$8000-$,$ff
 dephase
 
 ;
@@ -977,12 +1028,21 @@ phase	$8000
 dephase
 
 ;
-; block $52 - 53
+; block $52
 ;
 BattleFieldObjectsBlock:  equ   $52
 phase	$4000
-  incbin "..\grapx\Battlefield\BattleFieldObjects.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
+  incbin "..\grapx\Battlefield\BattleFieldObjects.SC5",7,45 * 128      ;45 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $53
+;
+ExtraRoutinesCodeBlock:  equ   $53
+phase	$4000
+	include	"ExtraRoutines.asm"	
+	ds		$8000-$,$ff
 dephase
 
 ;
@@ -1075,9 +1135,11 @@ phase	$4000
 dephase
 
 ;
-; block $65 - 66
+; block $65 - $66
 ;
+CampaignSelectBlock:  equ   $65
 phase	$4000
+  incbin "..\grapx\TitleScreen\CampaignSelect.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1087,7 +1149,7 @@ dephase
 VictoryBlock:  equ   $67
 GentleWinterMiniMapsBlock:  equ   $67
 phase	$4000
-  incbin "..\grapx\Battlefield\Victory.SC5",7,207 * 128      ;212 lines
+  incbin "..\grapx\Battlefield\Victory.SC5",7,207 * 128      ;207 lines
   incbin "..\grapx\hud\GentleWinterMiniMaps.SC5",7,048 * 128      ;048 lines
 	ds		$c000-$,$ff
 dephase
@@ -1097,16 +1159,25 @@ dephase
 ;
 DefeatBlock:  equ   $69
 phase	$4000
-  incbin "..\grapx\Battlefield\Defeat.SC5",7,207 * 128      ;212 lines
+  incbin "..\grapx\Battlefield\Defeat.SC5",7,207 * 128      ;207 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
-; block $6b - 6c
+; block $6b
 ;
 RetreatBlock:  equ   $6b
 phase	$4000
   incbin "..\grapx\Battlefield\Retreat.SC5",7,117 * 128      ;117 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $6c
+;
+TitleScreenCodeblock:  equ   $6c
+phase	$8000
+	include	"TitleScreenCode.asm"	
 	ds		$c000-$,$ff
 dephase
 
@@ -1216,16 +1287,11 @@ dephase
 CastleOverviewBlock:  equ   $81
 phase	$4000
   incbin "..\grapx\CastleOverview\CastleOverview.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\chamberofcommerce4.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\tavernoriginal.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\magicguild.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\chamberofcommerce.SC5",7,212 * 128      ;212 lines
-;  incbin "..\grapx\CastleOverview\image7.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
-; block $83 - 84
+; block $83
 ;
 RecruitCreatures4MonstersBlock:  equ   $83
 phase	$4000
@@ -1233,76 +1299,44 @@ phase	$4000
   incbin "..\grapx\CastleOverview\RecruitCreaturesMonster2.SC5",7,30 * 128      ;30 lines
   incbin "..\grapx\CastleOverview\RecruitCreaturesMonster3.SC5",7,30 * 128      ;30 lines
   incbin "..\grapx\CastleOverview\RecruitCreaturesMonster4.SC5",7,30 * 128      ;30 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $84
+;
+SpellAnimations16Block:  equ   $84
+phase	$4000
+  incbin "..\grapx\BattleField\SpellAnimations16.SC5",7,128 * 128      ;128 lines
+	ds		$8000-$,$ff
+dephase
+
+;
+; block $85 - $86
+;
+ScenarioSelectButtonsBlock:  equ   $85
+TitleScreenButtonsBlock:  equ   $85
+phase	$4000
+  incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,172 * 128      ;172 lines
+  incbin "..\grapx\TitleScreen\TitleScreenButtons.SC5",7,76 * 128      ;76 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
-; block $85 - 86
+; block $87 - $88
 ;
-TilesSdSnatcherBlock:  equ   $85
+ScenarioSelectBlock:  equ   $87
 phase	$4000
-  incbin "..\grapx\tilesheets\TilesSDSnatcher.SC5",7,208 * 128      ;208 lines
-  incbin "..\grapx\tilesheets\TilesSDSnatcherBottom48Lines.SC5",7,48 * 128 ;48 lines
-	ds		$c000-$,$ff
-dephase
-
-;
-; block $87 - 88
-;
-TilesSolidSnakeBlock:  equ   $87
-phase	$4000
-  incbin "..\grapx\tilesheets\TilesSolidSnake.SC5",7,208 * 128      ;208 lines
-  incbin "..\grapx\tilesheets\TilesSolidSnakeBottom48Lines.SC5",7,48 * 128 ;48 lines
+  incbin "..\grapx\TitleScreen\ScenarioSelect.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
 ;
 ; block $89
 ;
-World9MapBlock:  equ   $89
-World9ObjectLayerMapBlock:  equ   $89
-World10MapBlock:  equ   $89
-World10ObjectLayerMapBlock:  equ   $89
-World11MapBlock:  equ   $89
-World11ObjectLayerMapBlock:  equ   $89
-World12MapBlock:  equ   $89
-World12ObjectLayerMapBlock:  equ   $89
-World13MapBlock:  equ   $89
-World13ObjectLayerMapBlock:  equ   $89
-World14MapBlock:  equ   $89
-World14ObjectLayerMapBlock:  equ   $89
-GentleMap01MapBlock:  equ   $89
-GentleMap01ObjectLayerMapBlock:  equ   $89
+SpellAnimations15Block:  equ   $89
 phase	$4000
-World9Map:
-  incbin "..\maps\world9.map.pck"
-World9ObjectLayerMap:
-  incbin "..\maps\world9objects.map.pck"
-World10Map:
-  incbin "..\maps\world10.map.pck"
-World10ObjectLayerMap:
-  incbin "..\maps\world10objects.map.pck"
-World11Map:
-  incbin "..\maps\world11.map.pck"
-World11ObjectLayerMap:
-  incbin "..\maps\world11objects.map.pck"
-World12Map:
-  incbin "..\maps\world12.map.pck"
-World12ObjectLayerMap:
-  incbin "..\maps\world12objects.map.pck"
-World13Map:
-  incbin "..\maps\world13.map.pck"
-World13ObjectLayerMap:
-  incbin "..\maps\world13objects.map.pck"
-World14Map:
-  incbin "..\maps\world14.map.pck"
-World14ObjectLayerMap:
-  incbin "..\maps\world14objects.map.pck"
-  
-GentleMap01Map:
-  incbin "..\maps\GentleMap01.map.pck"
-GentleMap01ObjectLayerMap:
-  incbin "..\maps\GentleMap01objects.map.pck"
+  incbin "..\grapx\BattleField\SpellAnimations15.SC5",7,128 * 128      ;128 lines
 	ds		$8000-$,$ff
 dephase
 
@@ -1366,8 +1400,6 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-
-
 ;
 ; block $96
 ;
@@ -1400,8 +1432,6 @@ GentleDesertMap04ObjectLayerMap:
 	ds		$8000-$,$ff
 dephase
 
-
-
 ;
 ; block $97
 ;
@@ -1419,7 +1449,6 @@ GentleDesertMap05Map:
   incbin "..\maps\GentleDesertMap05.map.pck"
 GentleDesertMap05ObjectLayerMap:
   incbin "..\maps\GentleDesertMap05objects.map.pck"
-
 GentleWinterMap01Map:
   incbin "..\maps\GentleWinterMap01.map.pck"
 GentleWinterMap01ObjectLayerMap:
@@ -1442,7 +1471,8 @@ GentleWinterMap04MapBlock:  equ   $98
 GentleWinterMap04ObjectLayerMapBlock:  equ   $98
 GentleWinterMap05MapBlock:  equ   $98
 GentleWinterMap05ObjectLayerMapBlock:  equ   $98
-
+GentleMap01MapBlock:  equ   $98
+GentleMap01ObjectLayerMapBlock:  equ   $98
 phase	$4000
 GentleWinterMap04Map:
   incbin "..\maps\GentleWinterMap04.map.pck"
@@ -1452,6 +1482,10 @@ GentleWinterMap05Map:
   incbin "..\maps\GentleWinterMap05.map.pck"
 GentleWinterMap05ObjectLayerMap:
   incbin "..\maps\GentleWinterMap05objects.map.pck"
+GentleMap01Map:
+  incbin "..\maps\GentleMap01.map.pck"
+GentleMap01ObjectLayerMap:
+  incbin "..\maps\GentleMap01objects.map.pck"
 	ds		$8000-$,$ff
 dephase
 
@@ -1527,7 +1561,6 @@ GentleAutumnMap03ObjectLayerMap:
 	ds		$8000-$,$ff
 dephase
 
-
 ;
 ; block $9c
 ;
@@ -1553,8 +1586,6 @@ GentleCaveMap01ObjectLayerMap:
   incbin "..\maps\GentleCaveMap01objects.map.pck"
 	ds		$8000-$,$ff
 dephase
-
-
 
 ;
 ; block $9d
@@ -1589,8 +1620,6 @@ GentleCaveMap05ObjectLayerMap:
 	ds		$8000-$,$ff
 dephase
 
-
-
 ;
 ; block $9e
 ;
@@ -1623,13 +1652,11 @@ GentleMap05ObjectLayerMap:
 	ds		$8000-$,$ff
 dephase
 
-
 ;
 ; block $9f - $a0
 ;
 ;DefeatBlock2:  equ   $9f
 phase	$4000
-;  incbin "..\grapx\Battlefield\Defeat2.SC5",7,207 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1806,31 +1833,13 @@ phase	$4000
 dephase
 
 ;
-; block $bb
+; block $bb - $bc
 ;
-SpellAnimations15Block:  equ   $bb
-phase	$4000
-  incbin "..\grapx\BattleField\SpellAnimations15.SC5",7,128 * 128      ;128 lines
-	ds		$8000-$,$ff
-dephase
-
-;
-; block $bc
-;
-SpellAnimations16Block:  equ   $bc
-phase	$4000
-  incbin "..\grapx\BattleField\SpellAnimations16.SC5",7,128 * 128      ;128 lines
-	ds		$8000-$,$ff
-dephase
-
-;
-; block $bd - $be
-;
-GentleAutumnMiniMapsBlock:  equ   $bd
-GentleCaveMiniMapsBlock:  equ   $bd
-GentleDesertMiniMapsBlock:  equ   $bd
-GentleJungleMiniMapsBlock:  equ   $bd
-GentleMiniMapsBlock:  equ   $bd
+GentleAutumnMiniMapsBlock:  equ   $bb
+GentleCaveMiniMapsBlock:  equ   $bb
+GentleDesertMiniMapsBlock:  equ   $bb
+GentleJungleMiniMapsBlock:  equ   $bb
+GentleMiniMapsBlock:  equ   $bb
 phase	$4000
   incbin "..\grapx\hud\GentleAutumnMiniMaps.SC5",7,48 * 128      ;048 lines
   incbin "..\grapx\hud\GentleCaveMiniMaps.SC5",7,048 * 128      ;048 lines
@@ -1840,190 +1849,14 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-;
-; block $bf - $c0
-;
-ScenarioSelectBlock:  equ   $bf
-phase	$4000
-  incbin "..\grapx\TitleScreen\ScenarioSelect.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
+; block $bd - &?? VGM
+usas2repBlock:  equ   $bd
+phase	$0000
+	incbin "usas2.rep"
+;	ds		$56*RomBlockSize-$,$ff
 dephase
 
-;
-; block $c1
-;
-TitleScreenCodeblock:  equ   $c1
-phase	$8000
-	include	"TitleScreenCode.asm"	
-	ds		$c000-$,$ff
-dephase
 
-;
-; block $c2 - $c3
-;
-ScenarioSelectButtonsBlock:  equ   $c2
-TitleScreenButtonsBlock:  equ   $c2
-phase	$4000
-  incbin "..\grapx\TitleScreen\ScenarioSelectButtons.SC5",7,172 * 128      ;172 lines
-  incbin "..\grapx\TitleScreen\TitleScreenButtons.SC5",7,76 * 128      ;76 lines
-	ds		$c000-$,$ff
-dephase
-
-;
-; block $c4 - $c5
-;
-CampaignSelectBlock:  equ   $c4
-phase	$4000
-  incbin "..\grapx\TitleScreen\CampaignSelect.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
-dephase
-
-;
-; block $c6
-;
-ExtraRoutinesCodeBlock:  equ   $c6
-phase	$4000
-	include	"ExtraRoutines.asm"	
-	ds		$8000-$,$ff
-dephase
-
-;
-; block $c7 - $c8
-;
-TitleScreenGraphicsBlock:  equ   $c7
-phase	$4000
-if Promo?
-  incbin "..\grapx\TitleScreen\TitleScreenPromo.SC5",7,212 * 128      ;212 lines
-else
-  incbin "..\grapx\TitleScreen\TitleScreen.SC5",7,212 * 128      ;212 lines
-endif
-	ds		$c000-$,$ff
-dephase
-
-;
-; block $c9
-;
-SpritesWeaponsBlock:  equ   $c9
-phase	$4000
-SpriteCharKingMori:
-  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tgs.gen"
-SpriteColKingMori:
-  include "..\grapx\MonsterSprites\SpriesWeapons\KingMori.tcs.gen"
-SpriteCharBubbleBobble:
-  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tgs.gen"
-SpriteColBubbleBobble:
-  include "..\grapx\MonsterSprites\SpriesWeapons\BubbleBobble.tcs.gen"
-
-;SpriteCharBubblun:
-;  incbin "..\grapx\MonsterSprites\SpriesWeapons\sprconv FOR SINGLE SPRITES\Bubblun.spr",0,32*3
-;SpriteColBubblun:
-;  incbin "..\grapx\MonsterSprites\SpriesWeapons\sprconv FOR SINGLE SPRITES\Bubblun.spr",32*3,16*3
-
-SpriteCharAxeMan:
-  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tgs.gen"
-SpriteColAxeMan:
-  include "..\grapx\MonsterSprites\SpriesWeapons\AxeMan.tcs.gen"
-SpriteCharGeneralBullet1:
-  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tgs.gen"
-SpriteColGeneralBullet1:
-  include "..\grapx\MonsterSprites\SpriesWeapons\GeneralBullet1.tcs.gen"
-SpriteCharContraBullet:
-  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tgs.gen"
-SpriteColContraBullet:
-  include "..\grapx\MonsterSprites\SpriesWeapons\ContraBullet.tcs.gen"
-SpriteCharGrenadier:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tgs.gen"
-SpriteColGrenadier:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Grenadier.tcs.gen"
-SpriteCharHandGrenade:
-  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tgs.gen"
-SpriteColHandGrenade:
-  include "..\grapx\MonsterSprites\SpriesWeapons\HandGrenade.tcs.gen"
-SpriteCharVanguard:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tgs.gen"
-SpriteColVanguard:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Vanguard.tcs.gen"
-SpriteCharLanFang:
-  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tgs.gen"
-SpriteColLanFang:
-  include "..\grapx\MonsterSprites\SpriesWeapons\LanFang.tcs.gen"
-SpriteCharHanChen:
-  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tgs.gen"
-SpriteColHanChen:
-  include "..\grapx\MonsterSprites\SpriesWeapons\HanChen.tcs.gen"
-SpriteCharLiYen:
-  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tgs.gen"
-SpriteColLiYen:
-  include "..\grapx\MonsterSprites\SpriesWeapons\LiYen.tcs.gen"
-SpriteCharKnightYama:
-  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tgs.gen"
-SpriteColKnightYama:
-  include "..\grapx\MonsterSprites\SpriesWeapons\KnightYama.tcs.gen"
-SpriteCharBisshopHeichi:
-  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tgs.gen"
-SpriteColBisshopHeichi:
-  include "..\grapx\MonsterSprites\SpriesWeapons\BisshopHeichi.tcs.gen"
-SpriteCharPornHeichi:
-  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tgs.gen"
-SpriteColPornHeichi:
-  include "..\grapx\MonsterSprites\SpriesWeapons\PornHeichi.tcs.gen"
-SpriteCharYamaKnight:
-  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tgs.gen"
-SpriteColYamaKnight:
-  include "..\grapx\MonsterSprites\SpriesWeapons\YamaKnight.tcs.gen"
-SpriteCharGooGoo:
-  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tgs.gen"
-SpriteColGooGoo:
-  include "..\grapx\MonsterSprites\SpriesWeapons\GooGoo.tcs.gen"
-SpriteCharScreech:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tgs.gen"
-SpriteColScreech:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Screech.tcs.gen"
-SpriteCharPastryChef:
-  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tgs.gen"
-SpriteColPastryChef:
-  include "..\grapx\MonsterSprites\SpriesWeapons\PastryChef.tcs.gen"
-SpriteCharVicViper:
-  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tgs.gen"
-SpriteColVicViper:
-  include "..\grapx\MonsterSprites\SpriesWeapons\VicViper.tcs.gen"
-SpriteCharAndorogynus:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tgs.gen"
-SpriteColAndorogynus:
-  include "..\grapx\MonsterSprites\SpriesWeapons\Andorogynus.tcs.gen"
-SpriteCharNinjaKun:
-  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tgs.gen"
-SpriteColNinjaKun:
-  include "..\grapx\MonsterSprites\SpriesWeapons\NinjaKun.tcs.gen"
-	ds		$8000-$,$ff
-dephase
-
-;
-; block $ca
-;
-phase	$8000
-QuickTipsBlock:  equ   $ca
-  include "QuickTips.asm"
-	ds		$c000-$,$ff
-dephase
-
-;
-; block $cb
-;
-InsertMouseBlock:  equ   $cb
-phase	$4000
-  incbin "..\grapx\TitleScreen\InsertMouse.SC5",7,112 * 128      ;112 lines
-	ds		$8000-$,$ff
-dephase
-
-;
-; block $cc - cd
-;
-BattleFieldWinterBlock:  equ   $cc
-phase	$4000
-  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
-dephase
 
 
 totallenght:	Equ	$-MSXHeroes
