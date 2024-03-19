@@ -1,4 +1,8 @@
 robert: kan de requirements in een andere kleur ?
+shortest path routine werkt TOT 5 tiles van de rand. als je over die grens heen gaat, dan fukt ie m
+er zijn 5 maps open in tiled met dit probleem.
+OF maps aanpassen, OF voorwaarde toevoegen in de code (dit is waarschijnlijk beter).
+Straks gaan we ook de range van de radius verhogen, dus.......
 
 
 title screen

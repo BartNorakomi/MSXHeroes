@@ -3,13 +3,13 @@ phase	$c000
 StartOfTurnMessageOn?:              equ 1
 UnlimitedBuildsPerTurn?:            equ 0
 DisplayNumbers1to6?:                equ 0
-StartAtTitleScreen?:                equ 1
+StartAtTitleScreen?:                equ 0
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 MusicOn?:                           equ 1
 LoadSamples?:                       equ 1
-Music50PercentSpeed?:               equ 0
+Music50PercentSpeed?:               equ 1
 
 TitleSong:  equ 5
 CastleSong: equ 2
@@ -17,12 +17,12 @@ BattleSong: equ 3
 WorldSong:  equ 4
 
 
-WorldPointer: dw GentleAutumnMap01
-;WorldPointer: dw GentleCaveMap04
+;WorldPointer: dw GentleAutumnMap01
+WorldPointer: dw GentleCaveMap04
 ;WorldPointer: dw GentleDesertMap04
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap03
-;WorldPointer: dw GentleWinterMap04
+;WorldPointer: dw GentleWinterMap02
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -4197,9 +4197,9 @@ HeroAddressesTrevorBelmont:   db "Trevor Belmont",255,"   ","Sage        ",255,T
 HeroAddressesBigBoss:         db "Big Boss",255,"         ","Ranger      ",255,BigBossSpriteBlock| dw HeroSYSXBigBoss,HeroPortrait10x18SYSXBigBoss,HeroButton20x11SYSXBigBoss,HeroPortrait16x30SYSXBigBoss                                    | db 19 | db 029 |
 HeroAddressesSimonBelmont:    db "Simon Belmont",255,"    ","Wizzard     ",255,SimonBelmontSpriteBlock | dw HeroSYSXSimonBelmont,HeroPortrait10x18SYSXSimonBelmont,HeroButton20x11SYSXSimonBelmont,HeroPortrait16x30SYSXSimonBelmont          | db 22 | db 030 |
 HeroAddressesDrPettrovich:    db "Doctor Pettrovich",255,   "Battle Mage ",255,DrPettrovichSpriteBlock | dw HeroSYSXDrPettrovich,HeroPortrait10x18SYSXDrPettrovich,HeroButton20x11SYSXDrPettrovich,HeroPortrait16x30SYSXDrPettrovich          | db 25 | db 031 |
-HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Scholar     ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 28 | db 032 |
+HeroAddressesRichterBelmont:  db "Richter Belmont",255,"  ","Necromancer ",255,RichterBelmontSpriteBlock| dw HeroSYSXRichterBelmont,HeroPortrait10x18SYSXRichterBelmont,HeroButton20x11SYSXRichterBelmont,HeroPortrait16x30SYSXRichterBelmont | db 31 | db 032 |
 
-HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Necromancer ",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 31 | db 033 |
+HeroAddressesUltraBox:        db "Ultrabox",255,"         ","Scholar     ",255,UltraboxSpriteBlock| dw HeroSYSXUltrabox,HeroPortrait10x18SYSXUltrabox,HeroButton20x11SYSXUltrabox,HeroPortrait16x30SYSXUltrabox                               | db 28 | db 033 |
 HeroAddressesLoganSerios:     db "Logan Serios",255,"     ","Knight      ",255,LoganSeriosSpriteBlock| dw HeroSYSXLoganSerios,HeroPortrait10x18SYSXLoganSerios,HeroButton20x11SYSXLoganSerios,HeroPortrait16x30SYSXLoganSerios                | db 01 | db 034 |
 HeroAddressesHollyWhite:      db "Holly White",255,"      ","Barbarian   ",255,HollyWhiteSpriteBlock| dw HeroSYSXHollyWhite,HeroPortrait10x18SYSXHollyWhite,HeroButton20x11SYSXHollyWhite,HeroPortrait16x30SYSXHollyWhite                     | db 04 | db 035 |
 HeroAddressesMercies:         db "Mercies ",255,"         ","Shieldbearer",255,MerciesSpriteBlock| dw HeroSYSXMercies,HeroPortrait10x18SYSXMercies,HeroButton20x11SYSXMercies,HeroPortrait16x30SYSXMercies                                    | db 07 | db 036 |
