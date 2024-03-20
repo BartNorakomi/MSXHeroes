@@ -1,9 +1,4 @@
 robert: kan de requirements in een andere kleur ?
-shortest path routine werkt TOT 5 tiles van de rand. als je over die grens heen gaat, dan fukt ie m
-er zijn 5 maps open in tiled met dit probleem.
-OF maps aanpassen, OF voorwaarde toevoegen in de code (dit is waarschijnlijk beter).
-Straks gaan we ook de range van de radius verhogen, dus.......
-
 
 title screen
 options:
@@ -43,7 +38,6 @@ shift click unit moet nog gemaakt worden om units te splitsen
 units splitsen op hud
 units in hud nog een beetje finetunen
 als je scrollt wordt de page niet geswapped op vblank, daardoor je soms de helft van het scherm opgebouwd ziet, en de andere helft is nog van de mirror page (w/e?)
-als je xp >20000 dan zie je het / teken niet in het status scherm
 invisible items
 
 castle:

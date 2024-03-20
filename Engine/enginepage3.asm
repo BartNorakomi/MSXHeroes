@@ -1,14 +1,13 @@
 phase	$c000
 
-StartOfTurnMessageOn?:              equ 1
+StartOfTurnMessageOn?:              equ 0
 UnlimitedBuildsPerTurn?:            equ 0
 DisplayNumbers1to6?:                equ 0
 StartAtTitleScreen?:                equ 0
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
-MusicOn?:                           equ 1
-LoadSamples?:                       equ 1
+MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 1
 
 TitleSong:  equ 5
@@ -18,10 +17,10 @@ WorldSong:  equ 4
 
 
 ;WorldPointer: dw GentleAutumnMap01
-WorldPointer: dw GentleCaveMap04
-;WorldPointer: dw GentleDesertMap04
+;WorldPointer: dw GentleCaveMap05
+;WorldPointer: dw GentleDesertMap02
 ;WorldPointer: dw GentleJungleMap03
-;WorldPointer: dw GentleMap03
+WorldPointer: dw GentleMap05
 ;WorldPointer: dw GentleWinterMap02
 
 InitiateGame:
@@ -178,7 +177,7 @@ VGMRePlay:
   
   ld    a,FormatOPL4_ID
   call  RePlayer_Detect               ;detect moonsound
-  ld a,LoadSamples?	;debug function to skip sample load
+  ld a,MusicOn?	;debug function to skip sample load
   and A
   ret z
   ld    bc,0                          ;track nr 0 will alos initialize samples
@@ -205,8 +204,11 @@ ShortestPathBuffer: ;grid is 11x11, we add 1 extra foreground tile at the end of
 
   ds  12,255        ;1 additional foreground row below our grid
 
-
 CheckNormalRouteShortestPath:
+;######### this routine is on our interrupt, and unfortunately is super slow, and can take a whole frame.... Therefor we shouldn't interrupt this interrupt with yet another interrupt that overwrites shit... So di ???
+  di
+;######### this routine is on our interrupt, and unfortunately is super slow, and can take a whole frame.... Therefor we shouldn't interrupt this interrupt with yet another interrupt that overwrites shit... So di ???
+
 	ld		a,(ix+HeroY)			              ;pl1hero?y
 	ld		(movementpath+0),a              ;movement path starts with hero's initial y,x
 	ld		a,(ix+HeroX)			              ;pl1hero?y
@@ -214,6 +216,19 @@ CheckNormalRouteShortestPath:
   xor   a
 	ld		(movementpath+2),a              ;reset first movement
 	ld		(movementpath+3),a              ;reset first movement
+
+	ld    a,(ix+HeroY)			              ;pl1hero?y
+	cp    6
+  jp    c,CheckReverseRoute
+;	ld    a,(ix+HeroY)			              ;pl1hero?y
+	cp    128-6
+  jp    nc,CheckReverseRoute
+	ld    a,(ix+HeroX)			              ;pl1hero?y
+	cp    6
+  jp    c,CheckReverseRoute
+;	ld    a,(ix+HeroX)			              ;pl1hero?y
+	cp    128-6
+  jp    nc,CheckReverseRoute
 
   ;check if we clicked in a 5 tiles radius from hero
 	ld		a,(mouseclickx)                 ;mouse pointer x in tiles
@@ -286,8 +301,6 @@ CheckNormalRouteShortestPath:
  
   .noobstacle2:
   xor   a
-
-
 
 ;  cp    149
 ;  jr    nc,.ForeGroundFound

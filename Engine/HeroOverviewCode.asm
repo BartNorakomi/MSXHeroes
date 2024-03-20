@@ -3888,9 +3888,16 @@ SetStatusTextAttack:
   ld    l,(ix+HeroXp)
   ld    h,(ix+HeroXp+1)
   .XpSet:
-  ld    b,HeroOverViewStatusWindowDX + 063
+  ld    b,HeroOverViewStatusWindowDX + 068
   ld    c,HeroOverViewStatusWindowDY + 059
   call  SetNumber16BitCastle
+
+  ld    a,(PutLetter+dx)                ;dx of previous text
+  add   a,4
+  ld    b,a                             ;dx text
+  ld    c,HeroOverViewStatusWindowDY + 059  
+  ld    hl,TextSlash
+  call  SetText
 
   ld    a,(ix+HeroLevel)                ;current level
   cp    18
@@ -3908,7 +3915,9 @@ SetStatusTextAttack:
   ld    d,(hl)                          ;amount of xp needed for next level 
   ex    de,hl
   .XpMaxSet:
-  ld    b,HeroOverViewStatusWindowDX + 090
+  ld    a,(PutLetter+dx)                ;dx of previous text
+  add   a,4
+  ld    b,a                             ;dx text
   ld    c,HeroOverViewStatusWindowDY + 059
   call  SetNumber16BitCastle
 
@@ -3948,7 +3957,7 @@ SetStatusTextAttack:
   call  SetNumber16BitCastle
   ret
 
-
+TextSlash: db "/",255
 
 
 
