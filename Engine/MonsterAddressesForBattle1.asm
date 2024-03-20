@@ -2993,7 +2993,7 @@ Monster127Table:                        ;Rastan (rastan saga)
   dw    Monster127AttackPatternRightDown
   db    BattleMonsterSpriteSheet13Block
   db    32                              ;nx  
-  db    38+08                           ;ny
+  db    40+08                           ;ny
   db    RandomBUnitLevel3CostGold        ;cost (gold)
   db    RandomBUnitLevel3CostGems        ;cost (gems)
   db    RandomBUnitLevel3CostRubies      ;cost (rubies)
