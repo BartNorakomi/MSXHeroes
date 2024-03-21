@@ -51,8 +51,8 @@ InitiateGame:
 
 
   call  LoadSamplesAndPlaySong0
-  call  CheckSwitchNextSong
-  call  CheckSwitchNextSong
+;  call  CheckSwitchNextSong
+;  call  CheckSwitchNextSong
 
 
   if  StartAtTitleScreen?
@@ -124,34 +124,7 @@ StartGame:
 
 
 
-CheckSwitchNextSong:
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-;  ld    a,(NewPrContr)	
-;	bit		5,a           ;F1 pressed ?
-;  ret   z
 
-  ld    a,(CurrentSongBeingPlayed)
-  inc   a
-  cp    7
-  jr    nz,.EndCheckLastSong
-  ld    a,1
-  .EndCheckLastSong:
-  ld    (CurrentSongBeingPlayed),a
-  ld    c,a
-  ld    b,0
-  push  bc
-  call  RePlayer_Stop
-  pop   bc                            ;track nr
-;  ld    bc,3                          ;track nr
-  ld    a,usas2repBlock               ;ahl = sound data (after format ID, so +1)
-  ld    hl,$8000+1
-  call  RePlayer_Play                 ;bc = track number, ahl = sound data (after format ID, so +1)
-  call  RePlayer_Tick                 ;initialise, load samples
-  ret
 
 CurrentSongBeingPlayed: db  0
 LoadSamplesAndPlaySong0:

@@ -13,9 +13,12 @@
 ;World13: db  World13MapBlock | dw World13Map | db World13ObjectLayerMapBlock | dw World13ObjectLayerMap | db TilesGentleJungleBlock   |   incbin"..\grapx\tilesheets\PaletteGentleJungle.pl",0,4
 ;World14: db  World14MapBlock | dw World14Map | db World14ObjectLayerMapBlock | dw World14ObjectLayerMap | db TilesGentleCaveBlock     |   incbin"..\grapx\tilesheets\PaletteGentleCave.pl",0,4
 
+;GentleWinterMap05  need 5 months to kill all creatures
+;GentleMap04:       need 6 months to kill all creatures
+;GentleCaveMap01:   need 4 months to kill all creatures
+
 LenghtMapData:  equ GentleAutumnMap01-GentleMap03
 GentleMaps:
-
 
 GentleMap03: db  GentleMap03MapBlock | dw GentleMap03Map | db GentleMap03ObjectLayerMapBlock | dw GentleMap03ObjectLayerMap | db TilesGentleBlock     |   incbin"..\grapx\tilesheets\PaletteGentle.pl",0,4 | db BattleFieldGentleBlock | db GentleMiniMapsBlock | dw $4000 + (192*128) + (100/2) - 128                                                 | db "2",255,"S",255,"Pochi is Lost         ",255,"Icy gusts battered the",254,"Worzen residence.     ",254,"Pochi, their loyal    ",254,"dragon-dog, went      ",254,"missing. Royas, the   ",254,"youngest, stood quiet,",254,"his brow furrowed as  ",254,"he stretched out      ",254,"telepathically.       ",254,"Pochi's message was   ",254,"faint, echoing from an",254,"unfamiliar, oppressive",254,"place - the ominous   ",254,"castle in the north.  ",254,"'Pochi needs us',     ",254,"Royas finally declared",254,"with a firm voice.    ",254,                         254,"Will the Worzen family",254,"rescue their beloved  ",254,"companion?            ",255
 GentleAutumnMap01: db  GentleAutumnMap01MapBlock | dw GentleAutumnMap01Map | db GentleAutumnMap01ObjectLayerMapBlock | dw GentleAutumnMap01ObjectLayerMap | db TilesGentleAutumnBlock     |   incbin"..\grapx\tilesheets\PaletteGentleAutumn.pl",0,4 | db BattleFieldAutumnBlock | db GentleAutumnMiniMapsBlock | dw $4000 + (000*128) + (000/2) - 128 | db "3",255,"M",255,"Crossroads of Courage ",255,"An urgent plea pierces",254,"the Worzen home.      ",254,"Two fallen fortresses ",254,"cry for aid:          ",254,"Castlevania, overrun  ",254,"by ghouls and skeletal",254,"horrors, and Castle   ",254,"Junker HQ, swarming   ",254,"with the infamous     ",254,"Snatchers.            ",254,"The Worzen family,    ",254,"known for their       ",254,"unwavering courage and",254,"diverse skills, stands",254,"at the precipice of a ",254,"perilous choice.      ",254,                         254,"Can you forge a unique",254,"strategy to reclaim   ",254,"both fortresses?      ",254,"                      ",255 

@@ -1368,13 +1368,13 @@ SetNextPlayersTurnAndCheckPlayerEliminated:
   ld    hl,pl1hero1y+HeroStatus         ;check if this player has active heroes
   jr    z,.PlayerFound
   dec   a
-  ld    hl,pl1hero2y+HeroStatus         ;check if this player has active heroes
+  ld    hl,pl2hero1y+HeroStatus         ;check if this player has active heroes
   jr    z,.PlayerFound
   dec   a
-  ld    hl,pl1hero3y+HeroStatus         ;check if this player has active heroes
+  ld    hl,pl3hero1y+HeroStatus         ;check if this player has active heroes
   jr    z,.PlayerFound
 ;  dec   a
-  ld    hl,pl1hero4y+HeroStatus         ;check if this player has active heroes
+  ld    hl,pl4hero1y+HeroStatus         ;check if this player has active heroes
 ;  jr    z,.PlayerFound
 
   .PlayerFound:

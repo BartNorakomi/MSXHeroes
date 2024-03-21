@@ -1,4 +1,3 @@
-robert: kan de requirements in een andere kleur ?
 
 title screen
 options:
@@ -21,6 +20,7 @@ autocombat moet een sprite worden
 footman meervoud wordt footmans in battle ipv footmen. naam wijzigen
 als je de stats kijkt van een monster, net voordat een nieuwe ronde start (of net voordat er text in het textvak geplaatst wordt), dan wordt de text niet goed geplaatst in beide pages. oplossing: je kunt niet de stats kijken als puttext? of hoe dat dan ook heet actief is.
 battle field for castle + castle walls
+cure op een unit geeft de text fucked up.. er staat dan cured en unitnaam door elkaar.... Maar later werkte het WEL goed.....
 
 worldmap:
 AI
@@ -44,6 +44,7 @@ castle:
 
 low prio:
 als je een gebouw upgrade, misschien een coin pickup animatie, of een + symbool (samen met het sfx)
+robert: kan de requirements in een andere kleur ?
 
 title screen:
 

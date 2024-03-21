@@ -135,6 +135,18 @@ RePlayer_Tick:
 	ret
 
   .ChangeSong:
+  ;randomize worldsong
+  cp    WorldSong
+  jr    nz,.EndCheckRandomizeWorldSong
+  ld    a,r
+  and   7
+  inc   a
+  cp    7
+  jr    c,.EndCheckRandomizeWorldSong
+  ld    a,1
+  .EndCheckRandomizeWorldSong:
+  ;/randomize worldsong
+
   ld    (CurrentSongBeingPlayed),a
   ld    c,a
   ld    b,0
