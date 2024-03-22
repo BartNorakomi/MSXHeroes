@@ -5049,7 +5049,7 @@ CopyInactivePageToActivePage:
   
 
 DisplayStartOfTurnMessageCode:
-;call ScreenOn
+call ScreenOn
   call  SetPlayerStartTurnVButton
   
   call  SetPlayerStartTurnGraphics      ;put gfx at (24,30)
