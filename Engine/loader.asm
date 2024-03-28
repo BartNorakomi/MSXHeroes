@@ -21,6 +21,12 @@
 ;GentleJungleMap02: need 5 months to kill all creatures
 ;GentleWinterMap03: need 4 months to kill all creatures
 
+;GentleAutumnMap03: need 4 months to kill all creatures
+;GentleJungleMap04: need 6 months to kill all creatures
+;GentleCaveMap05:   need 3-4 months to kill all creatures
+;GentleWinterMap04: need 3-4 months to kill all creatures
+;GentleDesertMap01: need 5 months to kill all creatures
+
 
 LenghtMapData:  equ GentleAutumnMap01-GentleMap03
 GentleMaps:

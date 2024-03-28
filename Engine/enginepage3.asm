@@ -1,14 +1,16 @@
 phase	$c000
 
-StartOfTurnMessageOn?:              equ 1
-UnlimitedBuildsPerTurn?:            equ 0
-DisplayNumbers1to6?:                equ 0
 StartAtTitleScreen?:                equ 1
+StartOfTurnMessageOn?:              equ 1
+MusicOn?:                           equ 0
+Music50PercentSpeed?:               equ 0
+
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
+UnlimitedBuildsPerTurn?:            equ 0
+DisplayNumbers1to6?:                equ 0
+
 ShowNewlyBoughtBuildingFadingIn?:   db  1
-MusicOn?:                           equ 0
-Music50PercentSpeed?:               equ 1
 
 TitleSong:  equ 5
 CastleSong: equ 2
@@ -17,10 +19,10 @@ WorldSong:  equ 4
 
 
 ;WorldPointer: dw GentleAutumnMap01
-;WorldPointer: dw GentleCaveMap05
+WorldPointer: dw GentleCaveMap05
 ;WorldPointer: dw GentleDesertMap02
 ;WorldPointer: dw GentleJungleMap03
-WorldPointer: dw GentleMap05
+;WorldPointer: dw GentleMap01
 ;WorldPointer: dw GentleWinterMap02
 
 InitiateGame:

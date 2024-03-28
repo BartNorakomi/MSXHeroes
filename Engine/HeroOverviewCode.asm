@@ -1518,7 +1518,7 @@ DescriptionShield2:        db  "Wooden shield",254 | WoodenShieldDefence: equ 2
 
                           ;item 012
                           db  "Defense +3",254
-DescriptionShield3:        db  "The bram stoker",254 | TheBramStokerDefence: equ 2
+DescriptionShield3:        db  "The Bram Stoker",254 | TheBramStokerDefence: equ 2
                           db  "Defense +2",255
                           db  "-5% enemy spell damage",255
 
@@ -1582,7 +1582,7 @@ DescriptionGloves1:        db  "Gripfast",254
 
                           ;item 026
 DescriptionGloves2:        db  "Iron Hand",254 | IronHandUnitSpeed: equ -1
-                          db  "-2.5% enemy spell damage",254
+                          db  "-5% enemy spell damage",254
                           db  "Unit movement speed -1",255
 
                           ;item 027

@@ -5048,7 +5048,7 @@ ReduceSpellDamageFromItems:
   call  .CheckItem12                    ;Shield: The bram stoker (-5% spell damage)
   call  .CheckItem21                    ;Boots: Dusk Rover (-2.5% spell damage)
   call  .CheckItem23                    ;Boots: Knight's Night Slippers (-7.5% spell damage)
-  call  .CheckItem26                    ;Gloves: Iron Hand (-2.5% spell damage)
+  call  .CheckItem26                    ;Gloves: Iron Hand (-5% spell damage)
   call  .CheckItem33                    ;Ring: Bronze Ring (-7.5% spell damage)
   call  .CheckItem34                    ;Ring: Hypnotising Ring (-10% spell damage)
   call  .CheckItem35                    ;Neclace: The Blue Topaz (-2.5% spell damage)
@@ -5083,11 +5083,11 @@ ReduceSpellDamageFromItems:
   ld    de,13                           ;divide total attack by 13 to get 7.7%
   jp    .ReducePercentage
 
-  .CheckItem26:                         ;Gloves: Iron Hand (-2.5% spell damage)
+  .CheckItem26:                         ;Gloves: Iron Hand (-5% spell damage)
   ld    a,(ix+HeroInventory+5)          ;Gloves
   cp    026
   ret   nz
-  ld    de,40                           ;divide total attack by 40 to get 2.5%
+  ld    de,20                           ;divide total attack by 20 to get 5%
   jp    .ReducePercentage
 
   .CheckItem33:                         ;Ring: Bronze Ring (-7.5% spell damage)

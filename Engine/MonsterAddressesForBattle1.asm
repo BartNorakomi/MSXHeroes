@@ -7046,8 +7046,8 @@ Monster113AttackPatternLeft:
 RIdle1Monster114:   equ $4000 + (176*128) + (000/2) - 128  ;(y*128) + (x/2)
 RIdle2Monster114:   equ $4000 + (176*128) + (032/2) - 128  ;(y*128) + (x/2)
 
-LIdle1Monster114:   equ $4000 + (208*128) + (032/2) - 128  ;(y*128) + (x/2)
-LIdle2Monster114:   equ $4000 + (208*128) + (000/2) - 128  ;(y*128) + (x/2)
+LIdle1Monster114:   equ $4000 + (216*128) + (032/2) - 128  ;(y*128) + (x/2)
+LIdle2Monster114:   equ $4000 + (216*128) + (000/2) - 128  ;(y*128) + (x/2)
 
 Monster114Move:
 Monster114Idle:
