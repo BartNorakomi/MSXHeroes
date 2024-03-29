@@ -334,7 +334,29 @@ TextQuickTip45:
                 db "strategically to best complement",254
                 db "their strengths.",255
 
-LastQuickTip: equ 45
+TextQuickTip46:
+                db "When your foe's forces are",254
+                db "dwindling in combat, make a",254
+                db "concerted effort to eliminate them",254
+                db "in one decisive assault, leaving",254
+                db "no chance for retreat.",255
+
+TextQuickTip47:
+                db "Defeating a hero grants you",254
+                db "access to their equipment,",254
+                db "expanding your arsenal.",254
+                db "But remember, only what you can",254
+                db "physically hold becomes yours.",255
+
+TextQuickTip48:
+                db "Creatures require a hero's",254
+                db "guidance to be recruited. If your",254
+                db "main hero is unavailable, consider",254
+                db "acquiring another hero solely for",254
+                db "the purpose of transporting these",254
+                db "creatures.",255
+
+LastQuickTip: equ 48
 
 
 

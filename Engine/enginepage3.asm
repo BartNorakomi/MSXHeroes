@@ -1,9 +1,9 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 1
+StartAtTitleScreen?:                equ 0
 StartOfTurnMessageOn?:              equ 1
 MusicOn?:                           equ 0
-Music50PercentSpeed?:               equ 0
+Music50PercentSpeed?:               equ 1
 
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
@@ -18,8 +18,8 @@ BattleSong: equ 3
 WorldSong:  equ 4
 
 
-;WorldPointer: dw GentleAutumnMap01
-WorldPointer: dw GentleCaveMap05
+WorldPointer: dw GentleAutumnMap04
+;WorldPointer: dw GentleCaveMap05
 ;WorldPointer: dw GentleDesertMap02
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap01

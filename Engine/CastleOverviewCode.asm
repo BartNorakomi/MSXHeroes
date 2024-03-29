@@ -4969,9 +4969,9 @@ ListOfQuickTips:
   dw TextQuickTip11,TextQuickTip12,TextQuickTip13,TextQuickTip14,TextQuickTip15,TextQuickTip16,TextQuickTip17,TextQuickTip18,TextQuickTip19,TextQuickTip20
   dw TextQuickTip21,TextQuickTip22,TextQuickTip23,TextQuickTip24,TextQuickTip25,TextQuickTip26,TextQuickTip27,TextQuickTip28,TextQuickTip29,TextQuickTip30
   dw TextQuickTip31,TextQuickTip32,TextQuickTip33,TextQuickTip34,TextQuickTip35,TextQuickTip36,TextQuickTip37,TextQuickTip38,TextQuickTip39,TextQuickTip40
-  dw TextQuickTip41,TextQuickTip42,TextQuickTip43,TextQuickTip44,TextQuickTip45
+  dw TextQuickTip41,TextQuickTip42,TextQuickTip43,TextQuickTip44,TextQuickTip45,TextQuickTip46,TextQuickTip47,TextQuickTip48
   
-TotalAmountOfQuickTips: equ 45
+TotalAmountOfQuickTips: equ 48
 
 
 SetQuickTipsText:
@@ -4999,7 +4999,7 @@ SetQuickTipsText:
   ld    d,(hl)
   ex    de,hl
 
-;ld hl,TextQuickTip45
+;ld hl,TextQuickTip48
 
   ld    b,038+00                        ;dx
   ld    c,064+00                        ;dy

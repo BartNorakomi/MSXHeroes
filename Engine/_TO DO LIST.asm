@@ -1,3 +1,6 @@
+message: player 3 eliminated when only 2 players playing and you take a neutral castle (for instance in Autumn4)
+
+
 
 title screen
 options:
