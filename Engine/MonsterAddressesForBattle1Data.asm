@@ -444,7 +444,7 @@ ContraGroupAUnitLevel6CostRubies:       equ 0
 
 
 ContraGroupBUnitLevel1Number:           equ 44
-ContraGroupBUnitLevel1Attack:           equ 3
+ContraGroupBUnitLevel1Attack:           equ 4
 ContraGroupBUnitLevel1Defense:          equ 5
 ContraGroupBUnitLevel1HP:               equ 6
 ContraGroupBUnitLevel1Speed:            equ 4
@@ -454,9 +454,9 @@ ContraGroupBUnitLevel1CostGems:         equ 00+Level1Unit
 ContraGroupBUnitLevel1CostRubies:       equ 0
 
 ContraGroupBUnitLevel2Number:           equ 36      
-ContraGroupBUnitLevel2Attack:           equ 3   ;ranged
+ContraGroupBUnitLevel2Attack:           equ 4   ;ranged
 ContraGroupBUnitLevel2Defense:          equ 6
-ContraGroupBUnitLevel2HP:               equ 14
+ContraGroupBUnitLevel2HP:               equ 15
 ContraGroupBUnitLevel2Speed:            equ 4
 ContraGroupBUnitLevel2Growth:           equ 6
 ContraGroupBUnitLevel2CostGold:         equ 110/10
@@ -465,8 +465,8 @@ ContraGroupBUnitLevel2CostRubies:       equ 0
 
 ContraGroupBUnitLevel3Number:           equ 43      
 ContraGroupBUnitLevel3Attack:           equ 5   ;ranged
-ContraGroupBUnitLevel3Defense:          equ 6
-ContraGroupBUnitLevel3HP:               equ 20
+ContraGroupBUnitLevel3Defense:          equ 7
+ContraGroupBUnitLevel3HP:               equ 22
 ContraGroupBUnitLevel3Speed:            equ 9
 ContraGroupBUnitLevel3Growth:           equ 5
 ContraGroupBUnitLevel3CostGold:         equ 220/10
