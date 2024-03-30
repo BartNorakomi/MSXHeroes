@@ -1527,7 +1527,7 @@ DescriptionShield4:        db  "Impenetrable shield",254 | ImpenetrableShieldDef
                           db  "Defense +4",255
 
                           ;item 014
-DescriptionShield5:        db  "Training shield",254 | TrainingShieldDefence: equ 5
+DescriptionShield5:        db  "Hallowed Roundel",254 | TrainingShieldDefence: equ 5
                           db  "Defense +5",255
 
                           ;item 015
