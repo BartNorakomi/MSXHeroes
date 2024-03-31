@@ -2406,7 +2406,7 @@ DragonSlayerUnitLevel3Defense: equ 08h ; last def. pass 3
 HeroOverViewSpellIconButton6MouseOverSY: equ 050h ; last def. pass 3
 DescriptionShield3: equ 04A25h ; last def. pass 3
 FirstLineintHeightCastleTavern: equ 07Dh ; last def. pass 3
-GentleJungleMap02Map: equ 05682h ; last def. pass 3
+GentleJungleMap02Map: equ 0567Dh ; last def. pass 3
 Monster112Move: equ 0AAD7h ; last def. pass 3
 NegligeeOfTeethSpellPower: equ 02h ; last def. pass 3
 HeroButton20x11SYSXFern: equ 05711h ; last def. pass 3
@@ -3637,7 +3637,7 @@ ClearAmountUnderMonster: equ 062A2h ; last def. pass 3
 SurrenderButton1XRight: equ 052h ; last def. pass 3
 HeroOverviewSpellIconButtonTable_Water: equ 0D716h ; last def. pass 3
 ContraGroupBUnitLevel3CostGems: equ 040h ; last def. pass 3
-GentleJungleMap03Map: equ 06AA3h ; last def. pass 3
+GentleJungleMap03Map: equ 06A9Eh ; last def. pass 3
 SpriteCharAxeMan: equ 04240h ; last def. pass 3
 TextCPU: equ 095BFh ; last def. pass 3
 CheckRightClickToDisplayInfo.TextSlash: equ 04E15h ; last def. pass 3
@@ -6462,7 +6462,7 @@ BubbleBobbleGroupAUnitLevel3CostRubies: equ 00h ; last def. pass 3
 ButtonTableInventoryIconsSYSX: equ 0D558h ; last def. pass 3
 SetSpireOfWisdomButtonTable.Button2XLeft: equ 030h ; last def. pass 3
 ChukaTaisenUnitLevel3CostGems: equ 040h ; last def. pass 3
-GentleJungleMap01ObjectLayerMap: equ 0548Bh ; last def. pass 3
+GentleJungleMap01ObjectLayerMap: equ 05487h ; last def. pass 3
 SetTotalMonsterAttackInHL.BasicOffenceFound: equ 0510Eh ; last def. pass 3
 HeroOverViewInventoryIconButton12MouseOverSX: equ 092h ; last def. pass 3
 PutManaBar: equ 052E1h ; last def. pass 3
@@ -7224,7 +7224,7 @@ ContraGroupAUnitLevel1Attack: equ 04h ; last def. pass 3
 Monster2.nyprevious: equ 0CE35h ; last def. pass 3
 MiniMapSquareIconInteractionOnInterrupt.endCheckWithinYRange: equ 03E5h ; last def. pass 3
 SDSnatcherUnitLevel1Number: equ 06h ; last def. pass 3
-GentleJungleMap02ObjectLayerMap: equ 06900h ; last def. pass 3
+GentleJungleMap02ObjectLayerMap: equ 068FBh ; last def. pass 3
 DescriptionRing2: equ 04D29h ; last def. pass 3
 RIdle1Monster168: equ 05F80h ; last def. pass 3
 InventoryItem38MouseOverSY: equ 0D8h ; last def. pass 3
@@ -7357,7 +7357,7 @@ CastleOverviewTavernCode.EndCheck10bWithPopIXandBC: equ 07B32h ; last def. pass 
 RecruitButtonTable.endlenght: equ 0D226h ; last def. pass 3
 TextQuickTip9: equ 08508h ; last def. pass 3
 HeroButton20x11SYSXUndeadline1: equ 05590h ; last def. pass 3
-GentleJungleMap03ObjectLayerMap: equ 07DCEh ; last def. pass 3
+GentleJungleMap03ObjectLayerMap: equ 07DC9h ; last def. pass 3
 DefendingAndVisitingHeroButtonTable.Button10Ytop: equ 0B0h ; last def. pass 3
 SetTextPage123Buttons: equ 095C7h ; last def. pass 3
 HeroOverViewInventoryIconButton10OffSY: equ 09Ch ; last def. pass 3

@@ -3422,8 +3422,8 @@ ListOfGuardTowerMonsters:
 
 .level6:
   db    141                               ;Monstrilla (core dump)
-  db    141                               ;Monstrilla (core dump)
   db    156                               ;ColossalBot (Thexder)
+  db    141                               ;Monstrilla (core dump)
   db    156                               ;ColossalBot (Thexder)
 
 GuardTowerMonster:
