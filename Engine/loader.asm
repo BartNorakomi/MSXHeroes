@@ -34,6 +34,7 @@
 
 ;GentleJungleMap01: need 3 months to kill all creatures (i finished in month 3, week 3)
 ;GentleDesertMap02: need 3 months to kill all creatures (i finished in month 3, week 4)
+;GentleWinterMap01: need 2 months to kill all creatures (i finished in month 2, week 4)
 
 
 LenghtMapData:  equ GentleAutumnMap01-GentleMap03
