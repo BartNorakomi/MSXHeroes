@@ -1713,12 +1713,10 @@ ScenarioSelectCode:
   call  .SetMaxAmountOfPlayerButtons
   call  .SetMaxAmountOfPlayerButtons
 
-  ld    a,1
+  ld    a,1                             ;0=CPU, 1=Human, 2=OFF
   ld    (player1human?),a
-  xor   a
+  xor   a                               ;0=CPU, 1=Human, 2=OFF
   ld    (player2human?),a
-  ld    (player3human?),a
-  ld    (player4human?),a
   ld    (player1StartingTown),a
   ld    (player2StartingTown),a
   ld    (player3StartingTown),a
@@ -1744,6 +1742,9 @@ ScenarioSelectCode:
   ld    ix,(WorldPointer)
   ld    a,2
   ld    (amountofplayers),a
+  ld    a,2                             ;0=CPU, 1=Human, 2=OFF
+  ld    (player3human?),a
+  ld    (player4human?),a
   ld    a,(ix+ScenarioNameAddress)
   cp    "2"
   jp    z,.SetTextInPlayerButtons
@@ -1755,6 +1756,8 @@ ScenarioSelectCode:
 
   ld    a,3
   ld    (amountofplayers),a
+  xor   a                               ;0=CPU, 1=Human, 2=OFF
+  ld    (player3human?),a
   ld    a,(ix+ScenarioNameAddress)
   cp    "3"
   jp    z,.SetTextInPlayerButtons
@@ -1765,6 +1768,8 @@ ScenarioSelectCode:
   ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*22),a ;starting town buttons player 4
   ld    a,4
   ld    (amountofplayers),a
+  xor   a                               ;0=CPU, 1=Human, 2=OFF
+  ld    (player4human?),a
   
   .SetTextInPlayerButtons:
   call  SetTextHumanOrCPUButtons

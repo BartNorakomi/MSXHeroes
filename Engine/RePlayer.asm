@@ -141,8 +141,13 @@ RePlayer_Tick:
   ld    a,r
   and   7
   inc   a
+
+  cp    BattleSong
+  jr    z,.battlesoundfoundbutnotinbattle
+
   cp    7
   jr    c,.EndCheckRandomizeWorldSong
+  .battlesoundfoundbutnotinbattle:
   ld    a,1
   .EndCheckRandomizeWorldSong:
   ;/randomize worldsong

@@ -13640,15 +13640,15 @@ TextMagicGuildLevel3:
                           db  "1000 Gold",254
                           db  "+5 Wood",254
                           db  "+5 Ore",254
-                          db  "+10 Gems",254
-                          db  "+10 Rubies",255
+                          db  "+6 Gems",254
+                          db  "+6 Rubies",255
 
 MagicGuildLevel3Cost:
 .Gold:    dw  1000
 .Wood:    dw  05
 .Ore:     dw  05
-.Gems:    dw  10
-.Rubies:  dw  10
+.Gems:    dw  06
+.Rubies:  dw  06
 
 TextMagicGuildLevel4:        
                           db  " Magic Guild 4",254
@@ -13665,8 +13665,8 @@ TextMagicGuildLevel4:
                           db  "1000 Gold",254
                           db  "+5 Wood",254
                           db  "+5 Ore",254
-                          db  "+15 Gems",254
-                          db  "+15 Rubies",255
+                          db  "+8 Gems",254
+                          db  "+8 Rubies",255
 TextMagicGuildLevel4Finished:        
                           db  " Magic Guild 4",254
                           db  " ",254
@@ -13683,8 +13683,8 @@ MagicGuildLevel4Cost:
 .Gold:    dw  1000
 .Wood:    dw  05
 .Ore:     dw  05
-.Gems:    dw  15
-.Rubies:  dw  15
+.Gems:    dw  08
+.Rubies:  dw  08
 
 TextSawmillLevel1:        
                           db  "  Sawmill 1",254
@@ -13768,10 +13768,10 @@ TextMineLevel2:
                           db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "3000 Gold",255
+                          db  "2000 Gold",255
 
 MineLevel2Cost:
-.Gold:    dw  3000
+.Gold:    dw  2000
 .Wood:    dw  00
 .Ore:     dw  00
 .Gems:    dw  00
@@ -13787,7 +13787,7 @@ TextMineLevel3:
                           db  "per day",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "5000 Gold",255
+                          db  "2500 Gold",255
 TextMineLevel3Finished:        
                           db  "   Mine 3",254
                           db  " ",254
@@ -13798,7 +13798,7 @@ TextMineLevel3Finished:
                           db  "per day",255
                           
 MineLevel3Cost:
-.Gold:    dw  5000
+.Gold:    dw  2500
 .Wood:    dw  00
 .Ore:     dw  00
 .Gems:    dw  00
@@ -13819,12 +13819,12 @@ TextBarracksLevel1:
                           db  " ",254
                           db  "Cost:",254
                           db  "500 Gold",254
-                          db  "+10 Ore",255
+                          db  "+5 Wood",255
 
 BarracksLevel1Cost:
 .Gold:    dw  500
-.Wood:    dw  00
-.Ore:     dw  10
+.Wood:    dw  05
+.Ore:     dw  00
 .Gems:    dw  00
 .Rubies:  dw  00
 
@@ -13868,12 +13868,12 @@ TextBarracksLevel3:
                           db  " ",254
                           db  "Cost:",254
                           db  "1500 Gold",254
-                          db  "+15 Ore",255
+                          db  "+5 Ore",255
 
 BarracksLevel3Cost:
 .Gold:    dw  1500
 .Wood:    dw  00
-.Ore:     dw  15
+.Ore:     dw  05
 .Gems:    dw  00
 .Rubies:  dw  00
 
@@ -13887,18 +13887,18 @@ TextBarracksLevel4:
                           db  "week",254
                           db  " ",254
                           db  "Cost:",254
-                          db  "1500 Gold",254
-                          db  "+5 Wood",254
-                          db  "+5 Ore",254
-                          db  "+4 Gems",254
-                          db  "+4 Rubies",255
+                          db  "2000 Gold",254
+                          db  "+3 Wood",254
+                          db  "+3 Ore",254
+                          db  "+1 Gems",254
+                          db  "+1 Rubies",255
 
 BarracksLevel4Cost:
-.Gold:    dw  1500
-.Wood:    dw  05
-.Ore:     dw  05
-.Gems:    dw  04
-.Rubies:  dw  04
+.Gold:    dw  2000
+.Wood:    dw  03
+.Ore:     dw  03
+.Gems:    dw  01
+.Rubies:  dw  01
 
 TextBarracksLevel5:        
                           db  "  Barracks 5",254
@@ -13915,7 +13915,7 @@ TextBarracksLevel5:
                           db  " ",254
                           db  "Cost:",254
                           db  "5000 Gold",254
-                          db  "+20 Wood",255
+                          db  "+15 Wood",255
 TextBarracksLevel5Finished:
                           db  "  Barracks 5",254
                           db  " ",254
@@ -13932,7 +13932,7 @@ TextBarracksLevel5Finished:
 
 BarracksLevel5Cost:
 .Gold:    dw  5000
-.Wood:    dw  20
+.Wood:    dw  15
 .Ore:     dw  00
 .Gems:    dw  00
 .Rubies:  dw  00
@@ -13948,8 +13948,8 @@ TextBarracksTower:
                           db  " ",254
                           db  "Cost:",254
                           db  "20000 Gold",254
-                          db  "+20 Gems",254
-                          db  "+20 Rubies",254
+                          db  "+10 Gems",254
+                          db  "+10 Rubies",254
                           db  " ",254
                           db  "Requirements:",254
                           db  "Barracks 5",255
@@ -13970,8 +13970,8 @@ BarracksTowerCost:
 .Gold:    dw  20000
 .Wood:    dw  00
 .Ore:     dw  00
-.Gems:    dw  20
-.Rubies:  dw  20
+.Gems:    dw  10
+.Rubies:  dw  10
 
 TextCityWalls:        
                           db  "   City Walls",254
@@ -13987,8 +13987,8 @@ TextCityWalls:
                           db  " ",254
                           db  "Cost:",254
                           db  "2000 Gold",254
-                          db  "+15 Wood",254
-                          db  "+15 Ore",254
+                          db  "+5 Wood",254
+                          db  "+5 Ore",254
                           db  " ",254
                           db  "Requirements:",254
                           db  "Capitol",255
@@ -14011,8 +14011,8 @@ TextCityWallsFinished:
 
 CityWallsCost:
 .Gold:    dw  2000
-.Wood:    dw  15
-.Ore:     dw  15
+.Wood:    dw  5
+.Ore:     dw  5
 .Gems:    dw  00
 .Rubies:  dw  00
 

@@ -52,7 +52,7 @@ DragonSlayerUnitLevel5CostRubies:       equ 0
 DragonSlayerUnitLevel6Number:           equ 33
 DragonSlayerUnitLevel6Attack:           equ 15
 DragonSlayerUnitLevel6Defense:          equ 15
-DragonSlayerUnitLevel6HP:               equ 100
+DragonSlayerUnitLevel6HP:               equ 100+50
 DragonSlayerUnitLevel6Speed:            equ 7
 DragonSlayerUnitLevel6Growth:           equ 1
 DragonSlayerUnitLevel6CostGold:         equ 1000/10
@@ -116,7 +116,7 @@ UsasUnitLevel5CostRubies:       equ 1
 UsasUnitLevel6Number:           equ 50
 UsasUnitLevel6Attack:           equ 15
 UsasUnitLevel6Defense:          equ 14
-UsasUnitLevel6HP:               equ 90
+UsasUnitLevel6HP:               equ 90+50
 UsasUnitLevel6Speed:            equ 7
 UsasUnitLevel6Growth:           equ 1
 UsasUnitLevel6CostGold:         equ 850/10
@@ -178,7 +178,7 @@ SDSnatcherUnitLevel5CostRubies:       equ 0
 SDSnatcherUnitLevel6Number:           equ 4
 SDSnatcherUnitLevel6Attack:           equ 16
 SDSnatcherUnitLevel6Defense:          equ 13
-SDSnatcherUnitLevel6HP:               equ 115
+SDSnatcherUnitLevel6HP:               equ 115+50
 SDSnatcherUnitLevel6Speed:            equ 5
 SDSnatcherUnitLevel6Growth:           equ 1
 SDSnatcherUnitLevel6CostGold:         equ 850/10
@@ -239,7 +239,7 @@ CastleVaniaUnitLevel5CostRubies:       equ 0
 CastleVaniaUnitLevel6Number:           equ 24
 CastleVaniaUnitLevel6Attack:           equ 16
 CastleVaniaUnitLevel6Defense:          equ 12
-CastleVaniaUnitLevel6HP:               equ 90
+CastleVaniaUnitLevel6HP:               equ 90+50
 CastleVaniaUnitLevel6Speed:            equ 9
 CastleVaniaUnitLevel6Growth:           equ 1
 CastleVaniaUnitLevel6CostGold:         equ 900/10
@@ -302,7 +302,7 @@ PsychoWorldUnitLevel5CostRubies:       equ 0
 PsychoWorldUnitLevel6Number:           equ 68
 PsychoWorldUnitLevel6Attack:           equ 16
 PsychoWorldUnitLevel6Defense:          equ 16
-PsychoWorldUnitLevel6HP:               equ 120
+PsychoWorldUnitLevel6HP:               equ 120+50
 PsychoWorldUnitLevel6Speed:            equ 7
 PsychoWorldUnitLevel6Growth:           equ 1
 PsychoWorldUnitLevel6CostGold:         equ 1200/10
@@ -366,7 +366,7 @@ KingKongUnitLevel5CostRubies:       equ 0
 KingKongUnitLevel6Number:           equ 72
 KingKongUnitLevel6Attack:           equ 15
 KingKongUnitLevel6Defense:          equ 13
-KingKongUnitLevel6HP:               equ 80
+KingKongUnitLevel6HP:               equ 80+50
 KingKongUnitLevel6Speed:            equ 7
 KingKongUnitLevel6Growth:           equ 1
 KingKongUnitLevel6CostGold:         equ 850/10
@@ -431,7 +431,7 @@ ContraGroupAUnitLevel5CostRubies:       equ 1
 ContraGroupAUnitLevel6Number:           equ 46
 ContraGroupAUnitLevel6Attack:           equ 15
 ContraGroupAUnitLevel6Defense:          equ 12
-ContraGroupAUnitLevel6HP:               equ 70
+ContraGroupAUnitLevel6HP:               equ 70+50
 ContraGroupAUnitLevel6Speed:            equ 6
 ContraGroupAUnitLevel6Growth:           equ 1
 ContraGroupAUnitLevel6CostGold:         equ 750/10
@@ -458,27 +458,27 @@ ContraGroupBUnitLevel2Attack:           equ 4   ;ranged
 ContraGroupBUnitLevel2Defense:          equ 6
 ContraGroupBUnitLevel2HP:               equ 15
 ContraGroupBUnitLevel2Speed:            equ 4
-ContraGroupBUnitLevel2Growth:           equ 6
+ContraGroupBUnitLevel2Growth:           equ 8
 ContraGroupBUnitLevel2CostGold:         equ 110/10
 ContraGroupBUnitLevel2CostGems:         equ 00+Level2Unit
 ContraGroupBUnitLevel2CostRubies:       equ 0
 
 ContraGroupBUnitLevel3Number:           equ 43      
-ContraGroupBUnitLevel3Attack:           equ 5   ;ranged
-ContraGroupBUnitLevel3Defense:          equ 7
+ContraGroupBUnitLevel3Attack:           equ 8
+ContraGroupBUnitLevel3Defense:          equ 8
 ContraGroupBUnitLevel3HP:               equ 22
 ContraGroupBUnitLevel3Speed:            equ 9
-ContraGroupBUnitLevel3Growth:           equ 5
+ContraGroupBUnitLevel3Growth:           equ 7
 ContraGroupBUnitLevel3CostGold:         equ 220/10
 ContraGroupBUnitLevel3CostGems:         equ 00+Level3Unit
 ContraGroupBUnitLevel3CostRubies:       equ 0
 
 ContraGroupBUnitLevel4Number:           equ 37      
-ContraGroupBUnitLevel4Attack:           equ 6   ;ranged
+ContraGroupBUnitLevel4Attack:           equ 10
 ContraGroupBUnitLevel4Defense:          equ 11
 ContraGroupBUnitLevel4HP:               equ 35
-ContraGroupBUnitLevel4Speed:            equ 5
-ContraGroupBUnitLevel4Growth:           equ 4
+ContraGroupBUnitLevel4Speed:            equ 6
+ContraGroupBUnitLevel4Growth:           equ 5
 ContraGroupBUnitLevel4CostGold:         equ 330/10
 ContraGroupBUnitLevel4CostGems:         equ 00+Level4Unit
 ContraGroupBUnitLevel4CostRubies:       equ 0
@@ -496,7 +496,7 @@ ContraGroupBUnitLevel5CostRubies:       equ 0
 ContraGroupBUnitLevel6Number:           equ 40      
 ContraGroupBUnitLevel6Attack:           equ 10    ;ranged
 ContraGroupBUnitLevel6Defense:          equ 14
-ContraGroupBUnitLevel6HP:               equ 70
+ContraGroupBUnitLevel6HP:               equ 70+50
 ContraGroupBUnitLevel6Speed:            equ 7
 ContraGroupBUnitLevel6Growth:           equ 1
 ContraGroupBUnitLevel6CostGold:         equ 800/10
@@ -561,7 +561,7 @@ GoemonUnitLevel5CostRubies:       equ 0
 GoemonUnitLevel6Number:           equ 59
 GoemonUnitLevel6Attack:           equ 15
 GoemonUnitLevel6Defense:          equ 13
-GoemonUnitLevel6HP:               equ 75
+GoemonUnitLevel6HP:               equ 75+50
 GoemonUnitLevel6Speed:            equ 7
 GoemonUnitLevel6Growth:           equ 1
 GoemonUnitLevel6CostGold:         equ 750/10
@@ -625,7 +625,7 @@ GolvelliusUnitLevel5CostRubies:       equ 0
 GolvelliusUnitLevel6Number:           equ 86
 GolvelliusUnitLevel6Attack:           equ 13
 GolvelliusUnitLevel6Defense:          equ 12
-GolvelliusUnitLevel6HP:               equ 160
+GolvelliusUnitLevel6HP:               equ 160+50
 GolvelliusUnitLevel6Speed:            equ 5
 GolvelliusUnitLevel6Growth:           equ 1
 GolvelliusUnitLevel6CostGold:         equ 850/10
@@ -691,7 +691,7 @@ Ys3UnitLevel5CostRubies:       equ 0
 Ys3UnitLevel6Number:           equ 101
 Ys3UnitLevel6Attack:           equ 15
 Ys3UnitLevel6Defense:          equ 12
-Ys3UnitLevel6HP:               equ 100
+Ys3UnitLevel6HP:               equ 100+50
 Ys3UnitLevel6Speed:            equ 10
 Ys3UnitLevel6Growth:           equ 1
 Ys3UnitLevel6CostGold:         equ 1000/10
@@ -757,7 +757,7 @@ AkanbeDragonGroupAUnitLevel5CostRubies:       equ 1
 AkanbeDragonGroupAUnitLevel6Number:           equ 112
 AkanbeDragonGroupAUnitLevel6Attack:           equ 14
 AkanbeDragonGroupAUnitLevel6Defense:          equ 12
-AkanbeDragonGroupAUnitLevel6HP:               equ 70
+AkanbeDragonGroupAUnitLevel6HP:               equ 70+50
 AkanbeDragonGroupAUnitLevel6Speed:            equ 6
 AkanbeDragonGroupAUnitLevel6Growth:           equ 1
 AkanbeDragonGroupAUnitLevel6CostGold:         equ 750/10
@@ -822,7 +822,7 @@ AkanbeDragonGroupBUnitLevel5CostRubies:       equ 1
 AkanbeDragonGroupBUnitLevel6Number:           equ 121
 AkanbeDragonGroupBUnitLevel6Attack:           equ 12
 AkanbeDragonGroupBUnitLevel6Defense:          equ 12
-AkanbeDragonGroupBUnitLevel6HP:               equ 170
+AkanbeDragonGroupBUnitLevel6HP:               equ 170+50
 AkanbeDragonGroupBUnitLevel6Speed:            equ 6
 AkanbeDragonGroupBUnitLevel6Growth:           equ 1
 AkanbeDragonGroupBUnitLevel6CostGold:         equ 800/10
@@ -887,7 +887,7 @@ YieArKungFuUnitLevel5CostRubies:       equ 0
 YieArKungFuUnitLevel6Number:           equ 110
 YieArKungFuUnitLevel6Attack:           equ 15
 YieArKungFuUnitLevel6Defense:          equ 15
-YieArKungFuUnitLevel6HP:               equ 120
+YieArKungFuUnitLevel6HP:               equ 120+50
 YieArKungFuUnitLevel6Speed:            equ 8
 YieArKungFuUnitLevel6Growth:           equ 1
 YieArKungFuUnitLevel6CostGold:         equ 1200/10
@@ -951,7 +951,7 @@ BubbleBobbleGroupAUnitLevel5CostRubies:       equ 1
 BubbleBobbleGroupAUnitLevel6Number:           equ 71
 BubbleBobbleGroupAUnitLevel6Attack:           equ 13
 BubbleBobbleGroupAUnitLevel6Defense:          equ 13
-BubbleBobbleGroupAUnitLevel6HP:               equ 160
+BubbleBobbleGroupAUnitLevel6HP:               equ 160+50
 BubbleBobbleGroupAUnitLevel6Speed:            equ 6
 BubbleBobbleGroupAUnitLevel6Growth:           equ 1
 BubbleBobbleGroupAUnitLevel6CostGold:         equ 700/10
@@ -1016,7 +1016,7 @@ BubbleBobbleGroupBUnitLevel5CostRubies:       equ 0
 BubbleBobbleGroupBUnitLevel6Number:           equ 16
 BubbleBobbleGroupBUnitLevel6Attack:           equ 12
 BubbleBobbleGroupBUnitLevel6Defense:          equ 12
-BubbleBobbleGroupBUnitLevel6HP:               equ 200
+BubbleBobbleGroupBUnitLevel6HP:               equ 200+50
 BubbleBobbleGroupBUnitLevel6Speed:            equ 6
 BubbleBobbleGroupBUnitLevel6Growth:           equ 1
 BubbleBobbleGroupBUnitLevel6CostGold:         equ 800/10
@@ -1227,7 +1227,7 @@ ChukaTaisenUnitLevel5CostRubies:       equ 0
 ChukaTaisenUnitLevel6Number:           equ 187
 ChukaTaisenUnitLevel6Attack:           equ 13
 ChukaTaisenUnitLevel6Defense:          equ 13
-ChukaTaisenUnitLevel6HP:               equ 185
+ChukaTaisenUnitLevel6HP:               equ 185+50
 ChukaTaisenUnitLevel6Speed:            equ 6
 ChukaTaisenUnitLevel6Growth:           equ 1
 ChukaTaisenUnitLevel6CostGold:         equ 800/10
@@ -1293,7 +1293,7 @@ RandomAUnitLevel5CostRubies:       equ 0
 RandomAUnitLevel6Number:           equ 33
 RandomAUnitLevel6Attack:           equ 15
 RandomAUnitLevel6Defense:          equ 16
-RandomAUnitLevel6HP:               equ 90
+RandomAUnitLevel6HP:               equ 90+50
 RandomAUnitLevel6Speed:            equ 7
 RandomAUnitLevel6Growth:           equ 1
 RandomAUnitLevel6CostGold:         equ 1000/10
@@ -1357,7 +1357,7 @@ RandomBUnitLevel5CostRubies:       equ 1
 RandomBUnitLevel6Number:           equ 50
 RandomBUnitLevel6Attack:           equ 15
 RandomBUnitLevel6Defense:          equ 14
-RandomBUnitLevel6HP:               equ 95
+RandomBUnitLevel6HP:               equ 95+50
 RandomBUnitLevel6Speed:            equ 7
 RandomBUnitLevel6Growth:           equ 1
 RandomBUnitLevel6CostGold:         equ 850/10

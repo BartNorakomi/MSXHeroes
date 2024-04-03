@@ -872,12 +872,12 @@ Monster036Table:                        ;Sarge green (Contra)
 Monster037Table:                        ;Lieutenant red (Contra)
   dw    Monster037Idle
   dw    Monster037Move
-  dw    Monster037AttackPatternRight
-  dw    Monster037AttackPatternLeft
-  dw    Monster037AttackPatternLeft
-  dw    Monster037AttackPatternLeft
-  dw    Monster037AttackPatternRight
-  dw    Monster037AttackPatternRight
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
   db    BattleMonsterSpriteSheet4Block
   db    16                              ;nx  
   db    32+08                           ;ny
@@ -889,7 +889,7 @@ Monster037Table:                        ;Lieutenant red (Contra)
   db    ContraGroupBUnitLevel4Attack          ;attack
   db    ContraGroupBUnitLevel4Defense         ;defense
   db    ContraGroupBUnitLevel4Growth          ;growth
-  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    000                             ;special ability
   db    "Lieutenant",255," "
 
 Monster038Table:                        ;FootSoldier (Contra)
@@ -1010,12 +1010,12 @@ Monster042Table:                        ;Alien Grunt (Contra)
 Monster043Table:                        ;Infiltrant (Contra)
   dw    Monster043Idle
   dw    Monster043Move
-  dw    Monster043AttackPatternRight
-  dw    Monster043AttackPatternLeft
-  dw    Monster043AttackPatternLeft
-  dw    Monster043AttackPatternLeft
-  dw    Monster043AttackPatternRight
-  dw    Monster043AttackPatternRight
+  dw    GeneralMonsterAttackPatternRight
+  dw    GeneralMonsterAttackPatternLeft
+  dw    GeneralMonsterAttackPatternLeftUp
+  dw    GeneralMonsterAttackPatternLeftDown
+  dw    GeneralMonsterAttackPatternRightUp
+  dw    GeneralMonsterAttackPatternRightDown
   db    BattleMonsterSpriteSheet3Block
   db    16                              ;nx  
   db    32+08                           ;ny
@@ -1027,7 +1027,7 @@ Monster043Table:                        ;Infiltrant (Contra)
   db    ContraGroupBUnitLevel3Attack          ;attack
   db    ContraGroupBUnitLevel3Defense         ;defense
   db    ContraGroupBUnitLevel3Growth          ;growth
-  db    RangedMonster                   ;special ability, 128=ranged hero
+  db    000                             ;special ability
   db    "Infiltrant",255," "
 
 Monster044Table:                        ;Red Soldier (Contra)

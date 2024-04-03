@@ -2,8 +2,8 @@ phase	$c000
 
 StartAtTitleScreen?:                equ 1
 StartOfTurnMessageOn?:              equ 1
-MusicOn?:                           equ 0
-Music50PercentSpeed?:               equ 1
+MusicOn?:                           equ 1
+Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
@@ -62,6 +62,7 @@ InitiateGame:
   endif
 
 StartGame:
+;jp StartGame
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
   ld    hl,FindAndSetCastles            ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
