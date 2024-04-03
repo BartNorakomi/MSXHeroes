@@ -879,6 +879,12 @@ PutMonsterAmountOnBattleField:
 	db		000,000,007,000
 	db		0,%0000 0000,$98
 
+ClearMonsterAmountOnBattleField:
+	db		240,000,249,255
+	db		000,000,000,255
+	db		000,000,007,000
+	db		0,%0000 0000,$d0
+
 SmoothCornerPutMonsterAmount:
 	db	  240,000,249,000
 	db	  001,000,249,000

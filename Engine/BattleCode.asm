@@ -155,16 +155,15 @@ PressMToLookAtPage2And3:
 
   ld    a,(NewPrContr)
   bit   6,a                            ;check ontrols to see if f1 is pressed 
-  call  nz,.SetPage3  
-  ret
-
-.SetPage2:
-  ld    a,2*32+31
-  call  SetPageSpecial.setpage
-  jp    .WaitKeyPress
+  ret   z
 
 .SetPage3:
   ld    a,3*32+31
+  call  SetPageSpecial.setpage
+  jp    .WaitKeyPress
+
+.SetPage2:
+  ld    a,2*32+31
   call  SetPageSpecial.setpage
   jp    .WaitKeyPress
 
@@ -5393,7 +5392,6 @@ SetAmountUnderMonster:
 ;  ld    hl,ClearnNumber
 ;  call  docopy
 
-
   ld    hl,$4000 + (038*128) + (000/2) - 128
   ld    de,$0000 + (249*128) + (240/2) - 128  ;dy,dx
   ld    bc,$0000 + (007*256) + (016/2)        ;ny,nx  
@@ -5409,6 +5407,7 @@ SetAmountUnderMonster:
 
   ld    a,(PutLetter+dx)                ;dx of last letter put + that letter's nx
 sub 240
+;ld a,16
   ld    (PutMonsterAmountOnBattleField+nx),a
 
   ;if nx=16 add 0 to textbox
@@ -5450,28 +5449,28 @@ ClearAmountUnderMonster:
   ;if nx=48 add 16 to textbox
   ;if nx=64 add 24 to textbox
   ld    a,16
-  ld    (PutMonsterAmountOnBattleField+nx),a
+  ld    (ClearMonsterAmountOnBattleField+nx),a
   
   ld    a,(ix+MonsterNX)
   sub   a,16
 	srl		a				                        ;/2
   add   a,(ix+MonsterX)
-  ld    (PutMonsterAmountOnBattleField+sx),a
-  ld    (PutMonsterAmountOnBattleField+dx),a
+  ld    (ClearMonsterAmountOnBattleField+sx),a
+  ld    (ClearMonsterAmountOnBattleField+dx),a
 
   ld    a,(ix+MonsterY)
-  ld    (PutMonsterAmountOnBattleField+sy),a  
-  ld    (PutMonsterAmountOnBattleField+dy),a  
+  ld    (ClearMonsterAmountOnBattleField+sy),a  
+  ld    (ClearMonsterAmountOnBattleField+dy),a  
 
 ;step 1: clear amount above monster by copying from page 3 to inactive page
 	ld		a,(activepage)
   xor   1
-  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    (ClearMonsterAmountOnBattleField+dpage),a
   
   ld    a,3                             ;clear amount by copying from page 3 to inactive page
-  ld    (PutMonsterAmountOnBattleField+spage),a
+  ld    (ClearMonsterAmountOnBattleField+spage),a
 
-  ld    hl,PutMonsterAmountOnBattleField
+  ld    hl,ClearMonsterAmountOnBattleField
   call  docopy    
 
 ;step 2: recover other monsters that we also erased from inactive page
@@ -5481,53 +5480,50 @@ ClearAmountUnderMonster:
   ld    a,1
   ld    (RepairAmountAboveMonster?),a  
 
-;step 3: copy new amount above monster from inactive page to active page
+;step 3: clear amount above monster by copying from page 3 to active page
 	ld		a,(activepage)
-  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    (ClearMonsterAmountOnBattleField+dpage),a
   xor   1
-  ld    (PutMonsterAmountOnBattleField+spage),a
+  ld    (ClearMonsterAmountOnBattleField+spage),a
 
-  ld    hl,PutMonsterAmountOnBattleField
+  ld    hl,ClearMonsterAmountOnBattleField
   call  docopy  
-  
+ 
 ;step 4: clear amount above monster by copying from inactive page to page 2
 	ld		a,2
-  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    (ClearMonsterAmountOnBattleField+dpage),a
 
-  ld    hl,PutMonsterAmountOnBattleField
+  ld    hl,ClearMonsterAmountOnBattleField
   call  docopy
 
 ;step 5: repair overwritten monster in inactive page, by copying entire monster from page 2 to inactive page
   ld    a,2
-  ld    (PutMonsterAmountOnBattleField+spage),a
+  ld    (ClearMonsterAmountOnBattleField+spage),a
 	ld		a,(activepage)
   xor   1
-  ld    (PutMonsterAmountOnBattleField+dpage),a
+  ld    (ClearMonsterAmountOnBattleField+dpage),a
   ld    a,(ix+MonsterY)
-  ld    (PutMonsterAmountOnBattleField+sy),a
-  ld    (PutMonsterAmountOnBattleField+dy),a
+  ld    (ClearMonsterAmountOnBattleField+sy),a
+  ld    (ClearMonsterAmountOnBattleField+dy),a
   ld    a,(ix+MonsterX)
-  ld    (PutMonsterAmountOnBattleField+sx),a
-  ld    (PutMonsterAmountOnBattleField+dx),a
+  ld    (ClearMonsterAmountOnBattleField+sx),a
+  ld    (ClearMonsterAmountOnBattleField+dx),a
   ld    a,(ix+MonsterNY)
-  ld    (PutMonsterAmountOnBattleField+ny),a
+  ld    (ClearMonsterAmountOnBattleField+ny),a
   ld    a,(ix+MonsterNX)
-  ld    (PutMonsterAmountOnBattleField+nx),a
-  ld    hl,PutMonsterAmountOnBattleField
+  ld    (ClearMonsterAmountOnBattleField+nx),a
+  ld    hl,ClearMonsterAmountOnBattleField
   call  docopy
 
   ld    a,7
-  ld    (PutMonsterAmountOnBattleField+ny),a
+  ld    (ClearMonsterAmountOnBattleField+ny),a
   ld    a,240
-  ld    (PutMonsterAmountOnBattleField+sx),a
+  ld    (ClearMonsterAmountOnBattleField+sx),a
   ld    a,249
-  ld    (PutMonsterAmountOnBattleField+sy),a  
+  ld    (ClearMonsterAmountOnBattleField+sy),a  
   ret
 
 SetAmountUnderMonsterIn3Pages:
-;to do: when amount goes from 3 digits to 2 digits, 3d digit isnt erased
-;to do: when amount goes from 2 digits to 1 digit, 2d digit isnt erased
-;to do: when a huge monster is blocking the number, we should proceed the hard way
   ld    hl,(AmountMonsterBeforeBeingAttacked)
   ld    e,(ix+MonsterAmount)
   ld    d,(ix+MonsterAmount+1)
