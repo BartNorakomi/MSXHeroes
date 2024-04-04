@@ -800,7 +800,7 @@ AkanbeDragonGroupBUnitLevel3CostGems:         equ 00+Level3Unit
 AkanbeDragonGroupBUnitLevel3CostRubies:       equ 0
 
 AkanbeDragonGroupBUnitLevel4Number:           equ 120
-AkanbeDragonGroupBUnitLevel4Attack:           equ 10
+AkanbeDragonGroupBUnitLevel4Attack:           equ 9
 AkanbeDragonGroupBUnitLevel4Defense:          equ 11
 AkanbeDragonGroupBUnitLevel4HP:               equ 40
 AkanbeDragonGroupBUnitLevel4Speed:            equ 5
@@ -1179,15 +1179,15 @@ ChukaTaisenUnitLevel1Attack:           equ 4
 ChukaTaisenUnitLevel1Defense:          equ 3
 ChukaTaisenUnitLevel1HP:               equ 5
 ChukaTaisenUnitLevel1Speed:            equ 4
-ChukaTaisenUnitLevel1Growth:           equ 14
+ChukaTaisenUnitLevel1Growth:           equ 13
 ChukaTaisenUnitLevel1CostGold:         equ 50/10
 ChukaTaisenUnitLevel1CostGems:         equ 00+Level1Unit
 ChukaTaisenUnitLevel1CostRubies:       equ 0
-;Sun Wukong (chuka taisen) (main character)
+;Sun Wukong (chuka taisen) (main character) ranged
 ChukaTaisenUnitLevel2Number:           equ 183
 ChukaTaisenUnitLevel2Attack:           equ 4
 ChukaTaisenUnitLevel2Defense:          equ 5
-ChukaTaisenUnitLevel2HP:               equ 13
+ChukaTaisenUnitLevel2HP:               equ 12
 ChukaTaisenUnitLevel2Speed:            equ 5
 ChukaTaisenUnitLevel2Growth:           equ 8
 ChukaTaisenUnitLevel2CostGold:         equ 130/10
