@@ -9,7 +9,8 @@ MonsterTableSpeed:            equ MonsterTableHp+1
 MonsterTableAttack:           equ MonsterTableSpeed+1
 MonsterTableDefense:          equ MonsterTableAttack+1
 MonsterTableGrowth:           equ MonsterTableDefense+1
-MonsterTableSpecialAbility:   equ MonsterTableGrowth+1
+MonsterTableDamage:           equ MonsterTableGrowth+1
+MonsterTableSpecialAbility:   equ MonsterTableDamage+1
 MonsterTableName:             equ MonsterTableSpecialAbility+1
 RangedMonster:                equ 128
 
@@ -50,6 +51,7 @@ Monster001Table:                        ;brown flyer (sd snatcher)
   db    UsasUnitLevel3Attack          ;attack
   db    UsasUnitLevel3Defense         ;defense
   db    UsasUnitLevel3Growth          ;growth
+  db    UsasUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Brown Flyer",255
 
@@ -73,6 +75,7 @@ Monster002Table:                        ;green flyer (sd snatcher)
   db    UsasUnitLevel4Attack          ;attack
   db    UsasUnitLevel4Defense         ;defense
   db    UsasUnitLevel4Growth          ;growth
+  db    UsasUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Green Flyer",255
 
@@ -96,6 +99,7 @@ Monster003Table:                        ;Dark grey flyer (sd snatcher)
   db    UsasUnitLevel5Attack          ;attack
   db    UsasUnitLevel5Defense         ;defense
   db    UsasUnitLevel5Growth          ;growth
+  db    UsasUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "DarkG Flyer",255
 
@@ -119,6 +123,7 @@ Monster004Table:                        ;light grey flyer (sd snatcher)
   db    UsasUnitLevel6Attack          ;attack
   db    UsasUnitLevel6Defense         ;defense
   db    UsasUnitLevel6Growth          ;growth
+  db    UsasUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "LightGFlyer",255
 
@@ -142,6 +147,7 @@ Monster005Table:                        ;big spider (sd snatcher)
   db    UsasUnitLevel2Attack          ;attack
   db    UsasUnitLevel2Defense         ;defense
   db    UsasUnitLevel2Growth          ;growth
+  db    UsasUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Big Spider",255," "
 
@@ -165,6 +171,7 @@ Monster006Table:                        ;tiny spider (sd snatcher)
   db    UsasUnitLevel1Attack          ;attack
   db    UsasUnitLevel1Defense         ;defense
   db    UsasUnitLevel1Growth          ;growth
+  db    UsasUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Tiny Spider",255
 
@@ -188,6 +195,7 @@ Monster007Table:                        ;Bobblun blue (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel4Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel4Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel4Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Bobblun",255,"    "
 
@@ -211,6 +219,7 @@ Monster008Table:                        ;Bubblun green (bubble bobble)
   db    BubbleBobbleGroupAUnitLevel5Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel5Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel5Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Bubblun",255,"    "
 
@@ -234,6 +243,7 @@ Monster009Table:                        ;zen chan blue robotic (bubble bobble)
   db    BubbleBobbleGroupAUnitLevel1Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel1Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel1Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Zen Chan",255,"   "
 
@@ -257,6 +267,7 @@ Monster010Table:                        ;mad zen chan red robotic (bubble bobble
   db    BubbleBobbleGroupBUnitLevel3Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel3Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel3Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Mad Zenchan",255
 
@@ -280,6 +291,7 @@ Monster011Table:                        ;mighta ghoul (bubble bobble)
   db    BubbleBobbleGroupAUnitLevel3Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel3Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel3Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Mighta",255,"     "
 
@@ -303,6 +315,7 @@ Monster012Table:                        ;skell monsta ghost whale (bubble bobble
   db    BubbleBobbleGroupAUnitLevel4Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel4Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel4Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "SkellMonsta",255
 
@@ -326,6 +339,7 @@ Monster013Table:                        ;Banebou spring jumper (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel1Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel1Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel1Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Banebou",255,"    "
 
@@ -349,6 +363,7 @@ Monster014Table:                        ;Hidegons blue fuzzy (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel2Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel2Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel2Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Hidegons",255,"   "
 
@@ -372,6 +387,7 @@ Monster015Table:                        ;drunk green (bubble bobble)
   db    BubbleBobbleGroupAUnitLevel2Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel2Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel2Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Drunk",255,"      "
 
@@ -395,6 +411,7 @@ Monster016Table:                        ;super drunk green (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel6Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel6Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel6Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Super Drunk",255
 
@@ -418,6 +435,7 @@ Monster017Table:                        ;super mighta ghoul (bubble bobble)
   db    BubbleBobbleGroupBUnitLevel5Attack          ;attack
   db    BubbleBobbleGroupBUnitLevel5Defense         ;defense
   db    BubbleBobbleGroupBUnitLevel5Growth          ;growth
+  db    BubbleBobbleGroupBUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Supermighta",255
 
@@ -445,6 +463,7 @@ Monster018Table:                        ;Fish Man (Castlevania)
   db    CastleVaniaUnitLevel3Attack          ;attack
   db    CastleVaniaUnitLevel3Defense         ;defense
   db    CastleVaniaUnitLevel3Growth          ;growth
+  db    CastleVaniaUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Fish Man",255,"   "
 
@@ -468,6 +487,7 @@ Monster019Table:                        ;Zombie (Castlevania)
   db    CastleVaniaUnitLevel1Attack          ;attack
   db    CastleVaniaUnitLevel1Defense         ;defense
   db    CastleVaniaUnitLevel1Growth          ;growth
+  db    CastleVaniaUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Zombie",255,"     "
 
@@ -491,6 +511,7 @@ Monster020Table:                        ;Mummy Man (Castlevania)
   db    CastleVaniaUnitLevel5Attack          ;attack
   db    CastleVaniaUnitLevel5Defense         ;defense
   db    CastleVaniaUnitLevel5Growth          ;growth
+  db    CastleVaniaUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Mummy Man",255,"  "
 
@@ -514,6 +535,7 @@ Monster021Table:                        ;Spear Guard (Castlevania)
   db    CastleVaniaUnitLevel3Attack          ;attack
   db    CastleVaniaUnitLevel3Defense         ;defense
   db    CastleVaniaUnitLevel3Growth          ;growth
+  db    CastleVaniaUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Spear Guard",255
 
@@ -537,6 +559,7 @@ Monster022Table:                        ;Medusa Head (Castlevania)
   db    CastleVaniaUnitLevel2Attack          ;attack
   db    CastleVaniaUnitLevel2Defense         ;defense
   db    CastleVaniaUnitLevel2Growth          ;growth
+  db    CastleVaniaUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Medusa Head",255
   
@@ -560,6 +583,7 @@ Monster023Table:                        ;Flea Man (Castlevania)
   db    CastleVaniaUnitLevel2Attack          ;attack
   db    CastleVaniaUnitLevel2Defense         ;defense
   db    CastleVaniaUnitLevel2Growth          ;growth
+  db    CastleVaniaUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Flea Man",255,"   "
 
@@ -583,6 +607,7 @@ Monster024Table:                        ;Grim Reaper (Castlevania)
   db    CastleVaniaUnitLevel6Attack          ;attack
   db    CastleVaniaUnitLevel6Defense         ;defense
   db    CastleVaniaUnitLevel6Growth          ;growth
+  db    CastleVaniaUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Grim Reaper",255
   
@@ -606,6 +631,7 @@ Monster025Table:                        ;Skeleton (Castlevania)
   db    CastleVaniaUnitLevel1Attack          ;attack
   db    CastleVaniaUnitLevel1Defense         ;defense
   db    CastleVaniaUnitLevel1Growth          ;growth
+  db    CastleVaniaUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Skeleton",255,"   "
 
@@ -629,6 +655,7 @@ Monster026Table:                        ;Axe man (Castlevania)
   db    CastleVaniaUnitLevel4Attack          ;attack
   db    CastleVaniaUnitLevel4Defense         ;defense
   db    CastleVaniaUnitLevel4Growth          ;growth
+  db    CastleVaniaUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Axe Man",255,"    "
 
@@ -657,6 +684,7 @@ Monster027Table:                        ;Scorpii (Dragon Slayer IV)
   db    DragonSlayerUnitLevel2Attack          ;attack
   db    DragonSlayerUnitLevel2Defense         ;defense
   db    DragonSlayerUnitLevel2Growth          ;growth
+  db    DragonSlayerUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Scorpii",255,"    "
 
@@ -681,6 +709,7 @@ Monster028Table:                        ;Porgi (pink fatty) (Dragon Slayer IV)
   db    DragonSlayerUnitLevel1Attack          ;attack
   db    DragonSlayerUnitLevel1Defense         ;defense
   db    DragonSlayerUnitLevel1Growth          ;growth
+  db    DragonSlayerUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Porgi",255,"      "
 
@@ -704,6 +733,7 @@ Monster029Table:                        ;Rock man (grey/white round small head) 
   db    DragonSlayerUnitLevel3Attack          ;attack
   db    DragonSlayerUnitLevel3Defense         ;defense
   db    DragonSlayerUnitLevel3Growth          ;growth
+  db    DragonSlayerUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Rock Man",255,"   "
 
@@ -727,6 +757,7 @@ Monster030Table:                        ;Piglet (piggy red nose) (Dragon Slayer 
   db    DragonSlayerUnitLevel1Attack          ;attack
   db    DragonSlayerUnitLevel1Defense         ;defense
   db    DragonSlayerUnitLevel1Growth          ;growth
+  db    DragonSlayerUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Dawg",255,"       "
 ;  db    "Piglet",255,"     "
@@ -751,6 +782,7 @@ Monster031Table:                        ;Gers (white grey flat head) (Dragon Sla
   db    DragonSlayerUnitLevel4Attack          ;attack
   db    DragonSlayerUnitLevel4Defense         ;defense
   db    DragonSlayerUnitLevel4Growth          ;growth
+  db    DragonSlayerUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Gers",255,"       "
 
@@ -774,6 +806,7 @@ Monster032Table:                        ;Yashinotkin (red fish like creature) (D
   db    DragonSlayerUnitLevel2Attack          ;attack
   db    DragonSlayerUnitLevel2Defense         ;defense
   db    DragonSlayerUnitLevel2Growth          ;growth
+  db    DragonSlayerUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Yashinotkin",255
 
@@ -797,6 +830,7 @@ Monster033Table:                        ;King Mu (Dragon Slayer IV)
   db    DragonSlayerUnitLevel6Attack          ;attack
   db    DragonSlayerUnitLevel6Defense         ;defense
   db    DragonSlayerUnitLevel6Growth          ;growth
+  db    DragonSlayerUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "King Mu",255,"    "
 
@@ -820,6 +854,7 @@ Monster034Table:                        ;Crawler (blue 3 legs) (Dragon Slayer IV
   db    DragonSlayerUnitLevel3Attack          ;attack
   db    DragonSlayerUnitLevel3Defense         ;defense
   db    DragonSlayerUnitLevel3Growth          ;growth
+  db    DragonSlayerUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Crawler",255,"    "
 
@@ -843,6 +878,7 @@ Monster035Table:                        ;Octo (Dragon Slayer IV)
   db    DragonSlayerUnitLevel5Attack          ;attack
   db    DragonSlayerUnitLevel5Defense         ;defense
   db    DragonSlayerUnitLevel5Growth          ;growth
+  db    DragonSlayerUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Octo",255,"       "
 
@@ -866,6 +902,7 @@ Monster036Table:                        ;Sarge green (Contra)
   db    ContraGroupBUnitLevel2Attack          ;attack
   db    ContraGroupBUnitLevel2Defense         ;defense
   db    ContraGroupBUnitLevel2Growth          ;growth
+  db    ContraGroupBUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Sarge",255,"      "
 
@@ -889,6 +926,7 @@ Monster037Table:                        ;Lieutenant red (Contra)
   db    ContraGroupBUnitLevel4Attack          ;attack
   db    ContraGroupBUnitLevel4Defense         ;defense
   db    ContraGroupBUnitLevel4Growth          ;growth
+  db    ContraGroupBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Lieutenant",255," "
 
@@ -912,6 +950,7 @@ Monster038Table:                        ;FootSoldier (Contra)
   db    ContraGroupAUnitLevel1Attack          ;attack
   db    ContraGroupAUnitLevel1Defense         ;defense
   db    ContraGroupAUnitLevel1Growth          ;growth
+  db    ContraGroupAUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "FootSoldier",255
 
@@ -935,6 +974,7 @@ Monster039Table:                        ;Grenadier (Contra)
   db    ContraGroupBUnitLevel5Attack          ;attack
   db    ContraGroupBUnitLevel5Defense         ;defense
   db    ContraGroupBUnitLevel5Growth          ;growth
+  db    ContraGroupBUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Grenadier",255,"  "
 
@@ -958,6 +998,7 @@ Monster040Table:                        ;Sniper (Contra)
   db    ContraGroupBUnitLevel6Attack          ;attack
   db    ContraGroupBUnitLevel6Defense         ;defense
   db    ContraGroupBUnitLevel6Growth          ;growth
+  db    ContraGroupBUnitLevel6Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Sniper",255,"     "
 
@@ -981,6 +1022,7 @@ Monster041Table:                        ;Gigafly (Contra)
   db    ContraGroupAUnitLevel3Attack          ;attack
   db    ContraGroupAUnitLevel3Defense         ;defense
   db    ContraGroupAUnitLevel3Growth          ;growth
+  db    ContraGroupAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Gigafly",255,"    "
 
@@ -1004,6 +1046,7 @@ Monster042Table:                        ;Alien Grunt (Contra)
   db    ContraGroupAUnitLevel2Attack          ;attack
   db    ContraGroupAUnitLevel2Defense         ;defense
   db    ContraGroupAUnitLevel2Growth          ;growth
+  db    ContraGroupAUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Alien Grunt",255
 
@@ -1027,6 +1070,7 @@ Monster043Table:                        ;Infiltrant (Contra)
   db    ContraGroupBUnitLevel3Attack          ;attack
   db    ContraGroupBUnitLevel3Defense         ;defense
   db    ContraGroupBUnitLevel3Growth          ;growth
+  db    ContraGroupBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Infiltrant",255," "
 
@@ -1050,6 +1094,7 @@ Monster044Table:                        ;Red Soldier (Contra)
   db    ContraGroupBUnitLevel1Attack          ;attack
   db    ContraGroupBUnitLevel1Defense         ;defense
   db    ContraGroupBUnitLevel1Growth          ;growth
+  db    ContraGroupBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Red Soldier",255
   
@@ -1073,6 +1118,7 @@ Monster045Table:                        ;Face Hugger (Contra)
   db    ContraGroupAUnitLevel5Attack          ;attack
   db    ContraGroupAUnitLevel5Defense         ;defense
   db    ContraGroupAUnitLevel5Growth          ;growth
+  db    ContraGroupAUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Face Hugger",255
 
@@ -1096,6 +1142,7 @@ Monster046Table:                        ;Gorudea (Contra)
   db    ContraGroupAUnitLevel6Attack          ;attack
   db    ContraGroupAUnitLevel6Defense         ;defense
   db    ContraGroupAUnitLevel6Growth          ;growth
+  db    ContraGroupAUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Gorudea",255,"    "
 
@@ -1119,6 +1166,7 @@ Monster047Table:                        ;Turret (Contra)
   db    ContraGroupAUnitLevel4Attack          ;attack
   db    ContraGroupAUnitLevel4Defense         ;defense
   db    ContraGroupAUnitLevel4Growth          ;growth
+  db    ContraGroupAUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Turret",255,"     "
 
@@ -1149,6 +1197,7 @@ Monster048Table:                        ;GraveWing (Usas)
   db    UsasUnitLevel4Attack          ;attack
   db    UsasUnitLevel4Defense         ;defense
   db    UsasUnitLevel4Growth          ;growth
+  db    UsasUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Gravewing",255,"  "
 
@@ -1172,6 +1221,7 @@ Monster049Table:                        ;Vanguard (Usas)
   db    UsasUnitLevel5Attack          ;attack
   db    UsasUnitLevel5Defense         ;defense
   db    UsasUnitLevel5Growth          ;growth
+  db    UsasUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Vanguard",255,"   "
 
@@ -1195,6 +1245,7 @@ Monster050Table:                        ;Aerial Luna (Usas)
   db    UsasUnitLevel6Attack          ;attack
   db    UsasUnitLevel6Defense         ;defense
   db    UsasUnitLevel6Growth          ;growth
+  db    UsasUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Aerial Luna",255
   
@@ -1218,6 +1269,7 @@ Monster051Table:                        ;Mini Phanto (Usas)
   db    UsasUnitLevel1Attack          ;attack
   db    UsasUnitLevel1Defense         ;defense
   db    UsasUnitLevel1Growth          ;growth
+  db    UsasUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Mini Phanto",255
   
@@ -1241,6 +1293,7 @@ Monster052Table:                        ;Thicket Tot (Usas)
   db    UsasUnitLevel2Attack          ;attack
   db    UsasUnitLevel2Defense         ;defense
   db    UsasUnitLevel2Growth          ;growth
+  db    UsasUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Thicket Tot",255
   
@@ -1264,6 +1317,7 @@ Monster053Table:                        ;Bonefin (Usas)
   db    UsasUnitLevel1Attack          ;attack
   db    UsasUnitLevel1Defense         ;defense
   db    UsasUnitLevel1Growth          ;growth
+  db    UsasUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Bonefin",255,"    "
 
@@ -1287,6 +1341,7 @@ Monster054Table:                        ;Zomblet (Usas)
   db    UsasUnitLevel3Attack          ;attack
   db    UsasUnitLevel3Defense         ;defense
   db    UsasUnitLevel3Growth          ;growth
+  db    UsasUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Zomblet",255,"    "
 
@@ -1310,6 +1365,7 @@ Monster055Table:                        ;Cheek (Goemon) (white kimono, long slee
   db    GoemonUnitLevel1Attack          ;attack
   db    GoemonUnitLevel1Defense         ;defense
   db    GoemonUnitLevel1Growth          ;growth
+  db    GoemonUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Cheek",255,"      "
 
@@ -1333,6 +1389,7 @@ Monster056Table:                        ;Official (with the white cup thing) (Go
   db    GoemonUnitLevel4Attack          ;attack
   db    GoemonUnitLevel4Defense         ;defense
   db    GoemonUnitLevel4Growth          ;growth
+  db    GoemonUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Official",255,"   "
 
@@ -1356,6 +1413,7 @@ Monster057Table:                        ;Kasa-obake (jumping freaky) (Goemon)
   db    GoemonUnitLevel2Attack          ;attack
   db    GoemonUnitLevel2Defense         ;defense
   db    GoemonUnitLevel2Growth          ;growth
+  db    GoemonUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Kasa Obake",255," "
 
@@ -1379,6 +1437,7 @@ Monster058Table:                        ;Fishmonger (Goemon)
   db    GoemonUnitLevel2Attack          ;attack
   db    GoemonUnitLevel2Defense         ;defense
   db    GoemonUnitLevel2Growth          ;growth
+  db    GoemonUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Fishmonger",255," "
 
@@ -1402,6 +1461,7 @@ Monster059Table:                        ;Ronin (Goemon)
   db    GoemonUnitLevel6Attack          ;attack
   db    GoemonUnitLevel6Defense         ;defense
   db    GoemonUnitLevel6Growth          ;growth
+  db    GoemonUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Ronin",255,"      "
 
@@ -1425,6 +1485,7 @@ Monster060Table:                        ;Bucket Head (Goemon)
   db    GoemonUnitLevel3Attack          ;attack
   db    GoemonUnitLevel3Defense         ;defense
   db    GoemonUnitLevel3Growth          ;growth
+  db    GoemonUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Bucket Head",255
 
@@ -1448,6 +1509,7 @@ Monster061Table:                        ;Headmaster (with the stick) (Goemon)
   db    GoemonUnitLevel5Attack          ;attack
   db    GoemonUnitLevel5Defense         ;defense
   db    GoemonUnitLevel5Growth          ;growth
+  db    GoemonUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Headmaster",255," "
 
@@ -1471,6 +1533,7 @@ Monster062Table:                        ;Granola (Goemon)
   db    GoemonUnitLevel1Attack          ;attack
   db    GoemonUnitLevel1Defense         ;defense
   db    GoemonUnitLevel1Growth          ;growth
+  db    GoemonUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Granola",255,"    "
 
@@ -1494,6 +1557,7 @@ Monster063Table:                        ;Rouge Gazer (white grey with red eye) (
   db    PsychoWorldUnitLevel2Attack          ;attack
   db    PsychoWorldUnitLevel2Defense         ;defense
   db    PsychoWorldUnitLevel2Growth          ;growth
+  db    PsychoWorldUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Rouge Gazer",255
 
@@ -1517,6 +1581,7 @@ Monster064Table:                        ;Glacierling (Psycho World)
   db    PsychoWorldUnitLevel3Attack          ;attack
   db    PsychoWorldUnitLevel3Defense         ;defense
   db    PsychoWorldUnitLevel3Growth          ;growth
+  db    PsychoWorldUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Glacierling",255
 
@@ -1540,6 +1605,7 @@ Monster065Table:                        ;Floatwing (Psycho World)
   db    PsychoWorldUnitLevel4Attack          ;attack
   db    PsychoWorldUnitLevel4Defense         ;defense
   db    PsychoWorldUnitLevel4Growth          ;growth
+  db    PsychoWorldUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Floatwing",255,"  "
 
@@ -1563,6 +1629,7 @@ Monster066Table:                        ;CrimsonPeek (red with blue eye) (Psycho
   db    PsychoWorldUnitLevel1Attack          ;attack
   db    PsychoWorldUnitLevel1Defense         ;defense
   db    PsychoWorldUnitLevel1Growth          ;growth
+  db    PsychoWorldUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "CrimsonPeek",255
 
@@ -1586,6 +1653,7 @@ Monster067Table:                        ;Fernling (green little plant) (Psycho W
   db    PsychoWorldUnitLevel2Attack          ;attack
   db    PsychoWorldUnitLevel2Defense         ;defense
   db    PsychoWorldUnitLevel2Growth          ;growth
+  db    PsychoWorldUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Fernling",255,"   "
 
@@ -1609,6 +1677,7 @@ Monster068Table:                        ;Bladezilla (Psycho World)
   db    PsychoWorldUnitLevel6Attack          ;attack
   db    PsychoWorldUnitLevel6Defense         ;defense
   db    PsychoWorldUnitLevel6Growth          ;growth
+  db    PsychoWorldUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Bladezilla",255," "
 
@@ -1632,6 +1701,7 @@ Monster069Table:                        ;Spitvine (Psycho World)
   db    PsychoWorldUnitLevel5Attack          ;attack
   db    PsychoWorldUnitLevel5Defense         ;defense
   db    PsychoWorldUnitLevel5Growth          ;growth
+  db    PsychoWorldUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Spitvine",255,"   "
 
@@ -1655,6 +1725,7 @@ Monster070Table:                        ;OptiLeaper (1 eyes white blue jumper) (
   db    PsychoWorldUnitLevel1Attack          ;attack
   db    PsychoWorldUnitLevel1Defense         ;defense
   db    PsychoWorldUnitLevel1Growth          ;growth
+  db    PsychoWorldUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "OptiLeaper",255," "
 
@@ -1678,6 +1749,7 @@ Monster071Table:                        ;huge boo (bubble bobble)
   db    BubbleBobbleGroupAUnitLevel6Attack          ;attack
   db    BubbleBobbleGroupAUnitLevel6Defense         ;defense
   db    BubbleBobbleGroupAUnitLevel6Growth          ;growth
+  db    BubbleBobbleGroupAUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Boo",255,"        "
 
@@ -1701,6 +1773,7 @@ Monster072Table:                        ;King Kong (king kong)
   db    KingKongUnitLevel6Attack          ;attack
   db    KingKongUnitLevel6Defense         ;defense
   db    KingKongUnitLevel6Growth          ;growth
+  db    KingKongUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "King Kong",255,"  "
 
@@ -1724,6 +1797,7 @@ Monster073Table:                        ;RockGoliath (king kong)
   db    KingKongUnitLevel5Attack          ;attack
   db    KingKongUnitLevel5Defense         ;defense
   db    KingKongUnitLevel5Growth          ;growth
+  db    KingKongUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "RockGoliath",255
 
@@ -1747,6 +1821,7 @@ Monster074Table:                        ;Stone Guard (king kong)
   db    KingKongUnitLevel4Attack          ;attack
   db    KingKongUnitLevel4Defense         ;defense
   db    KingKongUnitLevel4Growth          ;growth
+  db    KingKongUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Stone Guard",255
   
@@ -1770,6 +1845,7 @@ Monster075Table:                        ;LimeCritter (king kong)
   db    KingKongUnitLevel2Attack          ;attack
   db    KingKongUnitLevel2Defense         ;defense
   db    KingKongUnitLevel2Growth          ;growth
+  db    KingKongUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "LimeCritter",255
   
@@ -1793,6 +1869,7 @@ Monster076Table:                        ;Salmon Hog (king kong)
   db    KingKongUnitLevel3Attack          ;attack
   db    KingKongUnitLevel3Defense         ;defense
   db    KingKongUnitLevel3Growth          ;growth
+  db    KingKongUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Salmon Hog",255," "
 
@@ -1816,6 +1893,7 @@ Monster077Table:                        ;Swamp Goop (king kong)
   db    KingKongUnitLevel1Attack          ;attack
   db    KingKongUnitLevel1Defense         ;defense
   db    KingKongUnitLevel1Growth          ;growth
+  db    KingKongUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Swamp Goop",255," "
 
@@ -1847,6 +1925,7 @@ Monster078Table:                        ;Bat (Golvellius)
   db    GolvelliusUnitLevel3Attack          ;attack
   db    GolvelliusUnitLevel3Defense         ;defense
   db    GolvelliusUnitLevel3Growth          ;growth
+  db    GolvelliusUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Bat",255,"        "
 
@@ -1870,6 +1949,7 @@ Monster079Table:                        ;Olive Boa (green snake) (Golvellius)
   db    GolvelliusUnitLevel2Attack          ;attack
   db    GolvelliusUnitLevel2Defense         ;defense
   db    GolvelliusUnitLevel2Growth          ;growth
+  db    GolvelliusUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Olive Boa",255,"  "
 
@@ -1893,6 +1973,7 @@ Monster080Table:                        ;SilkenLarva (green caterpillar) (Golvel
   db    GolvelliusUnitLevel1Attack          ;attack
   db    GolvelliusUnitLevel1Defense         ;defense
   db    GolvelliusUnitLevel1Growth          ;growth
+  db    GolvelliusUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "SilkenLarva",255
 
@@ -1916,6 +1997,7 @@ Monster081Table:                        ;ChocoTusker (Golvellius)
   db    GolvelliusUnitLevel2Attack          ;attack
   db    GolvelliusUnitLevel2Defense         ;defense
   db    GolvelliusUnitLevel2Growth          ;growth
+  db    GolvelliusUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "ChocoTusker",255
 
@@ -1939,6 +2021,7 @@ Monster082Table:                        ;JadeWormlet (white worm) (Golvellius)
   db    GolvelliusUnitLevel1Attack          ;attack
   db    GolvelliusUnitLevel1Defense         ;defense
   db    GolvelliusUnitLevel1Growth          ;growth
+  db    GolvelliusUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "JadeWormlet",255
   
@@ -1962,6 +2045,7 @@ Monster083Table:                        ;Sable Raven (Golvellius)
   db    GolvelliusUnitLevel3Attack          ;attack
   db    GolvelliusUnitLevel3Defense         ;defense
   db    GolvelliusUnitLevel3Growth          ;growth
+  db    GolvelliusUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Sable Raven",255
   
@@ -1985,6 +2069,7 @@ Monster084Table:                        ;Headless (Golvellius)
   db    GolvelliusUnitLevel4Attack          ;attack
   db    GolvelliusUnitLevel4Defense         ;defense
   db    GolvelliusUnitLevel4Growth          ;growth
+  db    GolvelliusUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Headless",255,"   "
 
@@ -2008,6 +2093,7 @@ Monster085Table:                        ;Seraph (Golvellius)
   db    GolvelliusUnitLevel5Attack          ;attack
   db    GolvelliusUnitLevel5Defense         ;defense
   db    GolvelliusUnitLevel5Growth          ;growth
+  db    GolvelliusUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Seraph",255,"     "
 
@@ -2031,6 +2117,7 @@ Monster086Table:                        ;Flame Cobra (Golvellius)
   db    GolvelliusUnitLevel6Attack          ;attack
   db    GolvelliusUnitLevel6Defense         ;defense
   db    GolvelliusUnitLevel6Growth          ;growth
+  db    GolvelliusUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Flame Cobra",255
   
@@ -2057,6 +2144,7 @@ Monster087Table:                        ;Visage (undeadline)
   db    RandomAUnitLevel4Attack          ;attack
   db    RandomAUnitLevel4Defense         ;defense
   db    RandomAUnitLevel4Growth          ;growth
+  db    RandomAUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Visage",255,"     "
   
@@ -2080,6 +2168,7 @@ Monster088Table:                        ;JungleBrute (undeadline)
   db    RandomAUnitLevel2Attack          ;attack
   db    RandomAUnitLevel2Defense         ;defense
   db    RandomAUnitLevel2Growth          ;growth
+  db    RandomAUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "JungleBrute",255
   
@@ -2103,6 +2192,7 @@ Monster089Table:                        ;Lurcher (undeadline)
   db    CastleVaniaUnitLevel1Attack          ;attack
   db    CastleVaniaUnitLevel1Defense         ;defense
   db    CastleVaniaUnitLevel1Growth          ;growth
+  db    CastleVaniaUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Lurcher",255,"    "
 
@@ -2128,6 +2218,7 @@ Monster090Table:                        ;Scavenger (Metal Gear)
   db    SolidSnakeUnitLevel1Attack          ;attack
   db    SolidSnakeUnitLevel1Defense         ;defense
   db    SolidSnakeUnitLevel1Growth          ;growth
+  db    SolidSnakeUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Scavenger",255,"  "
 
@@ -2151,6 +2242,7 @@ Monster091Table:                        ;Running Man (Metal Gear)
   db    SolidSnakeUnitLevel2Attack          ;attack
   db    SolidSnakeUnitLevel2Defense         ;defense
   db    SolidSnakeUnitLevel2Growth          ;growth
+  db    SolidSnakeUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Running Man",255
   
@@ -2174,6 +2266,7 @@ Monster092Table:                        ;Trooper (Metal Gear)
   db    SolidSnakeUnitLevel4Attack          ;attack
   db    SolidSnakeUnitLevel4Defense         ;defense
   db    SolidSnakeUnitLevel4Growth          ;growth
+  db    SolidSnakeUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Trooper",255,"    "
 
@@ -2197,6 +2290,7 @@ Monster093Table:                        ;Antigas Man (Metal Gear)
   db    SolidSnakeUnitLevel5Attack          ;attack
   db    SolidSnakeUnitLevel5Defense         ;defense
   db    SolidSnakeUnitLevel5Growth          ;growth
+  db    SolidSnakeUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Antigas Man",255
   
@@ -2220,6 +2314,7 @@ Monster094Table:                        ;Footman (Metal Gear)
   db    SolidSnakeUnitLevel3Attack          ;attack
   db    SolidSnakeUnitLevel3Defense         ;defense
   db    SolidSnakeUnitLevel3Growth          ;growth
+  db    SolidSnakeUnitLevel3Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Footman",255,"    "
 
@@ -2249,6 +2344,7 @@ Monster095Table:                        ;Geld (Ys 3)
   db    Ys3UnitLevel5Attack          ;attack
   db    Ys3UnitLevel5Defense         ;defense
   db    Ys3UnitLevel5Growth          ;growth
+  db    Ys3UnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Geld",255,"       "
 
@@ -2272,6 +2368,7 @@ Monster096Table:                        ;Raddel (Ys 3)
   db    Ys3UnitLevel4Attack          ;attack
   db    Ys3UnitLevel4Defense         ;defense
   db    Ys3UnitLevel4Growth          ;growth
+  db    Ys3UnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Raddel",255,"     "
   
@@ -2295,6 +2392,7 @@ Monster097Table:                        ;Bikmorl (Ys 3)
   db    Ys3UnitLevel3Attack          ;attack
   db    Ys3UnitLevel3Defense         ;defense
   db    Ys3UnitLevel3Growth          ;growth
+  db    Ys3UnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Bikmorl",255,"    "
   
@@ -2318,6 +2416,7 @@ Monster098Table:                        ;Slime (Ys 3)
   db    Ys3UnitLevel1Attack          ;attack
   db    Ys3UnitLevel1Defense         ;defense
   db    Ys3UnitLevel1Growth          ;growth
+  db    Ys3UnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Slime",255,"      "
   
@@ -2341,6 +2440,7 @@ Monster099Table:                        ;Keyron (Ys 3)
   db    Ys3UnitLevel2Attack          ;attack
   db    Ys3UnitLevel2Defense         ;defense
   db    Ys3UnitLevel2Growth          ;growth
+  db    Ys3UnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Keyron",255,"     "
   
@@ -2364,6 +2464,7 @@ Monster100Table:                        ;Gululmus (Ys 3)
   db    Ys3UnitLevel1Attack          ;attack
   db    Ys3UnitLevel1Defense         ;defense
   db    Ys3UnitLevel1Growth          ;growth
+  db    Ys3UnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Gululmus",255,"   "
   
@@ -2387,6 +2488,7 @@ Monster101Table:                        ;Sabre Wolf (Ys 3)
   db    Ys3UnitLevel6Attack          ;attack
   db    Ys3UnitLevel6Defense         ;defense
   db    Ys3UnitLevel6Growth          ;growth
+  db    Ys3UnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Sabre Wolf",255," "
   
@@ -2415,6 +2517,7 @@ Monster102Table:                        ;Lee Young (yie ar kung fu)
   db    YieArKungFuUnitLevel1Attack          ;attack
   db    YieArKungFuUnitLevel1Defense         ;defense
   db    YieArKungFuUnitLevel1Growth          ;growth
+  db    YieArKungFuUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Lee Young",255,"  "
   
@@ -2438,6 +2541,7 @@ Monster103Table:                        ;Yen Pei (braid hair) (yie ar kung fu)
   db    YieArKungFuUnitLevel2Attack          ;attack
   db    YieArKungFuUnitLevel2Defense         ;defense
   db    YieArKungFuUnitLevel2Growth          ;growth
+  db    YieArKungFuUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Yen Pei",255,"    "
   
@@ -2461,6 +2565,7 @@ Monster104Table:                        ;Lan Fang (fan thrower) (yie ar kung fu)
   db    YieArKungFuUnitLevel3Attack          ;attack
   db    YieArKungFuUnitLevel3Defense         ;defense
   db    YieArKungFuUnitLevel3Growth          ;growth
+  db    YieArKungFuUnitLevel3Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Lan Fang",255,"   "
 
@@ -2484,6 +2589,7 @@ Monster105Table:                        ;Po Chin (fatty) (yie ar kung fu)
   db    YieArKungFuUnitLevel4Attack          ;attack
   db    YieArKungFuUnitLevel4Defense         ;defense
   db    YieArKungFuUnitLevel4Growth          ;growth
+  db    YieArKungFuUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Po Chin",255,"    "
 
@@ -2507,6 +2613,7 @@ Monster106Table:                        ;Wen Hu (yie ar kung fu)
   db    YieArKungFuUnitLevel5Attack          ;attack
   db    YieArKungFuUnitLevel5Defense         ;defense
   db    YieArKungFuUnitLevel5Growth          ;growth
+  db    YieArKungFuUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Wen Hu",255,"     "
 
@@ -2530,6 +2637,7 @@ Monster107Table:                        ;Wei Chin (yie ar kung fu)
   db    YieArKungFuUnitLevel3Attack          ;attack
   db    YieArKungFuUnitLevel3Defense         ;defense
   db    YieArKungFuUnitLevel3Growth          ;growth
+  db    YieArKungFuUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Wei Chin",255,"   "
 
@@ -2553,6 +2661,7 @@ Monster108Table:                        ;Mei Ling (yie ar kung fu)
   db    YieArKungFuUnitLevel2Attack          ;attack
   db    YieArKungFuUnitLevel2Defense         ;defense
   db    YieArKungFuUnitLevel2Growth          ;growth
+  db    YieArKungFuUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Mei Ling",255,"   "
 
@@ -2576,6 +2685,7 @@ Monster109Table:                        ;Han Chen (bomb thrower) (yie ar kung fu
   db    YieArKungFuUnitLevel4Attack          ;attack
   db    YieArKungFuUnitLevel4Defense         ;defense
   db    YieArKungFuUnitLevel4Growth          ;growth
+  db    YieArKungFuUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Han Chen",255,"   "
 
@@ -2599,6 +2709,7 @@ Monster110Table:                        ;Li Yen (final boss) (yie ar kung fu)
   db    YieArKungFuUnitLevel6Attack          ;attack
   db    YieArKungFuUnitLevel6Defense         ;defense
   db    YieArKungFuUnitLevel6Growth          ;growth
+  db    YieArKungFuUnitLevel6Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Li Yen",255,"     "
 
@@ -2634,6 +2745,7 @@ Monster111Table:                        ;Queen Sora (pink bird) (akanbe dragon)
   db    AkanbeDragonGroupAUnitLevel5Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel5Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel5Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Queen Sora",255," "
 
@@ -2657,6 +2769,7 @@ Monster112Table:                        ;King Mori (akanbe dragon)
   db    AkanbeDragonGroupAUnitLevel6Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel6Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel6Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel6Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "King Mori",255,"  "
 
@@ -2680,6 +2793,7 @@ Monster113Table:                        ;Knight Yama (mongolface) (akanbe dragon
   db    AkanbeDragonGroupAUnitLevel2Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel2Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel2Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Knight Yama",255
   
@@ -2703,6 +2817,7 @@ Monster114Table:                        ;Bishop Mori (monkey) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel2Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel2Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel2Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Bishop Mori",255
 
@@ -2726,6 +2841,7 @@ Monster115Table:                        ;B. Heichi (rhino) (akanbe dragon)
   db    AkanbeDragonGroupAUnitLevel3Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel3Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel3Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel3Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "B. Heichi",255,"  "
 
@@ -2749,6 +2865,7 @@ Monster116Table:                        ;Roke Mizu (zebra) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel3Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel3Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel3Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Roke Mizu",255,"  "
 
@@ -2772,6 +2889,7 @@ Monster117Table:                        ;Porn Mizu (akanbe dragon)
   db    AkanbeDragonGroupAUnitLevel1Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel1Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel1Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Porn Mizu",255,"  "
 
@@ -2795,6 +2913,7 @@ Monster118Table:                        ;Roke Yama (kangaroo) (akanbe dragon)
   db    AkanbeDragonGroupAUnitLevel4Attack          ;attack
   db    AkanbeDragonGroupAUnitLevel4Defense         ;defense
   db    AkanbeDragonGroupAUnitLevel4Growth          ;growth
+  db    AkanbeDragonGroupAUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Roke Yama",255,"  "
 
@@ -2818,6 +2937,7 @@ Monster119Table:                        ;Porn Heichi (eliphant) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel1Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel1Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel1Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel1Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Porn Heichi",255
   
@@ -2841,6 +2961,7 @@ Monster120Table:                        ;Yama Knight (bushman) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel4Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel4Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel4Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Yama Knight",255
 
@@ -2864,6 +2985,7 @@ Monster121Table:                        ;King Heichi (endboss) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel6Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel6Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel6Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "King Heichi",255
 
@@ -2887,6 +3009,7 @@ Monster122Table:                        ;Spooky (Spooky)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Spooky",255,"     "
 
@@ -2910,6 +3033,7 @@ Monster123Table:                        ;Ghosty (spooky)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Ghosty",255,"     "
 
@@ -2933,6 +3057,7 @@ Monster124Table:                        ;KuGyoku Den (legendly 9 gems)
   db    RandomAUnitLevel3Attack          ;attack
   db    RandomAUnitLevel3Defense         ;defense
   db    RandomAUnitLevel3Growth          ;growth
+  db    RandomAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "KuGyoku Den",255
   
@@ -2956,6 +3081,7 @@ Monster125Table:                        ;GooGoo (quinpl)
   db    RandomBUnitLevel2Attack-2          ;attack
   db    RandomBUnitLevel2Defense-1         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "GooGoo",255,"     "
 
@@ -2979,6 +3105,7 @@ Monster126Table:                        ;sofia (sofia)
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Sofia",255,"      "
 
@@ -3002,6 +3129,7 @@ Monster127Table:                        ;Rastan (rastan saga)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Rastan",255,"     "
 
@@ -3025,6 +3153,7 @@ Monster128Table:                        ;BlasterBot
   db    RandomAUnitLevel5Attack          ;attack
   db    RandomAUnitLevel5Defense         ;defense
   db    RandomAUnitLevel5Growth          ;growth
+  db    RandomAUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "BlasterBot",255," "
 
@@ -3048,6 +3177,7 @@ Monster129Table:                        ;Screech
   db    RandomAUnitLevel2Attack-3          ;attack
   db    RandomAUnitLevel2Defense         ;defense
   db    RandomAUnitLevel2Growth          ;growth
+  db    RandomAUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Screech",255,"    "
 
@@ -3071,6 +3201,7 @@ Monster130Table:                        ;Schaefer (predator)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Schaefer",255,"   "
 
@@ -3094,6 +3225,7 @@ Monster131Table:                        ;Jon Sparkle (malaya no hihou)
   db    RandomAUnitLevel3Attack          ;attack
   db    RandomAUnitLevel3Defense         ;defense
   db    RandomAUnitLevel3Growth          ;growth
+  db    RandomAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Jon Sparkle",255
 
@@ -3117,6 +3249,7 @@ Monster132Table:                        ;Monmon (mon mon monster)
   db    RandomBUnitLevel4Attack          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Monmon",255,"     "
   
@@ -3140,6 +3273,7 @@ Monster133Table:                        ;Cob Crusher (mon mon monster)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Cob Crusher",255
   
@@ -3163,6 +3297,7 @@ Monster134Table:                        ;Limb Linger (mon mon monster)
   db    RandomAUnitLevel2Attack          ;attack
   db    RandomAUnitLevel2Defense         ;defense
   db    RandomAUnitLevel2Growth          ;growth
+  db    RandomAUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Limb Linger",255
   
@@ -3186,6 +3321,7 @@ Monster135Table:                        ;deva (deva)
   db    DevaUnitLevel4Attack          ;attack
   db    DevaUnitLevel4Defense         ;defense
   db    DevaUnitLevel4Growth          ;growth
+  db    DevaUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Deva",255,"       "
   
@@ -3209,6 +3345,7 @@ Monster136Table:                        ;Spectroll (deva)
   db    DevaUnitLevel2Attack          ;attack
   db    DevaUnitLevel2Defense         ;defense
   db    DevaUnitLevel2Growth          ;growth
+  db    DevaUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Spectroll",255,"  "
   
@@ -3232,6 +3369,7 @@ Monster137Table:                        ;Yurei Kage (deva)
   db    DevaUnitLevel3Attack          ;attack
   db    DevaUnitLevel3Defense         ;defense
   db    DevaUnitLevel3Growth          ;growth
+  db    DevaUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Yurei Kage",255," "
   
@@ -3255,6 +3393,7 @@ Monster138Table:                        ;Huge Blob (usas2)
   db    Usas2UnitLevel5Attack          ;attack
   db    Usas2UnitLevel5Defense         ;defense
   db    Usas2UnitLevel5Growth          ;growth
+  db    Usas2UnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Blob",255,"       "
 
@@ -3278,6 +3417,7 @@ Monster139Table:                        ;Emir Mystic (usas2)
   db    Usas2UnitLevel4Attack          ;attack
   db    Usas2UnitLevel4Defense         ;defense
   db    Usas2UnitLevel4Growth          ;growth
+  db    Usas2UnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Emir Mystic",255
   
@@ -3301,6 +3441,7 @@ Monster140Table:                        ;duncan seven (core dump)
   db    RandomAUnitLevel5Attack          ;attack
   db    RandomAUnitLevel5Defense         ;defense
   db    RandomAUnitLevel5Growth          ;growth
+  db    RandomAUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Duncan 7",255,"   "
 
@@ -3324,6 +3465,7 @@ Monster141Table:                        ;Monstrilla (core dump)
   db    RandomAUnitLevel6Attack          ;attack
   db    RandomAUnitLevel6Defense         ;defense
   db    RandomAUnitLevel6Growth          ;growth
+  db    RandomAUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Monstrilla",255," "
 
@@ -3347,6 +3489,7 @@ Monster142Table:                        ;Biolumia (core dump)
   db    RandomAUnitLevel4Attack          ;attack
   db    RandomAUnitLevel4Defense         ;defense
   db    RandomAUnitLevel4Growth          ;growth
+  db    RandomAUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Biolumia",255,"   "
 
@@ -3370,6 +3513,7 @@ Monster143Table:                        ;Anna Lee (cabage patch kids)
   db    RandomAUnitLevel1Attack          ;attack
   db    RandomAUnitLevel1Defense         ;defense
   db    RandomAUnitLevel1Growth          ;growth
+  db    RandomAUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Anna Lee",255,"   "
 
@@ -3393,6 +3537,7 @@ Monster144Table:                        ;Pastry Chef (comic bakery)
   db    RandomBUnitLevel2Attack-2          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Pastry Chef",255
 
@@ -3416,6 +3561,7 @@ Monster145Table:                        ;Indy Brave (magical tree)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Indy Brave",255," "
 
@@ -3439,6 +3585,7 @@ Monster146Table:                        ;Red Lupin (arsene lupin)
   db    RandomAUnitLevel3Attack          ;attack
   db    RandomAUnitLevel3Defense         ;defense
   db    RandomAUnitLevel3Growth          ;growth
+  db    RandomAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Red Lupin",255,"  "
 
@@ -3462,6 +3609,7 @@ Monster147Table:                        ;Green Lupin (arsene lupin)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Green Lupin",255
   
@@ -3485,6 +3633,7 @@ Monster148Table:                        ;Major Mirth (arsene lupin)
   db    RandomAUnitLevel2Attack          ;attack
   db    RandomAUnitLevel2Defense         ;defense
   db    RandomAUnitLevel2Growth          ;growth
+  db    RandomAUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Major Mirth",255
   
@@ -3508,6 +3657,7 @@ Monster149Table:                        ;Vic Viper (kings valley 2)
   db    KingsValley2UnitLevel4Attack          ;attack
   db    KingsValley2UnitLevel4Defense         ;defense
   db    KingsValley2UnitLevel4Growth          ;growth
+  db    KingsValley2UnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Vic Viper",255,"  "
 
@@ -3531,6 +3681,7 @@ Monster150Table:                        ;Rock Roll (kings valley 2)
   db    KingsValley2UnitLevel3Attack          ;attack
   db    KingsValley2UnitLevel3Defense         ;defense
   db    KingsValley2UnitLevel3Growth          ;growth
+  db    KingsValley2UnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Rock Roll",255,"  "
 
@@ -3554,6 +3705,7 @@ Monster151Table:                        ;Slouman (kings valley 2)
   db    KingsValley2UnitLevel1Attack          ;attack
   db    KingsValley2UnitLevel1Defense         ;defense
   db    KingsValley2UnitLevel1Growth          ;growth
+  db    KingsValley2UnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Slouman",255,"    "
 
@@ -3577,6 +3729,7 @@ Monster152Table:                        ;Pyoncy (kings valley 2)
   db    KingsValley2UnitLevel2Attack          ;attack
   db    KingsValley2UnitLevel2Defense         ;defense
   db    KingsValley2UnitLevel2Growth          ;growth
+  db    KingsValley2UnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Pyoncy",255,"     "
 
@@ -3606,6 +3759,7 @@ Monster153Table:                        ;Andorogynus (Andorogynus)
   db    RandomBUnitLevel4Attack-2          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Andorogynus",255
   
@@ -3629,6 +3783,7 @@ Monster154Table:                        ;Thexder (Thexder)
   db    RandomBUnitLevel5Attack          ;attack
   db    RandomBUnitLevel5Defense         ;defense
   db    RandomBUnitLevel5Growth          ;growth
+  db    RandomBUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Thexder",255,"    "
 
@@ -3652,6 +3807,7 @@ Monster155Table:                        ;BounceBot (Thexder)
   db    RandomAUnitLevel3Attack          ;attack
   db    RandomAUnitLevel3Defense         ;defense
   db    RandomAUnitLevel3Growth          ;growth
+  db    RandomAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "BounceBot",255,"  "
 
@@ -3675,6 +3831,7 @@ Monster156Table:                        ;ColossalBot (Thexder)
   db    RandomBUnitLevel6Attack          ;attack
   db    RandomBUnitLevel6Defense         ;defense
   db    RandomBUnitLevel6Growth          ;growth
+  db    RandomBUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "ColossalBot",255
 
@@ -3698,6 +3855,7 @@ Monster157Table:                        ;SuperRunner (SuperRunner)
   db    RandomAUnitLevel3Attack          ;attack
   db    RandomAUnitLevel3Defense         ;defense
   db    RandomAUnitLevel3Growth          ;growth
+  db    RandomAUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "SuperRunner",255
   
@@ -3721,6 +3879,7 @@ Monster158Table:                        ;Queen Sora (green bird) (akanbe dragon)
   db    AkanbeDragonGroupBUnitLevel5Attack          ;attack
   db    AkanbeDragonGroupBUnitLevel5Defense         ;defense
   db    AkanbeDragonGroupBUnitLevel5Growth          ;growth
+  db    AkanbeDragonGroupBUnitLevel5Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Queen Sora",255," "
 
@@ -3730,6 +3889,7 @@ Monster158Table:                        ;Queen Sora (green bird) (akanbe dragon)
 
 SenkoKyuLevel2Number:           equ 52
 SenkoKyuLevel2Attack:           equ 3
+SenkoKyuLevel2Damage:           equ 3
 SenkoKyuLevel2Defense:          equ 7
 SenkoKyuLevel2HP:               equ 18
 SenkoKyuLevel2Speed:            equ 3
@@ -3758,6 +3918,7 @@ Monster159Table:                        ;Senko Kyu (shooting head) (hinotori)
   db    SenkoKyuLevel2Attack          ;attack
   db    SenkoKyuLevel2Defense         ;defense
   db    SenkoKyuLevel2Growth          ;growth
+  db    SenkoKyuLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Senko Kyu",255,"  "
 
@@ -3781,6 +3942,7 @@ Monster160Table:                        ;Chucklehook (higemaru)
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Chucklehook",255
   
@@ -3804,6 +3966,7 @@ Monster161Table:                        ;Sir Oji (castle excellent)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Sir Oji",255,"    "
 
@@ -3827,6 +3990,7 @@ Monster162Table:                        ;Pentaro (parodius)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Pentaro",255,"    "
 
@@ -3850,6 +4014,7 @@ Monster163Table:                        ;Moai (parodius)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Moai",255,"       "
 
@@ -3873,6 +4038,7 @@ Monster164Table:                        ;Thomas (kung fu master)
   db    RandomBUnitLevel4Attack          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Thomas",255,"     "
 
@@ -3896,6 +4062,7 @@ Monster165Table:                        ;BlueSteel (knight with sword) (maze of 
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "BlueSteel",255,"  "
 
@@ -3919,6 +4086,7 @@ Monster166Table:                        ;HikoDrone (space manbow)
   db    RandomBUnitLevel4Attack          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Hikodrone",255,"  "
 
@@ -3942,11 +4110,13 @@ Monster167Table:                        ;Wonder Boy (Wonder Boy)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Wonder Boy",255," "
 
 NinjaKunLevel2Number:           equ 52
 NinjaKunLevel2Attack:           equ 3
+NinjaKunLevel2Damage:           equ 3
 NinjaKunLevel2Defense:          equ 7
 NinjaKunLevel2HP:               equ 17
 NinjaKunLevel2Speed:            equ 3
@@ -3975,6 +4145,7 @@ Monster168Table:                        ;Ninja Kun (Ninja Kun)
   db    NinjaKunLevel2Attack          ;attack;
   db    NinjaKunLevel2Defense         ;defense
   db    NinjaKunLevel2Growth          ;growth
+  db    NinjaKunLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Ninja Kun",255,"  "
 
@@ -3998,6 +4169,7 @@ Monster169Table:                        ;Kubiwatari (jumping head statue) (hinot
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Kubiwatari",255," "
 
@@ -4021,6 +4193,7 @@ Monster170Table:                        ;Flutterbane (maze of gallious)
   db    RandomBUnitLevel5Attack          ;attack
   db    RandomBUnitLevel5Defense         ;defense
   db    RandomBUnitLevel5Growth          ;growth
+  db    RandomBUnitLevel5Damage          ;damage
   db    000                             ;special ability
 ;  db    "Lepidoptera",255
   db    "Flutterbane",255
@@ -4045,6 +4218,7 @@ Monster171Table:                        ;Topple Zip (Topple Zip)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Topple Zip",255," "
 
@@ -4068,6 +4242,7 @@ Monster172Table:                        ;Topplane (Topple Zip)
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Topplane",255,"   "
 
@@ -4091,6 +4266,7 @@ Monster173Table:                        ;Nyancle (Nyancle racing)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Nyancle",255,"    "
 
@@ -4114,6 +4290,7 @@ Monster174Table:                        ;Ashguine (Ashguine 2)
   db    RandomBUnitLevel4Attack          ;attack
   db    RandomBUnitLevel4Defense         ;defense
   db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Ashguine",255,"   "
 
@@ -4137,6 +4314,7 @@ Monster175Table:                        ;Hard Boiled (Hard Boiled)
   db    RandomBUnitLevel3Attack          ;attack
   db    RandomBUnitLevel3Defense         ;defense
   db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Hard Boiled",255
 
@@ -4160,6 +4338,7 @@ Monster176Table:                        ;Pingo (Doki Doki Penguin Land)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Pingo",255,"      "
 
@@ -4183,6 +4362,7 @@ Monster177Table:                        ;Doki Bear (Doki Doki Penguin Land)
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Doki Bear",255,"  "
 
@@ -4206,6 +4386,7 @@ Monster178Table:                        ;InspecteurZ (Inspecteur Z)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "InspecteurZ",255
   
@@ -4229,6 +4410,7 @@ Monster179Table:                        ;Thug (Inspecteur Z) (dog with eye patch
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Thug",255,"       "
 
@@ -4252,6 +4434,7 @@ Monster180Table:                        ;Goblin (Ys 2) (green monster)
   db    RandomBUnitLevel1Attack          ;attack
   db    RandomBUnitLevel1Defense         ;defense
   db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Goblin",255,"     "
 
@@ -4275,6 +4458,7 @@ Monster181Table:                        ;Emberhorn (Ys 2) (red horned monster)
   db    RandomBUnitLevel2Attack          ;attack
   db    RandomBUnitLevel2Defense         ;defense
   db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Emberhorn",255,"  "
 
@@ -4298,6 +4482,7 @@ Monster182Table:                        ;Kanton Man (chuka taisen) (bird man)
   db    ChukaTaisenUnitLevel1Attack          ;attack
   db    ChukaTaisenUnitLevel1Defense         ;defense
   db    ChukaTaisenUnitLevel1Growth          ;growth
+  db    ChukaTaisenUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Kanton Man",255," "
 
@@ -4321,6 +4506,7 @@ Monster183Table:                        ;Sun Wukong (chuka taisen) (main charact
   db    ChukaTaisenUnitLevel2Attack          ;attack
   db    ChukaTaisenUnitLevel2Defense         ;defense
   db    ChukaTaisenUnitLevel2Growth          ;growth
+  db    ChukaTaisenUnitLevel2Damage          ;damage
   db    RangedMonster                   ;special ability, 128=ranged hero
   db    "Sun Wukong",255," "
 
@@ -4344,6 +4530,7 @@ Monster184Table:                        ;Shock Scout (chuka taisen) (boy with gr
   db    ChukaTaisenUnitLevel3Attack          ;attack
   db    ChukaTaisenUnitLevel3Defense         ;defense
   db    ChukaTaisenUnitLevel3Growth          ;growth
+  db    ChukaTaisenUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Shock Scout",255
   
@@ -4367,6 +4554,7 @@ Monster185Table:                        ;Evil Hermit (chuka taisen) (old man wit
   db    ChukaTaisenUnitLevel4Attack          ;attack
   db    ChukaTaisenUnitLevel4Defense         ;defense
   db    ChukaTaisenUnitLevel4Growth          ;growth
+  db    ChukaTaisenUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Evil Hermit",255
 
@@ -4390,6 +4578,7 @@ Monster186Table:                        ;Bad Buddha (chuka taisen) (blue dress a
   db    ChukaTaisenUnitLevel5Attack          ;attack
   db    ChukaTaisenUnitLevel5Defense         ;defense
   db    ChukaTaisenUnitLevel5Growth          ;growth
+  db    ChukaTaisenUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Bad Buddha",255," "
 
@@ -4413,6 +4602,7 @@ Monster187Table:                        ;Dualhorn (chuka taisen) (green demon wi
   db    ChukaTaisenUnitLevel6Attack          ;attack
   db    ChukaTaisenUnitLevel6Defense         ;defense
   db    ChukaTaisenUnitLevel6Growth          ;growth
+  db    ChukaTaisenUnitLevel6Damage          ;damage
   db    000                             ;special ability
   db    "Dualhorn",255,"   "
 

@@ -1,5 +1,4 @@
-message: player 3 eliminated when only 2 players playing and you take a neutral castle (for instance in Autumn4)
-
+curse animatie helemaal aan het eind geeft een bug ?
 
 
 title screen

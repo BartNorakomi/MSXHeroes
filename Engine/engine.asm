@@ -1515,7 +1515,7 @@ DisplaySpireOfWisdom:
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplaySpireOfWisdomCOde
-  call  EnterSpecificRoutineInBattleCode
+  call  EnterSpecificRoutineInExtraRoutines
   jp    UpdateHUd
 
 DisplayLearningStone?:  db  0
@@ -6228,13 +6228,13 @@ pl1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=de
 ;Pl1Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 ;Pl1Hero1Units:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
 Pl1Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
-Pl1Hero1StatAttack:  db 1
-Pl1Hero1StatDefense:  db 1
+Pl1Hero1StatAttack:  db 0
+Pl1Hero1StatDefense:  db 0
 Pl1Hero1StatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.HeroSkills:  db  6,22,21,30,0,0
 ;.HeroSkills:  db  25,18,3,33,9,0
-.HeroSkills:  db  27,0,0,0,0,0
+.HeroSkills:  db  13,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 1111
@@ -6436,11 +6436,11 @@ pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=de
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
 Pl2Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
 ;Pl2Hero1Units:  db 1 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.HeroStatAttack:  db 1
-.HeroStatDefense:  db 1
+.HeroStatAttack:  db 0
+.HeroStatDefense:  db 0
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
 .HeroStatSpellDamage:  db 1  ;amount of spell damage
-.HeroSkills:  db  11,0,0,0,0,0
+.HeroSkills:  db  13,0,0,0,0,0
 .HeroLevel: db  1
 .EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
 .FireSpells:        db  %0000 1111
@@ -6448,7 +6448,7 @@ Pl2Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBU
 .WaterSpells:       db  %0000 1111
 .AllSchoolsSpells:  db  %0000 1111
 ;               swo arm shi hel boo glo rin nec rob
-.Inventory: db  045,008,012,016,021,026,034,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
+.Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
 .HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
@@ -6579,10 +6579,10 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      6,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
-Castle2:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
-Castle3:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
-Castle4:  db  255,  255,  255,      1,          1,        0,        0,              0,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
+Castle1:  db  255,  255,  255,      6,          1,        0,        0,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle2:  db  255,  255,  255,      1,          1,        0,        0,              6,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
+Castle3:  db  255,  255,  255,      1,          1,        0,        0,              6,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
+Castle4:  db  255,  255,  255,      1,          1,        0,        0,              6,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2

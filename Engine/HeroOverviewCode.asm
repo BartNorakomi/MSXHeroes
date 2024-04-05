@@ -1470,8 +1470,8 @@ DescriptionSword2:        db  "Sword of Bahrain",254 | SwordOfBahrainAttack: equ
                           db  "Attack +2",255
 
                           ;item 002
-DescriptionSword3:        db  "Hell Slayer",254 | HellSlayerAttack: equ 6 | HellSlayerDefence: equ -2
-                          db  "Attack +6",254
+DescriptionSword3:        db  "Hell Slayer",254 | HellSlayerAttack: equ 5 | HellSlayerDefence: equ -2
+                          db  "Attack +5",254
                           db  "Defense -2",255
 
                           ;item 003
