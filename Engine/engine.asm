@@ -2260,9 +2260,252 @@ CheckHeroPicksUpItem:
   inc   hl
   ld    a,(hl)                          ;number (192,193,194,195) representing level of scrollspell
   ld    (hl),0                          ;remove number from object layer map
-  sub   192-46                          ;46=scroll (earth) level 1
-  ld    (iy+HeroInventory+9),a 
-  ;we now take the hero's movement points+date and divide it by 5, the rest will be 0,1,2,3,4 (representing: earth, fire, air, water, universal)
+  sub   192-46                          ;from 46 (earth level 1) - 65 (universal level 4)
+  ld    (iy+HeroInventory+9),a
+  cp    46
+  jp    z,.Level1Scroll
+  cp    47
+  jp    z,.Level2Scroll
+  cp    48
+  jp    z,.Level3Scroll
+
+  .Level4Scroll:
+  call  .AddSpellSchoolToSpellLevel     ;out: a=invent.  item nr
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    c,a                             ;backup originally intended scroll nr
+
+  ;Hero Already Has This Scroll or spell, now give hero another scroll, in this order:
+  ld    a,65                            ;universal level 4 (primal instinct)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,61                            ;water level 4
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,49                            ;earth level 4
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,53                            ;fire level 4
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,57                            ;air level 4 (spell bubble)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,c                             ;originally intended scroll nr
+  jp    .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+
+  .Level3Scroll:
+  call  .AddSpellSchoolToSpellLevel     ;out: a=invent.  item nr
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    c,a                             ;backup originally intended scroll nr
+
+  ;Hero Already Has This Scroll or spell, now give hero another scroll, in this order:
+  ld    a,52                            ;fire level 3 (implosion)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,64                            ;universal level 3 (teleport)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,60                            ;water level 3 (hypnosis)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,48                            ;earth level 3 (resurrection)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,56                            ;air level 3 (claw back)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,c                             ;originally intended scroll nr
+  jp    .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+
+  .Level2Scroll:
+  call  .AddSpellSchoolToSpellLevel     ;out: a=invent.  item nr
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    c,a                             ;backup originally intended scroll nr
+
+  ;Hero Already Has This Scroll or spell, now give hero another scroll, in this order:
+  ld    a,59                            ;water level 2 (ice peak)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,63                            ;universal level 2 (frenzy)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,55                            ;air level 2
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,51                            ;fire level 2
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,47                            ;earth level 2
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,c                             ;originally intended scroll nr
+  jp    .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+
+  .Level1Scroll:
+  call  .AddSpellSchoolToSpellLevel     ;out: a=invent.  item nr
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    c,a                             ;backup originally intended scroll nr
+
+  ;Hero Already Has This Scroll or spell, now give hero another scroll, in this order:
+  ld    a,62                            ;universal level 1 (magic arrows)
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,58                            ;water level 1
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,54                            ;air level 1
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,50                            ;fire level 1
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,46                            ;earth level 1
+  call  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ret   z                               ;z=hero doesn't have this scroll or spell
+  ld    a,c                             ;originally intended scroll nr
+  jp    .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+
+  .SetAndCheckIfHeroAlreadyHasThisScrollOrSpell:  ;in a=invent. item nr. out z=hero doesn't have this scroll or spell
+  ld    (iy+HeroInventory+9),a
+  ld    (SpellScrollInventoryNumber),a  ;from 46 (earth level 1) - 65 (universal level 4)
+
+  ld    b,0                             ;amount of times hero already has this scroll
+  cp    (ix+HeroInventory+9)
+  call  z,.ScrollFound
+  cp    (ix+HeroInventory+10)
+  call  z,.ScrollFound
+  cp    (ix+HeroInventory+11)
+  call  z,.ScrollFound
+  cp    (ix+HeroInventory+12)
+  call  z,.ScrollFound
+  cp    (ix+HeroInventory+13)
+  call  z,.ScrollFound
+  cp    (ix+HeroInventory+14)
+  call  z,.ScrollFound
+
+  dec   b                               ;if hero now has this scroll only once, we are good
+  ret   nz
+  ;at this point hero doesn't have this scroll. check if hero already knows this spell
+  
+  cp    46                              ;earth level 1
+  jr    z,.CheckEarthLevel1
+  cp    47                              ;earth level 2
+  jr    z,.CheckEarthLevel2
+  cp    48                              ;earth level 3
+  jr    z,.CheckEarthLevel3
+  cp    49                              ;earth level 4
+  jr    z,.CheckEarthLevel4
+
+  cp    50                              ;Fire level 1
+  jr    z,.CheckFireLevel1
+  cp    51                              ;Fire level 2
+  jr    z,.CheckFireLevel2
+  cp    52                              ;Fire level 3
+  jr    z,.CheckFireLevel3
+  cp    53                              ;Fire level 4
+  jr    z,.CheckFireLevel4
+
+  cp    54                              ;Air level 1
+  jr    z,.CheckAirLevel1
+  cp    55                              ;Air level 2
+  jr    z,.CheckAirLevel2
+  cp    56                              ;Air level 3
+  jr    z,.CheckAirLevel3
+  cp    57                              ;Air level 4
+  jr    z,.CheckAirLevel4
+
+  cp    58                              ;Water level 1
+  jr    z,.CheckWaterLevel1
+  cp    59                              ;Water level 2
+  jr    z,.CheckWaterLevel2
+  cp    60                              ;Water level 3
+  jr    z,.CheckWaterLevel3
+  cp    61                              ;Water level 4
+  jr    z,.CheckWaterLevel4
+
+  cp    62                              ;AllSchools level 1
+  jr    z,.CheckAllSchoolsLevel1
+  cp    63                              ;AllSchools level 2
+  jr    z,.CheckAllSchoolsLevel2
+  cp    64                              ;AllSchools level 3
+  jr    z,.CheckAllSchoolsLevel3
+  cp    65                              ;AllSchools level 4
+  jr    z,.CheckAllSchoolsLevel4
+
+  .CheckEarthLevel1:
+  bit   0,(ix+HeroEarthSpells)          ;check if hero already knows Earth level 1
+  ret
+  .CheckEarthLevel2:
+  bit   1,(ix+HeroEarthSpells)          ;check if hero already knows Earth level 2
+  ret
+  .CheckEarthLevel3:
+  bit   2,(ix+HeroEarthSpells)          ;check if hero already knows Earth level 3
+  ret
+  .CheckEarthLevel4:
+  bit   3,(ix+HeroEarthSpells)          ;check if hero already knows Earth level 4
+  ret
+
+  .CheckFireLevel1:
+  bit   0,(ix+HeroFireSpells)          ;check if hero already knows Fire level 1
+  ret
+  .CheckFireLevel2:
+  bit   1,(ix+HeroFireSpells)          ;check if hero already knows Fire level 2
+  ret
+  .CheckFireLevel3:
+  bit   2,(ix+HeroFireSpells)          ;check if hero already knows Fire level 3
+  ret
+  .CheckFireLevel4:
+  bit   3,(ix+HeroFireSpells)          ;check if hero already knows Fire level 4
+  ret
+
+  .CheckAirLevel1:
+  bit   0,(ix+HeroAirSpells)          ;check if hero already knows Air level 1
+  ret
+  .CheckAirLevel2:
+  bit   1,(ix+HeroAirSpells)          ;check if hero already knows Air level 2
+  ret
+  .CheckAirLevel3:
+  bit   2,(ix+HeroAirSpells)          ;check if hero already knows Air level 3
+  ret
+  .CheckAirLevel4:
+  bit   3,(ix+HeroAirSpells)          ;check if hero already knows Air level 4
+  ret
+
+  .CheckWaterLevel1:
+  bit   0,(ix+HeroWaterSpells)          ;check if hero already knows water level 1
+  ret
+  .CheckWaterLevel2:
+  bit   1,(ix+HeroWaterSpells)          ;check if hero already knows water level 2
+  ret
+  .CheckWaterLevel3:
+  bit   2,(ix+HeroWaterSpells)          ;check if hero already knows water level 3
+  ret
+  .CheckWaterLevel4:
+  bit   3,(ix+HeroWaterSpells)          ;check if hero already knows water level 4
+  ret
+
+  .CheckAllSchoolsLevel1:
+  bit   0,(ix+HeroAllSchoolsSpells)          ;check if hero already knows AllSchools level 1
+  ret
+  .CheckAllSchoolsLevel2:
+  bit   1,(ix+HeroAllSchoolsSpells)          ;check if hero already knows AllSchools level 2
+  ret
+  .CheckAllSchoolsLevel3:
+  bit   2,(ix+HeroAllSchoolsSpells)          ;check if hero already knows AllSchools level 3
+  ret
+  .CheckAllSchoolsLevel4:
+  bit   3,(ix+HeroAllSchoolsSpells)          ;check if hero already knows AllSchools level 4
+  ret
+
+  .ScrollFound:
+  inc   b                               ;amount of times hero already has this scroll
+  ret
+
+  .AddSpellSchoolToSpellLevel:          ;we now take the hero's movement points+date and divide it by 5, the rest will be 0,1,2,3,4 (representing: earth, fire, air, water, universal)
   ld    ix,(plxcurrentheroAddress)
   ld    d,0
   ld    e,(ix+HeroMove)
@@ -2276,8 +2519,6 @@ CheckHeroPicksUpItem:
   add   a,a
   add   a,a                             ;*4
   add   a,(iy+HeroInventory+9) 
-  ld    (iy+HeroInventory+9),a
-  ld    (SpellScrollInventoryNumber),a  ;from 46 (earth level 1) - 65 (universal level 4)
   ret
 
 .SpireOfWisdom:
@@ -6236,11 +6477,11 @@ Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.HeroSkills:  db  25,18,3,33,9,0
 .HeroSkills:  db  13,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 1111
-.AirSpells:         db  %0000 1111
-.WaterSpells:       db  %0000 1111
-.AllSchoolsSpells:  db  %0000 1111
+.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0000
+.AirSpells:         db  %0000 0000
+.WaterSpells:       db  %0000 0000
+.AllSchoolsSpells:  db  %0000 0000
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)

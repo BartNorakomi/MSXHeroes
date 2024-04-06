@@ -1,14 +1,14 @@
 phase	$c000
 
 StartAtTitleScreen?:                equ 0
-StartOfTurnMessageOn?:              equ 1
+StartOfTurnMessageOn?:              equ 0
 MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
 UnlimitedBuildsPerTurn?:            equ 0
-DisplayNumbers1to6?:                equ 0
+DisplayNumbers1to6?:                equ 1
 
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 

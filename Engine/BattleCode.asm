@@ -3358,7 +3358,25 @@ SetEnemyStatsWindow:
   ld    hl,$4000 + (062*128) + (174/2) - 128
   ld    bc,$0000 + (069*256) + (062/2)
   ld    a,ChestBlock           ;block to copy graphics from
+  push  de
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ;add bow&arrow symbol if monster is ranged
+  call  SetMonsterTableInIYNeutralMonster
+  pop   de
+  ld    a,(iy+MonsterTableSpecialAbility)
+  cp    RangedMonster
+  jp    nz,.EndCheckRanged
+  ld    hl,40/2 + (22*128)
+  add   hl,de
+  ex    de,hl
+  ld    hl,$4000 + (131*128) + (176/2) - 128
+  ld    bc,$0000 + (016*256) + (018/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  .EndCheckRanged:
+
+  
 
   call  SetNeutralMonsterHeroCollidedWithInA
   call  CheckRightClickToDisplayInfo.SetSYSX
