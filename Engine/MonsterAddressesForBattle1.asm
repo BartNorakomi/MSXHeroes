@@ -1357,15 +1357,15 @@ Monster055Table:                        ;Cheek (Goemon) (white kimono, long slee
   db    BattleMonsterSpriteSheet5Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    GoemonUnitLevel1CostGold        ;cost (gold)
-  db    GoemonUnitLevel1CostGems        ;cost (gems)
-  db    GoemonUnitLevel1CostRubies      ;cost (rubies)
-  db    GoemonUnitLevel1HP              ;hp
-  db    GoemonUnitLevel1Speed           ;speed
-  db    GoemonUnitLevel1Attack          ;attack
-  db    GoemonUnitLevel1Defense         ;defense
-  db    GoemonUnitLevel1Growth          ;growth
-  db    GoemonUnitLevel1Damage          ;damage
+  db    GoemonUnitLevel2CostGold        ;cost (gold)
+  db    GoemonUnitLevel2CostGems        ;cost (gems)
+  db    GoemonUnitLevel2CostRubies      ;cost (rubies)
+  db    GoemonUnitLevel2HP              ;hp
+  db    GoemonUnitLevel2Speed           ;speed
+  db    GoemonUnitLevel2Attack          ;attack
+  db    GoemonUnitLevel2Defense         ;defense
+  db    GoemonUnitLevel2Growth          ;growth
+  db    GoemonUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Cheek",255,"      "
 
@@ -2653,15 +2653,15 @@ Monster108Table:                        ;Mei Ling (yie ar kung fu)
   db    BattleMonsterSpriteSheet10Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    YieArKungFuUnitLevel2CostGold        ;cost (gold)
-  db    YieArKungFuUnitLevel2CostGems        ;cost (gems)
-  db    YieArKungFuUnitLevel2CostRubies      ;cost (rubies)
-  db    YieArKungFuUnitLevel2HP              ;hp
-  db    YieArKungFuUnitLevel2Speed           ;speed
-  db    YieArKungFuUnitLevel2Attack          ;attack
-  db    YieArKungFuUnitLevel2Defense         ;defense
-  db    YieArKungFuUnitLevel2Growth          ;growth
-  db    YieArKungFuUnitLevel2Damage          ;damage
+  db    YieArKungFuUnitLevel3CostGold        ;cost (gold)
+  db    YieArKungFuUnitLevel3CostGems        ;cost (gems)
+  db    YieArKungFuUnitLevel3CostRubies      ;cost (rubies)
+  db    YieArKungFuUnitLevel3HP              ;hp
+  db    YieArKungFuUnitLevel3Speed           ;speed
+  db    YieArKungFuUnitLevel3Attack          ;attack
+  db    YieArKungFuUnitLevel3Defense         ;defense
+  db    YieArKungFuUnitLevel3Growth          ;growth
+  db    YieArKungFuUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Mei Ling",255,"   "
 
@@ -3121,15 +3121,15 @@ Monster127Table:                        ;Rastan (rastan saga)
   db    BattleMonsterSpriteSheet13Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    RandomBUnitLevel3CostGold        ;cost (gold)
-  db    RandomBUnitLevel3CostGems        ;cost (gems)
-  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel3HP              ;hp
-  db    RandomBUnitLevel3Speed           ;speed
-  db    RandomBUnitLevel3Attack          ;attack
-  db    RandomBUnitLevel3Defense         ;defense
-  db    RandomBUnitLevel3Growth          ;growth
-  db    RandomBUnitLevel3Damage          ;damage
+  db    RandomBUnitLevel4CostGold        ;cost (gold)
+  db    RandomBUnitLevel4CostGems        ;cost (gems)
+  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel4HP              ;hp
+  db    RandomBUnitLevel4Speed           ;speed
+  db    RandomBUnitLevel4Attack          ;attack
+  db    RandomBUnitLevel4Defense         ;defense
+  db    RandomBUnitLevel4Growth          ;growth
+  db    RandomBUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Rastan",255,"     "
 
@@ -3313,15 +3313,15 @@ Monster135Table:                        ;deva (deva)
   db    BattleMonsterSpriteSheet14Block
   db    32                              ;nx  
   db    40+08                           ;ny
-  db    DevaUnitLevel4CostGold        ;cost (gold)
-  db    DevaUnitLevel4CostGems        ;cost (gems)
-  db    DevaUnitLevel4CostRubies      ;cost (rubies)
-  db    DevaUnitLevel4HP              ;hp
-  db    DevaUnitLevel4Speed           ;speed
-  db    DevaUnitLevel4Attack          ;attack
-  db    DevaUnitLevel4Defense         ;defense
-  db    DevaUnitLevel4Growth          ;growth
-  db    DevaUnitLevel4Damage          ;damage
+  db    DevaUnitLevel5CostGold        ;cost (gold)
+  db    DevaUnitLevel5CostGems        ;cost (gems)
+  db    DevaUnitLevel5CostRubies      ;cost (rubies)
+  db    DevaUnitLevel5HP              ;hp
+  db    DevaUnitLevel5Speed           ;speed
+  db    DevaUnitLevel5Attack          ;attack
+  db    DevaUnitLevel5Defense         ;defense
+  db    DevaUnitLevel5Growth          ;growth
+  db    DevaUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Deva",255,"       "
   
@@ -3361,15 +3361,15 @@ Monster137Table:                        ;Yurei Kage (deva)
   db    BattleMonsterSpriteSheet12Block
   db    32                              ;nx  
   db    48+08                           ;ny
-  db    DevaUnitLevel3CostGold        ;cost (gold)
-  db    DevaUnitLevel3CostGems        ;cost (gems)
-  db    DevaUnitLevel3CostRubies      ;cost (rubies)
-  db    DevaUnitLevel3HP              ;hp
-  db    DevaUnitLevel3Speed           ;speed
-  db    DevaUnitLevel3Attack          ;attack
-  db    DevaUnitLevel3Defense         ;defense
-  db    DevaUnitLevel3Growth          ;growth
-  db    DevaUnitLevel3Damage          ;damage
+  db    DevaUnitLevel4CostGold        ;cost (gold)
+  db    DevaUnitLevel4CostGems        ;cost (gems)
+  db    DevaUnitLevel4CostRubies      ;cost (rubies)
+  db    DevaUnitLevel4HP              ;hp
+  db    DevaUnitLevel4Speed           ;speed
+  db    DevaUnitLevel4Attack          ;attack
+  db    DevaUnitLevel4Defense         ;defense
+  db    DevaUnitLevel4Growth          ;growth
+  db    DevaUnitLevel4Damage          ;damage
   db    000                             ;special ability
   db    "Yurei Kage",255," "
   
@@ -4210,15 +4210,15 @@ Monster171Table:                        ;Topple Zip (Topple Zip)
   db    BattleMonsterSpriteSheet8Block
   db    16                              ;nx  
   db    24+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
-  db    RandomBUnitLevel2Damage          ;damage
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Topple Zip",255," "
 
@@ -4258,15 +4258,15 @@ Monster173Table:                        ;Nyancle (Nyancle racing)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    32+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
-  db    RandomBUnitLevel2Damage          ;damage
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "Nyancle",255,"    "
 
@@ -4282,15 +4282,15 @@ Monster174Table:                        ;Ashguine (Ashguine 2)
   db    BattleMonsterSpriteSheet15Block
   db    32                              ;nx  
   db    32+08                           ;ny
-  db    RandomBUnitLevel4CostGold        ;cost (gold)
-  db    RandomBUnitLevel4CostGems        ;cost (gems)
-  db    RandomBUnitLevel4CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel4HP              ;hp
-  db    RandomBUnitLevel4Speed           ;speed
-  db    RandomBUnitLevel4Attack          ;attack
-  db    RandomBUnitLevel4Defense         ;defense
-  db    RandomBUnitLevel4Growth          ;growth
-  db    RandomBUnitLevel4Damage          ;damage
+  db    RandomBUnitLevel5CostGold        ;cost (gold)
+  db    RandomBUnitLevel5CostGems        ;cost (gems)
+  db    RandomBUnitLevel5CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel5HP              ;hp
+  db    RandomBUnitLevel5Speed           ;speed
+  db    RandomBUnitLevel5Attack          ;attack
+  db    RandomBUnitLevel5Defense         ;defense
+  db    RandomBUnitLevel5Growth          ;growth
+  db    RandomBUnitLevel5Damage          ;damage
   db    000                             ;special ability
   db    "Ashguine",255,"   "
 
@@ -4306,15 +4306,15 @@ Monster175Table:                        ;Hard Boiled (Hard Boiled)
   db    BattleMonsterSpriteSheet15Block
   db    32                              ;nx  
   db    48+08                           ;ny
-  db    RandomBUnitLevel3CostGold        ;cost (gold)
-  db    RandomBUnitLevel3CostGems        ;cost (gems)
-  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel3HP              ;hp
-  db    RandomBUnitLevel3Speed           ;speed
-  db    RandomBUnitLevel3Attack          ;attack
-  db    RandomBUnitLevel3Defense         ;defense
-  db    RandomBUnitLevel3Growth          ;growth
-  db    RandomBUnitLevel3Damage          ;damage
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Hard Boiled",255
 
@@ -4330,15 +4330,15 @@ Monster176Table:                        ;Pingo (Doki Doki Penguin Land)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
-  db    RandomBUnitLevel2Damage          ;damage
+  db    RandomBUnitLevel1CostGold        ;cost (gold)
+  db    RandomBUnitLevel1CostGems        ;cost (gems)
+  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel1HP              ;hp
+  db    RandomBUnitLevel1Speed           ;speed
+  db    RandomBUnitLevel1Attack          ;attack
+  db    RandomBUnitLevel1Defense         ;defense
+  db    RandomBUnitLevel1Growth          ;growth
+  db    RandomBUnitLevel1Damage          ;damage
   db    000                             ;special ability
   db    "Pingo",255,"      "
 
@@ -4378,15 +4378,15 @@ Monster178Table:                        ;InspecteurZ (Inspecteur Z)
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    RandomBUnitLevel2CostGold        ;cost (gold)
-  db    RandomBUnitLevel2CostGems        ;cost (gems)
-  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel2HP              ;hp
-  db    RandomBUnitLevel2Speed           ;speed
-  db    RandomBUnitLevel2Attack          ;attack
-  db    RandomBUnitLevel2Defense         ;defense
-  db    RandomBUnitLevel2Growth          ;growth
-  db    RandomBUnitLevel2Damage          ;damage
+  db    RandomBUnitLevel3CostGold        ;cost (gold)
+  db    RandomBUnitLevel3CostGems        ;cost (gems)
+  db    RandomBUnitLevel3CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel3HP              ;hp
+  db    RandomBUnitLevel3Speed           ;speed
+  db    RandomBUnitLevel3Attack          ;attack
+  db    RandomBUnitLevel3Defense         ;defense
+  db    RandomBUnitLevel3Growth          ;growth
+  db    RandomBUnitLevel3Damage          ;damage
   db    000                             ;special ability
   db    "InspecteurZ",255
   
@@ -4402,15 +4402,15 @@ Monster179Table:                        ;Thug (Inspecteur Z) (dog with eye patch
   db    BattleMonsterSpriteSheet15Block
   db    16                              ;nx  
   db    16+08                           ;ny
-  db    RandomBUnitLevel1CostGold        ;cost (gold)
-  db    RandomBUnitLevel1CostGems        ;cost (gems)
-  db    RandomBUnitLevel1CostRubies      ;cost (rubies)
-  db    RandomBUnitLevel1HP              ;hp
-  db    RandomBUnitLevel1Speed           ;speed
-  db    RandomBUnitLevel1Attack          ;attack
-  db    RandomBUnitLevel1Defense         ;defense
-  db    RandomBUnitLevel1Growth          ;growth
-  db    RandomBUnitLevel1Damage          ;damage
+  db    RandomBUnitLevel2CostGold        ;cost (gold)
+  db    RandomBUnitLevel2CostGems        ;cost (gems)
+  db    RandomBUnitLevel2CostRubies      ;cost (rubies)
+  db    RandomBUnitLevel2HP              ;hp
+  db    RandomBUnitLevel2Speed           ;speed
+  db    RandomBUnitLevel2Attack          ;attack
+  db    RandomBUnitLevel2Defense         ;defense
+  db    RandomBUnitLevel2Growth          ;growth
+  db    RandomBUnitLevel2Damage          ;damage
   db    000                             ;special ability
   db    "Thug",255,"       "
 

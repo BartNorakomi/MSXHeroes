@@ -1186,27 +1186,27 @@ DevaUnitLevel2CostGold:         equ 110/10
 DevaUnitLevel2CostGems:         equ 00+Level2Unit
 DevaUnitLevel2CostRubies:       equ 0
 ;Yurei Kage
-DevaUnitLevel3Number:           equ 137
-DevaUnitLevel3Damage:           equ 5
-DevaUnitLevel3Attack:           equ 4
-DevaUnitLevel3Defense:          equ 7
-DevaUnitLevel3HP:               equ 21
-DevaUnitLevel3Speed:            equ 5
-DevaUnitLevel3Growth:           equ 4
-DevaUnitLevel3CostGold:         equ 250/10
-DevaUnitLevel3CostGems:         equ 00+Level3Unit
-DevaUnitLevel3CostRubies:       equ 0
-;deva
-DevaUnitLevel4Number:           equ 135
-DevaUnitLevel4Damage:           equ 8
-DevaUnitLevel4Attack:           equ 9
-DevaUnitLevel4Defense:          equ 12
-DevaUnitLevel4HP:               equ 35
+DevaUnitLevel4Number:           equ 137
+DevaUnitLevel4Damage:           equ 9
+DevaUnitLevel4Attack:           equ 8
+DevaUnitLevel4Defense:          equ 7
+DevaUnitLevel4HP:               equ 30
 DevaUnitLevel4Speed:            equ 6
-DevaUnitLevel4Growth:           equ 4
-DevaUnitLevel4CostGold:         equ 340/10
-DevaUnitLevel4CostGems:         equ 00+Level4Unit
+DevaUnitLevel4Growth:           equ 5
+DevaUnitLevel4CostGold:         equ 250/10
+DevaUnitLevel4CostGems:         equ 00+Level3Unit
 DevaUnitLevel4CostRubies:       equ 0
+;deva
+DevaUnitLevel5Number:           equ 135
+DevaUnitLevel5Damage:           equ 13
+DevaUnitLevel5Attack:           equ 11
+DevaUnitLevel5Defense:          equ 12
+DevaUnitLevel5HP:               equ 55
+DevaUnitLevel5Speed:            equ 6
+DevaUnitLevel5Growth:           equ 2
+DevaUnitLevel5CostGold:         equ 440/10
+DevaUnitLevel5CostGems:         equ 00+Level4Unit
+DevaUnitLevel5CostRubies:       equ 0
 
 ;Emir Mystic
 Usas2UnitLevel4Number:           equ 139

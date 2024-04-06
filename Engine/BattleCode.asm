@@ -3569,37 +3569,43 @@ ListOfMonsters:
   db    162                               ;184 Pentaro (parodius)
   db    163                               ;185 Moai (parodius)
   db    168                               ;186 Ninja Kun (Ninja Kun)
-  
+
+  db    181                               ;187 Emberhorn (Ys 2) (red horned monster)
+  db    180                               ;188 Goblin (Ys 2) (green monster)
+  db    178                               ;189 InspecteurZ (Inspecteur Z)
+  db    179                               ;190 Thug (Inspecteur Z) (dog with eye patch)
+  db    177                               ;191 Doki Bear (Doki Doki Penguin Land)
+    
 ListOfGuardTowerMonsters:
 .level1:
-  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
-  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
-  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
-  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
+  db    175                               ;Hard Boiled (Hard Boiled)
+  db    176                               ;Pingo (Doki Doki Penguin Land)
+  db    171                               ;Topple Zip (Topple Zip)
+  db    172                               ;Topplane (Topple Zip)
 
 .level2:
   db    057                               ;Kasa-obake (jumping freaky) (Goemon)
-  db    057                               ;Kasa-obake (jumping freaky) (Goemon)
-  db    108                               ;Mei Ling (yie ar kung fu)
+  db    173                               ;Nyancle (Nyancle racing)
+  db    055                               ;Cheek (Goemon) (white kimono, long sleeves)
   db    129                               ;Screech
 
 .level3:
   db    107                               ;Wei Chin (yie ar kung fu)
-  db    127                               ;Rastan (rastan saga)
-  db    137                               ;Yurei Kage (deva)
+  db    173                               ;Nyancle (Nyancle racing)
+  db    108                               ;Mei Ling (yie ar kung fu)
   db    165                               ;BlueSteel (knight with sword) (maze of gallious)
 
 .level4:
   db    109                               ;Han Chen (bomb thrower) (yie ar kung fu)
-  db    135                               ;deva (deva)
+  db    137                               ;Yurei Kage (deva)
   db    166                               ;HikoDrone (space manbow)
-  db    166                               ;HikoDrone (space manbow)
+  db    127                               ;Rastan (rastan saga)
 
 .level5:
-  db    138                               ;Huge Blob (usas2)
+  db    174                               ;Ashguine (Ashguine 2)
   db    138                               ;Huge Blob (usas2)
   db    170                               ;butterfly (maze of gallious)
-  db    170                               ;butterfly (maze of gallious)
+  db    135                               ;deva (deva)
 
 .level6:
   db    141                               ;Monstrilla (core dump)

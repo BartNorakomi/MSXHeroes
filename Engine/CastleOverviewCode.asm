@@ -14190,7 +14190,9 @@ HandleAllHeroesLearnMagicGuildSpells:
   ret
 
   .loop:
+  push  bc
   call  .CheckHero
+  pop   bc
   ld    de,lenghtherotable
   add   ix,de
   djnz  .loop
