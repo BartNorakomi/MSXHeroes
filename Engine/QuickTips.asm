@@ -356,7 +356,22 @@ TextQuickTip48:
                 db "the purpose of transporting these",254
                 db "creatures.",255
 
-LastQuickTip: equ 48
+TextQuickTip49:
+                db "Upon obtaining a scroll, the game",254
+                db "endeavors to assist your hero",254
+                db "by granting them a scroll",254
+                db "corresponding to a spell they",254
+                db "haven't yet obtained or learned.",255
+
+TextQuickTip50:
+                db "A creature's damage is its actual",254
+                db "offensive output during combat.",254
+                db "However, its attack and defense",254
+                db "serve as modifiers that determine",254
+                db "the extent to which its damage",254
+                db "increases or decreases.",255
+
+LastQuickTip: equ 50
 
 
 

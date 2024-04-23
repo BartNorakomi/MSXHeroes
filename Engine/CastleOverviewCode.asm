@@ -4969,9 +4969,9 @@ ListOfQuickTips:
   dw TextQuickTip11,TextQuickTip12,TextQuickTip13,TextQuickTip14,TextQuickTip15,TextQuickTip16,TextQuickTip17,TextQuickTip18,TextQuickTip19,TextQuickTip20
   dw TextQuickTip21,TextQuickTip22,TextQuickTip23,TextQuickTip24,TextQuickTip25,TextQuickTip26,TextQuickTip27,TextQuickTip28,TextQuickTip29,TextQuickTip30
   dw TextQuickTip31,TextQuickTip32,TextQuickTip33,TextQuickTip34,TextQuickTip35,TextQuickTip36,TextQuickTip37,TextQuickTip38,TextQuickTip39,TextQuickTip40
-  dw TextQuickTip41,TextQuickTip42,TextQuickTip43,TextQuickTip44,TextQuickTip45,TextQuickTip46,TextQuickTip47,TextQuickTip48
+  dw TextQuickTip41,TextQuickTip42,TextQuickTip43,TextQuickTip44,TextQuickTip45,TextQuickTip46,TextQuickTip47,TextQuickTip48,TextQuickTip49,TextQuickTip50
   
-TotalAmountOfQuickTips: equ 48
+TotalAmountOfQuickTips: equ 50
 
 
 SetQuickTipsText:
@@ -4999,7 +4999,7 @@ SetQuickTipsText:
   ld    d,(hl)
   ex    de,hl
 
-;ld hl,TextQuickTip48
+;ld hl,TextQuickTip50
 
   ld    b,038+00                        ;dx
   ld    c,064+00                        ;dy
@@ -10047,35 +10047,46 @@ CastleOverviewMarketPlaceCode:
   ret
 
 ;1 market place:
-.TextCostRequireWoodTradeStone:  dw 0001,0010
-.TextCostRequireWoodTradeGems:   dw 0001,0005
-.TextCostRequireWoodTradeGold:   dw 0001,2500
-.TextCostRequireGemTradeStone:   dw 0001,0020
-.TextCostRequireGemTradeGems:    dw 0001,0010
-.TextCostRequireGemTradeGold:    dw 0001,5000
-.TextCostRequireGoldTradeWood:   dw 0025,0001
-.TextCostRequireGoldTradeRuby:   dw 0050,0001
-.TextCostRequireGoldTradeGold:   dw 0001,0001
-;2 market places:
-.TextCostRequireWoodTradeStone2: dw 0001,0007
+;.TextCostRequireWoodTradeStone:  dw 0001,0010
+;.TextCostRequireWoodTradeGems:   dw 0001,0005
+;.TextCostRequireWoodTradeGold:   dw 0001,2500
+;.TextCostRequireGemTradeStone:   dw 0001,0020
+;.TextCostRequireGemTradeGems:    dw 0001,0010
+;.TextCostRequireGemTradeGold:    dw 0001,5000
+;.TextCostRequireGoldTradeWood:   dw 0025,0001
+;.TextCostRequireGoldTradeRuby:   dw 0050,0001
+;.TextCostRequireGoldTradeGold:   dw 0001,0001
+;1 market places: (was 2 before)
+.TextCostRequireWoodTradeStone: dw 0001,0007
+.TextCostRequireWoodTradeGems:  dw 0001,0003
+.TextCostRequireWoodTradeGold:  dw 0001,1667
+.TextCostRequireGemTradeStone:  dw 0001,0013
+.TextCostRequireGemTradeGems:   dw 0001,0007
+.TextCostRequireGemTradeGold:   dw 0001,3333
+.TextCostRequireGoldTradeWood:  dw 0037,0001
+.TextCostRequireGoldTradeRuby:  dw 0075,0001
+.TextCostRequireGoldTradeGold:  dw 0001,0001
+;2 market places: (was 3 before)
+.TextCostRequireWoodTradeStone2: dw 0001,0005
 .TextCostRequireWoodTradeGems2:  dw 0001,0003
-.TextCostRequireWoodTradeGold2:  dw 0001,1667
-.TextCostRequireGemTradeStone2:  dw 0001,0013
-.TextCostRequireGemTradeGems2:   dw 0001,0007
-.TextCostRequireGemTradeGold2:   dw 0001,3333
-.TextCostRequireGoldTradeWood2:  dw 0037,0001
-.TextCostRequireGoldTradeRuby2:  dw 0075,0001
+.TextCostRequireWoodTradeGold2:  dw 0001,1250
+.TextCostRequireGemTradeStone2:  dw 0001,0010
+.TextCostRequireGemTradeGems2:   dw 0001,0005
+.TextCostRequireGemTradeGold2:   dw 0001,2500
+.TextCostRequireGoldTradeWood2:  dw 0050,0001
+.TextCostRequireGoldTradeRuby2:  dw 0100,0001
 .TextCostRequireGoldTradeGold2:  dw 0001,0001
-;3 market places:
-.TextCostRequireWoodTradeStone3: dw 0001,0005
+;3 market places: (was 4 before)
+.TextCostRequireWoodTradeStone3: dw 0001,0004
 .TextCostRequireWoodTradeGems3:  dw 0001,0002
-.TextCostRequireWoodTradeGold3:  dw 0001,1250
-.TextCostRequireGemTradeStone3:  dw 0001,0010
-.TextCostRequireGemTradeGems3:   dw 0001,0005
-.TextCostRequireGemTradeGold3:   dw 0001,2500
-.TextCostRequireGoldTradeWood3:  dw 0050,0001
-.TextCostRequireGoldTradeRuby3:  dw 0100,0001
+.TextCostRequireWoodTradeGold3:  dw 0001,1000
+.TextCostRequireGemTradeStone3:  dw 0001,0008
+.TextCostRequireGemTradeGems3:   dw 0001,0004
+.TextCostRequireGemTradeGold3:   dw 0001,2000
+.TextCostRequireGoldTradeWood3:  dw 0062,0001
+.TextCostRequireGoldTradeRuby3:  dw 0125,0001
 .TextCostRequireGoldTradeGold3:  dw 0001,0001
+
 
 
   .SetTradeCostInHL:

@@ -441,7 +441,7 @@ ContraGroupAUnitLevel3Damage:           equ 5
 ContraGroupAUnitLevel3Attack:           equ 8
 ContraGroupAUnitLevel3Defense:          equ 4
 ContraGroupAUnitLevel3HP:               equ 15
-ContraGroupAUnitLevel3Speed:            equ 4
+ContraGroupAUnitLevel3Speed:            equ 6
 ContraGroupAUnitLevel3Growth:           equ 7
 ContraGroupAUnitLevel3CostGold:         equ 150/10
 ContraGroupAUnitLevel3CostGems:         equ 00+Level3Unit

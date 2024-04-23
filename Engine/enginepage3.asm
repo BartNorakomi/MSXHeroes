@@ -1,7 +1,7 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 1
-StartOfTurnMessageOn?:              equ 1
+StartAtTitleScreen?:                equ 0
+StartOfTurnMessageOn?:              equ 0
 MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
 
@@ -815,13 +815,12 @@ BufferCursorSpriteCol: ds  2
 
 ListOfMonstersToPut:
   ;monsternr|amount|           x            , y
-  db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
-  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
-  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
-
-  db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
-  db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
-  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
+ListOfMonstersToPutMonster1:  db  001 | dw 100 | db 012 + (01*08), 056 + (00*16) + 16
+ListOfMonstersToPutMonster2:  db  002 | dw 500 | db 012 + (00*08), 056 + (01*16) + 16
+ListOfMonstersToPutMonster3:  db  003 | dw 600 | db 012 + (00*08), 056 + (03*16) + 16
+ListOfMonstersToPutMonster4:  db  004 | dw 700 | db 012 + (01*08), 056 + (04*16) + 16
+ListOfMonstersToPutMonster5:  db  005 | dw 800 | db 012 + (01*08), 056 + (06*16) + 16
+ListOfMonstersToPutMonster6:  db  006 | dw 900 | db 012 + (00*08), 056 + (07*16) + 16
 
 ListOfMonstersToPutMonster7:   db  001 | dw 001 | db 012 + (27*08), 056 + (00*16) + 16
 ListOfMonstersToPutMonster8:   db  000 | dw 000 | db 012 + (26*08), 056 + (01*16) + 16

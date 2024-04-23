@@ -1,4 +1,9 @@
-curse animatie helemaal aan het eind geeft een bug ?
+bij release promo start discussie:
+obsonet, gr8net, Denyonet ... nowind ?
+
+check mogelijkheid om te retreaten als je geen kasteel meer hebt EN/OF 
+aangevallen wordt IN je (laatste) kasteel
+
 
 
 title screen
@@ -28,6 +33,7 @@ worldmap:
 AI
 options/settings/save menu:
 Show day/week/month
+show income+wood/ore per day
 1 save game
 2 load game
 3 main menu

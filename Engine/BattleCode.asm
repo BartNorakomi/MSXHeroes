@@ -1337,6 +1337,7 @@ CalculateXpGainedRightPlayer:
   call  CalculateXpGainedLeftPlayer.CalculateXpGained
   pop   de
   add   hl,de
+  add   hl,hl                           ;WE DOUBLE THE XP GAINED (balance patch)
 
   ld    ix,(HeroThatGetsAttacked)       ;defending hero
   call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
@@ -1401,6 +1402,7 @@ CalculateXpGainedLeftPlayer:
   call  .CalculateXpGained
   pop   de
   add   hl,de
+  add   hl,hl                           ;WE DOUBLE THE XP GAINED (balance patch)
   
   ld    ix,(plxcurrentheroAddress)      ;defending hero
   call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
@@ -1434,6 +1436,8 @@ CalculateXpGainedWhenRightPlayerIsNeutralMonster:
   ld    h,0
   ld    l,a
   call  MultiplyHlWithDE                ;Out: HL = result
+
+  add   hl,hl                           ;WE DOUBLE THE XP GAINED (balance patch)
 
   ld    ix,(plxcurrentheroAddress)      ;defending hero
   call  AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
@@ -1979,6 +1983,8 @@ CheckRightClickToDisplayInfo:
   ld    a,126
   .NoOverFlowRight:
 
+  res   0,a
+
   push  af                              ;store x window
 
 	srl		a				                        ;/2
@@ -2004,6 +2010,8 @@ CheckRightClickToDisplayInfo:
   jr    c,.NoOverFlowBottom
   ld    a,113
   .NoOverFlowBottom:
+
+  res   0,a
 
   push  af                              ;store y window
 
@@ -2053,10 +2061,10 @@ CheckRightClickToDisplayInfo:
 
   ex    af,af'
   pop   af                              ;y window
-  add   a,23+16
+  add   a,23+13
   ld    d,a
   pop   af                              ;x window
-  add   a,10
+  add   a,9
   ld    e,a
   push  af
   ld    a,d   
@@ -2088,10 +2096,10 @@ CheckRightClickToDisplayInfo:
 
   ;set hp
   pop   af                              ;y window
-  add   a,48-23+9
+  add   a,48-23+12
   ld    c,a                             ;dy
   pop   af                              ;x window
-  add   a,41-10
+  add   a,41-8
   ld    b,a                             ;dx
   push  bc
 
@@ -8916,7 +8924,55 @@ SpellResurrectionRoutine:
   jp    .EndRessurectionRoutine
 
   .SetTotalAmountMonsterAtStartBattleInHL:
+  ld    de,(MonsterThatIsBeingAttacked)
+  ld    hl,Monster1
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster1+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster2
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster2+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster3
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster3+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster4
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster4+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster5
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster5+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster6
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster6+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster7+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster8
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster8+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster9
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster9+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster10
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster10+1) ;total amount for this monster
+  ret   z
+  ld    hl,Monster11
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    hl,(ListOfMonstersToPutMonster11+1) ;total amount for this monster
+  ret   z
+;  ld    hl,Monster12
+;  call  CompareHLwithDE                 ;check if this is a general attack pattern right
   ld    hl,(ListOfMonstersToPutMonster12+1) ;total amount for this monster
+;  ret   z
   ret
 
   .EndRessurectionRoutine:
