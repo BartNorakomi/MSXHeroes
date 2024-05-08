@@ -292,9 +292,9 @@ call screenoff
   cp    9
   jp    z,.DiskOptionsButtonPressed
   cp    8
-  jr    z,.RetreatButtonPressed
+  jp    z,.RetreatButtonPressed
   cp    7
-  jr    z,.SurrenderButtonPressed
+  jp    z,.SurrenderButtonPressed
   cp    6
   jr    z,.WaitButtonPressed
   cp    5
@@ -372,11 +372,23 @@ call screenoff
   ret
 
 .SurrenderButtonPressed:
+  ;check if surrender button is grey
+  ld    hl,(GenericButtonTable + (2*GenericButtonTableLenghtPerButton) + 1)
+  ld    de,$4000 + (110*128) + (178/2) - 128
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   z
+
   ld    a,1
   ld    (SurrenderButtonPressed?),a
   jp    EndSpellSelected
 
 .RetreatButtonPressed:
+  ;check if retreat button is grey
+  ld    hl,(GenericButtonTable + (1*GenericButtonTableLenghtPerButton) + 1)
+  ld    de,$4000 + (110*128) + (160/2) - 128
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ret   z
+
   ld    a,1
   ld    (RetreatButtonPressed?),a
   jp    EndSpellSelected
@@ -6196,6 +6208,76 @@ CheckSwitchToNextMonster:
   or    a
   ret   nz
 
+
+
+  ;disable surrender and retreat button if hero is in castle or has no more castles left
+  ld    hl,.RetreatButtonActive
+  ld    de,GenericButtonTable + (1*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,.SurrenderButtonActive
+  ld    de,GenericButtonTable + (2*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  call  SetCurrentActiveMOnsterInIX
+  ;which hero is casting the spell ?
+  push  ix
+  pop   hl                              ;monster we are checking
+  ld    de,Monster7
+  call  CompareHLwithDE                 ;check if this is a general attack pattern right
+  ld    ix,(plxcurrentheroAddress)      ;left hero/attacking hero
+  jr    c,.HeroFound2
+  ld    ix,(HeroThatGetsAttacked)       ;lets call this defending
+  push  ix
+  pop   hl
+  ld    a,l
+  or    h
+  jp    z,.EndDisableSurrenderAndRetreatButton  ;Neutral Monster Is active
+  .HeroFound2:
+
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    2
+  jr    z,.NotPossibleToRetreatOrSurrender
+  cp    254
+  jr    z,.NotPossibleToRetreatOrSurrender
+
+  ;at this point hero is active on map. Check if player has a castle left
+  ld    a,(CurrentActiveMonster)        ;check if monster is facing left or right
+  cp    7
+	ld		a,(whichplayernowplaying?)  
+  jr    c,.ActivePlayerFound
+  ld    a,(PlayerThatGetsAttacked)
+  .ActivePlayerFound:
+  ld    b,a
+  ld    a,(Castle1+CastlePlayer)
+  cp    b
+  jr    z,.EndDisableSurrenderAndRetreatButton ;player still has a castle to retreat to
+  ld    a,(Castle2+CastlePlayer)
+  cp    b
+  jr    z,.EndDisableSurrenderAndRetreatButton ;player still has a castle to retreat to
+  ld    a,(Castle3+CastlePlayer)
+  cp    b
+  jr    z,.EndDisableSurrenderAndRetreatButton ;player still has a castle to retreat to
+  ld    a,(Castle4+CastlePlayer)
+  cp    b
+  jr    z,.EndDisableSurrenderAndRetreatButton ;player still has a castle to retreat to
+
+  .NotPossibleToRetreatOrSurrender:  
+  ld    hl,.RetreatButtonGrey
+  ld    de,GenericButtonTable + (1*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+
+  ld    hl,.SurrenderButtonGrey
+  ld    de,GenericButtonTable + (2*GenericButtonTableLenghtPerButton)
+  ld    bc,7
+  ldir
+  .EndDisableSurrenderAndRetreatButton:
+
+
+
   ;disable wait button if monster has already waited this round
   ld    hl,.WaitButtonActive
   ld    de,GenericButtonTable + (3*GenericButtonTableLenghtPerButton)
@@ -6238,10 +6320,23 @@ CheckSwitchToNextMonster:
   ldir
   ret
 
+.RetreatButtonGrey:
+  db  %1100 0011 | dw $4000 + (110*128) + (160/2) - 128 | dw $4000 + (110*128) + (160/2) - 128 | dw $4000 + (110*128) + (160/2) - 128
+.RetreatButtonActive:
+  db  %1100 0011 | dw $4000 + (000*128) + (214/2) - 128 | dw $4000 + (000*128) + (232/2) - 128 | dw $4000 + (018*128) + (160/2) - 128
+
+.SurrenderButtonGrey:
+  db  %1100 0011 | dw $4000 + (110*128) + (178/2) - 128 | dw $4000 + (110*128) + (178/2) - 128 | dw $4000 + (110*128) + (178/2) - 128
+.SurrenderButtonActive:
+  db  %1100 0011 | dw $4000 + (018*128) + (178/2) - 128 | dw $4000 + (018*128) + (196/2) - 128 | dw $4000 + (018*128) + (214/2) - 128
+
+
+
+
 .SpellBookButtonGrey:
   db  %1100 0011 | dw $4000 + (090*128) + (214/2) - 128 | dw $4000 + (090*128) + (214/2) - 128 | dw $4000 + (090*128) + (214/2) - 128
 .SpellBookButtonActive:
-  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 | db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (036*128) + (196/2) - 128 | dw $4000 + (036*128) + (214/2) - 128 | dw $4000 + (036*128) + (232/2) - 128 ;| db BattleButton6Ytop,BattleButton6YBottom,BattleButton6XLeft,BattleButton6XRight | dw $0000 + (BattleButton6Ytop*128) + (BattleButton6XLeft/2) - 128
 
 .WaitButtonGrey:
   db  %1100 0011 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128 | dw $4000 + (072*128) + (178/2) - 128

@@ -14179,7 +14179,23 @@ SetNameCastleAndDailyIncome:
   ld    c,009
   ld    hl,TextGoldPerDay
   call  SetText
-  ret
+
+  ;Text Day:
+  ld    b,230
+  ld    c,016
+  ld    hl,.TextDay
+  call  SetText
+
+  ;set day
+  ld    bc,(Date)
+  ld    de,7                            ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  inc   hl                              ;1-7
+  ld    b,248                           ;dx
+  ld    c,016                           ;dy
+  jp    SetNumber16BitCastle
+
+  .TextDay: db "Day:",255
 
 HandleAllHeroesLearnMagicGuildSpells:
   push  iy

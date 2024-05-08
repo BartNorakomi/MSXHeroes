@@ -965,7 +965,7 @@ SetBattleButtons:
   ld    bc,2+(GenericButtonTableLenghtPerButton*9)
   ldir
 
-  call  .CheckRetreatButton
+  call  .CheckSurrenderButton
 
   .CheckAutoCombatButton:
   ;turn autocombat button off, when fighting vs human player
@@ -987,8 +987,8 @@ SetBattleButtons:
   ld    (GenericButtonTable+6*GenericButtonTableLenghtPerButton),a
   ret
 
-  .CheckRetreatButton:
-  ;turn retreat button off, when fighting vs neutral monsters (monsters without hero)
+  .CheckSurrenderButton:
+  ;turn surrender button off, when fighting vs neutral monsters (monsters without hero)
   ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
   ld    a,l
   or    h

@@ -271,10 +271,18 @@ CheckIfAPlayerGotEliminated:
   jp    nz,DisableScrollScreen  
 
   ;check which player lost a hero
-  call  .CheckWhichPlayerLostAHero      ;out hl->plxHeroStatus
-  ld    a,(hl)                          ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  call  .CheckWhichPlayerLostAHero      ;out hl->plxHero
+  push  hl
+  pop   ix
+  ld    a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+  cp    255
+  jr    z,.NoMoreHeroesLeft
+  cp    254
+  ret   nz                              ;return if player still has active heroes
+  ld    a,(ix+HeroX)                    ;if status=254 and (X,Y) = (255,255) then hero retreated or surrendered (we consider this inactive as well)
   cp    255
   ret   nz                              ;return if player still has active heroes
+  .NoMoreHeroesLeft:
 
   ;at this point player has no more heroes left. Check if player has a castle left
   ld    a,(PlayerWhoLostAHeroInBattle?)
@@ -321,15 +329,15 @@ CheckIfAPlayerGotEliminated:
 .CheckWhichPlayerLostAHero:
   ld    a,(PlayerWhoLostAHeroInBattle?)
   dec   a
-  ld    hl,pl1hero1y+HeroStatus
+  ld    hl,pl1hero1y ;+HeroStatus
   ret   z
   dec   a
-  ld    hl,pl2hero1y+HeroStatus
+  ld    hl,pl2hero1y ;+HeroStatus
   ret   z
   dec   a
-  ld    hl,pl3hero1y+HeroStatus
+  ld    hl,pl3hero1y ;+HeroStatus
   ret   z
-  ld    hl,pl4hero1y+HeroStatus
+  ld    hl,pl4hero1y ;+HeroStatus
   ret
 
 CheckIfThereIsAPlayerWhoWonTheGame:

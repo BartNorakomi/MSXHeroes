@@ -309,21 +309,43 @@ else
 endif
 endif
 
-
-
-
-
-
-
-
 DeactivateAllHeroesAndCastles:
-  ld    hl,pl1hero1y+HeroStatus
-  ld    de,lenghtherotable
-  ld    b,amountofheroesperplayer* 4    ;8 heroes per player, and 4 players in total = 32 heroes to deactivate
-  .loop:
-  ld    (hl),255
-  add   hl,de                           ;next hero
-  djnz  .loop
+  ld    a,255
+  ld    (pl1hero1y+HeroStatus),a
+  ld    (pl1hero2y+HeroStatus),a
+  ld    (pl1hero3y+HeroStatus),a
+  ld    (pl1hero4y+HeroStatus),a
+  ld    (pl1hero5y+HeroStatus),a
+  ld    (pl1hero6y+HeroStatus),a
+  ld    (pl1hero7y+HeroStatus),a
+  ld    (pl1hero8y+HeroStatus),a
+
+  ld    (pl2hero1y+HeroStatus),a
+  ld    (pl2hero2y+HeroStatus),a
+  ld    (pl2hero3y+HeroStatus),a
+  ld    (pl2hero4y+HeroStatus),a
+  ld    (pl2hero5y+HeroStatus),a
+  ld    (pl2hero6y+HeroStatus),a
+  ld    (pl2hero7y+HeroStatus),a
+  ld    (pl2hero8y+HeroStatus),a
+
+  ld    (pl3hero1y+HeroStatus),a
+  ld    (pl3hero2y+HeroStatus),a
+  ld    (pl3hero3y+HeroStatus),a
+  ld    (pl3hero4y+HeroStatus),a
+  ld    (pl3hero5y+HeroStatus),a
+  ld    (pl3hero6y+HeroStatus),a
+  ld    (pl3hero7y+HeroStatus),a
+  ld    (pl3hero8y+HeroStatus),a
+
+  ld    (pl4hero1y+HeroStatus),a
+  ld    (pl4hero2y+HeroStatus),a
+  ld    (pl4hero3y+HeroStatus),a
+  ld    (pl4hero4y+HeroStatus),a
+  ld    (pl4hero5y+HeroStatus),a
+  ld    (pl4hero6y+HeroStatus),a
+  ld    (pl4hero7y+HeroStatus),a
+  ld    (pl4hero8y+HeroStatus),a
 
   ld    a,255
   ld    (Castle1+CastlePlayer),a

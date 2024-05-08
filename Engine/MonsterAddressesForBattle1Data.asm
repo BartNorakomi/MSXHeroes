@@ -1437,7 +1437,7 @@ RandomBUnitLevel2Number:           equ 52
 RandomBUnitLevel2Damage:           equ 4
 RandomBUnitLevel2Attack:           equ 6
 RandomBUnitLevel2Defense:          equ 7
-RandomBUnitLevel2HP:               equ 17
+RandomBUnitLevel2HP:               equ 16
 RandomBUnitLevel2Speed:            equ 3
 RandomBUnitLevel2Growth:           equ 8
 RandomBUnitLevel2CostGold:         equ 120/10

@@ -1,8 +1,15 @@
+zoek bug game met rik
+
+_____________ ___ __ _
+verkopen via:
+paypalme
+evt. laten hosten op webmsx
+_____________ ___ __ _
+
+
 bij release promo start discussie:
 obsonet, gr8net, Denyonet ... nowind ?
 
-check mogelijkheid om te retreaten als je geen kasteel meer hebt EN/OF 
-aangevallen wordt IN je (laatste) kasteel
 
 
 
@@ -20,6 +27,19 @@ options menu:
 3 load game
 4 main menu
 5 return to combat
+
+worldmap:
+options/settings/save menu:
+Show day/week/month
+show income+wood/ore per day
+1 save game
+2 load game (dit kan ook via main menu)
+3 main menu
+4 autosave every 1/2/3/4 turns ? (mag weg)
+5 show newly bought buildings animation ? (mag weg)
+6 show quicktips ? (mag weg)
+
+
 
 low prio
 enemy players moeten spells kunnen gebruiken in combat

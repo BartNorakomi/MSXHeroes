@@ -6393,10 +6393,10 @@ pl2hero1xp: dw 0000
 pl2hero1move:	db	20,20
 pl2hero1mana:	dw	50,10
 pl2hero1manarec:db	5		                ;recover x mana every turn
-pl2hero1status:	db	2		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+pl2hero1status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
 ;Pl2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
-Pl2Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
-;Pl2Hero1Units:  db 1 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+;Pl2Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
+Pl2Hero1Units:  db 1 | dw 001 |      db 001 | dw 010 |      db 001 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
 .HeroStatAttack:  db 0
 .HeroStatDefense:  db 0
 .HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
@@ -6413,7 +6413,33 @@ Pl2Hero1Units:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBU
 .HeroSpecificInfo: dw HeroAddressesDrasle1
 .HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
-pl2hero2y:		ds  lenghtherotable,255
+
+
+pl2hero2y:		db	00		                ;
+.pl1hero2x:		db	04		
+.pl1hero6xp: dw 0000
+.pl1hero6move:	db	20,20
+.pl1hero6mana:	dw	10,20
+.pl1hero6manarec:db	5		                ;recover x mana every turn
+.pl1hero6status:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6Units:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttack:  db 1
+.HeroStatDefense:  db 1
+.HeroStatKnowledge:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamage:  db 1  ;amount of spell damage
+.HeroSkills:  db  33,10,1,0,0,18
+.HeroLevel: db  1
+.EarthSpells:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 0001
+.AirSpells:         db  %0000 0001
+.WaterSpells:       db  %0000 0001
+.AllSchoolsSpells:  db  %0000 0001
+.Inventory: ds  lenghtinventorytable,045
+.HeroSpecificInfo: dw HeroAddressesDrasle2
+.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;pl2hero2y:		ds  lenghtherotable,255
 pl2hero3y:		ds  lenghtherotable,255
 pl2hero4y:		ds  lenghtherotable,255
 pl2hero5y:		ds  lenghtherotable,255

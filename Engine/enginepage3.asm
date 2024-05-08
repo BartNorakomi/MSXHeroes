@@ -1,8 +1,8 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 0
-StartOfTurnMessageOn?:              equ 0
-MusicOn?:                           equ 0
+StartAtTitleScreen?:                equ 1
+StartOfTurnMessageOn?:              equ 1
+MusicOn?:                           equ 1
 Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
@@ -18,8 +18,8 @@ BattleSong: equ 3
 WorldSong:  equ 4
 
 
-WorldPointer: dw GentleAutumnMap04
-;WorldPointer: dw GentleCaveMap05
+;WorldPointer: dw GentleAutumnMap04
+WorldPointer: dw GentleCaveMap01
 ;WorldPointer: dw GentleDesertMap02
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap01
@@ -78,6 +78,25 @@ StartGame:
   ld    a,WorldSong
   ld    (ChangeSong?),a
 
+
+
+;ld a,38
+;ld (pl1hero1y),a
+;ld a,60
+;ld (pl1hero1x),a
+
+;ld a,38
+;ld (pl2hero1y),a
+;ld a,59
+;ld (pl2hero1x),a
+
+;ld a,38
+;ld (pl2hero2y),a
+;ld a,58
+;ld (pl2hero2y.pl1hero2x),a
+
+
+
   .WhenExitingCombat:
   call  CenterMousePointer
   call  SetScreenOff
@@ -98,6 +117,14 @@ StartGame:
 ;  ld    hl,Castle1 | ld (WhichCastleIsPointerPointingAt?),hl | ld a,1 | ld (EnterCastle?),a
 
 ;  ld    a,1 | ld    (SetHeroOverViewMenu?),a
+
+
+
+
+
+
+
+
 
 ;ld a,255
 ;ld (pl1hero1y+HeroStatus),a
