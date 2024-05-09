@@ -218,7 +218,7 @@ call screenoff
   call  block34                         ;CARE!!! we can only switch block34 if page 1 is in rom    
   call  ClearBattleFieldGridStartOfBattle
   call  ClearBattleText
-;  call  SetFontPage0Y212                ;set font at (0,212) page 0
+;  call  SetFontPage0Y212BattleCode                ;set font at (0,212) page 0
   call  SetFontPage0Y250                ;set font at (0,212) page 0
   call  SetBattleButtons
 ;/battle code page 2
@@ -9757,7 +9757,7 @@ SetGuardTowerRewardVButtonTable: ;status (bit 7=off/on, bit 6=button normal (unt
 .Button1XRight:         equ .Button1XLeft + 020
 
 SetGuardTowerRewardText:
-  call  SetSpireOfWisdomText.SetFontPage0Y212                ;set font at (0,212) page 0
+  call  SetFontPage0Y212BattleCode                ;set font at (0,212) page 0
 
   ld    b,060+00                        ;dx
   ld    c,051+00                        ;dy
@@ -9875,8 +9875,16 @@ SetGuardTowerButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched)
 .Button2XLeft:          equ 112
 .Button2XRight:         equ .Button2XLeft + 020
 
+SetFontPage0Y212BattleCode:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
 SetGuardTowerText:
-  call  SetSpireOfWisdomText.SetFontPage0Y212                ;set font at (0,212) page 0
+  call  SetFontPage0Y212BattleCode                ;set font at (0,212) page 0
 
   ld    b,078+00                        ;dx
   ld    c,031+00                        ;dy

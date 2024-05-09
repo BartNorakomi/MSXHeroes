@@ -921,14 +921,98 @@ SetSpireOfWisdomGraphics:
   ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+DisplayDiskMenuCOde:
+  call  SetDiskMenuButtons
+  call  SetDiskMenuGraphics               ;put gfx
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetDiskMenuGraphics               ;put gfx
+  call  CopyActivePageToInactivePageExtraRoutines
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  DisplaySpireOfWisdomCOde.CheckButtonMouseInteractionGenericButtons
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af                              ;end this routine
+  
+
+  ret
 
 
 
+SetDiskMenuButtons:
+  ld    hl,SetDiskMenuButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*02)
+  ldir
+  ret
 
+SetDiskMenuButtonTableGfxBlock:  db  DiskMenuBlock
+SetDiskMenuButtonTableAmountOfButtons:  db  02
+SetDiskMenuButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;main menu
+  db  %1100 0011 | dw $4000 + (101*128) + (000/2) - 128 | dw $4000 + (112*128) + (000/2) - 128 | dw $4000 + (123*128) + (000/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;safe game
+  db  %1100 0011 | dw $4000 + (101*128) + (128/2) - 128 | dw $4000 + (112*128) + (128/2) - 128 | dw $4000 + (123*128) + (128/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
 
+.Button1Ytop:           equ 081
+.Button1YBottom:        equ .Button1Ytop + 011
+.Button1XLeft:          equ 038
+.Button1XRight:         equ .Button1XLeft + 128
 
+.Button2Ytop:           equ 095
+.Button2YBottom:        equ .Button2Ytop + 011
+.Button2XLeft:          equ 038
+.Button2XRight:         equ .Button2XLeft + 128
 
+SetDiskMenuGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (063*128) + (030/2) - 128
+  ld    bc,$0000 + (051*256) + (144/2)
+  ld    a,DiskMenuBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+CopyActivePageToInactivePageExtraRoutines:
+	ld		a,(activepage)                  ;we will copy to the page which was active the previous frame
+  or    a
+  ld    hl,.CopyPage0toPage1
+  jp    z,docopy
+  ld    hl,.CopyPage1toPage0
+  jp    docopy
+
+.CopyPage1toPage0:
+	db		000,000,016,001
+	db		000,000,016,000
+	db		000,001,212,000
+	db		000,000,$d0	
+.CopyPage0toPage1:
+	db		000,000,016,000
+	db		000,000,016,001
+	db		000,001,212,000
+	db		000,000,$d0	
 
 
 

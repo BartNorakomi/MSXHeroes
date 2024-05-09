@@ -1,5 +1,3 @@
-zoek bug game met rik
-
 _____________ ___ __ _
 verkopen via:
 paypalme
@@ -27,6 +25,16 @@ options menu:
 3 load game
 4 main menu
 5 return to combat
+
+
+worldmap:
+options/settings/save menu:
+Show day/week/month
+show income+wood/ore per day
+1 main menu
+2 save game
+
+
 
 worldmap:
 options/settings/save menu:

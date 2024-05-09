@@ -1849,8 +1849,17 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-; block $bd - &?? VGM
-usas2repBlock:  equ   $bd
+;
+; block $bd - be
+;
+DiskMenuBlock:  equ   $bd
+phase	$4000
+  incbin "..\grapx\DiskMenu\DiskMenu.SC5",7,134 * 128      ;134 lines
+	ds		$c000-$,$ff
+dephase
+
+; block $bf - &?? VGM
+usas2repBlock:  equ   $bf
 phase	$0000
 	incbin "usas2.rep"
 ;	ds		$56*RomBlockSize-$,$ff

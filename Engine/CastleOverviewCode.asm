@@ -1279,9 +1279,15 @@ HudCode:
   jp    z,ThirdCastleWindowClicked
   cp    03
   jp    z,CheckCastleArrowDown
-
   cp    02
   jp    z,EndTurn
+  cp    01
+  jp    z,DiskMenu
+  ret
+
+DiskMenu:
+  ld    a,3
+  ld    (DiskMenuClicked?),a  
   ret
 
 EndTurn:
@@ -11556,9 +11562,31 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
   call  .CheckAddCreaturesToVisitingHero
   jr    nc,.UnitsAdded                  ;not carry=units added to hero. carry=no visiting hero, no empty slots or no similar creatures in slots
+
+  ;at this point no hero is present in town, show message unable to buy without hero
+
+  ;clear resources
+  ld    hl,$4000 + (132*128) + (160/2) - 128
+  ld    de,$0000 + (067*128) + (080/2) - 128
+  ld    bc,$0000 + (041*256) + (096/2)
+  ld    a,LevelUpBlock          ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  call  SwapAndSetPage                  ;swap and set page
+  .WaitTriggerPressed:
+  call  PopulateControls                ;read out keys
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	ld		a,(NewPrContr)
+  and   %0011 0000
+  jr    z,.WaitTriggerPressed
   jp    ExitSingleUnitRecruitWindow
-  .UnitsAdded:
-  
+
+
+
+  .UnitsAdded:  
   call  SetResourcesCurrentPlayerinIX
   ;gold
   ld    l,(ix+0)
@@ -15443,6 +15471,4 @@ SetResourcesPlayer:
   ld    h,(ix+9)
   call  SetNumber16BitCastle            ;in hl=number, b=dx, c=dy  
   ret
-
-
 

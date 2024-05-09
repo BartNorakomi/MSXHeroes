@@ -10,6 +10,7 @@ LevelEngine:
 ;.kut: jp .kut
 
   call  HandleAIWorldMap
+  call  DisplayDiskMenu                 ;Show gfx for disk menu on the adventure map when clicked in the hud
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
   call  DisplayChestFound               ;Show gfx for chest found on the adventure map
@@ -477,6 +478,24 @@ InterruptHandler:
  
   pop   af 
   ei
+  ret
+
+DisplayDiskMenu:
+  ld    a,(DiskMenuClicked?)
+  dec   a
+  ret   m
+  ld    (DiskMenuClicked?),a
+  jp    nz,DisableScrollScreen
+
+  ld    a,1
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    hl,DisplayDiskMenuCOde
+  call  EnterSpecificRoutineInExtraRoutines
+
+	ld		a,3					                    ;update hud
+	ld		(SetHeroArmyAndStatusInHud?),a
   ret
 
 HandleAIWorldMap:
@@ -1964,7 +1983,7 @@ CheckHeroCollidesWithMonster:
   ld    a,(hl)
   cp    192
   ret   nc                              ;tilenr. 192 and up are top parts of objects
-  cp    76
+  cp    76                              ;tilenr. 76=guard tower
   jr    z,.CheckIfGuardTowerJustDied
   cp    128
   ret   c                               ;tilenr. 128 - 224 are creatures
