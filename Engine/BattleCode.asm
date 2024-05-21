@@ -224,6 +224,10 @@ call screenoff
 ;/battle code page 2
 
   call  BuildUpBattleFieldAndPutMonsters
+
+  ld    a,BattleSong
+  ld    (ChangeSong?),a
+
   .engine:
 ;  ld    a,(activepage)
 ;  call  Backdrop.in
@@ -854,6 +858,9 @@ SurrenderButtonPressed:
   call  HeroFledSurrendering
   pop   af                                ;pop the call to this routine
   pop   af                                ;back to game
+
+  ld    a,StopSong
+  ld    (ChangeSong?),a
   ret
 
 .RestoreBackGround:
@@ -1106,6 +1113,9 @@ RetreatButtonPressed:
   call  HeroFledRetreating
   pop   af                                ;pop the call to this routine
   pop   af                                ;back to game
+
+  ld    a,StopSong
+  ld    (ChangeSong?),a
   ret
 
 SetRetreatButtons:
@@ -1530,6 +1540,9 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
 
+  ld    a,StopSong
+  ld    (ChangeSong?),a
+
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
   call  SwapAndSetPage                  ;swap and set page 1  
@@ -1651,6 +1664,9 @@ CheckVictoryOrDefeat:
   ld    a,(ShowExplosionSprite?)      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   or    a
   ret   nz
+
+  ld    a,StopSong
+  ld    (ChangeSong?),a
   
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
@@ -6211,6 +6227,11 @@ CheckSwitchToNextMonster:
 
 
   ;disable surrender and retreat button if hero is in castle or has no more castles left
+  ld    hl,(HeroThatGetsAttacked)       ;lets call this defending
+  ld    a,l
+  or    h
+  jp    z,.EndDisableSurrenderAndRetreatButton  ;Ignore this routine when fighting vs Neutral Monster
+
   ld    hl,.RetreatButtonActive
   ld    de,GenericButtonTable + (1*GenericButtonTableLenghtPerButton)
   ld    bc,7

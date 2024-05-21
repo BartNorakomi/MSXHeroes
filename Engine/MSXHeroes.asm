@@ -1861,7 +1861,7 @@ dephase
 ; block $bf - &?? VGM
 usas2repBlock:  equ   $bf
 phase	$0000
-	incbin "usas2.rep"
+	incbin "msxlegends.rep"
 ;	ds		$56*RomBlockSize-$,$ff
 dephase
 

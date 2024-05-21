@@ -1,8 +1,15 @@
+Er moet een snelheidsmeter in de battle zitten.
+movement, bullets en misschien melee attacks mogen allemaal sneller
+
 _____________ ___ __ _
 verkopen via:
 paypalme
 evt. laten hosten op webmsx
 _____________ ___ __ _
+
+
+bij release niet aangeven min: 1 euro
+maar gewoon donate=buy, no matter the amount. just donate what you are willing/able to spend
 
 
 bij release promo start discussie:
@@ -17,6 +24,8 @@ options:
 2 frequency: 50/60
 3 show newly bought buildings animation ?
 4 show quicktips ingame ?
+for emulation purpose:
+5 music speed (50%-100%)
 
 battle:
 options menu: 
@@ -50,6 +59,7 @@ show income+wood/ore per day
 
 
 low prio
+guard tower reward mag een gold bag icoontje bij
 enemy players moeten spells kunnen gebruiken in combat
 autocombat moet een sprite worden
 footman meervoud wordt footmans in battle ipv footmen. naam wijzigen

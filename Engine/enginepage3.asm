@@ -13,10 +13,11 @@ DisplayNumbers1to6?:                equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 DiskMenuClicked?:                   db  0
 
+StopSong:   equ 255
 TitleSong:  equ 5
-CastleSong: equ 2
-BattleSong: equ 3
-WorldSong:  equ 4
+CastleSong: equ 1
+BattleSong: equ 6
+WorldSong:  equ 2
 
 
 ;WorldPointer: dw GentleAutumnMap04
@@ -2878,7 +2879,7 @@ ChangeSong?:  db 0
 ReloadAllObjectsInVram?:  db  0           
 SetNewBuilding?:  db  0                 ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls
 EnterCastle:
-  ld    a,CastleSong
+  ld    a,StopSong
   ld    (ChangeSong?),a
 
   ld    a,2
@@ -2903,6 +2904,10 @@ EnterCastle:
 ;  call  CastleOverviewMagicGuildCode
 ;  call  CastleOverviewMarketPlaceCode
 ;  call  CastleOverviewTavernCode
+
+  ld    a,StopSong
+  ld    (ChangeSong?),a
+  halt                                  ;halt, so that music can properly stop
 
   call  SetSpatInGame
 
@@ -2986,7 +2991,7 @@ SwapButDontSetPage:
   ret
 
 EnterCombat:
-  ld    a,BattleSong
+  ld    a,StopSong
   ld    (ChangeSong?),a
 
   ld    a,3
@@ -3005,6 +3010,7 @@ EnterCombat:
 
   call  SetSpatInCastle
   call  InitiateBattle
+  halt                                  ;halt, so that music can properly stop (in case of surrender/retreat)
   call  SetSpatInGame
 
   pop   af

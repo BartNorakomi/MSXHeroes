@@ -97,6 +97,7 @@ RePlayer_Tick:
   ld    a,(ChangeSong?)
   or    a
   jr    nz,.ChangeSong
+  .DontChangeSong:
 
 	ld a,(RePlayer_playing)
 	and a
@@ -135,12 +136,19 @@ RePlayer_Tick:
 	ret
 
   .ChangeSong:
+  ld    hl,CurrentSongBeingPlayed
+  cp    (hl)
+  jr    z,.DontChangeSong
+
+  or    a
+  jp    m,.StopSong
+
   ;randomize worldsong
   cp    WorldSong
   jr    nz,.EndCheckRandomizeWorldSong
   ld    a,r
-  and   7
-  inc   a
+  and   3
+  add   a,2
 
   cp    BattleSong
   jr    z,.battlesoundfoundbutnotinbattle
@@ -167,7 +175,12 @@ RePlayer_Tick:
   ld    (ChangeSong?),a
   ret
 
-
+  .StopSong:
+  call  RePlayer_Stop
+  xor   a
+  ld    (ChangeSong?),a
+  ret
+  
 
 
 ; hl = sound data

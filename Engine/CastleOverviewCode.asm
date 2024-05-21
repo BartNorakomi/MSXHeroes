@@ -14485,6 +14485,9 @@ CastleOverviewCode:                     ;in: iy-castle
   call  docopy
   call  HandleAllHeroesLearnMagicGuildSpells
 
+  ld    a,CastleSong
+  ld    (ChangeSong?),a  
+
   .engine:
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
