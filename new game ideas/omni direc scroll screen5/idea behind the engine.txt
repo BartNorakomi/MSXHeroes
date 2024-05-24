@@ -1,0 +1,9 @@
+when moving the character you 'lock' 16 pixels movement.
+for 16 frames you scroll each frame in the same direction.
+1 pixel per frame.
+During these 16 frames the new screen is build up by simply copying tiles (from rom->vram or vram->vram, some tiles are just pure white and can be copied with a fill instruction)
+
+main character could be copied with copy instruction at vblank (copy from rom->active page) (character is the within a white rectangle so you can copy the rectangle in total)
+enemies are hardware sprites
+
+
