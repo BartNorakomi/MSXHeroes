@@ -3,8 +3,8 @@
 MSXHeroes:
 ;
 ; MSXHeroes - ROM version
-;
-	dw		"AB",init,0,0,0,0,0,0
+
+	dw		"AB",init,0,0,0,0,0,0,"ASCII16X"
 ;
 ; this is one-time only... can be overwritten with game stuff after it's done
 ;
@@ -246,7 +246,7 @@ initMem.length:	equ	$-initMem
 ;
 
 ;
-init:		
+init:
   ld    a,13        ;is zwart in onze huidige pallet
 	ld		($f3e9),a	  ;foreground color 
 	ld		($f3ea),a	  ;background color 
@@ -432,23 +432,20 @@ enlength:	Equ	$-engine
 ;
 	ds		$c000-$,$ff		
 
+; block $02 - save files
+	ds		$4000
+
+; block $03 - save files
+	ds		$4000
+
 ;
-; block $02
+; block $04
 ;
-Loaderblock:  equ $02
+Loaderblock:  equ $04
 phase	$4000
 	include	"loader.asm"	
 endLoader:
 	ds		$8000-$,$ff		
-dephase
-
-;
-; block $03 - 04
-;
-BattleFieldWinterBlock:  equ   $03
-phase	$4000
-  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
 dephase
 
 ;
@@ -1858,8 +1855,17 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-; block $bf - &?? VGM
-usas2repBlock:  equ   $bf
+;
+; block $bf - c0
+;
+BattleFieldWinterBlock:  equ   $bf
+phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
+	ds		$c000-$,$ff
+dephase
+
+; block $c1 - &?? VGM
+usas2repBlock:  equ   $c1
 phase	$0000
 	incbin "msxlegends.rep"
 ;	ds		$56*RomBlockSize-$,$ff

@@ -1,8 +1,8 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 1
-StartOfTurnMessageOn?:              equ 1
-MusicOn?:                           equ 1
+StartAtTitleScreen?:                equ 0
+StartOfTurnMessageOn?:              equ 0
+MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
@@ -108,6 +108,12 @@ StartGame:
   call  LoadAllObjectsInVram            ;Load all objects in page 2 starting at (0,64)
   call  SetScreenOff
   call  LoadHud                         ;load the hud and movement arrows (all the windows and frames and buttons etc) in page 0 and copy it to page 1
+
+
+  call  Write2FlashObjectLayer
+
+
+
   call  SetInterruptHandler             ;set Vblank
   call  SetAllSpriteCoordinatesInPage2  ;sets all PlxHeroxDYDX (coordinates where sprite is located in page 2)
   call  SetAllHeroPosesInVram           ;Set all hero poses in page 2 in Vram
@@ -147,6 +153,7 @@ StartGame:
 ;  ld    (Castle2+CastlePlayer),a
 ;  ld    (Castle3+CastlePlayer),a
 ;  ld    (Castle4+CastlePlayer),a
+
 
 
 
