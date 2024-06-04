@@ -3392,6 +3392,15 @@ SetPage:                                ;in a->x*32+31 (x=page)
   out   ($99),a
   ret
 
+
+
+;ASCII16-EX:
+;----------------------------------------
+;Bank #1 low: 6000h - 67FFh (6000h used)
+;Bank #1 high: 8000h - 87FFh (should recommend to use 6000h)
+;----------------------------------------
+;Bank #2 low: 7000h - 77FFh (7000h and 77FFh used)
+;Bank #2 high: 9000h - 97FFh (should recommend to use 9000h)
 block12:	
   di
 	ld		(memblocks.1),a

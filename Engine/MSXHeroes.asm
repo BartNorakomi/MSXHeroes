@@ -1872,7 +1872,10 @@ phase	$0000
 dephase
 
 
-
-
 totallenght:	Equ	$-MSXHeroes
-	ds		(8*$80000)-totallenght
+	ds		(8*$80000)-totallenght,$ff
+
+
+Upper4MB:
+	ds		(16*$80000)-Upper4MB,$fe
+

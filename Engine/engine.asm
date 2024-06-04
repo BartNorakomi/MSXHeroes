@@ -113,18 +113,67 @@ LevelEngine:
 
 
 
-SectorPointedToInPage1: equ $4000
-SectorPointedToInPage2: equ $7fff
+
+
+
+; f <- z: found, nz: not found
+;DetectFlash:
+;   ld a,98H
+;   ld (40AAH),a
+;   ld a,(4020H)
+;   cp "Q"
+;   jr nz,Continue
+;   ld a,(4022H)
+;   cp "R"
+;   jr nz,Continue
+;   ld a,(4024H)
+;   cp "Y"
+;Continue:
+;   ld a,F0H
+;   ld (40AAH),a
+;   ret
+
+
+;block12:	
+  di
+	ld		(memblocks.1),a
+	ld		($6000),a
+	ei
+	ret
+
+;block34:	
+  di
+	ld		(memblocks.2),a
+	ld		($7000),a
+	ei
+	ret
+
+;block1234:	 
+  di
+	ld		(memblocks.1),a
+	ld		($6000),a
+	inc   a
+	ld		(memblocks.2),a
+	ld		($7000),a
+	ei
+	ret
+
+
+
+;  ld hl,$6000 + 256
+;  ld (hl),l     ; select bank xxx in 1st page (4000-7FFF, C000-FFFF)
 Write2FlashObjectLayer:
   ld    a,(slot.page1rom)            ;all RAM except page 1
   out   ($a8),a
-  ld    a,2                           ;set block 2
-  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
-;di
-  ;erase block 2 (each erase erases only 8kb)
-  ld    hl,SectorPointedToInPage1
-  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
-  ld    hl,SectorPointedToInPage2
+
+  ld    a,0         ;first block upper 4MB
+  ld    (6100H),a  ; select bank xxx in 1st page (4000-7FFF)
+  ;or alternatively in page 2, same result:
+;  ld    a,0         ;first block upper 4MB
+;  ld    ($6100+$4000),a  ; select bank xxx in 1st page (4000-7FFF)
+
+  ;erase sector (first 8 sectors are 8kb, all other sectors are 64kb)
+  ld    hl,$4000
   call  SectorErase                   ;erases sector (in hl=pointer to romblock)
 
   ;set object layer at $8000
@@ -132,12 +181,41 @@ Write2FlashObjectLayer:
   ld    (page1bank),a
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  call  WriteObjectLayer
+  call  WriteObjectLayerFirst8KB
+
+  ld    a,(slot.page2rom)            ;all RAM except page 2
+  out   ($a8),a
+
+;  ld    a,0         ;first block upper 4MB
+;  ld    ($7100),a  ; select bank xxx in 2nd page (8000-bFFF)
+  ;or alternatively in page 2, same result:
+  ld    a,0         ;first block upper 4MB
+  ld    ($7100+$4000),a  ; select bank xxx in 2nd page (8000-bFFF)
+
+  ;set object layer at $4000
+  ld		a,2                             ;set worldmap object layer in bank 2 at $4000
+  ld    (page2bank),a
+  out   ($fd),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 
-  .kut: jp .kut
-  
+
+
+;alleen het stuk van $b000-$bf00 gaat niet goed
+;Ja die moet dus weer via page 1 (7000H-7FFFH), want in B000H-BFFFH zit (de mirror van) het mapperregister voor page 2.
+
+
+
+  call  WriteObjectLayerSecond8KB
+  .kut3: jp .kut3  
   ret
+
+CheckEraseDone:
+  ld    hl,4000H    ; adres in sector die gewist word
+	ld    a,0FFH      ; als het klaar is moet het FFH zijn
+  Erase_Wait:
+	cp    (hl)        ; is de erase klaar?
+	ret   z          ; ja, klaar
+	jr    Erase_Wait  ; nee, nog bezig, wacht
 
 SectorErase:                          ;erases sector (in hl=pointer to romblock)
   ld    a,$aa
@@ -159,10 +237,10 @@ SectorErase:                          ;erases sector (in hl=pointer to romblock)
   ld    (hl),a
   ret
 
-WriteObjectLayer:                     ;object layer:$8000, write:$4000
+WriteObjectLayerFirst8KB:             ;object layer:$8000, write:$4000
   ld    hl,$8000                      ;address to write from
   ld    de,$4000                      ;address to write to
-  ld    b,20                          ;amount of bytes to write
+  ld    bc,$2000                      ;amount of bytes to write
 
   .loop:
   ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
@@ -172,11 +250,26 @@ WriteObjectLayer:                     ;object layer:$8000, write:$4000
   ld    a,$A0                         ; program commando
   ld    ($4AAA),a
 
-  ldi
-  djnz  .loop
+  ldi                                 ;write value to flashrom
+  jp    pe,.loop
   ret
 
+WriteObjectLayerSecond8KB:             ;object layer:$8000, write:$4000
+  ld    hl,$6000                      ;address to write from
+  ld    de,$a000                      ;address to write to
+  ld    bc,$2000                      ;amount of bytes to write
 
+  .loop:
+  ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
+  ld    ($8AAA),a
+  ld    a,$55
+  ld    ($8555),a
+  ld    a,$A0                         ; program commando
+  ld    ($8AAA),a
+
+  ldi                                 ;write value to flashrom
+  jp    pe,.loop
+  ret
 
 
 
@@ -195,6 +288,7 @@ WriteObjectLayer:                     ;object layer:$8000, write:$4000
 vblankintflag2: ds 1
 PreviousVblankIntFlag:  db  1
 page1bank:  ds  1
+page2bank:  ds  1
 vblank:
   push  bc
   push  de
