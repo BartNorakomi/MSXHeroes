@@ -1864,12 +1864,41 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
+; GLobals
+RomSize: 				equ 8*1024*1024 ;8MB
+RomBlockSize:			equ 16*1024	;16KB
+RomStartAddress:		equ $4000
+
+
+usas2sfx1repBlock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$0000
+					incbin "usas2sfx1.rep"
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
+
+usas2sfx2repBlock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$0000
+					incbin "usas2sfx2.rep"
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
+
+usas2repBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$0000
+					incbin "msxlegends.rep"
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
+
+
+
 ; block $c1 - &?? VGM
-usas2repBlock:  equ   $c1
-phase	$0000
-	incbin "msxlegends.rep"
+;usas2repBlock:  equ   $c1
+;phase	$0000
+;	incbin "msxlegends.rep"
 ;	ds		$56*RomBlockSize-$,$ff
-dephase
+;dephase
+
+
+
 
 
 totallenght:	Equ	$-MSXHeroes

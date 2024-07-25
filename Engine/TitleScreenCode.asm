@@ -195,7 +195,6 @@ TitleScreenCode:
 ;  call  RePlayer_Tick             ;music routine
 ;  call  MusicLoop
 
-
   halt
   ld    a,(framecounter)
   inc   a
@@ -1953,7 +1952,20 @@ ScenarioSelectCode:
   bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+
+  ;check if button was already hovered over, if so play sfx
+  ld    a,(ix+GenericButtonStatus)
+  and   %1111 0000
+  cp    %1010 0000
   ld    (ix+GenericButtonStatus),%1010 0011
+  ret   z
+
+;  push  iy
+  push  bc
+  ld    bc,SFX_click
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+;  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -1965,6 +1977,13 @@ ScenarioSelectCode:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+GenericButtonStatus),%1001 0011
+
+;  push  iy
+  push  bc
+  ld    bc,SFX_coin
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+;  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:

@@ -2,6 +2,7 @@
 ; Re-Play player
 ;
 	INCLUDE "MoonSound.asm"
+	INCLUDE "RePlayerSFX.asm"
 
 RePlayer_STACK_CAPACITY: equ 128
 FormatOPL4_ID: equ 1
@@ -93,6 +94,8 @@ RePlayer_Resume:
 RePlayer_Tick:
   ld    a,(slot.page12rom)             ;all RAM except page 1+2
   out   ($a8),a
+
+	call RePlayerSFX_Tick
 
   ld    a,(ChangeSong?)
   or    a
@@ -248,8 +251,6 @@ RePlayer_Tick:
 
 RePlayer_playing:
 	db 0
-RePlayer_currentBank: ;equ memblocks.2
-	 db 0
 RePlayer_stackPointer:
 	dw RePlayer_stack
 RePlayer_stack:

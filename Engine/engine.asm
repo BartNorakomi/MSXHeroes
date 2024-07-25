@@ -3301,6 +3301,11 @@ movehero:
   jp    .endmovement
   
   .animate:
+  push  bc
+  ld    bc,SFX_HeroWalking
+  call  RePlayerSFX_PlayCh1  
+  pop   bc
+
   ld    (ix+HeroStatus),001             ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
   ld    e,(ix+HeroSpecificInfo+0)       ;get hero specific info
   ld    d,(ix+HeroSpecificInfo+1)

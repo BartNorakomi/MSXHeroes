@@ -1,8 +1,8 @@
 phase	$c000
 
 StartAtTitleScreen?:                equ 0
-StartOfTurnMessageOn?:              equ 0
-MusicOn?:                           equ 0
+StartOfTurnMessageOn?:              equ 1
+MusicOn?:                           equ 1
 Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
@@ -14,8 +14,9 @@ ShowNewlyBoughtBuildingFadingIn?:   db  1
 DiskMenuClicked?:                   db  0
 
 StopSong:   equ 255
-TitleSong:  equ 5
+TitleSong:  equ 1
 CastleSong: equ 1
+
 BattleSong: equ 6
 WorldSong:  equ 2
 
@@ -110,7 +111,7 @@ StartGame:
   call  LoadHud                         ;load the hud and movement arrows (all the windows and frames and buttons etc) in page 0 and copy it to page 1
 
 
-  call  Write2FlashObjectLayer
+; call  Write2FlashObjectLayer
 
 
 
@@ -171,7 +172,7 @@ LoadSamplesAndPlaySong0:
 	and   a
 	ret   nz
 
-  xor   a
+  ld    a,0
   ld    (CurrentSongBeingPlayed),a
   call  RePlayer_Stop
   ld    bc,0                          ;track nr
@@ -189,6 +190,7 @@ VGMRePlay:
   
   ld    a,FormatOPL4_ID
   call  RePlayer_Detect               ;detect moonsound
+  call  RePlayerSFX_Initialize
   ld a,MusicOn?	;debug function to skip sample load
   and A
   ret z
@@ -197,6 +199,7 @@ VGMRePlay:
   ld    hl,$8000+1
   call  RePlayer_Play                 ;bc = track number, ahl = sound data (after format ID, so +1)
   call	RePlayer_Tick
+  call	RePlayer_Stop
   ret
 
 Main_Loop:
@@ -4876,9 +4879,13 @@ slot:
 .page1rom:	                rb    1
 .page2rom:	                rb    1
 .page12rom:	                rb    1
+
 memblocks:
 .1:			                    rb    1
 .2:			                    rb    1
+
+Replayer_Currentbank: equ $-1
+
 ;.3:			                    rb    1
 ;.4:			                    rb    1
 
