@@ -536,7 +536,10 @@ DisplayEnemyHeroStatsWindowCode:
   call  .Set16x30HeroIcon                ;sets hero icon in the Army Window
   ld    ix,(EnemyHeroThatPointerIsOn)
   call  SetArmyIconsAndAmount.army      ;sets hero's army in the Army Window
-  
+
+  ld    bc,SFX_ShowEnemyHeroStats
+  call  RePlayerSFX_PlayCh1
+
   .engine:
   call  PopulateControls                ;read out keys
 
@@ -3715,6 +3718,9 @@ Set16x30HeroIconAtHeroOverviewCode:
 HeroOverviewCode:
 call screenon
 
+  ld    bc,SFX_HeroOverviewMenu
+  call  RePlayerSFX_PlayCh1
+
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
 
@@ -4195,7 +4201,18 @@ CheckButtonMouseInteraction:
   bit   5,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   jr    nz,MenuOptionSelected           ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+;  ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+
+  bit   6,(ix+HeroOverviewWindowButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh2
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -4207,6 +4224,15 @@ CheckButtonMouseInteraction:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+
+;  push  af
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+;  pop   af
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:

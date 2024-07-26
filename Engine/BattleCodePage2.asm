@@ -3143,7 +3143,6 @@ HandleSpellBook:
   .engine:
   call  PopulateControls                ;read out keys
 
-
   ;handle interaction mouse - elemental buttons (4 buttons on the left side)
   ld    ix,BattleSpellBookButtonTable
   ld    iy,ButtonTableSpellBookSYSX_Water
@@ -3377,6 +3376,12 @@ HandleSpellBook:
   bit   6,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   ret   nz
   ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   jp    SetSpellExplanation             ;when first time hovering over a button, show the spell explanation
 
   .MouseOverButtonAndSpacePressed:
@@ -3388,9 +3393,17 @@ HandleSpellBook:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
   pop   af                              ;no need to check the other buttons
   ret
-  
+
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
   pop   af                              ;no need to check the other buttons
@@ -3489,6 +3502,13 @@ CheckButtonMouseInteraction4ElementalButtons:
   bit   6,(ix+HeroOverviewWindowButtonStatus) ;status (bit 7=off, bit 6=mouse hover over, bit 5=mouse over and clicked, bit 4-0=timer)
   ret   nz
   ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -3500,6 +3520,12 @@ CheckButtonMouseInteraction4ElementalButtons:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -4194,7 +4220,7 @@ HandleSpellCast:
 ;earth
 ;earthbound 1    6                                           50% less speed
 ;Plate Armor     2     5                                           +5 defense
-;resurrection    3     20                                          Reanimates 60 + (power×5) HP of killed friendly living creatures for the current battle/permanently.
+;resurrection    3     20                                          Reanimates 60 + (powerï¿½5) HP of killed friendly living creatures for the current battle/permanently.
 ;earthshock      4     16        50+(powerx10)   3 hex tiles wide
 
 ;fire

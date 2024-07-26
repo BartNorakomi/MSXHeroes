@@ -1,9 +1,9 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 0
+StartAtTitleScreen?:                equ 1
 StartOfTurnMessageOn?:              equ 1
 MusicOn?:                           equ 1
-Music50PercentSpeed?:               equ 0
+Music50PercentSpeed?:               equ 1
 
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
@@ -22,8 +22,8 @@ WorldSong:  equ 2
 
 
 ;WorldPointer: dw GentleAutumnMap04
-;WorldPointer: dw GentleCaveMap01
-WorldPointer: dw GentleDesertMap02
+WorldPointer: dw GentleCaveMap01
+;WorldPointer: dw GentleDesertMap02
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap01
 ;WorldPointer: dw GentleWinterMap02
@@ -3037,6 +3037,8 @@ EnterCombat:
 	ld		(mouseclicky),a                 ;mouse pointer y in tiles
   ld    (framecounter),a
 	ld		(movehero?),a	
+  ld    (WhichHudButtonClicked?),a
+  ld    (MenuOptionSelected?),a
 
   xor   a                               ;reset vertical offset register (battlescreen is 16 pixels shifted down)
   di

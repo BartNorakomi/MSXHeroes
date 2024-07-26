@@ -498,6 +498,9 @@ TextPlayerEliminated2:
 
 
 DisplaySpireOfWisdomCOde:
+  ld    bc,SFX_SpireOfWisdom
+  call  RePlayerSFX_PlayCh1  
+
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a  
   ld    ix,GenericButtonTable
@@ -509,7 +512,6 @@ DisplaySpireOfWisdomCOde:
   call  SwapAndSetPage                  ;swap and set page
   call  SetSpireOfWisdomGraphics               ;put gfx
   call  SetSpireOfWisdomText
-
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -525,7 +527,7 @@ DisplaySpireOfWisdomCOde:
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  .CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -662,104 +664,6 @@ DisplaySpireOfWisdomCOde:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
   ret
-
-
-
-
-
-
-  .CheckButtonMouseInteractionGenericButtons:
-  ld    b,(ix+GenericButtonAmountOfButtons)
-  ld    de,GenericButtonTableLenghtPerButton
-
-  .loop2:
-  call  .check
-  add   ix,de
-  djnz  .loop2
-  ret
-  
-  .check:
-  bit   7,(ix+GenericButtonStatus)        ;check if button is on/off
-  ret   z                               ;don't handle button if this button is off
-  
-  ld    a,(spat+0)                      ;y mouse
-  cp    (ix+GenericButtonYtop)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonYbottom)
-  jr    nc,.NotOverButton
-  ld    a,(spat+1)                      ;x mouse
-
-  add   a,06
-  
-  cp    (ix+GenericButtonXleft)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonXright)
-  jr    nc,.NotOverButton
-  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-
-  ld    a,(Controls)
-  bit   4,a                             ;check trigger a / space
-  jr    nz,.MouseOverButtonAndSpacePressed
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
-  .MouseHoverOverButton:
-  ld    (ix+GenericButtonStatus),%1010 0011
-  ret
-
-  .MouseOverButtonAndSpacePressed:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
-	ld		a,(NewPrContr)
-  bit   4,a                             ;check trigger a / space
-  jr    z,.MouseHoverOverButton
-
-  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-  
-  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-
-  .NotOverButton:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.buttonIsStillLit
-  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  ret   z
-  .buttonIsStillLit:
-  ld    (ix+GenericButtonStatus),%1100 0011
-  ret
-
-  .MenuOptionSelected:
-  pop   af                                ;no need to check the other buttons
-  ld    (ix+GenericButtonStatus),%1010 0011
-  scf                                     ;button has been clicked
-
-  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    (MenuOptionSelected?),a
-  ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   .VButton:
   pop   af                              ;end DisplayLevelUpCode
@@ -944,7 +848,7 @@ DisplayDiskMenuCOde:
   ret   nz
 
   ld    ix,GenericButtonTable
-  call  DisplaySpireOfWisdomCOde.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -1006,12 +910,12 @@ CopyActivePageToInactivePageExtraRoutines:
 .CopyPage1toPage0:
 	db		000,000,016,001
 	db		000,000,016,000
-	db		000,001,212,000
+	db		000,001,212-16,000
 	db		000,000,$d0	
 .CopyPage0toPage1:
 	db		000,000,016,000
 	db		000,000,016,001
-	db		000,001,212,000
+	db		000,001,212-16,000
 	db		000,000,$d0	
 
 

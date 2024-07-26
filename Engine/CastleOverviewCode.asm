@@ -11,10 +11,7 @@
 ;  call  DisplayScrollCode
 ;  call  DisplayChestCode
 ;  call  HeroLevelUpCode
-;  call  ShowEnemyStats
-;  call  ShowEnemyHeroStats
 ;  call  DisplayLearningStoneCode
-;  call  DisplaySpireOfWisdomCode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                           WARNING                      ;;
@@ -1234,7 +1231,7 @@ HudCode:
 
   ;handle all hud buttons
 ;  ld    ix,GenericButtonTable3
-;  call  CheckButtonMouseInteractionGenericButtons
+;  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckButtonClicked               ;in: carry=button clicked, b=button number
 
   call  checkcurrentplayerhuman         ;out zero flag, current player is computer
@@ -3050,6 +3047,9 @@ HeroLevelUpCode:
   call  SetPrimairySkillUpIcon          ;which primairy skill does the hero get ?
   call  SetLevelUpText
 
+  ld    bc,SFX_HeroLevelUp
+  call  RePlayerSFX_PlayCh1  
+
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -3065,7 +3065,7 @@ HeroLevelUpCode:
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -4306,6 +4306,8 @@ call ScreenOn
   call  SetChestGraphics                ;put gfx
   call  SetChestText
 
+  ld    bc,SFX_ChestFound
+  call  RePlayerSFX_PlayCh1  
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -4321,7 +4323,7 @@ call ScreenOn
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -4604,6 +4606,9 @@ DisplayLearningStoneCOde:
   call  SetLearningStoneGraphics               ;put gfx
   call  SetLearningStoneText
 
+  ld    bc,SFX_LearningStone
+  call  RePlayerSFX_PlayCh1  
+
   ld    ix,(plxcurrentheroAddress)      ;defending hero
   ld    hl,1000
   call  .AddXPBoostFromLearning          ;in: hl=xp, ix=player hero, out: hl=xp with boost from learning
@@ -4706,12 +4711,14 @@ TextLearningStone3:
 
 DisplayScrollCode:
   call  SetScrollVButton
-  
   call  SetScrollGraphics               ;put gfx
   call  SetScrollText
   call  SwapAndSetPage                  ;swap and set page
   call  SetScrollGraphics               ;put gfx
   call  SetScrollText
+
+  ld    bc,SFX_ScrollFound
+  call  RePlayerSFX_PlayCh1  
 
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
@@ -4728,7 +4735,7 @@ DisplayScrollCode:
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -4916,7 +4923,7 @@ DisplayQuickTipsCode:
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -5065,7 +5072,8 @@ call ScreenOn
 ;  call  SwapAndSetPage                  ;swap and set page
 ;  call  SetPlayerStartTurnGraphics     ;put gfx at (24,30)
 ;  call  SetPlayerStartTurnText
-
+  ld    bc,SFX_StartOfTurn
+  call  RePlayerSFX_PlayCh1  
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -5081,7 +5089,7 @@ call ScreenOn
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
@@ -5180,6 +5188,9 @@ PlayerStartTurnVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouch
 
 
 TradeMenuCode:
+  ld    bc,SFX_TradeMenu
+  call  RePlayerSFX_PlayCh1
+
 	ld		a,3					                    ;put new heros in windows (page 0 and page 1) 
 ;	ld		(SetHeroArmyAndStatusInHud?),a
 	ld		(ChangeManaAndMovement?),a  
@@ -5223,7 +5234,7 @@ TradeMenuCode:
 
   ;Trading Heroes Inventory buttons
   ld    ix,GenericButtonTable2
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClickedTradingHeroesInventory             ;in: carry=button clicked, b=button number
 
@@ -5252,7 +5263,7 @@ TradeMenuCode:
 
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClickedTradingHeroesArmy             ;in: carry=button clicked, b=button number
 
@@ -7350,7 +7361,7 @@ CastleOverviewTavernCode:
 
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
 
@@ -7379,7 +7390,7 @@ CastleOverviewTavernCode:
 
   ;tavern buttons
   ld    ix,GenericButtonTable2 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckTavernButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
@@ -8652,6 +8663,10 @@ CastleOverviewTavernCode:
   call  SetTavernHeroesTablePlayerinIX
   ld    a,(ix+TavernHero3)              ;recruit hero 3
   pop   ix
+  or    a
+  ret   z                               ;return if there is no hero in this slot
+  call  .Reduce2000Gold                 ;Hero cost = 2000 gold
+  ret   c                               ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8664,6 +8679,10 @@ CastleOverviewTavernCode:
   call  SetTavernHeroesTablePlayerinIX
   ld    a,(ix+TavernHero2)              ;recruit hero 2
   pop   ix
+  or    a
+  ret   z                               ;return if there is no hero in this slot
+  call  .Reduce2000Gold                 ;Hero cost = 2000 gold
+  ret   c                               ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8676,6 +8695,10 @@ CastleOverviewTavernCode:
   call  SetTavernHeroesTablePlayerinIX
   ld    a,(ix+TavernHero1)              ;recruit hero 1
   pop   ix
+  or    a
+  ret   z                               ;return if there is no hero in this slot
+  call  .Reduce2000Gold                 ;Hero cost = 2000 gold
+  ret   c                               ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8776,13 +8799,16 @@ CastleOverviewTavernCode:
   db    1,1,2,1                         ;necromancer (Necromancy)
   
   .Reduce2000Gold:
+  push  af
   call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
   ;gold
   ld    l,(ix+0)
   ld    h,(ix+1)                        ;gold
   ld    de,2000
-  xor   a
+  or    a
+  pop   af
   sbc   hl,de
+  ret   c
   ld    (ix+0),l
   ld    (ix+1),h                        ;gold   
   ret
@@ -8804,9 +8830,6 @@ CastleOverviewTavernCode:
   inc   a
   ld    (ix+HeroX),a                    ;set hero x
   ret
-
-
-
 
 .CheckIsHeroAHeroThatHasFled?:
   ld    c,a                             ;Tavern Hero HeroNumber
@@ -8851,7 +8874,6 @@ CastleOverviewTavernCode:
 
   call  .SetYX
   call  .FaceHeroLookingDown
-  call  .Reduce2000Gold                 ;Hero cost = 2000 gold
 
   pop   af
   ret  
@@ -9736,7 +9758,7 @@ CastleOverviewMarketPlaceCode:
 
   ;market place buttons
   ld    ix,GenericButtonTable 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
 
@@ -10483,7 +10505,7 @@ CastleOverviewMagicGuildCode:
 
   ;magic skill icons in the magic guild
   ld    ix,GenericButtonTable 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
@@ -10794,84 +10816,6 @@ SetGenericButtons:                      ;put button in mirror page below screen,
 
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
-  ret
-
-CheckButtonMouseInteractionGenericButtons:
-  ld    b,(ix+GenericButtonAmountOfButtons)
-  ld    de,GenericButtonTableLenghtPerButton
-
-  .loop:
-  call  .check
-  add   ix,de
-  djnz  .loop
-  ret
-  
-  .check:
-  bit   7,(ix+GenericButtonStatus)        ;check if button is on/off
-  ret   z                               ;don't handle button if this button is off
-  
-  ld    a,(spat+0)                      ;y mouse
-  cp    (ix+GenericButtonYtop)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonYbottom)
-  jr    nc,.NotOverButton
-  ld    a,(spat+1)                      ;x mouse
-
-  add   a,06
-  
-  cp    (ix+GenericButtonXleft)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonXright)
-  jr    nc,.NotOverButton
-  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-
-  ld    a,(Controls)
-  bit   4,a                             ;check trigger a / space
-  jr    nz,.MouseOverButtonAndSpacePressed
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
-  .MouseHoverOverButton:
-  ld    (ix+GenericButtonStatus),%1010 0011
-  ret
-
-  .MouseOverButtonAndSpacePressed:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
-	ld		a,(NewPrContr)
-  bit   4,a                             ;check trigger a / space
-  jr    z,.MouseHoverOverButton
-
-  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-  
-  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-
-  .NotOverButton:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.buttonIsStillLit
-  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  ret   z
-  .buttonIsStillLit:
-  ld    (ix+GenericButtonStatus),%1100 0011
-  ret
-
-  .MenuOptionSelected:
-  pop   af                                ;no need to check the other buttons
-  ld    (ix+GenericButtonStatus),%1010 0011
-  scf                                     ;button has been clicked
-
-
-  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    (MenuOptionSelected?),a
   ret
 
 MagicGuildButtonTableGfxBlock:  db  SpellBookGraphicsBlock
@@ -11200,7 +11144,7 @@ CastleOverviewRecruitCode:
 
   ;VisitingAndDefendingHeroesAndArmy buttons
   ld    ix,GenericButtonTable 
-  call  CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  CastleOverviewTavernCode.CheckButtonClickedVisitingAndDefendingHeroesAndArmy             ;in: carry=button clicked, b=button number
 
@@ -11458,7 +11402,17 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   bit   4,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+RecruitButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+RecruitButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -11470,6 +11424,12 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+RecruitButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -12099,7 +12059,17 @@ CheckButtonMouseInteractionRecruitButtons:
   bit   4,(ix+RecruitButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+RecruitButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+RecruitButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -12111,8 +12081,14 @@ CheckButtonMouseInteractionRecruitButtons:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+RecruitButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
-  
+
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
   ld    (ix+RecruitButtonStatus),%1001 0011
   ret
@@ -12502,9 +12478,18 @@ CheckButtonMouseInteractionSingleBuildButton:
   bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+BuildButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+BuildButtonStatus),%1010 0011
-  ret
+  ret   nz
 
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+  ret
   .MouseOverButtonAndSpacePressed:
   bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
@@ -12514,6 +12499,12 @@ CheckButtonMouseInteractionSingleBuildButton:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+BuildButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -13263,7 +13254,17 @@ CheckButtonMouseInteractionBuildButtons:
   bit   4,(ix+BuildButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+BuildButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+BuildButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -13275,6 +13276,12 @@ CheckButtonMouseInteractionBuildButtons:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+BuildButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -15025,7 +15032,19 @@ CheckButtonMouseInteractionCastleMainScreen:
   bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+;  ld    (ix+CastleOverviewWindowButtonStatus),%1010 0011
+
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+CastleOverviewWindowButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+CastleOverviewWindowButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -15037,6 +15056,12 @@ CheckButtonMouseInteractionCastleMainScreen:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -15141,7 +15166,17 @@ CheckButtonMouseInteractionCastle:
   bit   4,(ix+CastleOverviewWindowButtonStatus) ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+CastleOverviewWindowButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+CastleOverviewWindowButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
@@ -15153,6 +15188,12 @@ CheckButtonMouseInteractionCastle:
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:

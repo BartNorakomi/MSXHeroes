@@ -243,7 +243,7 @@ call screenoff
 
   ;battle buttons
   ld    ix,GenericButtonTable
-  call  .CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckBattleButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
@@ -491,83 +491,6 @@ call screenoff
   call  docopy
   ret
 
-.CheckButtonMouseInteractionGenericButtons:
-  ld    b,(ix+GenericButtonAmountOfButtons)
-  ld    de,GenericButtonTableLenghtPerButton
-
-  .loop2:
-  call  .check
-  add   ix,de
-  djnz  .loop2
-  ret
-  
-  .check:
-  bit   7,(ix+GenericButtonStatus)        ;check if button is on/off
-  ret   z                               ;don't handle button if this button is off
-  
-  ld    a,(spat+0)                      ;y mouse
-  cp    (ix+GenericButtonYtop)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonYbottom)
-  jr    nc,.NotOverButton
-  ld    a,(spat+1)                      ;x mouse
-
-  add   a,06
-  
-  cp    (ix+GenericButtonXleft)
-  jr    c,.NotOverButton
-  cp    (ix+GenericButtonXright)
-  jr    nc,.NotOverButton
-  ;at this point mouse pointer is over button, so light the edge of the button. Check if mouse button is pressed, in that case light entire button  
-
-;
-; bit	7	6	  5		    4		    3		    2		  1		  0
-;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
-;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
-;
-
-  ld    a,(Controls)
-  bit   4,a                             ;check trigger a / space
-  jr    nz,.MouseOverButtonAndSpacePressed
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
-  .MouseHoverOverButton:
-  ld    (ix+GenericButtonStatus),%1010 0011
-  ret
-
-  .MouseOverButtonAndSpacePressed:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
-	ld		a,(NewPrContr)
-  bit   4,a                             ;check trigger a / space
-  jr    z,.MouseHoverOverButton
-
-  .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-  
-  .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
-  ld    (ix+GenericButtonStatus),%1001 0011
-  ret
-
-  .NotOverButton:
-  bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  jr    nz,.buttonIsStillLit
-  bit   5,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
-  ret   z
-  .buttonIsStillLit:
-  ld    (ix+GenericButtonStatus),%1100 0011
-  ret
-
-  .MenuOptionSelected:
-  pop   af                                ;no need to check the other buttons
-  ld    (ix+GenericButtonStatus),%1010 0011
-  scf                                     ;button has been clicked
-
-  ld    a,b                                   ;b = (ix+HeroOverviewWindowAmountOfButtons)
-  ld    (MenuOptionSelected?),a
-  ret
-
 SetMonsterTableInIY:
   ld    a,(slot.page12rom)              ;all RAM except page 1+2
   out   ($a8),a     
@@ -787,7 +710,7 @@ SurrenderButtonPressed:
 
   ;surrender buttons
   ld    ix,GenericButtonTable2
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckSurrenderButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
@@ -1042,7 +965,7 @@ RetreatButtonPressed:
 
   ;retreat buttons
   ld    ix,GenericButtonTable2
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckRetreatButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
@@ -1606,7 +1529,7 @@ CheckVictoryOrDefeat:
 
   ;victory or defeat button
   ld    ix,GenericButtonTable2
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckVictoryOrDefeatButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
@@ -1740,7 +1663,7 @@ CheckVictoryOrDefeat:
 
   ;victory or defeat button
   ld    ix,GenericButtonTable2
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   call  .CheckVictoryOrDefeatButtonClicked2       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable2
@@ -3318,6 +3241,9 @@ ShowEnemyStats:
   call  SetEnemyStatsWindow             ;show window of enemy stats
   call  SwapAndSetPage                  ;swap and set page
   
+  ld    bc,SFX_SpireOfWisdom
+  call  RePlayerSFX_PlayCh1  
+
   .engine:
   call  PopulateControls                ;read out keys
 
@@ -4323,6 +4249,13 @@ MoveMonster:
   jp    .HandleMovement
 
   .ShootProjectile:
+  push  iy
+  push  bc
+  ld    bc,SFX_shoot2
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
   ld    a,1
   ld    (ShootProjectile?),a
   ld    a,(MonsterMovementPathPointer)
@@ -4334,6 +4267,14 @@ MoveMonster:
   ld    a,(ShootProjectile?)
   or    a
   ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_enemyhit
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
   ld    a,1
   ld    (ShowExplosionSprite?),a      ;1=BeingHitSprite, 2=SmallExplosionSprite, 3=BigExplosionSprite
   xor   a
@@ -4454,8 +4395,8 @@ MoveMonster:
   ;Now we have total damage for entire monsterstack in HL
 
   ;an attacked monster loses life with this formula:
-  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
-  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+  ;If the attacking unitï¿½s attack value is greater than defending unitï¿½s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack ï¿½ I1 in this case. We can get up to 300% increase in our damage in this way.
+  ;On the other hand, if defending unitï¿½s defense value is greater than attacking unitï¿½s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
   call  ApplyAttackDefenseFormula 
 
 
@@ -4637,6 +4578,13 @@ MoveMonster:
   ld    (ExplosionSpriteStep),a  
   ld    a,1
   ld    (MonsterDied?),a
+
+  push  iy
+  push  bc
+  ld    bc,SFX_MonsterDied
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
 
   ld    a,(SpellSelected?)              ;no need to handle retaliation when damage is spell related
   or    a
@@ -4899,8 +4847,8 @@ ApplyAttackReductionFromArmorer:
 
 
   ;an attacked monster loses life with this formula:
-  ;If the attacking unit’s attack value is greater than defending unit’s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
-  ;On the other hand, if defending unit’s defense value is greater than attacking unit’s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
+  ;If the attacking unitï¿½s attack value is greater than defending unitï¿½s defense, the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack ï¿½ I1 in this case. We can get up to 300% increase in our damage in this way.
+  ;On the other hand, if defending unitï¿½s defense value is greater than attacking unitï¿½s attack we get the R1 variable, which means that the attacking creature gets a 2.5% penalty to its total dealt damage for every point the attack value is lower. R1 variable can decrease the amount of received damage by up to 30%.
 ApplyAttackDefenseFormula:          ;in: hl=total damage, out: hl=total damage after attack/defense formula
   push  hl
   
@@ -4920,7 +4868,7 @@ ApplyAttackDefenseFormula:          ;in: hl=total damage, out: hl=total damage a
   
   jr    c,.DefenseIsHigher
 
-  .AttackIsHigher:                    ;the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack – I1 in this case. We can get up to 300% increase in our damage in this way.
+  .AttackIsHigher:                    ;the attacking unit receives a 5% bonus to for each attack point exceeding the total defense points of the unit under attack ï¿½ I1 in this case. We can get up to 300% increase in our damage in this way.
   ld    a,l
   cp    61
   jr    c,.Go2
@@ -5911,6 +5859,13 @@ CheckSpaceToMoveMonster:
   ld    (MonsterAnimationStep),a
   ld    iy,MonsterMovementPath
   ld    (iy),c                          ;255=end movement(normal walk), 10=attack right, 
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy  
   ret
 
   .SwordLeftUpFoundSetMovementPath:
@@ -5987,6 +5942,13 @@ CheckSpaceToMoveMonster:
   xor   a
   ld    (MonsterAnimationSpeed),a
   ld    (MonsterAnimationStep),a
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
 
   ;check, in case we attack, if current active monster is on this tile
   ld    a,(hl)                          ;amount of steps till destination is reached
@@ -8986,7 +8948,7 @@ SpellCureRoutine:
   call  PrepBattleTextForSpells
   jp    EndSpellSelectedAndReduceManaCost
 
-GetResurrectionAmount:                  ;out: hl=damage: 60 + (power×5) HP
+GetResurrectionAmount:                  ;out: hl=damage: 60 + (powerï¿½5) HP
   call  GetSpellPowerForCurrentActiveHero ;out: hl=spell power
   ld    de,5
   call  MultiplyHlWithDE                ;Out: HL = result
@@ -9688,6 +9650,9 @@ CopyActivePageToInactivePage:
 DisplayGuardTowerRewardCOde:
 call screenon
 
+  ld    bc,SFX_GuardTowerReward
+  call  RePlayerSFX_PlayCh1  
+
   call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
   ;gold
   ld    l,(ix+0)
@@ -9724,7 +9689,7 @@ call screenon
   ret   nz
 
   ld    ix,GenericButtonTable
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
   ret   c
 
   ld    ix,GenericButtonTable
@@ -9833,6 +9798,9 @@ DisplayGuardTowerCOde:
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  DoCopy
 
+  ld    bc,SFX_GuardTowerEncountered
+  call  RePlayerSFX_PlayCh1  
+
 ;  call  SetGuardTowerGraphics               ;put gfx
 ;  call  SetGuardTowerText
   
@@ -9850,7 +9818,7 @@ DisplayGuardTowerCOde:
   ret   nz
 
   ld    ix,GenericButtonTable
-  call  InitiateBattle.CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
 

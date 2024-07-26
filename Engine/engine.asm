@@ -959,7 +959,7 @@ checktriggerhud:
 ;  ret   nz
 
   ld    ix,GenericButtonTable3
-  call  .CheckButtonMouseInteractionGenericButtons
+  call  CheckButtonInteractionControlsOnInt
   call  CheckIfHeroButtonShouldRemainLit
   ret
 
@@ -973,7 +973,21 @@ checktriggerhud:
 ;  ret  
 
 ;****************** This is a slightly optimised variant of the one in CastleOverviewCode ***********************
-.CheckButtonMouseInteractionGenericButtons:
+CheckButtonInteractionControlsOnInt:
+  ld    hl,ControlsOnInterrupt
+  ld    (CheckButtonMouseInteractionGenericButtonsInEngine.SelfModifyingCodeControlsOnOffInterrupt),hl
+  ld    hl,NewPrControlsOnInterrupt
+  ld    (CheckButtonMouseInteractionGenericButtonsInEngine.SelfModifyingCodeNewPrControlsOnOffInterrupt),hl
+  jr    CheckButtonMouseInteractionGenericButtonsInEngine
+
+CheckButtonInteractionControlsNotOnInt:
+  ld    hl,Controls
+  ld    (CheckButtonMouseInteractionGenericButtonsInEngine.SelfModifyingCodeControlsOnOffInterrupt),hl
+  ld    hl,NewPrContr
+  ld    (CheckButtonMouseInteractionGenericButtonsInEngine.SelfModifyingCodeNewPrControlsOnOffInterrupt),hl
+;  jp    CheckButtonMouseInteractionGenericButtonsInEngine
+
+CheckButtonMouseInteractionGenericButtonsInEngine:
   ld    b,(ix+GenericButtonAmountOfButtons)
   ld    de,GenericButtonTableLenghtPerButton
 
@@ -985,8 +999,8 @@ checktriggerhud:
   
   .check:
 
-;  bit   7,(ix+GenericButtonStatus)      ;check if button is on/off
-;  ret   z                               ;don't handle button if this button is off
+  bit   7,(ix+GenericButtonStatus)      ;check if button is on/off
+  ret   z                               ;don't handle button if this button is off
   
   ld    a,(spat+0)                      ;y mouse
   cp    (ix+GenericButtonYtop)
@@ -1008,25 +1022,45 @@ checktriggerhud:
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-
+.SelfModifyingCodeControlsOnOffInterrupt: equ $+1
   ld    a,(ControlsOnInterrupt)
   bit   4,a                             ;check trigger a / space
   jr    nz,.MouseOverButtonAndSpacePressed
   bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
+
+
+  ;check if button was already hovered over, if so play sfx
+  bit   5,(ix+GenericButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   ld    (ix+GenericButtonStatus),%1010 0011
+  ret   nz
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonHoverOver
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
 
   .MouseOverButtonAndSpacePressed:
   bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit
+.SelfModifyingCodeNewPrControlsOnOffInterrupt: equ $+1
 	ld		a,(NewPrControlsOnInterrupt)
   bit   4,a                             ;check trigger a / space
   jr    z,.MouseHoverOverButton
 
   .MouseOverButtonAndSpacePressedOverButtonNotYetLit:
   ld    (ix+GenericButtonStatus),%1001 0011
+
+  push  iy
+  push  bc
+  ld    bc,SFX_ButtonClicked
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
   ret
   
   .MouseOverButtonAndSpacePressedOverButtonThatWasAlreadyFullyLit:
@@ -1045,7 +1079,7 @@ checktriggerhud:
   .MenuOptionSelected:
   pop   af                                ;no need to check the other buttons
   ld    (ix+GenericButtonStatus),%1010 0011
-;  scf                                     ;button has been clicked
+  scf                                     ;button has been clicked
  
   ld    a,b
   ld    (WhichHudButtonClicked?),a      ;gets handled in the hudcode
@@ -1802,6 +1836,8 @@ EnableScrollScreen:
   xor   a
   ld    (DisableScrollScreen?),a
   ld    (freezecontrols?),a
+  ld    (WhichHudButtonClicked?),a
+  ld    (MenuOptionSelected?),a
   ret
 
 HandleHud:                              ;handle all buttons in the hud (hero arrows, hero buttons, castle arrows, castle buttons, save, end turn)
@@ -1866,8 +1902,7 @@ EnterSpecificRoutineHeroOverviewCode:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
-  call  EnableScrollScreen
-  ret
+  jp    EnableScrollScreen
 
 EnterSpecificRoutineInExtraRoutines:
   ld    (.SelfModifyingCodeRoutine),hl
@@ -1900,8 +1935,7 @@ EnterSpecificRoutineInExtraRoutines:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
-  call  EnableScrollScreen
-  ret
+  jp    EnableScrollScreen
 
 EnterSpecificRoutineInCastleOverviewCode:
   ld    (.SelfModifyingCodeRoutine),hl
@@ -1934,8 +1968,7 @@ EnterSpecificRoutineInCastleOverviewCode:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
-  call  EnableScrollScreen
-  ret
+  jp    EnableScrollScreen
 
 EnterSpecificRoutineInBattleCode:
   ld    (.SelfModifyingCodeRoutine),hl
@@ -1968,8 +2001,7 @@ EnterSpecificRoutineInBattleCode:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    hl,0
   ld    (CurrentCursorSpriteCharacter),hl
-  call  EnableScrollScreen
-  ret
+  jp    EnableScrollScreen
 
 HeroWeTradeWith: ds 2
 HeroCollidesWithFriendlyHero?: ds 1
@@ -2433,7 +2465,9 @@ CheckHeroPicksUpItem:
   or    a,128 + (096 / 2)               ;0,16=right, 32,48=left, 64,80=down, 96,112=up
   xor   8
   ld    (ix+HeroinfoSYSX+0),a  
-  ret
+
+  ld    bc,SFX_WaterWell
+  jp    RePlayerSFX_PlayCh1  
 
 .SpireOfWisdom:
   call  .CheckSpireOfWisdomAlreadyVisited
@@ -2573,6 +2607,10 @@ CheckHeroPicksUpItem:
   ld    (BigChest?),a
   ret
 
+.SfxResourcePickedUp:
+  ld    bc,SFX_ResourcePickedUp
+  jp    RePlayerSFX_PlayCh1  
+
 .Gold:
 	xor		a
 	ld		(movehero?),a
@@ -2583,7 +2621,7 @@ CheckHeroPicksUpItem:
   add   hl,de
   ld    (ix+0),l
   ld    (ix+1),h  
-  ret
+  jr    .SfxResourcePickedUp
 
 .Wood:
 	xor		a
@@ -2595,7 +2633,7 @@ CheckHeroPicksUpItem:
   add   hl,de
   ld    (ix+2),l
   ld    (ix+3),h  
-  ret
+  jr    .SfxResourcePickedUp
 
 .Ore:
 	xor		a
@@ -2607,7 +2645,7 @@ CheckHeroPicksUpItem:
   add   hl,de
   ld    (ix+4),l
   ld    (ix+5),h  
-  ret
+  jr    .SfxResourcePickedUp
 
 .Gems:
 	xor		a
@@ -2619,7 +2657,7 @@ CheckHeroPicksUpItem:
   add   hl,de
   ld    (ix+6),l
   ld    (ix+7),h  
-  ret
+  jr    .SfxResourcePickedUp
 
 .Rubies:
 	xor		a
@@ -2631,7 +2669,7 @@ CheckHeroPicksUpItem:
   add   hl,de
   ld    (ix+8),l
   ld    (ix+9),h  
-  ret
+  jr    .SfxResourcePickedUp
 
 NXAndNY10x18HeroPortraits:          equ 018*256 + (010/2)            ;(ny*256 + nx/2) = (10x18)
 NXAndNY14x9HeroPortraits:           equ 009*256 + (014/2)            ;(ny*256 + nx/2) = (14x09)
@@ -6765,10 +6803,10 @@ AmountOfCastles:        equ 4
 LenghtCastleTable:      equ Castle2-Castle1
                               ;max 6 (=city walls)              max 4           max 6         max 3         max 3
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
-Castle1:  db  255,  255,  255,      6,          1,        1,        0,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
-Castle2:  db  255,  255,  255,      1,          1,        1,        0,              6,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
-Castle3:  db  255,  255,  255,      1,          1,        1,        0,              6,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
-Castle4:  db  255,  255,  255,      1,          1,        1,        0,              6,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
+Castle1:  db  255,  255,  255,      6,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle2:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
+Castle3:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
+Castle4:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
 Castle5:  db  255,  255,  255
 ;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
 WhichCastleIsPointerPointingAt?:  ds  2
@@ -6787,7 +6825,7 @@ AmountOfResourcesOffered:   ds  2
 AmountOfResourcesRequired:  ds  2
 CheckRequirementsWhichBuilding?:  ds  2
 ResourcesPlayer1:
-.Gold:    dw  20000 ;60000 ;20000
+.Gold:    dw  20009 ;60000 ;20000
 .Wood:    dw  20 ;900;20
 .Ore:     dw  20 ;900;20
 .Gems:    dw  10 ;900;10
