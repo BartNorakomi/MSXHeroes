@@ -1,3 +1,21 @@
+;
+;
+;
+;
+;DisplayDiskMenuCOde
+;SetSpireOfWisdomText
+;DisplaySpireOfWisdomCOde
+;SetPlayerEliminatedWindowAndText
+;SetPlayerWonGameWindowAndText
+;CheckIfThereIsAPlayerWhoWonTheGame
+;CheckIfAPlayerGotEliminated
+;CheckGuardTowerAlreadyVisited
+;CheckSpireOfWisdomAlreadyVisited
+;CheckLearningStoneAlreadyVisited
+;SetItemStatsWindow
+;ShowItemStats
+;
+
 ShowItemStats:
 call screenon
   call  SetItemStatsWindow              ;show window of item stats
@@ -861,11 +879,78 @@ DisplayDiskMenuCOde:
   .CheckButtonClicked:
   ret   nc
   pop   af                              ;end this routine
-  
-
+  ld    a,b
+  cp    1                               ;main menu not pressed ?
+  jp    nz,ConfirmMainMenuCOde
   ret
 
+ConfirmMainMenuCOde:
+  call  SetConfirmMainMenuButtons
+  call  SetConfirmMainMenuGraphics               ;put gfx
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetConfirmMainMenuGraphics               ;put gfx
+  call  CopyActivePageToInactivePageExtraRoutines
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
 
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af                              ;end this routine
+  ld    a,b
+  cp    1                               ;no pressed ?
+  jp    z,DisplayDiskMenuCOde
+  ld    a,1
+  ld    (BackToMainMenu?),a
+  ret
+
+SetConfirmMainMenuButtons:
+  ld    hl,SetConfirmMainMenuuButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*02)
+  ldir
+  ret
+
+SetConfirmMainMenuuButtonTableGfxBlock:  db  RetreatBlock
+SetConfirmMainMenuuButtonTableAmountOfButtons:  db  02
+SetConfirmMainMenuuButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;main menu
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;safe game
+  db  %1100 0011 | dw $4000 + (057*128) + (228/2) - 128 | dw $4000 + (075*128) + (228/2) - 128 | dw $4000 + (093*128) + (228/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+
+.Button1Ytop:           equ 088
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 048
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 089
+.Button2YBottom:        equ .Button2Ytop + 018
+.Button2XLeft:          equ 048+090
+.Button2XRight:         equ .Button2XLeft + 020
 
 SetDiskMenuButtons:
   ld    hl,SetDiskMenuButtonTable-2
@@ -891,6 +976,13 @@ SetDiskMenuButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), 
 .Button2YBottom:        equ .Button2Ytop + 011
 .Button2XLeft:          equ 038
 .Button2XRight:         equ .Button2XLeft + 128
+
+SetConfirmMainMenuGraphics:
+  ld    hl,$4000 + (050*128) + (000/2) - 128
+  ld    de,$0000 + (063*128) + (030/2) - 128
+  ld    bc,$0000 + (051*256) + (144/2)
+  ld    a,DiskMenuBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 SetDiskMenuGraphics:
   ld    hl,$4000 + (000*128) + (000/2) - 128

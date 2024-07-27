@@ -10,6 +10,7 @@ LevelEngine:
 ;.kut: jp .kut
 
   call  HandleAIWorldMap
+  call  CheckBackToMainMenu             ;check if player has confirmed via diskmenu that he goes back to main menu
   call  DisplayDiskMenu                 ;Show gfx for disk menu on the adventure map when clicked in the hud
   call  DisplayHeroLevelUp              ;Show gfx for Hero Level Up on the adventure map
   call  DisplayScrollFound              ;Show gfx for scroll found on the adventure map
@@ -654,6 +655,13 @@ InterruptHandler:
   pop   af 
   ei
   ret
+
+CheckBackToMainMenu:
+  ld    a,(BackToMainMenu?)
+  or    a
+  ret   z
+
+  jp    InitiateGame
 
 DisplayDiskMenu:
   ld    a,(DiskMenuClicked?)

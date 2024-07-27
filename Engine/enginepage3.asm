@@ -1,9 +1,9 @@
 phase	$c000
 
 StartAtTitleScreen?:                equ 1
-StartOfTurnMessageOn?:              equ 1
-MusicOn?:                           equ 1
-Music50PercentSpeed?:               equ 1
+StartOfTurnMessageOn?:              equ 0
+MusicOn?:                           equ 0
+Music50PercentSpeed?:               equ 0
 
 Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
@@ -12,6 +12,7 @@ DisplayNumbers1to6?:                equ 0
 
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 DiskMenuClicked?:                   db  0
+BackToMainMenu?:                    db  0
 
 StopSong:   equ 255
 TitleSong:  equ 1

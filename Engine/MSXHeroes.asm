@@ -1888,17 +1888,7 @@ usas2repBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
-
-
-; block $c1 - &?? VGM
-;usas2repBlock:  equ   $c1
-;phase	$0000
-;	incbin "msxlegends.rep"
-;	ds		$56*RomBlockSize-$,$ff
-;dephase
-
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 7 BLOCKS LEFT, SO WE COULD USE THIS FOR SAVEFILES - we still need load game screen/code and introsong
 
 
 totallenght:	Equ	$-MSXHeroes
@@ -1906,5 +1896,5 @@ totallenght:	Equ	$-MSXHeroes
 
 
 Upper4MB:
-	ds		(16*$80000)-Upper4MB,$fe
+;	ds		(16*$80000)-Upper4MB,$fe
 
