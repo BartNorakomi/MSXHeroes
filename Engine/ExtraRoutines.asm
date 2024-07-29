@@ -843,11 +843,17 @@ SetSpireOfWisdomGraphics:
   ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+DiskMenuWindowDX: equ 030
+DiskMenuWindowDY: equ 063
+DiskMenuWindowNX: equ 144
+DiskMenuWindowNY: equ 051
 DisplayDiskMenuCOde:
   call  SetDiskMenuButtons
   call  SetDiskMenuGraphics               ;put gfx
+  call  SetDayWeekMonthDiskMenu
   call  SwapAndSetPage                  ;swap and set page
   call  SetDiskMenuGraphics               ;put gfx
+  call  SetDayWeekMonthDiskMenu
   call  CopyActivePageToInactivePageExtraRoutines
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
@@ -872,9 +878,31 @@ DisplayDiskMenuCOde:
 
   ld    ix,GenericButtonTable
   call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
+  call  .CheckClickOutOfWindow          ;check if mouse is clicked outside of window. If so, return to game
 
   halt
   jp  .engine
+
+  .CheckClickOutOfWindow:;
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    DiskMenuWindowDY
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDY+DiskMenuWindowNY
+  jr    nc,.NotOutOfWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  add   a,06
+  cp    DiskMenuWindowDX
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDX+DiskMenuWindowNX
+  ret   c
+  .NotOutOfWindow:
+  pop   af
+  ret
 
   .CheckButtonClicked:
   ret   nc
@@ -882,6 +910,38 @@ DisplayDiskMenuCOde:
   ld    a,b
   cp    1                               ;main menu not pressed ?
   jp    nz,ConfirmMainMenuCOde
+  ret
+
+SetDayWeekMonthDiskMenu:
+  ;set day
+  ld    bc,(Date)
+  ld    de,7                            ;divide the days by 7, the rest is the day of the week
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  inc   hl                              ;1-7
+  ld    b,069+05                        ;dx
+  ld    c,053+17                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set week
+  ld    bc,(Date)
+  ld    de,7                            ;divide days by 7, the result is the weeks
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+
+  ;set week
+  ld    de,4                            ;divide weeks by 4, the result is the months, and the rest is the weeks of the month
+  call  DivideBCbyDE                    ;In: BC/DE. Out: BC = result, HL = rest
+  push  bc                              ;months
+  inc   hl
+  ld    b,104+05                        ;dx
+  ld    c,053+17                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set month
+  pop   hl
+  inc   hl
+  ld    b,142+05                        ;dx
+  ld    c,053+17                        ;dy
+  call  SetNumber16BitCastle
   ret
 
 ConfirmMainMenuCOde:
@@ -914,8 +974,32 @@ ConfirmMainMenuCOde:
   ld    ix,GenericButtonTable
   call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
 
+  call  .CheckClickOutOfWindow          ;check if mouse is clicked outside of window. If so, return to game
+
   halt
   jp  .engine
+
+  .CheckClickOutOfWindow:;
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    DiskMenuWindowDY
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDY+DiskMenuWindowNY
+  jr    nc,.NotOutOfWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  add   a,06
+  cp    DiskMenuWindowDX
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDX+DiskMenuWindowNX
+  ret   c
+  .NotOutOfWindow:
+  pop   af
+  jp    DisplayDiskMenuCOde
+
 
   .CheckButtonClicked:
   ret   nc

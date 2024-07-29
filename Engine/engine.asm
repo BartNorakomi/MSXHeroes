@@ -660,6 +660,8 @@ CheckBackToMainMenu:
   ld    a,(BackToMainMenu?)
   or    a
   ret   z
+  xor   a
+  ld    (BackToMainMenu?),a
 
   jp    InitiateGame
 
