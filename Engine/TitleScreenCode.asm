@@ -1,8 +1,9 @@
 HandleTitleScreenCode:
-  jp    InsertMouseCode
-  jp    TitleScreenCode
-  jp    ScenarioSelectCode
-  jp    CampaignSelectCode
+;  jp    InsertMouseCode
+;  jp    TitleScreenCode
+;  jp    ScenarioSelectCode
+;  jp    CampaignSelectCode
+  jp    LoadGameSelectCode
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
 ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
@@ -244,7 +245,8 @@ TitleScreenCode:
   jp    CampaignSelectCode
 
   .LoadGamePressed:
-  ret
+  pop   af
+  jp    LoadGameSelectCode
 
   .OptionsPressed:
   ret
@@ -758,6 +760,176 @@ screenonAfter3Frames:
   and   3
   ret   nz
   jp    screenon
+
+LoadGameSelectCode:
+  call  screenoff
+  ld    a,4
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
+  ld    a,1
+	ld		(activepage),a	
+  call  SetLoadGameGraphics
+  xor   a
+	ld		(activepage),a			
+  call  SetLoadGameGraphics
+
+  ld    hl,InGamePalette
+  call  SetPalette
+  call  SetSpatInCastle
+  call  SetInterruptHandler             ;set Vblank
+
+  call  SetLoadGameSelectButtons
+
+  call  SetFontPage0Y212                ;set font at (0,212) page 0
+
+;  call  SetPage1ButtonConstantlyLit
+;  call  SetDifficultyButtonConstantlyLit
+;  ld    b,28
+;  call  .ScenarioPressed
+  xor   a
+  ld    (framecounter),a
+  .engine:
+  ld    a,(framecounter)
+  inc   a
+  ld    (framecounter),a
+;  halt
+  call  screenonAfter3Frames
+;  call  CheckMouse
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+  ;scenario select buttons
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+;  call  .CheckScenarioSelectButtonClicked       ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+  ;/scenario select buttons
+
+  call  SetNamesInLoadGameButtons
+  jp    .engine
+
+;  .EndTitleScreenEngine:
+;  call  .SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
+;  call  .SetAmountOfPlayers
+;  call  .SetStartingTown
+;  call  .SetStartingResources
+;  call  .SetStartingHeroes
+;  call  .SetTavernHeroes
+;  call  SetTempisr                      ;end the current interrupt handler used in the engine
+;  call  SetSpatInGame
+;  xor   a
+;  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
+;  ret
+
+
+
+;ScenarioNameAddress:  equ 15
+SetNamesInLoadGameButtons:
+  ld    b,025                           ;dx
+  ld    c,050                           ;dy
+
+  ld    hl,TextPage1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ret
+
+
+
+
+SetLoadGameSelectButtons:
+  ld    hl,LoadGameSelectButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*28)
+  ldir
+  ret
+
+  ;10 save games
+LoadGameSelectButton1Ytop:           equ 047 + (0*13)
+LoadGameSelectButton1YBottom:        equ LoadGameSelectButton1Ytop + 011
+LoadGameSelectButton1XLeft:          equ 022
+LoadGameSelectButton1XRight:         equ LoadGameSelectButton1XLeft + 096
+
+LoadGameSelectButton2Ytop:           equ 047 + (1*13)
+LoadGameSelectButton2YBottom:        equ LoadGameSelectButton2Ytop + 011
+LoadGameSelectButton2XLeft:          equ 022
+LoadGameSelectButton2XRight:         equ LoadGameSelectButton2XLeft + 096
+
+LoadGameSelectButton3Ytop:           equ 047 + (2*13)
+LoadGameSelectButton3YBottom:        equ LoadGameSelectButton3Ytop + 011
+LoadGameSelectButton3XLeft:          equ 022
+LoadGameSelectButton3XRight:         equ LoadGameSelectButton3XLeft + 096
+
+LoadGameSelectButton4Ytop:           equ 047 + (3*13)
+LoadGameSelectButton4YBottom:        equ LoadGameSelectButton4Ytop + 011
+LoadGameSelectButton4XLeft:          equ 022
+LoadGameSelectButton4XRight:         equ LoadGameSelectButton4XLeft + 096
+
+LoadGameSelectButton5Ytop:           equ 047 + (4*13)
+LoadGameSelectButton5YBottom:        equ LoadGameSelectButton5Ytop + 011
+LoadGameSelectButton5XLeft:          equ 022
+LoadGameSelectButton5XRight:         equ LoadGameSelectButton5XLeft + 096
+
+LoadGameSelectButton6Ytop:           equ 047 + (5*13)
+LoadGameSelectButton6YBottom:        equ LoadGameSelectButton6Ytop + 011
+LoadGameSelectButton6XLeft:          equ 022
+LoadGameSelectButton6XRight:         equ LoadGameSelectButton6XLeft + 096
+
+LoadGameSelectButton7Ytop:           equ 047 + (6*13)
+LoadGameSelectButton7YBottom:        equ LoadGameSelectButton7Ytop + 011
+LoadGameSelectButton7XLeft:          equ 022
+LoadGameSelectButton7XRight:         equ LoadGameSelectButton7XLeft + 096
+
+LoadGameSelectButton8Ytop:           equ 047 + (7*13)
+LoadGameSelectButton8YBottom:        equ LoadGameSelectButton8Ytop + 011
+LoadGameSelectButton8XLeft:          equ 022
+LoadGameSelectButton8XRight:         equ LoadGameSelectButton8XLeft + 096
+
+LoadGameSelectButton9Ytop:           equ 047 + (8*13)
+LoadGameSelectButton9YBottom:        equ LoadGameSelectButton9Ytop + 011
+LoadGameSelectButton9XLeft:          equ 022
+LoadGameSelectButton9XRight:         equ LoadGameSelectButton9XLeft + 096
+
+LoadGameSelectButton10Ytop:           equ 047 + (9*13)
+LoadGameSelectButton10YBottom:        equ LoadGameSelectButton10Ytop + 011
+LoadGameSelectButton10XLeft:          equ 022
+LoadGameSelectButton10XRight:         equ LoadGameSelectButton10XLeft + 096
+
+  ;load / back / delete buttons
+LoadGameSelectButton11Ytop:           equ 191
+LoadGameSelectButton11YBottom:        equ LoadGameSelectButton11Ytop + 015
+LoadGameSelectButton11XLeft:          equ 106
+LoadGameSelectButton11XRight:         equ LoadGameSelectButton11XLeft + 018
+
+LoadGameSelectButton12Ytop:           equ 191
+LoadGameSelectButton12YBottom:        equ LoadGameSelectButton12Ytop + 015
+LoadGameSelectButton12XLeft:          equ 132
+LoadGameSelectButton12XRight:         equ LoadGameSelectButton12XLeft + 018
+
+LoadGameSelectButton13Ytop:           equ 191
+LoadGameSelectButton13YBottom:        equ LoadGameSelectButton13Ytop + 015
+LoadGameSelectButton13XLeft:          equ 216
+LoadGameSelectButton13XRight:         equ LoadGameSelectButton13XLeft + 022
+
+LoadGameSelectButtonTableGfxBlock:  db  ScenarioSelectButtonsBlock ;LoadGameSelectButtonsBlock
+LoadGameSelectButtonTableAmountOfButtons:  db  13
+LoadGameSelectButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;10 visible scenarios (per page)
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton1Ytop,LoadGameSelectButton1YBottom,LoadGameSelectButton1XLeft,LoadGameSelectButton1XRight | dw $0000 + (LoadGameSelectButton1Ytop*128) + (LoadGameSelectButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton2Ytop,LoadGameSelectButton2YBottom,LoadGameSelectButton2XLeft,LoadGameSelectButton2XRight | dw $0000 + (LoadGameSelectButton2Ytop*128) + (LoadGameSelectButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton3Ytop,LoadGameSelectButton3YBottom,LoadGameSelectButton3XLeft,LoadGameSelectButton3XRight | dw $0000 + (LoadGameSelectButton3Ytop*128) + (LoadGameSelectButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton4Ytop,LoadGameSelectButton4YBottom,LoadGameSelectButton4XLeft,LoadGameSelectButton4XRight | dw $0000 + (LoadGameSelectButton4Ytop*128) + (LoadGameSelectButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton5Ytop,LoadGameSelectButton5YBottom,LoadGameSelectButton5XLeft,LoadGameSelectButton5XRight | dw $0000 + (LoadGameSelectButton5Ytop*128) + (LoadGameSelectButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton6Ytop,LoadGameSelectButton6YBottom,LoadGameSelectButton6XLeft,LoadGameSelectButton6XRight | dw $0000 + (LoadGameSelectButton6Ytop*128) + (LoadGameSelectButton6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton7Ytop,LoadGameSelectButton7YBottom,LoadGameSelectButton7XLeft,LoadGameSelectButton7XRight | dw $0000 + (LoadGameSelectButton7Ytop*128) + (LoadGameSelectButton7XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton8Ytop,LoadGameSelectButton8YBottom,LoadGameSelectButton8XLeft,LoadGameSelectButton8XRight | dw $0000 + (LoadGameSelectButton8Ytop*128) + (LoadGameSelectButton8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton9Ytop,LoadGameSelectButton9YBottom,LoadGameSelectButton9XLeft,LoadGameSelectButton9XRight | dw $0000 + (LoadGameSelectButton9Ytop*128) + (LoadGameSelectButton9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db LoadGameSelectButton10Ytop,LoadGameSelectButton10YBottom,LoadGameSelectButton10XLeft,LoadGameSelectButton10XRight | dw $0000 + (LoadGameSelectButton10Ytop*128) + (LoadGameSelectButton10XLeft/2) - 128
+
+  ;begin / back buttons / delete
+  db  %1100 0011 | dw $4000 + (122*128) + (028/2) - 128 | dw $4000 + (122*128) + (046/2) - 128 | dw $4000 + (122*128) + (064/2) - 128 | db LoadGameSelectButton11Ytop,LoadGameSelectButton11YBottom,LoadGameSelectButton11XLeft,LoadGameSelectButton11XRight | dw $0000 + (LoadGameSelectButton11Ytop*128) + (LoadGameSelectButton11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (078/2) - 128 | dw $4000 + (040*128) + (096/2) - 128 | db LoadGameSelectButton12Ytop,LoadGameSelectButton12YBottom,LoadGameSelectButton12XLeft,LoadGameSelectButton12XRight | dw $0000 + (LoadGameSelectButton12Ytop*128) + (LoadGameSelectButton12XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (137*128) + (000/2) - 128 | dw $4000 + (137*128) + (022/2) - 128 | dw $4000 + (137*128) + (044/2) - 128 | db LoadGameSelectButton13Ytop,LoadGameSelectButton13YBottom,LoadGameSelectButton13XLeft,LoadGameSelectButton13XRight | dw $0000 + (LoadGameSelectButton13Ytop*128) + (LoadGameSelectButton13XLeft/2) - 128
 
 ScenarioSelectCode:
   call  screenoff
@@ -3003,6 +3175,13 @@ ClearCampaignButtonGraphics:
   ld    de,$0000 + (040*128) + (018/2) - 128
   ld    bc,$0000 + (131*256) + (116/2)
   ld    a,CampaignSelectBlock                   ;block to copy graphics from  
+  jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
+
+SetLoadGameGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (000*128) + (000/2) - 128
+  ld    bc,$0000 + (212*256) + (256/2)
+  ld    a,LoadGameBlock                   ;block to copy graphics from  
   jp    CopyRamToVramCorrectedCastleOverview      ;in: hl->AddressToWriteTo, bc->AddressToWriteFrom, de->NXAndNY
 
 SetScenarioSelectGraphics:

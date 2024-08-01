@@ -1869,7 +1869,6 @@ RomSize: 				equ 8*1024*1024 ;8MB
 RomBlockSize:			equ 16*1024	;16KB
 RomStartAddress:		equ $4000
 
-
 usas2sfx1repBlock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					phase	$0000
 					incbin "usas2sfx1.rep"
@@ -1888,7 +1887,14 @@ usas2repBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 7 BLOCKS LEFT, SO WE COULD USE THIS FOR SAVEFILES - we still need load game screen/code and introsong
+LoadGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$4000
+  					incbin "..\grapx\TitleScreen\LoadGame.SC5",7,212 * 128      ;134 lines
+					ds		$c000-$,$ff
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 5 BLOCKS LEFT we still need save game screen/code and introsong
 
 
 totallenght:	Equ	$-MSXHeroes
