@@ -4,7 +4,6 @@ Rename-Item -Path "GentleDesertMap01.map.pck" -NewName "GentleDesertMap01objects
 
 .\convert-tmxtoraw16.ps1 -Path C:\Users\bartf\Documents\GitHub\MSXHeroes\maps\GentleDesertMap01.tmx -targetPath .\  -excludeLayer "objects" -pack
 
-Remove-Item -Path "GentleDesertMap01.map"
 
 cd..
 cd engine

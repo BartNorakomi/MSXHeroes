@@ -769,7 +769,9 @@ LoadGameSelectCode:
 	ld		(activepage),a	
   call  SetLoadGameGraphics
   xor   a
-	ld		(activepage),a			
+	ld		(activepage),a
+  ld    a,255
+	ld		(SaveGameSelected),a            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
   call  SetLoadGameGraphics
 
   ld    hl,InGamePalette
@@ -787,6 +789,7 @@ LoadGameSelectCode:
 ;  call  .ScenarioPressed
   xor   a
   ld    (framecounter),a
+
   .engine:
   ld    a,(framecounter)
   inc   a
@@ -800,7 +803,7 @@ LoadGameSelectCode:
   ;scenario select buttons
   ld    ix,GenericButtonTable
   call  CheckButtonInteractionControlsNotOnInt
-;  call  .CheckScenarioSelectButtonClicked       ;in: carry=button clicked, b=button number
+  call  .CheckSaveGameButtonClicked       ;in: carry=button clicked, b=button number
 
   ld    ix,GenericButtonTable
   call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
@@ -809,18 +812,129 @@ LoadGameSelectCode:
   call  SetNamesInLoadGameButtons
   jp    .engine
 
-;  .EndTitleScreenEngine:
-;  call  .SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
-;  call  .SetAmountOfPlayers
-;  call  .SetStartingTown
-;  call  .SetStartingResources
-;  call  .SetStartingHeroes
-;  call  .SetTavernHeroes
-;  call  SetTempisr                      ;end the current interrupt handler used in the engine
-;  call  SetSpatInGame
-;  xor   a
-;  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
-;  ret
+  .EndTitleScreenEngine:
+  call  ScenarioSelectCode.SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
+  call  ScenarioSelectCode.SetAmountOfPlayers
+  call  ScenarioSelectCode.SetStartingTown
+  call  ScenarioSelectCode.SetStartingResources
+  call  ScenarioSelectCode.SetStartingHeroes
+  call  ScenarioSelectCode.SetTavernHeroes
+
+  call  .LoadSaveData
+  call  SetTempisr                      ;end the current interrupt handler used in the engine
+  call  SetSpatInGame
+  xor   a
+  ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen 
+  ret
+
+  .LoadSaveData:
+  ld    a,SaveGame1Block-256                          ;Map block
+;  call  block12High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+  di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching
+	ld		($6100),a                     ;set block 0 from upper 4MB at $4000
+
+  ld    hl,$4000
+  ld    de,StartSaveGameData
+  ld    bc,EndSaveGameData-StartSaveGameData
+  ldir
+  ei
+  ret
+
+
+
+
+
+
+.CheckSaveGameButtonClicked:      ;in: carry=button clicked, b=button number
+  ret   nc
+
+  ld    a,b
+  cp    3
+  jp    z,.LoadButtonPressed
+  cp    2
+  jp    z,.BackButtonPressed
+  cp    1
+  jp    z,.DeleteButtonPressed
+
+  .SaveGamePressed:
+  ld    a,13                      ;10 save game buttons, 3 other buttons
+  sub   b
+	ld		(SaveGameSelected),a      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+
+  call  SetLoadGameSelectButtons  ;unlit all save game buttons
+
+  ;now constantly light active save game button
+	ld		a,(SaveGameSelected)
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GenericButtonTable+1
+  add   hl,de
+  ex    de,hl
+  ld    hl,.ScenarioButtonConstantlyLit
+  ld    bc,4
+  ldir
+  ret
+
+  .LoadButtonPressed:
+  pop   af
+  jp    .EndTitleScreenEngine
+
+
+
+
+  jp    TitleScreenCode
+
+
+
+
+
+
+
+
+  .BackButtonPressed:
+  pop   af
+  jp    TitleScreenCode
+  ret
+
+  .DeleteButtonPressed:
+  pop   af
+  jp    TitleScreenCode
+  ret
+
+
+  .SetDifficulty:
+  ld    a,b
+  ld    (Difficulty),a
+  call  SetDifficultyButtonConstantlyLit
+  ret
+
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*19),a ;starting town buttons player 1
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*20),a ;starting town buttons player 2
+
+  .ScenarioButtonConstantlyLit:
+  dw    $4000 + (011*128) + (000/2) - 128, $4000 + (011*128) + (000/2) - 128
+  .ScenarioButtonNormallyLit:
+  dw    $4000 + (000*128) + (000/2) - 128, $4000 + (000*128) + (096/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

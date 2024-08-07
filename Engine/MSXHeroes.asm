@@ -1891,10 +1891,15 @@ LoadGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					phase	$4000
   					incbin "..\grapx\TitleScreen\LoadGame.SC5",7,212 * 128      ;134 lines
 					ds		$c000-$,$ff
+					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 5 BLOCKS LEFT we still need save game screen/code and introsong
+
+
+
+
 
 
 totallenght:	Equ	$-MSXHeroes
@@ -1902,5 +1907,537 @@ totallenght:	Equ	$-MSXHeroes
 
 
 Upper4MB:
-;	ds		(16*$80000)-Upper4MB,$fe
+
+SaveGame1Block:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$4000
+
+
+
+
+
+
+
+
+
+
+
+
+SaveGame1Data:
+
+;******************** SAVE GAME DATA **************************
+
+
+
+
+
+pl1hero1yXXX:		db	3
+pl1hero1xXXX:		db	3
+pl1hero1xpXXX: dw 0 ;65000 ;3000 ;999
+pl1hero1moveXXX:	db	20,20
+pl1hero1manaXXX:	dw	50,10
+pl1hero1manarecXXX:db	5		                ;recover x mana every turn
+pl1hero1statusXXX:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+;Pl1Hero1UnitsXXX:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+;Pl1Hero1UnitsXXX:  db 001 | dw 001 |      db 001 | dw 001 |      db 002 | dw 040 |      db 003 | dw 040 |      db 011 | dw 070 |      db 020 | dw 009 ;unit,amount
+Pl1Hero1UnitsXXX:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
+Pl1Hero1StatAttackXXX:  db 0
+Pl1Hero1StatDefenseXXX:  db 0
+Pl1Hero1StatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+Pl1Hero1StatSpellDamageXXX:  db 9  ;amount of spell damage
+;.HeroSkillsXXX:  db  6,22,21,30,0,0
+;.HeroSkillsXXX:  db  25,18,3,33,9,0
+.HeroSkillsXXX:  db  13,0,0,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0000
+.AirSpellsXXX:         db  %0000 0000
+.WaterSpellsXXX:       db  %0000 0000
+.AllSchoolsSpellsXXX:  db  %0000 0000
+;               swo arm shi hel boo glo rin nec rob
+;.InventoryXXX: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+;.InventoryXXX: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.InventoryXXX: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.HeroSpecificInfoXXX: dw HeroAddressesSnake1
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+ ;-------------------- MIGHT ------------------------------         ------------- ADVENTURE ---------------        ------------------ WIZZARDRY -------------------------------
+;knight   |   barbarian   |   Shieldbearer   |   overlord   |          alchemist   |   sage   |   ranger   |          wizzard   |   battle mage   |   scholar   |   necromancer       
+;Archery  |   Offence     |   Armourer       |   Resistance |          Estates     | Learning | Logistics  |        Intelligence|   Sorcery       |   Wisdom    |   Necromancy
+;1-3          4-6             7-9                10-12                 13-15         16-18      19-21               22-24           25-27             28-30         31-33
+
+
+pl1hero2yXXX:		db	$1c
+pl1hero2xXXX:		db	$33
+pl1hero2xpXXX: dw 0000
+pl1hero2moveXXX:	db	06,20
+pl1hero2manaXXX:	dw	10,10
+pl1hero2manarecXXX:db	5		                ;recover x mana every turn
+pl1hero2statusXXX:	db	255	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero2UnitsXXX:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  31,0,0,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0000
+.AirSpellsXXX:         db  %0000 0000
+.WaterSpellsXXX:       db  %0000 0000
+.AllSchoolsSpellsXXX:  db  %0000 0000
+.InventoryXXX: db  045,045,045,045,045,045,045,045,044,  016,027,033,043,038,039;9 body slots and 6 open slots
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero3yXXX:		db	01	                ;
+pl1hero3xXXX:		db	03
+pl1hero3xpXXX: dw 0000
+pl1hero3moveXXX:	db	20,20
+pl1hero3manaXXX:	dw	10,10
+pl1hero3manarecXXX:db	5		                ;recover x mana every turn
+pl1hero3statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero3UnitsXXX:  db 001 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  8,30,24,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0000
+.AirSpellsXXX:         db  %0000 0000
+.WaterSpellsXXX:       db  %0000 0000
+.AllSchoolsSpellsXXX:  db  %0000 0000
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero4yXXX:		db	00		                ;
+pl1hero4xXXX:		db	00		
+pl1hero4xpXXX: dw 0000
+pl1hero4moveXXX:	db	20,20
+pl1hero4manaXXX:	dw	10,20
+pl1hero4manarecXXX:db	5		                ;recover x mana every turn
+pl1hero4statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero4UnitsXXX:  db 006 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero5yXXX:		db	00		                ;
+pl1hero5xXXX:		db	01		
+pl1hero5xpXXX: dw 0000
+pl1hero5moveXXX:	db	20,20
+pl1hero5manaXXX:	dw	10,20
+pl1hero5manarecXXX:db	5		                ;recover x mana every turn
+pl1hero5statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl1Hero5UnitsXXX:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero6yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	02		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	20,20
+.pl1hero6manaXXX:	dw	10,20
+.pl1hero6manarecXXX:db	5		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6UnitsXXX:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,18
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero7yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	03		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	20,20
+.pl1hero6manaXXX:	dw	10,20
+.pl1hero6manarecXXX:db	5		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6UnitsXXX:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,18
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero8yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	04		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	20,20
+.pl1hero6manaXXX:	dw	10,20
+.pl1hero6manarecXXX:db	5		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6UnitsXXX:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,18
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: db 255,255
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl1hero9yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	00		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	00,00
+.pl1hero6manaXXX:	dw	00,00
+.pl1hero6manarecXXX:db	0		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl2hero1yXXX:		db	3
+pl2hero1xXXX:		db	6
+;pl2hero1xXXX:		db	100
+pl2hero1xpXXX: dw 0000
+pl2hero1moveXXX:	db	20,20
+pl2hero1manaXXX:	dw	50,10
+pl2hero1manarecXXX:db	5		                ;recover x mana every turn
+pl2hero1statusXXX:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+;Pl2Hero1UnitsXXX:  db CastleVaniaUnitLevel1Number | dw 010 |      db CastleVaniaUnitLevel2Number | dw 010 |      db CastleVaniaUnitLevel3Number | dw 010 |      db CastleVaniaUnitLevel4Number | dw 010 |      db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw 010 ;unit,amount
+;Pl2Hero1UnitsXXX:  db ContraGroupBUnitLevel1Number | dw 150 |      db ContraGroupBUnitLevel2Number | dw 130 |      db 000 | dw 000 |      db ContraGroupBUnitLevel4Number | dw 130 |      db ContraGroupBUnitLevel5Number | dw 100 |      db ContraGroupBUnitLevel6Number | dw 100 ;unit,amount
+Pl2Hero1UnitsXXX:  db 1 | dw 001 |      db 001 | dw 010 |      db 001 | dw 100 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 0
+.HeroStatDefenseXXX:  db 0
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  13,0,0,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 1111
+.AirSpellsXXX:         db  %0000 1111
+.WaterSpellsXXX:       db  %0000 1111
+.AllSchoolsSpellsXXX:  db  %0000 1111
+;               swo arm shi hel boo glo rin nec rob
+.InventoryXXX: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045;9 body slots and 6 open slots
+.HeroSpecificInfoXXX: dw HeroAddressesDrasle1
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+pl2hero2yXXX:		db	00		                ;
+.pl1hero2xXXX:		db	04		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	20,20
+.pl1hero6manaXXX:	dw	10,20
+.pl1hero6manarecXXX:db	5		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	1		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.Pl1Hero6UnitsXXX:  db 023 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,18
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0001  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0001
+.AirSpellsXXX:         db  %0000 0001
+.WaterSpellsXXX:       db  %0000 0001
+.AllSchoolsSpellsXXX:  db  %0000 0001
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: dw HeroAddressesDrasle2
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;pl2hero2yXXX:		ds  lenghtherotable,255
+pl2hero3yXXX:		ds  lenghtherotable,255
+pl2hero4yXXX:		ds  lenghtherotable,255
+pl2hero5yXXX:		ds  lenghtherotable,255
+pl2hero6yXXX:		ds  lenghtherotable,255
+pl2hero7yXXX:		ds  lenghtherotable,255
+pl2hero8yXXX:		ds  lenghtherotable,255
+
+pl2hero9yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	00		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	00,00
+.pl1hero6manaXXX:	dw	00,00
+.pl1hero6manarecXXX:db	0		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl3hero1yXXX:		db	80
+pl3hero1xXXX:		db	40
+pl3hero1xpXXX: dw 0000
+pl3hero1moveXXX:	db	20,20
+pl3hero1manaXXX:	dw	20,20
+pl3hero1manarecXXX:db	2		                ;recover x mana every turn
+pl3hero1statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl3Hero1UnitsXXX:  db 033 | dw 103 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,18,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0000
+.AirSpellsXXX:         db  %0000 0000
+.WaterSpellsXXX:       db  %0000 0000
+.AllSchoolsSpellsXXX:  db  %0000 0000
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: dw HeroAddressesGolvellius
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl3hero2yXXX:		ds  lenghtherotable,255
+pl3hero3yXXX:		ds  lenghtherotable,255
+pl3hero4yXXX:		ds  lenghtherotable,255
+pl3hero5yXXX:		ds  lenghtherotable,255
+pl3hero6yXXX:		ds  lenghtherotable,255
+pl3hero7yXXX:		ds  lenghtherotable,255
+pl3hero8yXXX:		ds  lenghtherotable,255
+
+pl3hero9yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	00		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	00,00
+.pl1hero6manaXXX:	dw	00,00
+.pl1hero6manarecXXX:db	0		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+pl4hero1yXXX:		db	100
+pl4hero1xXXX:		db	100
+pl4hero1xpXXX: dw 0000
+pl4hero1moveXXX:	db	10,20
+pl4hero1manaXXX:	dw	10,20
+pl4hero1manarecXXX:db	2		                ;recover x mana every turn
+pl4hero1statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+Pl4Hero1UnitsXXX:  db 053 | dw 001 |      db 065 | dw 001 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.HeroStatAttackXXX:  db 1
+.HeroStatDefenseXXX:  db 1
+.HeroStatKnowledgeXXX:  db 1  ;decides total mana (*20) and mana recovery (*1)
+.HeroStatSpellDamageXXX:  db 1  ;amount of spell damage
+.HeroSkillsXXX:  db  33,10,1,0,0,0
+.HeroLevelXXX: db  1
+.EarthSpellsXXX:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpellsXXX:        db  %0000 0000
+.AirSpellsXXX:         db  %0000 0000
+.WaterSpellsXXX:       db  %0000 0000
+.AllSchoolsSpellsXXX:  db  %0000 0000
+.InventoryXXX: ds  lenghtinventorytable,045
+.HeroSpecificInfoXXX: dw HeroAddressesDrasle1
+.HeroDYDXXXX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+pl4hero2yXXX:		ds  lenghtherotable,255
+pl4hero3yXXX:		ds  lenghtherotable,255
+pl4hero4yXXX:		ds  lenghtherotable,255
+pl4hero5yXXX:		ds  lenghtherotable,255
+pl4hero6yXXX:		ds  lenghtherotable,255
+pl4hero7yXXX:		ds  lenghtherotable,255
+pl4hero8yXXX:		ds  lenghtherotable,255
+
+pl4hero9yXXX:		db	00		                ;
+.pl1hero6xXXX:		db	00		
+.pl1hero6xpXXX: dw 0000
+.pl1hero6moveXXX:	db	00,00
+.pl1hero6manaXXX:	dw	00,00
+.pl1hero6manarecXXX:db	0		                ;recover x mana every turn
+.pl1hero6statusXXX:	db	255		                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CastleYXXX:                equ 0
+CastleXXXX:                equ CastleY+1
+CastlePlayerXXX:           equ CastleX+1
+CastleLevelXXX:            equ CastlePlayer+1
+CastleTavernXXX:           equ CastleLevel+1
+CastleMarketXXX:           equ CastleTavern+1
+CastleMageGuildLevelXXX:   equ CastleMarket+1
+CastleBarracksLevelXXX:    equ CastleMageGuildLevel+1
+CastleSawmillLevelXXX:     equ CastleBarracksLevel+1
+CastleMineLevelXXX:        equ CastleSawmillLevel+1
+AlreadyBuiltThisTurn?XXX:  equ CastleMineLevel+1
+CastleNameXXX:             equ AlreadyBuiltThisTurn?+1
+CastleLevel1UnitsXXX:      equ CastleName+13
+CastleLevel2UnitsXXX:      equ CastleLevel1Units+1
+CastleLevel3UnitsXXX:      equ CastleLevel2Units+1
+CastleLevel4UnitsXXX:      equ CastleLevel3Units+1
+CastleLevel5UnitsXXX:      equ CastleLevel4Units+1
+CastleLevel6UnitsXXX:      equ CastleLevel5Units+1
+CastleLevel1UnitsAvailXXX: equ CastleLevel6Units+1
+CastleLevel2UnitsAvailXXX: equ CastleLevel1UnitsAvail+2
+CastleLevel3UnitsAvailXXX: equ CastleLevel2UnitsAvail+2
+CastleLevel4UnitsAvailXXX: equ CastleLevel3UnitsAvail+2
+CastleLevel5UnitsAvailXXX: equ CastleLevel4UnitsAvail+2
+CastleLevel6UnitsAvailXXX: equ CastleLevel5UnitsAvail+2
+
+AmountOfCastlesXXX:        equ 4
+LenghtCastleTableXXX:      equ Castle2-Castle1
+                              ;max 6 (=city walls)              max 4           max 6         max 3         max 3
+;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?,castlename, lev1Units,  lev2Units,  lev3Units,  lev4Units,  lev5Units,  lev6Units,  lev1Available,  lev2Available,  lev3Available,  lev4Available,  lev5Available,  lev6Available,  terrainSY, already built this turn ?,castle name
+Castle1XXX:  db  255,  255,  255,      6,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, CastleVaniaUnitLevel1Number,                CastleVaniaUnitLevel2Number,         CastleVaniaUnitLevel3Number,         CastleVaniaUnitLevel4Number,         CastleVaniaUnitLevel5Number,         CastleVaniaUnitLevel6Number   | dw   CastleVaniaUnitLevel1Growth,              CastleVaniaUnitLevel2Growth,             CastleVaniaUnitLevel3Growth,            CastleVaniaUnitLevel4Growth,            CastleVaniaUnitLevel5Growth,           CastleVaniaUnitLevel6Growth
+Castle2XXX:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, usasUnitLevel1Number,                usasUnitLevel2Number,         usasUnitLevel3Number,         usasUnitLevel4Number,         usasUnitLevel5Number,         usasUnitLevel6Number   | dw   usasUnitLevel1Growth,              usasUnitLevel2Growth,             usasUnitLevel3Growth,            usasUnitLevel4Growth,            usasUnitLevel5Growth,           usasUnitLevel6Growth
+Castle3XXX:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, sdsnatcherUnitLevel1Number,                sdsnatcherUnitLevel2Number,         sdsnatcherUnitLevel3Number,         sdsnatcherUnitLevel4Number,         sdsnatcherUnitLevel5Number,         sdsnatcherUnitLevel6Number   | dw   sdsnatcherUnitLevel1Growth,              sdsnatcherUnitLevel2Growth,             sdsnatcherUnitLevel3Growth,            sdsnatcherUnitLevel4Growth,            sdsnatcherUnitLevel5Growth,           sdsnatcherUnitLevel6Growth
+Castle4XXX:  db  255,  255,  255,      1,          1,        1,        1,              6,            0,            0,        0,               "Outer Heave1",255, psychoworldUnitLevel1Number,                psychoworldUnitLevel2Number,         psychoworldUnitLevel3Number,         psychoworldUnitLevel4Number,         psychoworldUnitLevel5Number,         psychoworldUnitLevel6Number   | dw   psychoworldUnitLevel1Growth,              psychoworldUnitLevel2Growth,             psychoworldUnitLevel3Growth,            psychoworldUnitLevel4Growth,            psychoworldUnitLevel5Growth,           psychoworldUnitLevel6Growth
+Castle5XXX:  db  255,  255,  255
+;castle level 1=500 gpd, level 2=1000 gpd, level 3=2000 gpd, level 4=3000 gpd, level 5=4000 gpd
+WhichCastleIsPointerPointingAt?XXX:  ds  2
+TempVariableCastleYXXX:	ds	1
+TempVariableCastleXXXX:	ds	1
+
+TavernHeroesTableXXX:
+TavernHero1XXX:  equ 0 | TavernHero2XXX:  equ 1 | TavernHero3XXX:  equ 2
+TavernHeroTableLenghtXXX:  equ TavernHeroesPlayer2-TavernHeroesPlayer1-1
+db 255 | TavernHeroesPlayer1XXX:        db  076,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer2XXX:        db  002,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer3XXX:        db  003,000,000,000,000,000,000,000,000,000
+db 255 | TavernHeroesPlayer4XXX:        db  004,000,000,000,000,000,000,000,000,000
+
+AmountOfResourcesOfferedXXX:   ds  2
+AmountOfResourcesRequiredXXX:  ds  2
+CheckRequirementsWhichBuilding?XXX:  ds  2
+ResourcesPlayer1XXX:
+.GoldXXX:    dw  20009 ;60000 ;20000
+.WoodXXX:    dw  20 ;900;20
+.OreXXX:     dw  20 ;900;20
+.GemsXXX:    dw  10 ;900;10
+.RubiesXXX:  dw  10 ;900;10
+ResourcesPlayer2XXX:
+.GoldXXX:    dw  20000 ;60000 ;20000
+.WoodXXX:    dw  20 ;900;20
+.OreXXX:     dw  20 ;900;20 
+.GemsXXX:    dw  10 ;900;10
+.RubiesXXX:  dw  10 ;900;10
+ResourcesPlayer3XXX:
+.GoldXXX:    dw  5000
+.WoodXXX:    dw  300
+.OreXXX:     dw  100
+.GemsXXX:    dw  60
+.RubiesXXX:  dw  30
+ResourcesPlayer4XXX:
+.GoldXXX:    dw  5000
+.WoodXXX:    dw  300
+.OreXXX:     dw  100
+.GemsXXX:    dw  60
+.RubiesXXX:  dw  30
+
+                      ;E4E3E2E1   F4F3F2F1   A4A3A2A1   W4W3W2W1
+Castle1SpellsXXX:   db  % 1 1 0 0, % 0 1 0 1, % 1 0 1 0, % 0 0 1 1
+Castle2SpellsXXX:   db  % 0 1 1 0, % 1 0 1 0, % 0 1 0 1, % 1 0 0 1
+Castle3SpellsXXX:   db  % 0 0 1 1, % 0 1 0 1, % 1 0 1 0, % 1 1 0 0
+Castle4SpellsXXX:   db  % 1 0 0 1, % 1 0 1 0, % 0 1 0 1, % 0 1 1 0
+
+StartingTownLevel1UnitXXX: ds  1
+StartingTownLevel2UnitXXX: ds  1
+StartingTownLevel3UnitXXX: ds  1
+StartingTownLevel4UnitXXX: ds  1
+StartingTownLevel5UnitXXX: ds  1
+StartingTownLevel6UnitXXX: ds  1
+
+player1StartingTownXXX:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player2StartingTownXXX:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player3StartingTownXXX:			db	255 ;0=random, 1=DS4, 2=CastleVania
+player4StartingTownXXX:			db	255 ;0=random, 1=DS4, 2=CastleVania
+
+amountofplayersXXX:		db	3
+player1human?XXX:			db	1 ;0=CPU, 1=Human, 2=OFF
+player2human?XXX:			db	1
+player3human?XXX:			db	1
+player4human?XXX:			db	2
+whichplayernowplaying?XXX:	db	1
+
+movementpathpointerXXX:	ds	1	
+movehero?XXX:				ds	1
+movementspeedXXX:			ds	1
+
+putmovementstars?XXX:	db	0
+movementpathXXX:		ds	48*2 ;| db 128	;1stbyteXXX:yhero,	2ndbyteXXX:xhero, then x movement, y movement (0=end movement) (128=end table)
+                        db 128,128
+movementpathReverseXXX:		ds	48*2 ;| db 128	;1stbyteXXX:yhero,	2ndbyteXXX:xhero, then x movement, y movement (0=end movement) (128=end table)
+ystarXXX:				ds	1
+xstarXXX:				ds	1
+
+currentherowindowclickedXXX:	db	1
+
+WorldPointerXXX: dw GentleAutumnMap04
+;WorldPointer: dw GentleCaveMap01
+;WorldPointer: dw GentleDesertMap02
+;WorldPointer: dw GentleJungleMap03
+;WorldPointer: dw GentleMap01
+;WorldPointer: dw GentleWinterMap02
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					ds		$8000-$,$ff
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
+
+  incbin "..\maps\GentleDesertMap01.map"
+  
+
+
+
+
+
+
+
+
+
+	ds		(16*$80000)-Upper4MB,$ff
 

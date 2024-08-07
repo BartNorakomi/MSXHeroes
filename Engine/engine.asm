@@ -136,28 +136,28 @@ LevelEngine:
 
 
 ;block12:	
-  di
-	ld		(memblocks.1),a
-	ld		($6000),a
-	ei
-	ret
+;  di
+;	ld		(memblocks.1),a
+;	ld		($6000),a
+;	ei
+;	ret
 
 ;block34:	
-  di
-	ld		(memblocks.2),a
-	ld		($7000),a
-	ei
-	ret
+;  di
+;	ld		(memblocks.2),a
+;	ld		($7000),a
+;	ei
+;	ret
 
 ;block1234:	 
-  di
-	ld		(memblocks.1),a
-	ld		($6000),a
-	inc   a
-	ld		(memblocks.2),a
-	ld		($7000),a
-	ei
-	ret
+;  di
+;	ld		(memblocks.1),a
+;	ld		($6000),a
+;	inc   a
+;	ld		(memblocks.2),a
+;	ld		($7000),a
+;	ei
+;	ret
 
 
 
@@ -6426,6 +6426,17 @@ EmptyHeroRecruitedAtTavern:
 .HeroSpecificInfo: ds 2
 ;.HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
+
+
+
+
+
+;******************** SAVE GAME DATA **************************
+
+
+
+StartSaveGameData:
+
 pl1hero1y:		db	3
 pl1hero1x:		db	3
 pl1hero1xp: dw 0 ;65000 ;3000 ;999
@@ -6897,3 +6908,11 @@ xstar:				ds	1
 
 currentherowindowclicked:	db	1
 
+WorldPointer: dw GentleAutumnMap04
+;WorldPointer: dw GentleCaveMap01
+;WorldPointer: dw GentleDesertMap02
+;WorldPointer: dw GentleJungleMap03
+;WorldPointer: dw GentleMap01
+;WorldPointer: dw GentleWinterMap02
+
+EndSaveGameData:

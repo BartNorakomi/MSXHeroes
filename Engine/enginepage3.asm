@@ -22,12 +22,7 @@ BattleSong: equ 6
 WorldSong:  equ 2
 
 
-;WorldPointer: dw GentleAutumnMap04
-WorldPointer: dw GentleCaveMap01
-;WorldPointer: dw GentleDesertMap02
-;WorldPointer: dw GentleJungleMap03
-;WorldPointer: dw GentleMap01
-;WorldPointer: dw GentleWinterMap02
+
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -3400,6 +3395,7 @@ SetPage:                                ;in a->x*32+31 (x=page)
 
 
 
+
 ;ASCII16-EX:
 ;----------------------------------------
 ;Bank #1 low: 6000h - 67FFh (6000h used)
@@ -3407,6 +3403,67 @@ SetPage:                                ;in a->x*32+31 (x=page)
 ;----------------------------------------
 ;Bank #2 low: 7000h - 77FFh (7000h and 77FFh used)
 ;Bank #2 high: 9000h - 97FFh (should recommend to use 9000h)
+
+;Feature set:
+
+;  * Flash ROM memory with commands for per-sector erasing and programming.
+;  * Extended addressable capacity up to 64 MB (design provided for 8 MB).
+;  * Two 16K mapper pages, mirrored to the full address range.
+;  * Two bank selection registers accessible in all pages.
+;  * Backwards compatible with ASCII16.
+
+;The two 16K pages are available at 4000H and 8000H, and mirrored to C000H and
+;0000H respectively. The two bank select registers exist at 6000H and 7000H just
+;like in ASCII16, but are also accessible at A000H, E000H and 2000H. The bank
+;number is passed as the data, and for ROM sizes > 4 MB the MSB of the bank
+;number is passed in address bits 8-11. Unused bits are ignored.
+
+;Initial banks after power on / reset are 0, however note that the BIOS selects
+;a different bank in the 2nd page during boot-up, due to slot expander detection
+;writing to mirrored bank select registers if the mapper is in a primary slot.
+;So it is recommended to boot from 4000H and manually initialise the banks.
+
+;Below is some example code, assuming the correct cartridge slot is already
+;selected at the addresses written to.
+
+;    ld a,47H
+;    ld (6000H),a  ; select bank 47H in 1st page (4000-7FFF, C000-FFFF)
+;    ld a,47H
+;    ld (7000H),a  ; select bank 47H in 2nd page (8000-BFFF, 0000-3FFF)
+;    ld a,47H
+;    ld (0E000H),a ; select bank 47H in 1st page (4000-7FFF, C000-FFFF)
+;    ld a,47H
+;    ld (3000H),a  ; select bank 47H in 2nd page (8000-BFFF, 0000-3FFF)
+;    ld a,47H
+;    ld (6100H),a  ; select bank 147H in 1st page (4000-7FFF, C000-FFFF)
+;    ld hl,6147H
+;    ld (hl),l     ; select bank 147H in 1st page (4000-7FFF, C000-FFFF)
+
+;block12High:
+ ; di
+;	ld		(memblocks.1),a
+;	ld		($6100),a
+;	ei
+;	ret
+
+;block34High:	
+ ; di
+;	ld		(memblocks.2),a
+;	ld		($7100),a
+;	ei
+;	ret
+
+;block1234High:	 
+ ; di
+;	ld		(memblocks.1),a
+;	ld		($6100),a
+;	inc   a
+;	ld		(memblocks.2),a
+;	ld		($7100),a
+;	ei
+;	ret
+
+
 block12:	
   di
 	ld		(memblocks.1),a
@@ -4589,10 +4646,6 @@ HeroAddressesPampas:          db "Pampas",255,"           ","Wizzard     ",255,P
 HeroAddressesSelene:          db "Selene",255,"           ","Battle Mage ",255,SeleneSpriteBlock| dw HeroSYSXSelene,HeroPortrait10x18SYSXSelene,HeroButton20x11SYSXSelene,HeroPortrait16x30SYSXSelene                                         | db 25 | db 075 |
 HeroAddressesSkooter:         db "Skooter",255,"          ","Scholar     ",255,SkooterSpriteBlock| dw HeroSYSXSkooter,HeroPortrait10x18SYSXSkooter,HeroButton20x11SYSXSkooter,HeroPortrait16x30SYSXSkooter                                    | db 28 | db 076 |
 
-
-
-
-
 HeroSYSXAdol:         equ $4000+(000*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXGoemon1:      equ $4000+(000*128)+((64+128)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
 HeroSYSXPixy:         equ $4000+(032*128)+((64+000)/2)-128 ;(sy*128 + sx/2) Source in gfx file in ROM
@@ -4845,6 +4898,7 @@ HeroPortrait16x30SYSXJeddaChef:         equ $8000+(120*128)+(176/2)-128 ;(dy*128
 Difficulty: ds  1                   ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
 ScenarioPage: ds  1
 ScenarioSelected: ds  1
+SaveGameSelected: ds  1             ;save game is a value between 1 and 13. when save game=0 it means no save game is selected
 LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
 PlayerWhoLostAHeroInBattle?: ds   1
