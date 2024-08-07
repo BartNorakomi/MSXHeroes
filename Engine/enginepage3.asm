@@ -1,6 +1,6 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 1
+StartAtTitleScreen?:                equ 0
 StartOfTurnMessageOn?:              equ 0
 MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0

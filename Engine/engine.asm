@@ -1808,7 +1808,6 @@ CastleCodeSetAdditionalStatFromInventoryItemsInHL:
 
 DisplayStartOfTurnMessage?: db  3
 DisplayQuickTips?: db  1
-Date: dw  0                          ;days, weeks, months
 DisplayStartOfTurnMessage:
   if    StartOfTurnMessageOn?
   else
@@ -6914,5 +6913,16 @@ WorldPointer: dw GentleAutumnMap04
 ;WorldPointer: dw GentleJungleMap03
 ;WorldPointer: dw GentleMap01
 ;WorldPointer: dw GentleWinterMap02
+
+Date: dw  0                     ;date of current turn. days, weeks, months
+
+;**** the following data should only be saved, not be LOADED when loading a game ****
+
+;DayOfMonthEenheden:         ds    1    
+;DayOfMonthTientallen:       ds    1
+;MonthEenheden:              ds    1
+;MonthTientallen:            ds    1
+;YearEenheden:               ds    1       ;you still need to add +1980 to the year
+;YearTientallen:             ds    1
 
 EndSaveGameData:

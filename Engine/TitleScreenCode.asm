@@ -840,11 +840,6 @@ LoadGameSelectCode:
   ei
   ret
 
-
-
-
-
-
 .CheckSaveGameButtonClicked:      ;in: carry=button clicked, b=button number
   ret   nc
 
@@ -880,18 +875,6 @@ LoadGameSelectCode:
   .LoadButtonPressed:
   pop   af
   jp    .EndTitleScreenEngine
-
-
-
-
-  jp    TitleScreenCode
-
-
-
-
-
-
-
 
   .BackButtonPressed:
   pop   af
@@ -954,7 +937,7 @@ SetNamesInLoadGameButtons:
 SetLoadGameSelectButtons:
   ld    hl,LoadGameSelectButtonTable-2
   ld    de,GenericButtonTable-2
-  ld    bc,2+(GenericButtonTableLenghtPerButton*28)
+  ld    bc,2+(GenericButtonTableLenghtPerButton*13)
   ldir
   ret
 

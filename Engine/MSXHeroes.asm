@@ -1894,8 +1894,15 @@ LoadGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
+SaveGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$4000
+  					incbin "..\grapx\DiskMenu\SaveGame.SC5",7,192 * 128      ;134 lines
+					ds		$c000-$,$ff
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 5 BLOCKS LEFT we still need save game screen/code and introsong
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 2????? BLOCKS LEFT we still need introsong
 
 
 
@@ -2408,9 +2415,14 @@ WorldPointerXXX: dw GentleAutumnMap04
 ;WorldPointer: dw GentleMap01
 ;WorldPointer: dw GentleWinterMap02
 
+DateXXX: dw  0                     ;date of current turn. days, weeks, months
 
-
-
+DayOfMonthEenhedenXXX:         ds    1	;the date will be written to a save file when saving
+DayOfMonthTientallenXXX:       ds    1
+MonthEenhedenXXX:              ds    1
+MonthTientallenXXX:            ds    1
+YearEenhedenXXX:               ds    1       ;you still need to add +1980 to the year
+YearTientallenXXX:             ds    1
 
 
 

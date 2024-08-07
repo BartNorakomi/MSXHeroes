@@ -1,7 +1,4 @@
-;
-;
-;
-;
+;SaveGameCode
 ;DisplayDiskMenuCOde
 ;SetSpireOfWisdomText
 ;DisplaySpireOfWisdomCOde
@@ -843,6 +840,238 @@ SetSpireOfWisdomGraphics:
   ld    a,SecondarySkillsButtonsBlock           ;block to copy graphics from
   jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+
+
+
+
+
+
+SaveGameCode:
+  call  SetSaveGameGraphics               ;put gfx
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetSaveGameGraphics               ;put gfx
+  call  CopyActivePageToInactivePageExtraRoutines
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  docopy
+
+  call  SetSaveGameButtons
+  ld    a,255
+	ld		(SaveGameSelected),a            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
+;  call  .CheckClickOutOfWindow          ;check if mouse is clicked outside of window. If so, return to game
+
+  halt
+  jp  .engine
+
+  .CheckClickOutOfWindow:;
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    DiskMenuWindowDY
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDY+DiskMenuWindowNY
+  jr    nc,.NotOutOfWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  add   a,06
+  cp    DiskMenuWindowDX
+  jr    c,.NotOutOfWindow
+  cp    DiskMenuWindowDX+DiskMenuWindowNX
+  ret   c
+  .NotOutOfWindow:
+  pop   af
+  ret
+
+
+
+
+
+  .CheckButtonClicked:
+  ret   nc
+
+  ld    a,b
+  cp    2
+  jp    z,.SaveButtonPressed
+  cp    1
+  jp    z,.BackButtonPressed
+
+  .SaveGameSlotPressed:
+  ld    a,12                      ;10 save game buttons, 3 other buttons
+  sub   b
+	ld		(SaveGameSelected),a      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+
+  call  SetSaveGameButtons  ;unlit all save game buttons
+
+  ;now constantly light active save game button
+	ld		a,(SaveGameSelected)            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  ld    d,0
+  ld    e,a
+  ld    hl,GenericButtonTableLenghtPerButton
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,GenericButtonTable+1
+  add   hl,de
+  ex    de,hl
+  ld    hl,.ScenarioButtonConstantlyLit
+  ld    bc,4
+  ldir
+  ret
+
+  .SaveButtonPressed:
+  pop   af
+  ret
+
+  .BackButtonPressed:
+  pop   af
+  ret
+
+  .ScenarioButtonConstantlyLit:
+  dw    $4000 + (011*128) + (000/2) - 128, $4000 + (011*128) + (000/2) - 128
+  .ScenarioButtonNormallyLit:
+  dw    $4000 + (000*128) + (000/2) - 128, $4000 + (000*128) + (096/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SetSaveGameGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (005*128) + (006/2) - 128
+  ld    bc,$0000 + (192*256) + (192/2)
+  ld    a,SaveGameBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+SetSaveGameButtons:
+  ld    hl,SaveGameButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*12)
+  ldir
+  ret
+
+  ;10 save games
+SaveGameButton1Ytop:           equ 047 + (0*13) - 5
+SaveGameButton1YBottom:        equ SaveGameButton1Ytop + 011
+SaveGameButton1XLeft:          equ 022 - 8
+SaveGameButton1XRight:         equ SaveGameButton1XLeft + 096
+
+SaveGameButton2Ytop:           equ 047 + (1*13) - 5
+SaveGameButton2YBottom:        equ SaveGameButton2Ytop + 011
+SaveGameButton2XLeft:          equ 022 - 8
+SaveGameButton2XRight:         equ SaveGameButton2XLeft + 096
+
+SaveGameButton3Ytop:           equ 047 + (2*13) - 5
+SaveGameButton3YBottom:        equ SaveGameButton3Ytop + 011
+SaveGameButton3XLeft:          equ 022 - 8
+SaveGameButton3XRight:         equ SaveGameButton3XLeft + 096
+
+SaveGameButton4Ytop:           equ 047 + (3*13) - 5
+SaveGameButton4YBottom:        equ SaveGameButton4Ytop + 011
+SaveGameButton4XLeft:          equ 022 - 8
+SaveGameButton4XRight:         equ SaveGameButton4XLeft + 096
+
+SaveGameButton5Ytop:           equ 047 + (4*13) - 5
+SaveGameButton5YBottom:        equ SaveGameButton5Ytop + 011
+SaveGameButton5XLeft:          equ 022 - 8
+SaveGameButton5XRight:         equ SaveGameButton5XLeft + 096
+
+SaveGameButton6Ytop:           equ 047 + (5*13) - 5
+SaveGameButton6YBottom:        equ SaveGameButton6Ytop + 011
+SaveGameButton6XLeft:          equ 022 - 8
+SaveGameButton6XRight:         equ SaveGameButton6XLeft + 096
+
+SaveGameButton7Ytop:           equ 047 + (6*13) - 5
+SaveGameButton7YBottom:        equ SaveGameButton7Ytop + 011
+SaveGameButton7XLeft:          equ 022 - 8
+SaveGameButton7XRight:         equ SaveGameButton7XLeft + 096
+
+SaveGameButton8Ytop:           equ 047 + (7*13) - 5
+SaveGameButton8YBottom:        equ SaveGameButton8Ytop + 011
+SaveGameButton8XLeft:          equ 022 - 8
+SaveGameButton8XRight:         equ SaveGameButton8XLeft + 096
+
+SaveGameButton9Ytop:           equ 047 + (8*13) - 5
+SaveGameButton9YBottom:        equ SaveGameButton9Ytop + 011
+SaveGameButton9XLeft:          equ 022 - 8
+SaveGameButton9XRight:         equ SaveGameButton9XLeft + 096
+
+SaveGameButton10Ytop:           equ 047 + (9*13) - 5
+SaveGameButton10YBottom:        equ SaveGameButton10Ytop + 011
+SaveGameButton10XLeft:          equ 022 - 8
+SaveGameButton10XRight:         equ SaveGameButton10XLeft + 096
+
+  ;save / back buttons
+SaveGameButton11Ytop:           equ 172
+SaveGameButton11YBottom:        equ SaveGameButton11Ytop + 015
+SaveGameButton11XLeft:          equ 078
+SaveGameButton11XRight:         equ SaveGameButton11XLeft + 018
+
+SaveGameButton12Ytop:           equ 172
+SaveGameButton12YBottom:        equ SaveGameButton12Ytop + 015
+SaveGameButton12XLeft:          equ 104
+SaveGameButton12XRight:         equ SaveGameButton12XLeft + 018
+
+SaveGameButtonTableGfxBlock:  db  ScenarioSelectButtonsBlock ;SaveGameButtonsBlock
+SaveGameButtonTableAmountOfButtons:  db  12
+SaveGameButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;10 visible scenarios (per page)
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton1Ytop,SaveGameButton1YBottom,SaveGameButton1XLeft,SaveGameButton1XRight | dw $0000 + (SaveGameButton1Ytop*128) + (SaveGameButton1XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton2Ytop,SaveGameButton2YBottom,SaveGameButton2XLeft,SaveGameButton2XRight | dw $0000 + (SaveGameButton2Ytop*128) + (SaveGameButton2XLeft/2) - 128 
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton3Ytop,SaveGameButton3YBottom,SaveGameButton3XLeft,SaveGameButton3XRight | dw $0000 + (SaveGameButton3Ytop*128) + (SaveGameButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton4Ytop,SaveGameButton4YBottom,SaveGameButton4XLeft,SaveGameButton4XRight | dw $0000 + (SaveGameButton4Ytop*128) + (SaveGameButton4XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton5Ytop,SaveGameButton5YBottom,SaveGameButton5XLeft,SaveGameButton5XRight | dw $0000 + (SaveGameButton5Ytop*128) + (SaveGameButton5XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton6Ytop,SaveGameButton6YBottom,SaveGameButton6XLeft,SaveGameButton6XRight | dw $0000 + (SaveGameButton6Ytop*128) + (SaveGameButton6XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton7Ytop,SaveGameButton7YBottom,SaveGameButton7XLeft,SaveGameButton7XRight | dw $0000 + (SaveGameButton7Ytop*128) + (SaveGameButton7XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton8Ytop,SaveGameButton8YBottom,SaveGameButton8XLeft,SaveGameButton8XRight | dw $0000 + (SaveGameButton8Ytop*128) + (SaveGameButton8XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton9Ytop,SaveGameButton9YBottom,SaveGameButton9XLeft,SaveGameButton9XRight | dw $0000 + (SaveGameButton9Ytop*128) + (SaveGameButton9XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (000*128) + (000/2) - 128 | dw $4000 + (000*128) + (096/2) - 128 | dw $4000 + (011*128) + (000/2) - 128 | db SaveGameButton10Ytop,SaveGameButton10YBottom,SaveGameButton10XLeft,SaveGameButton10XRight | dw $0000 + (SaveGameButton10Ytop*128) + (SaveGameButton10XLeft/2) - 128
+
+  ;save / back buttons
+  db  %1100 0011 | dw $4000 + (152*128) + (000/2) - 128 | dw $4000 + (152*128) + (018/2) - 128 | dw $4000 + (152*128) + (036/2) - 128 | db SaveGameButton11Ytop,SaveGameButton11YBottom,SaveGameButton11XLeft,SaveGameButton11XRight | dw $0000 + (SaveGameButton11Ytop*128) + (SaveGameButton11XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + (040*128) + (060/2) - 128 | dw $4000 + (040*128) + (078/2) - 128 | dw $4000 + (040*128) + (096/2) - 128 | db SaveGameButton12Ytop,SaveGameButton12YBottom,SaveGameButton12XLeft,SaveGameButton12XRight | dw $0000 + (SaveGameButton12Ytop*128) + (SaveGameButton12XLeft/2) - 128
+
+
+
+
+
+
+
+
+
+
+
+
+
 DiskMenuWindowDX: equ 030
 DiskMenuWindowDY: equ 063
 DiskMenuWindowNX: equ 144
@@ -910,7 +1139,7 @@ DisplayDiskMenuCOde:
   ld    a,b
   cp    1                               ;main menu not pressed ?
   jp    nz,ConfirmMainMenuCOde
-  ret
+  jp    SaveGameCode
 
 SetDayWeekMonthDiskMenu:
   ;set day
