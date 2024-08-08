@@ -921,7 +921,7 @@ SaveGameCode:
   sub   b
 	ld		(SaveGameSelected),a      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
 
-  call  SetSaveGameButtons  ;unlit all save game buttons
+  call  SetSaveGameButtons        ;unlit all save game buttons
 
   ;now constantly light active save game button
 	ld		a,(SaveGameSelected)            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
@@ -938,6 +938,12 @@ SaveGameCode:
   ret
 
   .SaveButtonPressed:
+	ld		a,(SaveGameSelected)      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  cp    255
+  ret   z                         ;return if no save game selected
+
+  call  SaveGameToFlash
+
   pop   af
   ret
 

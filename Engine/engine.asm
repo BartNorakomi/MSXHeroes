@@ -182,7 +182,7 @@ Write2FlashObjectLayer:
   ld    (page1bank),a
   out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
-  call  WriteObjectLayerFirst8KB
+;  call  WriteObjectLayerFirst8KB
 
   ld    a,(slot.page2rom)            ;all RAM except page 2
   out   ($a8),a
@@ -206,71 +206,13 @@ Write2FlashObjectLayer:
 
 
 
-  call  WriteObjectLayerSecond8KB
+;  call  WriteObjectLayerSecond8KB
   .kut3: jp .kut3  
   ret
 
-CheckEraseDone:
-  ld    hl,4000H    ; adres in sector die gewist word
-	ld    a,0FFH      ; als het klaar is moet het FFH zijn
-  Erase_Wait:
-	cp    (hl)        ; is de erase klaar?
-	ret   z          ; ja, klaar
-	jr    Erase_Wait  ; nee, nog bezig, wacht
 
-SectorErase:                          ;erases sector (in hl=pointer to romblock)
-  ld    a,$aa
-  ld    ($4aaa),a
 
-  ld    a,$55
-  ld    ($4555),a
 
-  ld    a,$80
-  ld    ($4aaa),a
-
-  ld    a,$aa
-  ld    ($4aaa),a
-
-  ld    a,$55
-  ld    ($4555),a
-
-  ld    a,$30
-  ld    (hl),a
-  ret
-
-WriteObjectLayerFirst8KB:             ;object layer:$8000, write:$4000
-  ld    hl,$8000                      ;address to write from
-  ld    de,$4000                      ;address to write to
-  ld    bc,$2000                      ;amount of bytes to write
-
-  .loop:
-  ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
-  ld    ($4AAA),a
-  ld    a,$55
-  ld    ($4555),a
-  ld    a,$A0                         ; program commando
-  ld    ($4AAA),a
-
-  ldi                                 ;write value to flashrom
-  jp    pe,.loop
-  ret
-
-WriteObjectLayerSecond8KB:             ;object layer:$8000, write:$4000
-  ld    hl,$6000                      ;address to write from
-  ld    de,$a000                      ;address to write to
-  ld    bc,$2000                      ;amount of bytes to write
-
-  .loop:
-  ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
-  ld    ($8AAA),a
-  ld    a,$55
-  ld    ($8555),a
-  ld    a,$A0                         ; program commando
-  ld    ($8AAA),a
-
-  ldi                                 ;write value to flashrom
-  jp    pe,.loop
-  ret
 
 
 
@@ -1927,7 +1869,7 @@ EnterSpecificRoutineInExtraRoutines:
   out   ($a8),a
 
   ld    a,ExtraRoutinesCodeBlock       ;Map block
-  call  block1234                       ;CARE!!! we can only switch block34 if page 1 is in rom  
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
 
   .SelfModifyingCodeRoutine:	equ	$+1
   call  $ffff

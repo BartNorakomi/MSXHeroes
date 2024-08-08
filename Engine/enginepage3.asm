@@ -1,6 +1,6 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 0
+StartAtTitleScreen?:                equ 1
 StartOfTurnMessageOn?:              equ 0
 MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
@@ -59,10 +59,18 @@ InitiateGame:
   if  StartAtTitleScreen?
   call  TitleScreen
   endif
-
-StartGame:
+  StartGame:
 ;jp StartGame
+
+
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
+
+
+
+;  call  SaveGameToFlash
+
+
+
   ld    hl,FindAndSetCastles            ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
   ld    hl,PlaceHeroesInCastles         ;Place hero nr#1 in their castle
@@ -77,6 +85,9 @@ StartGame:
   ld    a,WorldSong
   ld    (ChangeSong?),a
 
+
+
+  call  LoadSaveData
 
 
 ;ld a,38
@@ -157,6 +168,198 @@ StartGame:
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
+
+LoadSaveData?:  db  0
+LoadSaveData:
+  ld    a,(LoadSaveData?)
+  or    a
+  ret   z
+  xor   a
+  ld    (LoadSaveData?),a
+
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  cp    255
+  ret   z
+
+  ld    a,(slot.page12rom)            ;all RAM except page 1+2
+  out   ($a8),a
+
+  di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching
+
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+;  call  block12High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+	ld		($6100),a                     ;set block 0 from upper 4MB at $4000
+
+  ld    hl,$4000
+  ld    de,StartSaveGameData
+  ld    bc,EndSaveGameData-StartSaveGameData
+  ldir
+
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+  inc   a                             ;Map block (object layer data)
+;  call  block12High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+	ld		($6100),a                     ;set block 1 from upper 4MB at $4000
+
+  ld    a,(slot.page1rom)            ;all RAM except page 1+2
+  out   ($a8),a
+
+  ld    hl,$4000
+  ld    de,$8000
+  ld    bc,$4000
+  ldir
+
+
+
+  ei
+  ret
+
+
+
+
+SaveGameToFlash:
+  di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching
+
+  ld    a,(slot.page12rom)            ;all RAM except page 1+2
+  out   ($a8),a
+
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+	ld		($7100),a                     ;set block from upper 4MB at $8000
+
+;  call  block12High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+;  call  block34High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  ;set block 0 in this sector in page 2 at $8000 (here we write save data to)
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+	ld		($7100),a                     ;set block from upper 4MB at $8000
+
+  ;erase sector (first 8 sectors are 8kb, all other sectors are 64kb)
+  ld    hl,$8000
+  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
+
+  call  CheckEraseDone
+
+  ;write save data for current game to flashrom
+  ld    hl,StartSaveGameData
+  ld    de,$8000
+  ld    bc,EndSaveGameData-StartSaveGameData
+  call  FlashWrite
+
+  ;set block 1 in this sector in page 1 at $4000  (here we write mapobjects data to)
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+  inc   a                             ;Map block (object layer data)
+	ld		($6100),a                     ;set block from upper 4MB at $4000
+
+  ld    a,(slot.page1rom)             ;rom in page 1
+  out   ($a8),a
+
+  ld		a,2                           ;set worldmap object layer in bank 2 at $8000
+  out   ($fe),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  call  WriteObjectLayerFirstAndSecond4KB
+  call  WriteObjectLayerFourth4KB
+
+  ;set block 1 in this sector at page 2 at $8000  (here we write mapobjects data to)
+	ld		a,(SaveGameSelected)          ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+  inc   a                             ;Map block (object layer data)
+	ld		($7100),a                     ;set block from upper 4MB at $8000
+
+  ld    a,(slot.page2rom)            ;all RAM except page 2
+  out   ($a8),a
+
+  ld		a,2                           ;set worldmap object layer in bank 2 at $8000
+  out   ($fd),a          	            ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+
+  call  WriteObjectLayerThird4KB
+
+;  ei
+
+  ld    a,(slot.page12rom)              ;all RAM except page 1 and 2
+  out   ($a8),a
+
+  ld    a,ExtraRoutinesCodeBlock       ;Map block
+  call  block12                         ;CARE!!! we can only switch block34 if page 1 is in rom  
+  ret
+
+CheckEraseDone:
+  ld    hl,8000H    ; adres in sector die gewist word
+	ld    a,0FFH      ; als het klaar is moet het FFH zijn
+  Erase_Wait:
+	cp    (hl)        ; is de erase klaar?
+	ret   z          ; ja, klaar
+	jr    Erase_Wait  ; nee, nog bezig, wacht
+
+SectorErase:                          ;erases sector (in hl=pointer to romblock)
+  ld    a,$aa
+  ld    ($4aaa),a
+
+  ld    a,$55
+  ld    ($4555),a
+
+  ld    a,$80
+  ld    ($4aaa),a
+
+  ld    a,$aa
+  ld    ($4aaa),a
+
+  ld    a,$55
+  ld    ($4555),a
+
+  ld    a,$30
+  ld    (hl),a
+  ret
+
+WriteObjectLayerFirstAndSecond4KB:             ;object layer:$8000, write:$4000
+  ld    hl,$8000                      ;address to write from
+  ld    de,$4000                      ;address to write to
+  ld    bc,$2000                      ;amount of bytes to write
+  jr    FlashWrite
+
+WriteObjectLayerThird4KB:             ;object layer:$8000, write:$4000
+  ld    hl,$6000                      ;address to write from
+  ld    de,$a000                      ;address to write to
+  ld    bc,$1000                      ;amount of bytes to write
+
+  .loop:
+  ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
+  ld    ($8AAA),a
+  ld    a,$55
+  ld    ($8555),a
+  ld    a,$A0                         ; program commando
+  ld    ($8AAA),a
+
+  ldi                                 ;write value to flashrom
+  jp    pe,.loop
+  ret
+
+WriteObjectLayerFourth4KB:            ;object layer:$8000, write:$4000
+  ld    hl,$b000                      ;address to write from
+  ld    de,$7000                      ;address to write to
+  ld    bc,$1000                      ;amount of bytes to write
+  jr    FlashWrite
+
+FlashWrite:                           ;in: hl->source, de->destination, bc->amount
+  ld    a,$AA                         ; magic bytes (om per ongeluk schrijven te voorkomen)
+  ld    ($4AAA),a
+  ld    a,$55
+  ld    ($4555),a
+  ld    a,$A0                         ; program commando
+  ld    ($4AAA),a
+
+  ldi                                 ;write value to flashrom
+  jp    pe,FlashWrite
+  ret
 
 
 
