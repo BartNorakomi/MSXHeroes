@@ -6314,7 +6314,6 @@ addytomouseDiagonalPointer:	equ	-2
 
 HeroTotalManaBeforeLevelingUp:  ds  1
 amountofheroesperplayer:	equ	8
-plxcurrentheroAddress:	dw  pl1hero1y
 lenghtherotable:	equ	pl1hero2y-pl1hero1y
 
 HeroY:                  equ 0
@@ -6848,6 +6847,7 @@ ystar:				ds	1
 xstar:				ds	1
 
 currentherowindowclicked:	db	1
+plxcurrentheroAddress:	dw  pl1hero1y
 
 WorldPointer: dw GentleAutumnMap04
 ;WorldPointer: dw GentleCaveMap01
@@ -6857,6 +6857,7 @@ WorldPointer: dw GentleAutumnMap04
 ;WorldPointer: dw GentleWinterMap02
 
 Date: dw  0                     ;date of current turn. days, weeks, months
+
 
 ;**** the following data should only be saved, not be LOADED when loading a game ****
 

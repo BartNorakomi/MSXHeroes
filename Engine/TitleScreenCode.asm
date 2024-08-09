@@ -1,9 +1,9 @@
 HandleTitleScreenCode:
-;  jp    InsertMouseCode
+  jp    InsertMouseCode
 ;  jp    TitleScreenCode
 ;  jp    ScenarioSelectCode
 ;  jp    CampaignSelectCode
-  jp    LoadGameSelectCode
+;  jp    LoadGameSelectCode
 
 ;             y     x     player, castlelev?, tavern?,  market?,  mageguildlev?,  barrackslev?, sawmilllev?,  minelev?, already built this turn?
 ResetBuildings: db                        1,       0,        0,              0,             0,           0,          0,           0
@@ -295,7 +295,7 @@ TitleScreenButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), 
 if promo?
   db  %1100 0011 | dw $4000 + ((172+000)*128) + (000/2) - 128 | dw $4000 + ((172+000)*128) + (070/2) - 128 | dw $4000 + ((172+000)*128) + (140/2) - 128 | db TitleScreenButton1Ytop+10,TitleScreenButton1YBottom+10,TitleScreenButton1XLeft,TitleScreenButton1XRight | dw $0000 + ((TitleScreenButton1Ytop+10)*128) + (TitleScreenButton1XLeft/2) - 128 
   db  %0100 0011 | dw $4000 + ((172+014)*128) + (000/2) - 128 | dw $4000 + ((172+014)*128) + (062/2) - 128 | dw $4000 + ((172+014)*128) + (124/2) - 128 | db TitleScreenButton2Ytop+10,TitleScreenButton2YBottom+10,TitleScreenButton2XLeft,TitleScreenButton2XRight | dw $0000 + ((TitleScreenButton2Ytop+10)*128) + (TitleScreenButton2XLeft/2) - 128 
-  db  %0100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
+  db  %1100 0011 | dw $4000 + ((172+030)*128) + (000/2) - 128 | dw $4000 + ((172+030)*128) + (072/2) - 128 | dw $4000 + ((172+030)*128) + (144/2) - 128 | db TitleScreenButton3Ytop,TitleScreenButton3YBottom,TitleScreenButton3XLeft,TitleScreenButton3XRight | dw $0000 + (TitleScreenButton3Ytop*128) + (TitleScreenButton3XLeft/2) - 128
   db  %0100 0011 | dw $4000 + ((172+045)*128) + (000/2) - 128 | dw $4000 + ((172+045)*128) + (050/2) - 128 | dw $4000 + ((172+045)*128) + (100/2) - 128 | db TitleScreenButton4Ytop,TitleScreenButton4YBottom,TitleScreenButton4XLeft,TitleScreenButton4XRight | dw $0000 + (TitleScreenButton4Ytop*128) + (TitleScreenButton4XLeft/2) - 128
   db  %0100 0011 | dw $4000 + ((172+061)*128) + (000/2) - 128 | dw $4000 + ((172+061)*128) + (068/2) - 128 | dw $4000 + ((172+061)*128) + (136/2) - 128 | db TitleScreenButton5Ytop,TitleScreenButton5YBottom,TitleScreenButton5XLeft,TitleScreenButton5XRight | dw $0000 + (TitleScreenButton5Ytop*128) + (TitleScreenButton5XLeft/2) - 128
 else
@@ -763,16 +763,19 @@ screenonAfter3Frames:
 
 LoadGameSelectCode:
   call  screenoff
+LoadGameSelectCodeSkipScreenOff:
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
 	ld		(activepage),a	
   call  SetLoadGameGraphics
+  call  SetNamesInLoadGameButtons
   xor   a
 	ld		(activepage),a
   ld    a,255
 	ld		(SaveGameSelected),a            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
   call  SetLoadGameGraphics
+  call  SetNamesInLoadGameButtons
 
   ld    hl,InGamePalette
   call  SetPalette
@@ -813,12 +816,12 @@ LoadGameSelectCode:
   jp    .engine
 
   .EndTitleScreenEngine:
-  call  ScenarioSelectCode.SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
-  call  ScenarioSelectCode.SetAmountOfPlayers
-  call  ScenarioSelectCode.SetStartingTown
-  call  ScenarioSelectCode.SetStartingResources
-  call  ScenarioSelectCode.SetStartingHeroes
-  call  ScenarioSelectCode.SetTavernHeroes
+;  call  ScenarioSelectCode.SortHumanCPUOFFPlayersAndTown  ;If any Player is set to OFF, move all players below that up in the list  
+;  call  ScenarioSelectCode.SetAmountOfPlayers
+;  call  ScenarioSelectCode.SetStartingTown
+;  call  ScenarioSelectCode.SetStartingResources
+;  call  ScenarioSelectCode.SetStartingHeroes
+;  call  ScenarioSelectCode.SetTavernHeroes
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
@@ -895,10 +898,8 @@ LoadGameSelectCode:
 	ld		a,(SaveGameSelected)      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
   cp    255
   ret   z
-
-;  pop   af
-;  jp    TitleScreenCode
-  ret
+  pop   af
+  jp    ConfirmDeleteFileCOde
 
   .SetDifficulty:
   ld    a,b
@@ -920,6 +921,137 @@ LoadGameSelectCode:
 
 
 
+
+
+
+
+DeleteFileWindowDX: equ 030 + 26
+DeleteFileWindowDY: equ 063
+DeleteFileWindowNX: equ 144
+DeleteFileWindowNY: equ 051
+ConfirmDeleteFileCOde:
+  call  SetConfirmDeleteFileButtons
+  call  SetConfirmDeleteFileGraphics               ;put gfx
+  call  SetConfirmDeleteFileGraphics2               ;put gfx
+  call  SwapAndSetPage                  ;swap and set page
+  call  SetConfirmDeleteFileGraphics               ;put gfx
+  call  SetConfirmDeleteFileGraphics2               ;put gfx
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  jp    nz,LoadGameSelectCodeSkipScreenOff
+
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  ScenarioSelectCode.SetGenericButtons              ;copies button state from rom -> vram
+
+  call  .CheckClickOutOfWindow          ;check if mouse is clicked outside of window. If so, return to game
+
+  halt
+  jp  .engine
+
+  .CheckClickOutOfWindow:;
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    DeleteFileWindowDY
+  jr    c,.NotOutOfWindow
+  cp    DeleteFileWindowDY+DeleteFileWindowNY
+  jr    nc,.NotOutOfWindow
+  
+  ld    a,(spat+1)                      ;x mouse
+  add   a,06
+  cp    DeleteFileWindowDX
+  jr    c,.NotOutOfWindow
+  cp    DeleteFileWindowDX+DeleteFileWindowNX
+  ret   c
+  .NotOutOfWindow:
+  pop   af
+  jp    LoadGameSelectCodeSkipScreenOff
+
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af                              ;end this routine
+  ld    a,b
+  cp    1                               ;no pressed ?
+  jp    z,LoadGameSelectCodeSkipScreenOff
+  ;yes pressed, erase save file
+
+
+	ld		a,(SaveGameSelected)      ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+  di
+	ld		($6100),a                     ;set block from upper 4MB at $4000
+
+  ;erase sector (first 8 sectors are 8kb, all other sectors are 64kb)
+  ld    hl,$4000
+  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
+  call  CheckEraseDonePage1
+  jp    LoadGameSelectCodeSkipScreenOff
+
+CheckEraseDonePage1:
+  ld    hl,4000H    ; adres in sector die gewist word
+	ld    a,0FFH      ; als het klaar is moet het FFH zijn
+  .Erase_Wait:
+	cp    (hl)        ; is de erase klaar?
+	ret   z          ; ja, klaar
+	jr    .Erase_Wait  ; nee, nog bezig, wacht
+
+SetConfirmDeleteFileButtons:
+  ld    hl,SetConfirmDeleteFileuButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*02)
+  ldir
+  ret
+
+SetConfirmDeleteFileuButtonTableGfxBlock:  db  RetreatBlock
+SetConfirmDeleteFileuButtonTableAmountOfButtons:  db  02
+SetConfirmDeleteFileuButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;main menu
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;safe game
+  db  %1100 0011 | dw $4000 + (057*128) + (228/2) - 128 | dw $4000 + (075*128) + (228/2) - 128 | dw $4000 + (093*128) + (228/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+
+.Button1Ytop:           equ 088
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 048 + 26
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 089
+.Button2YBottom:        equ .Button2Ytop + 018
+.Button2XLeft:          equ 048+090 + 26
+.Button2XRight:         equ .Button2XLeft + 020
+
+SetConfirmDeleteFileGraphics:
+  ld    hl,$4000 + (050*128) + (000/2) - 128
+  ld    de,$0000 + (063*128) + (056/2) - 128
+  ld    bc,$0000 + (051*256) + (144/2)
+  ld    a,DiskMenuBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+SetConfirmDeleteFileGraphics2:
+  ld    hl,$4000 + (000*128) + (144/2) - 128
+  ld    de,$0000 + (071*128) + (106/2) - 128
+  ld    bc,$0000 + (005*256) + (040/2)
+  ld    a,DiskMenuBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
 
 
@@ -1427,9 +1559,10 @@ ScenarioSelectCode:
   ;search a random hero from the list HeroesWithoutCastle.
 
   .PickRandomHeroWithoutCastle:
-  ld    hl,HeroesWithoutCastle
   ld    a,r
   and   31                              ;take a hero out of the first 32
+
+  ld    hl,HeroesWithoutCastle
 
 ;still to do, WIP:
 ;1. player first unlocks ALL heroes (and their castles) that HAVE a castle (9 campaigns, the first campain unlocks 2 castles)

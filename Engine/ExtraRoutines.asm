@@ -846,10 +846,157 @@ SetSpireOfWisdomGraphics:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+;ScenarioNameAddress:  equ 15
+SetNamesInSaveGameButtons:
+  ld    b,10                          ;amount of save files
+	ld		a,000                         ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
+  ld    c,045+(0*13)                  ;dy
+  .loop:
+  push  af
+  push  bc
+  call  .SetName
+  pop   bc
+  ld    a,c
+  add   a,13
+  ld    c,a                           ;dy next save file is 13 pixels lower
+  pop   af
+  inc   a                             ;next save file
+  djnz  .loop
+  ei
+  ret
+
+  .SetName:
+  add   a,a
+  add   a,a                           ;save game * 4. 64k block where save game data starts
+  di
+	ld		($7100),a                     ;set block from upper 4MB at $8000
+
+  ld    a,(amountofplayers-StartSaveGameData+$8000)
+  ld    d,a                           ;amount of players
+  ld    hl,(WorldPointer-StartSaveGameData+$8000)
+
+  ld    a,($8000+HeroMove)
+  cp    255
+  ret   z
+
+  ld    a,(slot.page12rom)            ;page 1 and 2 rom
+  out   ($a8),a      
+  ld    a,Loaderblock                 ;Map block
+  call  block34                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+  push  de
+
+  ld    de,ScenarioNameAddress+2+$4000      ;map size
+  add   hl,de
+  push  bc
+  ld    b,184                         ;dx
+  call  SetText                       ;in: b=dx, c=dy, hl->text
+  pop   bc
+
+  inc   hl                            ;map name
+  push  bc
+  ld    b,017                         ;dx
+  call  SetText                       ;in: b=dx, c=dy, hl->text
+  pop   bc
+
+  pop   de
+
+  ld    h,000                         ;amount of players
+  ld    l,d                           ;amount of players
+  push  bc
+  ld    b,165                         ;dx
+  call  SetNumber16BitCastle
+
+  ld    a,(DayOfMonthTientallen)
+  ld    hl,10
+  ld    d,0
+  ld    e,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    a,(DayOfMonthEenheden)
+  ld    e,a
+  ld    d,0
+  add   hl,de
+
+  pop   bc
+  push  bc
+  ld    b,112                         ;dx
+  call  SetNumber16BitCastle
+
+  ld    hl,.TextSlash
+  pop   bc
+  push  bc
+  ld    a,(PutLetter+dx)
+  ld    b,a                           ;dx
+  call  SetText                       ;in: b=dx, c=dy, hl->text
+
+  ld    a,(MonthTientallen)
+  ld    hl,10
+  ld    d,0
+  ld    e,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    a,(MonthEenheden)
+  ld    e,a
+  ld    d,0
+  add   hl,de
+  pop   bc
+  push  bc
+  ld    a,(PutLetter+dx)
+  ld    b,a                           ;dx
+  call  SetNumber16BitCastle
+
+  ld    hl,.TextSlash
+  pop   bc
+  push  bc
+  ld    a,(PutLetter+dx)
+  ld    b,a                           ;dx
+  call  SetText                       ;in: b=dx, c=dy, hl->text
+
+  ld    a,(YearTientallen)
+  ld    hl,10
+  ld    d,0
+  ld    e,a
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    a,(YearEenheden)
+  ld    e,a
+  ld    d,0
+  add   hl,de
+  ld    de,1980                       ;you still need to add +1980 to the year
+  add   hl,de
+
+  pop   bc
+  push  bc
+  ld    a,(PutLetter+dx)
+  ld    b,a                           ;dx
+  call  SetNumber16BitCastle
+  pop   bc  
+  ret
+
+.TextSlash:  db  "/",255
+
+
+
+
+
+
+
+
 SaveGameCode:
   call  SetSaveGameGraphics               ;put gfx
+  call  SetNamesInSaveGameButtons
   call  SwapAndSetPage                  ;swap and set page
   call  SetSaveGameGraphics               ;put gfx
+  call  SetNamesInSaveGameButtons
   call  CopyActivePageToInactivePageExtraRoutines
   ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
   call  docopy
@@ -879,7 +1026,10 @@ SaveGameCode:
   call  DisplaySpireOfWisdomCOde.SetGenericButtons              ;copies button state from rom -> vram
 ;  call  .CheckClickOutOfWindow          ;check if mouse is clicked outside of window. If so, return to game
 
-  halt
+  call  SetNamesInSaveGameButtons
+
+
+;  halt
   jp  .engine
 
   .CheckClickOutOfWindow:;
