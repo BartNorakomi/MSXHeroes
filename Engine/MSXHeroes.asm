@@ -1,6 +1,7 @@
 		fname	"MSXHeroes.rom"
 	org		$4000
 MSXHeroes:
+
 ;
 ; MSXHeroes - ROM version
 

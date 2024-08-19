@@ -1,11 +1,11 @@
 phase	$c000
 
 StartAtTitleScreen?:                equ 1
-StartOfTurnMessageOn?:              equ 1
-MusicOn?:                           equ 1
+StartOfTurnMessageOn?:              equ 0
+MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
 
-Promo?:                             equ 1
+Promo?:                             equ 0
 CollectionOptionAvailable?:         equ 0
 UnlimitedBuildsPerTurn?:            equ 0
 DisplayNumbers1to6?:                equ 0
@@ -65,11 +65,7 @@ InitiateGame:
 
   call  LoadWorldMapAndObjectLayerMap   ;unpack the worldmap to $8000 in ram (bank 1), unpack the world object layer map to $8000 in ram (bank 2)
 
-
-
 ;  call  SaveGameToFlash
-
-
 
   ld    hl,FindAndSetCastles            ;castles on the map have to be assigned to their players, and coordinates have to be set
   call  ExecuteLoaderRoutine
@@ -85,10 +81,9 @@ InitiateGame:
   ld    a,WorldSong
   ld    (ChangeSong?),a
 
-
+  call  SetCampaignHeroesCastlesResources
 
   call  LoadSaveData
-
 
 ;ld a,38
 ;ld (pl1hero1y),a
@@ -136,12 +131,6 @@ InitiateGame:
 
 
 
-
-
-
-
-
-
 ;ld a,255
 ;ld (pl1hero1y+HeroStatus),a
 ;ld (pl1hero1y),a
@@ -167,6 +156,17 @@ InitiateGame:
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+SetCampaignHeroesCastlesResources:
+  ld    a,(CampaignMode?)
+  or    a
+  ret   z
+
+  ld    a,(slot.page12rom)            ;all RAM except page 1
+  out   ($a8),a      
+  ld    a,TitleScreenCodeblock        ;Map block
+  call  block34                       ;CARE!!! we can only switch block34 if page 1 is in rom
+  jp    DoSetCampaignHeroesCastlesResources
 
 
 LoadSaveData?:  db  0
@@ -5100,7 +5100,6 @@ HeroPortrait16x30SYSXJeddaChef:         equ $8000+(120*128)+(176/2)-128 ;(dy*128
 
 Difficulty: ds  1                   ;1=easy, 2=normal, 3=hard, 4=expert, 5=impossible
 ScenarioPage: ds  1
-ScenarioSelected: ds  1
 SaveGameSelected: ds  1             ;save game is a value between 1 and 13. when save game=0 it means no save game is selected
 LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1

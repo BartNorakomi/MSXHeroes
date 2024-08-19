@@ -161,42 +161,40 @@ LevelEngine:
 
 
 
-;  ld hl,$6000 + 256
-;  ld (hl),l     ; select bank xxx in 1st page (4000-7FFF, C000-FFFF)
-Write2FlashObjectLayer:
-  ld    a,(slot.page1rom)            ;all RAM except page 1
-  out   ($a8),a
+;Write2FlashObjectLayer:
+;  ld    a,(slot.page1rom)            ;all RAM except page 1
+;  out   ($a8),a
 
-  ld    a,0         ;first block upper 4MB
-  ld    (6100H),a  ; select bank xxx in 1st page (4000-7FFF)
+;  ld    a,0         ;first block upper 4MB
+;  ld    (6100H),a  ; select bank xxx in 1st page (4000-7FFF)
   ;or alternatively in page 2, same result:
 ;  ld    a,0         ;first block upper 4MB
 ;  ld    ($6100+$4000),a  ; select bank xxx in 1st page (4000-7FFF)
 
   ;erase sector (first 8 sectors are 8kb, all other sectors are 64kb)
-  ld    hl,$4000
-  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
+;  ld    hl,$4000
+;  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
 
   ;set object layer at $8000
-  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
-  ld    (page1bank),a
-  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+;  ld		a,2                             ;set worldmap object layer in bank 2 at $8000
+;  ld    (page1bank),a
+;  out   ($fe),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 ;  call  WriteObjectLayerFirst8KB
 
-  ld    a,(slot.page2rom)            ;all RAM except page 2
-  out   ($a8),a
+;  ld    a,(slot.page2rom)            ;all RAM except page 2
+;  out   ($a8),a
 
 ;  ld    a,0         ;first block upper 4MB
 ;  ld    ($7100),a  ; select bank xxx in 2nd page (8000-bFFF)
   ;or alternatively in page 2, same result:
-  ld    a,0         ;first block upper 4MB
-  ld    ($7100+$4000),a  ; select bank xxx in 2nd page (8000-bFFF)
+;  ld    a,0         ;first block upper 4MB
+;  ld    ($7100+$4000),a  ; select bank xxx in 2nd page (8000-bFFF)
 
   ;set object layer at $4000
-  ld		a,2                             ;set worldmap object layer in bank 2 at $4000
-  ld    (page2bank),a
-  out   ($fd),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
+;  ld		a,2                             ;set worldmap object layer in bank 2 at $4000
+;  ld    (page2bank),a
+;  out   ($fd),a          	              ;$ff = page 0 ($c000-$ffff) | $fe = page 1 ($8000-$bfff) | $fd = page 2 ($4000-$7fff) | $fc = page 3 ($0000-$3fff) 
 
 
 
@@ -207,8 +205,7 @@ Write2FlashObjectLayer:
 
 
 ;  call  WriteObjectLayerSecond8KB
-  .kut3: jp .kut3  
-  ret
+;  ret
 
 
 
@@ -6846,6 +6843,9 @@ movementpathReverse:		ds	48*2 ;| db 128	;1stbyte:yhero,	2ndbyte:xhero, then x mo
 ystar:				ds	1
 xstar:				ds	1
 
+CampaignMode?:  ds  1
+ScenarioSelected: ds  1
+
 currentherowindowclicked:	db	1
 plxcurrentheroAddress:	dw  pl1hero1y
 
@@ -6869,3 +6869,4 @@ Date: dw  0                     ;date of current turn. days, weeks, months
 ;YearTientallen:             ds    1
 
 EndSaveGameData:
+SaveGameDataLenght: equ EndSaveGameData-StartSaveGameData
