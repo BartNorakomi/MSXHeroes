@@ -6857,7 +6857,9 @@ WorldPointer: dw GentleAutumnMap04
 ;WorldPointer: dw GentleWinterMap02
 
 Date: dw  0                     ;date of current turn. days, weeks, months
-
+DaysToCompleteCampaign: ds  1
+CampaignText: ds  CampaignTextLenght
+CampaignFinished?: db  0
 
 ;**** the following data should only be saved, not be LOADED when loading a game ****
 

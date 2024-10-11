@@ -432,6 +432,10 @@ SetPlayerWonGameWindowAndText:
   ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
   call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
 
+  ld    a,(CampaignMode?)
+  or    a
+  jr    nz,.CampaignMode
+
   ld    b,075                           ;x coordinate text
   ld    c,067                           ;y coordinate text
   ld    hl,TextPlayerWonGame1
@@ -460,11 +464,82 @@ SetPlayerWonGameWindowAndText:
   ld    hl,TextPlayerWonGame2
   jp    SetText
 
+  .CampaignMode:
+  ld    a,(DaysToCompleteCampaign)
+  ld    l,a
+  ld    h,0
+  ld    de,(Date)
+  xor   a
+  dec   hl
+  sbc   hl,de
+  jr    nc,.CampaignFinishedInTime
+
+  .CampaignFinishedOutOfTime:
+  ld    b,075                           ;x coordinate text
+  ld    c,067                           ;y coordinate text
+  ld    hl,TextOutOfTime
+  call  SetText
+
+  ld    b,078                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  ld    hl,TextCampaignFailed
+  jp    SetText
+
+  .CampaignFinishedInTime:
+  ld    b,075                           ;x coordinate text
+  ld    c,067                           ;y coordinate text
+  ld    hl,TextPlayerWonGame1
+  call  SetText
+
+  ld    a,1
+  ld    (CampaignFinished?),a
+  ld    b,078                           ;x coordinate text
+  ld    c,078                           ;y coordinate text
+  ld    hl,TextCampaignFinished
+  call  SetText
+
+  ;check if this is the latest campaign (AND that it's not finished yet)
+  ld    a,(ScenarioSelected)
+  ld    b,a
+  ld    a,(AmountOfCampaignsFinished)
+  cp    b
+  ret   nz
+  inc   a
+  ld    (AmountOfCampaignsFinished),a
+
+  ;save amount of campaigns finished to flashrom
+  di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching
+  ld    a,SaveDataBlock11-$100
+	ld		($7100),a                     ;set block from upper 4MB at $8000
+
+  ;erase sector (first 8 sectors are 8kb, all other sectors are 64kb)
+  ld    hl,$8000
+  call  SectorErase                   ;erases sector (in hl=pointer to romblock)
+
+  call  CheckEraseDone
+
+  ;write amount of campaigns finished to rom
+  ld    hl,AmountOfCampaignsFinished
+  ld    de,$8000
+  ld    bc,1
+  call  FlashWrite
+  ret
+
+TextOutOfTime:
+                    db    "Out Of Time",255
+TextCampaignFailed:    
+                    db    " You failed",254
+                    db    "the Campaign",255
+
 TextPlayerWonGame1:    
                     db    "Congratulations",255
 TextPlayerWonGame2:    
                     db    "  Player",254
                     db    "Is Victorious",255
+
+TextCampaignFinished:    
+                    db    " You finished",254
+                    db    "this Campaign",255
 
 SetPlayerEliminatedWindowAndText:
   ld    hl,$4000 + (070*128) + (150/2) - 128

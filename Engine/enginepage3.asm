@@ -1,7 +1,7 @@
 phase	$c000
 
 StartAtTitleScreen?:                equ 1
-StartOfTurnMessageOn?:              equ 0
+StartOfTurnMessageOn?:              equ 1
 MusicOn?:                           equ 0
 Music50PercentSpeed?:               equ 0
 
@@ -32,9 +32,12 @@ InitiateGame:
 ;ld (pl2hero1y+HeroUnits),a
 ;ld a,(pl1hero1y+HeroUnits+3)
 ;ld (pl2hero1y+HeroUnits+3),a
-
+  ld    a,3
+  ld    (DisplayStartOfTurnMessage?),a
 	ld		a,1
 	ld		(whichplayernowplaying?),a      ;which hero has it's first turn
+  xor   a
+  ld    (CampaignFinished?),a
 
 ;  ld    hl,0
   ld    hl,pl1hero1y
@@ -55,6 +58,7 @@ InitiateGame:
 ;  call  CheckSwitchNextSong
 ;  call  CheckSwitchNextSong
 
+  call  LoadAmountOfCampaignsFinished
 
   if  StartAtTitleScreen?
   call  TitleScreen
@@ -84,6 +88,18 @@ InitiateGame:
   call  SetCampaignHeroesCastlesResources
 
   call  LoadSaveData
+
+
+
+
+
+
+
+
+
+
+
+
 
 ;ld a,38
 ;ld (pl1hero1y),a
@@ -157,6 +173,18 @@ InitiateGame:
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
 
+LoadAmountOfCampaignsFinished:
+  di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching
+  ld    a,(slot.page12rom)            ;all RAM except page 1+2
+  out   ($a8),a
+
+  ld    a,SaveDataBlock11-$100
+	ld		($6100),a                     ;set block from upper 4MB at $4000
+
+  ld    a,($4000)
+  ld    (AmountOfCampaignsFinished),a
+  ret
+
 SetCampaignHeroesCastlesResources:
   ld    a,(CampaignMode?)
   or    a
@@ -164,6 +192,8 @@ SetCampaignHeroesCastlesResources:
 
   ld    a,(slot.page12rom)            ;all RAM except page 1
   out   ($a8),a      
+  ld    a,CampaignInfoblock
+  call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
   ld    a,TitleScreenCodeblock        ;Map block
   call  block34                       ;CARE!!! we can only switch block34 if page 1 is in rom
   jp    DoSetCampaignHeroesCastlesResources
@@ -3642,12 +3672,12 @@ SetPage:                                ;in a->x*32+31 (x=page)
 ;    ld hl,6147H
 ;    ld (hl),l     ; select bank 147H in 1st page (4000-7FFF, C000-FFFF)
 
-;block12High:
- ; di
-;	ld		(memblocks.1),a
-;	ld		($6100),a
-;	ei
-;	ret
+block12High:
+  di
+	ld		(memblocks.1),a
+	ld		($6100),a
+	ei
+	ret
 
 ;block34High:	
  ; di
@@ -5105,6 +5135,9 @@ LitScenarioButtonInWhichPage?: ds  1
 AmountOfMapsVisibleInCurrentPage: ds  1
 PlayerWhoLostAHeroInBattle?: ds   1
 PlayerLostHeroInBattle?: db  0
+
+AmountOfCampaignsFinished:  db  0
+
 AmountOfMapsUnlocked: 
 if promo?
 db 3

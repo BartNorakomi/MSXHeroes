@@ -1891,41 +1891,56 @@ usas2repBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 LoadGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					phase	$4000
   					incbin "..\grapx\TitleScreen\LoadGame.SC5",7,212 * 128      ;134 lines
-					ds		$c000-$,$ff
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 SaveGameBlock:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					phase	$4000
   					incbin "..\grapx\DiskMenu\SaveGame.SC5",7,192 * 128      ;134 lines
-					ds		$c000-$,$ff
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
+CampaignInfoblock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
+					phase	$4000
+					include	"CampaignInfo.asm"	
+					dephase
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;; WE HAVE 2????? BLOCKS LEFT we still need introsong
+;;;;WE HAVE 2 BLOCKS FREE IN THE LOWER 4MB
+ds $4000,-1
+ds $4000,-1
 
 
 
-
-
-
-totallenght:	Equ	$-MSXHeroes
-	ds		(8*$80000)-totallenght,$ff
+;totallenght:	Equ	$-MSXHeroes
+;	ds		(8*$80000)-totallenght,$ff
 
 
 Upper4MB:
-;					phase	$4000
-;					ds		$8000-$,$00
-;					dephase
 
-;					phase	$4000
-;					ds		$8000-$,$01
-;					dephase
-
-;					phase	$4000
-;					ds		$8000-$,$02
-;					dephase
+SaveDataBlock1:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock2:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock3:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock4:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock5:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock6:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock7:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock8:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock9:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock10:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					ds		$10000,$ff
+SaveDataBlock11:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
+					db	8						;Amount of Campaigns Finished saved in Rom (AmountOfCampaignsFinished in enginepage3)
+					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 
 

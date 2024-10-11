@@ -451,7 +451,7 @@ CampaignSelectCode:
   jp    .engine
 
 SetTextPage123ButtonsCampaign:
-  ld    a,(AmountOfMapsUnlocked)
+  ld    a,(AmountOfCampaignsFinished)
   cp    11-1
   ret   c
 
@@ -465,7 +465,7 @@ SetTextPage123ButtonsCampaign:
   ld    hl,TextPage2
   call  SetText                         ;in: b=dx, c=dy, hl->text
 
-  ld    a,(AmountOfMapsUnlocked)
+  ld    a,(AmountOfCampaignsFinished)
   cp    21-1
   ret   c
 
@@ -591,554 +591,6 @@ EndCampaignScreenEngine:
   ret
 
 
-;Pochi is lost: start with royas, tavern filled with worzen family, except pochi, enemy town empty
-Campaign01:
-.StartingTowns:                       db  001,002,000,000   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  006,008,010,039,041,000,000,000,000,000
-.Players:                             db  2,1,0,2,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
-.StartingResources:
-.Gold:                                dw  20000
-.Wood:                                dw  20
-.Ore:                                 dw  20
-.Gems:                                dw  10
-.Rubies:                              dw  10
-.Castle1Player:                       db  1
-.Castle2Player:                       db  2
-.Castle3Player:                       db  3
-.Castle4Player:                       db  4
-;starting Heroes
-.P1hero1y:		db	1
-.P1hero1x:		db	1
-.P1hero1xp: dw 0 ;65000 ;3000 ;999
-.P1hero1move:	db	20,20
-.P1hero1mana:	dw	10,10
-.P1hero1manarec:db	5		                ;recover x mana every turn
-.P1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P1Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P1Hero1StatAttack:  db 1
-.P1Hero1StatDefense:  db 2
-.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P1HeroSkills:  db  10,0,0,0,0,0
-.P1HeroLevel: db  1
-.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P1FireSpells:        db  %0000 0000
-.P1AirSpells:         db  %0000 0000
-.P1WaterSpells:       db  %0000 0000
-.P1AllSchoolsSpells:  db  %0000 0000
-.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P1HeroSpecificInfo: dw HeroAddressesDrasle1
-.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P2hero1y:		db	1
-.P2hero1x:		db	1
-.P2hero1xp: dw 0 ;65000 ;3000 ;999
-.P2hero1move:	db	20,20
-.P2hero1mana:	dw	10,10
-.P2hero1manarec:db	5		                ;recover x mana every turn
-.P2hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db SDSnatcherUnitLevel1Number | dw SDSnatcherUnitLevel1Growth |      db SDSnatcherUnitLevel2Number | dw SDSnatcherUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P2Hero1StatAttack:  db 1
-.P2Hero1StatDefense:  db 2
-.P2Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P2Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P2HeroSkills:  db  01,0,0,0,0,0
-.P2HeroLevel: db  1
-.P2EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P2FireSpells:        db  %0000 0000
-.P2AirSpells:         db  %0000 0000
-.P2WaterSpells:       db  %0000 0000
-.P2AllSchoolsSpells:  db  %0000 0000
-.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesSnatcher
-.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P3hero1y:		db	1
-.P3hero1x:		db	1
-.P3hero1xp: dw 0 ;65000 ;3000 ;999
-.P3hero1move:	db	20,20
-.P3hero1mana:	dw	10,10
-.P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P3Hero1StatAttack:  db 1
-.P3Hero1StatDefense:  db 2
-.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P3HeroSkills:  db  16,0,0,0,0,0
-.P3HeroLevel: db  1
-.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P3FireSpells:        db  %0000 0000
-.P3AirSpells:         db  %0000 0000
-.P3WaterSpells:       db  %0000 0000
-.P3AllSchoolsSpells:  db  %0000 0000
-.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesTrevorBelmont
-.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P4hero1y:		db	1
-.P4hero1x:		db	1
-.P4hero1xp: dw 0 ;65000 ;3000 ;999
-.P4hero1move:	db	20,20
-.P4hero1mana:	dw	10,10
-.P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P4Hero1StatAttack:  db 1
-.P4Hero1StatDefense:  db 2
-.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P4HeroSkills:  db  10,0,0,0,0,0
-.P4HeroLevel: db  1
-.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P4FireSpells:        db  %0000 0000
-.P4AirSpells:         db  %0000 0000
-.P4WaterSpells:       db  %0000 0000
-.P4AllSchoolsSpells:  db  %0000 0000
-.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesSnake2
-.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-
-;Crossroads of Courage: start without hero, tavern filled with worzen family, enemy towns have both 1 hero (snatcher and a belmont) and several units
-Campaign02:
-.StartingTowns:                       db  001,002,003,000   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  039,041,004,026,006,008,010,000,000,000
-.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
-.StartingResources:
-.Gold:                                dw  20000
-.Wood:                                dw  20
-.Ore:                                 dw  20
-.Gems:                                dw  10
-.Rubies:                              dw  10
-.Castle1Player:                       db  1
-.Castle2Player:                       db  2
-.Castle3Player:                       db  3
-.Castle4Player:                       db  4
-;starting Heroes
-.P1hero1y:		db	1
-.P1hero1x:		db	1
-.P1hero1xp: dw 0 ;65000 ;3000 ;999
-.P1hero1move:	db	20,20
-.P1hero1mana:	dw	10,10
-.P1hero1manarec:db	5		                ;recover x mana every turn
-.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P1Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P1Hero1StatAttack:  db 1
-.P1Hero1StatDefense:  db 2
-.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P1HeroSkills:  db  10,0,0,0,0,0
-.P1HeroLevel: db  1
-.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P1FireSpells:        db  %0000 0000
-.P1AirSpells:         db  %0000 0000
-.P1WaterSpells:       db  %0000 0000
-.P1AllSchoolsSpells:  db  %0000 0000
-.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P1HeroSpecificInfo: dw HeroAddressesSnake2
-.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P2hero1y:		db	1
-.P2hero1x:		db	1
-.P2hero1xp: dw 0 ;65000 ;3000 ;999
-.P2hero1move:	db	20,20
-.P2hero1mana:	dw	10,10
-.P2hero1manarec:db	5		                ;recover x mana every turn
-.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db SDSnatcherUnitLevel1Number | dw SDSnatcherUnitLevel1Growth |      db SDSnatcherUnitLevel2Number | dw SDSnatcherUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P2Hero1StatAttack:  db 1
-.P2Hero1StatDefense:  db 2
-.P2Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P2Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P2HeroSkills:  db  01,0,0,0,0,0
-.P2HeroLevel: db  1
-.P2EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P2FireSpells:        db  %0000 0000
-.P2AirSpells:         db  %0000 0000
-.P2WaterSpells:       db  %0000 0000
-.P2AllSchoolsSpells:  db  %0000 0000
-.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesSnatcher
-.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P3hero1y:		db	1
-.P3hero1x:		db	1
-.P3hero1xp: dw 0 ;65000 ;3000 ;999
-.P3hero1move:	db	20,20
-.P3hero1mana:	dw	10,10
-.P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P3Hero1StatAttack:  db 1
-.P3Hero1StatDefense:  db 2
-.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P3HeroSkills:  db  16,0,0,0,0,0
-.P3HeroLevel: db  1
-.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P3FireSpells:        db  %0000 0000
-.P3AirSpells:         db  %0000 0000
-.P3WaterSpells:       db  %0000 0000
-.P3AllSchoolsSpells:  db  %0000 0000
-.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesTrevorBelmont
-.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P4hero1y:		db	1
-.P4hero1x:		db	1
-.P4hero1xp: dw 0 ;65000 ;3000 ;999
-.P4hero1move:	db	20,20
-.P4hero1mana:	dw	10,10
-.P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P4Hero1StatAttack:  db 1
-.P4Hero1StatDefense:  db 2
-.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P4HeroSkills:  db  10,0,0,0,0,0
-.P4HeroLevel: db  1
-.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P4FireSpells:        db  %0000 0000
-.P4AirSpells:         db  %0000 0000
-.P4WaterSpells:       db  %0000 0000
-.P4AllSchoolsSpells:  db  %0000 0000
-.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesSnake2
-.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-
-;Whispers in the Sand: start without heroes. tavern filled with cles and wit. enemy town has trevor belmont and several units. loss condition: lose both with and cles.
-Campaign03:                               ;c1, c2
-.StartingTowns:                       db  004,002,000,000   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  047,019,000,000,000,000,000,000,000,000
-.Players:                             db  2,1,0,2,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
-.StartingResources:
-.Gold:                                dw  20000
-.Wood:                                dw  20
-.Ore:                                 dw  20
-.Gems:                                dw  10
-.Rubies:                              dw  10
-.Castle1Player:                       db  1
-.Castle2Player:                       db  2
-.Castle3Player:                       db  3
-.Castle4Player:                       db  4
-;starting Heroes
-.P1hero1y:		db	1
-.P1hero1x:		db	1
-.P1hero1xp: dw 0 ;65000 ;3000 ;999
-.P1hero1move:	db	20,20
-.P1hero1mana:	dw	10,10
-.P1hero1manarec:db	5		                ;recover x mana every turn
-.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P1Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P1Hero1StatAttack:  db 1
-.P1Hero1StatDefense:  db 2
-.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P1HeroSkills:  db  10,0,0,0,0,0
-.P1HeroLevel: db  1
-.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P1FireSpells:        db  %0000 0000
-.P1AirSpells:         db  %0000 0000
-.P1WaterSpells:       db  %0000 0000
-.P1AllSchoolsSpells:  db  %0000 0000
-.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P1HeroSpecificInfo: dw HeroAddressesSnake2
-.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P2hero1y:		db	1
-.P2hero1x:		db	1
-.P2hero1xp: dw 0 ;65000 ;3000 ;999
-.P2hero1move:	db	20,20
-.P2hero1mana:	dw	10,10
-.P2hero1manarec:db	5		                ;recover x mana every turn
-.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P2Hero1StatAttack:  db 1
-.P2Hero1StatDefense:  db 2
-.P2Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P2Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P2HeroSkills:  db  01,0,0,0,0,0
-.P2HeroLevel: db  1
-.P2EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P2FireSpells:        db  %0000 0000
-.P2AirSpells:         db  %0000 0000
-.P2WaterSpells:       db  %0000 0000
-.P2AllSchoolsSpells:  db  %0000 0000
-.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesTrevorBelmont
-.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P3hero1y:		db	1
-.P3hero1x:		db	1
-.P3hero1xp: dw 0 ;65000 ;3000 ;999
-.P3hero1move:	db	20,20
-.P3hero1mana:	dw	10,10
-.P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P3Hero1StatAttack:  db 1
-.P3Hero1StatDefense:  db 2
-.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P3HeroSkills:  db  16,0,0,0,0,0
-.P3HeroLevel: db  1
-.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P3FireSpells:        db  %0000 0000
-.P3AirSpells:         db  %0000 0000
-.P3WaterSpells:       db  %0000 0000
-.P3AllSchoolsSpells:  db  %0000 0000
-.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesTrevorBelmont
-.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P4hero1y:		db	1
-.P4hero1x:		db	1
-.P4hero1xp: dw 0 ;65000 ;3000 ;999
-.P4hero1move:	db	20,20
-.P4hero1mana:	dw	10,10
-.P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P4Hero1StatAttack:  db 1
-.P4Hero1StatDefense:  db 2
-.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P4HeroSkills:  db  10,0,0,0,0,0
-.P4HeroLevel: db  1
-.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P4FireSpells:        db  %0000 0000
-.P4AirSpells:         db  %0000 0000
-.P4WaterSpells:       db  %0000 0000
-.P4AllSchoolsSpells:  db  %0000 0000
-.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesSnake2
-.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-
-;An Arctic Alliance: start without heroes. start with 2 castles, goemon and castlevania. tavern filled with heroes of those castles. enemy towns are dragon slayer 4 and junkery hq. loss condition: lose all heroes.
-Campaign04:                               ;c1, c3, c4, c2
-.StartingTowns:                       db  005,001,003,002   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  002,028,015,030,032,000,000,000,000,000
-.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
-.StartingResources:
-.Gold:                                dw  20000
-.Wood:                                dw  20
-.Ore:                                 dw  20
-.Gems:                                dw  10
-.Rubies:                              dw  10
-.Castle1Player:                       db  1
-.Castle2Player:                       db  2
-.Castle3Player:                       db  3
-.Castle4Player:                       db  1
-;starting Heroes
-.P1hero1y:		db	1
-.P1hero1x:		db	1
-.P1hero1xp: dw 0 ;65000 ;3000 ;999
-.P1hero1move:	db	20,20
-.P1hero1mana:	dw	10,10
-.P1hero1manarec:db	5		                ;recover x mana every turn
-.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P1Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P1Hero1StatAttack:  db 1
-.P1Hero1StatDefense:  db 2
-.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P1HeroSkills:  db  10,0,0,0,0,0
-.P1HeroLevel: db  1
-.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P1FireSpells:        db  %0000 0000
-.P1AirSpells:         db  %0000 0000
-.P1WaterSpells:       db  %0000 0000
-.P1AllSchoolsSpells:  db  %0000 0000
-.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P1HeroSpecificInfo: dw HeroAddressesSnake2
-.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P2hero1y:		db	1
-.P2hero1x:		db	1
-.P2hero1xp: dw 0 ;65000 ;3000 ;999
-.P2hero1move:	db	20,20
-.P2hero1mana:	dw	10,10
-.P2hero1manarec:db	5		                ;recover x mana every turn
-.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P2Hero1StatAttack:  db 1
-.P2Hero1StatDefense:  db 2
-.P2Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P2Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P2HeroSkills:  db  01,0,0,0,0,0
-.P2HeroLevel: db  1
-.P2EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P2FireSpells:        db  %0000 0000
-.P2AirSpells:         db  %0000 0000
-.P2WaterSpells:       db  %0000 0000
-.P2AllSchoolsSpells:  db  %0000 0000
-.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesPochi
-.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P3hero1y:		db	1
-.P3hero1x:		db	1
-.P3hero1xp: dw 0 ;65000 ;3000 ;999
-.P3hero1move:	db	20,20
-.P3hero1mana:	dw	10,10
-.P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db SdSnatcherUnitLevel1Number | dw SdSnatcherUnitLevel1Growth |      db SdSnatcherUnitLevel2Number | dw SdSnatcherUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P3Hero1StatAttack:  db 1
-.P3Hero1StatDefense:  db 2
-.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P3HeroSkills:  db  16,0,0,0,0,0
-.P3HeroLevel: db  1
-.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P3FireSpells:        db  %0000 0000
-.P3AirSpells:         db  %0000 0000
-.P3WaterSpells:       db  %0000 0000
-.P3AllSchoolsSpells:  db  %0000 0000
-.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesGillianSeed
-.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P4hero1y:		db	1
-.P4hero1x:		db	1
-.P4hero1xp: dw 0 ;65000 ;3000 ;999
-.P4hero1move:	db	20,20
-.P4hero1mana:	dw	10,10
-.P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db DragonSlayerUnitLevel1Number | dw DragonSlayerUnitLevel1Growth |      db DragonSlayerUnitLevel2Number | dw DragonSlayerUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P4Hero1StatAttack:  db 1
-.P4Hero1StatDefense:  db 2
-.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P4HeroSkills:  db  10,0,0,0,0,0
-.P4HeroLevel: db  1
-.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P4FireSpells:        db  %0000 0000
-.P4AirSpells:         db  %0000 0000
-.P4WaterSpells:       db  %0000 0000
-.P4AllSchoolsSpells:  db  %0000 0000
-.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesSnake2
-.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-
-
-;Felghana's Champion: start with Adol at level 5. start with 1 castle. tavern is empty. enemy towns are junkery hq, castlevania & goemon. win condition: conquer all 3 castles. loss condition: lose adol.
-Campaign05:                               ;c1, c3, c4, c2
-.StartingTowns:                       db  006,003,002,005   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  000,000,000,000,000,000,000,000,000,000
-.Players:                             db  4,1,0,0,0             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
-.StartingResources:
-.Gold:                                dw  20000
-.Wood:                                dw  20
-.Ore:                                 dw  20
-.Gems:                                dw  10
-.Rubies:                              dw  10
-.Castle1Player:                       db  1
-.Castle2Player:                       db  2
-.Castle3Player:                       db  3
-.Castle4Player:                       db  4
-;starting Heroes
-.P1hero1y:		db	1
-.P1hero1x:		db	1
-.P1hero1xp: dw 4600
-.P1hero1move:	db	20,20
-.P1hero1mana:	dw	20,20
-.P1hero1manarec:db	5		                ;recover x mana every turn
-.P1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P1Hero1Units:  db Ys3UnitLevel1Number | dw Ys3UnitLevel1Growth |      db Ys3UnitLevel2Number | dw Ys3UnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P1Hero1StatAttack:  db 3
-.P1Hero1StatDefense:  db 2
-.P1Hero1StatKnowledge:  db 2  ;decides total mana (*10)
-.P1Hero1StatSpellDamage:  db 2  ;amount of spell damage
-.P1HeroSkills:  db  1,5,8,0,0,0
-.P1HeroLevel: db  5
-.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P1FireSpells:        db  %0000 0000
-.P1AirSpells:         db  %0000 0000
-.P1WaterSpells:       db  %0000 0000
-.P1AllSchoolsSpells:  db  %0000 0000
-.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P1HeroSpecificInfo: dw HeroAddressesAdol
-.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P2hero1y:		db	1
-.P2hero1x:		db	1
-.P2hero1xp: dw 0 ;65000 ;3000 ;999
-.P2hero1move:	db	20,20
-.P2hero1mana:	dw	10,10
-.P2hero1manarec:db	5		                ;recover x mana every turn
-.P2hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db SDSnatcherUnitLevel1Number | dw SDSnatcherUnitLevel1Growth |      db SDSnatcherUnitLevel2Number | dw SDSnatcherUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P2Hero1StatAttack:  db 1
-.P2Hero1StatDefense:  db 2
-.P2Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P2Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P2HeroSkills:  db  01,0,0,0,0,0
-.P2HeroLevel: db  1
-.P2EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P2FireSpells:        db  %0000 0000
-.P2AirSpells:         db  %0000 0000
-.P2WaterSpells:       db  %0000 0000
-.P2AllSchoolsSpells:  db  %0000 0000
-.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesRandomHajile
-.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P3hero1y:		db	1
-.P3hero1x:		db	1
-.P3hero1xp: dw 0 ;65000 ;3000 ;999
-.P3hero1move:	db	20,20
-.P3hero1mana:	dw	10,10
-.P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	1 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db CastleVaniaUnitLevel1Number | dw CastleVaniaUnitLevel1Growth |      db CastleVaniaUnitLevel2Number | dw CastleVaniaUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P3Hero1StatAttack:  db 1
-.P3Hero1StatDefense:  db 2
-.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P3HeroSkills:  db  16,0,0,0,0,0
-.P3HeroLevel: db  1
-.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P3FireSpells:        db  %0000 0000
-.P3AirSpells:         db  %0000 0000
-.P3WaterSpells:       db  %0000 0000
-.P3AllSchoolsSpells:  db  %0000 0000
-.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesSimonBelmont
-.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
-.P4hero1y:		db	1
-.P4hero1x:		db	1
-.P4hero1xp: dw 0 ;65000 ;3000 ;999
-.P4hero1move:	db	20,20
-.P4hero1mana:	dw	10,10
-.P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db GoemonUnitLevel1Number | dw GoemonUnitLevel1Growth |      db GoemonUnitLevel2Number | dw GoemonUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
-.P4Hero1StatAttack:  db 1
-.P4Hero1StatDefense:  db 2
-.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
-.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
-.P4HeroSkills:  db  10,0,0,0,0,0
-.P4HeroLevel: db  1
-.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.P4FireSpells:        db  %0000 0000
-.P4AirSpells:         db  %0000 0000
-.P4WaterSpells:       db  %0000 0000
-.P4AllSchoolsSpells:  db  %0000 0000
-.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesGoemon2
-.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
-
 
 ;  .HeroSkillPerClassTable:
 ;       A D I S
@@ -1159,24 +611,13 @@ Campaign05:                               ;c1, c3, c4, c2
 
 DoSetCampaignHeroesCastlesResources:
   ld    a,(ScenarioSelected)
-  or    a
-  ld    hl,Campaign01
-  jr    z,.Go
-  dec   a
-  ld    hl,Campaign02
-  jr    z,.Go
-  dec   a
-  ld    hl,Campaign03
-  jr    z,.Go
-  dec   a
-  ld    hl,Campaign04
-  jr    z,.Go
-  dec   a
-  ld    hl,Campaign05
-  jr    z,.Go
-  dec   a
+  ld    d,0
+  ld    e,a
+  ld    hl,CampaignInfoLenght
+  call  MultiplyHlWithDE                ;Out: HL = result
+  ld    de,Campaign01
+  add   hl,de
 
-  .Go:
   ;set starting town numbers
   ld    de,player1StartingTown
   ld    bc,4
@@ -1205,6 +646,12 @@ DoSetCampaignHeroesCastlesResources:
   ldir
   ld    de,Castle4+CastlePlayer
   ld    bc,1
+  ldir
+  ld    de,DaysToCompleteCampaign
+  ld    bc,1
+  ldir
+  ld    de,CampaignText               ;Campaign Text
+  ld    bc,CampaignTextLenght
   ldir
   ;set starting heroes
   ld    de,pl1hero1y
@@ -2436,25 +1883,25 @@ ScenarioSelectCode:
 .SetStartingTown:
   ;First set all towns
   ld    hl,player1StartingTown
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle1+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 1 and all creatures units belonging to that faction
 
   ld    hl,player2StartingTown
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle2+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
 
   ld    hl,player3StartingTown
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle3+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
 
   ld    hl,player4StartingTown
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle4+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 4 and all creatures units belonging to that faction
@@ -2462,14 +1909,14 @@ ScenarioSelectCode:
   ;Then set towns again, and change a town in case random is selected
   ld    hl,player1StartingTown
   call  .ChangeTownInCaseRandomIsSelected
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle1+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 1 and all creatures units belonging to that faction
 
   ld    hl,player2StartingTown
   call  .ChangeTownInCaseRandomIsSelected
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle2+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 2 and all creatures units belonging to that faction
@@ -2478,7 +1925,7 @@ ScenarioSelectCode:
   ld    a,(amountofplayers)
   cp    3
   call  nc,.ChangeTownInCaseRandomIsSelected
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle3+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 3 and all creatures units belonging to that faction
@@ -2487,7 +1934,7 @@ ScenarioSelectCode:
   ld    a,(amountofplayers)
   cp    4
   call  nc,.ChangeTownInCaseRandomIsSelected
-  call  SetTextStartingTownButtons.SetTownNameInHl
+  call  SetTextStartingTownButtons.SetTownNameInHlAndLdEHL
   ld    de,Castle4+CastleName
   ld    bc,InfoTownLenght
   ldir                                  ;this sets the name for castle 4 and all creatures units belonging to that faction
@@ -3395,9 +2842,15 @@ SetTextStartingTownButtons:
   call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
 
-  .SetTownNameInHl:
-  ld    d,0
+  .SetTownNameInHlAndLdEHL:
   ld    e,(hl)
+  jr    .go
+
+  .SetTownNameInHl:
+  ld    e,a
+
+  .go:
+  ld    d,0
   ld    hl,InfoTownLenght
   call  MultiplyHlWithDE                ;Out: HL = result
   ld    de,InfoTownRandom
@@ -3736,13 +3189,15 @@ TextImpossible: db  "Impossible",255
 SetAmountOfCampaignPageButtons:
 ;we show 1 more campaign than the amount of maps that are unlocked (in scenario mode)
   ld    a,(AmountOfMapsUnlocked)
+  push  af
+
+  ld    a,(AmountOfCampaignsFinished)
   inc   a
   ld    (AmountOfMapsUnlocked),a
 
   call  SetAmountOfScenarioPageButtons
 
-  ld    a,(AmountOfMapsUnlocked)
-  dec   a
+  pop   af
   ld    (AmountOfMapsUnlocked),a
   ret
 
@@ -3779,19 +3234,103 @@ SetAmountOfScenarioPageButtons:
   db  %1100 0011 | dw $4000 + (011*128) + (096/2) - 128 | dw $4000 + (011*128) + (128/2) - 128
 
 SetAmountOfCampaignButtons:
-;we show 1 more campaign than the amount of maps that are unlocked (in scenario mode)
-  ld    a,(AmountOfMapsUnlocked)
-  inc   a
-  ld    (AmountOfMapsUnlocked),a
-
   call  ClearCampaignButtonGraphics
   call  SwapAndSetPage                  ;swap and set page
   call  ClearCampaignButtonGraphics
-  call  SetAmountOfScenarioButtons.go
+  
+  .go:
+  ld    a,%1100 0011
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*0),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*1),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*2),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*3),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*4),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*5),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*6),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*7),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*8),a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*9),a
 
-  ld    a,(AmountOfMapsUnlocked)
+  ld    a,(ScenarioPage)
   dec   a
-  ld    (AmountOfMapsUnlocked),a
+  ld    b,0
+  jr    z,.PageFound
+  dec   a
+  ld    b,10
+  jr    z,.PageFound
+  ld    b,20
+  .PageFound:
+
+
+;  ld    a,0 ;TitleScreenCodeblock        ;Map block
+;  call  block12High                   ;CARE!!! we can only switch block34 if page 1 is in rom
+
+;  ld    a,CampaignInfoblock
+;  call  block12
+
+;  ld    a,($4000)
+;  cp    1
+
+;.kut: jp .kut
+;.kut: jp nz,.kut
+
+
+;  ld    a,Loaderblock                 ;Map block
+ ; call  block12                       ;CARE!!! we can only switch block34 if page 1 is in rom
+
+
+
+  ld    a,(AmountOfCampaignsFinished)
+  inc   a                                         ;we show 1 more campaign than the amount of campaigns that are finished
+  sub   b
+  ld    (AmountOfMapsVisibleInCurrentPage),a
+  dec   a
+  jr    z,.UpToScenario1Unlocked
+  dec   a
+  jr    z,.UpToScenario2Unlocked
+  dec   a
+  jr    z,.UpToScenario3Unlocked
+  dec   a
+  jr    z,.UpToScenario4Unlocked
+  dec   a
+  jr    z,.UpToScenario5Unlocked
+  dec   a
+  jr    z,.UpToScenario6Unlocked
+  dec   a
+  jr    z,.UpToScenario7Unlocked
+  dec   a
+  jr    z,.UpToScenario8Unlocked
+  dec   a
+  jr    z,.UpToScenario9Unlocked
+  ret
+
+  .UpToScenario1Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*1),a
+  .UpToScenario2Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*2),a
+  .UpToScenario3Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*3),a
+  .UpToScenario4Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*4),a
+  .UpToScenario5Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*5),a
+  .UpToScenario6Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*6),a
+  .UpToScenario7Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*7),a
+  .UpToScenario8Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*8),a
+  .UpToScenario9Unlocked:
+  xor   a
+  ld    (GenericButtonTable+GenericButtonTableLenghtPerButton*9),a
   ret
 
 SetAmountOfScenarioButtons:

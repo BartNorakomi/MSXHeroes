@@ -5109,6 +5109,19 @@ call ScreenOn
 TextDate:           db "Day:   Week:   Month:",255
 TextPlayerTurn:     db "Player  's turn",255
 
+TextRemainingDaysForCampaign:
+                    db "Remaining days to complete",254
+                    db "     Campaign:",255
+
+CampaignFailedText: db  "Mission failed. The campaign",254
+                    db  "was not finished in time.",255
+
+CampaignFinishedText: db  "You have successfully completed",254
+                      db  "the campaign.",254
+                      db  " ",254
+                      db  "Return to the main menu and",254
+                      db  "prepare for your next challenge.",255
+
 SetPlayerStartTurnText:
   call  SetCastleOverViewFontPage0Y212    ;set font at (0,212) page 0
 
@@ -5147,6 +5160,69 @@ SetPlayerStartTurnText:
   ld    c,053+00                        ;dy
   call  SetNumber16BitCastle
 
+ld a,(date)
+ld b,a
+ld a,(date+1)
+or a
+jr  nz,.notzero
+ld  a,20
+;ld    (pl1hero1y),a
+ld a,70
+;ld    (pl1hero1x),a
+.notzero:
+
+
+  ld    a,(CampaignMode?)
+  or    a
+  jr    z,.ScenarioMode
+
+  ld    a,(CampaignFinished?)
+  or    a
+  jr    nz,CampaignFinished
+
+  ;set text remaining days to complete campaign
+  ld    b,050+00                        ;dx
+  ld    c,091+00                        ;dy
+  ld    hl,TextRemainingDaysForCampaign
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    a,(DaysToCompleteCampaign)
+  ld    l,a
+  ld    h,0
+  ld    de,(Date)
+  xor   a
+  dec   hl
+  sbc   hl,de
+  jr    nc,.StillTimeLeft
+
+  .OutOfTime:
+  ld    hl,0
+  ld    b,118+00                        ;dx
+  ld    c,098+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set campaign failed text
+  ld    b,040+00                        ;dx
+  ld    c,070+00                        ;dy
+  ld    hl,CampaignFailedText
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+  .StillTimeLeft:
+  inc   hl
+  ld    b,118+00                        ;dx
+  ld    c,098+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ;set campaign text
+  ld    b,040+00                        ;dx
+  ld    c,070+00                        ;dy
+  ld    hl,CampaignText
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+  .ScenarioMode:
+  ;set text Player 1's turn
   ld    b,075+00                        ;dx
   ld    c,091+00                        ;dy
   ld    hl,TextPlayerTurn  
@@ -5158,6 +5234,13 @@ SetPlayerStartTurnText:
   ld    b,095+06                        ;dx
   ld    c,091+00                        ;dy
   call  SetNumber16BitCastle
+  ret
+
+CampaignFinished:
+  ld    b,040+00                        ;dx
+  ld    c,070+00                        ;dy
+  ld    hl,CampaignFinishedText
+  call  SetText                         ;in: b=dx, c=dy, hl->text
   ret
 
 SetPlayerStartTurnGraphics:
