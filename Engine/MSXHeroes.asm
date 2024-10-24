@@ -1653,8 +1653,9 @@ dephase
 ;
 ; block $9f - $a0
 ;
-;DefeatBlock2:  equ   $9f
+BattleFieldWinterBlock:  equ   $9f
 phase	$4000
+  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1856,15 +1857,6 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-;
-; block $bf - c0
-;
-BattleFieldWinterBlock:  equ   $bf
-phase	$4000
-  incbin "..\grapx\BattleField\BattleFieldWinter.SC5",7,212 * 128      ;212 lines
-	ds		$c000-$,$ff
-dephase
-
 ; GLobals
 RomSize: 				equ 8*1024*1024 ;8MB
 RomBlockSize:			equ 16*1024	;16KB
@@ -1907,8 +1899,8 @@ CampaignInfoblock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 ;;;;WE HAVE 2 BLOCKS FREE IN THE LOWER 4MB
-ds $4000,-1
-ds $4000,-1
+;ds $4000,-1
+;ds $4000,-1
 
 
 
@@ -1939,7 +1931,7 @@ SaveDataBlock9:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each s
 SaveDataBlock10:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
 					ds		$10000,$ff
 SaveDataBlock11:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
-					db	8						;Amount of Campaigns Finished saved in Rom (AmountOfCampaignsFinished in enginepage3)
+					db	21						;Amount of Campaigns Finished saved in Rom (AmountOfCampaignsFinished in enginepage3)
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 

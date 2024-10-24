@@ -1,0 +1,20 @@
+general:
+click - je klikt op een button (bv in de hud)
+mouseover - je beweegt over een button waardoor deze oplicht
+
+worldmap:
+walk - hero loopt over de worldmap
+levelup - er verschijnt een scherm waarin je ziet dat de hero level up gegaan is
+collectitem - je loopt met je hero over een item/resource en pakt dit op
+
+castle:
+purchase - je koopt iets in het kasteel (een monster, een gebouw, een hero etc)
+building being build - een gebouw verschijnt geleidelijk in het scherm bij het kopen hiervan (duurt 3-5 seconden)
+
+battle:
+punch - een monster slaat
+kick - een monster trapt
+shoot - een monster shiet
+magic - de hero gebruikt een magic skill (haste, slow, armor up, armor down, attack up, attack down, lightning, fire, ice, wind magic)
+
+

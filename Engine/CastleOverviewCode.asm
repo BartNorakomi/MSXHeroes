@@ -14575,7 +14575,19 @@ CastleOverviewCode:                     ;in: iy-castle
   call  docopy
   call  HandleAllHeroesLearnMagicGuildSpells
 
-  ld    a,CastleSong
+  ld    a,(CurrentSongBeingPlayed)
+  cp    SongSquareA
+  jr    z,.engine
+  cp    SongSquareB
+  jr    z,.engine
+
+  ld    a,r
+  rrca
+  ld    b,SongSquareA
+  jr    c,.SongSquareFound
+  ld    b,SongSquareB
+  .SongSquareFound:
+  ld    a,b
   ld    (ChangeSong?),a  
 
   .engine:

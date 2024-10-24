@@ -499,7 +499,7 @@ SetPlayerWonGameWindowAndText:
   call  SetText
 
   ;check if this is the latest campaign (AND that it's not finished yet)
-  ld    a,(ScenarioSelected)
+  ld    a,(CampaignSelected)
   ld    b,a
   ld    a,(AmountOfCampaignsFinished)
   cp    b

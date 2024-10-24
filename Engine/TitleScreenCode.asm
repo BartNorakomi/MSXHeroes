@@ -168,7 +168,7 @@ CheckMouse:
 TitleScreenPalette:
   incbin"..\grapx\TitleScreen\TitleScreenPalette.pl"
 TitleScreenCode:
-  ld    a,TitleSong
+  ld    a,SongTitle
   ld    (ChangeSong?),a
   
   call  screenoff
@@ -584,6 +584,7 @@ EndCampaignScreenEngine:
 ;Dawn of the Ninja: start with ruika level 7, yiearkungfu castle. tavern filled with random heroes. enemy castle 1: akanbe dragon 1 units with dr. mitchell. tavern with random heroes. enemy castle 2: lolo with akanbe draong 2 units. tavern with random heroes. win condition: defeat lolo and mitchell. lose condition: lose ruika.
 ;Pixy's Bubble Symphony: start with pixy level 5, bubble bobble 1 castle. tavern empty. enemy castle: dr pettrovich with a snatcher army. win condition: defeat dr pettrovich. lose condition: lose pixy.
 ;A Worzen Family Epic: start with bubble bobble 2 castle castle. no heroes. tavern filled with worzen family. 3 enemy castles with random heroes and randomly filled taverns. win condition: defeat all castles, lose condition: lose all heroes and castles.
+  call  FadeOutMusic
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
@@ -610,7 +611,7 @@ EndCampaignScreenEngine:
 
 
 DoSetCampaignHeroesCastlesResources:
-  ld    a,(ScenarioSelected)
+  ld    a,(CampaignSelected)
   ld    d,0
   ld    e,a
   ld    hl,CampaignInfoLenght
@@ -745,6 +746,21 @@ CheckCampaignSelectButtonClicked:
   ld    a,15
   sub   b
 	ld		(ScenarioSelected),a
+
+
+;set campaign selected
+  ld    a,(ScenarioPage)
+  dec   a
+  ld    b,0
+  jr    z,.PageFound1
+  dec   a
+  ld    b,10
+  jr    z,.PageFound1
+  ld    b,20
+  .PageFound1:
+	ld		a,(ScenarioSelected)
+  add   a,b                             ;a=scenario selected (0 - 29)
+  ld    (CampaignSelected),a
 
   .LightCurrentActiveScenarioButton:
   ;first unlit all scenario buttons
@@ -946,6 +962,7 @@ LoadGameSelectCodeSkipScreenOff:
 ;  call  ScenarioSelectCode.SetStartingResources
 ;  call  ScenarioSelectCode.SetStartingHeroes
 ;  call  ScenarioSelectCode.SetTavernHeroes
+  call  FadeOutMusic
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a
@@ -1518,6 +1535,7 @@ ScenarioSelectCode:
   call  .SetStartingResources
   call  .SetStartingHeroes
   call  .SetTavernHeroes
+  call  FadeOutMusic
   call  SetTempisr                      ;end the current interrupt handler used in the engine
   call  SetSpatInGame
   xor   a

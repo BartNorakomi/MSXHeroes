@@ -149,17 +149,29 @@ RePlayer_Tick:
   ;randomize worldsong
   cp    WorldSong
   jr    nz,.EndCheckRandomizeWorldSong
-  ld    a,r
-  and   3
-  add   a,2
 
-  cp    BattleSong
-  jr    z,.battlesoundfoundbutnotinbattle
+	ld	a,r
+	cp	22
+	ld	b,SongDewA
+	jr	c,.WorldSongFound
+	cp	44
+	ld	b,SongDewB
+	jr	c,.WorldSongFound
+	cp	66
+	ld	b,SongGloomyA
+	jr	c,.WorldSongFound
+	cp	88
+	ld	b,SongGloomyB
+	jr	c,.WorldSongFound
+	cp	110
+	ld	b,SongHaze
+	jr	c,.WorldSongFound
+;	cp	132
+	ld	b,SongSolitude
+;	jr	c,.WorldSongFound
+	.WorldSongFound:
+	ld	a,b
 
-  cp    7
-  jr    c,.EndCheckRandomizeWorldSong
-  .battlesoundfoundbutnotinbattle:
-  ld    a,1
   .EndCheckRandomizeWorldSong:
   ;/randomize worldsong
 

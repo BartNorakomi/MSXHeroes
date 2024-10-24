@@ -936,6 +936,11 @@ CheckButtonInteractionControlsNotOnInt:
   ld    (CheckButtonMouseInteractionGenericButtonsInEngine.SelfModifyingCodeNewPrControlsOnOffInterrupt),hl
 ;  jp    CheckButtonMouseInteractionGenericButtonsInEngine
 
+  call  CheckButtonMouseInteractionGenericButtonsInEngine
+  ld    a,0
+  ld    (WhichHudButtonClicked?),a      ;gets handled in the hudcode
+  ret
+
 CheckButtonMouseInteractionGenericButtonsInEngine:
   ld    b,(ix+GenericButtonAmountOfButtons)
   ld    de,GenericButtonTableLenghtPerButton
@@ -947,7 +952,6 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
   ret
   
   .check:
-
   bit   7,(ix+GenericButtonStatus)      ;check if button is on/off
   ret   z                               ;don't handle button if this button is off
   
@@ -978,7 +982,6 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
   bit   4,(ix+GenericButtonStatus)        ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
   jr    nz,.MenuOptionSelected          ;space NOT pressed and button was fully lit ? Then menu option is selected
   .MouseHoverOverButton:
-
 
   ;check if button was already hovered over, if so play sfx
   bit   5,(ix+GenericButtonStatus)      ;status (bit 7=on/off, bit 6=normal state, bit 5=mouse hover over, bit 4=mouse over and clicked, bit 1-0=timer)
@@ -1784,7 +1787,7 @@ EnableScrollScreen:
   xor   a
   ld    (DisableScrollScreen?),a
   ld    (freezecontrols?),a
-  ld    (WhichHudButtonClicked?),a
+;  ld    (WhichHudButtonClicked?),a ;turned this on off, cuz it conflicted with accurate hud button interaction (10/22/2024)
   ld    (MenuOptionSelected?),a
   ret
 
@@ -6845,6 +6848,7 @@ xstar:				ds	1
 
 CampaignMode?:  ds  1
 ScenarioSelected: ds  1
+CampaignSelected: ds  1
 
 currentherowindowclicked:	db	1
 plxcurrentheroAddress:	dw  pl1hero1y

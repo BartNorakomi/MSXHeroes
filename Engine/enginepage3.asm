@@ -15,14 +15,22 @@ DiskMenuClicked?:                   db  0
 BackToMainMenu?:                    db  0
 
 StopSong:   equ 255
-TitleSong:  equ 1
-CastleSong: equ 1
 
-BattleSong: equ 6
-WorldSong:  equ 2
-
-
-
+WorldSong:    equ 15  ;this is the total of all the worldsongs
+SongVictory:  equ 1
+SongDefeat:   equ 2
+SongDewA:     equ 3
+SongDewB:     equ 4
+SongGloomyA:  equ 5
+SongGloomyB:  equ 6
+SongHaze:     equ 7
+SongTitle:    equ 8
+SongSolitude: equ 9
+SongSquareA:  equ 10
+SongSquareB:  equ 11
+SongWarzoneA: equ 12
+SongWarzoneB: equ 13
+SongWarzoneC: equ 14
 
 InitiateGame:
   ld    hl,CHMOUS
@@ -172,6 +180,17 @@ InitiateGame:
 
 ;jp SetHeroOverviewMenuInPage1ROM
   jp    LevelEngine
+
+;TO DO, ADD FADE OUT ROUTINE HERE
+FadeOutMusic:
+  ld    a,StopSong
+  ld    (ChangeSong?),a
+  ld    b,20
+  .waitloop:
+  ei
+  halt
+  djnz  .waitloop
+  ret
 
 LoadAmountOfCampaignsFinished:
   di                                  ;we keep int disabled when accessing (reading and writing) upper 4MB, because the int. revert changes made to the map switching

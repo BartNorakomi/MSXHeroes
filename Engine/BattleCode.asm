@@ -225,7 +225,17 @@ call screenoff
 
   call  BuildUpBattleFieldAndPutMonsters
 
-  ld    a,BattleSong
+  ;play battle song (3 versions, only offsets are different)
+  ld    a,r
+  and   3
+  ld    b,SongWarzoneC
+  jr    z,.SongWarzoneFound
+  dec   a
+  ld    b,SongWarzoneB
+  jr    z,.SongWarzoneFound
+  ld    b,SongWarzoneA
+  .SongWarzoneFound:
+  ld    a,b
   ld    (ChangeSong?),a
 
   .engine:
@@ -1463,7 +1473,10 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
 
-  ld    a,StopSong
+;  ld    a,StopSong
+;  ld    (ChangeSong?),a
+
+  ld    a,SongDefeat
   ld    (ChangeSong?),a
 
 	ld    a,1                             ;now we switch and set our page
@@ -1588,9 +1601,12 @@ CheckVictoryOrDefeat:
   or    a
   ret   nz
 
-  ld    a,StopSong
+;  ld    a,StopSong
+;  ld    (ChangeSong?),a
+
+  ld    a,SongVictory
   ld    (ChangeSong?),a
-  
+
 	ld    a,1                             ;now we switch and set our page
 	ld		(activepage),a		
   call  SwapAndSetPage                  ;swap and set page 1  
