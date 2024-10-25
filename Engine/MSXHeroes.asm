@@ -1931,7 +1931,7 @@ SaveDataBlock9:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each s
 SaveDataBlock10:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
 					ds		$10000,$ff
 SaveDataBlock11:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
-					db	21						;Amount of Campaigns Finished saved in Rom (AmountOfCampaignsFinished in enginepage3)
+					db	0						;Amount of Campaigns Finished saved in Rom (AmountOfCampaignsFinished in enginepage3)
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
 

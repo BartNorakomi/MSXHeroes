@@ -2365,9 +2365,9 @@ Campaign21:                               ;c1, c3, c4, c2
 
 ;A Desert Blood Moon: start with 1 castle. castle of YS. no heroes. tavern filled with lucia and dick. enemy castles are castlevania, usas and golvellius, but are defended by the 3 belmonts. taverns are empty. win condition: defeat all castles. lose condition: lose all heroes.
 Campaign22:                               ;c1, c3, c4, c2
-.StartingTowns:                       db  014,013,012,011   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
-.TavernHeroes:                        db  057,048,039,060,000,061,062,063,064,000
-.Players:                             db  2,1,0,2,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingTowns:                       db  006,002,008,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  048,049,000,000,000,000,000,000,000,000
+.Players:                             db  4,1,0,0,0             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
 .StartingResources:
 .Gold:                                dw  15000
 .Wood:                                dw  20
@@ -2376,10 +2376,10 @@ Campaign22:                               ;c1, c3, c4, c2
 .Rubies:                              dw  10
 .Castle1Player:                       db  1
 .Castle2Player:                       db  2
-.Castle3Player:                       db  1
-.Castle4Player:                       db  1
+.Castle3Player:                       db  3
+.Castle4Player:                       db  4
 .DaysToCompleteCampaign:              db  75
-.CampaignText:						  db " Storm Randar's unaware castle   ",255
+.CampaignText:						  db "Reclaim the Three Sunken Spires  ",255
 ;starting Heroes
 .P1hero1y:		db	1
 .P1hero1x:		db	1
@@ -2411,7 +2411,7 @@ Campaign22:                               ;c1, c3, c4, c2
 .P2hero1mana:	dw	80,80
 .P2hero1manarec:db	5		                ;recover x mana every turn
 .P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P2Hero1Units:  db 011 | dw 70 |      db 018 | dw 030 |      db 000 | dw 000 |      db 027 | dw 013 |      db 000 | dw 000 |      db 027 | dw 050 ;unit,amount
+.P2Hero1Units:  db CastleVaniaUnitLevel1Number | dw 100 |      db CastleVaniaUnitLevel2Number | dw 060 |      db 000 | dw 000 |      db CastleVaniaUnitLevel1Number | dw 005 |      db CastleVaniaUnitLevel1Number | dw 006 |      db 000 | dw 000 ;unit,amount
 .P2Hero1StatAttack:  db 6
 .P2Hero1StatDefense:  db 7
 .P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
@@ -2424,7 +2424,7 @@ Campaign22:                               ;c1, c3, c4, c2
 .P2WaterSpells:       db  %0000 1111
 .P2AllSchoolsSpells:  db  %0000 1111
 .P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P2HeroSpecificInfo: dw HeroAddressesRandar
+.P2HeroSpecificInfo: dw HeroAddressesSimonBelmont
 .P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 .P3hero1y:		db	1
@@ -2433,8 +2433,8 @@ Campaign22:                               ;c1, c3, c4, c2
 .P3hero1move:	db	20,20
 .P3hero1mana:	dw	10,10
 .P3hero1manarec:db	5		                ;recover x mana every turn
-.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P3Hero1Units:  db 175 | dw 060 |      db 000 | dw 000 |      db 000 | dw 000 |      db 173 | dw 020 |      db 000 | dw 000 |      db 175 | dw 060 ;unit,amount
+.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db CastleVaniaUnitLevel3Number | dw 30 |      db CastleVaniaUnitLevel4Number | dw 30 |      db 000 | dw 000 |      db 000 | dw 000 |      db CastleVaniaUnitLevel1Number | dw 005 |      db CastleVaniaUnitLevel1Number | dw 003 ;unit,amount
 .P3Hero1StatAttack:  db 1
 .P3Hero1StatDefense:  db 2
 .P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
@@ -2447,7 +2447,7 @@ Campaign22:                               ;c1, c3, c4, c2
 .P3WaterSpells:       db  %0000 0000
 .P3AllSchoolsSpells:  db  %0000 0000
 .P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P3HeroSpecificInfo: dw HeroAddressesAce
+.P3HeroSpecificInfo: dw HeroAddressesTrevorBelmont
 .P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 .P4hero1y:		db	1
@@ -2456,8 +2456,8 @@ Campaign22:                               ;c1, c3, c4, c2
 .P4hero1move:	db	20,20
 .P4hero1mana:	dw	10,10
 .P4hero1manarec:db	5		                ;recover x mana every turn
-.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
-.P4Hero1Units:  db 176 | dw 016 |      db 176 | dw 027 |      db 176 | dw 021 |      db 176 | dw 031 |      db 176 | dw 040 |      db 176 | dw 053 ;unit,amount
+.P4hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
 .P4Hero1StatAttack:  db 1
 .P4Hero1StatDefense:  db 2
 .P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
@@ -2470,22 +2470,901 @@ Campaign22:                               ;c1, c3, c4, c2
 .P4WaterSpells:       db  %0000 0000
 .P4AllSchoolsSpells:  db  %0000 0000
 .P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
-.P4HeroSpecificInfo: dw HeroAddressesRandomHajile
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
 .P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
 
 
 ;A Beloved Journey: start with 1 castle. start with popolon and aphrodite (both level 3) in front of the castle. tavern empty. castle is psycho world. 2nd castle is empty. castle is junker hq. tavern filled with random heroes. Ruika is in a corner of the map in front of emerald gloves. win condition: capture emerald gloves. lose condition: lose either popolon or aphrodite.
-;Amber Skies, Rogue AI: start with 1 castle. no heroes. Tien Ren, Ho Mei, and Mei Hong in tavern. Junker HQ is castle. enemy castle has Snatcher defending it with a huge snatcher army. win condition: defeat snatcher. lose condition: lose all heroes.
-;last 6 campaigns unlock these castles: akanbe 1, akanbe 2, contra 2, yiearekungfu, bubble bobble 1, bubble bobble 2
-;Dragons' Deliverance: start without heroes. start with goemon castle. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
-;Hunting Dr. Mitchell: start without heroes. start with castlevania castle. tavern filled with 3 belmots. 2nd castle is empty and this is golvellius castle. both kelesis in tavern. win condition: defeat hank mitchell. lose condition: lose all belmonts if you own 1 castle. lose all heroes if you own 2 castles.
-;Heart of the Jungle: start with bill rizer level 5. start with contra 1 castle. tavern filled with random heroes. enemy castle 1 has big boss and contra level 2 castle and units and random heroes in tavern. castle 2 the same, but with grey fox.
-;Dawn of the Ninja: start with ruika level 7, yiearkungfu castle. tavern filled with random heroes. enemy castle 1: akanbe dragon 1 units with dr. mitchell. tavern with random heroes. enemy castle 2: lolo with akanbe draong 2 units. tavern with random heroes. win condition: defeat lolo and mitchell. lose condition: lose ruika.
-;Pixy's Bubble Symphony: start with pixy level 5, bubble bobble 1 castle. tavern empty. enemy castle: dr pettrovich with a snatcher army. win condition: defeat dr pettrovich. lose condition: lose pixy.
-;A Worzen Family Epic: start with bubble bobble 2 castle castle. no heroes. tavern filled with worzen family. 3 enemy castles with random heroes and randomly filled taverns. win condition: defeat all castles, lose condition: lose all heroes and castles.
+Campaign23:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  006,002,008,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  050,052,000,000,000,000,000,000,000,000
+.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  15000
+.Wood:                                dw  20
+.Ore:                                 dw  20
+.Gems:                                dw  10
+.Rubies:                              dw  10
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  255
+.DaysToCompleteCampaign:              db  75
+.CampaignText:						  db "Confront Ruika, the fierce ninja ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db YieArKungFuUnitLevel1Number | dw YieArKungFuUnitLevel1Growth |      db YieArKungFuUnitLevel2Number | dw YieArKungFuUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPippols
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db 187 | dw 02 |      db 187 | dw 010 |      db 000 | dw 000 |      db 000 | dw 000 |      db 187 | dw 010 |      db 187 | dw 010 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesUndeadline2
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db 187 | dw 2 |      db 187 | dw 3 |      db 000 | dw 000 |      db 000 | dw 000 |      db 187 | dw 5 |      db 187 | dw 6 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesUndeadline2
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+;Amber Skies, Rogue AI: start with 1 castle. no heroes. Tien Ren, Ho Mei, and Mei Hong in tavern. Junker HQ is castle. enemy castle has Snatcher defending it with a huge snatcher army. win condition: defeat snatcher. lose condition: lose all heroes.
+Campaign24:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  003,013,014,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  051,053,055,000,000,000,000,000,000,000
+.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  15000
+.Wood:                                dw  20
+.Ore:                                 dw  20
+.Gems:                                dw  10
+.Rubies:                              dw  10
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  255
+.DaysToCompleteCampaign:              db  75
+.CampaignText:						  db "Shut down the rogue AI snatcher  ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db YieArKungFuUnitLevel1Number | dw YieArKungFuUnitLevel1Growth |      db YieArKungFuUnitLevel2Number | dw YieArKungFuUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPippols
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db SDSnatcherUnitLevel1Number | dw 30 |      db SDSnatcherUnitLevel2Number | dw 31 |      db SDSnatcherUnitLevel3Number | dw 12 |      db SDSnatcherUnitLevel4Number | dw 15 |      db SDSnatcherUnitLevel5Number | dw 17 |      db SDSnatcherUnitLevel6Number | dw 005 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesSnatcher
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db SDSnatcherUnitLevel1Number | dw 30 |      db SDSnatcherUnitLevel2Number | dw 31 |      db SDSnatcherUnitLevel3Number | dw 12 |      db SDSnatcherUnitLevel4Number | dw 15 |      db SDSnatcherUnitLevel5Number | dw 17 |      db SDSnatcherUnitLevel6Number | dw 020 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesSnatcher
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;last 6 campaigns unlock these castles: akanbe 1, akanbe 2, contra 2, yiearekungfu, bubble bobble 1, bubble bobble 2
+
+;Dragons' Deliverance: start without heroes. start with goemon castle. tavern filled with random heroes. win condition: defeat hank mitchell within 60 days. lose condition: otherwise
+Campaign25:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  005,008,004,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  018,025,030,037,041,046,061,062,063,000
+.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  15000
+.Wood:                                dw  20
+.Ore:                                 dw  20
+.Gems:                                dw  10
+.Rubies:                              dw  10
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  255
+.DaysToCompleteCampaign:              db  60
+.CampaignText:						  db "Foil Hank Mitchell's evil plans  ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db YieArKungFuUnitLevel1Number | dw YieArKungFuUnitLevel1Growth |      db YieArKungFuUnitLevel2Number | dw YieArKungFuUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPippols
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db 181 | dw 070 |      db 181 | dw 81 |      db 181 | dw 72 |      db 181 | dw 65 |      db 181 | dw 57 |      db 181 | dw 045 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesMitchell
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db SDSnatcherUnitLevel1Number | dw 30 |      db SDSnatcherUnitLevel2Number | dw 31 |      db SDSnatcherUnitLevel3Number | dw 12 |      db SDSnatcherUnitLevel4Number | dw 15 |      db SDSnatcherUnitLevel5Number | dw 17 |      db SDSnatcherUnitLevel6Number | dw 020 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesSnatcher
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;Hunting Dr. Mitchell: start without heroes. start with castlevania castle. tavern filled with 3 belmots. 2nd castle is empty and this is golvellius castle. both kelesis in tavern. win condition: defeat hank mitchell. lose condition: lose all belmonts if you own 1 castle. lose all heroes if you own 2 castles.
+Campaign26:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  014,008,004,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  046,061,062,063,000,018,025,030,037,041
+.Players:                             db  3,1,0,0,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  18000
+.Wood:                                dw  25
+.Ore:                                 dw  25
+.Gems:                                dw  15
+.Rubies:                              dw  15
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  255
+.DaysToCompleteCampaign:              db  70
+.CampaignText:						  db "Foil Hank Mitchell's evil plans  ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db YieArKungFuUnitLevel1Number | dw YieArKungFuUnitLevel1Growth |      db YieArKungFuUnitLevel2Number | dw YieArKungFuUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPippols
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db 112 | dw 003 |      db 158 | dw 02 |      db 112 | dw 04 |      db 158 | dw 3 |      db 112 | dw 4 |      db 158 | dw 06 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesMitchell
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db SDSnatcherUnitLevel1Number | dw 30 |      db SDSnatcherUnitLevel2Number | dw 31 |      db SDSnatcherUnitLevel3Number | dw 12 |      db SDSnatcherUnitLevel4Number | dw 15 |      db SDSnatcherUnitLevel5Number | dw 17 |      db SDSnatcherUnitLevel6Number | dw 020 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesSnatcher
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+;Heart of the Jungle: start with bill rizer level 5. start with contra 1 castle. tavern filled with random heroes. enemy castle 1 has big boss and contra level 2 castle and units and random heroes in tavern. castle 2 the same, but with grey fox.
+Campaign27:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  010,011,009,012   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  000,000,000,000,000,000,000,000,000,072
+.Players:                             db  4,1,0,0,0             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  18000
+.Wood:                                dw  25
+.Ore:                                 dw  25
+.Gems:                                dw  15
+.Rubies:                              dw  15
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  4
+.DaysToCompleteCampaign:              db  40
+.CampaignText:						  db " Defeat Big Boss and Grey Fox    ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db ContraGroupAUnitLevel1Number | dw ContraGroupAUnitLevel1Growth |      db ContraGroupAUnitLevel2Number | dw ContraGroupAUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesBillRizer
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db 090 | dw 013 |      db 091 | dw 10 |      db 092 | dw 14 |      db 090 | dw 23 |      db 090 | dw 24 |      db 090 | dw 06 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesBigBoss
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db 093 | dw 06 |      db 093 | dw 5 |      db 093 | dw 2 |      db 093 | dw 2 |      db 093 | dw 3 |      db 094 | dw 12 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesGreyFox
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;Dawn of the Ninja: start with ruika level 7, yiearkungfu castle. tavern filled with random heroes. enemy castle 1: akanbe dragon 1 units with dr. mitchell. tavern with random heroes. enemy castle 2: lolo with akanbe draong 2 units. tavern with random heroes. win condition: defeat lolo and mitchell. lose condition: lose ruika.
+Campaign28:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  014,013,012,011   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  001,005,009,000,000,000,000,000,000,072
+.Players:                             db  4,1,0,0,0             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  18000
+.Wood:                                dw  25
+.Ore:                                 dw  25
+.Gems:                                dw  15
+.Rubies:                              dw  15
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  4
+.DaysToCompleteCampaign:              db  65
+.CampaignText:						  db "  Repossess two besieged towns   ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db YieArKungFuUnitLevel1Number | dw YieArKungFuUnitLevel1Growth |      db YieArKungFuUnitLevel2Number | dw YieArKungFuUnitLevel2Growth |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesUndeadline2
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db 165 | dw 043 |      db 000 | dw 000 |      db 165 | dw 44 |      db 000 | dw 000 |      db 165 | dw 34 |      db 000 | dw 000 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesPampas
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db 170 | dw 08 |      db 170 | dw 7 |      db 170 | dw 4 |      db 179 | dw 72 |      db 170 | dw 4 |      db 170 | dw 13 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesSelene
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+;Pixy's Bubble Symphony: start with pixy level 5, bubble bobble 1 castle. tavern empty. enemy castle: dr pettrovich with a snatcher army. win condition: defeat dr pettrovich. lose condition: lose pixy.
+Campaign29:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  015,013,000,000   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  000,000,000,000,000,000,000,000,000,000
+.Players:                             db  2,1,0,2,2             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  00000
+.Wood:                                dw  0
+.Ore:                                 dw  0
+.Gems:                                dw  0
+.Rubies:                              dw  0
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  255
+.Castle4Player:                       db  255
+.DaysToCompleteCampaign:              db  60
+.CampaignText:						  db "    Defeat Doctor Pettrovich     ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db BubbleBobbleGroupAUnitLevel1Number | dw BubbleBobbleGroupAUnitLevel1Growth |      db BubbleBobbleGroupAUnitLevel2Number | dw BubbleBobbleGroupAUnitLevel2Growth |      db BubbleBobbleGroupAUnitLevel3Number | dw 004 |      db BubbleBobbleGroupAUnitLevel4Number | dw 002 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPixy
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db  001 | dw 023 |      db 001 | dw 015 |      db 002 | dw 007 |      db 002 | dw 009 |      db 003 | dw 18 |      db 004 | dw 011 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesDrPettrovich
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db 170 | dw 08 |      db 170 | dw 7 |      db 170 | dw 4 |      db 179 | dw 72 |      db 170 | dw 4 |      db 170 | dw 13 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesSelene
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db CastleVaniaUnitLevel5Number | dw 010 |      db CastleVaniaUnitLevel6Number | dw  2 |      db CastleVaniaUnitLevel6Number | dw 2 |      db CastleVaniaUnitLevel6Number | dw 1 |      db CastleVaniaUnitLevel6Number | dw 001 |      db CastleVaniaUnitLevel5Number | dw 010 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesRichterBelmont
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+
+
+;A Worzen Family Epic: start with bubble bobble 2 castle castle. no heroes. tavern filled with worzen family. 3 enemy castles with random heroes and randomly filled taverns. win condition: defeat all castles, lose condition: lose all heroes and castles.
+Campaign30:                               ;c1, c3, c4, c2
+.StartingTowns:                       db  016,017,013,010   ;0=random, 1=DS4, 2=CastleVania, 3=sdsnatcher, 4=usas, 5=goemon, 6=ys3, 7=psycho world, 8=king kong, 9=golvellius, 10=contra1, 11=contra2, 12=akanbe 1, 13=akanbe 2, 14=yiearekungfu, 15=bubble 1, 16=bubbl 2, 17=cloud palace
+.TavernHeroes:                        db  010,008,006,004,026,039,041,000,000,000
+.Players:                             db  4,1,0,0,0             ;amount of players, player 1-4 (0=CPU, 1=Human, 2=OFF)
+.StartingResources:
+.Gold:                                dw  00000
+.Wood:                                dw  0
+.Ore:                                 dw  0
+.Gems:                                dw  0
+.Rubies:                              dw  0
+.Castle1Player:                       db  1
+.Castle2Player:                       db  2
+.Castle3Player:                       db  3
+.Castle4Player:                       db  4
+.DaysToCompleteCampaign:              db  120
+.CampaignText:						  db "  Siege the final three palaces  ",255
+;starting Heroes
+.P1hero1y:		db	1
+.P1hero1x:		db	1
+.P1hero1xp: dw 0 ;65000 ;3000 ;999
+.P1hero1move:	db	20,20
+.P1hero1mana:	dw	10,10
+.P1hero1manarec:db	5		                ;recover x mana every turn
+.P1hero1status:	db	255 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P1Hero1Units:  db BubbleBobbleGroupAUnitLevel1Number | dw BubbleBobbleGroupAUnitLevel1Growth |      db BubbleBobbleGroupAUnitLevel2Number | dw BubbleBobbleGroupAUnitLevel2Growth |      db BubbleBobbleGroupAUnitLevel3Number | dw 004 |      db BubbleBobbleGroupAUnitLevel4Number | dw 002 |      db 000 | dw 000 |      db 000 | dw 000 ;unit,amount
+.P1Hero1StatAttack:  db 1
+.P1Hero1StatDefense:  db 2
+.P1Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P1Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P1HeroSkills:  db  10,0,0,0,0,0
+.P1HeroLevel: db  1
+.P1EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P1FireSpells:        db  %0000 0000
+.P1AirSpells:         db  %0000 0000
+.P1WaterSpells:       db  %0000 0000
+.P1AllSchoolsSpells:  db  %0000 0000
+.P1Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P1HeroSpecificInfo: dw HeroAddressesPixy
+.P1HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P2hero1y:		db	50
+.P2hero1x:		db	50
+.P2hero1xp: dw 0 ;65000 ;3000 ;999
+.P2hero1move:	db	20,20
+.P2hero1mana:	dw	80,80
+.P2hero1manarec:db	5		                ;recover x mana every turn
+.P2hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P2Hero1Units:  db  007 | dw 023 |      db 008 | dw 015 |      db 000 | dw 000 |      db 000 | dw 000 |      db 007 | dw 28 |      db 008 | dw 014 ;unit,amount
+.P2Hero1StatAttack:  db 6
+.P2Hero1StatDefense:  db 7
+.P2Hero1StatKnowledge:  db 8  ;decides total mana (*10)
+.P2Hero1StatSpellDamage:  db 11  ;amount of spell damage
+.P2HeroSkills:  db  10,0,0,0,0,0
+.P2HeroLevel: db  15
+.P2EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.P2FireSpells:        db  %0000 1111
+.P2AirSpells:         db  %0000 1111
+.P2WaterSpells:       db  %0000 1111
+.P2AllSchoolsSpells:  db  %0000 1111
+.P2Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P2HeroSpecificInfo: dw HeroAddressesSkooter
+.P2HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P3hero1y:		db	1
+.P3hero1x:		db	1
+.P3hero1xp: dw 0 ;65000 ;3000 ;999
+.P3hero1move:	db	20,20
+.P3hero1mana:	dw	10,10
+.P3hero1manarec:db	5		                ;recover x mana every turn
+.P3hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P3Hero1Units:  db 022 | dw 38 |      db 022 | dw 27 |      db 022 | dw 45 |      db 022 | dw 52 |      db 022 | dw 64 |      db 022 | dw 53 ;unit,amount
+.P3Hero1StatAttack:  db 1
+.P3Hero1StatDefense:  db 2
+.P3Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P3Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P3HeroSkills:  db  10,0,0,0,0,0
+.P3HeroLevel: db  1
+.P3EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P3FireSpells:        db  %0000 0000
+.P3AirSpells:         db  %0000 0000
+.P3WaterSpells:       db  %0000 0000
+.P3AllSchoolsSpells:  db  %0000 0000
+.P3Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P3HeroSpecificInfo: dw HeroAddressesThiharis
+.P3HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
+
+.P4hero1y:		db	1
+.P4hero1x:		db	1
+.P4hero1xp: dw 0 ;65000 ;3000 ;999
+.P4hero1move:	db	20,20
+.P4hero1mana:	dw	10,10
+.P4hero1manarec:db	5		                ;recover x mana every turn
+.P4hero1status:	db	2 	                ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+.P4Hero1Units:  db 34 | dw 030 |      db 39 | dw  5 |      db 41 | dw 32 |      db 48 | dw 4 |      db 55 | dw 031 |      db 68 | dw 3 ;unit,amount
+.P4Hero1StatAttack:  db 1
+.P4Hero1StatDefense:  db 2
+.P4Hero1StatKnowledge:  db 1  ;decides total mana (*10)
+.P4Hero1StatSpellDamage:  db 1  ;amount of spell damage
+.P4HeroSkills:  db  16,0,0,0,0,0
+.P4HeroLevel: db  1
+.P4EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
+.P4FireSpells:        db  %0000 0000
+.P4AirSpells:         db  %0000 0000
+.P4WaterSpells:       db  %0000 0000
+.P4AllSchoolsSpells:  db  %0000 0000
+.P4Inventory: db  045,045,045,045,045,045,045,045,045,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
+.P4HeroSpecificInfo: dw HeroAddressesSpaceExplorer01
+.P4HeroDYDX:  dw $ffff ;(dy*128 + dx/2) Destination in Vram page 2
 
 
 
