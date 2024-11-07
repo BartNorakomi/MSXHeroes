@@ -87,6 +87,7 @@ SFX_click: equ 8001H + 4 * 1
 SFX_ShowEnemyStats: equ 8001H + 4 * 1
 SFX_ShowEnemyHeroStats: equ 8001H + 4 * 1
 SFX_ButtonHoverOver: equ 8001H + 4 * 1
+SFX_UnableToPurchase: equ 8001H + 4 * 5
 SFX_HeroWalking: equ 8001H + 4 * 1
 SFX_jump: equ 8001H + 4 * 2
 SFX_land: equ 8001H + 4 * 3

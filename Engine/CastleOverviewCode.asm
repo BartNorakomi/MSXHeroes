@@ -1288,6 +1288,38 @@ DiskMenu:
   ret
 
 EndTurn:
+
+;ld a,50
+;ld (pl1hero1y),a
+;ld a,11
+;ld (pl1hero1x),a
+;ld a,1
+;ld (pl1hero1y+HeroUnits+0),a
+;ld (pl1hero1y+HeroUnits+1),a
+;ld (pl1hero1y+HeroUnits+2),a
+
+;ld (pl1hero1y+HeroUnits+3),a
+;ld (pl1hero1y+HeroUnits+4),a
+;ld (pl1hero1y+HeroUnits+5),a
+
+;ld (pl1hero1y+HeroUnits+6),a
+;ld (pl1hero1y+HeroUnits+7),a
+;ld (pl1hero1y+HeroUnits+8),a
+
+;ld (pl1hero1y+HeroUnits+9),a
+;ld (pl1hero1y+HeroUnits+10),a
+;ld (pl1hero1y+HeroUnits+11),a
+
+;ld (pl1hero1y+HeroUnits+12),a
+;ld (pl1hero1y+HeroUnits+13),a
+;ld (pl1hero1y+HeroUnits+14),a
+
+;ld (pl1hero1y+HeroUnits+15),a
+;ld (pl1hero1y+HeroUnits+16),a
+;ld (pl1hero1y+HeroUnits+17),a
+
+
+
   ld    a,2
   ld    (DisplayStartOfTurnMessage?),a
 
@@ -3023,6 +3055,25 @@ HeroButton20x11SYSXJeddaChef:         db  %1100 0011 | dw $4000 + (240*128) + (0
 HeroLevelUpCode:
 ;call ScreenOn
   ld    ix,(plxcurrentheroAddress)
+
+
+;	ld		a,(ix+HeroStatus)               ;1=active on map, 2=visiting castle,254=defending in castle, 255=inactive
+ ; cp    255                             ;check if status is inactive
+;  ret   z
+
+;HeroFled:
+;  ld    (ix+HeroStatus),254             ;254 = hero fled
+;  ld    (ix+Heroy),255
+;  ld    (ix+Herox),255
+;don't level up when hero has retreated or surrendered
+  ld    a,(ix+Heroy)
+  cp    255
+  ret   z
+
+
+
+
+
   ld    a,(ix+HeroTotalMana)
   ld    (HeroTotalManaBeforeLevelingUp),a
 
@@ -11606,8 +11657,27 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   call  .CheckAddCreaturesToVisitingHero
   jr    nc,.UnitsAdded                  ;not carry=units added to hero. carry=no visiting hero, no empty slots or no similar creatures in slots
 
-  ;at this point no hero is present in town, show message unable to buy without hero
 
+  push  iy
+  push  bc
+  ld    bc,SFX_UnableToPurchase
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
+
+  ;at this point a creature is not purchased. the reason is either hero has no creature slots available, or player has no heroes
+  ld    c,002                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  jp    nc,ExitSingleUnitRecruitWindow  ;carry=no visiting/defending hero found
+
+  ld    c,254                           ;check if hero status=002 (visiting) or 254 (defending)
+  call  SetVisitingOrDefendingHeroInIX  ;in: iy->castle, c=002 (check visiting), c=254 (check defending). out: carry=no defending hero found / ix-> hero
+  jp    nc,ExitSingleUnitRecruitWindow  ;carry=no visiting/defending hero found
+
+
+
+  ;at this point no hero is present in town, show message unable to buy without hero
   ;clear resources
   ld    hl,$4000 + (132*128) + (160/2) - 128
   ld    de,$0000 + (067*128) + (080/2) - 128

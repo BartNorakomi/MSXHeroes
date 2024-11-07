@@ -543,13 +543,18 @@ DisplayEnemyHeroStatsWindowCode:
   .engine:
   call  PopulateControls                ;read out keys
 
-  ld    a,(Controls)
-  bit   5,a                             ;check ontrols to see if m is pressed (to exit overview)
-  ret   nz
+  ld    a,(NewPrContr)
+  and   %0011 0000
+  jr    nz,.end
 
   call  CheckEndHeroOverviewArmy        ;check if mouse is clicked outside of window. If so, return to game
   halt
   jp  .engine
+
+  .end:
+  ld    a,%0011 0000
+	ld		(ControlsOnInterrupt),a                  ;reset trigger a+b
+  ret
 
 .Set16x30HeroIcon:
   ld    ix,(EnemyHeroThatPointerIsOn)
