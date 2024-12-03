@@ -1262,10 +1262,9 @@ dephase
 ;
 ; block $7d - 7e
 ;
-BattleMonsterSpriteSheet17Block:  equ   $7d
+DiskMenuBlock:  equ   $7d
 phase	$4000
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8.SC5",7,208 * 128      ;208 lines
-;  incbin "..\grapx\MonsterSprites\BattleMonstersSpriteSheet8Bottom48Lines.SC5",7,048 * 128      ;208 lines
+  incbin "..\grapx\DiskMenu\DiskMenu.SC5",7,134 * 128      ;134 lines
 	ds		$c000-$,$ff
 dephase
 
@@ -1848,15 +1847,6 @@ phase	$4000
 	ds		$c000-$,$ff
 dephase
 
-;
-; block $bd - be
-;
-DiskMenuBlock:  equ   $bd
-phase	$4000
-  incbin "..\grapx\DiskMenu\DiskMenu.SC5",7,134 * 128      ;134 lines
-	ds		$c000-$,$ff
-dephase
-
 ; GLobals
 RomSize: 				equ 8*1024*1024 ;8MB
 RomBlockSize:			equ 16*1024	;16KB
@@ -1864,13 +1854,7 @@ RomStartAddress:		equ $4000
 
 usas2sfx1repBlock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					phase	$0000
-					incbin "usas2sfx1.rep"
-					dephase
-					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
-
-usas2sfx2repBlock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
-					phase	$0000
-					incbin "usas2sfx2.rep"
+					incbin "msxlegendssfx.rep"
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
@@ -1898,9 +1882,8 @@ CampaignInfoblock:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize
 					dephase
 					DS RomBlockSize- $ and (RomBlockSize-1),-1	;fill remainder of block
 
-;;;;WE HAVE 2 BLOCKS FREE IN THE LOWER 4MB
-;ds $4000,-1
-;ds $4000,-1
+;;;;WE HAVE 1 BLOCKS FREE IN THE LOWER 4MB
+ds $4000,-1
 
 
 

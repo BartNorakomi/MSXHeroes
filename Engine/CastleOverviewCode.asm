@@ -3098,9 +3098,6 @@ HeroLevelUpCode:
   call  SetPrimairySkillUpIcon          ;which primairy skill does the hero get ?
   call  SetLevelUpText
 
-  ld    bc,SFX_HeroLevelUp
-  call  RePlayerSFX_PlayCh1  
-
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -4357,8 +4354,6 @@ call ScreenOn
   call  SetChestGraphics                ;put gfx
   call  SetChestText
 
-  ld    bc,SFX_ChestFound
-  call  RePlayerSFX_PlayCh1  
   .engine:  
   call  SwapAndSetPage                  ;swap and set page
   call  PopulateControls                ;read out keys
@@ -4377,8 +4372,6 @@ call ScreenOn
   call  CheckButtonInteractionControlsNotOnInt
 
   call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
-
-
 
   ;we mark previous button clicked
   ld    ix,(PreviousButtonClickedIX) 
@@ -4656,9 +4649,6 @@ DisplayLearningStoneCOde:
   call  SwapAndSetPage                  ;swap and set page
   call  SetLearningStoneGraphics               ;put gfx
   call  SetLearningStoneText
-
-  ld    bc,SFX_LearningStone
-  call  RePlayerSFX_PlayCh1  
 
   ld    ix,(plxcurrentheroAddress)      ;defending hero
   ld    hl,1000
@@ -8800,7 +8790,7 @@ CastleOverviewTavernCode:
   or    a
   ret   z                               ;return if there is no hero in this slot
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
-  ret   c                               ;return if insufficient funds
+  jp    c,PlayInsuffucientFundsSfx      ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8816,7 +8806,7 @@ CastleOverviewTavernCode:
   or    a
   ret   z                               ;return if there is no hero in this slot
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
-  ret   c                               ;return if insufficient funds
+  jp    c,PlayInsuffucientFundsSfx      ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8832,7 +8822,7 @@ CastleOverviewTavernCode:
   or    a
   ret   z                               ;return if there is no hero in this slot
   call  .Reduce2000Gold                 ;Hero cost = 2000 gold
-  ret   c                               ;return if insufficient funds
+  jp    c,PlayInsuffucientFundsSfx      ;return if insufficient funds
   call  .SetHeroStats                   ;set status=2, set y, set x, herospecific address
   push  ix
   call  SetTavernHeroesTablePlayerinIX
@@ -8841,6 +8831,14 @@ CastleOverviewTavernCode:
   jp    .HeroRecruited
 
   .HeroRecruited:
+
+  push  iy
+  push  bc
+  ld    bc,SFX_Purchase
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
   call  SetResourcesPlayer
   call  SetVisitingAndDefendingHeroesAndArmy
   call  SetTavernHeroes
@@ -9831,6 +9829,15 @@ SetCastleMarketInterruptThirdLine:
   out   ($99),a 
   ret
 
+PlayInsuffucientFundsSfx:
+  push  iy
+  push  bc
+  ld    bc,SFX_InsufficientFunds
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+  ret
+
 CastleOverviewMarketPlaceCode:
   call  SetScreenOff
 
@@ -9992,7 +9999,7 @@ CastleOverviewMarketPlaceCode:
   ld    h,(ix+1)                        ;resource needed
   ld    de,(AmountOfResourcesOffered)
   add   hl,de                           ;amount of resources offered
-  ret   c
+  jp    c,PlayInsuffucientFundsSfx
   ;/Check if we overflow the amount we gain
 
   ;reduce the amount of resources we have to invest
@@ -10023,7 +10030,7 @@ CastleOverviewMarketPlaceCode:
   ld    de,(AmountOfResourcesRequired)
   xor   a
   sbc   hl,de                           ;amount of resources required
-  ret   c
+  jp    c,PlayInsuffucientFundsSfx
   ld    (ix+0),l
   ld    (ix+1),h                        ;resource required
   ;/reduce the amount of resources we have to invest
@@ -10059,11 +10066,18 @@ CastleOverviewMarketPlaceCode:
   ld    (ix+1),h                        ;resource needed
   ;/increase the amount of resources we gain/buy
 
+  push  iy
+  push  bc
+  ld    bc,SFX_Purchase
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
   call  SetResourcesPlayer
   call  SwapAndSetPage                  ;swap and set page  
   call  SetResourcesPlayer
   ret
-  
+
   .WoodNeeded:
   inc   ix
   inc   ix                              ;wood
@@ -11543,7 +11557,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -11560,7 +11574,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   ld    (ix+RecruitButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -11660,7 +11674,7 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
 
   push  iy
   push  bc
-  ld    bc,SFX_UnableToPurchase
+  ld    bc,SFX_InsufficientFunds
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -11697,9 +11711,14 @@ CheckButtonMouseInteractionRecruitMAXBUYButtons:
   jr    z,.WaitTriggerPressed
   jp    ExitSingleUnitRecruitWindow
 
+  .UnitsAdded:
+  push  iy
+  push  bc
+  ld    bc,SFX_Purchase
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
 
-
-  .UnitsAdded:  
   call  SetResourcesCurrentPlayerinIX
   ;gold
   ld    l,(ix+0)
@@ -12219,7 +12238,7 @@ CheckButtonMouseInteractionRecruitButtons:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -12236,7 +12255,7 @@ CheckButtonMouseInteractionRecruitButtons:
   ld    (ix+RecruitButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -12638,7 +12657,7 @@ CheckButtonMouseInteractionSingleBuildButton:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -12654,7 +12673,7 @@ CheckButtonMouseInteractionSingleBuildButton:
   ld    (ix+BuildButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -12688,7 +12707,9 @@ CheckButtonMouseInteractionSingleBuildButton:
   xor   a
   sbc   hl,de
   ret   nz
-  
+
+  ld    a,255                                 ;1=barracks,2=barracks upgrade,3=sawmill,4=mine,5=mage guild,6=tavern,7=market,8=city walls,255=building is purchased, but only play sfx
+  ld    (SetNewBuilding?),a  
 
   ld    a,(WhichBuildingWasClicked?)
   cp    1                                     ;city walls
@@ -12787,6 +12808,13 @@ PurchaseBuilding:
   if    UnlimitedBuildsPerTurn?=0
   ld    (iy+AlreadyBuiltThisTurn?),1
   endif
+
+  push  iy
+  push  bc
+  ld    bc,SFX_Purchase
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
 
   ;gold
   ld    ix,(CheckRequirementsWhichBuilding?)
@@ -13414,7 +13442,7 @@ CheckButtonMouseInteractionBuildButtons:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -13431,7 +13459,7 @@ CheckButtonMouseInteractionBuildButtons:
   ld    (ix+BuildButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -14877,10 +14905,25 @@ SetVariablesNewBuilding:
   CityWallsNX:  equ 255
   CityWallsNY:  equ 027
 
+OnlyPlaySfxNewBuilding:
+  push  iy
+  push  bc
+  ld    bc,SFX_BuildingBeingBuilt
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
+
+  xor   a
+  ld    (SetNewBuilding?),a
+  ret
+
 FadeInNewlyBoughtBuilding:
   ld    a,(SetNewBuilding?)
   or    a
   ret   z
+
+  cp  255
+  jp  z,OnlyPlaySfxNewBuilding
 
   ld    a,1
   ld    (ReloadAllObjectsInVram?),a     ;THIS ONLY NEEDS TO BE DONE IF WE USED PAGE 2 IN CASTLE (SO WHEN FADING IN NEW BUILDING IN FIRST PAGE)
@@ -14914,7 +14957,13 @@ FadeInNewlyBoughtBuilding:
 	ld		(activepage),a                  ;start in page 0  
   call  SetNameCastleAndDailyIncome
 
-  ;at this point we have our old graphics in page 2 and our new graphics (with new building) in page 1
+  ;at this point we have our old graphics in page 2 and our new graphics (with new building) in page 1  
+  push  iy
+  push  bc
+  ld    bc,SFX_BuildingBeingBuilt
+  call  RePlayerSFX_PlayCh1
+  pop   bc
+  pop   iy
 
   call  SetVariablesNewBuilding
   ld    d,.AmountOfBuildingSteps
@@ -15206,7 +15255,7 @@ CheckButtonMouseInteractionCastleMainScreen:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -15223,7 +15272,7 @@ CheckButtonMouseInteractionCastleMainScreen:
   ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -15338,7 +15387,7 @@ CheckButtonMouseInteractionCastle:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -15355,7 +15404,7 @@ CheckButtonMouseInteractionCastle:
   ld    (ix+CastleOverviewWindowButtonStatus),%1001 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy

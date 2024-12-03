@@ -3378,7 +3378,7 @@ HandleSpellBook:
   ld    (ix+HeroOverviewWindowButtonStatus),%0100 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -3396,7 +3396,7 @@ HandleSpellBook:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -3505,7 +3505,7 @@ CheckButtonMouseInteraction4ElementalButtons:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -3522,7 +3522,7 @@ CheckButtonMouseInteraction4ElementalButtons:
   ld    (ix+HeroOverviewWindowButtonStatus),%0010 0011
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy

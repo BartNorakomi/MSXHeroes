@@ -588,9 +588,6 @@ TextPlayerEliminated2:
 
 
 DisplaySpireOfWisdomCOde:
-  ld    bc,SFX_SpireOfWisdom
-  call  RePlayerSFX_PlayCh1  
-
   ld    a,255                           ;reset previous button clicked
   ld    (PreviousButtonClicked),a  
   ld    ix,GenericButtonTable

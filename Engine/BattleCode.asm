@@ -3257,7 +3257,7 @@ ShowEnemyStats:
   call  SetEnemyStatsWindow             ;show window of enemy stats
   call  SwapAndSetPage                  ;swap and set page
   
-  ld    bc,SFX_SpireOfWisdom
+  ld    bc,SFX_ShowEnemyStats
   call  RePlayerSFX_PlayCh1  
 
   .engine:
@@ -4267,7 +4267,7 @@ MoveMonster:
   .ShootProjectile:
   push  iy
   push  bc
-  ld    bc,SFX_shoot2
+  ld    bc,SFX_Shoot
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -5878,7 +5878,7 @@ CheckSpaceToMoveMonster:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy  
@@ -5961,7 +5961,7 @@ CheckSpaceToMoveMonster:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy

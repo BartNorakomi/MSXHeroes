@@ -990,7 +990,7 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonHoverOver
+  ld    bc,SFX_MouseOver
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -1009,7 +1009,7 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
 
   push  iy
   push  bc
-  ld    bc,SFX_ButtonClicked
+  ld    bc,SFX_MouseClick
   call  RePlayerSFX_PlayCh1
   pop   bc
   pop   iy
@@ -1662,6 +1662,9 @@ DisplayHeroLevelUp:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
+  ld    bc,SFX_Levelup
+  call  RePlayerSFX_PlayCh1  
+  
   ld    hl,HeroLevelUpCode
   jp    EnterSpecificRoutineInCastleOverviewCode
 
@@ -1694,6 +1697,9 @@ DisplaySpireOfWisdom:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
+  ld    bc,SFX_SpireOfWisdom
+  call  RePlayerSFX_PlayCh1  
+
   ld    hl,DisplaySpireOfWisdomCOde
   call  EnterSpecificRoutineInExtraRoutines
   jp    UpdateHUd
@@ -1710,6 +1716,9 @@ DisplayLearningStone:
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
+  ld    bc,SFX_LearningStone
+  call  RePlayerSFX_PlayCh1
+  
   ld    hl,DisplayLearningStoneCOde
   jp    EnterSpecificRoutineInCastleOverviewCode
   
@@ -1725,6 +1734,9 @@ DisplayChestFound:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
+
+  ld    bc,SFX_ChestFound
+  call  RePlayerSFX_PlayCh1  
 
   ld    hl,DisplayChestCode
   jp    EnterSpecificRoutineInCastleOverviewCode
@@ -2559,7 +2571,7 @@ CheckHeroPicksUpItem:
   ret
 
 .SfxResourcePickedUp:
-  ld    bc,SFX_ResourcePickedUp
+  ld    bc,SFX_CollectItem
   jp    RePlayerSFX_PlayCh1  
 
 .Gold:
@@ -3291,7 +3303,7 @@ movehero:
   
   .animate:
   push  bc
-  ld    bc,SFX_HeroWalking
+  ld    bc,SFX_HeroWalk
   call  RePlayerSFX_PlayCh1  
   pop   bc
 
