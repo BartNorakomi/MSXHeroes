@@ -21,6 +21,23 @@ RePlayerSFX_Initialize_Loop:
 ; For example: player attacks, player impacts, jump, land.
 ; bc = sfx
 RePlayerSFX_PlayCh1:	
+	ld		a,AmountOfFramesWaitUntilPlayNextSfx
+	ld		(WaitFramesUntilPlayNextSfx),a
+
+	ld iy,RePlayerSFX_channels
+	di
+	ld (iy + 0),c
+	ld (iy + 1),b
+	ld (iy + 2),usas2sfx1repBlock
+	ei
+	ld (iy + 3),1
+	ret
+
+RePlayerSFX_PlayCh1_MouseAction:	
+	ld		a,(WaitFramesUntilPlayNextSfx)
+	dec		a
+	ret		nz
+
 	ld iy,RePlayerSFX_channels
 	di
 	ld (iy + 0),c
@@ -31,8 +48,14 @@ RePlayerSFX_PlayCh1:
 	ret
 
 
-
 RePlayerSFX_Tick:
+	ld		a,(WaitFramesUntilPlayNextSfx)
+	dec		a
+	jr		z,.go
+	ld		(WaitFramesUntilPlayNextSfx),a
+	.go:
+
+
 	ld a,(RePlayer_currentBank)
 	push af
 	ld ix,RePlayerSFX_channels
@@ -76,11 +99,13 @@ SoftestSfx:	equ 62
 
 ; Sound effects list (base address + 4 * track nr)
 SFX_nop: equ 8001H + 4 * 0
-SFX_MouseClick: equ 8001H + 4 * (1 + SofterSfx)
+SFX_MouseClick: equ 8001H + 4 * (1 + SoftestSfx)
 SFX_MouseOver: equ 8001H + 4 * (2 + SoftestSfx)
-SFX_HeroWalk: equ 8001H + 4 * 3
+SFX_HeroWalk: equ 8001H + 4 * (3 + SoftestSfx - 1)
 SFX_ChestFound: equ 8001H + 4 * 5 | SFX_LearningStone: equ 8001H + 4 * 5 | SFX_ScrollFound: equ 8001H + 4 * 5 | SFX_TradeMenu: equ 8001H + 4 * 5 | SFX_SpireOfWisdom: equ 8001H + 4 * 5
 SFX_BuildingBeingBuilt: equ 8001H + 4 * 5
+SFX_HeroOverviewMenu: equ 8001H + 4 * 65
+
 
 SFX_CollectItem: equ 8001H + 4 * 66
 
@@ -101,12 +126,14 @@ SFX_ShowEnemyStats: equ 8001H + 4 * 66
 SFX_Purchase: equ 8001H + 4 * 66
 
 SFX_MonsterDied: equ 8001H + 4 * 7
-SFX_Punch: equ 8001H + 4 * 8 | SFX_enemyhit: equ 8001H + 4 * 8 
-SFX_Kick: equ 8001H + 4 * 9
-SFX_Shoot: equ 8001H + 4 * 10
+SFX_Punch: equ 8001H + 4 * 8 
+SFX_Kick: equ 8001H + 4 * 9 |  SFX_enemyhit: equ 8001H + 4 * 9
+SFX_10: equ 8001H + 4 * 10
+SFX_Shoot: equ 8001H + 4 * 11
 SFX_Cure: equ 8001H + 4 * 11
 SFX_Haste: equ 8001H + 4 * 12
-SFX_Earthshock: equ 8001H + 4 * 13
+SFX_EarthBound: equ 8001H + 4 * 13
+SFX_EarthShock: equ 8001H + 4 * 13
 SFX_MagicArrow: equ 8001H + 4 * 14
 SFX_Sunstrike: equ 8001H + 4 * 15
 SFX_IceBolt: equ 8001H + 4 * 16
@@ -121,7 +148,7 @@ SFX_Teleport: equ 8001H + 4 * 24
 SFX_Frenzy: equ 8001H + 4 * 25
 SFX_Resurrect: equ 8001H + 4 * 26
 SFX_SpellBubble: equ 8001H + 4 * 27
-SFX_Hypnosis: equ 8001H + 4 * 28
-SFX_ClawBack: equ 8001H + 4 * 29
+SFX_Hypnosis: equ 8001H + 4 * 29
+SFX_ClawBack: equ 8001H + 4 * 28
 SFX_BlindingFog: equ 8001H + 4 * 30
-SFX_InsufficientFunds: equ 8001H + 4 * 31 | SFX_WaterWell: equ 8001H + 4 * 31 | SFX_ShowEnemyHeroStats: equ 8001H + 4 * 31 | SFX_HeroOverviewMenu: equ 8001H + 4 * 31
+SFX_InsufficientFunds: equ 8001H + 4 * 31 | SFX_WaterWell: equ 8001H + 4 * 31 | SFX_ShowEnemyHeroStats: equ 8001H + 4 * 31 | 

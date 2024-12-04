@@ -3379,7 +3379,7 @@ HandleSpellBook:
   push  iy
   push  bc
   ld    bc,SFX_MouseOver
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   jp    SetSpellExplanation             ;when first time hovering over a button, show the spell explanation
@@ -3397,7 +3397,7 @@ HandleSpellBook:
   push  iy
   push  bc
   ld    bc,SFX_MouseClick
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
 
@@ -3506,7 +3506,7 @@ CheckButtonMouseInteraction4ElementalButtons:
   push  iy
   push  bc
   ld    bc,SFX_MouseOver
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   ret
@@ -3523,7 +3523,7 @@ CheckButtonMouseInteraction4ElementalButtons:
   push  iy
   push  bc
   ld    bc,SFX_MouseClick
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   ret

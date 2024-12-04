@@ -3723,8 +3723,7 @@ Set16x30HeroIconAtHeroOverviewCode:
 HeroOverviewCode:
 call screenon
 
-  ld    bc,SFX_HeroOverviewMenu
-  call  RePlayerSFX_PlayCh1
+
 
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
@@ -3762,6 +3761,10 @@ call screenon
 ;
   ld    a,%0001 0000
 	ld		(Controls),a                  ;reset trigger a
+
+
+  ld    bc,SFX_HeroOverviewMenu
+  call  RePlayerSFX_PlayCh1
 
   .engine:  
   call  PopulateControls                ;read out keys
@@ -4215,7 +4218,7 @@ CheckButtonMouseInteraction:
   push  iy
   push  bc
   ld    bc,SFX_MouseOver
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   ret
@@ -4234,7 +4237,7 @@ CheckButtonMouseInteraction:
   push  iy
   push  bc
   ld    bc,SFX_MouseClick
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
 ;  pop   af

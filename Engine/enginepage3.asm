@@ -1,11 +1,11 @@
 phase	$c000
 
-StartAtTitleScreen?:                equ 0
+StartAtTitleScreen?:                equ 1
 StartOfTurnMessageOn?:              equ 1
 MusicOn?:                           equ 1
 Music50PercentSpeed?:               equ 0
 
-Promo?:                             equ 0
+Promo?:                             equ 1
 OptionsAvailable?:                  equ 0
 CollectionOptionAvailable?:         equ 0
 UnlimitedBuildsPerTurn?:            equ 0
@@ -14,6 +14,9 @@ DisplayNumbers1to6?:                equ 0
 ShowNewlyBoughtBuildingFadingIn?:   db  1
 DiskMenuClicked?:                   db  0
 BackToMainMenu?:                    db  0
+
+AmountOfFramesWaitUntilPlayNextSfx: equ 60
+WaitFramesUntilPlayNextSfx:         db  1
 
 StopSong:   equ 255
 

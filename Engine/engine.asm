@@ -991,7 +991,7 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
   push  iy
   push  bc
   ld    bc,SFX_MouseOver
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   ret
@@ -1010,7 +1010,7 @@ CheckButtonMouseInteractionGenericButtonsInEngine:
   push  iy
   push  bc
   ld    bc,SFX_MouseClick
-  call  RePlayerSFX_PlayCh1
+  call  RePlayerSFX_PlayCh1_MouseAction
   pop   bc
   pop   iy
   ret
@@ -1682,7 +1682,8 @@ DisplayGuardTowerReward:
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
 
   ld    hl,DisplayGuardTowerRewardCOde
-  call  EnterSpecificRoutineInBattleCode
+;  call  EnterSpecificRoutineInBattleCode
+  call  EnterSpecificRoutineInExtraRoutines
   jp    UpdateHUd
 
 DisplaySpireOfWisdom?:  db  0
@@ -2370,6 +2371,9 @@ CheckHeroPicksUpItem:
   ld    a,3
 	ld		(SetHeroArmyAndStatusInHud?),a
   call  SetHeroMaxMovementPoints
+
+  call  .SfxResourcePickedUp
+
   jp    SetTotalManaHero
 
 
@@ -6407,11 +6411,11 @@ Pl1Hero1StatSpellDamage:  db 9  ;amount of spell damage
 ;.HeroSkills:  db  25,18,3,33,9,0
 .HeroSkills:  db  13,0,0,0,0,0
 .HeroLevel: db  1
-.EarthSpells:       db  %0000 0000  ;bit 0 - 3 are used, each school has 4 spells
-.FireSpells:        db  %0000 0000
-.AirSpells:         db  %0000 0000
-.WaterSpells:       db  %0000 0000
-.AllSchoolsSpells:  db  %0000 0000
+.EarthSpells:       db  %0000 1111  ;bit 0 - 3 are used, each school has 4 spells
+.FireSpells:        db  %0000 1111
+.AirSpells:         db  %0000 1111
+.WaterSpells:       db  %0000 1111
+.AllSchoolsSpells:  db  %0000 1111
 ;               swo arm shi hel boo glo rin nec rob
 ;.Inventory: db  003,009,014,018,024,027,030,037,044,  032,039,044,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)
 ;.Inventory: db  004,009,045,045,024,045,045,038,040,  045,045,045,045,045,045 ;9 body slots and 6 open slots (045 = empty slot)

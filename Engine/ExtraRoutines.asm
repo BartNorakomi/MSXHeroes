@@ -1556,5 +1556,319 @@ CopyActivePageToInactivePageExtraRoutines:
 
 
 
+DisplayGuardTowerRewardCOde:
+call screenon
+
+  ld    bc,SFX_GuardTowerReward
+  call  RePlayerSFX_PlayCh1  
+
+  call  SetResourcesCurrentPlayerinIX   ;subtract 2000 gold (cost of any hero)
+  ;gold
+  ld    l,(ix+0)
+  ld    h,(ix+1)                        ;gold
+  ld    de,(GuardTowerReward)
+  add   hl,de
+  jr    c,.EndCheckOverFlow
+  ld    (ix+0),l
+  ld    (ix+1),h                        ;gold   
+  .EndCheckOverFlow:
+  
+;The dust of battle settles, revealing a reward within the conquered tower:
+;Emerging victorious from the guard tower's trials, you claim your reward:
+  call  SetGuardTowerRewardVButton
+
+  call  SetGuardTowerRewardGraphics               ;put gfx
+  call  SetGuardTowerRewardText
+  call  SwapAndSetPage                  ;swap and set page
+  call  CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+  ret   c
+
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+
+  call  .CheckEndWindow                 ;check if mouse is clicked outside of window. If so, close this window
+
+  halt
+  jp  .engine
+
+
+  .CheckEndWindow:
+	ld		a,(NewPrContr)
+  bit   4,a                             ;check trigger a / space
+  ret   z
+
+  ld    a,(spat+0)                      ;y mouse
+  cp    044                             ;dy
+  jr    c,.Exit
+  cp    044+095                         ;dy+ny
+  jr    nc,.Exit
+  
+  ld    a,(spat+1)                      ;x mouse
+
+  add   a,06
+
+  cp    030                             ;dx
+  jr    c,.Exit
+  cp    030+144                         ;dx+nx
+  ret   c
+
+  .Exit:
+  pop   af
+  ret
+
+SetGuardTowerRewardVButton:
+  ld    hl,SetGuardTowerRewardVButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*01)
+  ldir
+  ret
+
+SetGuardTowerRewardVButtonTableGfxBlock:  db  PlayerStartTurnBlock
+SetGuardTowerRewardVButtonTableAmountOfButtons:  db  01
+SetGuardTowerRewardVButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  db  %1100 0011 | dw $4000 + (000*128) + (144/2) - 128 | dw $4000 + (019*128) + (144/2) - 128 | dw $4000 + (038*128) + (144/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+
+.Button1Ytop:           equ 113
+.Button1YBottom:        equ .Button1Ytop + 019
+.Button1XLeft:          equ 146
+.Button1XRight:         equ .Button1XLeft + 020
+
+SetGuardTowerRewardText:
+  call  SetFontPage0Y212BattleCode                ;set font at (0,212) page 0
+
+  ld    b,060+00                        ;dx
+  ld    c,051+00                        ;dy
+  ld    hl,TextGuardTowerReward1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,040+00                        ;dx
+  ld    c,064+00                        ;dy
+  ld    hl,TextGuardTowerReward2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    hl,(GuardTowerReward)
+  ld    b,080+00                        ;dx
+  ld    c,100+00                        ;dy
+  call  SetNumber16BitCastle
+
+  ld    b,106+00                        ;dx
+  ld    c,100+00                        ;dy
+  ld    hl,TextGuardTowerReward3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+  ret
+
+TextGuardTowerReward1:
+                db "Guard Tower Reward",255
+TextGuardTowerReward2:
+                db "The dust of battle settles,",254
+                db "revealing a reward within the",254
+                db "conquered tower:",255
+TextGuardTowerReward3:
+                db "Gold",255
+
+
+
+
+
+
+
+
+SetGuardTowerRewardGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (44*128) + (030/2) - 128
+  ld    bc,$0000 + (095*256) + (144/2)
+  ld    a,PlayerStartTurnBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+DisplayGuardTowerCOde:
+  call  SetGuardTowerButtons
+  call  SetGuardTowerGraphics               ;put gfx
+  call  SetGuardTowerText
+  call  SwapAndSetPage                  ;swap and set page
+  call  CopyActivePageToInactivePage
+  ld    hl,TinyCopyWhichFunctionsAsWaitVDPReady
+  call  DoCopy
+
+  ld    bc,SFX_GuardTowerEncountered
+  call  RePlayerSFX_PlayCh1  
+
+;  call  SetGuardTowerGraphics               ;put gfx
+;  call  SetGuardTowerText
+  
+  .engine:  
+  call  SwapAndSetPage                  ;swap and set page
+  call  PopulateControls                ;read out keys
+
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+  ld    a,(NewPrContr)
+  bit   5,a                             ;check ontrols to see if m is pressed (M to exit castle overview)
+  ret   nz
+
+  ld    ix,GenericButtonTable
+  call  CheckButtonInteractionControlsNotOnInt
+
+  call  .CheckButtonClicked             ;in: carry=button clicked, b=button number
+
+  ld    ix,GenericButtonTable
+  call  InitiateBattle.SetGenericButtons              ;copies button state from rom -> vram
+
+  halt
+  jp  .engine
+
+  .CheckButtonClicked:
+  ret   nc
+  pop   af                              ;end DisplayGuardTowerCOde
+
+  ld    a,b
+  cp    1
+  ret   nz                              ;return when 'x' pressed
+  ld    a,1                             ;fight when 'v' pressed
+	ld		(FightGuardTowerMonster?),a  
+  ret
+
+SetGuardTowerButtons:
+  ld    hl,SetGuardTowerButtonTable-2
+  ld    de,GenericButtonTable-2
+  ld    bc,2+(GenericButtonTableLenghtPerButton*02)
+  ldir
+  ret
+
+SetGuardTowerButtonTableGfxBlock:  db  RetreatBlock
+SetGuardTowerButtonTableAmountOfButtons:  db  02
+SetGuardTowerButtonTable: ;status (bit 7=off/on, bit 6=button normal (untouched), bit 5=button moved over, bit 4=button clicked, bit 1-0=timer), Button_SYSX_Ontouched, Button_SYSX_MovedOver, Button_SYSX_Clicked, ytop, ybottom, xleft, xright, DYDX
+  ;x button
+  db  %1100 0011 | dw $4000 + (057*128) + (228/2) - 128 | dw $4000 + (075*128) + (228/2) - 128 | dw $4000 + (093*128) + (228/2) - 128 | db .Button1Ytop,.Button1YBottom,.Button1XLeft,.Button1XRight | dw $0000 + (.Button1Ytop*128) + (.Button1XLeft/2) - 128 
+  ;v button
+  db  %1100 0011 | dw $4000 + (000*128) + (228/2) - 128 | dw $4000 + (019*128) + (228/2) - 128 | dw $4000 + (038*128) + (228/2) - 128 | db .Button2Ytop,.Button2YBottom,.Button2XLeft,.Button2XRight | dw $0000 + (.Button2Ytop*128) + (.Button2XLeft/2) - 128 
+
+.Button1Ytop:           equ 148
+.Button1YBottom:        equ .Button1Ytop + 018
+.Button1XLeft:          equ 072
+.Button1XRight:         equ .Button1XLeft + 020
+
+.Button2Ytop:           equ 147
+.Button2YBottom:        equ .Button2Ytop + 019
+.Button2XLeft:          equ 112
+.Button2XRight:         equ .Button2XLeft + 020
+
+SetFontPage0Y212BattleCode:                       ;set font at (0,212) page 0
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (212*128) + (000/2) - 128
+  ld    bc,$0000 + (006*256) + (256/2)
+  ld    a,CastleOverviewFontBlock         ;font graphics block
+  jp    CopyRamToVramCorrectedWithoutActivePageSetting          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+
+SetGuardTowerText:
+  call  SetFontPage0Y212BattleCode                ;set font at (0,212) page 0
+
+  ld    b,078+00                        ;dx
+  ld    c,031+00                        ;dy
+  ld    hl,TextGuardTower1
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,027+00                        ;dx
+  ld    c,041+00                        ;dy
+  ld    hl,TextGuardTower2
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  ld    b,040+00                        ;dx
+  ld    c,140+00                        ;dy
+  ld    hl,TextGuardTower3
+  call  SetText                         ;in: b=dx, c=dy, hl->text
+
+  call  SetAmountInHL
+  ld    b,121+00                        ;dx
+  ld    c,055+00                        ;dy
+  call  SetText                         ;in: b=dx, c=dy, hl->text  
+  
+  ld    a,(GuardTowerMonsterLevel)
+  ld    l,a
+  ld    h,0
+  ld    b,047+00                        ;dx
+  ld    c,062+00                        ;dy
+  call  SetNumber16BitCastle
+  
+  xor   a                               ;set guard tower monster
+  ld    (MonsterHerocollidedWithOnMap),a
+
+  call  SetMonsterTableInIYNeutralMonster
+  push  iy
+  pop   hl
+  ld    de,MonsterTableName
+  add   hl,de
+  ld    b,057+00                        ;dx
+  ld    c,062+00                        ;dy
+;  call  SetText                         ;in: b=dx, c=dy, hl->text  
+
+  push  bc
+  call  SetText                         ;in: b=dx, c=dy, hl->text    
+  pop   bc
+
+  dec   hl
+  ld    a,(hl)
+  cp    "s"
+  ret   z
+
+  ld    hl,.TextS
+  ld    a,(PutLetter+dx)                ;set dx of text  
+  ld    b,a                             ;dx
+  jp    SetText                         ;in: b=dx, c=dy, hl->text    
+
+.TextS: db "s.",255
+
+TextGuardTower1:
+                db "Guard Tower",255
+TextGuardTower2:
+                db "A majestic ancient guard tower rises  ",254
+                db "before you, concealing treasures ",254
+                db "untold. But defended by",254
+                db "level  ",255
+TextGuardTower3:
+                db "Dare you face them in combat?",255
+
+SetGuardTowerGraphics:
+  ld    hl,$4000 + (000*128) + (000/2) - 128
+  ld    de,$0000 + (024*128) + (020/2) - 128
+  ld    bc,$0000 + (148*256) + (162/2)
+  ld    a,ScrollBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (139*128) + (044/2) - 128
+  ld    de,$0000 + ((024+53)*128) + ((020+30)/2) - 128
+  ld    bc,$0000 + (060*256) + (104/2)
+  ld    a,DefeatBlock           ;block to copy graphics from
+  call  CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+
+  ld    hl,$4000 + (000*128) + (150/2) - 128
+  ld    de,$0000 + ((024+44)*128) + ((020+56)/2) - 128
+  ld    bc,$0000 + (070*256) + (064/2)
+  ld    a,HeroOverviewStatusGraphicsBlock           ;block to copy graphics from
+  jp    CopyRamToVramCorrectedCastleOverview          ;in: hl->sx,sy, de->dx, dy, bc->NXAndNY
+  
+
+
 
                     
