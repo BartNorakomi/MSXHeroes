@@ -5,7 +5,7 @@ StartOfTurnMessageOn?:              equ 1
 MusicOn?:                           equ 1
 Music50PercentSpeed?:               equ 0
 
-Promo?:                             equ 1
+Promo?:                             equ 0
 OptionsAvailable?:                  equ 0
 CollectionOptionAvailable?:         equ 0
 UnlimitedBuildsPerTurn?:            equ 0

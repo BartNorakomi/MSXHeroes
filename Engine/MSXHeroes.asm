@@ -1,4 +1,4 @@
-		fname	"MSXHeroes.rom"
+		fname	"MSXLegends.rom"
 	org		$4000
 MSXHeroes:
 

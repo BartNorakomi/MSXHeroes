@@ -212,6 +212,40 @@ SetCastlesInMiniMap:
   jp    EnterSpecificRoutineInCastleOverviewCode
 
 ConvertMonstersObjectLayer:
+  ld    a,r
+  and   7
+  ld    hl,ListOfUnlockedMonstersLevel1
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    (MonsterLevel1Pointer),hl
+
+  ld    hl,ListOfUnlockedMonstersLevel4
+  add   hl,de
+  ld    (MonsterLevel4Pointer),hl
+
+
+  ld    a,r
+  and   15
+  ld    hl,ListOfUnlockedMonstersLevel2
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    (MonsterLevel2Pointer),hl
+
+  ld    hl,ListOfUnlockedMonstersLevel3
+  add   hl,de
+  ld    (MonsterLevel3Pointer),hl
+
+  ld    a,r
+  and   4
+  ld    hl,ListOfUnlockedMonstersLevel5
+  ld    d,0
+  ld    e,a
+  add   hl,de
+  ld    (MonsterLevel5Pointer),hl
+
+
  ; ld    a,(slot.page1rom)             ;all RAM except page 1
  ; out   ($a8),a      
 
