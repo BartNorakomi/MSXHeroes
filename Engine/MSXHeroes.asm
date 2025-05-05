@@ -82,6 +82,26 @@ initMem:
 	or		c
 	ld		(slot.page12rom),a
 	
+
+
+
+	; The engine only does primary slot selection via I/O port $a8.
+ 	; To still support having the game ROM and/or RAM in subslots,
+ 	; it pre-sets the subslot for RAM and ROM in the secondary slot
+ 	; register by enabling them once through the BIOS, which will
+ 	; set up the secondary slot register appropriately.
+ 	; Note: The game ROM and RAM can not be in the same primary slot.
+ 	ld		a,(page2ram)
+ 	ld		h,$80  ; pre-set RAM secondary slot register in page 2
+ 	call	$24
+ 	
+
+
+
+
+
+
+
 	ld		a,(romSlot)
 	ld		h,$80
 	call	$24
@@ -313,6 +333,72 @@ REDCLK:	equ	001f5h
   ld		a,($2d)			;3=turbo r, 2=msx2+, 1=msx2, 0=msx1
   ld		(ComputerID),a
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+call	PopulateControlsTEST
+;
+; bit	7	6	  5		    4		    3		    2		  1		  0
+;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
+;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
+;
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+call	PopulateControlsTEST
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+	halt
+  ld    a,(Controls)
+	bit		6,a
+	ret		nz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ;let's copy the copies of the vdp registers to our addresses of choice
   ld    hl,$F3DF
   ld    de,VDP_0
@@ -402,7 +488,105 @@ if MusicOn?
   call  VGMRePlay
 endif
 
+
+
   jp    InitiateGame
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PopulateControlsTEST:
+	ld		a,15		                        ; select joystick port 1
+	di
+	out		($a0),a
+	ld		a,$8f
+	out		($a1),a
+	ld		a,14		                        ; read joystick data
+	out		($a0),a
+	ei
+	in		a,($a2)
+	cpl
+	and		$3f			                        ; 00BARLDU
+	ld		c,a
+
+	ld		de,$04F0
+	
+	in		a,($aa)
+	and		e
+	or		6
+	out		($aa),a
+	in		a,($a9)
+	cpl
+	and		$20			                        ; 'F1' key
+	rlca				                          ; 01000000
+	or		c
+	ld		c,a			                        ; 01BARLDU
+	
+	in		a,($aa)	                        ; M = B-trigger
+	and		e
+	or		d
+	out		($aa),a
+	in		a,($a9)
+	cpl
+	and		d			                          ; xxxxxBxx
+	ld		b,a
+	in		a,($aa)
+	and		e
+	or		8
+	out		($aa),a
+	in		a,($a9)
+	cpl					                          ; RDULxxxA
+	and		$F1		                          ; RDUL000A
+	rlca				                          ; DUL000AR
+	or		b			                          ; DUL00BAR
+	rla					                          ; UL00BAR0
+	rla					                          ; L00BAR0D
+	rla					                          ; 00BAR0DU
+	ld		b,a
+	rla					                          ; 0BAR0DUL
+	rla					                          ; BAR0DUL0
+	rla					                          ; AR0DUL00
+	and		d			                          ; 00000L00
+	or		b			                          ; 00BARLDU
+	or		c			                          ; 51BARLDU
+	
+	ld		b,a
+	ld		hl,Controls
+	ld		a,(hl)
+	xor		b
+	and		b
+	ld		(NewPrContr),a
+	ld		(hl),b
+	ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		; set temp ISR
 tempisr:	
@@ -1891,7 +2075,7 @@ ds $4000,-1
 ;	ds		(8*$80000)-totallenght,$ff
 
 
-Upper4MB:
+;Upper4MB:
 
 SaveDataBlock1:		equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each saveblock is 64kb
 					ds		$10000,$ff
@@ -1922,7 +2106,5 @@ SaveDataBlock11:	equ   ($-RomStartAddress) and (romsize-1) /RomBlockSize	;each s
 
 
 
-
-
-	ds		(16*$80000)-Upper4MB,$ff
-
+endRom:
+	ds		$800000 - endRom + $4000,$ff

@@ -168,6 +168,11 @@ CheckMouse:
 TitleScreenPalette:
   incbin"..\grapx\TitleScreen\TitleScreenPalette.pl"
 TitleScreenCode:
+
+  ld    a,$98
+  ld    (PutLetter+copytype),a
+
+
   ld    a,SongTitle
   ld    (ChangeSong?),a
   
@@ -908,6 +913,12 @@ screenonAfter3Frames:
 LoadGameSelectCode:
   call  screenoff
 LoadGameSelectCodeSkipScreenOff:
+
+
+  ld    a,$98
+  ld    (PutLetter+copytype),a
+
+
   ld    a,4
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   ld    a,1
@@ -920,6 +931,8 @@ LoadGameSelectCodeSkipScreenOff:
 	ld		(SaveGameSelected),a            ;save game is a value between 0 and 9. when save game=255 it means no save game is selected
   call  SetLoadGameGraphics
   call  SetNamesInLoadGameButtons
+
+;  call  SetFontPage0Y212                ;set font at (0,212) page 0
 
   ld    hl,InGamePalette
   call  SetPalette

@@ -392,9 +392,38 @@ WriteObjectLayerThird4KB:             ;object layer:$8000, write:$4000
   ld    a,$A0                         ; program commando
   ld    ($8AAA),a
 
-  ldi                                 ;write value to flashrom
-  jp    pe,.loop
+
+
+  ld    a,(hl)
+  ld    (de),a
+
+  .CheckIfWritten:
+  ld    a,(de)
+  cp    (hl)
+  jr    nz,.CheckIfWritten
+
+
+  inc   hl
+  inc   de
+  dec   bc
+
+  ld    a,b
+  or    c
+  jr    nz,.loop
   ret
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 WriteObjectLayerFourth4KB:            ;object layer:$8000, write:$4000
   ld    hl,$b000                      ;address to write from
@@ -410,8 +439,22 @@ FlashWrite:                           ;in: hl->source, de->destination, bc->amou
   ld    a,$A0                         ; program commando
   ld    ($4AAA),a
 
-  ldi                                 ;write value to flashrom
-  jp    pe,FlashWrite
+  ld    a,(hl)
+  ld    (de),a
+
+  .CheckIfWritten:
+  ld    a,(de)
+  cp    (hl)
+  jr    nz,.CheckIfWritten
+
+
+  inc   hl
+  inc   de
+  dec   bc
+
+  ld    a,b
+  or    c
+  jr    nz,FlashWrite
   ret
 
 

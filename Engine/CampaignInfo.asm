@@ -17,7 +17,7 @@ Campaign01:
 .Castle3Player:                       db  255
 .Castle4Player:                       db  255
 .DaysToCompleteCampaign:              db  4*30
-.CampaignText:						  db "Find Pochi in the nothern castle ",255
+.CampaignText:						  db "Find Pochi in the northern castle",255
 ;starting Heroes
 .P1hero1y:		db	1
 .P1hero1x:		db	1
