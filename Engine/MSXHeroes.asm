@@ -349,33 +349,33 @@ REDCLK:	equ	001f5h
 
 
 
-call	PopulateControlsTEST
+;call	PopulateControlsTEST
 ;
 ; bit	7	6	  5		    4		    3		    2		  1		  0
 ;		  0	0	  trig-b	trig-a	right	  left	down	up	(joystick)
 ;		  0	F1	'M'		  space	  right	  left	down	up	(keyboard)
 ;
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-call	PopulateControlsTEST
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-	halt
-  ld    a,(Controls)
-	bit		6,a
-	ret		nz
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;call	PopulateControlsTEST
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+;	halt
+ ; ld    a,(Controls)
+	;bit		6,a
+;	ret		nz
 
 
 
@@ -507,69 +507,69 @@ endif
 
 
 
-PopulateControlsTEST:
-	ld		a,15		                        ; select joystick port 1
-	di
-	out		($a0),a
-	ld		a,$8f
-	out		($a1),a
-	ld		a,14		                        ; read joystick data
-	out		($a0),a
-	ei
-	in		a,($a2)
-	cpl
-	and		$3f			                        ; 00BARLDU
-	ld		c,a
+;PopulateControlsTEST:
+;	ld		a,15		                        ; select joystick port 1
+;	di
+;	out		($a0),a
+;	ld		a,$8f
+;	out		($a1),a
+;	ld		a,14		                        ; read joystick data
+;	out		($a0),a
+;	ei
+;	in		a,($a2)
+;	cpl
+;	and		$3f			                        ; 00BARLDU
+;	ld		c,a
 
-	ld		de,$04F0
+;	ld		de,$04F0
 	
-	in		a,($aa)
-	and		e
-	or		6
-	out		($aa),a
-	in		a,($a9)
-	cpl
-	and		$20			                        ; 'F1' key
-	rlca				                          ; 01000000
-	or		c
-	ld		c,a			                        ; 01BARLDU
+;	in		a,($aa)
+;	and		e
+;	or		6
+;	out		($aa),a
+;	in		a,($a9)
+;	cpl
+;	and		$20			                        ; 'F1' key
+;	rlca				                          ; 01000000
+;	or		c
+;	ld		c,a			                        ; 01BARLDU
 	
-	in		a,($aa)	                        ; M = B-trigger
-	and		e
-	or		d
-	out		($aa),a
-	in		a,($a9)
-	cpl
-	and		d			                          ; xxxxxBxx
-	ld		b,a
-	in		a,($aa)
-	and		e
-	or		8
-	out		($aa),a
-	in		a,($a9)
-	cpl					                          ; RDULxxxA
-	and		$F1		                          ; RDUL000A
-	rlca				                          ; DUL000AR
-	or		b			                          ; DUL00BAR
-	rla					                          ; UL00BAR0
-	rla					                          ; L00BAR0D
-	rla					                          ; 00BAR0DU
-	ld		b,a
-	rla					                          ; 0BAR0DUL
-	rla					                          ; BAR0DUL0
-	rla					                          ; AR0DUL00
-	and		d			                          ; 00000L00
-	or		b			                          ; 00BARLDU
-	or		c			                          ; 51BARLDU
+;	in		a,($aa)	                        ; M = B-trigger
+;	and		e
+;	or		d
+;	out		($aa),a
+;	in		a,($a9)
+;	cpl
+;	and		d			                          ; xxxxxBxx
+;	ld		b,a
+;	in		a,($aa)
+;	and		e
+;	or		8
+;	out		($aa),a
+;	in		a,($a9)
+;	cpl					                          ; RDULxxxA
+;	and		$F1		                          ; RDUL000A
+;	rlca				                          ; DUL000AR
+;	or		b			                          ; DUL00BAR
+;	rla					                          ; UL00BAR0
+;	rla					                          ; L00BAR0D
+;	rla					                          ; 00BAR0DU
+;	ld		b,a
+;	rla					                          ; 0BAR0DUL
+;	rla					                          ; BAR0DUL0
+;	rla					                          ; AR0DUL00
+;	and		d			                          ; 00000L00
+;	or		b			                          ; 00BARLDU
+;	or		c			                          ; 51BARLDU
 	
-	ld		b,a
-	ld		hl,Controls
-	ld		a,(hl)
-	xor		b
-	and		b
-	ld		(NewPrContr),a
-	ld		(hl),b
-	ret
+;	ld		b,a
+;	ld		hl,Controls
+;	ld		a,(hl)
+;	xor		b
+;	and		b
+;	ld		(NewPrContr),a
+;	ld		(hl),b
+;	ret
 
 
 

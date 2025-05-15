@@ -2123,7 +2123,7 @@ CheckHeroCollidesWithGuardTower:
   ld    a,1
   ld    (GameStatus),a                  ;0=in game, 1=hero overview menu, 2=castle overview, 3=battle, 4=title screen
   call  ClearMapPage0AndMapPage1        ;the map has to be rebuilt, since hero overview is placed on top of the map
-  ld    hl,DisplayGuardTowerCOde
+  ld    hl,DisplayGuardTowerCode
   call  EnterSpecificRoutineInBattleCode
   pop   hl
 
